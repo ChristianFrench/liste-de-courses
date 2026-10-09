@@ -1,0 +1,136 @@
+{
+  "_description": "Données factices de la maquette Flutter — Application liste de courses. Version 0.1 du 9 octobre 2026. Mêmes noms d'entités et de champs que le document « Modèle de données ». Aucune donnée réelle.",
+  "foyer": {"id": "f1", "nom": "Foyer de démonstration", "dateCreation": "2026-10-01"},
+  "membres": [
+    {"id": "m1", "nomAffiche": "Membre 1", "role": "administrateur", "moi": true},
+    {"id": "m2", "nomAffiche": "Membre 2", "role": "membre", "moi": false}
+  ],
+  "invitation": {"code": "K7P2QX", "expiration": "2026-10-16"},
+  "magasins": [
+    {"id": "mg1", "nom": "Magasin 1", "enseigne": "Enseigne A", "ville": "Ville"},
+    {"id": "mg2", "nom": "Magasin 2", "enseigne": "Enseigne B", "ville": "Ville"}
+  ],
+  "rayons": [
+    {"id": "r1", "magasinId": "mg1", "nom": "Frais"},
+    {"id": "r2", "magasinId": "mg1", "nom": "Épicerie"},
+    {"id": "r3", "magasinId": "mg1", "nom": "Boissons"},
+    {"id": "r4", "magasinId": "mg1", "nom": "Droguerie"},
+    {"id": "r5", "magasinId": "mg1", "nom": "Hygiène"},
+    {"id": "r6", "magasinId": "mg1", "nom": "Surgelés"}
+  ],
+  "secteurs": [
+    {"id": "s1", "rayonId": "r1", "nom": "Fruits et légumes"},
+    {"id": "s2", "rayonId": "r1", "nom": "Crèmerie"},
+    {"id": "s3", "rayonId": "r1", "nom": "Boucherie"},
+    {"id": "s4", "rayonId": "r1", "nom": "Charcuterie"},
+    {"id": "s5", "rayonId": "r1", "nom": "Traiteur"},
+    {"id": "s6", "rayonId": "r2", "nom": "Conserves et pâtes"},
+    {"id": "s7", "rayonId": "r2", "nom": "Liquides"},
+    {"id": "s8", "rayonId": "r2", "nom": "Petit-déjeuner"},
+    {"id": "s9", "rayonId": "r3", "nom": "Eaux"},
+    {"id": "s10", "rayonId": "r4", "nom": "Papier et entretien"},
+    {"id": "s11", "rayonId": "r5", "nom": "Soins dentaires"},
+    {"id": "s12", "rayonId": "r6", "nom": "Surgelés"}
+  ],
+  "marques": [
+    {"id": "b1", "nom": "Marque A"}, {"id": "b2", "nom": "Marque B"}, {"id": "b3", "nom": "Marque C"}
+  ],
+  "packagings": [
+    {"id": "k1", "libelle": "Bouteille 1 L"}, {"id": "k2", "libelle": "Pack de 6"},
+    {"id": "k3", "libelle": "Pack de 12"}, {"id": "k4", "libelle": "500 g"},
+    {"id": "k5", "libelle": "250 g"}, {"id": "k6", "libelle": "200 g"},
+    {"id": "k7", "libelle": "Sachet 1,5 kg"}, {"id": "k8", "libelle": "Paquet de 12"},
+    {"id": "k9", "libelle": "Boîte de 12"}, {"id": "k10", "libelle": "20 cl"},
+    {"id": "k11", "libelle": "4 tranches"}, {"id": "k12", "libelle": "Pack de 8"},
+    {"id": "k13", "libelle": "125 g"}, {"id": "k14", "libelle": "Pack de 4"}
+  ],
+  "produits": [
+    {"id": "p1", "nom": "Pommes", "marqueIds": [], "packagingIds": ["k7"], "nbUtilisations": 12},
+    {"id": "p2", "nom": "Lait demi-écrémé", "marqueIds": ["b1", "b2"], "packagingIds": ["k1", "k2"], "nbUtilisations": 14},
+    {"id": "p3", "nom": "Yaourts nature", "marqueIds": ["b1"], "packagingIds": ["k3"], "nbUtilisations": 10},
+    {"id": "p4", "nom": "Fromage râpé", "marqueIds": ["b2"], "packagingIds": ["k6"], "nbUtilisations": 8},
+    {"id": "p5", "nom": "Beurre doux", "marqueIds": ["b1", "b3"], "packagingIds": ["k5"], "nbUtilisations": 6},
+    {"id": "p6", "nom": "Crème fraîche", "marqueIds": [], "packagingIds": ["k10"], "nbUtilisations": 2},
+    {"id": "p7", "nom": "Œufs", "marqueIds": [], "packagingIds": ["k9"], "nbUtilisations": 7},
+    {"id": "p8", "nom": "Lait entier", "marqueIds": ["b2"], "packagingIds": ["k1"], "nbUtilisations": 1},
+    {"id": "p9", "nom": "Yaourts aux fruits", "marqueIds": ["b3"], "packagingIds": ["k12"], "nbUtilisations": 3},
+    {"id": "p10", "nom": "Fromage blanc", "marqueIds": [], "packagingIds": ["k4"], "nbUtilisations": 2},
+    {"id": "p11", "nom": "Emmental", "marqueIds": ["b2"], "packagingIds": ["k5"], "nbUtilisations": 2},
+    {"id": "p12", "nom": "Mozzarella", "marqueIds": [], "packagingIds": ["k13"], "nbUtilisations": 1},
+    {"id": "p13", "nom": "Desserts lactés", "marqueIds": ["b3"], "packagingIds": ["k14"], "nbUtilisations": 1},
+    {"id": "p14", "nom": "Beurre demi-sel", "marqueIds": ["b1"], "packagingIds": ["k5"], "nbUtilisations": 0},
+    {"id": "p15", "nom": "Jambon", "marqueIds": ["b1"], "packagingIds": ["k11"], "nbUtilisations": 6},
+    {"id": "p16", "nom": "Pâtes", "marqueIds": ["b1", "b2", "b3"], "packagingIds": ["k4"], "nbUtilisations": 11},
+    {"id": "p17", "nom": "Café moulu", "marqueIds": ["b1", "b2"], "packagingIds": ["k5"], "nbUtilisations": 8},
+    {"id": "p18", "nom": "Huile d'olive", "marqueIds": ["b3"], "packagingIds": ["k1"], "nbUtilisations": 4},
+    {"id": "p19", "nom": "Papier toilette", "marqueIds": ["b2"], "packagingIds": ["k8"], "nbUtilisations": 5},
+    {"id": "p20", "nom": "Dentifrice", "marqueIds": ["b1", "b3"], "packagingIds": [], "nbUtilisations": 4},
+    {"id": "p21", "nom": "Bougies chauffe-plat", "marqueIds": [], "packagingIds": [], "nbUtilisations": 1}
+  ],
+  "emplacements": [
+    {"magasinId": "mg1", "produitId": "p1", "secteurId": "s1"},
+    {"magasinId": "mg1", "produitId": "p2", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p3", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p4", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p5", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p6", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p7", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p8", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p9", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p10", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p11", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p12", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p13", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p14", "secteurId": "s2"},
+    {"magasinId": "mg1", "produitId": "p15", "secteurId": "s4"},
+    {"magasinId": "mg1", "produitId": "p16", "secteurId": "s6"},
+    {"magasinId": "mg1", "produitId": "p17", "secteurId": "s8"},
+    {"magasinId": "mg1", "produitId": "p18", "secteurId": "s7"},
+    {"magasinId": "mg1", "produitId": "p19", "secteurId": "s10"},
+    {"magasinId": "mg1", "produitId": "p20", "secteurId": "s11"}
+  ],
+  "promotions": [
+    {"id": "pr1", "magasinId": "mg1", "produitId": "p2", "packagingId": "k2", "type": "lot", "parametres": {"quantiteAchetee": 3, "quantiteOfferte": 1}, "libelle": "3 achetés = 1 offert", "debut": "2026-10-05", "fin": "2026-10-19"},
+    {"id": "pr2", "magasinId": "mg1", "produitId": "p16", "type": "prixGlobal", "parametres": {"quantiteMinimale": 3, "prixGlobal": 4.5}, "libelle": "3 pour 4,50 €", "debut": "2026-10-05", "fin": "2026-10-19"},
+    {"id": "pr3", "magasinId": "mg1", "produitId": "p3", "packagingId": "k3", "type": "packagingSpecial", "parametres": {"gain": "+20 % gratuit"}, "libelle": "+20 % gratuit", "debut": "2026-10-01", "fin": "2026-10-31"},
+    {"id": "pr4", "magasinId": "mg1", "produitId": "p9", "type": "remise", "parametres": {"pourcentage": 30}, "libelle": "−30 %", "debut": "2026-10-08", "fin": "2026-10-15"},
+    {"id": "pr5", "magasinId": "mg1", "produitId": "p18", "type": "fidelite", "parametres": {"pourcentage": 30}, "libelle": "30 % sur la carte", "debut": "2026-10-01", "fin": "2026-10-20"}
+  ],
+  "parcours": [
+    {"id": "pc1", "magasinId": "mg1", "membreId": "m1", "nom": "Parcours habituel", "parDefaut": true, "etapes": ["s1", "s6", "s2", "s4", "s7", "s8", "s10", "s11", "s12"]},
+    {"id": "pc2", "magasinId": "mg1", "membreId": "m1", "nom": "Gros produits d'abord", "parDefaut": false, "etapes": ["s9", "s10", "s6", "s7", "s8", "s1", "s2", "s4", "s11", "s12"]},
+    {"id": "pc3", "magasinId": "mg1", "membreId": "m2", "nom": "Au plus court", "parDefaut": true, "etapes": ["s12", "s2", "s4", "s1", "s6", "s7", "s8", "s10", "s11"]}
+  ],
+  "listes": [
+    {"id": "l1", "magasinId": "mg1", "statut": "enConstruction", "parcoursId": null, "dateCreation": "2026-10-09",
+     "lignes": [
+       {"produitId": "p1", "packagingId": "k7", "quantite": 1},
+       {"produitId": "p16", "marqueId": "b1", "packagingId": "k4", "quantite": 2, "promotionId": "pr2"},
+       {"produitId": "p17", "quantite": 1},
+       {"produitId": "p2", "marqueId": "b1", "packagingId": "k2", "quantite": 3, "promotionId": "pr1"},
+       {"produitId": "p3", "packagingId": "k3", "quantite": 1, "promotionId": "pr3"},
+       {"produitId": "p4", "packagingId": "k6", "quantite": 1},
+       {"produitId": "p15", "packagingId": "k11", "quantite": 1},
+       {"produitId": "p19", "packagingId": "k8", "quantite": 1},
+       {"produitId": "p21", "quantite": 1}
+     ]},
+    {"id": "l2", "magasinId": "mg2", "statut": "enConstruction", "parcoursId": null, "dateCreation": "2026-10-08",
+     "lignes": [
+       {"produitId": "p20", "quantite": 1}, {"produitId": "p18", "quantite": 1},
+       {"produitId": "p7", "quantite": 1}, {"produitId": "p1", "quantite": 1}
+     ]}
+  ],
+  "historique": [
+    {"id": "h1", "magasinId": "mg1", "dateCourses": "2026-10-02", "membreId": "m1", "nbArticles": 12, "ticket": {"source": "photo", "montant": 64.3}},
+    {"id": "h2", "magasinId": "mg2", "dateCourses": "2026-09-27", "membreId": "m2", "nbArticles": 7, "ticket": null},
+    {"id": "h3", "magasinId": "mg1", "dateCourses": "2026-09-25", "membreId": "m1", "nbArticles": 15, "ticket": {"source": "photo", "montant": 81.9}},
+    {"id": "h4", "magasinId": "mg1", "dateCourses": "2026-09-18", "membreId": "m2", "nbArticles": 9, "ticket": {"source": "photo", "montant": 47.2}},
+    {"id": "h5", "magasinId": "mg1", "dateCourses": "2026-09-11", "membreId": "m1", "nbArticles": 11, "ticket": null},
+    {"id": "h6", "magasinId": "mg1", "dateCourses": "2026-09-04", "membreId": "m1", "nbArticles": 13, "ticket": {"source": "photo", "montant": 70.1}},
+    {"id": "h7", "magasinId": "mg1", "dateCourses": "2026-08-28", "membreId": "m2", "nbArticles": 10, "ticket": {"source": "photo", "montant": 55.6}}
+  ],
+  "frequencesPreliste": {
+    "_regle": "Proposition : nombre de présences du produit dans les 6 dernières courses de ce magasin ; préliste = présent au moins 3 fois sur 6. Règle à valider.",
+    "mg1": {"p1": 6, "p2": 6, "p3": 5, "p4": 4, "p15": 3, "p16": 5, "p17": 4, "p18": 2, "p19": 3, "p20": 2, "p5": 3, "p7": 3}
+  }
+}

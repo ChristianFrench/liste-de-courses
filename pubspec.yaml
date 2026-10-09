@@ -1,13 +1,15 @@
 name: liste_de_courses
 description: Liste de courses partagée (Android, iPhone, Windows)
 publish_to: 'none'
-version: 0.2.0+2
+version: 0.3.0+3
 
 environment:
   sdk: '>=3.4.0 <4.0.0'
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
 dev_dependencies:
@@ -18,3 +20,12 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icone_ronde.png
+    - assets/donnees_maquette.json
+  fonts:
+    - family: Atkinson
+      fonts:
+        - asset: assets/polices/AtkinsonHyperlegible-Regular.ttf
+        - asset: assets/polices/AtkinsonHyperlegible-Bold.ttf
+          weight: 700
+        - asset: assets/polices/AtkinsonHyperlegible-Italic.ttf
+          style: italic

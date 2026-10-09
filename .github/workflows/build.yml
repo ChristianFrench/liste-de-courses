@@ -8,6 +8,31 @@ env:
   CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,ios,windows .
 
 jobs:
+  verification:
+    name: verification (analyse et tests de recette)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Analyser le code
+        run: |
+          flutter pub get
+          flutter --version
+          set +e
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyse.log 2>&1
+          code=$?
+          python3 outils/annoter.py analyse.log "Analyse du code" analyse
+          exit $code
+      - name: Tests de recette de la maquette
+        if: always()
+        run: |
+          set +e
+          flutter test --reporter expanded > tests.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py tests.log "Tests de recette"; else tail -n 30 tests.log; fi
+          exit $code
+
   android:
     runs-on: ubuntu-latest
     steps:
@@ -23,7 +48,12 @@ jobs:
           flutter pub add dev:flutter_launcher_icons
           dart run flutter_launcher_icons
       - name: Compiler l'APK
-        run: flutter build apk --release
+        run: |
+          set +e
+          flutter build apk --release > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
+          exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
       - uses: actions/upload-artifact@v4
         with:
@@ -44,7 +74,13 @@ jobs:
           flutter pub add dev:flutter_launcher_icons
           dart run flutter_launcher_icons
       - name: Compiler l'exécutable Windows
-        run: flutter build windows --release
+        shell: bash
+        run: |
+          set +e
+          flutter build windows --release > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Windows"; else tail -n 20 compilation.log; fi
+          exit $code
       - name: Joindre les bibliothèques Visual C++
         shell: pwsh
         run: |
@@ -56,6 +92,7 @@ jobs:
         with:
           name: Liste de courses Windows
           path: build/windows/x64/runner/Release/
+
   iphone:
     runs-on: macos-latest
     steps:
@@ -69,4 +106,9 @@ jobs:
           flutter pub add dev:flutter_launcher_icons
           dart run flutter_launcher_icons
       - name: Compiler la version iPhone (vérification, sans signature)
-        run: flutter build ios --release --no-codesign
+        run: |
+          set +e
+          flutter build ios --release --no-codesign > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation iPhone"; else tail -n 20 compilation.log; fi
+          exit $code

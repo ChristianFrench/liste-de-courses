@@ -3,7 +3,7 @@ Lancé automatiquement par GitHub Actions ; rien à faire à la main."""
 import pathlib, re, sys
 
 NOM = "Liste de courses"
-LARGEUR, HAUTEUR = 412, 892   # format d'un téléphone courant, en points
+LARGEUR, HAUTEUR = 390, 844   # format de référence de la spécification IHM, en points
 
 
 def remplacer(chemin, ancien, nouveau, regex=False):
@@ -28,7 +28,7 @@ remplacer("ios/Runner/Info.plist",
           rf"\g<1>{NOM}\g<2>", regex=True)
 
 # Windows : taille de la fenêtre au format téléphone, ajustée à la hauteur de l'écran
-TAILLE_FENETRE = """// Fenetre au format telephone (rapport 412 x 892), ajustee a la hauteur utile de l ecran
+TAILLE_FENETRE = """// Fenetre au format telephone (rapport %d x %d), ajustee a la hauteur utile de l ecran
   RECT zone;
   SystemParametersInfo(SPI_GETWORKAREA, 0, &zone, 0);
   HDC ecran = GetDC(nullptr);
@@ -37,7 +37,7 @@ TAILLE_FENETRE = """// Fenetre au format telephone (rapport 412 x 892), ajustee 
   int hauteur = static_cast<int>((zone.bottom - zone.top) / echelle) - 40;
   if (hauteur > %d) hauteur = %d;
   int largeur = hauteur * %d / %d;
-  Win32Window::Size size(largeur, hauteur);""" % (HAUTEUR, HAUTEUR, LARGEUR, HAUTEUR)
+  Win32Window::Size size(largeur, hauteur);""" % (LARGEUR, HAUTEUR, HAUTEUR, HAUTEUR, LARGEUR, HAUTEUR)
 remplacer("windows/runner/main.cpp",
           r"Win32Window::Size size\(\d+, \d+\);", lambda m: TAILLE_FENETRE, regex=True)
 remplacer("windows/runner/main.cpp",

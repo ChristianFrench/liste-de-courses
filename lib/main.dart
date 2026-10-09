@@ -1,9 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
-void main() => runApp(const ListeDeCoursesApp());
+import 'donnees/modele.dart';
+import 'ecrans/e01_accueil.dart';
+import 'theme.dart';
 
-const vert = Color(0xFF2E7D32);
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Etat.instance.charger();
+  runApp(const ListeDeCoursesApp());
+}
 
 class ListeDeCoursesApp extends StatelessWidget {
   const ListeDeCoursesApp({super.key});
@@ -13,85 +20,54 @@ class ListeDeCoursesApp extends StatelessWidget {
     return MaterialApp(
       title: 'Liste de courses',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: vert, useMaterial3: true),
+      theme: Charte.theme(),
+      locale: const Locale('fr', 'FR'),
+      supportedLocales: const [Locale('fr', 'FR')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       home: const EcranAccueil(),
       builder: (context, enfant) => FormatTelephone(child: enfant!),
     );
   }
 }
 
-/// Taille de référence de l'écran, identique sur toutes les versions.
-const tailleTelephone = Size(412, 892);
+/// Taille de référence de l'écran (spécification IHM : 390 × 844), identique sur toutes les versions.
+const tailleTelephone = Size(390, 844);
 
 /// Sous Windows, l'application est dessinée sur un écran virtuel de téléphone
-/// (412 × 892) puis agrandie ou réduite pour remplir la fenêtre : la mise en page
-/// est ainsi strictement celle du téléphone. Sur téléphone, rien ne change.
+/// (390 × 844) puis agrandie ou réduite pour remplir la fenêtre : la mise en page
+/// est ainsi strictement celle du téléphone. Sur téléphone, seule la taille des
+/// caractères choisie dans les réglages est bornée, pour éviter les textes coupés.
 class FormatTelephone extends StatelessWidget {
   const FormatTelephone({super.key, required this.child});
   final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) return child;
     final media = MediaQuery.of(context);
+    final bornee = media.copyWith(
+      textScaler: media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.15),
+    );
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) {
+      return MediaQuery(data: bornee, child: child);
+    }
     return ColoredBox(
       color: Colors.white,
       child: FittedBox(
         child: SizedBox.fromSize(
           size: tailleTelephone,
           child: MediaQuery(
-            data: media.copyWith(size: tailleTelephone, padding: EdgeInsets.zero),
+            data: bornee.copyWith(
+              size: tailleTelephone,
+              padding: EdgeInsets.zero,
+              viewPadding: EdgeInsets.zero,
+              viewInsets: EdgeInsets.zero,
+            ),
             child: child,
           ),
-        ),
-      ),
-    );
-  }
-}
-
-String nomPlateforme() {
-  if (kIsWeb) return 'Web';
-  switch (defaultTargetPlatform) {
-    case TargetPlatform.android:
-      return 'Android';
-    case TargetPlatform.iOS:
-      return 'iPhone';
-    case TargetPlatform.windows:
-      return 'Windows';
-    default:
-      return defaultTargetPlatform.name;
-  }
-}
-
-class EcranAccueil extends StatelessWidget {
-  const EcranAccueil({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Image.asset('assets/icone_ronde.png', width: 200, height: 200),
-            const SizedBox(height: 24),
-            const Text(
-              'Liste de courses',
-              style: TextStyle(
-                  fontSize: 26, fontWeight: FontWeight.bold, color: Color(0xFF1B5E20)),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Version 0.2 — étape 1 (Flutter)',
-              style: TextStyle(fontSize: 16, color: Color(0xFF546E7A)),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Plateforme : ${nomPlateforme()}',
-              style: const TextStyle(fontSize: 16, color: Color(0xFF546E7A)),
-            ),
-          ],
         ),
       ),
     );
