@@ -56,6 +56,7 @@ Future<void> _afficher(WidgetTester tester, Widget ecran, List<String> images) a
     for (final url in images.where((u) => u.isNotEmpty)) {
       try {
         await _telecharger(url);
+        if (!_photos.containsKey(url)) continue;
         await precacheImage(PhotoArticle.fournisseur(url), ctx).timeout(const Duration(seconds: 10));
       } catch (_) {}
     }
@@ -71,7 +72,7 @@ Future<void> _telecharger(String url) async {
   if (_photos.containsKey(url)) return;
   final client = HttpClient()..userAgent = OpenFoodFacts.agent;
   try {
-    final rep = await (await client.getUrl(Uri.parse(url))).close().timeout(const Duration(seconds: 10));
+    final rep = await (await client.getUrl(Uri.parse(url))).close().timeout(const Duration(seconds: 20));
     final octets = <int>[];
     await for (final morceau in rep.timeout(const Duration(seconds: 10))) {
       octets.addAll(morceau);
@@ -85,7 +86,7 @@ Future<void> _telecharger(String url) async {
 void main() {
   setUpAll(() async {
     HttpOverrides.global = null; // accès réel au réseau pour ces captures
-    PhotoArticle.fournisseur = (url) => _photos.containsKey(url) ? MemoryImage(_photos[url]!) : const AssetImage('assets/icone_ronde.png');
+    PhotoArticle.fournisseur = (url) => MemoryImage(_photos[url] ?? Uint8List(0)); // photo absente : cadre « Photo indisponible »
     await _police('Atkinson', [
       'assets/polices/AtkinsonHyperlegible-Regular.ttf',
       'assets/polices/AtkinsonHyperlegible-Bold.ttf',
