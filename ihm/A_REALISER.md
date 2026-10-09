@@ -4,7 +4,7 @@ Les ordres les plus récents sont en tête. Le fil de génération exécute l'or
 
 ---
 
-## Ordre n° 1 — IHM v0.2 · statut : À réaliser
+## Ordre n° 1 — IHM v0.2 · statut : Réalisé
 
 - **Déposé le :** 9 octobre 2026, par le fil « IHM et ergonomie »
 - **Dossier :** [`ihm/v0.2`](v0.2/LISEZMOI.md) — conception validée par le maître d'ouvrage (maquette v0.4, 18 écrans)
@@ -17,4 +17,4 @@ Les ordres les plus récents sont en tête. Le fil de génération exécute l'or
 - **Points d'attention :**
   - La promotion est désormais portée par la ligne de liste. C'est un écart avec le modèle de données, détaillé dans le champ `_ecartsModele` de `Données maquette.json`.
   - Les travaux en cours sur l'écran d'essai « Produits réels » (Open Food Facts) ne font pas partie de cette conception. Les conserver ou non relève du maître d'ouvrage : lui poser la question.
-- **Réalisé :** _(à compléter par le fil de génération : version de l'application, date)_
+- **Réalisé :** version 0.6.0 de l'application, le 10 octobre 2026 (Windows, Android, iPhone). Contradictions et écarts : « Fiche d'evolution 0.6 » dans « 1 Documents ».

@@ -60,6 +60,7 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
             ),
           ),
         Bascule(
+          douce: true,
           options: const ['Par date', 'Par magasin'],
           index: vue,
           onChange: (i) => setState(() => vue = i),
@@ -195,6 +196,7 @@ class SousEcranTickets extends StatelessWidget {
               ],
             ),
           ),
+          if (c == null) const SizedBox(width: 8),
           if (c == null)
             Lien('Rattacher', onTap: () {
               Nav.i.ticketARattacher = t.id;

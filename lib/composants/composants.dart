@@ -483,7 +483,11 @@ class LigneChoix extends StatelessWidget {
           constraints: const BoxConstraints(minHeight: Charte.ligneConstruction),
           decoration: const BoxDecoration(border: Border(bottom: _bordLigne)),
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          Row(
             children: [
               CaseACocher(coche: coche),
               const SizedBox(width: 10),
@@ -502,7 +506,6 @@ class LigneChoix extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (alerte != null) AlerteQuantite(requise: alerte!),
                     ],
                   ),
                 ),
@@ -518,6 +521,10 @@ class LigneChoix extends StatelessWidget {
                   message: 'Acheté habituellement',
                   child: Icon(Icons.history, size: 19, color: Charte.texteSecondaire),
                 ),
+            ],
+          ),
+          if (alerte != null)
+            Padding(padding: const EdgeInsets.only(left: 32, bottom: 4), child: AlerteQuantite(requise: alerte!)),
             ],
           ),
         ),
@@ -785,7 +792,8 @@ class BarreAction extends StatelessWidget {
 
 /// Deux boutons accolés, un sélectionné.
 class Bascule extends StatelessWidget {
-  const Bascule({super.key, required this.options, required this.index, required this.onChange, this.hauteur = 48});
+  const Bascule({super.key, required this.options, required this.index, required this.onChange, this.hauteur = 48, this.douce = false});
+  final bool douce;
   final List<String> options;
   final int index;
   final ValueChanged<int> onChange;
@@ -808,14 +816,14 @@ class Bascule extends StatelessWidget {
                 button: true,
                 selected: i == index,
                 child: Material(
-                  color: i == index ? Charte.encre : Charte.fond,
+                  color: i == index ? (douce ? Charte.fondSelection : Charte.encre) : Charte.fond,
                   child: InkWell(
                     onTap: () => onChange(i),
                     child: Center(
                       child: Text(options[i],
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: Charte.texte(16, gras: i == index, couleur: i == index ? Charte.fond : Charte.encre)),
+                          style: Charte.texte(16, gras: i == index, couleur: i == index && !douce ? Charte.fond : Charte.encre)),
                     ),
                   ),
                 ),
