@@ -15,7 +15,7 @@ on:
     - cron: '47 4 * * *'      # cumul : chaque nuit, 4 h 47 UTC
   push:
     branches: [main]
-    paths: ['outils/catalogue_off.py', '.github/workflows/catalogue.yml']
+    paths: ['outils/catalogue_off.py', 'outils/version_catalogue.py', '.github/workflows/catalogue.yml']
 
 concurrency: catalogue
 
@@ -34,14 +34,19 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Télécharger l'export Open Food Facts et la taxonomie
+      - name: Télécharger la taxonomie
         run: |
-          curl -fsSL -A "$UA" -o export.csv.gz https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
           curl -fsSL -A "$UA" -o categories.json https://static.openfoodfacts.org/data/taxonomies/categories.json
           curl -fsSL -o categories.txt https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/taxonomies/food/categories.txt
-          ls -la export.csv.gz categories.json categories.txt
-      - name: Construire la base
-        run: python3 outils/catalogue_off.py base export.csv.gz categories.json categories.txt catalogue.json.gz | tee base.log
+          pip install --quiet orjson || true
+          sudo apt-get install -y -qq pigz >/dev/null || true
+      - name: Construire la base depuis l'export JSONL (13 Go, lu au fil du téléchargement)
+        run: |
+          set -o pipefail
+          curl -fsSL -A "$UA" https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz \
+            | (command -v pigz >/dev/null && pigz -dc || gzip -dc) \
+            | grep -F '"en:france"' \
+            | python3 outils/catalogue_off.py base_jsonl - categories.json categories.txt catalogue.json.gz | tee base.log
       - name: Publier (la mise à jour cumulative repart de zéro)
         env:
           GH_TOKEN: ${{ github.token }}
@@ -49,12 +54,13 @@ jobs:
           python3 outils/catalogue_off.py cumul catalogue.json.gz - vide catalogue-maj.json.gz
           python3 outils/version_catalogue.py catalogue.json.gz catalogue-maj.json.gz > catalogue-version.txt
           cat catalogue-version.txt
-          gh release delete catalogue-off --yes --cleanup-tag 2>/dev/null || true
-          git push -q origin :refs/tags/catalogue-off 2>/dev/null || true
-          gh release create catalogue-off catalogue.json.gz catalogue-maj.json.gz catalogue-version.txt base.log \
+          # La page n'est jamais supprimée : les fichiers sont remplacés un à un
+          gh release view catalogue-off >/dev/null 2>&1 || gh release create catalogue-off \
             --target "$GITHUB_SHA" --prerelease \
             --title "Catalogue Open Food Facts" \
             --notes "Extrait des produits vendus en France utilisé par l'application (base mensuelle et mise à jour cumulative quotidienne). Données Open Food Facts (ODbL), photos CC BY-SA."
+          gh release upload catalogue-off catalogue.json.gz catalogue-maj.json.gz base.log --clobber
+          gh release upload catalogue-off catalogue-version.txt --clobber
 
   cumul:
     if: >-
@@ -93,6 +99,7 @@ jobs:
           ls -la deltas
       - name: Calculer la mise à jour cumulative
         run: |
+          pip install --quiet orjson || true
           curl -fsSL -A "$UA" -o categories.json https://static.openfoodfacts.org/data/taxonomies/categories.json
           curl -fsSL -o categories.txt https://raw.githubusercontent.com/openfoodfacts/openfoodfacts-server/main/taxonomies/food/categories.txt
           ANCIEN=ancien.json.gz; [ -f "$ANCIEN" ] || ANCIEN=-

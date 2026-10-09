@@ -5,6 +5,9 @@ Lancé par GitHub Actions (workflow « Catalogue Open Food Facts ») ; rien à f
   python outils/catalogue_off.py base <export.csv.gz> <categories.json> <categories.txt> <sortie.json.gz>
       Extrait complet (mensuel) : produits vendus en France, les plus scannés.
 
+  zcat openfoodfacts-products.jsonl.gz | grep -F '"en:france"' | python outils/catalogue_off.py base_jsonl - <categories.json> <categories.txt> <sortie.json.gz>
+      Même extrait, construit depuis l'export JSONL (à jour, contrairement au CSV figé au 26/05/2026).
+
   python outils/catalogue_off.py cumul <base.json.gz> <ancien_cumul.json.gz|-> <dossier_deltas> <sortie.json.gz>
       Mise à jour cumulative (quotidienne) : tous les produits modifiés depuis la base,
       d'après les fichiers de changements quotidiens d'Open Food Facts.
@@ -236,6 +239,78 @@ def base(export, tax_json, tax_txt, sortie):
     print(f"durée : {time.time()-debut:.0f} s")
 
 
+def lire_json(ligne):
+    try:
+        import orjson
+        return orjson.loads(ligne)
+    except ImportError:
+        return json.loads(ligne)
+
+
+def doc_vers_produit(doc, cats):
+    """Produit au format de l'extrait d'après un document complet (JSONL ou changements)."""
+    code = str(doc.get("code") or "")
+    nom = (doc.get("product_name_fr") or doc.get("product_name") or "").strip()
+    marques = [m.strip() for m in (doc.get("brands") or "").split(",") if m.strip()]
+    return [code, nom, marques[0] if marques else "", (doc.get("quantity") or "").strip(),
+            nutriscore(doc.get("nutriscore_grade")), int(doc.get("unique_scans_n") or 0),
+            cats.numeros(doc.get("categories_tags") or []), chemin_photo_doc(doc)]
+
+
+def base_jsonl(entree, tax_json, tax_txt, sortie):
+    debut = time.time()
+    noms = lire_taxonomie(tax_json, tax_txt)
+    source = sys.stdin.buffer if entree == "-" else gzip.open(entree, "rb")
+    candidats = []
+    lus = france = 0
+    jusqua = 0
+    for ligne in source:
+        lus += 1
+        if lus % 200000 == 0:
+            print(f"  {lus} lignes lues, {len(candidats)} retenues ({time.time()-debut:.0f} s)", flush=True)
+        try:
+            doc = lire_json(ligne)
+        except ValueError:
+            continue
+        if "en:france" not in (doc.get("countries_tags") or []):
+            continue
+        france += 1
+        try:
+            jusqua = max(jusqua, int(doc.get("last_modified_t") or 0))
+        except (TypeError, ValueError):
+            pass
+        code = str(doc.get("code") or "")
+        nom = (doc.get("product_name_fr") or doc.get("product_name") or "").strip()
+        try:
+            scans = int(doc.get("unique_scans_n") or 0)
+        except (TypeError, ValueError):
+            scans = 0
+        if not nom or not code.isdigit() or scans < SCANS_MIN:
+            continue
+        # On ne garde que l'utile (la mémoire reste raisonnable)
+        candidats.append({k: doc.get(k) for k in ("code", "product_name_fr", "product_name", "brands", "quantity",
+                                                   "nutriscore_grade", "unique_scans_n", "categories_tags", "lang")}
+                         | {"images": {k: v for k, v in (doc.get("images") or {}).items() if k.startswith("front")}})
+    print(f"lu : {lus} lignes ; vendus en France : {france} ; candidats : {len(candidats)}")
+    print(f"dernière modification : {time.strftime('%d/%m/%Y %H:%M', time.gmtime(jusqua))} UTC")
+    candidats.sort(key=lambda d: -int(d.get("unique_scans_n") or 0))
+    cats = Categories(noms)
+    produits = [doc_vers_produit(d, cats) for d in candidats[:MAX_PRODUITS]]
+    contenu = {
+        "version": time.strftime("%Y%m%d"),
+        "jusqua": jusqua,
+        "date": time.strftime("%d/%m/%Y"),
+        "source": "Open Food Facts (openfoodfacts.org)",
+        "licence": "Données ODbL, photos CC BY-SA",
+        "categories": cats.liste,
+        "produits": produits,
+    }
+    ecrire(sortie, contenu)
+    print(f"base : {len(produits)} produits, {len(cats.liste)} catégories, version {contenu['version']}")
+    apercu(cats.liste, produits)
+    print(f"durée : {time.time()-debut:.0f} s")
+
+
 # ---------------------------------------------------------------- Cumul
 
 def bornes(nom_fichier):
@@ -268,7 +343,7 @@ def cumul(chemin_base, chemin_ancien, dossier_deltas, sortie, tax_json=None, tax
         with gzip.open(chemin, "rt", encoding="utf-8", errors="replace") as f:
             for ligne in f:
                 try:
-                    doc = json.loads(ligne)
+                    doc = lire_json(ligne)
                 except ValueError:
                     continue
                 lus += 1
@@ -283,10 +358,7 @@ def cumul(chemin_base, chemin_ancien, dossier_deltas, sortie, tax_json=None, tax
                 scans = int(doc.get("unique_scans_n") or 0)
                 if not nom or (scans < SCANS_MIN and code not in dans_base):
                     continue
-                marques = [m.strip() for m in (doc.get("brands") or "").split(",") if m.strip()]
-                produits[code] = [code, nom, marques[0] if marques else "", (doc.get("quantity") or "").strip(),
-                                  nutriscore(doc.get("nutriscore_grade")), scans,
-                                  cats.numeros(doc.get("categories_tags") or []), chemin_photo_doc(doc)]
+                produits[code] = doc_vers_produit(doc, cats)
                 retenus += 1
         print(f"  {os.path.basename(chemin)} : traité ({time.time()-debut:.0f} s)", flush=True)
     contenu = {
@@ -307,6 +379,8 @@ if __name__ == "__main__":
     a = sys.argv[1:]
     if len(a) == 5 and a[0] == "base":
         base(*a[1:])
+    elif len(a) == 5 and a[0] == "base_jsonl":
+        base_jsonl(*a[1:])
     elif len(a) in (5, 7) and a[0] == "cumul":
         cumul(*a[1:])
     else:

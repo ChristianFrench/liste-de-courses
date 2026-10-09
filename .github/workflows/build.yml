@@ -158,6 +158,7 @@ jobs:
   publication:
     name: publication (page « derniere-version »)
     needs: [verification, android, windows]
+    concurrency: publication
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
