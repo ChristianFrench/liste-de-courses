@@ -5,7 +5,7 @@ Chaque version de la conception de l'interface est déposée ici, dans son propr
 
 | Version | Date | Contenu | État |
 |---|---|---|---|
-| [v0.2](v0.2/LISEZMOI.md) | 9 octobre 2026 | Maquette v0.4 : onglets à icône, interruption et reprise sans perte, promotions choisies en construction, Paramètres — 18 écrans | **À réaliser** (Windows d'abord) |
+| [v0.2](v0.2/LISEZMOI.md) | 9 octobre 2026 | Maquette v0.4 : onglets à icône, interruption et reprise sans perte, promotions choisies en construction, Paramètres — 18 écrans | **À réaliser** — voir [A_REALISER.md](A_REALISER.md) |
 
 La version 0.1 (12 écrans) a été transmise en zip et a servi à la version 0.3.0 de l'application.
 
