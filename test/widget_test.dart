@@ -12,6 +12,7 @@ import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
+import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -168,13 +169,13 @@ void main() {
       await _ciblesTactiles(tester);
 
       // 6 : Lait demi-écrémé, lot 3 = 1 avec 2 → alerte ; passer à 3 la fait disparaître
-      final lait = find.ancestor(of: find.text('Lait demi-écrémé'), matching: find.byType(LigneChoix));
+      final lait = find.ancestor(of: find.textContaining('Lait demi-écrémé', findRichText: true), matching: find.byType(LigneChoix)).first;
       expect(find.descendant(of: lait, matching: find.text('Il en faut 3 pour la promotion')), findsOneWidget);
       await _toucher(tester, find.descendant(of: lait, matching: find.text('+')));
       expect(find.descendant(of: lait, matching: find.text('Il en faut 3 pour la promotion')), findsNothing);
 
       // 6 bis : choisir « Lot » sur Yaourts nature (quantité 1) → alerte
-      final yaourts = find.ancestor(of: find.text('Yaourts nature'), matching: find.byType(LigneChoix));
+      final yaourts = find.ancestor(of: find.textContaining('Yaourts nature', findRichText: true), matching: find.byType(LigneChoix)).first;
       await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)));
       expect(find.text('Promotion visée'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -183,7 +184,7 @@ void main() {
       expect(find.descendant(of: yaourts, matching: find.text('Il en faut 3 pour la promotion')), findsOneWidget);
 
       // 5 : cocher → quantité et bouton promotion ; ramener à 0 décoche
-      final beurre = find.ancestor(of: find.text('Beurre doux'), matching: find.byType(LigneChoix));
+      final beurre = find.ancestor(of: find.textContaining('Beurre doux', findRichText: true), matching: find.byType(LigneChoix)).first;
       await _toucher(tester, beurre);
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsOneWidget);
       expect(find.descendant(of: beurre, matching: find.byType(BoutonPromo)), findsOneWidget);
@@ -192,18 +193,18 @@ void main() {
 
       // 4 : changer de rayon et de secteur met à jour produits et compteurs
       await _toucher(tester, find.textContaining('Épicerie').first);
-      expect(find.text('Pâtes'), findsOneWidget);
+      expect(find.textContaining('Pâtes', findRichText: true), findsOneWidget);
       await _toucher(tester, find.text('Charcuterie').first);
       expect(find.text('Charcuterie'), findsWidgets);
       await _toucher(tester, find.text('Frais').first);
       await _toucher(tester, find.text('Charcuterie').first);
-      expect(find.text('Jambon'), findsOneWidget);
+      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
 
       // 8 : quitter puis revenir ramène au même secteur
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
       await _toucher(tester, find.text('Interrompue'));
-      expect(find.text('Jambon'), findsOneWidget);
+      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
       expect(Etat.instance.liste('l1')!.repriseSecteurId, 's4');
 
       // Ma liste → liste complète
