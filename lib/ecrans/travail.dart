@@ -613,11 +613,13 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          type = t.id;
-          enMontant = false;
-          if (type == 'lot' && c1.text.isEmpty) {
-            c1.text = '3';
-            c2.text = '1';
+          if (type != t.id) {
+            type = t.id;
+            enMontant = false;
+            libelleModifie = false;
+            // Valeurs proposées pour le type choisi
+            c1.text = switch (type) { 'lot' => '3', 'prixGlobal' => '2', _ => '' };
+            c2.text = switch (type) { 'lot' => '1', _ => '' };
           }
           _majLibelle();
         },

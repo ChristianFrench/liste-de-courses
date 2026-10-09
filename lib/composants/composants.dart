@@ -380,7 +380,7 @@ class AlerteQuantite extends StatelessWidget {
         children: [
           const Icon(Icons.warning_amber_rounded, size: 15, color: Charte.encre),
           const SizedBox(width: 3),
-          Text('Il en faut $requise pour la promotion', style: Charte.texte(12, gras: true)),
+          Flexible(child: Text('Il en faut $requise pour la promotion', style: Charte.texte(12, gras: true))),
         ],
       ),
     );
@@ -1133,7 +1133,7 @@ class SousOnglets extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
       child: Container(
-        height: Charte.sousOnglets,
+        height: Charte.sousOnglets + 4, // 44 de zone tactile à l'intérieur du cadre de 2
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
           border: Border.all(color: Charte.encre, width: Charte.traitCadre),
