@@ -21,15 +21,16 @@ const _accents = {
   'ù': 'u', 'û': 'u', 'ü': 'u', 'ú': 'u', 'ÿ': 'y', 'œ': 'oe', 'æ': 'ae',
 };
 
-/// Clé de recherche : minuscules, sans accents, mots au singulier.
-String cleRecherche(String texte) {
+/// Clé de recherche : minuscules, mots au singulier, sans accents
+/// (ou avec, si [accents] : « pâtes » et « pâtés » restent alors distincts).
+String cleRecherche(String texte, {bool accents = false}) {
   final b = StringBuffer();
   for (final c in texte.toLowerCase().split('')) {
-    b.write(_accents[c] ?? c);
+    b.write(accents ? c : (_accents[c] ?? c));
   }
   final mots = b
       .toString()
-      .replaceAll(RegExp(r'[^a-z0-9]+'), ' ')
+      .replaceAll(RegExp(r'[^a-z0-9àâäáãåçéèêëîïíìñôöóòõùûüúÿœæ]+'), ' ')
       .trim()
       .split(' ')
       .where((m) => m.isNotEmpty)
@@ -59,6 +60,7 @@ class CatalogueOff extends ChangeNotifier {
   // Contenu
   List<List<String>> _categories = []; // [tag, nom, synonymes…]
   List<Set<String>> _clesCategories = [];
+  List<Set<String>> _clesCategoriesAccents = [];
   final Map<String, List<dynamic>> _produits = {};
   final Map<String, String> _clesNoms = {};
   String baseVersion = '';
@@ -148,6 +150,7 @@ class CatalogueOff extends ChangeNotifier {
     _clesNoms.clear();
     _categories = [];
     _clesCategories = [];
+    _clesCategoriesAccents = [];
     _ajouterCategories(j['categories'] as List);
     for (final p in (j['produits'] as List)) {
       _ajouterProduit(p as List);
@@ -174,6 +177,7 @@ class CatalogueOff extends ChangeNotifier {
       final noms = [for (final x in c as List) x as String];
       _categories.add(noms);
       _clesCategories.add({for (final n in noms.skip(1)) cleRecherche(n)});
+      _clesCategoriesAccents.add({for (final n in noms.skip(1)) cleRecherche(n, accents: true)});
     }
   }
 
@@ -215,10 +219,18 @@ class CatalogueOff extends ChangeNotifier {
   ResultatRecherche rechercher(String texte, {int maximum = 100}) {
     final cle = cleRecherche(texte);
     if (cle.isEmpty || vide) return ResultatRecherche([], '');
-    final exactes = <int>{
-      for (var i = 0; i < _clesCategories.length; i++)
-        if (_clesCategories[i].contains(cle)) i
+    // Correspondance exacte avec une catégorie : accents respectés d'abord, puis ignorés
+    final cleAccents = cleRecherche(texte, accents: true);
+    var exactes = <int>{
+      for (var i = 0; i < _clesCategoriesAccents.length; i++)
+        if (_clesCategoriesAccents[i].contains(cleAccents)) i
     };
+    if (exactes.isEmpty) {
+      exactes = {
+        for (var i = 0; i < _clesCategories.length; i++)
+          if (_clesCategories[i].contains(cle)) i
+      };
+    }
     if (exactes.isNotEmpty) {
       final trouves = _produits.values
           .where((p) => (p[6] as List).any((i) => exactes.contains((i as num).toInt())))

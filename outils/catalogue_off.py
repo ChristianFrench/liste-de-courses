@@ -115,15 +115,29 @@ def chemin_photo_url(url):
 
 
 def chemin_photo_doc(doc):
-    """Chemin de la photo de face (200 px) d'après un document produit complet."""
+    """Chemin de la photo de face (200 px) d'après un document produit complet.
+
+    Deux formats coexistent chez Open Food Facts :
+      ancien  : images = {"front_fr": {"rev": "12", …}, …}
+      nouveau : images = {"selected": {"front": {"fr": {"rev": 12, …}, …}}, "uploaded": {…}}
+    """
     code = str(doc.get("code") or "")
     images = doc.get("images") or {}
     langue = doc.get("lang") or "fr"
-    for cle in ("front_fr", f"front_{langue}", "front"):
-        rev = (images.get(cle) or {}).get("rev")
-        if rev:
-            break
-    else:
+    cle = rev = None
+    choisies = ((images.get("selected") or {}).get("front") or {})
+    if isinstance(choisies, dict) and choisies:
+        for l in ["fr", langue] + list(choisies.keys()):
+            if isinstance(choisies.get(l), dict) and choisies[l].get("rev"):
+                cle, rev = f"front_{l}", choisies[l]["rev"]
+                break
+    if rev is None:
+        for c in ("front_fr", f"front_{langue}", "front"):
+            r = (images.get(c) or {}).get("rev") if isinstance(images.get(c), dict) else None
+            if r:
+                cle, rev = c, r
+                break
+    if rev is None:
         return ""
     if code.isdigit() and len(code) <= 13:
         c = code.zfill(13)
@@ -247,13 +261,39 @@ def lire_json(ligne):
         return json.loads(ligne)
 
 
+def popularite_france(doc):
+    """Popularité en France d'après les étiquettes de scans d'Open Food Facts
+    (« top-100-fr-scans-2025 », « at-least-5-fr-scans-2025 », « top-country-fr-scans-2025 »).
+    Année la plus récente ; à défaut d'étiquette française, une fraction des scans mondiaux."""
+    etiquettes = doc.get("popularity_tags") or []
+    par_annee = {}
+    for e in etiquettes:
+        m = re.match(r"^(top|at-least)-(\d+)-fr-scans-(\d{4})$", e)
+        if m:
+            n, annee = int(m.group(2)), int(m.group(3))
+            score = 1_000_000 // max(n, 1) if m.group(1) == "top" else n
+            par_annee[annee] = max(par_annee.get(annee, 0), score)
+        m = re.match(r"^top-country-fr-scans-(\d{4})$", e)
+        if m:
+            par_annee.setdefault(int(m.group(1)), 1)
+            par_annee[-int(m.group(1))] = 1  # marqueur « la France est le premier pays »
+    annees = [a for a in par_annee if a > 0]
+    if not annees:
+        return int(doc.get("unique_scans_n") or 0) // 100
+    a = max(annees)
+    score = 1000 + par_annee[a]
+    if -a in par_annee:
+        score *= 2
+    return score
+
+
 def doc_vers_produit(doc, cats):
     """Produit au format de l'extrait d'après un document complet (JSONL ou changements)."""
     code = str(doc.get("code") or "")
     nom = (doc.get("product_name_fr") or doc.get("product_name") or "").strip()
     marques = [m.strip() for m in (doc.get("brands") or "").split(",") if m.strip()]
     return [code, nom, marques[0] if marques else "", (doc.get("quantity") or "").strip(),
-            nutriscore(doc.get("nutriscore_grade")), int(doc.get("unique_scans_n") or 0),
+            nutriscore(doc.get("nutriscore_grade")), popularite_france(doc),
             cats.numeros(doc.get("categories_tags") or []), chemin_photo_doc(doc)]
 
 
@@ -262,6 +302,7 @@ def base_jsonl(entree, tax_json, tax_txt, sortie):
     noms = lire_taxonomie(tax_json, tax_txt)
     source = sys.stdin.buffer if entree == "-" else gzip.open(entree, "rb")
     candidats = []
+    exemples = []
     lus = france = 0
     jusqua = 0
     for ligne in source:
@@ -288,14 +329,28 @@ def base_jsonl(entree, tax_json, tax_txt, sortie):
         if not nom or not code.isdigit() or scans < SCANS_MIN:
             continue
         # On ne garde que l'utile (la mémoire reste raisonnable)
-        candidats.append({k: doc.get(k) for k in ("code", "product_name_fr", "product_name", "brands", "quantity",
-                                                   "nutriscore_grade", "unique_scans_n", "categories_tags", "lang")}
-                         | {"images": {k: v for k, v in (doc.get("images") or {}).items() if k.startswith("front")}})
+        images = doc.get("images") or {}
+        reduit = {k: doc.get(k) for k in ("code", "product_name_fr", "product_name", "brands", "quantity",
+                                          "nutriscore_grade", "unique_scans_n", "categories_tags", "lang",
+                                          "popularity_tags")}
+        reduit["images"] = {k: v for k, v in images.items() if k.startswith("front")}
+        if isinstance(images.get("selected"), dict):
+            reduit["images"]["selected"] = {"front": images["selected"].get("front") or {}}
+        reduit["_pop"] = popularite_france(reduit)
+        if len(exemples) < 3 and scans > 1000:
+            exemples.append({"code": code, "images_cles": list(images.keys())[:12],
+                             "selected_front": (images.get("selected") or {}).get("front") if isinstance(images.get("selected"), dict) else None,
+                             "popularity_tags": [e for e in (doc.get("popularity_tags") or []) if "fr" in e][:12]})
+        candidats.append(reduit)
     print(f"lu : {lus} lignes ; vendus en France : {france} ; candidats : {len(candidats)}")
     print(f"dernière modification : {time.strftime('%d/%m/%Y %H:%M', time.gmtime(jusqua))} UTC")
-    candidats.sort(key=lambda d: -int(d.get("unique_scans_n") or 0))
+    for e in exemples:
+        print("exemple :", json.dumps(e, ensure_ascii=False)[:900])
+    candidats.sort(key=lambda d: (-d["_pop"], -int(d.get("unique_scans_n") or 0)))
     cats = Categories(noms)
     produits = [doc_vers_produit(d, cats) for d in candidats[:MAX_PRODUITS]]
+    print(f"avec photo : {sum(1 for p in produits if p[7])} ; avec popularité française : "
+          f"{sum(1 for d in candidats[:MAX_PRODUITS] if d['_pop'] >= 1000)}")
     contenu = {
         "version": time.strftime("%Y%m%d"),
         "jusqua": jusqua,

@@ -108,12 +108,14 @@ void main() {
           ['en:pastas', 'pâtes alimentaires', 'pâtes'],
           ['fr:pates-a-tartiner', 'Pâtes à tartiner', 'Pâte à tartiner'],
           ['en:semi-skimmed-milks', 'Laits demi-écrémés', 'lait demi-écrémé'],
+          ['en:pates', 'Pâtés'],
         ],
         'produits': [
           ['3017620422003', 'Nutella', 'Ferrero', '400 g', 'e', 5000, [1], ''],
           ['3038350208606', 'Spaghetti n°5', 'Panzani', '500 g', 'a', 800, [0], '303/835/020/8606/front_fr.1.200.jpg'],
           ['8076800195057', 'Penne rigate', 'Barilla', '500 g', 'a', 900, [0], ''],
           ['3428272950057', 'Lait demi-écrémé UHT', 'Lactel', '1 L', 'b', 700, [2], ''],
+          ['3250390000000', 'Pâté de campagne', 'Hénaff', '78 g', 'd', 600, [3], ''],
         ],
       });
       final pates = c.rechercher('Pâtes');
@@ -123,6 +125,8 @@ void main() {
       expect(c.rechercher('barilla').articles.single.nom, 'Penne rigate');
       expect(c.parCode('3038350208606')!.imagePetite, contains('/images/products/303/835/020/8606/front_fr.1.200.jpg'));
       expect(c.parMarque('PANZANI').length, 1);
+      expect(c.rechercher('Pâtés').articles.single.nom, 'Pâté de campagne');
+      expect(c.rechercher('pates').articles.length, 3); // sans accents : pâtes et pâtés
       c.appliquerMaj({
         'base': '20261009',
         'jusqua': 1760090000,
@@ -132,7 +136,7 @@ void main() {
         ],
       });
       expect(c.rechercher('pâtes').articles.length, 3);
-      expect(c.nbProduits, 5);
+      expect(c.nbProduits, 6);
     });
 
     test('lecture d\'un article', () {
