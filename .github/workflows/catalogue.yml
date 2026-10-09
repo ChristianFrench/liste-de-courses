@@ -24,6 +24,21 @@ env:
   PAGE: https://github.com/ChristianFrench/liste-de-courses/releases/download/catalogue-off
 
 jobs:
+  diagnostic:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fraîcheur des exports Open Food Facts (diagnostic temporaire)
+        run: |
+          for u in https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz \
+                   https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz \
+                   https://static.openfoodfacts.org/data/delta/index.txt \
+                   "https://huggingface.co/datasets/openfoodfacts/product-database/resolve/main/food.parquet?download=true"; do
+            H=$(curl -sSIL -A "$UA" "$u" | grep -iE '^(last-modified|content-length)' | tr '\r\n' '  ')
+            echo "::notice title=$(basename "${u%%\?*}")::$H"
+          done
+          echo "::notice title=delta index::$(curl -fsSL -A "$UA" https://static.openfoodfacts.org/data/delta/index.txt | tr '\n' ' ')"
+
   base:
     if: >-
       (github.event_name == 'schedule' && github.event.schedule == '17 3 1 * *') ||
