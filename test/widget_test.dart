@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' show Axis, Scrollable, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
@@ -56,6 +56,11 @@ Future<void> _accueil(WidgetTester tester) async {
 }
 
 Future<void> _toucher(WidgetTester tester, Finder f) async {
+  if (f.evaluate().isEmpty) {
+    // Élément pas encore construit : faire défiler la liste verticale jusqu'à lui
+    await tester.scrollUntilVisible(f, 150,
+        scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+  }
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
   await tester.tap(f);
@@ -221,7 +226,7 @@ void main() {
       await _toucher(tester, find.text('Garder 10 et compléter'));
       expect(find.textContaining('Ma liste · 10'), findsOneWidget);
       await _toucher(tester, find.text('Liste prête'));
-      expect(find.text('Prêtes pour les courses'), findsOneWidget);
+      expect(find.text('PRÊTES POUR LES COURSES'), findsOneWidget);
     });
 
     testWidgets('9. Pause puis Interrompre ; Reprendre ramène au même secteur avec les mêmes coches', (tester) async {

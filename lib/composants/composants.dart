@@ -348,7 +348,7 @@ class BoutonPromo extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: SizedBox(
-          width: 40,
+          width: 44,
           height: 44,
           child: Center(
             child: code == null
@@ -392,14 +392,15 @@ class SelecteurQuantite extends StatelessWidget {
   final int quantite;
   final ValueChanged<int> onChange;
 
+  /// Zone tactile de 44 × 44 ; le signe est dessiné dans le cadre de 34 de haut.
   Widget _bouton(String signe, int valeur, String libelle) => Semantics(
         button: true,
         label: libelle,
         child: InkWell(
           onTap: () => onChange(valeur),
           child: SizedBox(
-            width: 34,
-            height: 34,
+            width: 44,
+            height: 44,
             child: Center(child: Text(signe, style: Charte.texte(18, gras: true))),
           ),
         ),
@@ -407,22 +408,35 @@ class SelecteurQuantite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 34,
-      decoration: BoxDecoration(
-        color: Charte.fond,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: Charte.encre, width: Charte.traitCadre),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return SizedBox(
+      height: 44,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          _bouton('−', quantite - 1, 'Diminuer'),
-          SizedBox(
-            width: 24,
-            child: Text('$quantite', textAlign: TextAlign.center, style: Charte.texte(16, gras: true)),
+          Positioned(
+            left: 6,
+            right: 6,
+            top: 5,
+            bottom: 5,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Charte.fond,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Charte.encre, width: Charte.traitCadre),
+              ),
+            ),
           ),
-          _bouton('+', quantite + 1, 'Augmenter'),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _bouton('−', quantite - 1, 'Diminuer'),
+              SizedBox(
+                width: 18,
+                child: Text('$quantite', textAlign: TextAlign.center, style: Charte.texte(16, gras: true)),
+              ),
+              _bouton('+', quantite + 1, 'Augmenter'),
+            ],
+          ),
         ],
       ),
     );
@@ -1126,6 +1140,7 @@ class SousOnglets extends StatelessWidget {
         ),
         clipBehavior: Clip.antiAlias,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             for (var i = 0; i < onglets.length; i++) ...[
               if (i > 0) Container(width: 1.5, color: Charte.encre),

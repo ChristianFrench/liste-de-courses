@@ -37,6 +37,10 @@ Future<void> _polices() async {
 Future<void> _capture(String nom) => expectLater(find.byKey(_cle), matchesGoldenFile('captures/$nom.png'));
 
 Future<void> _toucher(WidgetTester tester, Finder f) async {
+  if (f.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(f, 150,
+        scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+  }
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
   await tester.tap(f);

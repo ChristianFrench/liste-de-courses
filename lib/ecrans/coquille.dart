@@ -33,6 +33,7 @@ class BarreOnglets extends StatelessWidget {
         border: Border(top: BorderSide(color: Charte.encre, width: Charte.traitCadre)),
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           for (var i = 0; i < entrees.length; i++)
             Expanded(
