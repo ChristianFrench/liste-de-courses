@@ -17,6 +17,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: { channel: stable, cache: true }
+      - name: Diagnostic temporaire Open Food Facts
+        continue-on-error: true
+        run: |
+          UA="ListeDeCourses/0.4 (maquette; github.com/ChristianFrench/liste-de-courses)"
+          F="code,product_name,brands,brands_tags,quantity,image_front_small_url,nutriscore_grade,countries_tags"
+          curl -sS -A "$UA" "https://search.openfoodfacts.org/search?q=lait%20demi%20%C3%A9cr%C3%A9m%C3%A9%20countries_tags:%22en:france%22&page_size=8&sort_by=-unique_scans_n&fields=$F" > sal.json
+          python3 -c "
+          import json;d=json.load(open('sal.json'));print('::notice title=SAL::'+json.dumps({k:d[k] for k in d if k!='hits'})[:300]+' %0A'+'%0A'.join(json.dumps(h,ensure_ascii=False)[:400] for h in d.get('hits',[])[:6]))"
+          curl -sS -A "$UA" "https://fr.openfoodfacts.org/cgi/search.pl?search_terms=lait+demi+ecreme&search_simple=1&action=process&json=1&page_size=8&sort_by=unique_scans_n&tagtype_0=countries&tag_contains_0=contains&tag_0=en%3Afrance&fields=$F" > cgi.json
+          python3 -c "
+          import json;d=json.load(open('cgi.json'));print('::notice title=CGI::count='+str(d.get('count'))+'%0A'+'%0A'.join(h.get('code','')+' '+h.get('product_name','')+' '+str(h.get('countries_tags'))[:120] for h in d.get('products',[])[:8]))"
       - name: Analyser le code
         run: |
           flutter pub get
@@ -45,7 +56,7 @@ jobs:
           if [ $code -ne 0 ]; then python3 outils/annoter.py captures.log "Captures des écrans"; fi
           # Écran d'essai Open Food Facts avec de vraies données : un échec ne bloque pas
           flutter test --update-goldens test/captures_off_test.dart > captures_off.log 2>&1 \
-            || { echo "::warning title=Captures Open Food Facts::échec (voir le journal)"; tail -n 60 captures_off.log; }
+            || { echo "::warning title=Captures Open Food Facts::échec, détail ci-dessous"; python3 outils/annoter.py captures_off.log "Captures Open Food Facts" | grep '^::' | sed 's/^::error/::warning/'; }
           ls test/captures || exit 1
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
