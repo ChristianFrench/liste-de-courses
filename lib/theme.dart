@@ -80,7 +80,7 @@ class Charte {
       ),
       inputDecorationTheme: const InputDecorationTheme(
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(8)),
           borderSide: BorderSide(color: encre, width: traitCadre),
