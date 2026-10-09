@@ -157,7 +157,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
         if (i == 0) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-            child: Text('${r.length} produit${r.length > 1 ? 's' : ''} · les plus scannés en France d\'abord',
+            child: Text('${r.length} produit${r.length > 1 ? 's' : ''} vendus en France · codes-barres français d\'abord',
                 style: Charte.texte(12, couleur: Charte.texteSecondaire)),
           );
         }

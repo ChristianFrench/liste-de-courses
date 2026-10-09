@@ -122,7 +122,14 @@ class OpenFoodFacts {
       'fields': champs,
     });
     final j = await _lire(adresse);
-    return _articles(j['products']);
+    return francaisDabord(_articles(j['products']));
+  }
+
+  /// Codes-barres attribués en France (préfixes 300 à 379) placés en tête,
+  /// en gardant l'ordre de popularité à l'intérieur de chaque groupe.
+  static List<ArticleOff> francaisDabord(List<ArticleOff> liste) {
+    bool francais(ArticleOff a) => a.code.length == 13 && a.code.startsWith('3');
+    return [...liste.where(francais), ...liste.where((a) => !francais(a))];
   }
 
   /// Article par code-barres ; null s'il est inconnu.
@@ -144,7 +151,7 @@ class OpenFoodFacts {
       'fields': champs,
     }));
     final total = (j['count'] as num?)?.toInt() ?? 0;
-    return (total, _articles(j['products']));
+    return (total, francaisDabord(_articles(j['products'])));
   }
 }
 

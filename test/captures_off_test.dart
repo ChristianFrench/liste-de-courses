@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/code_barres.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/e13_produits_reels.dart';
@@ -54,7 +55,8 @@ Future<void> _afficher(WidgetTester tester, Widget ecran, List<String> images) a
     final ctx = tester.element(find.byType(Navigator).first);
     for (final url in images.where((u) => u.isNotEmpty)) {
       try {
-        await precacheImage(NetworkImage(url, headers: const {'User-Agent': OpenFoodFacts.agent}), ctx);
+        await _telecharger(url);
+        await precacheImage(PhotoArticle.fournisseur(url), ctx).timeout(const Duration(seconds: 10));
       } catch (_) {}
     }
   });
@@ -62,9 +64,28 @@ Future<void> _afficher(WidgetTester tester, Widget ecran, List<String> images) a
   await tester.pump(const Duration(milliseconds: 100));
 }
 
+final Map<String, Uint8List> _photos = {};
+
+/// Télécharge une photo (10 s au plus) ; elle est ensuite servie depuis la mémoire.
+Future<void> _telecharger(String url) async {
+  if (_photos.containsKey(url)) return;
+  final client = HttpClient()..userAgent = OpenFoodFacts.agent;
+  try {
+    final rep = await (await client.getUrl(Uri.parse(url))).close().timeout(const Duration(seconds: 10));
+    final octets = <int>[];
+    await for (final morceau in rep.timeout(const Duration(seconds: 10))) {
+      octets.addAll(morceau);
+    }
+    if (rep.statusCode == 200) _photos[url] = Uint8List.fromList(octets);
+  } finally {
+    client.close(force: true);
+  }
+}
+
 void main() {
   setUpAll(() async {
     HttpOverrides.global = null; // accès réel au réseau pour ces captures
+    PhotoArticle.fournisseur = (url) => _photos.containsKey(url) ? MemoryImage(_photos[url]!) : const AssetImage('assets/icone_ronde.png');
     await _police('Atkinson', [
       'assets/polices/AtkinsonHyperlegible-Regular.ttf',
       'assets/polices/AtkinsonHyperlegible-Bold.ttf',
@@ -93,5 +114,5 @@ void main() {
           [for (final x in m.$2.take(10)) x.imagePetite]);
       await expectLater(find.byKey(_cle), matchesGoldenFile('captures/13c marque.png'));
     }
-  }, skip: !_actif, timeout: const Timeout(Duration(minutes: 3)));
+  }, skip: !_actif, timeout: const Timeout(Duration(minutes: 4)));
 }

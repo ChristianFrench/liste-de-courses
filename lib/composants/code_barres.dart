@@ -93,6 +93,10 @@ class PhotoArticle extends StatelessWidget {
   final String url;
   final double taille;
 
+  /// Source des photos ; remplaçable pour les captures automatiques.
+  static ImageProvider Function(String url) fournisseur =
+      (url) => NetworkImage(url, headers: const {'User-Agent': OpenFoodFacts.agent});
+
   @override
   Widget build(BuildContext context) {
     Widget vide(String texte) => Container(
@@ -108,10 +112,9 @@ class PhotoArticle extends StatelessWidget {
       child: SizedBox(
         width: taille,
         height: taille,
-        child: Image.network(
-          url,
+        child: Image(
+          image: fournisseur(url),
           fit: BoxFit.contain,
-          headers: const {'User-Agent': OpenFoodFacts.agent},
           loadingBuilder: (context, enfant, progression) => progression == null ? enfant : vide('…'),
           errorBuilder: (context, erreur, pile) => vide('Photo indisponible'),
         ),
