@@ -540,21 +540,31 @@ class LigneCompacte extends StatelessWidget {
       padding: const EdgeInsets.only(left: 40, right: 12),
       child: Row(
         children: [
-          Flexible(
-            child: Text.rich(
-              TextSpan(children: [
-                TextSpan(text: nom, style: Charte.texte(15, couleur: couleur, barre: coche)),
-                if (complement.isNotEmpty)
-                  TextSpan(text: '  $complement', style: Charte.texte(12, couleur: Charte.texteSecondaire, barre: coche)),
-              ]),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text.rich(
+                    TextSpan(children: [
+                      TextSpan(text: nom, style: Charte.texte(15, couleur: couleur, barre: coche)),
+                      if (complement.isNotEmpty)
+                        TextSpan(
+                            text: '  $complement',
+                            style: Charte.texte(12, couleur: Charte.texteSecondaire, barre: coche)),
+                    ]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (promo != null) ...[const SizedBox(width: 6), IconePromo(type: promo!)],
+              ],
             ),
           ),
-          if (promo != null) ...[const SizedBox(width: 6), IconePromo(type: promo!)],
-          const Spacer(),
           const SizedBox(width: 8),
-          Text('$quantite', style: Charte.texte(15, gras: true, couleur: couleur)),
+          SizedBox(
+            width: 28,
+            child: Text('$quantite', textAlign: TextAlign.right, style: Charte.texte(15, gras: true, couleur: couleur)),
+          ),
         ],
       ),
     );
@@ -626,6 +636,7 @@ class Bouton extends StatelessWidget {
     this.pointille = false,
     this.hauteur = 48,
     this.icone,
+    this.iconeApres,
     this.taille = 17,
   });
   final String texte;
@@ -634,6 +645,7 @@ class Bouton extends StatelessWidget {
   final bool pointille;
   final double hauteur;
   final IconData? icone;
+  final IconData? iconeApres;
   final double taille;
 
   @override
@@ -646,14 +658,19 @@ class Bouton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icone != null) ...[Icon(icone, size: 20, color: texteCouleur), const SizedBox(width: 8)],
-          Flexible(
-            child: Text(texte,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
-          ),
+          if (icone != null) ...[
+            Icon(icone, size: 20 + (texte.isEmpty ? 10 : 0), color: texteCouleur),
+            if (texte.isNotEmpty) const SizedBox(width: 6),
+          ],
+          if (texte.isNotEmpty)
+            Flexible(
+              child: Text(texte,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
+            ),
+          if (iconeApres != null) ...[const SizedBox(width: 4), Icon(iconeApres, size: 28, color: texteCouleur)],
         ],
       ),
     );

@@ -99,7 +99,7 @@ class EcranFicheProduit extends StatelessWidget {
                           style: Charte.texte(15),
                         ),
                       ),
-                      Text('${etat.magasin(pr.magasinId)?.nom ?? ''} · → ${jjmm(pr.fin)}',
+                      Text("${etat.magasin(pr.magasinId)?.nom ?? ''} · jusqu'au ${jjmm(pr.fin)}",
                           style: Charte.texte(12, couleur: Charte.texteSecondaire)),
                     ],
                   ),
@@ -204,29 +204,27 @@ class EcranFicheProduit extends StatelessWidget {
   }
 
   Widget _pastille(String texte) => Container(
-        height: 40,
+        height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        alignment: Alignment.center,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(color: Charte.encre, width: Charte.traitCadre),
         ),
-        child: Text(texte, style: Charte.texte(15)),
+        child: Center(widthFactor: 1, child: Text(texte, style: Charte.texte(15))),
       );
 
   Widget _ajout(String texte, VoidCallback onTap) => CadrePointille(
-        rayon: 20,
+        rayon: 22,
         child: Material(
           color: Charte.fond,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,
             child: Container(
               height: 44,
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.center,
-              child: Text(texte, style: Charte.texte(15)),
+              child: Center(widthFactor: 1, child: Text(texte, style: Charte.texte(15))),
             ),
           ),
         ),

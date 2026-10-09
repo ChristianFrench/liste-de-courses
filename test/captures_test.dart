@@ -75,6 +75,12 @@ Future<void> _capturer(WidgetTester tester, String nom, Widget ecran) async {
     ),
   ));
   await tester.pumpAndSettle();
+  // Charger réellement les images (icône) avant la capture
+  await tester.runAsync(() async {
+    final ctx = tester.element(find.byType(Navigator).first);
+    await precacheImage(const AssetImage('assets/icone_ronde.png'), ctx);
+  });
+  await tester.pumpAndSettle();
   await expectLater(find.byKey(_cle), matchesGoldenFile('captures/$nom.png'));
 }
 
@@ -119,6 +125,12 @@ void main() {
     e.cocher('p3');
     e.basculerReseau();
     await _capturer(t, '06 courses par secteur', const EcranCoursesSecteur());
+  }, skip: !_actif);
+  testWidgets('06b dernier secteur', (t) async {
+    e.demarrerCourses(e.liste('l1')!, 'm1', 'pc1');
+    final n = e.etapes(e.liste('l1')!, 'pc1').length;
+    e.allerEtape(n - 1);
+    await _capturer(t, '06b dernier secteur', const EcranCoursesSecteur());
   }, skip: !_actif);
   testWidgets('07 foyer', (t) => _capturer(t, '07 foyer', const EcranFoyer()), skip: !_actif);
   testWidgets('08 produits', (t) => _capturer(t, '08 produits', const EcranProduits()), skip: !_actif);

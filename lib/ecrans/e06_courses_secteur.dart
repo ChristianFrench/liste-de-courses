@@ -138,12 +138,18 @@ class EcranCoursesSecteur extends StatelessWidget {
           bas: [
             BarreAction(boutons: [
               if (i > 0)
-                Bouton(texte: '◀ ${nomEtape(i - 1)}', taille: 16, onTap: () => etat.allerEtape(i - 1))
+                Bouton(
+                  texte: nomEtape(i - 1),
+                  icone: Icons.arrow_left,
+                  taille: 16,
+                  onTap: () => etat.allerEtape(i - 1),
+                )
               else
-                const Bouton(texte: '◀', onTap: null),
+                const Bouton(texte: '', icone: Icons.arrow_left, onTap: null),
               if (i < etapes.length - 1)
                 Bouton(
-                  texte: '${nomEtape(i + 1)} ▶',
+                  texte: nomEtape(i + 1),
+                  iconeApres: Icons.arrow_right,
                   taille: secteurTermine ? 17 : 16,
                   plein: true,
                   onTap: () => etat.allerEtape(i + 1),
