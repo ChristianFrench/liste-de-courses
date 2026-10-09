@@ -52,6 +52,13 @@ jobs:
           git commit -qm "Captures des écrans pour ${GITHUB_SHA::7}"
           git push -qf origin HEAD:refs/heads/captures
           exit $code
+      - name: Conserver les captures pour la publication
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Captures
+          path: test/captures/
+          if-no-files-found: ignore
 
   android:
     runs-on: ubuntu-latest
@@ -132,3 +139,42 @@ jobs:
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation iPhone"; else tail -n 20 compilation.log; fi
           exit $code
+
+  publication:
+    name: publication (page « derniere-version »)
+    needs: [verification, android, windows]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: livrables }
+      - name: Préparer les fichiers
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          mkdir -p publication
+          cp "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk
+          (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
+          (cd livrables/Captures && zip -qr ../../publication/Captures.zip .)
+          (cd documents && zip -qr ../publication/Documents.zip .)
+          {
+            echo "version=$VERSION"
+            echo "commit=${GITHUB_SHA::7}"
+            echo "date=$(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')"
+          } > publication/version.txt
+          cat publication/version.txt
+          ls -la publication
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(grep '^version=' publication/version.txt | cut -d= -f2)
+          gh release delete derniere-version --yes --cleanup-tag 2>/dev/null || true
+          git push -q origin :refs/tags/derniere-version 2>/dev/null || true
+          gh release create derniere-version publication/* \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Dernière version — $VERSION (${GITHUB_SHA::7})" \
+            --notes "Fichiers récupérés automatiquement par « Mettre a jour.bat ». Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')."
