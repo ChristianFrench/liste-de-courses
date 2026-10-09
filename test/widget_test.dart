@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
+import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/main.dart';
@@ -97,6 +98,43 @@ void main() {
       expect(m.take(3), [true, false, true]);
     });
 
+    test('catalogue : « pâtes » trouve les pâtes alimentaires, pas la pâte à tartiner', () {
+      final c = CatalogueOff.instance;
+      c.lireBase({
+        'version': '20261009',
+        'jusqua': 1760000000,
+        'date': '09/10/2026',
+        'categories': [
+          ['en:pastas', 'pâtes alimentaires', 'pâtes'],
+          ['fr:pates-a-tartiner', 'Pâtes à tartiner', 'Pâte à tartiner'],
+          ['en:semi-skimmed-milks', 'Laits demi-écrémés', 'lait demi-écrémé'],
+        ],
+        'produits': [
+          ['3017620422003', 'Nutella', 'Ferrero', '400 g', 'e', 5000, [1], ''],
+          ['3038350208606', 'Spaghetti n°5', 'Panzani', '500 g', 'a', 800, [0], '303/835/020/8606/front_fr.1.200.jpg'],
+          ['8076800195057', 'Penne rigate', 'Barilla', '500 g', 'a', 900, [0], ''],
+          ['3428272950057', 'Lait demi-écrémé UHT', 'Lactel', '1 L', 'b', 700, [2], ''],
+        ],
+      });
+      final pates = c.rechercher('Pâtes');
+      expect(pates.articles.map((a) => a.nom), ['Penne rigate', 'Spaghetti n°5']);
+      expect(c.rechercher('pate a tartiner').articles.single.nom, 'Nutella');
+      expect(c.rechercher('Laits demi-écrémés').articles.single.marque, 'Lactel');
+      expect(c.rechercher('barilla').articles.single.nom, 'Penne rigate');
+      expect(c.parCode('3038350208606')!.imagePetite, contains('/images/products/303/835/020/8606/front_fr.1.200.jpg'));
+      expect(c.parMarque('PANZANI').length, 1);
+      c.appliquerMaj({
+        'base': '20261009',
+        'jusqua': 1760090000,
+        'categories': [],
+        'produits': [
+          ['3560070000000', 'Coquillettes', 'Carrefour', '1 kg', 'a', 3, [0], ''],
+        ],
+      });
+      expect(c.rechercher('pâtes').articles.length, 3);
+      expect(c.nbProduits, 5);
+    });
+
     test('lecture d\'un article', () {
       final a = ArticleOff.depuis({
         'code': '3428272950057',
@@ -139,7 +177,7 @@ void main() {
       await tester.tap(find.textContaining('Produits réels'));
       await tester.pumpAndSettle();
       expect(find.text('Produits réels (essai)'), findsOneWidget);
-      expect(find.textContaining('Cherchez un produit'), findsOneWidget);
+      expect(find.textContaining('Cherchez une catégorie'), findsOneWidget);
       await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
     });
 

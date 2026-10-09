@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
 import 'ecrans/e01_accueil.dart';
 import 'theme.dart';
@@ -9,6 +10,8 @@ import 'theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Etat.instance.charger();
+  // Catalogue Open Food Facts : chargé en arrière-plan, mis à jour selon le délai réglé
+  CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
 }
 

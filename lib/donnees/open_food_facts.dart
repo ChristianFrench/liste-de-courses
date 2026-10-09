@@ -15,6 +15,8 @@ class ArticleOff {
     required this.imagePetite,
     required this.imageGrande,
     required this.nutriscore,
+    this.categories = const [],
+    this.scans = 0,
   });
 
   final String code;
@@ -32,6 +34,12 @@ class ArticleOff {
 
   /// Nutri-Score : a à e, ou vide si non calculé.
   final String nutriscore;
+
+  /// Catégories (noms français), de la plus générale à la plus précise.
+  final List<String> categories;
+
+  /// Nombre de personnes ayant scanné le produit (popularité).
+  final int scans;
 
   String get marque => marques.isEmpty ? '' : marques.first;
   String? get marqueTag => marquesTags.isEmpty ? null : marquesTags.first;

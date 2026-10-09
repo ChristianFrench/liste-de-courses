@@ -2,19 +2,22 @@ import 'package:flutter/material.dart';
 
 import '../composants/code_barres.dart';
 import '../composants/composants.dart';
+import '../donnees/catalogue_off.dart';
 import '../donnees/modele.dart';
 import '../donnees/open_food_facts.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
 /// Écran d'essai — Produits réels, d'après la base libre Open Food Facts.
-/// Recherche par nom ou par code-barres ; fiche d'un article ; produits d'une marque.
+/// La recherche se fait dans le catalogue gardé sur l'appareil (sans réseau) :
+/// par catégorie, par nom ou marque, ou par code-barres.
 class EcranProduitsReels extends StatefulWidget {
-  const EcranProduitsReels({super.key, this.rechercheInitiale, this.resultatsInitiaux});
+  const EcranProduitsReels({super.key, this.rechercheInitiale, this.resultatsInitiaux, this.explicationInitiale = ''});
 
   /// Pour les captures automatiques : recherche déjà faite.
   final String? rechercheInitiale;
   final List<ArticleOff>? resultatsInitiaux;
+  final String explicationInitiale;
 
   @override
   State<EcranProduitsReels> createState() => _EcranProduitsReelsState();
@@ -25,6 +28,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
 
   final saisie = TextEditingController();
   List<ArticleOff>? resultats;
+  String explication = '';
   String? erreur;
   bool enCours = false;
   String derniere = '';
@@ -37,6 +41,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
       derniere = widget.rechercheInitiale!;
     }
     resultats = widget.resultatsInitiaux;
+    explication = widget.explicationInitiale;
   }
 
   @override
@@ -56,16 +61,31 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
       erreur = null;
     });
     try {
+      final catalogue = CatalogueOff.instance;
       final chiffres = texte.replaceAll(' ', '');
       List<ArticleOff> trouves;
+      var texteExplication = '';
       if (RegExp(r'^\d{8,14}$').hasMatch(chiffres)) {
-        final a = await OpenFoodFacts.instance.parCode(chiffres);
-        trouves = a == null ? [] : [a];
+        // Code-barres : catalogue de l'appareil, sinon site d'Open Food Facts
+        final local = catalogue.parCode(chiffres);
+        if (local != null) {
+          trouves = [local];
+          texteExplication = 'Code-barres trouvé dans le catalogue';
+        } else {
+          final a = await OpenFoodFacts.instance.parCode(chiffres);
+          trouves = a == null ? [] : [a];
+          texteExplication = 'Code-barres absent du catalogue : recherche sur le site d\'Open Food Facts';
+        }
       } else {
-        trouves = await OpenFoodFacts.instance.rechercher(texte);
+        final r = catalogue.rechercher(texte);
+        trouves = r.articles;
+        texteExplication = r.explication;
       }
       if (!mounted) return;
-      setState(() => resultats = trouves);
+      setState(() {
+        resultats = trouves;
+        explication = texteExplication;
+      });
     } on ErreurOff catch (e) {
       if (!mounted) return;
       setState(() => erreur = e.message);
@@ -79,7 +99,11 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
     return PageBase(
       entete: EnTeteGestion(
         titre: 'Produits réels (essai)',
-        action: Text('Open Food Facts', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+        action: BoutonIcone(
+          icone: Icons.cloud_sync_outlined,
+          libelle: 'Catalogue et mises à jour',
+          onTap: () => Nav.aller(context, const EcranCatalogue()),
+        ),
       ),
       haut: [
         Padding(
@@ -107,6 +131,10 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
           puces: [for (final e in exemples) Puce(e)],
           selection: exemples.indexOf(derniere),
           onChoix: (i) => _chercher(exemples[i]),
+        ),
+        ListenableBuilder(
+          listenable: CatalogueOff.instance,
+          builder: (context, _) => _EtatCatalogue(onTap: () => Nav.aller(context, const EcranCatalogue())),
         ),
       ],
       corps: _corps(),
@@ -145,11 +173,15 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
     if (r == null) {
       return _message(
         Icons.travel_explore,
-        'Cherchez un produit par son nom ou tapez les chiffres de son code-barres, '
-        'ou touchez un exemple ci-dessus.\n\nUne connexion internet est nécessaire.',
+        'Cherchez une catégorie (« pâtes », « café moulu »…), un nom ou une marque, '
+        'ou tapez les chiffres d\'un code-barres. Vous pouvez aussi toucher un exemple ci-dessus.\n\n'
+        'La recherche se fait dans le catalogue gardé sur l\'appareil : pas besoin de réseau.',
       );
     }
-    if (r.isEmpty) return _message(Icons.search_off, 'Aucun produit trouvé pour « $derniere ».');
+    if (r.isEmpty) {
+      return _message(Icons.search_off,
+          CatalogueOff.instance.vide ? 'Le catalogue n\'est pas encore chargé.' : 'Aucun produit trouvé pour « $derniere ».');
+    }
     return ListView.builder(
       padding: const EdgeInsets.only(bottom: 8),
       itemCount: r.length + 1,
@@ -157,7 +189,10 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
         if (i == 0) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
-            child: Text('${r.length} produit${r.length > 1 ? 's' : ''} vendus en France · codes-barres français d\'abord',
+            child: Text(
+                r.length >= 100 && explication.isNotEmpty
+                    ? '$explication · les 100 plus populaires'
+                    : (explication.isEmpty ? '${r.length} produit${r.length > 1 ? 's' : ''}' : explication),
                 style: Charte.texte(12, couleur: Charte.texteSecondaire)),
           );
         }
@@ -270,12 +305,13 @@ class EcranArticle extends StatelessWidget {
           const SizedBox(height: 8),
           ligne('Nom', Text(a.nom, style: Charte.texte(16, gras: true))),
           if (a.nomGenerique.isNotEmpty) ligne('Dénomination', Text(a.nomGenerique, style: Charte.texte(15))),
+          if (a.categories.isNotEmpty) ligne('Catégorie', Text(a.categories.last, style: Charte.texte(15))),
           ligne(
             'Marque',
-            a.marqueTag == null
-                ? Text(a.marque.isEmpty ? '—' : a.marque, style: Charte.texte(15))
+            a.marque.isEmpty
+                ? Text('—', style: Charte.texte(15))
                 : Lien('${a.marque} · voir tous ses produits',
-                    taille: 15, onTap: () => Nav.aller(context, EcranMarque(marque: a.marque, marqueTag: a.marqueTag!))),
+                    taille: 15, onTap: () => Nav.aller(context, EcranMarque(marque: a.marque))),
           ),
           if (a.marques.length > 1) ligne('Autres marques', Text(a.marques.skip(1).join(', '), style: Charte.texte(15))),
           ligne('Quantité', Text(a.quantite.isEmpty ? '—' : a.quantite, style: Charte.texte(15))),
@@ -335,85 +371,160 @@ class EcranArticle extends StatelessWidget {
   }
 }
 
-/// Tous les produits d'une marque (vendus en France).
-class EcranMarque extends StatefulWidget {
-  const EcranMarque({super.key, required this.marque, required this.marqueTag, this.initial});
+/// Tous les produits d'une marque présents dans le catalogue de l'appareil.
+class EcranMarque extends StatelessWidget {
+  const EcranMarque({super.key, required this.marque});
   final String marque;
-  final String marqueTag;
-
-  /// Pour les captures automatiques : résultat déjà chargé.
-  final (int, List<ArticleOff>)? initial;
-
-  @override
-  State<EcranMarque> createState() => _EcranMarqueState();
-}
-
-class _EcranMarqueState extends State<EcranMarque> {
-  (int, List<ArticleOff>)? resultat;
-  String? erreur;
-
-  @override
-  void initState() {
-    super.initState();
-    resultat = widget.initial;
-    if (resultat == null) _charger();
-  }
-
-  Future<void> _charger() async {
-    setState(() => erreur = null);
-    try {
-      final r = await OpenFoodFacts.instance.parMarque(widget.marqueTag);
-      if (mounted) setState(() => resultat = r);
-    } on ErreurOff catch (e) {
-      if (mounted) setState(() => erreur = e.message);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
-    final r = resultat;
-    Widget corps;
-    if (erreur != null) {
-      corps = Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(erreur!, textAlign: TextAlign.center, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 16),
-            SizedBox(width: 200, child: Bouton(texte: 'Réessayer', onTap: _charger)),
-          ],
-        ),
-      );
-    } else if (r == null) {
-      corps = const Center(child: CircularProgressIndicator(color: Charte.encre));
-    } else {
-      corps = ListView.builder(
-        itemCount: r.$2.length + 1,
+    final articles = CatalogueOff.instance.parMarque(marque);
+    return PageBase(
+      entete: EnTeteGestion(titre: 'Marque · $marque'),
+      corps: ListView.builder(
+        itemCount: articles.length + 1,
         itemBuilder: (context, i) {
           if (i == 0) {
-            final affiches = r.$2.length;
             return Padding(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
               child: Text(
-                r.$1 > affiches
-                    ? '${r.$1} produits vendus en France · les $affiches plus scannés'
-                    : '${r.$1} produit${r.$1 > 1 ? 's' : ''} vendu${r.$1 > 1 ? 's' : ''} en France',
+                '${articles.length} produit${articles.length > 1 ? 's' : ''} de cette marque dans le catalogue, '
+                'les plus populaires d\'abord',
                 style: Charte.texte(12, couleur: Charte.texteSecondaire),
               ),
             );
           }
-          return LigneArticle(article: r.$2[i - 1]);
+          return LigneArticle(article: articles[i - 1]);
         },
-      );
-    }
-    return PageBase(
-      entete: EnTeteGestion(
-        titre: 'Marque · ${widget.marque}',
-        action: Text('Open Food Facts', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
       ),
-      corps: corps,
       bas: const [BarreNavigation(index: 2)],
+    );
+  }
+}
+
+/// Ligne d'état du catalogue, sous la recherche.
+class _EtatCatalogue extends StatelessWidget {
+  const _EtatCatalogue({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CatalogueOff.instance;
+    String texte;
+    if (!c.charge) {
+      texte = 'Chargement du catalogue…';
+    } else if (c.vide) {
+      texte = 'Catalogue absent : touchez ici pour le télécharger';
+    } else {
+      final n = c.nbProduits.toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]} ');
+      texte = 'Catalogue : $n produits, à jour au ${c.majDate}${c.enCours ? ' · mise à jour en cours…' : ''}';
+    }
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 44),
+        color: Charte.fondBandeau,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        child: Row(
+          children: [
+            Icon(c.enCours ? Icons.sync : Icons.inventory_2_outlined, size: 16, color: Charte.texteSecondaire),
+            const SizedBox(width: 8),
+            Expanded(child: Text(texte, style: Charte.texte(12, couleur: Charte.texteSecondaire))),
+            const Icon(Icons.chevron_right, size: 18, color: Charte.texteSecondaire),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Catalogue : version, délai de rafraîchissement, mise à jour manuelle.
+class EcranCatalogue extends StatelessWidget {
+  const EcranCatalogue({super.key});
+
+  static String _libelleDelai(int j) => switch (j) {
+        0 => 'Manuel',
+        1 => '1 jour',
+        _ => '$j jours',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final c = CatalogueOff.instance;
+    return ListenableBuilder(
+      listenable: c,
+      builder: (context, _) {
+        Widget ligne(String etiquette, String valeur) => Container(
+              constraints: const BoxConstraints(minHeight: 40),
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              child: Row(
+                children: [
+                  SizedBox(width: 150, child: Text(etiquette, style: Charte.texte(14, couleur: Charte.texteSecondaire))),
+                  Expanded(child: Text(valeur, style: Charte.texte(15))),
+                ],
+              ),
+            );
+        final v = c.derniereVerification;
+        return PageBase(
+          entete: const EnTeteGestion(titre: 'Catalogue des produits réels'),
+          corps: ListView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            children: [
+              const TitreSection('Contenu', cote: 0),
+              ligne('Produits', c.vide ? 'aucun' : '${c.nbProduits}'),
+              ligne('Base du', c.baseDate.isEmpty ? '—' : c.baseDate),
+              ligne('Mis à jour jusqu\'au', c.majDate.isEmpty ? '—' : c.majDate),
+              ligne('Dernière vérification', v == null ? 'jamais' : CatalogueOff.dateHeure(v)),
+              const TitreSection('Rafraîchissement automatique', cote: 0),
+              Text(
+                'L\'application vérifie elle-même s\'il existe une mise à jour, à son ouverture puis toutes les heures, '
+                'dès que le délai choisi est écoulé. Seules les modifications sont téléchargées, sauf au changement '
+                'de catalogue mensuel.',
+                style: Charte.texte(13, couleur: Charte.texteSecondaire),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final j in CatalogueOff.delais)
+                    SizedBox(
+                      width: 80,
+                      child: Bouton(
+                        texte: _libelleDelai(j),
+                        taille: 15,
+                        hauteur: 44,
+                        plein: c.delaiJours == j,
+                        onTap: () => c.changerDelai(j),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Bouton(
+                texte: c.enCours ? 'Mise à jour en cours…' : 'Mettre à jour maintenant',
+                icone: Icons.sync,
+                plein: true,
+                onTap: c.enCours ? null : () => c.verifier(force: true),
+              ),
+              if (c.message != null) ...[
+                const SizedBox(height: 10),
+                Text(c.message!, style: Charte.texte(14, gras: true)),
+              ],
+              const TitreSection('Source', cote: 0),
+              Text(
+                'Open Food Facts (openfoodfacts.org), base collaborative libre : données sous licence ODbL, '
+                'photos sous licence CC BY-SA. Extrait : les produits vendus en France les plus scannés, '
+                'reconstruit chaque mois et complété chaque nuit.',
+                style: Charte.texte(13, couleur: Charte.texteSecondaire),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+          bas: const [BarreNavigation(index: 2)],
+        );
+      },
     );
   }
 }

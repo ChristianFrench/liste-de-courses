@@ -1,2 +1,4 @@
 test/captures/
 *.log
+assets/catalogue/*.gz
+outils/__pycache__/

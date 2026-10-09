@@ -1,0 +1,2 @@
+Le catalogue Open Food Facts (catalogue.json.gz) est placé ici par la compilation GitHub,
+juste avant de compiler l'application. Il n'est pas conservé dans le dépôt.
