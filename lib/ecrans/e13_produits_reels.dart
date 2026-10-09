@@ -97,9 +97,10 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
   @override
   Widget build(BuildContext context) {
     return PageBase(
-      entete: EnTeteGestion(
+      entete: EnTeteSousNiveau(
+        fil: 'Paramètres › Essais',
         titre: 'Produits réels (essai)',
-        action: BoutonIcone(
+        droite: BoutonIcone(
           icone: Icons.cloud_sync_outlined,
           libelle: 'Catalogue et mises à jour',
           onTap: () => Nav.aller(context, const EcranCatalogue()),
@@ -148,7 +149,6 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
             style: Charte.texte(11, couleur: Charte.texteSecondaire),
           ),
         ),
-        const BarreNavigation(index: 2),
       ],
     );
   }
@@ -294,7 +294,7 @@ class EcranArticle extends StatelessWidget {
           ),
         );
     return PageBase(
-      entete: EnTeteGestion(titre: a.nom),
+      entete: EnTeteSousNiveau(fil: 'Produits réels', titre: a.nom),
       corps: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
@@ -380,7 +380,7 @@ class EcranMarque extends StatelessWidget {
   Widget build(BuildContext context) {
     final articles = CatalogueOff.instance.parMarque(marque);
     return PageBase(
-      entete: EnTeteGestion(titre: 'Marque · $marque'),
+      entete: EnTeteSousNiveau(fil: 'Produits réels', titre: 'Marque · $marque'),
       corps: ListView.builder(
         itemCount: articles.length + 1,
         itemBuilder: (context, i) {
@@ -397,7 +397,6 @@ class EcranMarque extends StatelessWidget {
           return LigneArticle(article: articles[i - 1]);
         },
       ),
-      bas: const [BarreNavigation(index: 2)],
     );
   }
 }
@@ -467,7 +466,7 @@ class EcranCatalogue extends StatelessWidget {
             );
         final v = c.derniereVerification;
         return PageBase(
-          entete: const EnTeteGestion(titre: 'Catalogue des produits réels'),
+          entete: const EnTeteSousNiveau(fil: 'Produits réels', titre: 'Catalogue des produits réels'),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
@@ -522,8 +521,7 @@ class EcranCatalogue extends StatelessWidget {
               const SizedBox(height: 16),
             ],
           ),
-          bas: const [BarreNavigation(index: 2)],
-        );
+            );
       },
     );
   }

@@ -1,5 +1,6 @@
-// Captures des 12 écrans au format téléphone (390 × 844), produites par GitHub
-// (travail « verification ») et rangées dans la branche « captures » du dépôt.
+// Captures des 18 écrans de la maquette IHM v0.2 au format téléphone (390 × 844),
+// numérotées comme dans ihm/v0.2/Captures, pour comparaison avec la maquette fil de fer.
+// Produites par GitHub (travail « verification ») et rangées dans la branche « captures ».
 // Ignoré lors d'un « flutter test » ordinaire (variable CAPTURES absente).
 
 import 'dart:convert';
@@ -7,23 +8,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
-import 'package:liste_de_courses/ecrans/e01_accueil.dart';
-import 'package:liste_de_courses/ecrans/e02_nouvelle_liste.dart';
-import 'package:liste_de_courses/ecrans/e03_construction.dart';
-import 'package:liste_de_courses/ecrans/e04_je_fais_les_courses.dart';
-import 'package:liste_de_courses/ecrans/e05_liste_complete.dart';
-import 'package:liste_de_courses/ecrans/e06_courses_secteur.dart';
-import 'package:liste_de_courses/ecrans/e07_foyer.dart';
-import 'package:liste_de_courses/ecrans/e08_produits.dart';
-import 'package:liste_de_courses/ecrans/e09_fiche_produit.dart';
-import 'package:liste_de_courses/ecrans/e10_promotion.dart';
-import 'package:liste_de_courses/ecrans/e11_magasins_parcours.dart';
-import 'package:liste_de_courses/ecrans/e12_historique.dart';
+import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
-import 'package:liste_de_courses/theme.dart';
+import 'package:liste_de_courses/navigation.dart';
 
 final bool _actif = Platform.environment['CAPTURES'] == '1';
 final _cle = GlobalKey();
@@ -39,110 +29,93 @@ Future<void> _police(String famille, List<String> fichiers) async {
 }
 
 Future<void> _polices() async {
-  await _police('Atkinson', [
-    'assets/polices/AtkinsonHyperlegible-Regular.ttf',
-    'assets/polices/AtkinsonHyperlegible-Bold.ttf',
-  ]);
+  await _police('Atkinson', ['assets/polices/AtkinsonHyperlegible-Regular.ttf', 'assets/polices/AtkinsonHyperlegible-Bold.ttf']);
   final racine = Platform.environment['FLUTTER_ROOT'] ?? '';
   await _police('MaterialIcons', ['$racine/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf']);
 }
 
-void _donnees() {
-  final texte = File('assets/donnees_maquette.json').readAsStringSync();
-  Etat.instance.lire(jsonDecode(texte) as Map<String, dynamic>);
+Future<void> _capture(String nom) => expectLater(find.byKey(_cle), matchesGoldenFile('captures/$nom.png'));
+
+Future<void> _toucher(WidgetTester tester, Finder f) async {
+  await tester.ensureVisible(f);
+  await tester.pumpAndSettle();
+  await tester.tap(f);
+  await tester.pumpAndSettle();
 }
 
-Future<void> _capturer(WidgetTester tester, String nom, Widget ecran) async {
-  tester.view.physicalSize = const Size(780, 1688);
-  tester.view.devicePixelRatio = 2;
-  tester.view.padding = const FakeViewPadding(top: 94, bottom: 68);
-  tester.view.viewPadding = const FakeViewPadding(top: 94, bottom: 68);
-  addTearDown(tester.view.reset);
-  await tester.pumpWidget(RepaintBoundary(
-    key: _cle,
-    child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: Charte.theme(),
-      locale: const Locale('fr', 'FR'),
-      supportedLocales: const [Locale('fr', 'FR')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      builder: (context, enfant) => FormatTelephone(child: enfant!),
-      home: ecran,
-    ),
-  ));
-  await tester.pumpAndSettle();
-  // Charger réellement les images (icône) avant la capture
-  await tester.runAsync(() async {
-    final ctx = tester.element(find.byType(Navigator).first);
-    await precacheImage(const AssetImage('assets/icone_ronde.png'), ctx);
-  });
-  await tester.pumpAndSettle();
-  await expectLater(find.byKey(_cle), matchesGoldenFile('captures/$nom.png'));
-}
+Finder _onglet(String l) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(l));
+Finder _sous(String l) => find.descendant(of: find.byType(SousOnglets), matching: find.text(l));
 
 void main() {
   setUpAll(_polices);
-  setUp(_donnees);
 
-  final e = Etat.instance;
+  testWidgets('18 écrans IHM v0.2', (tester) async {
+    final e = Etat.instance;
+    e.enregistrementActif = false;
+    e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
+    Nav.i.reinitialiser();
 
-  testWidgets('01 accueil', (t) => _capturer(t, '01 accueil', const EcranAccueil()), skip: !_actif);
-  testWidgets('01b accueil courses en cours', (t) async {
-    final l = e.liste('l1')!;
-    e.demarrerCourses(l, 'm1', 'pc1');
-    for (final id in ['p1', 'p16', 'p17', 'p2']) {
-      e.cocher(id);
-    }
-    await _capturer(t, '01b accueil courses en cours', const EcranAccueil());
+    tester.view.physicalSize = const Size(780, 1688);
+    tester.view.devicePixelRatio = 2;
+    tester.view.padding = const FakeViewPadding(top: 94, bottom: 68);
+    tester.view.viewPadding = const FakeViewPadding(top: 94, bottom: 68);
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
+    await tester.runAsync(() async {
+      await precacheImage(const AssetImage('assets/icone_ronde.png'), tester.element(find.byType(Scaffold).first));
+    });
+    await tester.pumpAndSettle();
+
+    await _capture('10 Relance');
+    await _toucher(tester, find.text('Aller à l\'accueil'));
+    await _capture('01 Main');
+
+    await _toucher(tester, find.text('+ Nouvelle liste'));
+    await _capture('02 Preliste');
+    await _toucher(tester, find.byTooltip('Retour'));
+
+    await _toucher(tester, find.text('Interrompue'));
+    await _capture('03 Construire');
+    final lait = find.ancestor(of: find.text('Lait demi-écrémé'), matching: find.byType(LigneChoix));
+    await _toucher(tester, find.descendant(of: lait, matching: find.byType(BoutonPromo)));
+    await _capture('04 Construire-Promo');
+    Nav.i.racine.currentState!.pop();
+    await tester.pumpAndSettle();
+    await _toucher(tester, find.byTooltip('Retour'));
+
+    await _toucher(tester, _sous('Parcours'));
+    await _capture('05 Listes-Parcours');
+    await _toucher(tester, _sous('Courses'));
+    await _capture('06 Listes-Courses');
+
+    await _toucher(tester, find.text('Reprendre les courses'));
+    await _capture('08 Courses-Secteur');
+    await _toucher(tester, find.byTooltip('Liste complète'));
+    await _capture('07 Liste-Complete');
+    await _toucher(tester, find.text('Reprendre les courses'));
+    await _toucher(tester, find.text('Pause'));
+    await _capture('09 Courses-Interrompre');
+    await _toucher(tester, find.text('Interrompre'));
+
+    await _toucher(tester, _onglet('Historique'));
+    await _capture('11 Historique-Courses');
+    await _toucher(tester, _sous('Tickets de caisse'));
+    await _capture('12 Historique-Tickets');
+
+    await _toucher(tester, _onglet('Magasin'));
+    await _capture('13 Magasin-Rayons');
+    await _toucher(tester, find.text('Frais'));
+    await _capture('14 Magasin-Secteurs');
+    await _toucher(tester, find.text('Crèmerie'));
+    await _capture('15 Magasin-Produits');
+    await _toucher(tester, find.text('Lait demi-écrémé'));
+    await _capture('16 Fiche-Produit');
+    await _toucher(tester, find.byTooltip('Retour'));
+
+    await _toucher(tester, _onglet('Paramètres'));
+    await _capture('17 Parametres');
+    await _toucher(tester, find.text('Types de promotion'));
+    await _capture('18 Parametres-Promos');
   }, skip: !_actif);
-  testWidgets('02 nouvelle liste', (t) => _capturer(t, '02 nouvelle liste', const EcranNouvelleListe()),
-      skip: !_actif);
-  testWidgets('03 construction', (t) async {
-    await _capturer(t, '03 construction', const EcranConstruction(listeId: 'l1'));
-    await t.tap(find.text('Crèmerie'));
-    await t.pumpAndSettle();
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/03b construction cremerie.png'));
-    await t.tap(find.text('Épicerie'));
-    await t.pumpAndSettle();
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/03c construction epicerie.png'));
-  }, skip: !_actif);
-  testWidgets('04 je fais les courses',
-      (t) => _capturer(t, '04 je fais les courses', const EcranJeFaisLesCourses()),
-      skip: !_actif);
-  testWidgets('05 liste complete', (t) async {
-    e.demarrerCourses(e.liste('l1')!, 'm1', 'pc1');
-    await _capturer(t, '05 liste complete', const EcranListeComplete(listeId: 'l1'));
-  }, skip: !_actif);
-  testWidgets('06 courses par secteur', (t) async {
-    e.demarrerCourses(e.liste('l1')!, 'm1', 'pc1');
-    e.cocher('p1');
-    e.cocher('p16');
-    e.allerEtape(2);
-    e.cocher('p3');
-    e.basculerReseau();
-    await _capturer(t, '06 courses par secteur', const EcranCoursesSecteur());
-  }, skip: !_actif);
-  testWidgets('06b dernier secteur', (t) async {
-    e.demarrerCourses(e.liste('l1')!, 'm1', 'pc1');
-    final n = e.etapes(e.liste('l1')!, 'pc1').length;
-    e.allerEtape(n - 1);
-    await _capturer(t, '06b dernier secteur', const EcranCoursesSecteur());
-  }, skip: !_actif);
-  testWidgets('07 foyer', (t) => _capturer(t, '07 foyer', const EcranFoyer()), skip: !_actif);
-  testWidgets('08 produits', (t) => _capturer(t, '08 produits', const EcranProduits()), skip: !_actif);
-  testWidgets('09 fiche produit', (t) => _capturer(t, '09 fiche produit', const EcranFicheProduit(produitId: 'p2')),
-      skip: !_actif);
-  testWidgets('10 promotion', (t) => _capturer(t, '10 promotion', const EcranPromotion(produitId: 'p2')),
-      skip: !_actif);
-  testWidgets('11 magasins et parcours', (t) async {
-    await _capturer(t, '11 magasins et parcours', const EcranMagasinsParcours());
-    await t.tap(find.text('Rayons et secteurs'));
-    await t.pumpAndSettle();
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/11b rayons et secteurs.png'));
-  }, skip: !_actif);
-  testWidgets('12 historique', (t) => _capturer(t, '12 historique', const EcranHistorique()), skip: !_actif);
 }

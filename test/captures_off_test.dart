@@ -112,17 +112,17 @@ void main() {
       ].join('\n'));
     await _afficher(tester, EcranProduitsReels(rechercheInitiale: 'Pâtes', resultatsInitiaux: r.articles, explicationInitiale: r.explication),
         [for (final a in r.articles.take(8)) a.imagePetite]);
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/13 produits reels.png'));
+    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 1 produits reels.png'));
 
     final a = r.articles.first;
     await _afficher(tester, EcranArticle(article: a), [a.imageGrande, a.imagePetite]);
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/13b fiche article.png'));
+    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 2 fiche article.png'));
 
     final m = c.parMarque(a.marque);
     await _afficher(tester, EcranMarque(marque: a.marque), [for (final x in m.take(8)) x.imagePetite]);
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/13c marque.png'));
+    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 3 marque.png'));
 
     await _afficher(tester, const EcranCatalogue(), const []);
-    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/13d catalogue.png'));
+    await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 4 catalogue.png'));
   }, skip: !_actif, timeout: const Timeout(Duration(minutes: 4)));
 }

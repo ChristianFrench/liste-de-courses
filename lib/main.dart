@@ -1,16 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
-import 'ecrans/e01_accueil.dart';
+import 'ecrans/coquille.dart';
+import 'navigation.dart';
 import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Etat.instance.charger();
-  // Catalogue Open Food Facts : chargé en arrière-plan, mis à jour selon le délai réglé
+  // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan
   CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
 }
@@ -24,6 +26,8 @@ class ListeDeCoursesApp extends StatelessWidget {
       title: 'Liste de courses',
       debugShowCheckedModeBanner: false,
       theme: Charte.theme(),
+      navigatorKey: Nav.i.racine,
+      scaffoldMessengerKey: Nav.i.messager,
       locale: const Locale('fr', 'FR'),
       supportedLocales: const [Locale('fr', 'FR')],
       localizationsDelegates: const [
@@ -31,19 +35,25 @@ class ListeDeCoursesApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const EcranAccueil(),
-      builder: (context, enfant) => FormatTelephone(child: enfant!),
+      // Écran de reprise au lancement s'il existe des courses en cours ou une préparation interrompue
+      home: Etat.instance.repriseAuLancement ? const EcranRelance() : const Coquille(),
+      builder: (context, enfant) => CallbackShortcuts(
+        // Sous Windows, Échap = retour système
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.escape): () => Nav.i.racine.currentState?.maybePop(),
+        },
+        child: Focus(autofocus: true, child: FormatTelephone(child: enfant!)),
+      ),
     );
   }
 }
 
-/// Taille de référence de l'écran (spécification IHM : 390 × 844), identique sur toutes les versions.
+/// Taille de référence de l'écran (Charte.tokens.json : 390 × 844), identique sur toutes les versions.
 const tailleTelephone = Size(390, 844);
 
-/// Sous Windows, l'application est dessinée sur un écran virtuel de téléphone
-/// (390 × 844) puis agrandie ou réduite pour remplir la fenêtre : la mise en page
-/// est ainsi strictement celle du téléphone. Sur téléphone, seule la taille des
-/// caractères choisie dans les réglages est bornée, pour éviter les textes coupés.
+/// Sous Windows, l'application est dessinée sur un écran virtuel de téléphone (390 × 844)
+/// puis ajustée à la fenêtre (390 × 844 si l'écran le permet). Sur téléphone, seule la taille
+/// des caractères choisie dans les réglages est bornée, pour éviter les textes coupés.
 class FormatTelephone extends StatelessWidget {
   const FormatTelephone({super.key, required this.child});
   final Widget child;
@@ -51,9 +61,7 @@ class FormatTelephone extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
-    final bornee = media.copyWith(
-      textScaler: media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.15),
-    );
+    final bornee = media.copyWith(textScaler: media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.15));
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) {
       return MediaQuery(data: bornee, child: child);
     }

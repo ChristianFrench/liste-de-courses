@@ -14,7 +14,10 @@ class Charte {
   static const Color texteSecondaire = Color(0xFF555555);
   static const Color separateurZone = Color(0xFFCCCCCC);
   static const Color separateurLigne = Color(0xFFDDDDDD);
-  static const Color texteBarre = Color(0xFF6E6E6E);
+  static const Color texteBarre = Color(0xFF777777); // texteCoche
+  static const Color texteCoche = Color(0xFF777777);
+  static const Color fondNavActive = Color(0xFFEDEDED);
+  static const Color voile = Color(0x73000000); // noir 45 %
   static const Color placeholder = Color(0xFFE6E6E6);
 
   // Hauteurs de référence (points)
@@ -26,6 +29,18 @@ class Charte {
   static const double ligneCompacte = 32;
   static const double barreAction = 64;
   static const double barreNavigation = 64;
+  static const double enTeteNiveau = 52;
+  static const double sousOnglets = 44;
+  static const double barreOnglets = 64;
+  static const double puce = 36;
+  static const double bouton = 48;
+  static const double selecteurQuantite = 34;
+
+  // Tailles de texte (Charte.tokens.json v0.2)
+  static const double tTitreNiveau = 20;
+  static const double tTitreTravail = 17;
+  static const double tNavigation = 11;
+  static const double tCodePromo = 9;
 
   // Espacements
   static const double e1 = 4;

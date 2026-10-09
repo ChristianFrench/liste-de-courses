@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../donnees/modele.dart';
-import '../navigation.dart';
 import '../theme.dart';
 
 // Composants réutilisables (spécification IHM, chapitre 5).
@@ -54,10 +52,11 @@ class BoutonIcone extends StatelessWidget {
 
 /// En-tête des écrans de travail (48 points).
 class EnTeteTravail extends StatelessWidget {
-  const EnTeteTravail({super.key, required this.titre, this.gauche, this.action});
+  const EnTeteTravail({super.key, required this.titre, this.gauche, this.action, this.sousTitre});
   final String titre;
   final Widget? gauche;
   final Widget? action;
+  final String? sousTitre;
 
   @override
   Widget build(BuildContext context) {
@@ -76,7 +75,22 @@ class EnTeteTravail extends StatelessWidget {
               ),
           const SizedBox(width: 4),
           Expanded(
-            child: Text(titre, style: Charte.titreEcran, maxLines: 1, overflow: TextOverflow.ellipsis),
+            child: sousTitre == null
+                ? Text(titre, style: Charte.titreEcran, maxLines: 1, overflow: TextOverflow.ellipsis)
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(titre, style: Charte.titreEcran, maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Row(
+                        children: [
+                          const Icon(Icons.check, size: 12, color: Charte.texteSecondaire),
+                          const SizedBox(width: 3),
+                          Text(sousTitre!, style: Charte.texte(11, couleur: Charte.texteSecondaire)),
+                        ],
+                      ),
+                    ],
+                  ),
           ),
           if (action != null) action!,
           const SizedBox(width: 6),
@@ -291,22 +305,63 @@ class CaseACocher extends StatelessWidget {
 }
 
 class IconePromo extends StatelessWidget {
-  const IconePromo({super.key, required this.type, this.inverse = false});
-  final TypePromo type;
+  const IconePromo({super.key, required this.code, this.inverse = false});
+  final String code;
   final bool inverse;
 
   @override
   Widget build(BuildContext context) {
     final couleur = inverse ? Charte.fond : Charte.encre;
     return Semantics(
-      label: 'Promotion ${type.nom}',
+      label: 'Promotion $code',
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(4),
           border: Border.all(color: couleur, width: 1.5),
         ),
-        child: Text(type.code, style: Charte.texte(10, gras: true, couleur: couleur)),
+        child: Text(code, style: Charte.texte(Charte.tCodePromo + 1, gras: true, couleur: couleur)),
+      ),
+    );
+  }
+}
+
+/// Bouton promotion d'une ligne cochée (34 × 30) : code du type si une promotion est visée,
+/// sinon « % » en pointillé. Zone tactile portée à 44.
+class BoutonPromo extends StatelessWidget {
+  const BoutonPromo({super.key, required this.code, required this.onTap});
+  final String? code;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final contenu = SizedBox(
+      width: 34,
+      height: 30,
+      child: Center(
+        child: Text(code ?? '%', style: Charte.texte(code == null ? 14 : Charte.tCodePromo + 1, gras: true)),
+      ),
+    );
+    return Semantics(
+      button: true,
+      label: code == null ? 'Indiquer une promotion' : 'Promotion $code',
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          width: 40,
+          height: 44,
+          child: Center(
+            child: code == null
+                ? CadrePointille(rayon: 6, epaisseur: 1.5, child: contenu)
+                : Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: Charte.encre, width: 1.5),
+                    ),
+                    child: contenu,
+                  ),
+          ),
+        ),
       ),
     );
   }
@@ -318,20 +373,14 @@ class AlerteQuantite extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 2),
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-      decoration: BoxDecoration(
-        color: Charte.fond,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Charte.encre, width: 1.2),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.warning_amber_rounded, size: 13, color: Charte.encre),
+          const Icon(Icons.warning_amber_rounded, size: 15, color: Charte.encre),
           const SizedBox(width: 3),
-          Text('Il en faut $requise', style: Charte.texte(11, gras: true)),
+          Text('Il en faut $requise pour la promotion', style: Charte.texte(12, gras: true)),
         ],
       ),
     );
@@ -390,19 +439,25 @@ class LigneChoix extends StatelessWidget {
     required this.quantite,
     required this.onTap,
     required this.onQuantite,
-    this.promo,
+    this.codePromo,
+    this.onPromo,
     this.habituel = false,
     this.alerte,
+    this.afficherQuantite = true,
+    this.droite,
   });
   final String nom;
   final String complement;
   final bool coche;
   final int quantite;
-  final TypePromo? promo;
+  final String? codePromo;
+  final VoidCallback? onPromo;
   final bool habituel;
   final int? alerte;
   final VoidCallback onTap;
   final ValueChanged<int> onQuantite;
+  final bool afficherQuantite;
+  final Widget? droite;
 
   @override
   Widget build(BuildContext context) {
@@ -438,11 +493,13 @@ class LigneChoix extends StatelessWidget {
                   ),
                 ),
               ),
-              if (promo != null) ...[const SizedBox(width: 4), IconePromo(type: promo!)],
-              const SizedBox(width: 6),
-              if (coche)
+              if (coche && onPromo != null) BoutonPromo(code: codePromo, onTap: onPromo!),
+              const SizedBox(width: 4),
+              if (droite != null)
+                droite!
+              else if (coche && afficherQuantite)
                 SelecteurQuantite(quantite: quantite, onChange: onQuantite)
-              else if (habituel)
+              else if (!coche && habituel)
                 const Tooltip(
                   message: 'Acheté habituellement',
                   child: Icon(Icons.history, size: 19, color: Charte.texteSecondaire),
@@ -471,7 +528,7 @@ class LigneCourse extends StatelessWidget {
   final String complement;
   final bool coche;
   final int quantite;
-  final TypePromo? promo;
+  final String? promo;
   final int? alerte;
   final VoidCallback onTap;
 
@@ -512,7 +569,7 @@ class LigneCourse extends StatelessWidget {
                   ),
                 ),
               ),
-              if (promo != null) ...[IconePromo(type: promo!), const SizedBox(width: 8)],
+              if (promo != null) ...[IconePromo(code: promo!), const SizedBox(width: 8)],
               Text('×$quantite', style: Charte.texte(17, gras: true, couleur: couleur)),
             ],
           ),
@@ -528,7 +585,7 @@ class LigneCompacte extends StatelessWidget {
   final String nom;
   final String complement;
   final int quantite;
-  final TypePromo? promo;
+  final String? promo;
   final bool coche;
 
   @override
@@ -556,7 +613,7 @@ class LigneCompacte extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (promo != null) ...[const SizedBox(width: 6), IconePromo(type: promo!)],
+                if (promo != null) ...[const SizedBox(width: 6), IconePromo(code: promo!)],
               ],
             ),
           ),
@@ -706,53 +763,6 @@ class BarreAction extends StatelessWidget {
             if (i > 0) const SizedBox(width: 8),
             Expanded(child: boutons[i]),
           ],
-        ],
-      ),
-    );
-  }
-}
-
-/// Barre de navigation des écrans de gestion.
-class BarreNavigation extends StatelessWidget {
-  const BarreNavigation({super.key, required this.index});
-  final int index;
-
-  static const _onglets = <(IconData, String)>[
-    (Icons.home_outlined, 'Accueil'),
-    (Icons.checklist, 'Liste'),
-    (Icons.inventory_2_outlined, 'Produits'),
-    (Icons.storefront_outlined, 'Magasins'),
-    (Icons.history, 'Historique'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: Charte.barreNavigation,
-      decoration: const BoxDecoration(border: Border(top: _bordZone)),
-      child: Row(
-        children: [
-          for (var i = 0; i < _onglets.length; i++)
-            Expanded(
-              child: Semantics(
-                button: true,
-                selected: i == index,
-                child: Material(
-                  color: i == index ? Charte.fondSelection : Charte.fond,
-                  child: InkWell(
-                    onTap: i == index && i != 0 ? null : () => Nav.onglet(context, i),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(_onglets[i].$1, size: 24, color: Charte.encre),
-                        const SizedBox(height: 2),
-                        Text(_onglets[i].$2, style: Charte.texte(12, gras: i == index)),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );
@@ -1082,6 +1092,315 @@ Future<T?> choisirDansListe<T>(BuildContext context, {required String titre, req
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// ----------------------------------------------------------------- Composants v0.2
+
+class SousOnglet {
+  const SousOnglet(this.libelle, this.icone);
+  final String libelle;
+  final IconData icone;
+}
+
+/// Boutons d'onglet accolés dans un cadre arrondi ; l'actif est plein.
+class SousOnglets extends StatelessWidget {
+  const SousOnglets({super.key, required this.onglets, required this.actif, required this.onChoix});
+  final List<SousOnglet> onglets;
+  final int actif;
+  final ValueChanged<int> onChoix;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        height: Charte.sousOnglets,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Charte.encre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          children: [
+            for (var i = 0; i < onglets.length; i++) ...[
+              if (i > 0) Container(width: 1.5, color: Charte.encre),
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: i == actif,
+                  label: onglets[i].libelle,
+                  child: Material(
+                    color: i == actif ? Charte.encre : Charte.fond,
+                    child: InkWell(
+                      onTap: () => onChoix(i),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(onglets[i].icone, size: 18, color: i == actif ? Charte.fond : Charte.encre),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(onglets[i].libelle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Charte.texte(15, gras: i == actif, couleur: i == actif ? Charte.fond : Charte.encre)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// En-tête d'un écran racine d'onglet (52) : titre 20 gras, élément à droite.
+class EnTeteNiveau extends StatelessWidget {
+  const EnTeteNiveau({super.key, required this.titre, this.droite, this.onAppuiLong});
+  final String titre;
+  final Widget? droite;
+  final VoidCallback? onAppuiLong;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: Charte.enTeteNiveau,
+      padding: const EdgeInsets.only(left: 16, right: 8),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurZone, width: 1))),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onLongPress: onAppuiLong,
+              child: Text(titre, style: Charte.texte(Charte.tTitreNiveau, gras: true)),
+            ),
+          ),
+          if (droite != null) droite!,
+        ],
+      ),
+    );
+  }
+}
+
+/// En-tête d'un sous-niveau (52) : flèche retour, fil d'Ariane au-dessus du titre, action à droite.
+class EnTeteSousNiveau extends StatelessWidget {
+  const EnTeteSousNiveau({super.key, required this.fil, required this.titre, this.droite});
+  final String fil;
+  final String titre;
+  final Widget? droite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: Charte.enTeteNiveau,
+      padding: const EdgeInsets.only(right: 6),
+      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurZone, width: 1))),
+      child: Row(
+        children: [
+          BoutonIcone(icone: Icons.chevron_left, taille: 32, libelle: 'Retour', onTap: () => Navigator.of(context).maybePop()),
+          const SizedBox(width: 2),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(fil, style: Charte.texte(11, couleur: Charte.texteSecondaire)),
+                Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(18, gras: true)),
+              ],
+            ),
+          ),
+          if (droite != null) droite!,
+        ],
+      ),
+    );
+  }
+}
+
+/// « ● Synchronisé » (maquette : pas encore de synchronisation réelle).
+class IndicateurSynchro extends StatelessWidget {
+  const IndicateurSynchro({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.circle, size: 10, color: Charte.encre),
+          const SizedBox(width: 6),
+          Text('Synchronisé', style: Charte.texte(13)),
+        ],
+      ),
+    );
+  }
+}
+
+/// Carte : cadre 2, rayon 10 ; cliquable = chevron à droite.
+class Carte extends StatelessWidget {
+  const Carte({super.key, required this.child, this.onTap, this.chevron, this.fond = Charte.fond, this.padding});
+  final Widget child;
+  final VoidCallback? onTap;
+  final bool? chevron;
+  final Color fond;
+  final EdgeInsets? padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final avecChevron = chevron ?? onTap != null;
+    return Material(
+      color: fond,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: padding ?? const EdgeInsets.fromLTRB(14, 12, 8, 12),
+          child: Row(
+            children: [
+              Expanded(child: child),
+              if (avecChevron) const Icon(Icons.chevron_right, size: 28, color: Charte.encre),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Ligne de menu : titre, sous-titre gris, chevron ; zone tactile 44 au moins.
+class LigneMenu extends StatelessWidget {
+  const LigneMenu({super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite});
+  final String titre;
+  final String? sousTitre;
+  final VoidCallback? onTap;
+  final double titreTaille;
+  final Widget? gauche;
+  final Widget? droite;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Charte.fond,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Row(
+            children: [
+              if (gauche != null) ...[gauche!, const SizedBox(width: 12)],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(titre, style: Charte.texte(titreTaille, gras: true)),
+                    if (sousTitre != null)
+                      Text(sousTitre!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ],
+                ),
+              ),
+              if (droite != null) droite!,
+              if (onTap != null && droite == null) const Icon(Icons.chevron_right, size: 26, color: Charte.encre),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton Pause : pastille contour, icône pause + « Pause ».
+class BoutonPause extends StatelessWidget {
+  const BoutonPause({super.key, required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Pause',
+      child: Material(
+        color: Charte.fond,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 44,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.pause, size: 18, color: Charte.encre),
+                  const SizedBox(width: 4),
+                  Text('Pause', style: Charte.texte(15, gras: true)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Dialogue de confirmation : fond assombri, carte centrée, bouton plein + bouton contour.
+/// Renvoie true pour le bouton contour (action secondaire), false pour le bouton plein, null si fermé.
+Future<bool?> confirmer(
+  BuildContext context, {
+  required String titre,
+  required Widget contenu,
+  required String plein,
+  required String contour,
+  IconData? icone,
+}) {
+  return showDialog<bool>(
+    context: context,
+    barrierColor: Charte.voile,
+    builder: (ctx) => Dialog(
+      backgroundColor: Charte.fond,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(18),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                if (icone != null) ...[Icon(icone, size: 28, color: Charte.encre), const SizedBox(width: 10)],
+                Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
+              ],
+            ),
+            const SizedBox(height: 12),
+            contenu,
+            const SizedBox(height: 18),
+            Bouton(texte: plein, plein: true, onTap: () => Navigator.of(ctx).pop(false)),
+            const SizedBox(height: 10),
+            Bouton(texte: contour, onTap: () => Navigator.of(ctx).pop(true)),
           ],
         ),
       ),
