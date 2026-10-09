@@ -63,9 +63,12 @@ jobs:
           gh release upload catalogue-off catalogue-version.txt --clobber
 
   cumul:
+    needs: base
     if: >-
+      always() && needs.base.result != 'failure' && (
       (github.event_name == 'schedule' && github.event.schedule == '47 4 * * *') ||
-      (github.event_name == 'workflow_dispatch' && inputs.travail != 'base')
+      (github.event_name == 'workflow_dispatch') ||
+      github.event_name == 'push' )
     runs-on: ubuntu-latest
     permissions:
       contents: write
