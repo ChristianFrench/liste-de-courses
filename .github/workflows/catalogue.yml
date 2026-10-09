@@ -1,0 +1,39 @@
+name: Catalogue Open Food Facts
+
+# Extrait des produits vendus en France, publié sur la page « catalogue-off ».
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 3 1 * *'      # le 1er de chaque mois, 3 h 17 (UTC)
+  push:
+    branches: [main]
+    paths: ['outils/catalogue_off.py', '.github/workflows/catalogue.yml']
+
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Télécharger l'export Open Food Facts et la taxonomie
+        run: |
+          UA="ListeDeCourses (github.com/ChristianFrench/liste-de-courses)"
+          curl -fsSL -A "$UA" -o export.csv.gz https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
+          curl -fsSL -A "$UA" -o categories.json https://static.openfoodfacts.org/data/taxonomies/categories.json
+          ls -la export.csv.gz categories.json
+      - name: Construire l'extrait
+        run: python3 outils/catalogue_off.py base export.csv.gz categories.json catalogue.json.gz | tee extrait.log
+      - name: Publier sur la page « catalogue-off »
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ls -la catalogue.json.gz
+          python3 -c "import gzip,json;d=json.load(gzip.open('catalogue.json.gz','rt'));print('version='+d['version']);print('date='+d['date']);print('produits='+str(len(d['produits'])))" > catalogue-version.txt
+          cat catalogue-version.txt
+          gh release delete catalogue-off --yes --cleanup-tag 2>/dev/null || true
+          git push -q origin :refs/tags/catalogue-off 2>/dev/null || true
+          gh release create catalogue-off catalogue.json.gz catalogue-version.txt extrait.log \
+            --target "$GITHUB_SHA" --prerelease \
+            --title "Catalogue Open Food Facts — $(grep '^date=' catalogue-version.txt | cut -d= -f2)" \
+            --notes "Extrait des produits vendus en France utilisé par l'application. Données Open Food Facts (ODbL), photos CC BY-SA."
