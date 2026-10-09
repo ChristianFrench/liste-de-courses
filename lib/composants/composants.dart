@@ -1195,8 +1195,15 @@ class EnTeteNiveau extends StatelessWidget {
         children: [
           Expanded(
             child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
               onLongPress: onAppuiLong,
-              child: Text(titre, style: Charte.texte(Charte.tTitreNiveau, gras: true)),
+              child: SizedBox(
+                height: Charte.enTeteNiveau,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(titre, style: Charte.texte(Charte.tTitreNiveau, gras: true)),
+                ),
+              ),
             ),
           ),
           if (droite != null) droite!,
