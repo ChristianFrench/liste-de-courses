@@ -1,0 +1,348 @@
+# Description structurée des écrans — Application liste de courses
+# Version 0.2 du 9 octobre 2026 (maquette v0.4, navigation par onglets). Remplace la version 0.1.
+# Complète « Spécification IHM.odt » (même contenu, forme lisible par une machine).
+# Les identifiants d'écran servent de noms de routes Flutter.
+
+application:
+  nom: Liste de courses
+  langue: fr
+  ordre_de_livraison:
+    - windows   # en premier : fenêtre fixe 390 x 844, pour les essais du maître d'ouvrage
+    - android   # APK
+    - ios
+  plateformes:
+    windows: fenêtre fixe 390 x 844, non redimensionnable, même rendu que les téléphones
+    android: plein écran, portrait
+    ios: plein écran, portrait
+  perimetre_maquette:
+    inclus:
+      - les 18 écrans ci-dessous et toute la navigation (onglets, sous-onglets, retours)
+      - interactions locales (cocher, quantités, choix rayon / secteur / parcours, secteur suivant, promotion visée)
+      - interruption et reprise (préparation et courses), écran de reprise au lancement
+      - données factices chargées depuis « Données maquette.json »
+      - persistance locale simple (fichier JSON dans le dossier de l'application) pour que l'interruption survive à la fermeture
+    exclus:
+      - connexion Google, Firebase, synchronisation entre appareils
+      - photos réelles (boutons présents, message « disponible plus tard »)
+      - modifications en cours de courses, notifications
+  charte: Charte.tokens.json
+
+navigation:
+  principe: >
+    Barre d'onglets à icône en bas (4 onglets). Chaque onglet s'ouvre sur des boutons d'onglet
+    (sous-onglets) qui ne montrent que les choix de ce niveau. Un niveau inférieur (fiche, réglage)
+    garde la barre d'onglets et ajoute une flèche de retour. Les écrans de travail (construction,
+    liste complète, courses par secteur, préliste) masquent la barre d'onglets pour gagner de la place ;
+    on en sort par la flèche de retour ou le bouton Pause, sans rien perdre.
+  onglets:
+    - {id: listes,     libelle: Listes,     icone: liste cochée, sous_onglets: [preparer, parcours, courses], ecran_par_defaut: preparer}
+    - {id: historique, libelle: Historique, icone: horloge,     sous_onglets: [coursesEffectuees, tickets]}
+    - {id: magasin,    libelle: Magasin,    icone: boutique,    sous_onglets: [rayons, secteurs, produits], selecteur: magasin courant en haut à droite}
+    - {id: parametres, libelle: Paramètres, icone: engrenage,   sous_onglets: []}
+  memoire: chaque onglet retient son dernier sous-onglet ; revenir sur un onglet rouvre ce sous-onglet
+  retour_systeme: même effet que la flèche de l'en-tête ; sur un écran racine d'onglet, retour vers Listes › Préparer, puis sortie
+
+interruption_et_reprise:
+  enregistrement: chaque action (coche, quantité, promotion, changement de secteur) est enregistrée immédiatement ; aucun bouton « Enregistrer »
+  preparation: >
+    Quitter la construction (flèche, retour système, changement d'onglet, fermeture de l'application) ne perd rien.
+    La liste reste « en construction », marquée « Interrompue », avec le rayon et le secteur où l'on était (champ reprise).
+  courses: >
+    Le bouton Pause ouvre la confirmation « Interrompre les courses ? » (écran coursesInterrompre).
+    La liste reste « en cours » avec les coches et l'étape courante. La carte « Courses interrompues »
+    apparaît en tête de Listes › Courses. Fermer l'application pendant les courses équivaut à une interruption.
+  au_lancement: >
+    S'il existe une liste en cours ou une préparation interrompue, afficher l'écran relance avant tout.
+    Reprendre → retour exactement à la position enregistrée ; « Aller à l'accueil » → Listes › Préparer.
+  donnees: champs interrompueLe et reprise des listes (voir Données maquette.json)
+
+regles_globales:
+  - Zone tactile minimale 44 ; la ligne entière est cliquable, pas seulement la case.
+  - Une action principale par écran, en bas, bouton plein ; action secondaire en bouton contour.
+  - La couleur ne porte jamais seule une information (coché = barré + grisé ; promotion = code + libellé).
+  - Textes entre crochets dans les maquettes HTML ([Magasin 1]) = données à prendre dans le fichier JSON.
+
+promotions:
+  principe: >
+    Pas d'écran Promotions. La promotion visée est un choix manuel sur une ligne cochée, pendant la construction,
+    d'après le catalogue papier ou en ligne du magasin. Les types proposés viennent de Paramètres › Types de promotion.
+  icone_provisoire: code du type dans une pastille encadrée
+  alerte_quantite: "si quantité < quantité requise (lot : achetés ; prixGlobal : quantiteMinimale) → « Il en faut n pour la promotion » sous la ligne (règle 11)"
+
+composants:
+  BarreOnglets:       {hauteur: 64, contenu: "4 entrées icône 22 + libellé 12 ; onglet actif : pastille 56 x 30 pleine encre, icône blanche, libellé gras"}
+  SousOnglets:        {hauteur: 44, contenu: "2 ou 3 boutons accolés dans un cadre arrondi, icône 18 + libellé ; actif plein encre"}
+  EnTeteNiveau:       {hauteur: 52, contenu: "titre de l'onglet 20 gras ; à droite : indicateur Synchronisé ou sélecteur de magasin"}
+  EnTeteSousNiveau:   {hauteur: 52, contenu: "flèche retour, fil d'Ariane 11 gris au-dessus du titre 18 gras, action à droite"}
+  EnTeteTravail:      {hauteur: 48, contenu: "flèche retour ou icône liste, titre tronqué, sous-titre « Enregistré » (construction), action à droite (recherche, Pause)"}
+  BandeauPuces:       {hauteur: 44, contenu: "puces défilant horizontalement, une sélectionnée (fond encre), compteur optionnel"}
+  LigneChoix:         {hauteur: 44, contenu: "case 22, nom (gras si coché), complément gris, BoutonPromo si coché, SelecteurQuantite si coché, picto « habituel » sinon", comportement: "toucher = cocher (quantité 1) / décocher ; ligne cochée sur fond fondSelection"}
+  BoutonPromo:        {taille: "34 x 30", contenu: "code du type si une promotion est visée, sinon « % » en pointillé", comportement: "ouvre FeuillePromotion"}
+  FeuillePromotion:   {contenu: "volet bas : titre, produit · packaging · magasin, grille 3 x 2 des types, champs selon le type, libellé prérempli modifiable, boutons « Sans promotion » / « Valider »"}
+  AlerteQuantite:     {contenu: "triangle + « Il en faut n pour la promotion », sous la ligne, même fond"}
+  LigneCourse:        {hauteur: 56, contenu: "case 28, nom sur 2 lignes (complément + libellé de promotion), code promo, quantité ×n", comportement: "toucher = cocher ; coché = barré, grisé, reste en place"}
+  LigneCompacte:      {hauteur: 32, contenu: "nom, complément, code promo, quantité à droite", comportement: lecture seule}
+  TitreGroupe:        {contenu: "numéro rond optionnel, nom du secteur ou du rayon, fond gris"}
+  SelecteurQuantite:  {hauteur: 34, contenu: "− n +", comportement: "ramener à 0 = décocher"}
+  Carte:              {contenu: "cadre 2, rayon 10, contenu libre ; carte cliquable = chevron à droite"}
+  EtiquetteEtat:      {contenu: "« Interrompue », « Sans ticket » : cadre pointillé ; « Ticket ✓ », « Administrateur » : cadre plein"}
+  BoutonPause:        {contenu: "pastille contour, icône pause + « Pause »"}
+  DialogueConfirmation: {contenu: "fond assombri, carte centrée, titre, texte rassurant, bouton plein + bouton contour"}
+
+ecrans:
+
+  # ---------- Onglet Listes ----------
+  - id: preparer
+    numero: 1
+    onglet: listes
+    sous_onglet: preparer
+    maquette: Main.dc.html
+    capture: "01 Main.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Listes, droite: Synchronisé}
+      - {composant: SousOnglets, actif: preparer}
+      - {composant: bouton plein, contenu: "+ Nouvelle liste → preliste"}
+      - {composant: Carte, titre: En préparation, contenu: "listes statut enConstruction : magasin, nombre d'articles, modifiée par, quand ; EtiquetteEtat « Interrompue » si interrompueLe → construction (position de reprise)"}
+      - {composant: Carte, titre: Prêtes pour les courses, contenu: "listes statut prete → courses (sous-onglet)"}
+
+  - id: preliste
+    numero: 2
+    onglet: listes
+    maquette: Preliste.dc.html
+    capture: "02 Preliste.png"
+    gabarit: travail
+    zones:
+      - {composant: EnTeteTravail, titre: Nouvelle liste, retour: preparer}
+      - {composant: liste déroulante, contenu: "magasin ; changer de magasin recalcule la préliste"}
+      - {composant: LigneChoix sans quantité, groupement: rayon, contenu: "produits ayant une fréquence ; cochés si dans la préliste ; « n/6 » à droite"}
+      - {composant: BarreAction, boutons: ["Liste vide → construction", "Garder n et compléter → construction"]}
+    regles: ["préliste = présent au moins parametres.preliste.presencesMin fois sur les parametres.preliste.sur dernières courses de ce magasin", "quantité, marque, packaging repris de la dernière course"]
+
+  - id: construction
+    numero: 3
+    onglet: listes
+    maquette: Construire.dc.html
+    capture: "03 Construire.png"
+    gabarit: travail
+    zones:
+      - {composant: EnTeteTravail, titre: "Préparer · <magasin>", sous_titre: "✓ Enregistré", retour: "preparer (interruption sans perte)", droite: recherche}
+      - {composant: BandeauPuces, contenu: "rayons du magasin ; compteur = articles de la liste dans ce rayon"}
+      - {composant: BandeauPuces, fond: fondBandeau, contenu: "secteurs du rayon ; compteur = articles dans ce secteur"}
+      - {composant: [LigneChoix, AlerteQuantite], contenu: "produits ayant un emplacement dans ce secteur ; cochés d'abord, puis par nbUtilisations décroissant ; BoutonPromo sur les lignes cochées"}
+      - {composant: lien, contenu: "+ Produit absent de ce secteur → ficheProduit (nouveau)"}
+      - {composant: BarreAction, boutons: ["Ma liste · n → listeComplete", "Liste prête → preparer (statut → prete)"]}
+    regles: [8, 11]
+
+  - id: feuillePromotion
+    numero: 4
+    onglet: listes
+    maquette: Construire-Promo.dc.html
+    capture: "04 Construire-Promo.png"
+    gabarit: volet sur construction
+    zones:
+      - {composant: FeuillePromotion, types: typesPromotion, exemple_affiche: lot}
+    comportement:
+      - "« Valider » enregistre la promotion sur la ligne et ferme le volet ; l'AlerteQuantite se met à jour"
+      - "« Sans promotion » retire la promotion de la ligne"
+      - "toucher le fond assombri ferme sans changer"
+
+  - id: parcours
+    numero: 5
+    onglet: listes
+    sous_onglet: parcours
+    maquette: Listes-Parcours.dc.html
+    capture: "05 Listes-Parcours.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Listes}
+      - {composant: SousOnglets, actif: parcours}
+      - {composant: [liste déroulante, Bascule], contenu: "magasin ; membre"}
+      - {composant: [liste déroulante, bouton], contenu: "parcours du membre pour ce magasin, « + Nouveau »"}
+      - {composant: liste réordonnable, contenu: "étapes numérotées : secteur · rayon, « (retour) » si rayon déjà visité ; poignée de glisser"}
+      - {composant: bouton pointillé, contenu: "+ Ajouter un secteur"}
+      - {composant: case, contenu: "Parcours par défaut pour ce magasin"}
+    regles: [6, 7]
+    enregistrement: immédiat
+
+  - id: courses
+    numero: 6
+    onglet: listes
+    sous_onglet: courses
+    maquette: Listes-Courses.dc.html
+    capture: "06 Listes-Courses.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Listes}
+      - {composant: SousOnglets, actif: courses}
+      - {composant: Carte, titre: Courses interrompues, si: "liste statut enCours", contenu: "magasin, cochés / total, barre de progression, personne, secteur d'arrêt, heure ; bouton plein « Reprendre les courses » → coursesSecteur (étape de reprise)"}
+      - {composant: boutons radio, titre: Démarrer des courses, contenu: "listes statut prete"}
+      - {composant: [liste déroulante, liste déroulante], contenu: "qui fait les courses (défaut : moi) ; parcours (défaut : celui de la personne pour ce magasin)"}
+      - {composant: bouton, contenu: "Voir la liste et partir → listeComplete (statut → enCours)"}
+
+  - id: listeComplete
+    numero: 7
+    onglet: listes
+    maquette: Liste-Complete.dc.html
+    capture: "07 Liste-Complete.png"
+    gabarit: travail
+    zones:
+      - {composant: EnTeteTravail, titre: "<magasin> · n articles", retour: "écran précédent"}
+      - {composant: texte, contenu: "parcours · personne · n secteurs"}
+      - {composant: [TitreGroupe, LigneCompacte], contenu: "groupées par secteur dans l'ordre du parcours ; « Non placé » en dernier (règle 9)"}
+      - {composant: BarreAction, boutons: ["Commencer · secteur 1 → coursesSecteur (ou « Reprendre » si déjà commencé)"]}
+    regles: [9]
+
+  - id: coursesSecteur
+    numero: 8
+    onglet: listes
+    maquette: Courses-Secteur.dc.html
+    capture: "08 Courses-Secteur.png"
+    gabarit: travail
+    zones:
+      - {composant: EnTeteTravail, gauche: "icône liste → listeComplete", titre: "<magasin> · cochés / total", droite: "BoutonPause → coursesInterrompre"}
+      - {composant: BandeauPuces, contenu: "étapes du parcours ayant au moins un article, puis « ? Non placé » ; terminée = grisée + ✓ ; courante = pleine ; toucher = y aller"}
+      - {composant: texte, fond: fondBandeau, contenu: "secteur · rayon ; cochés / total du secteur"}
+      - {composant: LigneCourse, contenu: "articles de la liste dans ce secteur"}
+      - {composant: BarreAction, boutons: ["◀ <secteur précédent>", "<secteur suivant> ▶ ; dernière étape : « Terminer les courses » → historique (statut → terminee)"]}
+    fin_de_secteur: "pas de passage automatique ; bouton suivant mis en évidence + message bref « Secteur terminé »"
+    regles: [9]
+
+  - id: coursesInterrompre
+    numero: 9
+    onglet: listes
+    maquette: Courses-Interrompre.dc.html
+    capture: "09 Courses-Interrompre.png"
+    gabarit: dialogue sur coursesSecteur
+    zones:
+      - {composant: DialogueConfirmation, titre: "Interrompre les courses ?", texte: "Rien n'est perdu : n articles cochés sur N, arrêt au secteur X. Vous reprendrez depuis Listes › Courses, ou au prochain lancement.", boutons: ["Continuer les courses → coursesSecteur", "Interrompre → courses (sous-onglet)"]}
+
+  - id: relance
+    numero: 10
+    maquette: Relance.dc.html
+    capture: "10 Relance.png"
+    gabarit: plein écran, sans onglets
+    affiche_si: "au lancement, une liste enCours ou une liste enConstruction avec interrompueLe"
+    zones:
+      - {composant: logo et titre, contenu: "Reprendre où vous en étiez ? — Rien n'a été perdu depuis votre dernière utilisation."}
+      - {composant: Carte, si: liste enCours, contenu: "Courses en cours · magasin ; cochés / total, secteur d'arrêt, quand ; bouton plein « Reprendre les courses » → coursesSecteur"}
+      - {composant: Carte, si: préparation interrompue, contenu: "Liste en préparation · magasin ; articles, secteur, date ; bouton « Reprendre la préparation » → construction"}
+      - {composant: bouton pointillé, contenu: "Aller à l'accueil → preparer"}
+
+  # ---------- Onglet Historique ----------
+  - id: coursesEffectuees
+    numero: 11
+    onglet: historique
+    sous_onglet: coursesEffectuees
+    maquette: Historique-Courses.dc.html
+    capture: "11 Historique-Courses.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Historique}
+      - {composant: SousOnglets, actif: coursesEffectuees, libelles: ["Courses effectuées", "Tickets de caisse"]}
+      - {composant: Bascule, contenu: "Par date / Par magasin"}
+      - {composant: liste groupée, contenu: "groupes par mois (ou par magasin) ; ligne : date · magasin, articles · personne · montant ; EtiquetteEtat « Ticket ✓ » ou « Sans ticket »"}
+      - {composant: bouton, contenu: "Refaire une liste à partir d'une course → construction (nouvelle liste préremplie)"}
+
+  - id: tickets
+    numero: 12
+    onglet: historique
+    sous_onglet: tickets
+    maquette: Historique-Tickets.dc.html
+    capture: "12 Historique-Tickets.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Historique}
+      - {composant: SousOnglets, actif: tickets}
+      - {composant: boutons, contenu: "Photographier (message « disponible plus tard ») ; Compte magasin (à étudier)"}
+      - {composant: liste, contenu: "vignette, date · magasin · montant ; « Lié à la course du … » ou « Non rattaché à une course » + lien « Rattacher » → coursesEffectuees (choix de la course)"}
+
+  # ---------- Onglet Magasin ----------
+  - id: rayons
+    numero: 13
+    onglet: magasin
+    sous_onglet: rayons
+    maquette: Magasin-Rayons.dc.html
+    capture: "13 Magasin-Rayons.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Magasin, droite: "sélecteur du magasin courant (+ Nouveau magasin)"}
+      - {composant: SousOnglets, actif: rayons}
+      - {composant: liste, contenu: "rayons : nom, nombre de secteurs et de produits ; toucher → secteurs filtrés sur ce rayon"}
+      - {composant: bouton pointillé, contenu: "+ Ajouter un rayon"}
+
+  - id: secteurs
+    numero: 14
+    onglet: magasin
+    sous_onglet: secteurs
+    maquette: Magasin-Secteurs.dc.html
+    capture: "14 Magasin-Secteurs.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Magasin, droite: sélecteur de magasin}
+      - {composant: SousOnglets, actif: secteurs}
+      - {composant: BandeauPuces, contenu: "Tous + rayons ; filtre"}
+      - {composant: liste, contenu: "secteurs : nom, rayon, nombre de produits ; toucher → produits filtrés sur ce secteur"}
+      - {composant: bouton pointillé, contenu: "+ Ajouter un secteur au rayon <rayon>"}
+
+  - id: produits
+    numero: 15
+    onglet: magasin
+    sous_onglet: produits
+    maquette: Magasin-Produits.dc.html
+    capture: "15 Magasin-Produits.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Magasin, droite: sélecteur de magasin}
+      - {composant: SousOnglets, actif: produits}
+      - {composant: [liste déroulante, liste déroulante, recherche], contenu: "rayon, secteur (avec « Tous »), recherche en direct sur nom et marque"}
+      - {composant: liste, contenu: "vignette, nom, marques et packagings → ficheProduit"}
+      - {composant: bouton pointillé, contenu: "+ Nouveau produit dans <secteur> → ficheProduit (nouveau)"}
+
+  - id: ficheProduit
+    numero: 16
+    onglet: magasin
+    maquette: Fiche-Produit.dc.html
+    capture: "16 Fiche-Produit.png"
+    gabarit: sous-niveau
+    zones:
+      - {composant: EnTeteSousNiveau, fil: "Magasin › Produits", titre: "<produit>", retour: produits, droite: modifier}
+      - {composant: image, contenu: "image ou cadre « ajouter une photo »"}
+      - {composant: liste, titre: Où le trouver, contenu: "par magasin : rayon › secteur, ou « Non placé · indiquer le secteur » → secteurs"}
+      - {composant: puces, titre: Marques, contenu: "+ Marque"}
+      - {composant: puces, titre: Packagings, contenu: "+ Packaging"}
+      - {composant: mention, si: "nbUtilisations > 0", contenu: "Déjà utilisé dans une liste : ni suppression ni archivage"}
+      - {composant: BarreAction, boutons: ["Ajouter à la liste en préparation → construction"]}
+    regles: [4, 5]
+
+  # ---------- Onglet Paramètres ----------
+  - id: parametres
+    numero: 17
+    onglet: parametres
+    maquette: Parametres.dc.html
+    capture: "17 Parametres.png"
+    gabarit: niveau
+    zones:
+      - {composant: EnTeteNiveau, titre: Paramètres}
+      - {composant: section, titre: Foyer, contenu: "nom (Renommer), date de création ; membres avec EtiquetteEtat de rôle ; carte code d'invitation (Envoyer) ; « J'ai reçu un code : rejoindre un foyer »"}
+      - {composant: section, titre: Listes, contenu: "Types de promotion → parametresPromos ; Préliste (règle de fréquence)"}
+      - {composant: section, titre: "Comptes magasin (option à étudier)", contenu: "enseigne, identifiant"}
+
+  - id: parametresPromos
+    numero: 18
+    onglet: parametres
+    maquette: Parametres-Promos.dc.html
+    capture: "18 Parametres-Promos.png"
+    gabarit: sous-niveau
+    zones:
+      - {composant: EnTeteSousNiveau, fil: Paramètres, titre: Types de promotion, retour: parametres}
+      - {composant: texte, contenu: "Proposés quand on indique une promotion visée sur une ligne de la liste. La liste reste ouverte."}
+      - {composant: liste, contenu: "code, nom, exemple, paramètres ; crayon = modifier (maquette : sans effet)"}
+      - {composant: bouton pointillé, contenu: "+ Ajouter un type de promotion"}
+
+decisions:
+  barre_onglets_ecrans_travail: masquée (préliste, construction, liste complète, courses par secteur) — validé
+  alerte_quantite: sur la ligne, sous le nom du produit
+  fin_de_secteur: pas de passage automatique ; bouton suivant mis en évidence + message « Secteur terminé »
+  regle_preliste: au moins 3 présences sur les 6 dernières courses dans ce magasin (réglable dans Paramètres)
+  recherche_construction: recherche dans tout le magasin ; le résultat montre le secteur de chaque produit

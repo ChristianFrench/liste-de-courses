@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Types de promotion</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:2px;padding:0 4px;border-bottom:1px solid #CCCCCC;flex:none}
+.ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex:none}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.it{display:flex;align-items:center;gap:12px;min-height:64px;border-bottom:1px solid #DDDDDD;text-decoration:none}
+.pi{min-width:40px;height:28px;padding:0 4px;border:2px solid #222222;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none}
+.s{font-size:12px;color:#555555}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 12px;border:2px dashed #222222;border-radius:8px;font-weight:700;background:#FFFFFF;color:#222222;font-family:inherit;font-size:15px;width:100%}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <a class="ib" href="Parametres.dc.html" aria-label="Retour aux paramètres"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <div style="flex:1"><div style="font-size:11px;color:#555555">Paramètres</div><h1 style="margin:0;font-size:18px">Types de promotion</h1></div>
+  </header>
+  <main style="flex:1;overflow-y:auto;padding:0 12px 12px">
+    <p style="font-size:13px;color:#555555;margin:10px 0 4px">Proposés quand on indique une promotion visée sur une ligne de la liste. La liste reste ouverte.</p>
+    <a class="it" href="#"><span class="pi">LOT</span><div style="flex:1"><b>Lot</b><div class="s">Ex. : 3 achetés = 1 offert · 2e à −50 %</div><div class="s">Paramètres : achetés, offerts ou remise</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <a class="it" href="#"><span class="pi">2=€</span><div style="flex:1"><b>Prix global</b><div class="s">Ex. : 2 pour 5 €</div><div class="s">Paramètres : quantité minimale, prix</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <a class="it" href="#"><span class="pi">−%</span><div style="flex:1"><b>Remise immédiate</b><div class="s">Ex. : −30 % · −1 €</div><div class="s">Paramètres : pourcentage ou montant</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <a class="it" href="#"><span class="pi">PK</span><div style="flex:1"><b>Packaging spécial</b><div class="s">Ex. : +20 % gratuit · format promo</div><div class="s">Paramètres : packaging, gain</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <a class="it" href="#"><span class="pi">FID</span><div style="flex:1"><b>Fidélité</b><div class="s">Ex. : 30 % crédités sur la carte</div><div class="s">Paramètres : pourcentage ou montant</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <a class="it" href="#"><span class="pi">?</span><div style="flex:1"><b>Autre</b><div class="s">Toute nouvelle forme d'offre</div><div class="s">Paramètres : libellé libre</div></div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-label="Modifier"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+    <button type="button" class="btn" style="margin-top:12px">+ Ajouter un type de promotion</button>
+  </main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a class="act" href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

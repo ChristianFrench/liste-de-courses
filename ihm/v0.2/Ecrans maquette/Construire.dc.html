@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Construction par secteur</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:48px;display:flex;align-items:center;gap:2px;padding:0 4px;border-bottom:2px solid #222222;flex:none}
+.ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex:none;background:none;border:0;color:#222222}
+.strip{display:flex;gap:6px;overflow-x:auto;padding:4px 8px;white-space:nowrap;border-bottom:1px solid #CCCCCC;flex:none}
+.chip{display:flex;align-items:center;gap:4px;min-height:36px;padding:0 12px;border:2px solid #222222;border-radius:18px;font-size:14px;background:#FFFFFF;font-family:inherit;color:#222222;flex:none}
+.chip.sel{background:#222222;color:#FFFFFF;font-weight:700}
+.sq{font-size:13px;border-radius:6px}
+.cnt{font-size:11px;font-weight:700;border:1.5px solid currentColor;border-radius:9px;padding:0 5px}
+.row{display:flex;align-items:center;gap:8px;min-height:44px;border-bottom:1px solid #DDDDDD;padding:0 8px}
+.row input{width:22px;height:22px;margin:0;accent-color:#222222;flex:none}
+.on{background:#F2F2F2}
+.nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
+.s{font-size:12px;color:#555555}
+.pb{min-width:34px;height:30px;padding:0 4px;border:1.5px solid #222222;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex:none;text-decoration:none;background:#FFFFFF}
+.pb.vide{border-style:dashed;font-size:13px;font-weight:400}
+.step{display:flex;align-items:center;border:1.5px solid #222222;border-radius:6px;flex:none;height:34px;background:#FFFFFF}
+.step button{width:30px;height:32px;border:0;background:none;font-size:16px;font-family:inherit;color:#222222}
+.warn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:0 8px 6px 38px;background:#F2F2F2;border-bottom:1px solid #DDDDDD}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 12px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:15px}
+.pri{background:#222222;color:#FFFFFF}
+.pri:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <a class="ib" href="Main.dc.html" aria-label="Quitter (tout est conservé)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <div style="flex:1;min-width:0">
+      <h1 style="margin:0;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Préparer · [Magasin 1]</h1>
+      <div style="font-size:11px;color:#555555;display:flex;align-items:center;gap:4px"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Enregistré</div>
+    </div>
+    <button type="button" class="ib" aria-label="Rechercher un produit"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+  </header>
+  <nav class="strip" aria-label="Rayons">
+    <button type="button" class="chip sel">Frais <span class="cnt">5</span></button>
+    <button type="button" class="chip">Épicerie <span class="cnt">2</span></button>
+    <button type="button" class="chip">Boissons</button>
+    <button type="button" class="chip">Droguerie <span class="cnt">1</span></button>
+    <button type="button" class="chip">Hygiène</button>
+  </nav>
+  <nav class="strip" aria-label="Secteurs du rayon Frais" style="background:#F7F7F7">
+    <button type="button" class="chip sq">Fruits et légumes <span class="cnt">1</span></button>
+    <button type="button" class="chip sq sel">Crèmerie <span class="cnt">3</span></button>
+    <button type="button" class="chip sq">Boucherie</button>
+    <button type="button" class="chip sq">Charcuterie <span class="cnt">1</span></button>
+  </nav>
+  <main style="flex:1;overflow-y:auto">
+    <label class="row on" style="border-bottom:0"><input type="checkbox" defaultChecked="{{ true }}"/><span class="nm"><b>Lait demi-écrémé</b> <span class="s">· [Marque A] · pack de 6</span></span><a class="pb" href="Construire-Promo.dc.html" aria-label="Promotion visée : lot">LOT</a><span class="step"><button type="button" aria-label="Moins">−</button><span style="min-width:16px;text-align:center">2</span><button type="button" aria-label="Plus">+</button></span></label>
+    <div class="warn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 3l10 18H2zM12 10v5M12 18h.01"/></svg>Il en faut 3 pour la promotion</div>
+    <label class="row on"><input type="checkbox" defaultChecked="{{ true }}"/><span class="nm"><b>Yaourts nature</b> <span class="s">· pack de 12</span></span><a class="pb vide" href="Construire-Promo.dc.html" aria-label="Indiquer une promotion">%</a><span class="step"><button type="button" aria-label="Moins">−</button><span style="min-width:16px;text-align:center">1</span><button type="button" aria-label="Plus">+</button></span></label>
+    <label class="row on"><input type="checkbox" defaultChecked="{{ true }}"/><span class="nm"><b>Fromage râpé</b> <span class="s">· 200 g</span></span><a class="pb vide" href="Construire-Promo.dc.html" aria-label="Indiquer une promotion">%</a><span class="step"><button type="button" aria-label="Moins">−</button><span style="min-width:16px;text-align:center">1</span><button type="button" aria-label="Plus">+</button></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Beurre doux <span class="s">· 250 g</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" aria-label="Acheté habituellement"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Crème fraîche <span class="s">· 20 cl</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Œufs <span class="s">· boîte de 12</span></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#555555" stroke-width="2" aria-label="Acheté habituellement"><path d="M4 12a8 8 0 1 0 3-6.2M4 4v4h4"/></svg></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Lait entier <span class="s">· bouteille 1 L</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Yaourts aux fruits <span class="s">· pack de 8</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Fromage blanc <span class="s">· 500 g</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Emmental <span class="s">· bloc 250 g</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Mozzarella <span class="s">· 125 g</span></span></label>
+    <label class="row"><input type="checkbox"/><span class="nm">Desserts lactés <span class="s">· pack de 4</span></span></label>
+    <a class="row" href="Fiche-Produit.dc.html" style="text-decoration:none;color:#555555;font-size:14px">+ Produit absent de ce secteur</a>
+  </main>
+  <div style="padding:6px 8px;border-top:2px solid #222222;display:flex;gap:8px">
+    <a class="btn" href="Liste-Complete.dc.html" style="flex:1">Ma liste · 9</a>
+    <a class="btn pri" href="Main.dc.html" style="flex:1">Liste prête</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

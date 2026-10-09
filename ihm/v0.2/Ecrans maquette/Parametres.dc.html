@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Paramètres</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid #CCCCCC;flex:none}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.sec{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#555555;margin:16px 0 6px}
+.it{display:flex;align-items:center;gap:12px;min-height:56px;border-bottom:1px solid #DDDDDD;text-decoration:none}
+.ph{background:#E4E4E4;border:1.5px dashed #888888;display:flex;align-items:center;justify-content:center;font-size:11px;color:#555555;flex:none}
+.tag{border:1.5px solid #222222;border-radius:4px;padding:2px 6px;font-size:11px;font-weight:700;white-space:nowrap}
+.s{font-size:12px;color:#555555}
+.card{border:2px solid #222222;border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;margin-top:8px}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd"><h1 style="margin:0;font-size:20px;flex:1">Paramètres</h1></header>
+  <main style="flex:1;overflow-y:auto;padding:0 12px 12px">
+    <div class="sec">Foyer</div>
+    <div class="it"><div style="flex:1"><b style="font-size:17px">[Nom du foyer]</b><div class="s">Créé le [date]</div></div><a href="#" style="min-height:44px;display:flex;align-items:center">Renommer</a></div>
+    <div class="it"><div class="ph" style="width:40px;height:40px;border-radius:50%">M1</div><div style="flex:1"><b>[Membre 1]</b><div class="s">Compte Google</div></div><span class="tag">Administrateur</span></div>
+    <div class="it"><div class="ph" style="width:40px;height:40px;border-radius:50%">M2</div><div style="flex:1"><b>[Membre 2]</b><div class="s">Compte Google</div></div><span class="tag" style="font-weight:400">Membre</span></div>
+    <div class="card">
+      <div style="flex:1"><div style="font-size:13px">Code d'invitation</div><div style="font-size:24px;font-weight:700;letter-spacing:.15em">[CODE]</div><div class="s">valable jusqu'au [date]</div></div>
+      <a href="#" style="min-height:44px;display:flex;align-items:center;font-weight:700">Envoyer</a>
+    </div>
+    <a class="it" href="#"><div style="flex:1">J'ai reçu un code : rejoindre un foyer</div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+
+    <div class="sec">Listes</div>
+    <a class="it" href="Parametres-Promos.dc.html"><div style="flex:1"><b>Types de promotion</b><div class="s">6 types · libellés proposés en construction de liste</div></div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+    <a class="it" href="#"><div style="flex:1"><b>Préliste</b><div class="s">Produits présents 3 fois sur les 6 dernières courses</div></div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+
+    <div class="sec">Comptes magasin (option à étudier)</div>
+    <a class="it" href="#"><div style="flex:1"><b>[Enseigne]</b><div class="s">Identifiant [xxx] · récupération des tickets</div></div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></a>
+  </main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a class="act" href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

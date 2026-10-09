@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Au lancement : reprendre ?</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.item{display:flex;flex-direction:column;gap:8px;border:2px solid #222222;border-radius:12px;padding:14px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;padding:0 12px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:16px}
+.pri{background:#222222;color:#FFFFFF}
+.pri:hover{color:#FFFFFF}
+.s{font-size:13px;color:#555555}
+.ph{background:#E4E4E4;border:1.5px dashed #888888;display:flex;align-items:center;justify-content:center;font-size:11px;color:#555555}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;gap:14px;padding:48px 20px 24px;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <div class="ph" style="width:64px;height:64px;border-radius:14px;align-self:center">LOGO</div>
+  <h1 style="margin:8px 0 0;font-size:24px;text-align:center">Reprendre où vous en étiez ?</h1>
+  <p style="margin:0 0 6px;font-size:14px;color:#555555;text-align:center">Rien n'a été perdu depuis votre dernière utilisation.</p>
+
+  <section class="item">
+    <div style="display:flex;align-items:center;gap:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg><b style="font-size:17px">Courses en cours · [Magasin 1]</b></div>
+    <div class="s">4 / 9 cochés · arrêt au secteur Crèmerie · [hier, 18 h 20]</div>
+    <a class="btn pri" href="Courses-Secteur.dc.html">Reprendre les courses</a>
+  </section>
+
+  <section class="item">
+    <div style="display:flex;align-items:center;gap:8px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg><b style="font-size:17px">Liste en préparation · [Magasin 2]</b></div>
+    <div class="s">4 articles · secteur Crèmerie · [date]</div>
+    <a class="btn" href="Construire.dc.html">Reprendre la préparation</a>
+  </section>
+
+  <div style="flex:1"></div>
+  <a class="btn" href="Main.dc.html" style="border-style:dashed">Aller à l'accueil</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

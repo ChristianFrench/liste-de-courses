@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Magasin · Produits</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid #CCCCCC;flex:none}
+.inp{height:40px;border:2px solid #222222;border-radius:8px;padding:0 8px;font-family:inherit;font-size:15px;background:#FFFFFF;color:#222222}
+.sub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:8px 12px;border:2px solid #222222;border-radius:10px;overflow:hidden;flex:none}
+.sub a{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;text-decoration:none;font-size:14px;border-left:2px solid #222222}
+.sub a:first-child{border-left:0}
+.sub .on{background:#222222;color:#FFFFFF;font-weight:700}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.it{display:flex;align-items:center;gap:10px;min-height:48px;border-bottom:1px solid #DDDDDD;text-decoration:none}
+.ph{background:#E4E4E4;border:1.5px dashed #888888;display:flex;align-items:center;justify-content:center;font-size:9px;color:#555555;flex:none}
+.s{font-size:12px;color:#555555}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 12px;border:2px dashed #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:15px}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <h1 style="margin:0;font-size:20px;flex:1">Magasin</h1>
+    <select class="inp" aria-label="Magasin" style="font-weight:700"><option>[Magasin 1]</option><option>[Magasin 2]</option></select>
+  </header>
+  <nav class="sub" aria-label="Magasin">
+    <a href="Magasin-Rayons.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 15h18"/></svg>Rayons</a>
+    <a href="Magasin-Secteurs.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="3" width="8" height="8"/><rect x="3" y="13" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/></svg>Secteurs</a>
+    <a class="on" href="Magasin-Produits.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7l9-4 9 4-9 4zM3 7v10l9 4 9-4V7M12 11v10"/></svg>Produits</a>
+  </nav>
+  <div style="padding:0 12px 8px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid #CCCCCC">
+    <div style="display:flex;gap:6px">
+      <select class="inp" aria-label="Rayon" style="flex:1"><option>Frais</option><option>Tous les rayons</option></select>
+      <select class="inp" aria-label="Secteur" style="flex:1"><option>Crèmerie</option><option>Tous les secteurs</option></select>
+    </div>
+    <label style="display:flex"><span style="position:absolute;left:-9999px">Rechercher</span><input class="inp" type="search" placeholder="Rechercher un produit, une marque…" style="width:100%"/></label>
+  </div>
+  <main style="flex:1;overflow-y:auto;padding:0 12px 12px">
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Lait demi-écrémé</b> <span class="s">· 2 marques · 2 packagings</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Yaourts nature</b> <span class="s">· 1 marque · 1 packaging</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Fromage râpé</b> <span class="s">· 1 marque</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Beurre doux</b> <span class="s">· 2 marques</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Crème fraîche</b> <span class="s">· 20 cl</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Œufs</b> <span class="s">· boîte de 12</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Lait entier</b> <span class="s">· 1 marque</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Yaourts aux fruits</b> <span class="s">· 1 marque</span></div></a>
+    <a class="it" href="Fiche-Produit.dc.html"><div class="ph" style="width:36px;height:36px">IMG</div><div style="flex:1"><b>Fromage blanc</b> <span class="s">· 500 g</span></div></a>
+    <a class="btn" href="Fiche-Produit.dc.html" style="margin-top:10px">+ Nouveau produit dans Crèmerie</a>
+  </main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a class="act" href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

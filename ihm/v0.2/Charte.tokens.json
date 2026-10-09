@@ -1,0 +1,416 @@
+{
+ "$description": "Charte de la maquette — Application liste de courses. Format W3C Design Tokens (DTCG 2025.10). Valeurs en points logiques (= pixels logiques Flutter). Version 0.2 du 9 octobre 2026.",
+ "couleur": {
+  "$type": "color",
+  "encre": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.1333,
+     0.1333,
+     0.1333
+    ],
+    "hex": "#222222"
+   },
+   "$description": "Textes, traits, boutons pleins, élément sélectionné"
+  },
+  "fond": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     1,
+     1,
+     1
+    ],
+    "hex": "#FFFFFF"
+   }
+  },
+  "fondSelection": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.949,
+     0.949,
+     0.949
+    ],
+    "hex": "#F2F2F2"
+   },
+   "$description": "Ligne cochée en construction, titre de groupe, élément choisi"
+  },
+  "fondBandeau": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.9686,
+     0.9686,
+     0.9686
+    ],
+    "hex": "#F7F7F7"
+   },
+   "$description": "Bandeau secondaire (secteurs, rappel du secteur)"
+  },
+  "fondNavActive": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.9294,
+     0.9294,
+     0.9294
+    ],
+    "hex": "#EDEDED"
+   }
+  },
+  "texteSecondaire": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.3333,
+     0.3333,
+     0.3333
+    ],
+    "hex": "#555555"
+   }
+  },
+  "texteCoche": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.4667,
+     0.4667,
+     0.4667
+    ],
+    "hex": "#777777"
+   },
+   "$description": "Article coché : grisé et barré"
+  },
+  "separateurZone": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.8,
+     0.8,
+     0.8
+    ],
+    "hex": "#CCCCCC"
+   }
+  },
+  "separateurLigne": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0.8667,
+     0.8667,
+     0.8667
+    ],
+    "hex": "#DDDDDD"
+   }
+  },
+  "texteSurEncre": {
+   "$value": "{couleur.fond}"
+  },
+  "voile": {
+   "$value": {
+    "colorSpace": "srgb",
+    "components": [
+     0,
+     0,
+     0
+    ],
+    "alpha": 0.45,
+    "hex": "#000000"
+   },
+   "$description": "Fond assombri sous un volet ou un dialogue"
+  }
+ },
+ "police": {
+  "famille": {
+   "$type": "fontFamily",
+   "$value": [
+    "Atkinson Hyperlegible",
+    "sans-serif"
+   ]
+  },
+  "normal": {
+   "$type": "fontWeight",
+   "$value": 400
+  },
+  "gras": {
+   "$type": "fontWeight",
+   "$value": 700
+  }
+ },
+ "taille": {
+  "$type": "dimension",
+  "titreGestion": {
+   "$value": {
+    "value": 19,
+    "unit": "px"
+   }
+  },
+  "titreTravail": {
+   "$value": {
+    "value": 17,
+    "unit": "px"
+   }
+  },
+  "ligneConstruction": {
+   "$value": {
+    "value": 15,
+    "unit": "px"
+   }
+  },
+  "ligneCourses": {
+   "$value": {
+    "value": 17,
+    "unit": "px"
+   }
+  },
+  "secondaire": {
+   "$value": {
+    "value": 12,
+    "unit": "px"
+   }
+  },
+  "titreGroupe": {
+   "$value": {
+    "value": 12,
+    "unit": "px"
+   },
+   "$description": "Majuscules, espacement des lettres 0,06 em"
+  },
+  "navigation": {
+   "$value": {
+    "value": 11,
+    "unit": "px"
+   }
+  },
+  "codePromo": {
+   "$value": {
+    "value": 9,
+    "unit": "px"
+   }
+  },
+  "titreNiveau": {
+   "$value": {
+    "value": 20,
+    "unit": "px"
+   }
+  }
+ },
+ "hauteur": {
+  "$type": "dimension",
+  "enTeteTravail": {
+   "$value": {
+    "value": 48,
+    "unit": "px"
+   }
+  },
+  "enTeteGestion": {
+   "$value": {
+    "value": 60,
+    "unit": "px"
+   }
+  },
+  "bandeauPuces": {
+   "$value": {
+    "value": 44,
+    "unit": "px"
+   }
+  },
+  "puce": {
+   "$value": {
+    "value": 36,
+    "unit": "px"
+   }
+  },
+  "ligneConstruction": {
+   "$value": {
+    "value": 44,
+    "unit": "px"
+   }
+  },
+  "ligneCourses": {
+   "$value": {
+    "value": 56,
+    "unit": "px"
+   }
+  },
+  "ligneCompacte": {
+   "$value": {
+    "value": 32,
+    "unit": "px"
+   }
+  },
+  "barreAction": {
+   "$value": {
+    "value": 64,
+    "unit": "px"
+   }
+  },
+  "barreNavigation": {
+   "$value": {
+    "value": 64,
+    "unit": "px"
+   }
+  },
+  "bouton": {
+   "$value": {
+    "value": 48,
+    "unit": "px"
+   }
+  },
+  "zoneTactileMin": {
+   "$value": {
+    "value": 44,
+    "unit": "px"
+   }
+  },
+  "selecteurQuantite": {
+   "$value": {
+    "value": 34,
+    "unit": "px"
+   }
+  },
+  "enTeteNiveau": {
+   "$value": {
+    "value": 52,
+    "unit": "px"
+   },
+   "$description": "En-tête d'un écran racine d'onglet ou de sous-niveau"
+  },
+  "sousOnglets": {
+   "$value": {
+    "value": 44,
+    "unit": "px"
+   }
+  },
+  "barreOnglets": {
+   "$value": {
+    "value": 64,
+    "unit": "px"
+   }
+  },
+  "pastilleOngletActif": {
+   "$value": {
+    "value": 30,
+    "unit": "px"
+   }
+  }
+ },
+ "espace": {
+  "$type": "dimension",
+  "base": {
+   "$value": {
+    "value": 8,
+    "unit": "px"
+   }
+  },
+  "demi": {
+   "$value": {
+    "value": 4,
+    "unit": "px"
+   }
+  },
+  "marge": {
+   "$value": {
+    "value": 16,
+    "unit": "px"
+   },
+   "$description": "Marge latérale des écrans de gestion (8 sur les écrans de travail)"
+  }
+ },
+ "rayon": {
+  "$type": "dimension",
+  "petit": {
+   "$value": {
+    "value": 6,
+    "unit": "px"
+   }
+  },
+  "bouton": {
+   "$value": {
+    "value": 8,
+    "unit": "px"
+   }
+  },
+  "carte": {
+   "$value": {
+    "value": 10,
+    "unit": "px"
+   }
+  },
+  "pastille": {
+   "$value": {
+    "value": 18,
+    "unit": "px"
+   }
+  }
+ },
+ "trait": {
+  "$type": "dimension",
+  "cadre": {
+   "$value": {
+    "value": 2,
+    "unit": "px"
+   }
+  },
+  "separateur": {
+   "$value": {
+    "value": 1,
+    "unit": "px"
+   }
+  }
+ },
+ "ecran": {
+  "$type": "dimension",
+  "largeur": {
+   "$value": {
+    "value": 390,
+    "unit": "px"
+   },
+   "$description": "Taille de référence ; fenêtre Windows fixe à cette taille"
+  },
+  "hauteur": {
+   "$value": {
+    "value": 844,
+    "unit": "px"
+   }
+  }
+ },
+ "dimension_icone": {
+  "$type": "dimension",
+  "onglet": {
+   "$value": {
+    "value": 22,
+    "unit": "px"
+   }
+  },
+  "sousOnglet": {
+   "$value": {
+    "value": 18,
+    "unit": "px"
+   }
+  },
+  "ligne": {
+   "$value": {
+    "value": 20,
+    "unit": "px"
+   }
+  }
+ },
+ "largeur": {
+  "$type": "dimension",
+  "pastilleOngletActif": {
+   "$value": {
+    "value": 56,
+    "unit": "px"
+   }
+  },
+  "boutonPromo": {
+   "$value": {
+    "value": 34,
+    "unit": "px"
+   }
+  }
+ }
+}
