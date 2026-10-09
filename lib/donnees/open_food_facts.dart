@@ -56,6 +56,8 @@ class ArticleOff {
   }
 }
 
+class _Sature implements Exception {}
+
 class ErreurOff implements Exception {
   ErreurOff(this.message);
   final String message;
@@ -73,7 +75,19 @@ class OpenFoodFacts {
   static const String champs = 'code,product_name_fr,product_name,generic_name_fr,brands,brands_tags,'
       'quantity,image_front_small_url,image_front_url,nutriscore_grade';
 
+  /// Lecture avec deux nouvelles tentatives si le service est momentanément saturé.
   Future<Map<String, dynamic>> _lire(Uri adresse) async {
+    for (var essai = 1;; essai++) {
+      try {
+        return await _lireUneFois(adresse);
+      } on _Sature {
+        if (essai >= 3) throw ErreurOff('Open Food Facts est momentanément saturé : réessayez dans un moment.');
+        await Future<void>.delayed(Duration(seconds: 2 * essai));
+      }
+    }
+  }
+
+  Future<Map<String, dynamic>> _lireUneFois(Uri adresse) async {
     final client = HttpClient()
       ..userAgent = agent
       ..connectionTimeout = const Duration(seconds: 15);
@@ -85,6 +99,7 @@ class OpenFoodFacts {
         throw ErreurOff('Trop de recherches en peu de temps : patientez une minute.');
       }
       if (reponse.statusCode == 404) return {'status': 0};
+      if (reponse.statusCode == 502 || reponse.statusCode == 503 || reponse.statusCode == 504) throw _Sature();
       if (reponse.statusCode != 200) {
         throw ErreurOff('Open Food Facts a répondu par une erreur (${reponse.statusCode}).');
       }
