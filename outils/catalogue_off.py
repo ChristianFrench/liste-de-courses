@@ -179,7 +179,7 @@ def base(export, tax_json, tax_txt, sortie):
     csv.field_size_limit(1 << 30)
     candidats = []
     lus = france = 0
-    jusqua = 0
+    jusqua = max_maj = recents = 0
     with gzip.open(export, "rt", encoding="utf-8", errors="replace", newline="") as f:
         lecteur = csv.DictReader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
         for l in lecteur:
@@ -187,7 +187,12 @@ def base(export, tax_json, tax_txt, sortie):
             if lus % 1000000 == 0:
                 print(f"  {lus} lignes lues ({time.time()-debut:.0f} s)", flush=True)
             try:
-                jusqua = max(jusqua, int(l.get("last_modified_t") or 0))
+                m = int(l.get("last_modified_t") or 0)
+                u = int(l.get("last_updated_t") or 0)
+                jusqua = max(jusqua, m)
+                max_maj = max(max_maj, u)
+                if m >= 1788220800:
+                    recents += 1
             except ValueError:
                 pass
             if "en:france" not in (l.get("countries_tags") or ""):
@@ -209,6 +214,9 @@ def base(export, tax_json, tax_txt, sortie):
                               (l.get("categories_tags") or "").split(","),
                               chemin_photo_url(l.get("image_small_url") or "")))
     print(f"lu : {lus} lignes ; vendus en France : {france} ; candidats : {len(candidats)}")
+    print(f"dernière modification : {time.strftime('%d/%m/%Y %H:%M', time.gmtime(jusqua))} ; "
+          f"dernière mise à jour : {time.strftime('%d/%m/%Y %H:%M', time.gmtime(max_maj))} ; "
+          f"modifiés depuis le 01/09/2026 : {recents}")
     candidats.sort(key=lambda p: -p[5])
     cats = Categories(noms)
     produits = [[p[0], p[1], p[2], p[3], p[4], p[5], cats.numeros(p[6]), p[7]] for p in candidats[:MAX_PRODUITS]]
