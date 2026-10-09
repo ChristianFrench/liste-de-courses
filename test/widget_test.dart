@@ -4,7 +4,6 @@
 
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,6 +41,13 @@ void _telephone(WidgetTester tester) {
 Future<void> _demarrer(WidgetTester tester) async {
   _telephone(tester);
   await tester.pumpWidget(const ListeDeCoursesApp());
+  await tester.pumpAndSettle();
+}
+
+/// Fait défiler jusqu'à l'élément puis l'amène entièrement à l'écran.
+Future<void> _montrer(WidgetTester tester, Finder element, {Finder? scrollable}) async {
+  await tester.scrollUntilVisible(element, 150, scrollable: scrollable ?? find.byType(Scrollable).first);
+  await tester.ensureVisible(element);
   await tester.pumpAndSettle();
 }
 
@@ -92,7 +98,7 @@ void main() {
     testWidgets('écrans de gestion accessibles depuis l\'accueil, sans débordement', (tester) async {
       await _demarrer(tester);
       for (final tuile in ['Produits', 'Magasins et parcours', 'Historique', 'Promotions', 'Foyer']) {
-        await tester.scrollUntilVisible(find.widgetWithText(Bouton, tuile), 100);
+        await _montrer(tester, find.widgetWithText(Bouton, tuile));
         await tester.tap(find.widgetWithText(Bouton, tuile));
         await tester.pumpAndSettle();
         expect(find.byType(EnTeteGestion), findsOneWidget, reason: tuile);
@@ -175,11 +181,11 @@ void main() {
       await tester.tap(find.text('Produits').last);
       await tester.pumpAndSettle();
       final grille = find.descendant(of: find.byType(GridView), matching: find.byType(Scrollable)).first;
-      await tester.scrollUntilVisible(find.text('Lait demi-écrémé'), 150, scrollable: grille);
+      await _montrer(tester, find.text('Lait demi-écrémé'), scrollable: grille);
       await tester.tap(find.text('Lait demi-écrémé'));
       await tester.pumpAndSettle();
       expect(find.text('Où le trouver'.toUpperCase()), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('+ Signaler une promotion'), 100);
+      await _montrer(tester, find.text('+ Signaler une promotion'));
       await tester.tap(find.text('+ Signaler une promotion'));
       await tester.pumpAndSettle();
       for (final t in ['Prix global', 'Remise', 'Packaging', 'Fidélité', 'Autre', 'Lot']) {

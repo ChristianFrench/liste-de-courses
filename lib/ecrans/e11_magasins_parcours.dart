@@ -238,8 +238,7 @@ class _EcranMagasinsParcoursState extends State<EcranMagasinsParcours> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       header: entete,
       footer: pied,
-      onReorder: (ancien, nouveau) => setState(() {
-        if (nouveau > ancien) nouveau--;
+      onReorderItem: (ancien, nouveau) => setState(() {
         final sid = etapes.removeAt(ancien);
         etapes.insert(nouveau, sid);
         modifie = true;

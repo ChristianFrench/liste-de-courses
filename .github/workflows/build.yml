@@ -11,6 +11,8 @@ jobs:
   verification:
     name: verification (analyse et tests de recette)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
@@ -31,6 +33,24 @@ jobs:
           flutter test --reporter expanded > tests.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py tests.log "Tests de recette"; else tail -n 30 tests.log; fi
+          exit $code
+      - name: Captures des écrans (branche « captures »)
+        if: always() && github.ref == 'refs/heads/main'
+        env:
+          CAPTURES: '1'
+        run: |
+          set +e
+          flutter test --update-goldens test/captures_test.dart > captures.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py captures.log "Captures des écrans"; fi
+          ls test/captures || exit 1
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan captures-temp
+          git rm -rq --cached .
+          git add -f test/captures/*.png
+          git commit -qm "Captures des écrans pour ${GITHUB_SHA::7}"
+          git push -qf origin HEAD:refs/heads/captures
           exit $code
 
   android:
