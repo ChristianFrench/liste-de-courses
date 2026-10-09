@@ -1,0 +1,72 @@
+name: Compilation Android, Windows, iPhone
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,ios,windows .
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        run: |
+          $CREER
+          python3 outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons
+      - name: Compiler l'APK
+        run: flutter build apk --release
+      - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Liste de courses Android
+          path: build/Liste de courses.apk
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        shell: bash
+        run: |
+          $CREER
+          python outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons
+      - name: Compiler l'exécutable Windows
+        run: flutter build windows --release
+      - name: Joindre les bibliothèques Visual C++
+        shell: pwsh
+        run: |
+          $dest = "build/windows/x64/runner/Release"
+          foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") {
+            Copy-Item "C:\Windows\System32\$f" $dest
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Liste de courses Windows
+          path: build/windows/x64/runner/Release/
+  iphone:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        run: |
+          $CREER
+          python3 outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons
+      - name: Compiler la version iPhone (vérification, sans signature)
+        run: flutter build ios --release --no-codesign
