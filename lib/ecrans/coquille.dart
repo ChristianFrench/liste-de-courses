@@ -1,3 +1,4 @@
+// ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
@@ -127,9 +128,9 @@ class RacineOnglet extends StatelessWidget {
               SousOnglet('Courses', Icons.shopping_cart_outlined),
             ];
             contenu = switch (sous) {
-              Nav.parcours => const SousEcranParcours(),
-              Nav.courses => const SousEcranCourses(),
-              _ => const SousEcranPreparer(),
+              Nav.parcours => SousEcranParcours(),
+              Nav.courses => SousEcranCourses(),
+              _ => SousEcranPreparer(),
             };
           case Nav.historique:
             titre = 'Historique';
@@ -137,7 +138,7 @@ class RacineOnglet extends StatelessWidget {
               SousOnglet('Courses effectuées', Icons.shopping_cart_outlined),
               SousOnglet('Tickets de caisse', Icons.receipt_long_outlined),
             ];
-            contenu = sous == Nav.tickets ? const SousEcranTickets() : const SousEcranCoursesEffectuees();
+            contenu = sous == Nav.tickets ? SousEcranTickets() : SousEcranCoursesEffectuees();
           default:
             titre = 'Magasin';
             droite = const SelecteurMagasin();
@@ -147,11 +148,12 @@ class RacineOnglet extends StatelessWidget {
               SousOnglet('Produits', Icons.inventory_2_outlined),
             ];
             contenu = switch (sous) {
-              Nav.secteurs => const SousEcranSecteurs(),
-              Nav.produits => const SousEcranProduits(),
-              _ => const SousEcranRayons(),
+              Nav.secteurs => SousEcranSecteurs(),
+              Nav.produits => SousEcranProduits(),
+              _ => SousEcranRayons(),
             };
         }
+        // Contenus recréés à chaque changement de données (pas de « const ») pour qu'ils se redessinent.
         return PageBase(
           entete: EnTeteNiveau(titre: titre, droite: droite),
           haut: [SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],

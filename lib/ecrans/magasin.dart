@@ -27,7 +27,7 @@ class SelecteurMagasin extends StatelessWidget {
     return SizedBox(
       width: 168,
       child: ChoixDeroulant<String>(
-        hauteur: 42,
+        hauteur: 48,
         valeur: magasinCourant(),
         choix: {for (final m in etat.magasins) m.id: m.nom, nouveau: '+ Nouveau magasin'},
         onChange: (v) async {
