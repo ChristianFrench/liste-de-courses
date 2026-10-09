@@ -785,7 +785,7 @@ class BarreAction extends StatelessWidget {
 
 /// Deux boutons accolés, un sélectionné.
 class Bascule extends StatelessWidget {
-  const Bascule({super.key, required this.options, required this.index, required this.onChange, this.hauteur = 44});
+  const Bascule({super.key, required this.options, required this.index, required this.onChange, this.hauteur = 48});
   final List<String> options;
   final int index;
   final ValueChanged<int> onChange;

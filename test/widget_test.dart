@@ -199,8 +199,6 @@ void main() {
       // 4 : changer de rayon et de secteur met à jour produits et compteurs
       await _toucher(tester, find.textContaining('Épicerie').first);
       expect(find.textContaining('Pâtes', findRichText: true), findsOneWidget);
-      await _toucher(tester, find.text('Charcuterie').first);
-      expect(find.text('Charcuterie'), findsWidgets);
       await _toucher(tester, find.text('Frais').first);
       await _toucher(tester, find.text('Charcuterie').first);
       expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
@@ -248,7 +246,10 @@ void main() {
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Interrompre'));
       expect(find.text('Courses interrompues'.toUpperCase()), findsOneWidget);
-      expect(find.textContaining('arrêt au secteur Charcuterie'), findsOneWidget);
+      final l4 = Etat.instance.liste('l4')!;
+      expect(l4.repriseSecteurId, 's4', reason: 'étape enregistrée à l\'interruption');
+      expect(find.textContaining('arrêt au secteur Charcuterie'), findsOneWidget,
+          reason: [for (final w in tester.widgetList<Text>(find.byType(Text))) w.data ?? ''].join(' | '));
 
       await _toucher(tester, find.text('Reprendre les courses'));
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
