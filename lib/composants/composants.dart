@@ -659,7 +659,7 @@ class Bouton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (icone != null) ...[
-            Icon(icone, size: 20 + (texte.isEmpty ? 10 : 0), color: texteCouleur),
+            Icon(icone, size: icone == Icons.arrow_left || texte.isEmpty ? 28 : 20, color: texteCouleur),
             if (texte.isNotEmpty) const SizedBox(width: 6),
           ],
           if (texte.isNotEmpty)
