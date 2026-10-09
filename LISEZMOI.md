@@ -42,3 +42,16 @@ La fenêtre s'ouvre au format téléphone (rapport 390 × 844), sans redimension
   le bandeau d'information apparaît alors pendant les courses.
 - Photo, envoi du code d'invitation, comptes magasin : boutons présents, fonction affichée « non disponible ».
 - Taille des caractères du téléphone prise en compte jusqu'à 115 %, pour éviter les textes coupés.
+
+## Catalogue Open Food Facts (depuis la version 0.5)
+
+Workflow « Catalogue Open Food Facts » (`.github/workflows/catalogue.yml`), page « catalogue-off » :
+
+| Fichier | Contenu | Fréquence |
+|---|---|---|
+| `catalogue.json.gz` | Base : les 60 000 produits les plus populaires en France | 1er du mois (export JSONL d'Open Food Facts) |
+| `catalogue-maj.json.gz` | Mise à jour cumulative depuis la base | chaque nuit (fichiers de changements quotidiens) |
+| `catalogue-version.txt` | Versions lues par l'application | à chaque publication |
+
+La base est jointe à l'application à la compilation ; l'application télécharge ensuite
+elle-même les mises à jour selon le délai réglé (7 jours par défaut).
