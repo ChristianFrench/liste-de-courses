@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/main.dart';
 
 Future<void> _chargerPolice() async {
@@ -86,6 +87,32 @@ void main() {
     });
   });
 
+  group('Open Food Facts', () {
+    test('code-barres EAN-13 : clé de contrôle et 95 modules', () {
+      expect(ean13Valide('3017620422003'), isTrue);
+      expect(ean13Valide('3017620422004'), isFalse);
+      expect(ean13Valide('12345'), isFalse);
+      final m = modulesEan13('3017620422003');
+      expect(m.length, 95);
+      expect(m.take(3), [true, false, true]);
+    });
+
+    test('lecture d\'un article', () {
+      final a = ArticleOff.depuis({
+        'code': '3428272950057',
+        'product_name_fr': 'Lait demi-écrémé',
+        'brands': 'Marque X, Groupe Y',
+        'brands_tags': ['marque-x', 'groupe-y'],
+        'quantity': '1 L',
+        'nutriscore_grade': 'B',
+      });
+      expect(a.marque, 'Marque X');
+      expect(a.marqueTag, 'marque-x');
+      expect(a.nutriscore, 'b');
+      expect(a.imagePetite, '');
+    });
+  });
+
   group('Écrans', () {
     testWidgets('1. Accueil', (tester) async {
       await _demarrer(tester);
@@ -104,6 +131,16 @@ void main() {
         expect(find.byType(EnTeteGestion), findsOneWidget, reason: tuile);
         await _retour(tester);
       }
+    });
+
+    testWidgets('13. Produits réels : écran d\'essai sans recherche automatique', (tester) async {
+      await _demarrer(tester);
+      await _montrer(tester, find.textContaining('Produits réels'));
+      await tester.tap(find.textContaining('Produits réels'));
+      await tester.pumpAndSettle();
+      expect(find.text('Produits réels (essai)'), findsOneWidget);
+      expect(find.textContaining('Cherchez un produit'), findsOneWidget);
+      await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
     });
 
     testWidgets('2. Nouvelle liste : la préliste coche les produits fréquents', (tester) async {

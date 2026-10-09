@@ -22,6 +22,10 @@ def remplacer(chemin, ancien, nouveau, regex=False):
 remplacer("android/app/src/main/AndroidManifest.xml",
           r'android:label="[^"]*"', f'android:label="{NOM}"', regex=True)
 
+# Android : autorisation d'accès à internet (Open Food Facts, puis Firebase)
+remplacer("android/app/src/main/AndroidManifest.xml",
+          r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.INTERNET"/>', regex=True)
+
 # iPhone : nom sous l'icône
 remplacer("ios/Runner/Info.plist",
           r"(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)",

@@ -13,6 +13,7 @@ import 'e08_produits.dart';
 import 'e10_promotion.dart';
 import 'e11_magasins_parcours.dart';
 import 'e12_historique.dart';
+import 'e13_produits_reels.dart';
 
 /// Écran 1 — Accueil.
 class EcranAccueil extends StatelessWidget {
@@ -99,6 +100,16 @@ class EcranAccueil extends StatelessWidget {
                       onTap: () => Nav.aller(context, EcranPromotion(produitId: etat.produits.first.id))),
                   Bouton(texte: 'Foyer', taille: 16, onTap: () => Nav.aller(context, const EcranFoyer())),
                 ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Bouton(
+                texte: 'Produits réels (essai Open Food Facts)',
+                icone: Icons.travel_explore,
+                pointille: true,
+                taille: 16,
+                onTap: () => Nav.aller(context, const EcranProduitsReels()),
               ),
             ),
           ],

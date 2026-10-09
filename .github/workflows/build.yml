@@ -43,12 +43,15 @@ jobs:
           flutter test --update-goldens test/captures_test.dart > captures.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py captures.log "Captures des écrans"; fi
+          # Écran d'essai Open Food Facts avec de vraies données : un échec ne bloque pas
+          flutter test --update-goldens test/captures_off_test.dart > captures_off.log 2>&1 \
+            || { echo "::warning title=Captures Open Food Facts::échec (voir le journal)"; tail -n 60 captures_off.log; }
           ls test/captures || exit 1
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
           git checkout -q --orphan captures-temp
           git rm -rq --cached .
-          git add -f test/captures/*.png
+          git add -f test/captures/*.png test/captures/*.txt 2>/dev/null || git add -f test/captures/*.png
           git commit -qm "Captures des écrans pour ${GITHUB_SHA::7}"
           git push -qf origin HEAD:refs/heads/captures
           exit $code
