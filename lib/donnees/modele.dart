@@ -1,12 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show Random;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
-// Données de la maquette v0.2 (« Données maquette.json »), gardées dans un fichier JSON local
-// pour que l'interruption survive à la fermeture. Chaque action est enregistrée immédiatement.
+import 'stockage.dart';
+
+// Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
+// (stockage.dart). Chaque action est enregistrée immédiatement.
 
 DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v as String);
 String? _iso(DateTime? d) => d?.toIso8601String().substring(0, 19);
@@ -312,10 +315,15 @@ class Etat extends ChangeNotifier {
   static final Etat instance = Etat._();
 
   static const String fichierDonnees = 'assets/donnees_maquette.json';
-  static const String fichierLocal = 'etat_maquette.json';
+  static const String fichierAncien = 'etat_maquette.json'; // maquette 0.6 et avant
+  static const String baseFoyer = 'liste_de_courses.db';
+  static const String baseDemo = 'demonstration.db';
 
   /// Désactive l'enregistrement sur disque (tests).
   bool enregistrementActif = true;
+
+  /// Mode démonstration : données fictives, gardées dans une base à part.
+  bool modeDemo = false;
 
   late Map<String, dynamic> _brut; // champs conservés tels quels (description, écarts…)
   String foyerId = 'f1';
@@ -346,42 +354,112 @@ class Etat extends ChangeNotifier {
 
   // ------------------------------------------------------------ Chargement et enregistrement
 
-  Future<File?> _fichier() async {
-    if (!enregistrementActif) return null;
-    try {
-      final d = await getApplicationSupportDirectory();
-      if (!d.existsSync()) d.createSync(recursive: true);
-      return File('${d.path}${Platform.pathSeparator}$fichierLocal');
-    } catch (_) {
-      return null;
-    }
-  }
+  Directory? _dossier;
+  Stockage? _foyer;
+  Stockage? _demo;
+  Stockage? get _actif => modeDemo ? _demo : _foyer;
 
-  /// Fichier local s'il existe, sinon données de démonstration.
+  String _chemin(String nom) => '${_dossier!.path}${Platform.pathSeparator}$nom';
+
+  Future<Map<String, dynamic>> _donneesDemo() async =>
+      jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>;
+
+  /// Base du foyer (vraies données) et, en mode démonstration, base de démonstration.
   Future<void> charger() async {
-    final f = await _fichier();
-    if (f != null && f.existsSync()) {
+    if (enregistrementActif) {
       try {
-        lire(jsonDecode(f.readAsStringSync()) as Map<String, dynamic>);
+        final d = await getApplicationSupportDirectory();
+        if (!d.existsSync()) d.createSync(recursive: true);
+        _dossier = d;
+        _foyer = Stockage.ouvrir(_chemin(baseFoyer));
+        modeDemo = _foyer!.reglage('modeDemo') == 'oui';
+        _reprendreAncienFichier();
+        await _ouvrirActif();
         return;
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Base locale indisponible : $e');
+        _foyer = _demo = null;
+      }
     }
-    lire(jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>);
-    await enregistrer();
+    lire(await _donneesDemo());
   }
 
-  /// Revient aux données de démonstration.
+  /// Le fichier de la maquette 0.6 contient des essais sur les données fictives :
+  /// il devient le contenu de la base de démonstration.
+  void _reprendreAncienFichier() {
+    final f = File(_chemin(fichierAncien));
+    if (!f.existsSync()) return;
+    try {
+      final demo = _demo ??= Stockage.ouvrir(_chemin(baseDemo));
+      if (demo.vide) demo.ecrire(jsonDecode(f.readAsStringSync()) as Map<String, dynamic>);
+      f.renameSync('${f.path}.ancien');
+    } catch (e) {
+      debugPrint('Reprise du fichier $fichierAncien impossible : $e');
+    }
+  }
+
+  Future<void> _ouvrirActif() async {
+    if (modeDemo) _demo ??= Stockage.ouvrir(_chemin(baseDemo));
+    final s = _actif!;
+    if (s.vide) {
+      lire(modeDemo ? await _donneesDemo() : _depart(await _donneesDemo()));
+      s.ecrire(versJson());
+    } else {
+      lire(s.lire());
+    }
+  }
+
+  /// Premier lancement : un foyer vide, avec son créateur et un premier magasin.
+  Map<String, dynamic> _depart(Map<String, dynamic> demo) {
+    final auj = DateTime.now();
+    const lettres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    final hasard = Random.secure();
+    final code = List.generate(6, (_) => lettres[hasard.nextInt(lettres.length)]).join();
+    return {
+      '_description': demo['_description'],
+      '_ecartsModele': demo['_ecartsModele'],
+      'foyer': {'id': nouvelId('f'), 'nom': 'Mon foyer', 'dateCreation': _iso(auj)!.substring(0, 10)},
+      'membres': [
+        {'id': nouvelId('m'), 'nomAffiche': 'Moi', 'role': 'administrateur', 'moi': true}
+      ],
+      'invitation': {'code': code, 'expiration': _iso(auj.add(const Duration(days: 7)))!.substring(0, 10)},
+      'parametres': demo['parametres'],
+      'typesPromotion': demo['typesPromotion'],
+      'magasins': [
+        {'id': nouvelId('mg'), 'nom': 'Mon magasin', 'enseigne': '', 'ville': ''}
+      ],
+      for (final cle in ['rayons', 'secteurs', 'marques', 'packagings', 'produits', 'emplacements', 'parcours', 'listes', 'historique', 'tickets'])
+        cle: <dynamic>[],
+      'frequencesPreliste': {'_regle': (demo['frequencesPreliste'] as Map?)?['_regle'] ?? ''},
+    };
+  }
+
+  /// Passe des vraies données à la démonstration, ou l'inverse. Rien n'est effacé.
+  Future<void> basculerDemo(bool oui) async {
+    if (oui == modeDemo) return;
+    modeDemo = oui;
+    if (_foyer == null) {
+      lire(oui ? await _donneesDemo() : _depart(await _donneesDemo()));
+      return;
+    }
+    _foyer!.definirReglage('modeDemo', oui ? 'oui' : 'non');
+    await _ouvrirActif();
+  }
+
+  /// Mode démonstration : revient aux données de démonstration d'origine.
   Future<void> reinitialiser() async {
-    lire(jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>);
+    if (!modeDemo) return;
+    lire(await _donneesDemo());
     await enregistrer();
   }
 
   Future<void> enregistrer() async {
-    final f = await _fichier();
-    if (f == null) return;
+    if (!enregistrementActif) return;
     try {
-      f.writeAsStringSync(jsonEncode(versJson()));
-    } catch (_) {}
+      _actif?.ecrire(versJson());
+    } catch (e) {
+      debugPrint('Enregistrement impossible : $e');
+    }
   }
 
   /// À appeler après chaque action : prévient les écrans et enregistre.

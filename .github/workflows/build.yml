@@ -22,6 +22,7 @@ jobs:
         run: curl -fsSL -o assets/catalogue/catalogue.json.gz https://github.com/ChristianFrench/liste-de-courses/releases/download/catalogue-off/catalogue.json.gz || echo "::warning::catalogue absent, application livrée sans catalogue"
       - name: Analyser le code
         run: |
+          sudo apt-get install -y -qq libsqlite3-dev > /dev/null   # SQLite pour les tests de la base locale
           flutter pub get
           flutter --version
           set +e

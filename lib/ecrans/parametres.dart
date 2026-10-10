@@ -8,11 +8,19 @@ import 'e13_produits_reels.dart';
 
 // Onglet Paramètres (17) et Types de promotion (18).
 
-/// Écran 17 — Paramètres. Appui long sur le titre : revenir aux données de démonstration.
+/// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
 class EcranParametres extends StatelessWidget {
   const EcranParametres({super.key});
 
+  Future<void> _basculerDemo(BuildContext context, bool oui) async {
+    await Etat.instance.basculerDemo(oui);
+    Nav.i.reinitialiser();
+    Nav.i.allerOnglet(Nav.parametres);
+    if (context.mounted) Nav.message(context, oui ? 'Mode démonstration' : 'Retour à vos données');
+  }
+
   Future<void> _reinitialiser(BuildContext context) async {
+    if (!Etat.instance.modeDemo) return;
     final ok = await confirmer(
       context,
       titre: 'Données de démonstration',
@@ -124,15 +132,31 @@ class EcranParametres extends StatelessWidget {
                 sousTitre: 'Identifiant · récupération des tickets',
                 onTap: () => Nav.message(context, 'Récupération par compte magasin : option à étudier'),
               ),
+            const TitreSection('Données', cote: 0),
+            Bascule(
+              options: const ['Mes données', 'Démonstration'],
+              index: etat.modeDemo ? 1 : 0,
+              onChange: (i) => _basculerDemo(context, i == 1),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              etat.modeDemo
+                  ? 'Données fictives pour essayer l\'application. Vos données sont gardées à part.'
+                  : 'Vos données sont enregistrées sur cet appareil.',
+              style: Charte.texte(13, couleur: Charte.texteSecondaire),
+            ),
+            if (etat.modeDemo)
+              LigneMenu(
+                titre: 'Rétablir les données de démonstration',
+                titreTaille: 16,
+                onTap: () => _reinitialiser(context),
+              ),
             const TitreSection('Essais', cote: 0),
             LigneMenu(
               titre: 'Produits réels — essai Open Food Facts',
               sousTitre: 'Catalogue de vrais produits gardé sur l\'appareil',
               onTap: () => Nav.aller(context, const EcranProduitsReels()),
             ),
-            const SizedBox(height: 14),
-            Text('Appui long sur « Paramètres » : revenir aux données de démonstration.',
-                style: Charte.texte(12, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 16),
           ],
         ),
