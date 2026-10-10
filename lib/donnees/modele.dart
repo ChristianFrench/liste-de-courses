@@ -296,6 +296,18 @@ class Ticket {
   final String source;
 }
 
+/// Élément de la corbeille : ce qui a été supprimé ensemble, pour pouvoir le remettre.
+class ElementCorbeille {
+  ElementCorbeille(this.id, this.type, this.libelle, this.le, this.contenu);
+  final String id;
+  final String type; // magasin, rayon, secteur, produit, liste, parcours
+  final String libelle;
+  final DateTime le;
+  final Map<String, dynamic> contenu; // collection du JSON → objets retirés
+
+  Map<String, dynamic> toJson() => {'id': id, 'type': type, 'libelle': libelle, 'le': _iso(le), 'contenu': contenu};
+}
+
 /// Étape des courses : un secteur (ou « Non placé » si [secteur] est nul) et ses lignes.
 class Etape {
   Etape(this.secteur, this.lignes);
@@ -347,6 +359,7 @@ class Etat extends ChangeNotifier {
   List<Course> historique = [];
   List<Ticket> tickets = [];
   Map<String, Map<String, int>> frequences = {};
+  List<ElementCorbeille> corbeille = [];
   String regleFrequence = '';
 
   int _compteur = 0;
@@ -536,6 +549,11 @@ class Etat extends ChangeNotifier {
         Ticket(t['id'] as String, t['listeId'] as String?, t['magasinId'] as String, _date(t['date']) ?? DateTime.now(),
             (t['montant'] as num? ?? 0).toDouble(), t['source'] as String? ?? 'photo')
     ]..sort((a, b) => b.date.compareTo(a.date));
+    corbeille = [
+      for (final c in (j['corbeille'] as List? ?? []).cast<Map>())
+        ElementCorbeille(c['id'] as String, c['type'] as String, c['libelle'] as String, _date(c['le']) ?? DateTime.now(),
+            Map<String, dynamic>.from(c['contenu'] as Map))
+    ];
     frequences = {};
     (j['frequencesPreliste'] as Map? ?? {}).forEach((cle, valeur) {
       if (cle == '_regle') {
@@ -583,6 +601,7 @@ class Etat extends ChangeNotifier {
             {'id': t.id, 'listeId': t.listeId, 'magasinId': t.magasinId, 'date': _iso(t.date)!.substring(0, 10), 'montant': t.montant, 'source': t.source}
         ],
         'frequencesPreliste': {'_regle': regleFrequence, ...frequences},
+        'corbeille': [for (final c in corbeille) c.toJson()],
       };
 
   // ------------------------------------------------------------ Recherche
@@ -960,6 +979,132 @@ class Etat extends ChangeNotifier {
     }
     if (!p.packagingIds.contains(k.id)) p.packagingIds.add(k.id);
     modifie();
+  }
+
+  // ------------------------------------------------------------ Suppression et corbeille
+
+  /// Raison pour laquelle [objet] ne peut pas être supprimé, ou null.
+  String? suppressionImpossible(Object objet) {
+    if (objet is Magasin) {
+      if (magasins.length <= 1) return 'C\'est le seul magasin : créez-en un autre avant de le supprimer.';
+      if (coursesEnCours?.magasinId == objet.id) return 'Des courses sont en cours dans ce magasin : terminez-les d\'abord.';
+    }
+    if (objet is Produit && produitUtilise(objet)) return 'Ce produit a déjà servi dans une liste : il ne peut pas être supprimé.';
+    if (objet is Liste && objet.statut == StatutListe.enCours) return 'Les courses de cette liste sont en cours : terminez-les d\'abord.';
+    return null;
+  }
+
+  /// Ce qu'emporte la suppression de [objet], en clair (pour la confirmation).
+  String consequences(Object objet) {
+    String n(int x, String mot) => '$x $mot${x > 1 ? 's' : ''}';
+    if (objet is Magasin) {
+      final r = rayonsDu(objet.id);
+      final l = listes.where((x) => x.magasinId == objet.id && x.statut != StatutListe.terminee).length;
+      return 'Avec ${n(r.length, 'rayon')}, ${n(secteursDuMagasin(objet.id).length, 'secteur')}, '
+          'l\'emplacement des produits, ${n(parcours.where((p) => p.magasinId == objet.id).length, 'parcours')} '
+          'et ${n(l, 'liste')} non terminée${l > 1 ? 's' : ''}. L\'historique des courses est gardé.';
+    }
+    if (objet is Rayon) {
+      return 'Avec ${n(secteursDu(objet.id).length, 'secteur')} ; ses produits deviennent « non placés » dans ce magasin.';
+    }
+    if (objet is Secteur) return 'Ses ${n(produitsDu(rayon(objet.rayonId)?.magasinId ?? '', objet.id).length, 'produit')} deviennent « non placés » dans ce magasin.';
+    return '';
+  }
+
+  /// Supprime [objet] et ce qui en dépend ; le tout va dans la corbeille.
+  void supprimer(Object objet) {
+    final j = versJson();
+    final retires = <String, List<dynamic>>{};
+    void retirer(String collection, bool Function(Map o) test) {
+      final l = (j[collection] as List).cast<Map>();
+      final partis = l.where(test).toList();
+      if (partis.isEmpty) return;
+      (retires[collection] ??= []).addAll(partis);
+      l.removeWhere(test);
+    }
+
+    void retirerSecteurs(Set<String> ids) {
+      retirer('secteurs', (o) => ids.contains(o['id']));
+      retirer('emplacements', (o) => ids.contains(o['secteurId']));
+      // Les parcours gardent leurs autres étapes.
+      for (final p in (j['parcours'] as List).cast<Map>()) {
+        (p['etapes'] as List).removeWhere(ids.contains);
+      }
+    }
+
+    late String type, libelle;
+    if (objet is Magasin) {
+      type = 'magasin';
+      libelle = objet.nom;
+      final rayonsM = rayonsDu(objet.id).map((r) => r.id).toSet();
+      retirer('magasins', (o) => o['id'] == objet.id);
+      retirer('rayons', (o) => rayonsM.contains(o['id']));
+      retirerSecteurs(secteursDuMagasin(objet.id).map((s) => s.id).toSet());
+      retirer('emplacements', (o) => o['magasinId'] == objet.id);
+      retirer('parcours', (o) => o['magasinId'] == objet.id);
+      retirer('listes', (o) => o['magasinId'] == objet.id && o['statut'] != StatutListe.terminee.name);
+    } else if (objet is Rayon) {
+      type = 'rayon';
+      libelle = '${objet.nom} · ${magasin(objet.magasinId)?.nom ?? ''}';
+      retirer('rayons', (o) => o['id'] == objet.id);
+      retirerSecteurs(secteursDu(objet.id).map((s) => s.id).toSet());
+    } else if (objet is Secteur) {
+      type = 'secteur';
+      libelle = '${objet.nom} · ${rayon(objet.rayonId)?.nom ?? ''}';
+      retirerSecteurs({objet.id});
+    } else if (objet is Produit) {
+      type = 'produit';
+      libelle = objet.nom;
+      retirer('produits', (o) => o['id'] == objet.id);
+      retirer('emplacements', (o) => o['produitId'] == objet.id);
+    } else if (objet is Liste) {
+      type = 'liste';
+      libelle = 'Liste ${magasin(objet.magasinId)?.nom ?? ''} · ${objet.lignes.length} articles';
+      retirer('listes', (o) => o['id'] == objet.id);
+    } else if (objet is Parcours) {
+      type = 'parcours';
+      libelle = 'Parcours ${objet.nom} · ${magasin(objet.magasinId)?.nom ?? ''}';
+      retirer('parcours', (o) => o['id'] == objet.id);
+    } else {
+      return;
+    }
+    (j['corbeille'] as List).insert(0, ElementCorbeille(nouvelId('cb'), type, libelle, DateTime.now(), retires).toJson());
+    lire(j);
+    enregistrer();
+  }
+
+  /// Ce qui manque pour restaurer [c] (son magasin, son rayon…), ou null.
+  String? restaurationImpossible(ElementCorbeille c) {
+    final contenu = c.contenu;
+    final ids = <String>{for (final l in contenu.values) for (final o in (l as List).cast<Map>()) if (o['id'] != null) o['id'] as String};
+    bool existe(String? id) => id == null || ids.contains(id) || magasin(id) != null || rayon(id) != null;
+    for (final o in (contenu['rayons'] as List? ?? []).cast<Map>()) {
+      if (!existe(o['magasinId'] as String?)) return 'Restaurez d\'abord le magasin de ce rayon.';
+    }
+    for (final o in (contenu['secteurs'] as List? ?? []).cast<Map>()) {
+      if (!existe(o['rayonId'] as String?)) return 'Restaurez d\'abord le rayon de ce secteur.';
+    }
+    for (final o in [...(contenu['listes'] as List? ?? []), ...(contenu['parcours'] as List? ?? [])].cast<Map>()) {
+      if (!existe(o['magasinId'] as String?)) return 'Restaurez d\'abord le magasin.';
+    }
+    return null;
+  }
+
+  /// Remet en place un élément de la corbeille.
+  void restaurer(ElementCorbeille c) {
+    if (restaurationImpossible(c) != null) return;
+    final j = versJson();
+    c.contenu.forEach((collection, objets) {
+      final l = <dynamic>[...j[collection] as List];
+      for (final o in objets as List) {
+        final id = (o as Map)['id'];
+        if (id == null || !l.any((x) => (x as Map)['id'] == id)) l.add(o);
+      }
+      j[collection] = l;
+    });
+    (j['corbeille'] as List).removeWhere((x) => (x as Map)['id'] == c.id);
+    lire(j);
+    enregistrer();
   }
 
   // ------------------------------------------------------------ Paramètres et historique

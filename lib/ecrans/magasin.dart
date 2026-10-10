@@ -4,6 +4,7 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'corbeille.dart';
 import 'travail.dart';
 
 // Onglet Magasin : Rayons (13), Secteurs (14), Produits (15), fiche produit (16).
@@ -87,6 +88,16 @@ class SousEcranRayons extends StatelessWidget {
           onTap: () async {
             final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Nom du rayon');
             if (nom != null && nom.isNotEmpty) etat.ajouterRayon(m, nom);
+          },
+        ),
+        LienSupprimer(
+          texte: 'Supprimer le magasin ${etat.magasin(m)?.nom ?? ''}',
+          onTap: () async {
+            final mg = etat.magasin(m);
+            if (mg != null && await demanderSuppression(context, mg, 'le magasin ${mg.nom}')) {
+              Nav.i.magasinCourant = null;
+              Nav.i.signaler();
+            }
           },
         ),
       ],
@@ -176,6 +187,16 @@ class SousEcranSecteurs extends StatelessWidget {
                   onTap: () async {
                     final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${rayonAjout.nom}', aide: 'Nom du secteur');
                     if (nom != null && nom.isNotEmpty) etat.ajouterSecteur(rayonAjout.id, nom);
+                  },
+                ),
+              if (etat.rayon(filtre) case final r?)
+                LienSupprimer(
+                  texte: 'Supprimer le rayon ${r.nom}',
+                  onTap: () async {
+                    if (await demanderSuppression(context, r, 'le rayon ${r.nom}')) {
+                      nav.filtreRayonSecteurs = null;
+                      nav.signaler();
+                    }
                   },
                 ),
             ],
@@ -297,6 +318,16 @@ class _SousEcranProduitsState extends State<SousEcranProduits> {
                   Nav.aller(context, EcranFicheProduit(produitId: p.id));
                 },
               ),
+              if (secteur != null)
+                LienSupprimer(
+                  texte: 'Supprimer le secteur ${secteur.nom}',
+                  onTap: () async {
+                    if (await demanderSuppression(context, secteur, 'le secteur ${secteur.nom}')) {
+                      nav.filtreSecteurProduits = null;
+                      nav.signaler();
+                    }
+                  },
+                ),
             ],
           ),
         ),
@@ -415,6 +446,15 @@ class EcranFicheProduit extends StatelessWidget {
                   ),
                 ),
               ],
+              if (!etat.produitUtilise(p))
+                LienSupprimer(
+                  texte: 'Supprimer ce produit',
+                  onTap: () async {
+                    if (await demanderSuppression(context, p, 'le produit ${p.nom}') && context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                ),
               const SizedBox(height: 16),
             ],
           ),

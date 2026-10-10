@@ -4,6 +4,7 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'corbeille.dart';
 import 'travail.dart';
 
 // Onglet Listes : sous-onglets Préparer (écran 1), Parcours (5), Courses (6).
@@ -51,6 +52,7 @@ class SousEcranPreparer extends StatelessWidget {
                   ),
                 ),
                 if (l.interrompueLe != null) ...[const SizedBox(width: 8), const Etiquette('Interrompue', pointille: true)],
+                _BoutonSupprimerListe(l),
               ],
             ),
           ),
@@ -65,16 +67,23 @@ class SousEcranPreparer extends StatelessWidget {
               Nav.i.listeAPartir = l.id;
               Nav.i.allerSous(Nav.courses);
             },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
-                Text(etat.magasin(l.magasinId)?.nom ?? '', style: Charte.texte(18, gras: true)),
-                const SizedBox(height: 2),
-                Text(
-                  '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
-                  '${quandJour(l.modifieeLe ?? l.dateCreation)}',
-                  style: Charte.texte(14, couleur: Charte.texteSecondaire),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(etat.magasin(l.magasinId)?.nom ?? '', style: Charte.texte(18, gras: true)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
+                        '${quandJour(l.modifieeLe ?? l.dateCreation)}',
+                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
+                      ),
+                    ],
+                  ),
                 ),
+                _BoutonSupprimerListe(l),
               ],
             ),
           ),
@@ -86,6 +95,19 @@ class SousEcranPreparer extends StatelessWidget {
       ],
     );
   }
+}
+
+class _BoutonSupprimerListe extends StatelessWidget {
+  const _BoutonSupprimerListe(this.liste);
+  final Liste liste;
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: 'Supprimer la liste',
+        icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+        onPressed: () =>
+            demanderSuppression(context, liste, 'la liste ${Etat.instance.magasin(liste.magasinId)?.nom ?? ''}'),
+      );
 }
 
 /// Écran 5 — Listes › Parcours. Enregistrement immédiat.
@@ -116,6 +138,10 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
 
   @override
   Widget build(BuildContext context) {
+    if (etat.magasin(magasinId) == null) {
+      magasinId = etat.magasins.first.id;
+      _parDefaut();
+    }
     final liste = etat.parcoursDe(magasinId, membreId);
     if (parcoursId != null && !liste.any((p) => p.id == parcoursId)) _parDefaut();
     final p = etat.unParcours(parcoursId);
@@ -236,6 +262,12 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
                       ],
                     ),
                   ),
+                ),
+                LienSupprimer(
+                  texte: 'Supprimer le parcours ${p.nom}',
+                  onTap: () async {
+                    if (await demanderSuppression(context, p, 'le parcours ${p.nom}')) setState(_parDefaut);
+                  },
                 ),
               ],
             ),

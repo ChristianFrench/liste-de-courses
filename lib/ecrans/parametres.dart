@@ -4,6 +4,7 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'corbeille.dart';
 import 'e13_produits_reels.dart';
 
 // Onglet Paramètres (17) et Types de promotion (18).
@@ -137,6 +138,13 @@ class EcranParametres extends StatelessWidget {
               options: const ['Mes données', 'Démonstration'],
               index: etat.modeDemo ? 1 : 0,
               onChange: (i) => _basculerDemo(context, i == 1),
+            ),
+            LigneMenu(
+              titre: 'Corbeille',
+              sousTitre: etat.corbeille.isEmpty
+                  ? 'Vide'
+                  : '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''} supprimé${etat.corbeille.length > 1 ? 's' : ''} · touchez pour restaurer',
+              onTap: () => Nav.aller(context, const EcranCorbeille()),
             ),
             const SizedBox(height: 4),
             Text(

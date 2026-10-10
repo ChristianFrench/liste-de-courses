@@ -140,4 +140,56 @@ void main() {
     expect(e.rayonsDu(m.id).length, greaterThan(20));
     expect(e.produits.where((p) => p.nom.toLowerCase() == 'lait demi-écrémé').length, lessThanOrEqualTo(1));
   });
+
+  test('un magasin supprimé va dans la corbeille et se restaure, même après relecture', () {
+    final chemin = '${dossier.path}/essai.db';
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final s = Stockage.ouvrir(chemin);
+    s.ecrire(e.versJson());
+    final mg = e.magasins.last;
+    e.ajouterSecteur(e.ajouterRayon(mg.id, 'Rayon essai').id, 'Secteur essai');
+    s.ecrire(e.versJson());
+    final nbRayons = e.rayonsDu(mg.id).length;
+    final nomRayon = e.rayonsDu(mg.id).first.nom;
+    e.supprimer(mg);
+    expect(e.magasin(mg.id), isNull);
+    expect(e.corbeille, hasLength(1));
+    s.ecrire(e.versJson());
+    expect(s.erreurs, isEmpty);
+    s.fermer();
+
+    // Relue depuis la base : le magasin est absent, la corbeille est gardée.
+    final s2 = Stockage.ouvrir(chemin);
+    e.lire(s2.lire());
+    expect(e.magasin(mg.id), isNull);
+    e.restaurer(e.corbeille.single);
+    s2.ecrire(e.versJson());
+    expect(s2.erreurs, isEmpty);
+    s2.fermer();
+
+    e.lire(Stockage.ouvrir(chemin).lire());
+    expect(e.magasin(mg.id)?.nom, mg.nom);
+    expect(e.rayonsDu(mg.id), hasLength(nbRayons));
+    expect(e.rayonsDu(mg.id).map((r) => r.nom), contains(nomRayon));
+    expect(e.corbeille, isEmpty);
+
+    // Un nouveau rayon peut reprendre le nom d'un rayon supprimé.
+    final s3 = Stockage.ouvrir(chemin);
+    e.lire(s3.lire());
+    e.supprimer(e.rayonsDu(mg.id).firstWhere((r) => r.nom == 'Rayon essai'));
+    s3.ecrire(e.versJson());
+    e.ajouterRayon(mg.id, 'Rayon essai');
+    s3.ecrire(e.versJson());
+    expect(s3.erreurs, isEmpty);
+    s3.fermer();
+  });
+
+  test('un produit déjà utilisé ne peut pas être supprimé', () {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final utilise = e.produits.firstWhere(e.produitUtilise);
+    expect(e.suppressionImpossible(utilise), isNotNull);
+    expect(e.suppressionImpossible(e.magasins.last), isNull);
+  });
 }

@@ -265,6 +265,8 @@ class Stockage {
     ];
     final freq = reglage('frequences_preliste');
     etat['frequencesPreliste'] = freq == null ? <String, dynamic>{} : jsonDecode(freq);
+    final corbeille = reglage('corbeille');
+    etat['corbeille'] = corbeille == null ? <dynamic>[] : jsonDecode(corbeille);
 
     _ecrit
       ..clear()
@@ -385,7 +387,10 @@ class Stockage {
     final h = t.horodate ? [maintenant] : <Object?>[];
     switch (t.retrait) {
       case _Retrait.archive:
-        requete('UPDATE $nom SET archive = 1$horo WHERE $ou').execute([...h, ...valeurs]);
+        // Le nom d'un rayon ou d'un secteur archivé est libéré (nom unique par magasin ou par rayon) ;
+        // une restauration réécrit le nom d'origine.
+        final libere = nom == 'rayon' || nom == 'secteur' ? ", nom = nom || ' [' || id || ']'" : '';
+        requete('UPDATE $nom SET archive = 1$libere$horo WHERE $ou').execute([...h, ...valeurs]);
       case _Retrait.supprime:
         requete('UPDATE $nom SET supprime = 1$horo WHERE $ou').execute([...h, ...valeurs]);
       case _Retrait.abandon:
@@ -600,6 +605,7 @@ class Stockage {
       {'cle': 'foyer_courant', 'valeur': foyerId},
       if (moi != null) {'cle': 'membre_courant', 'valeur': moi},
       {'cle': 'frequences_preliste', 'valeur': jsonEncode(etat['frequencesPreliste'] ?? {})},
+      {'cle': 'corbeille', 'valeur': jsonEncode(etat['corbeille'] ?? [])},
     ]);
     return res;
   }
