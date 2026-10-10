@@ -1,3 +1,7 @@
+// Généré à partir de documents/schema-v2.sql : ne pas modifier ici.
+// ignore_for_file: lines_longer_than_80_chars
+
+const schemaV2 = r'''
 -- =====================================================================
 --  Application liste de courses — Schéma de la base locale SQLite
 --  Version 2 — 10/10/2026
@@ -478,3 +482,4 @@ FROM liste
 WHERE statut = 'en_cours' OR (statut = 'construction' AND interrompue_le IS NOT NULL); -- [v2] comme la maquette
 
 -- Fin du script.
+''';

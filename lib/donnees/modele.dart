@@ -9,7 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'stockage.dart';
 
 // Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
-// (stockage.dart). Chaque action est enregistrée immédiatement.
+// au schéma v2 (stockage.dart). Chaque action est enregistrée immédiatement.
 
 DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v as String);
 String? _iso(DateTime? d) => d?.toIso8601String().substring(0, 19);
@@ -372,7 +372,7 @@ class Etat extends ChangeNotifier {
         if (!d.existsSync()) d.createSync(recursive: true);
         _dossier = d;
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
-        modeDemo = _foyer!.reglage('modeDemo') == 'oui';
+        modeDemo = _foyer!.reglage('mode_demo') == '1';
         _reprendreAncienFichier();
         await _ouvrirActif();
         return;
@@ -442,7 +442,7 @@ class Etat extends ChangeNotifier {
       lire(oui ? await _donneesDemo() : _depart(await _donneesDemo()));
       return;
     }
-    _foyer!.definirReglage('modeDemo', oui ? 'oui' : 'non');
+    _foyer!.definirReglage('mode_demo', oui ? '1' : '0');
     await _ouvrirActif();
   }
 
@@ -455,8 +455,18 @@ class Etat extends ChangeNotifier {
 
   Future<void> enregistrer() async {
     if (!enregistrementActif) return;
+    final s = _actif;
+    if (s == null) return;
     try {
-      _actif?.ecrire(versJson());
+      s.ecrire(versJson());
+      for (final e in s.erreurs) {
+        debugPrint('Refusé par la base : $e');
+      }
+      // Le compteur d'utilisation est tenu par la base (règle R4).
+      final c = s.compteurs();
+      for (final p in produits) {
+        p.nbUtilisations = c[p.id] ?? p.nbUtilisations;
+      }
     } catch (e) {
       debugPrint('Enregistrement impossible : $e');
     }
@@ -652,6 +662,7 @@ class Etat extends ChangeNotifier {
     final g = ligne(l, produitId);
     if (g == null) {
       final p = produit(produitId);
+      p?.nbUtilisations++; // entrée dans une liste (règle R4)
       l.lignes.add(LigneListe(
         produitId: produitId,
         packagingId: (p != null && p.packagingIds.isNotEmpty) ? p.packagingIds.first : null,
@@ -707,6 +718,9 @@ class Etat extends ChangeNotifier {
   }
 
   Liste creerListe(String magasinId, List<LigneListe> lignes) {
+    for (final g in lignes) {
+      produit(g.produitId)?.nbUtilisations++; // entrée dans une liste (règle R4)
+    }
     final l = Liste(
       id: nouvelId('l'),
       magasinId: magasinId,
@@ -832,11 +846,9 @@ class Etat extends ChangeNotifier {
   }
 
   Course terminerCourses(Liste l) {
-    final c = Course(nouvelId('h'), l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches);
+    // Dans la base, une course de l'historique est la liste elle-même, au statut « terminee ».
+    final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches);
     historique.insert(0, c);
-    for (final g in l.lignes) {
-      if (g.coche) produit(g.produitId)?.nbUtilisations++;
-    }
     l.statut = StatutListe.terminee;
     l.interrompueLe = null;
     modifie();
@@ -852,7 +864,50 @@ class Etat extends ChangeNotifier {
     return m;
   }
 
+  static const String fichierCatalogueType = 'assets/catalogue_type.json';
+
+  /// Modèles proposés à la création d'un magasin : taille → libellé (0 = vide).
+  static const modelesMagasin = {
+    0: 'Vide',
+    1: 'Magasin de proximité',
+    2: 'Supermarché',
+    3: 'Hypermarché',
+  };
+
+  /// Remplit un magasin avec les rayons, secteurs et produits du catalogue type jusqu'à la
+  /// [taille] donnée (1 proximité, 2 supermarché, 3 hypermarché). Un produit déjà connu du
+  /// foyer (même nom) est réutilisé. Rend le nombre de produits placés.
+  Future<int> appliquerModele(Magasin m, int taille, {Map<String, dynamic>? catalogue}) async {
+    if (taille <= 0) return 0;
+    catalogue ??= jsonDecode(await rootBundle.loadString(fichierCatalogueType)) as Map<String, dynamic>;
+    final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
+    var n = 0;
+    for (final r in (catalogue['rayons'] as List).cast<Map>()) {
+      final secteursR = (r['secteurs'] as List).cast<Map>().where((s) => (s['taille'] as num) <= taille).toList();
+      if (secteursR.isEmpty) continue;
+      final rayon = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == r['nom']) ??
+          (Rayon(nouvelId('r'), m.id, r['nom'] as String)..let(rayons.add));
+      for (final s in secteursR) {
+        final secteur = _trouve(secteurs, (x) => x.rayonId == rayon.id && x.nom == s['nom']) ??
+            (Secteur(nouvelId('s'), rayon.id, s['nom'] as String)..let(secteurs.add));
+        for (final p in (s['produits'] as List).cast<Map>()) {
+          if ((p['taille'] as num) > taille) continue;
+          final nom = p['nom'] as String;
+          final produit = parNom[nom.toLowerCase()] ??= (Produit(nouvelId('p'), nom, [], [], 0)..let(produits.add));
+          if (_trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == produit.id) == null) {
+            emplacements.add(Emplacement(m.id, produit.id, secteur.id));
+            n++;
+          }
+        }
+      }
+    }
+    modifie();
+    return n;
+  }
+
   Rayon ajouterRayon(String magasinId, String nom) {
+    final existant = _trouve(rayons, (r) => r.magasinId == magasinId && r.nom == nom);
+    if (existant != null) return existant; // un nom par magasin (contrainte de la base)
     final r = Rayon(nouvelId('r'), magasinId, nom);
     rayons.add(r);
     modifie();
@@ -860,6 +915,8 @@ class Etat extends ChangeNotifier {
   }
 
   Secteur ajouterSecteur(String rayonId, String nom) {
+    final existant = _trouve(secteurs, (s) => s.rayonId == rayonId && s.nom == nom);
+    if (existant != null) return existant; // un nom par rayon (contrainte de la base)
     final s = Secteur(nouvelId('s'), rayonId, nom);
     secteurs.add(s);
     modifie();
@@ -919,7 +976,12 @@ class Etat extends ChangeNotifier {
   }
 
   void ajouterTypePromotion(String code, String nom, String exemple) {
-    typesPromotion.add(TypePromotion(nouvelId('tp'), code, nom, exemple, ['libelle']));
+    // Le code est unique (contrainte de la base) : « BON », « BON2 »…
+    var unique = code;
+    for (var i = 2; typesPromotion.any((t) => t.code == unique); i++) {
+      unique = '$code$i';
+    }
+    typesPromotion.add(TypePromotion(nouvelId('tp'), unique, nom, exemple, ['libelle']));
     modifie();
   }
 
@@ -927,4 +989,8 @@ class Etat extends ChangeNotifier {
     t.listeId = c.id;
     modifie();
   }
+}
+
+extension _Let<T> on T {
+  void let(void Function(T) f) => f(this);
 }

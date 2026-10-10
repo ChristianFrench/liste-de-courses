@@ -33,8 +33,14 @@ class SelecteurMagasin extends StatelessWidget {
         onChange: (v) async {
           if (v == nouveau) {
             final nom = await demanderTexte(context, titre: 'Nouveau magasin', aide: 'Ex. : Hyper de la gare');
-            if (nom == null || nom.isEmpty) return;
-            v = etat.creerMagasin(nom).id;
+            if (nom == null || nom.isEmpty || !context.mounted) return;
+            final taille = await choisirDansListe<int>(context,
+                titre: 'Remplir le magasin avec…', choix: Etat.modelesMagasin);
+            if (taille == null) return;
+            final m = etat.creerMagasin(nom);
+            v = m.id;
+            final n = await etat.appliquerModele(m, taille);
+            if (n > 0 && context.mounted) Nav.message(context, '$nom : $n produits placés dans ses rayons');
           }
           Nav.i.magasinCourant = v;
           Nav.i.filtreRayonSecteurs = Nav.i.filtreRayonProduits = Nav.i.filtreSecteurProduits = null;
