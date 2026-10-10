@@ -38,7 +38,7 @@ jobs:
           if [ $code -ne 0 ]; then python3 outils/annoter.py tests.log "Tests de recette"; else tail -n 30 tests.log; fi
           exit $code
       - name: Captures des écrans (branche « captures »)
-        if: always() && github.ref == 'refs/heads/main'
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]')
         env:
           CAPTURES: '1'
         run: |
@@ -59,7 +59,7 @@ jobs:
           git push -qf origin HEAD:refs/heads/captures
           exit $code
       - name: Conserver les captures pour la publication
-        if: always() && github.ref == 'refs/heads/main'
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]')
         uses: actions/upload-artifact@v4
         with:
           name: Captures
@@ -67,6 +67,8 @@ jobs:
           if-no-files-found: ignore
 
   android:
+    # Mode rapide (« [rapide] » dans le message de commit) : Windows seulement
+    if: "!contains(github.event.head_commit.message, '[rapide]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -133,6 +135,7 @@ jobs:
           path: build/windows/x64/runner/Release/
 
   iphone:
+    if: "!contains(github.event.head_commit.message, '[rapide]')"
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -159,7 +162,7 @@ jobs:
     name: publication (page « derniere-version »)
     needs: [verification, android, windows]
     concurrency: publication
-    if: github.ref == 'refs/heads/main'
+    if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && needs.windows.result == 'success' && needs.android.result != 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -168,12 +171,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with: { path: livrables }
       - name: Préparer les fichiers
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           mkdir -p publication
-          cp "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk
+          # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
+          gh release download derniere-version -p Liste-de-courses.apk -p Captures.zip -D publication 2>/dev/null || true
+          if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
-          (cd livrables/Captures && zip -qr ../../publication/Captures.zip .)
+          if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
           {
             echo "version=$VERSION"
