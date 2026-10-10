@@ -1,0 +1,6392 @@
+{
+ "_description": "Catalogue type d'un magasin français. taille : 1 proximité, 2 supermarché, 3 hypermarché.",
+ "tailles": {
+  "1": "Proximité",
+  "2": "Supermarché",
+  "3": "Hypermarché"
+ },
+ "rayons": [
+  {
+   "nom": "Fruits et légumes",
+   "ordre": 1,
+   "secteurs": [
+    {
+     "nom": "Fruits",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Pommes",
+       "taille": 1
+      },
+      {
+       "nom": "Poires",
+       "taille": 1
+      },
+      {
+       "nom": "Bananes",
+       "taille": 1
+      },
+      {
+       "nom": "Oranges",
+       "taille": 1
+      },
+      {
+       "nom": "Clémentines",
+       "taille": 1
+      },
+      {
+       "nom": "Citrons",
+       "taille": 1
+      },
+      {
+       "nom": "Raisin",
+       "taille": 1
+      },
+      {
+       "nom": "Kiwis",
+       "taille": 1
+      },
+      {
+       "nom": "Fraises",
+       "taille": 2
+      },
+      {
+       "nom": "Melon",
+       "taille": 2
+      },
+      {
+       "nom": "Pêches",
+       "taille": 2
+      },
+      {
+       "nom": "Abricots",
+       "taille": 2
+      },
+      {
+       "nom": "Ananas",
+       "taille": 2
+      },
+      {
+       "nom": "Mangue",
+       "taille": 3
+      },
+      {
+       "nom": "Avocats",
+       "taille": 1
+      },
+      {
+       "nom": "Nectarines",
+       "taille": 1
+      },
+      {
+       "nom": "Cerises",
+       "taille": 2
+      },
+      {
+       "nom": "Prunes",
+       "taille": 1
+      },
+      {
+       "nom": "Pamplemousse",
+       "taille": 1
+      },
+      {
+       "nom": "Mandarines",
+       "taille": 1
+      },
+      {
+       "nom": "Figues",
+       "taille": 2
+      },
+      {
+       "nom": "Fruits de la passion",
+       "taille": 2
+      },
+      {
+       "nom": "Citrons verts",
+       "taille": 1
+      },
+      {
+       "nom": "Framboises",
+       "taille": 2
+      },
+      {
+       "nom": "Myrtilles",
+       "taille": 2
+      },
+      {
+       "nom": "Kakis",
+       "taille": 2
+      },
+      {
+       "nom": "Pastèque",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Légumes",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Pommes de terre",
+       "taille": 1
+      },
+      {
+       "nom": "Carottes",
+       "taille": 1
+      },
+      {
+       "nom": "Oignons",
+       "taille": 1
+      },
+      {
+       "nom": "Ail",
+       "taille": 1
+      },
+      {
+       "nom": "Échalotes",
+       "taille": 1
+      },
+      {
+       "nom": "Tomates",
+       "taille": 1
+      },
+      {
+       "nom": "Courgettes",
+       "taille": 1
+      },
+      {
+       "nom": "Concombre",
+       "taille": 1
+      },
+      {
+       "nom": "Poivrons",
+       "taille": 1
+      },
+      {
+       "nom": "Aubergines",
+       "taille": 2
+      },
+      {
+       "nom": "Poireaux",
+       "taille": 1
+      },
+      {
+       "nom": "Haricots verts",
+       "taille": 2
+      },
+      {
+       "nom": "Brocoli",
+       "taille": 2
+      },
+      {
+       "nom": "Chou-fleur",
+       "taille": 2
+      },
+      {
+       "nom": "Champignons de Paris",
+       "taille": 1
+      },
+      {
+       "nom": "Endives",
+       "taille": 2
+      },
+      {
+       "nom": "Céleri",
+       "taille": 3
+      },
+      {
+       "nom": "Radis",
+       "taille": 2
+      },
+      {
+       "nom": "Betteraves cuites",
+       "taille": 2
+      },
+      {
+       "nom": "Patates douces",
+       "taille": 1
+      },
+      {
+       "nom": "Navets",
+       "taille": 1
+      },
+      {
+       "nom": "Courge butternut",
+       "taille": 1
+      },
+      {
+       "nom": "Potiron",
+       "taille": 2
+      },
+      {
+       "nom": "Épinards",
+       "taille": 1
+      },
+      {
+       "nom": "Chou vert",
+       "taille": 1
+      },
+      {
+       "nom": "Chou rouge",
+       "taille": 2
+      },
+      {
+       "nom": "Fenouil",
+       "taille": 2
+      },
+      {
+       "nom": "Asperges",
+       "taille": 2
+      },
+      {
+       "nom": "Artichauts",
+       "taille": 2
+      },
+      {
+       "nom": "Panais",
+       "taille": 2
+      },
+      {
+       "nom": "Tomates cerises",
+       "taille": 1
+      },
+      {
+       "nom": "Gingembre",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Salades et herbes",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Salade verte",
+       "taille": 1
+      },
+      {
+       "nom": "Mâche",
+       "taille": 1
+      },
+      {
+       "nom": "Roquette",
+       "taille": 2
+      },
+      {
+       "nom": "Persil",
+       "taille": 1
+      },
+      {
+       "nom": "Ciboulette",
+       "taille": 2
+      },
+      {
+       "nom": "Basilic",
+       "taille": 2
+      },
+      {
+       "nom": "Coriandre",
+       "taille": 3
+      },
+      {
+       "nom": "Menthe",
+       "taille": 3
+      },
+      {
+       "nom": "Laitue",
+       "taille": 1
+      },
+      {
+       "nom": "Batavia",
+       "taille": 1
+      },
+      {
+       "nom": "Feuille de chêne",
+       "taille": 1
+      },
+      {
+       "nom": "Frisée",
+       "taille": 2
+      },
+      {
+       "nom": "Jeunes pousses d'épinards",
+       "taille": 2
+      },
+      {
+       "nom": "Aneth",
+       "taille": 2
+      },
+      {
+       "nom": "Estragon",
+       "taille": 2
+      },
+      {
+       "nom": "Thym frais",
+       "taille": 2
+      },
+      {
+       "nom": "Romarin frais",
+       "taille": 2
+      },
+      {
+       "nom": "Cerfeuil",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Fraîche découpe",
+     "ordre": 4,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Salade en sachet",
+       "taille": 2
+      },
+      {
+       "nom": "Crudités râpées",
+       "taille": 2
+      },
+      {
+       "nom": "Fruits découpés",
+       "taille": 3
+      },
+      {
+       "nom": "Légumes pour soupe prêts à cuire",
+       "taille": 3
+      },
+      {
+       "nom": "Poêlée de légumes fraîche",
+       "taille": 2
+      },
+      {
+       "nom": "Légumes pour wok",
+       "taille": 2
+      },
+      {
+       "nom": "Courgettes en spaghetti",
+       "taille": 2
+      },
+      {
+       "nom": "Champignons émincés",
+       "taille": 2
+      },
+      {
+       "nom": "Oignons émincés",
+       "taille": 2
+      },
+      {
+       "nom": "Haricots verts équeutés",
+       "taille": 2
+      },
+      {
+       "nom": "Pommes de terre épluchées",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Jus de fruits frais",
+     "ordre": 5,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Jus d'orange frais",
+       "taille": 2
+      },
+      {
+       "nom": "Smoothie",
+       "taille": 2
+      },
+      {
+       "nom": "Jus de pamplemousse frais",
+       "taille": 2
+      },
+      {
+       "nom": "Jus de pomme frais",
+       "taille": 2
+      },
+      {
+       "nom": "Jus multifruits frais",
+       "taille": 2
+      },
+      {
+       "nom": "Gaspacho",
+       "taille": 2
+      },
+      {
+       "nom": "Citronnade",
+       "taille": 2
+      },
+      {
+       "nom": "Jus de carotte frais",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Fruits secs et graines",
+     "ordre": 6,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Noix",
+       "taille": 2
+      },
+      {
+       "nom": "Amandes",
+       "taille": 2
+      },
+      {
+       "nom": "Raisins secs",
+       "taille": 2
+      },
+      {
+       "nom": "Pruneaux",
+       "taille": 2
+      },
+      {
+       "nom": "Noisettes",
+       "taille": 3
+      },
+      {
+       "nom": "Graines de courge",
+       "taille": 3
+      },
+      {
+       "nom": "Noix de cajou",
+       "taille": 2
+      },
+      {
+       "nom": "Abricots secs",
+       "taille": 2
+      },
+      {
+       "nom": "Dattes",
+       "taille": 2
+      },
+      {
+       "nom": "Figues sèches",
+       "taille": 2
+      },
+      {
+       "nom": "Cranberries séchées",
+       "taille": 2
+      },
+      {
+       "nom": "Graines de tournesol",
+       "taille": 2
+      },
+      {
+       "nom": "Graines de lin",
+       "taille": 3
+      },
+      {
+       "nom": "Mélange étudiant",
+       "taille": 2
+      },
+      {
+       "nom": "Noix de pécan",
+       "taille": 3
+      },
+      {
+       "nom": "Pignons de pin",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Boucherie",
+   "ordre": 2,
+   "secteurs": [
+    {
+     "nom": "Boucherie libre-service",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Steak haché",
+       "taille": 1
+      },
+      {
+       "nom": "Viande hachée",
+       "taille": 1
+      },
+      {
+       "nom": "Rôti de porc",
+       "taille": 2
+      },
+      {
+       "nom": "Côtes de porc",
+       "taille": 1
+      },
+      {
+       "nom": "Escalopes de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Bœuf bourguignon",
+       "taille": 2
+      },
+      {
+       "nom": "Saucisses",
+       "taille": 1
+      },
+      {
+       "nom": "Merguez",
+       "taille": 2
+      },
+      {
+       "nom": "Chipolatas",
+       "taille": 2
+      },
+      {
+       "nom": "Pavés de bœuf",
+       "taille": 2
+      },
+      {
+       "nom": "Bavette",
+       "taille": 2
+      },
+      {
+       "nom": "Rumsteck",
+       "taille": 2
+      },
+      {
+       "nom": "Bœuf pour pot-au-feu",
+       "taille": 2
+      },
+      {
+       "nom": "Rôti de bœuf",
+       "taille": 2
+      },
+      {
+       "nom": "Filet mignon de porc",
+       "taille": 2
+      },
+      {
+       "nom": "Échine de porc",
+       "taille": 2
+      },
+      {
+       "nom": "Poitrine de porc",
+       "taille": 2
+      },
+      {
+       "nom": "Sauté de porc",
+       "taille": 2
+      },
+      {
+       "nom": "Brochettes de bœuf",
+       "taille": 2
+      },
+      {
+       "nom": "Paupiettes de veau",
+       "taille": 2
+      },
+      {
+       "nom": "Côtelettes d'agneau",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Boucherie traditionnelle et Volailles",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Entrecôte",
+       "taille": 3
+      },
+      {
+       "nom": "Gigot d'agneau",
+       "taille": 3
+      },
+      {
+       "nom": "Côte de bœuf",
+       "taille": 3
+      },
+      {
+       "nom": "Blanquette de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Faux-filet",
+       "taille": 3
+      },
+      {
+       "nom": "Filet de bœuf",
+       "taille": 3
+      },
+      {
+       "nom": "Tournedos",
+       "taille": 3
+      },
+      {
+       "nom": "Épaule d'agneau",
+       "taille": 3
+      },
+      {
+       "nom": "Navarin d'agneau",
+       "taille": 3
+      },
+      {
+       "nom": "Jarret de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Osso-buco",
+       "taille": 3
+      },
+      {
+       "nom": "Tête de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Carré d'agneau",
+       "taille": 3
+      },
+      {
+       "nom": "Tendrons de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Joues de bœuf",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Produits du terroir",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Foie gras",
+       "taille": 3
+      },
+      {
+       "nom": "Confit de canard",
+       "taille": 3
+      },
+      {
+       "nom": "Spécialités régionales",
+       "taille": 3
+      },
+      {
+       "nom": "Gésiers confits",
+       "taille": 3
+      },
+      {
+       "nom": "Magret de canard séché",
+       "taille": 3
+      },
+      {
+       "nom": "Escargots",
+       "taille": 3
+      },
+      {
+       "nom": "Graisse de canard",
+       "taille": 3
+      },
+      {
+       "nom": "Andouillette",
+       "taille": 3
+      },
+      {
+       "nom": "Andouille",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Volaille",
+   "ordre": 3,
+   "secteurs": [
+    {
+     "nom": "Volaille libre-service",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Blancs de poulet",
+       "taille": 1
+      },
+      {
+       "nom": "Cuisses de poulet",
+       "taille": 1
+      },
+      {
+       "nom": "Poulet entier",
+       "taille": 2
+      },
+      {
+       "nom": "Escalopes de dinde",
+       "taille": 1
+      },
+      {
+       "nom": "Aiguillettes de poulet",
+       "taille": 2
+      },
+      {
+       "nom": "Pilons de poulet",
+       "taille": 1
+      },
+      {
+       "nom": "Ailes de poulet",
+       "taille": 2
+      },
+      {
+       "nom": "Hauts de cuisse de poulet",
+       "taille": 2
+      },
+      {
+       "nom": "Magret de canard",
+       "taille": 2
+      },
+      {
+       "nom": "Cuisses de canard",
+       "taille": 2
+      },
+      {
+       "nom": "Rôti de dinde",
+       "taille": 2
+      },
+      {
+       "nom": "Cordons bleus",
+       "taille": 1
+      },
+      {
+       "nom": "Pintade",
+       "taille": 2
+      },
+      {
+       "nom": "Lapin",
+       "taille": 2
+      },
+      {
+       "nom": "Brochettes de poulet",
+       "taille": 2
+      },
+      {
+       "nom": "Sauté de dinde",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Rôtisserie",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Poulet rôti",
+       "taille": 3
+      },
+      {
+       "nom": "Cuisses de poulet rôties",
+       "taille": 3
+      },
+      {
+       "nom": "Pommes de terre rôtisserie",
+       "taille": 3
+      },
+      {
+       "nom": "Jarret de porc rôti",
+       "taille": 3
+      },
+      {
+       "nom": "Travers de porc rôtis",
+       "taille": 3
+      },
+      {
+       "nom": "Pintade rôtie",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Poissonnerie",
+   "ordre": 4,
+   "secteurs": [
+    {
+     "nom": "Poissonnerie libre-service",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Filets de saumon",
+       "taille": 2
+      },
+      {
+       "nom": "Filets de cabillaud",
+       "taille": 2
+      },
+      {
+       "nom": "Crevettes cuites",
+       "taille": 2
+      },
+      {
+       "nom": "Saumon fumé",
+       "taille": 2
+      },
+      {
+       "nom": "Surimi",
+       "taille": 2
+      },
+      {
+       "nom": "Moules",
+       "taille": 3
+      },
+      {
+       "nom": "Filets de lieu",
+       "taille": 2
+      },
+      {
+       "nom": "Truite fumée",
+       "taille": 2
+      },
+      {
+       "nom": "Filets de merlu",
+       "taille": 2
+      },
+      {
+       "nom": "Crevettes crues",
+       "taille": 2
+      },
+      {
+       "nom": "Filets de truite",
+       "taille": 2
+      },
+      {
+       "nom": "Harengs marinés",
+       "taille": 2
+      },
+      {
+       "nom": "Maquereau fumé",
+       "taille": 2
+      },
+      {
+       "nom": "Œufs de lump",
+       "taille": 2
+      },
+      {
+       "nom": "Gambas",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Poissonnerie traditionnelle",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Poisson du jour",
+       "taille": 3
+      },
+      {
+       "nom": "Huîtres",
+       "taille": 3
+      },
+      {
+       "nom": "Coquillages",
+       "taille": 3
+      },
+      {
+       "nom": "Bar",
+       "taille": 3
+      },
+      {
+       "nom": "Daurade",
+       "taille": 3
+      },
+      {
+       "nom": "Sole",
+       "taille": 3
+      },
+      {
+       "nom": "Lotte",
+       "taille": 3
+      },
+      {
+       "nom": "Thon frais",
+       "taille": 3
+      },
+      {
+       "nom": "Langoustines",
+       "taille": 3
+      },
+      {
+       "nom": "Bulots",
+       "taille": 3
+      },
+      {
+       "nom": "Coquilles Saint-Jacques",
+       "taille": 3
+      },
+      {
+       "nom": "Tourteau",
+       "taille": 3
+      },
+      {
+       "nom": "Encornets",
+       "taille": 3
+      },
+      {
+       "nom": "Merlan",
+       "taille": 3
+      },
+      {
+       "nom": "Raie",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Crèmerie",
+   "ordre": 5,
+   "secteurs": [
+    {
+     "nom": "Lait",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Lait demi-écrémé",
+       "taille": 1
+      },
+      {
+       "nom": "Lait entier",
+       "taille": 1
+      },
+      {
+       "nom": "Lait écrémé",
+       "taille": 2
+      },
+      {
+       "nom": "Lait sans lactose",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson végétale avoine",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson soja",
+       "taille": 3
+      },
+      {
+       "nom": "Lait de chèvre",
+       "taille": 2
+      },
+      {
+       "nom": "Lait chocolaté",
+       "taille": 1
+      },
+      {
+       "nom": "Boisson amande",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson riz",
+       "taille": 2
+      },
+      {
+       "nom": "Lait fermenté",
+       "taille": 3
+      },
+      {
+       "nom": "Lait de croissance",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson coco",
+       "taille": 3
+      },
+      {
+       "nom": "Lait frais microfiltré",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Beurre, œufs, crème",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Beurre doux",
+       "taille": 1
+      },
+      {
+       "nom": "Beurre demi-sel",
+       "taille": 1
+      },
+      {
+       "nom": "Œufs",
+       "taille": 1
+      },
+      {
+       "nom": "Crème fraîche épaisse",
+       "taille": 1
+      },
+      {
+       "nom": "Crème liquide",
+       "taille": 1
+      },
+      {
+       "nom": "Margarine",
+       "taille": 2
+      },
+      {
+       "nom": "Crème fraîche légère",
+       "taille": 1
+      },
+      {
+       "nom": "Crème chantilly",
+       "taille": 1
+      },
+      {
+       "nom": "Beurre allégé",
+       "taille": 2
+      },
+      {
+       "nom": "Beurre de baratte",
+       "taille": 2
+      },
+      {
+       "nom": "Crème végétale",
+       "taille": 2
+      },
+      {
+       "nom": "Œufs de caille",
+       "taille": 3
+      },
+      {
+       "nom": "Beurre clarifié",
+       "taille": 3
+      },
+      {
+       "nom": "Blancs d'œufs liquides",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Yaourts et desserts",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Yaourts nature",
+       "taille": 1
+      },
+      {
+       "nom": "Yaourts aux fruits",
+       "taille": 1
+      },
+      {
+       "nom": "Fromage blanc",
+       "taille": 1
+      },
+      {
+       "nom": "Petits-suisses",
+       "taille": 2
+      },
+      {
+       "nom": "Crèmes desserts",
+       "taille": 1
+      },
+      {
+       "nom": "Compotes en coupelles",
+       "taille": 2
+      },
+      {
+       "nom": "Skyr",
+       "taille": 3
+      },
+      {
+       "nom": "Yaourts à boire",
+       "taille": 2
+      },
+      {
+       "nom": "Yaourts à la grecque",
+       "taille": 1
+      },
+      {
+       "nom": "Yaourts au lait de brebis",
+       "taille": 2
+      },
+      {
+       "nom": "Yaourts au soja",
+       "taille": 2
+      },
+      {
+       "nom": "Mousse au chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Riz au lait",
+       "taille": 1
+      },
+      {
+       "nom": "Flans",
+       "taille": 1
+      },
+      {
+       "nom": "Îles flottantes",
+       "taille": 2
+      },
+      {
+       "nom": "Liégeois",
+       "taille": 1
+      },
+      {
+       "nom": "Faisselle",
+       "taille": 1
+      },
+      {
+       "nom": "Yaourts allégés",
+       "taille": 1
+      },
+      {
+       "nom": "Panna cotta",
+       "taille": 2
+      },
+      {
+       "nom": "Tiramisu",
+       "taille": 2
+      },
+      {
+       "nom": "Gâteau de semoule",
+       "taille": 2
+      },
+      {
+       "nom": "Kéfir",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Fromagerie",
+   "ordre": 6,
+   "secteurs": [
+    {
+     "nom": "Fromages libre-service",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Emmental râpé",
+       "taille": 1
+      },
+      {
+       "nom": "Camembert",
+       "taille": 1
+      },
+      {
+       "nom": "Comté",
+       "taille": 1
+      },
+      {
+       "nom": "Mozzarella",
+       "taille": 1
+      },
+      {
+       "nom": "Chèvre bûche",
+       "taille": 1
+      },
+      {
+       "nom": "Raclette",
+       "taille": 2
+      },
+      {
+       "nom": "Roquefort",
+       "taille": 2
+      },
+      {
+       "nom": "Fromage à tartiner",
+       "taille": 1
+      },
+      {
+       "nom": "Feta",
+       "taille": 2
+      },
+      {
+       "nom": "Parmesan",
+       "taille": 2
+      },
+      {
+       "nom": "Coulommiers",
+       "taille": 3
+      },
+      {
+       "nom": "Brie",
+       "taille": 1
+      },
+      {
+       "nom": "Reblochon",
+       "taille": 1
+      },
+      {
+       "nom": "Emmental en tranches",
+       "taille": 1
+      },
+      {
+       "nom": "Saint-Nectaire",
+       "taille": 2
+      },
+      {
+       "nom": "Cantal",
+       "taille": 2
+      },
+      {
+       "nom": "Morbier",
+       "taille": 2
+      },
+      {
+       "nom": "Munster",
+       "taille": 2
+      },
+      {
+       "nom": "Tomme de Savoie",
+       "taille": 2
+      },
+      {
+       "nom": "Bleu d'Auvergne",
+       "taille": 2
+      },
+      {
+       "nom": "Mimolette",
+       "taille": 2
+      },
+      {
+       "nom": "Ricotta",
+       "taille": 2
+      },
+      {
+       "nom": "Mascarpone",
+       "taille": 2
+      },
+      {
+       "nom": "Burrata",
+       "taille": 2
+      },
+      {
+       "nom": "Halloumi",
+       "taille": 3
+      },
+      {
+       "nom": "Cheddar en tranches",
+       "taille": 2
+      },
+      {
+       "nom": "Saint-Marcellin",
+       "taille": 2
+      },
+      {
+       "nom": "Gouda",
+       "taille": 2
+      },
+      {
+       "nom": "Chèvre frais",
+       "taille": 2
+      },
+      {
+       "nom": "Fromages en portions",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Fromages à la coupe",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Fromage à la coupe",
+       "taille": 3
+      },
+      {
+       "nom": "Beaufort",
+       "taille": 3
+      },
+      {
+       "nom": "Chaource",
+       "taille": 3
+      },
+      {
+       "nom": "Pont-l'évêque",
+       "taille": 3
+      },
+      {
+       "nom": "Abondance",
+       "taille": 3
+      },
+      {
+       "nom": "Ossau-iraty",
+       "taille": 3
+      },
+      {
+       "nom": "Époisses",
+       "taille": 3
+      },
+      {
+       "nom": "Livarot",
+       "taille": 3
+      },
+      {
+       "nom": "Salers",
+       "taille": 3
+      },
+      {
+       "nom": "Fourme d'Ambert",
+       "taille": 3
+      },
+      {
+       "nom": "Tomme de brebis",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Charcuterie",
+   "ordre": 7,
+   "secteurs": [
+    {
+     "nom": "Charcuterie libre-service",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Jambon blanc",
+       "taille": 1
+      },
+      {
+       "nom": "Jambon cru",
+       "taille": 2
+      },
+      {
+       "nom": "Saucisson sec",
+       "taille": 1
+      },
+      {
+       "nom": "Pâté",
+       "taille": 1
+      },
+      {
+       "nom": "Rillettes",
+       "taille": 2
+      },
+      {
+       "nom": "Chorizo",
+       "taille": 2
+      },
+      {
+       "nom": "Lardons",
+       "taille": 1
+      },
+      {
+       "nom": "Allumettes de bacon",
+       "taille": 2
+      },
+      {
+       "nom": "Blanc de poulet tranché",
+       "taille": 2
+      },
+      {
+       "nom": "Jambon de dinde",
+       "taille": 1
+      },
+      {
+       "nom": "Boudin noir",
+       "taille": 2
+      },
+      {
+       "nom": "Boudin blanc",
+       "taille": 2
+      },
+      {
+       "nom": "Saucisses de Strasbourg",
+       "taille": 1
+      },
+      {
+       "nom": "Mortadelle",
+       "taille": 2
+      },
+      {
+       "nom": "Coppa",
+       "taille": 2
+      },
+      {
+       "nom": "Rosette",
+       "taille": 2
+      },
+      {
+       "nom": "Pancetta",
+       "taille": 2
+      },
+      {
+       "nom": "Poitrine fumée",
+       "taille": 1
+      },
+      {
+       "nom": "Salami",
+       "taille": 1
+      },
+      {
+       "nom": "Jambon persillé",
+       "taille": 3
+      },
+      {
+       "nom": "Viande des Grisons",
+       "taille": 3
+      },
+      {
+       "nom": "Fromage de tête",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Charcuterie à la coupe",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Jambon à la coupe",
+       "taille": 3
+      },
+      {
+       "nom": "Saucisson à la coupe",
+       "taille": 3
+      },
+      {
+       "nom": "Pâté en croûte",
+       "taille": 3
+      },
+      {
+       "nom": "Terrine à la coupe",
+       "taille": 3
+      },
+      {
+       "nom": "Jambon de Bayonne",
+       "taille": 3
+      },
+      {
+       "nom": "Jambon de Parme",
+       "taille": 3
+      },
+      {
+       "nom": "Lomo",
+       "taille": 3
+      },
+      {
+       "nom": "Saucisse sèche",
+       "taille": 3
+      },
+      {
+       "nom": "Galantine",
+       "taille": 3
+      },
+      {
+       "nom": "Tête roulée",
+       "taille": 3
+      },
+      {
+       "nom": "Jambon à l'os",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Traiteur",
+   "ordre": 8,
+   "secteurs": [
+    {
+     "nom": "Traiteur frais",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Taboulé",
+       "taille": 2
+      },
+      {
+       "nom": "Salade piémontaise",
+       "taille": 2
+      },
+      {
+       "nom": "Pizza fraîche",
+       "taille": 2
+      },
+      {
+       "nom": "Quiche lorraine",
+       "taille": 2
+      },
+      {
+       "nom": "Houmous",
+       "taille": 3
+      },
+      {
+       "nom": "Plats cuisinés frais",
+       "taille": 2
+      },
+      {
+       "nom": "Céleri rémoulade",
+       "taille": 2
+      },
+      {
+       "nom": "Salade de pâtes",
+       "taille": 2
+      },
+      {
+       "nom": "Salade de riz",
+       "taille": 2
+      },
+      {
+       "nom": "Tarama",
+       "taille": 2
+      },
+      {
+       "nom": "Tzatziki",
+       "taille": 2
+      },
+      {
+       "nom": "Guacamole",
+       "taille": 2
+      },
+      {
+       "nom": "Sandwichs",
+       "taille": 2
+      },
+      {
+       "nom": "Hachis parmentier",
+       "taille": 2
+      },
+      {
+       "nom": "Lasagnes fraîches",
+       "taille": 2
+      },
+      {
+       "nom": "Nems",
+       "taille": 2
+      },
+      {
+       "nom": "Samoussas",
+       "taille": 2
+      },
+      {
+       "nom": "Croque-monsieur",
+       "taille": 2
+      },
+      {
+       "nom": "Sushis",
+       "taille": 2
+      },
+      {
+       "nom": "Accras de morue",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Pâtes fraîches et pâtes à tarte",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Pâtes fraîches",
+       "taille": 1
+      },
+      {
+       "nom": "Raviolis frais",
+       "taille": 2
+      },
+      {
+       "nom": "Gnocchis",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte feuilletée",
+       "taille": 1
+      },
+      {
+       "nom": "Pâte brisée",
+       "taille": 1
+      },
+      {
+       "nom": "Pâte à pizza",
+       "taille": 1
+      },
+      {
+       "nom": "Pâte sablée",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte filo",
+       "taille": 3
+      },
+      {
+       "nom": "Tortellini",
+       "taille": 2
+      },
+      {
+       "nom": "Ravioles du Dauphiné",
+       "taille": 2
+      },
+      {
+       "nom": "Galettes de sarrasin",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte à crêpes prête",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Traiteur à la coupe",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Plat du jour traiteur",
+       "taille": 3
+      },
+      {
+       "nom": "Salade traiteur",
+       "taille": 3
+      },
+      {
+       "nom": "Paella",
+       "taille": 3
+      },
+      {
+       "nom": "Choucroute garnie",
+       "taille": 3
+      },
+      {
+       "nom": "Couscous royal",
+       "taille": 3
+      },
+      {
+       "nom": "Pizza à la part",
+       "taille": 3
+      },
+      {
+       "nom": "Bouchées à la reine",
+       "taille": 3
+      },
+      {
+       "nom": "Brandade de morue",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Boulangerie",
+   "ordre": 9,
+   "secteurs": [
+    {
+     "nom": "Pain",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Baguette",
+       "taille": 1
+      },
+      {
+       "nom": "Pain de campagne",
+       "taille": 2
+      },
+      {
+       "nom": "Pain de mie",
+       "taille": 1
+      },
+      {
+       "nom": "Pain complet",
+       "taille": 2
+      },
+      {
+       "nom": "Pains burger",
+       "taille": 2
+      },
+      {
+       "nom": "Wraps",
+       "taille": 2
+      },
+      {
+       "nom": "Pain aux céréales",
+       "taille": 1
+      },
+      {
+       "nom": "Pain de seigle",
+       "taille": 2
+      },
+      {
+       "nom": "Ficelle",
+       "taille": 1
+      },
+      {
+       "nom": "Baguette tradition",
+       "taille": 1
+      },
+      {
+       "nom": "Pain sans gluten",
+       "taille": 2
+      },
+      {
+       "nom": "Pains hot-dog",
+       "taille": 2
+      },
+      {
+       "nom": "Pain pita",
+       "taille": 2
+      },
+      {
+       "nom": "Pain précuit",
+       "taille": 1
+      },
+      {
+       "nom": "Bagels",
+       "taille": 2
+      },
+      {
+       "nom": "Pain viennois",
+       "taille": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Viennoiserie et pâtisserie",
+   "ordre": 10,
+   "secteurs": [
+    {
+     "nom": "Viennoiserie",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Croissants",
+       "taille": 1
+      },
+      {
+       "nom": "Pains au chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Brioche",
+       "taille": 1
+      },
+      {
+       "nom": "Pains au lait",
+       "taille": 1
+      },
+      {
+       "nom": "Madeleines",
+       "taille": 2
+      },
+      {
+       "nom": "Pains aux raisins",
+       "taille": 1
+      },
+      {
+       "nom": "Chaussons aux pommes",
+       "taille": 1
+      },
+      {
+       "nom": "Croissants aux amandes",
+       "taille": 2
+      },
+      {
+       "nom": "Muffins",
+       "taille": 2
+      },
+      {
+       "nom": "Donuts",
+       "taille": 2
+      },
+      {
+       "nom": "Gaufres",
+       "taille": 1
+      },
+      {
+       "nom": "Pancakes",
+       "taille": 2
+      },
+      {
+       "nom": "Chouquettes",
+       "taille": 2
+      },
+      {
+       "nom": "Galette des rois",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Pâtisserie",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Tarte aux fruits",
+       "taille": 3
+      },
+      {
+       "nom": "Éclairs",
+       "taille": 3
+      },
+      {
+       "nom": "Gâteau d'anniversaire",
+       "taille": 3
+      },
+      {
+       "nom": "Flan pâtissier",
+       "taille": 3
+      },
+      {
+       "nom": "Millefeuille",
+       "taille": 3
+      },
+      {
+       "nom": "Paris-brest",
+       "taille": 3
+      },
+      {
+       "nom": "Tarte au citron",
+       "taille": 3
+      },
+      {
+       "nom": "Fraisier",
+       "taille": 3
+      },
+      {
+       "nom": "Choux à la crème",
+       "taille": 3
+      },
+      {
+       "nom": "Macarons",
+       "taille": 3
+      },
+      {
+       "nom": "Bûche de Noël",
+       "taille": 3
+      },
+      {
+       "nom": "Tropézienne",
+       "taille": 3
+      },
+      {
+       "nom": "Religieuse",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Épicerie salée",
+   "ordre": 11,
+   "secteurs": [
+    {
+     "nom": "Pâtes, riz et féculents",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Pâtes spaghetti",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes coquillettes",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes penne",
+       "taille": 1
+      },
+      {
+       "nom": "Riz long",
+       "taille": 1
+      },
+      {
+       "nom": "Riz basmati",
+       "taille": 2
+      },
+      {
+       "nom": "Semoule",
+       "taille": 1
+      },
+      {
+       "nom": "Lentilles",
+       "taille": 2
+      },
+      {
+       "nom": "Quinoa",
+       "taille": 3
+      },
+      {
+       "nom": "Purée en flocons",
+       "taille": 2
+      },
+      {
+       "nom": "Pois chiches",
+       "taille": 2
+      },
+      {
+       "nom": "Pâtes tagliatelles",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes fusilli",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes macaroni",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes à lasagnes",
+       "taille": 1
+      },
+      {
+       "nom": "Vermicelles",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtes complètes",
+       "taille": 2
+      },
+      {
+       "nom": "Riz rond",
+       "taille": 1
+      },
+      {
+       "nom": "Riz thaï",
+       "taille": 1
+      },
+      {
+       "nom": "Riz complet",
+       "taille": 2
+      },
+      {
+       "nom": "Riz à risotto",
+       "taille": 2
+      },
+      {
+       "nom": "Boulgour",
+       "taille": 2
+      },
+      {
+       "nom": "Lentilles corail",
+       "taille": 2
+      },
+      {
+       "nom": "Polenta",
+       "taille": 2
+      },
+      {
+       "nom": "Nouilles chinoises",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Conserves",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Thon en boîte",
+       "taille": 1
+      },
+      {
+       "nom": "Sardines",
+       "taille": 1
+      },
+      {
+       "nom": "Haricots verts en boîte",
+       "taille": 1
+      },
+      {
+       "nom": "Petits pois carottes",
+       "taille": 1
+      },
+      {
+       "nom": "Maïs",
+       "taille": 1
+      },
+      {
+       "nom": "Tomates pelées",
+       "taille": 1
+      },
+      {
+       "nom": "Concentré de tomate",
+       "taille": 1
+      },
+      {
+       "nom": "Ratatouille",
+       "taille": 2
+      },
+      {
+       "nom": "Cassoulet",
+       "taille": 2
+      },
+      {
+       "nom": "Raviolis en boîte",
+       "taille": 2
+      },
+      {
+       "nom": "Maquereaux",
+       "taille": 2
+      },
+      {
+       "nom": "Flageolets",
+       "taille": 1
+      },
+      {
+       "nom": "Champignons en boîte",
+       "taille": 1
+      },
+      {
+       "nom": "Cœurs de palmier",
+       "taille": 2
+      },
+      {
+       "nom": "Fonds d'artichaut",
+       "taille": 2
+      },
+      {
+       "nom": "Miettes de crabe",
+       "taille": 2
+      },
+      {
+       "nom": "Salsifis",
+       "taille": 2
+      },
+      {
+       "nom": "Épinards en boîte",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Sauces et condiments",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Huile de tournesol",
+       "taille": 1
+      },
+      {
+       "nom": "Huile d'olive",
+       "taille": 1
+      },
+      {
+       "nom": "Vinaigre",
+       "taille": 1
+      },
+      {
+       "nom": "Moutarde",
+       "taille": 1
+      },
+      {
+       "nom": "Mayonnaise",
+       "taille": 1
+      },
+      {
+       "nom": "Ketchup",
+       "taille": 1
+      },
+      {
+       "nom": "Sauce tomate",
+       "taille": 1
+      },
+      {
+       "nom": "Pesto",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce soja",
+       "taille": 2
+      },
+      {
+       "nom": "Cornichons",
+       "taille": 1
+      },
+      {
+       "nom": "Olives",
+       "taille": 2
+      },
+      {
+       "nom": "Vinaigrette",
+       "taille": 2
+      },
+      {
+       "nom": "Huile de colza",
+       "taille": 1
+      },
+      {
+       "nom": "Vinaigre balsamique",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce barbecue",
+       "taille": 1
+      },
+      {
+       "nom": "Sauce béarnaise",
+       "taille": 1
+      },
+      {
+       "nom": "Sauce burger",
+       "taille": 2
+      },
+      {
+       "nom": "Harissa",
+       "taille": 1
+      },
+      {
+       "nom": "Câpres",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce bolognaise",
+       "taille": 2
+      },
+      {
+       "nom": "Tapenade",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce samouraï",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce piquante",
+       "taille": 2
+      },
+      {
+       "nom": "Huile de sésame",
+       "taille": 3
+      },
+      {
+       "nom": "Sauce carbonara",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce aigre-douce",
+       "taille": 2
+      },
+      {
+       "nom": "Nuoc-mâm",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Sel, épices et aides culinaires",
+     "ordre": 4,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Sel",
+       "taille": 1
+      },
+      {
+       "nom": "Poivre",
+       "taille": 1
+      },
+      {
+       "nom": "Bouillon cube",
+       "taille": 1
+      },
+      {
+       "nom": "Herbes de Provence",
+       "taille": 1
+      },
+      {
+       "nom": "Paprika",
+       "taille": 2
+      },
+      {
+       "nom": "Curry",
+       "taille": 2
+      },
+      {
+       "nom": "Cumin",
+       "taille": 3
+      },
+      {
+       "nom": "Fond de veau",
+       "taille": 3
+      },
+      {
+       "nom": "Levure chimique",
+       "taille": 1
+      },
+      {
+       "nom": "Fécule de maïs",
+       "taille": 2
+      },
+      {
+       "nom": "Noix de muscade",
+       "taille": 2
+      },
+      {
+       "nom": "Cannelle",
+       "taille": 1
+      },
+      {
+       "nom": "Origan",
+       "taille": 2
+      },
+      {
+       "nom": "Piment d'Espelette",
+       "taille": 2
+      },
+      {
+       "nom": "Ras el hanout",
+       "taille": 2
+      },
+      {
+       "nom": "Curcuma",
+       "taille": 2
+      },
+      {
+       "nom": "Laurier",
+       "taille": 1
+      },
+      {
+       "nom": "Quatre-épices",
+       "taille": 2
+      },
+      {
+       "nom": "Fleur de sel",
+       "taille": 2
+      },
+      {
+       "nom": "Fumet de poisson",
+       "taille": 2
+      },
+      {
+       "nom": "Piment de Cayenne",
+       "taille": 2
+      },
+      {
+       "nom": "Roux",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Soupes et plats préparés",
+     "ordre": 5,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Soupe en brique",
+       "taille": 2
+      },
+      {
+       "nom": "Soupe déshydratée",
+       "taille": 2
+      },
+      {
+       "nom": "Plat cuisiné en conserve",
+       "taille": 2
+      },
+      {
+       "nom": "Nouilles instantanées",
+       "taille": 2
+      },
+      {
+       "nom": "Croûtons",
+       "taille": 2
+      },
+      {
+       "nom": "Chili con carne",
+       "taille": 2
+      },
+      {
+       "nom": "Soupe de poisson",
+       "taille": 2
+      },
+      {
+       "nom": "Soupe miso",
+       "taille": 3
+      },
+      {
+       "nom": "Plats cuisinés en barquette",
+       "taille": 2
+      },
+      {
+       "nom": "Salade composée en boîte",
+       "taille": 2
+      },
+      {
+       "nom": "Saucisses lentilles",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Bio, vrac et terroir",
+   "ordre": 12,
+   "secteurs": [
+    {
+     "nom": "Diététique et bio",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Galettes de riz",
+       "taille": 2
+      },
+      {
+       "nom": "Produits sans gluten",
+       "taille": 2
+      },
+      {
+       "nom": "Lait d'amande",
+       "taille": 3
+      },
+      {
+       "nom": "Graines de chia",
+       "taille": 3
+      },
+      {
+       "nom": "Lait d'avoine",
+       "taille": 2
+      },
+      {
+       "nom": "Lait de soja",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson au riz",
+       "taille": 2
+      },
+      {
+       "nom": "Galettes de maïs",
+       "taille": 2
+      },
+      {
+       "nom": "Pâtes sans gluten",
+       "taille": 2
+      },
+      {
+       "nom": "Farine sans gluten",
+       "taille": 3
+      },
+      {
+       "nom": "Tofu",
+       "taille": 2
+      },
+      {
+       "nom": "Edulcorant",
+       "taille": 2
+      },
+      {
+       "nom": "Biscuits sans sucre",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Vrac",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Pâtes en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Riz en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Légumineuses en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Fruits secs en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Céréales en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Café en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Bonbons en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Graines en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Farine en vrac",
+       "taille": 3
+      },
+      {
+       "nom": "Flocons d'avoine en vrac",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Apéritif",
+   "ordre": 13,
+   "secteurs": [
+    {
+     "nom": "Chips et biscuits apéritif",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Chips",
+       "taille": 1
+      },
+      {
+       "nom": "Biscuits apéritif",
+       "taille": 1
+      },
+      {
+       "nom": "Tortillas chips",
+       "taille": 2
+      },
+      {
+       "nom": "Crackers",
+       "taille": 1
+      },
+      {
+       "nom": "Bretzels",
+       "taille": 1
+      },
+      {
+       "nom": "Gressins",
+       "taille": 2
+      },
+      {
+       "nom": "Popcorn",
+       "taille": 1
+      },
+      {
+       "nom": "Chips de légumes",
+       "taille": 2
+      },
+      {
+       "nom": "Biscuits soufflés",
+       "taille": 1
+      },
+      {
+       "nom": "Toasts apéritif",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce pour chips",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Fruits secs salés et olives",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Cacahuètes",
+       "taille": 1
+      },
+      {
+       "nom": "Pistaches",
+       "taille": 2
+      },
+      {
+       "nom": "Olives apéritif",
+       "taille": 2
+      },
+      {
+       "nom": "Mélange apéritif",
+       "taille": 3
+      },
+      {
+       "nom": "Amandes grillées",
+       "taille": 1
+      },
+      {
+       "nom": "Olives vertes",
+       "taille": 1
+      },
+      {
+       "nom": "Olives noires",
+       "taille": 1
+      },
+      {
+       "nom": "Olives farcies",
+       "taille": 2
+      },
+      {
+       "nom": "Graines de tournesol salées",
+       "taille": 2
+      },
+      {
+       "nom": "Tomates séchées",
+       "taille": 2
+      },
+      {
+       "nom": "Cornichons apéritif",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Cuisine du monde",
+   "ordre": 14,
+   "secteurs": [
+    {
+     "nom": "Asie",
+     "ordre": 1,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Nouilles de riz",
+       "taille": 3
+      },
+      {
+       "nom": "Sauce nuoc-mâm",
+       "taille": 3
+      },
+      {
+       "nom": "Lait de coco",
+       "taille": 3
+      },
+      {
+       "nom": "Riz basmati thaï",
+       "taille": 3
+      },
+      {
+       "nom": "Feuilles de riz",
+       "taille": 3
+      },
+      {
+       "nom": "Pâte de curry thaï",
+       "taille": 3
+      },
+      {
+       "nom": "Wasabi",
+       "taille": 3
+      },
+      {
+       "nom": "Riz pour sushi",
+       "taille": 3
+      },
+      {
+       "nom": "Algues nori",
+       "taille": 3
+      },
+      {
+       "nom": "Gingembre mariné",
+       "taille": 3
+      },
+      {
+       "nom": "Nems surgelés",
+       "taille": 3
+      },
+      {
+       "nom": "Sauce teriyaki",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Mexique et Amérique",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Tortillas",
+       "taille": 3
+      },
+      {
+       "nom": "Haricots rouges",
+       "taille": 3
+      },
+      {
+       "nom": "Sauce salsa",
+       "taille": 3
+      },
+      {
+       "nom": "Kit fajitas",
+       "taille": 3
+      },
+      {
+       "nom": "Kit tacos",
+       "taille": 3
+      },
+      {
+       "nom": "Piments jalapeños",
+       "taille": 3
+      },
+      {
+       "nom": "Haricots noirs",
+       "taille": 3
+      },
+      {
+       "nom": "Sauce chili",
+       "taille": 3
+      },
+      {
+       "nom": "Sirop d'érable",
+       "taille": 3
+      },
+      {
+       "nom": "Beurre de cacahuète crunchy",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Orient et Inde",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Sauce curry",
+       "taille": 3
+      },
+      {
+       "nom": "Épices du monde",
+       "taille": 3
+      },
+      {
+       "nom": "Couscous préparé",
+       "taille": 3
+      },
+      {
+       "nom": "Pâte de curry indienne",
+       "taille": 3
+      },
+      {
+       "nom": "Galettes naan",
+       "taille": 3
+      },
+      {
+       "nom": "Chutney de mangue",
+       "taille": 3
+      },
+      {
+       "nom": "Feuilles de brick",
+       "taille": 3
+      },
+      {
+       "nom": "Thé à la menthe",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Italie",
+     "ordre": 4,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Sauce tomate basilic",
+       "taille": 1
+      },
+      {
+       "nom": "Antipasti",
+       "taille": 2
+      },
+      {
+       "nom": "Risotto",
+       "taille": 2
+      },
+      {
+       "nom": "Ravioles fraîches",
+       "taille": 2
+      },
+      {
+       "nom": "Sauce arrabbiata",
+       "taille": 2
+      },
+      {
+       "nom": "Pâtes fraîches farcies",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Espagne",
+     "ordre": 5,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Paella préparée",
+       "taille": 2
+      },
+      {
+       "nom": "Riz pour paella",
+       "taille": 2
+      },
+      {
+       "nom": "Jambon serrano",
+       "taille": 1
+      },
+      {
+       "nom": "Tapas",
+       "taille": 2
+      },
+      {
+       "nom": "Poivrons piquillos",
+       "taille": 3
+      },
+      {
+       "nom": "Fromage manchego",
+       "taille": 3
+      },
+      {
+       "nom": "Pimentón",
+       "taille": 3
+      },
+      {
+       "nom": "Calamars à la romaine",
+       "taille": 2
+      },
+      {
+       "nom": "Turrón",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Petit-déjeuner",
+   "ordre": 15,
+   "secteurs": [
+    {
+     "nom": "Café",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Café moulu",
+       "taille": 1
+      },
+      {
+       "nom": "Café en dosettes",
+       "taille": 1
+      },
+      {
+       "nom": "Café soluble",
+       "taille": 2
+      },
+      {
+       "nom": "Café en grains",
+       "taille": 3
+      },
+      {
+       "nom": "Café décaféiné",
+       "taille": 1
+      },
+      {
+       "nom": "Capsules de café",
+       "taille": 1
+      },
+      {
+       "nom": "Dosettes souples",
+       "taille": 1
+      },
+      {
+       "nom": "Chicorée",
+       "taille": 1
+      },
+      {
+       "nom": "Filtres à café",
+       "taille": 1
+      },
+      {
+       "nom": "Boisson café au lait soluble",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Thé et chocolat en poudre",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Thé",
+       "taille": 1
+      },
+      {
+       "nom": "Infusion",
+       "taille": 2
+      },
+      {
+       "nom": "Chocolat en poudre",
+       "taille": 1
+      },
+      {
+       "nom": "Thé vert",
+       "taille": 1
+      },
+      {
+       "nom": "Thé noir",
+       "taille": 1
+      },
+      {
+       "nom": "Tisane verveine",
+       "taille": 1
+      },
+      {
+       "nom": "Camomille",
+       "taille": 1
+      },
+      {
+       "nom": "Rooibos",
+       "taille": 2
+      },
+      {
+       "nom": "Thé earl grey",
+       "taille": 1
+      },
+      {
+       "nom": "Chocolat instantané",
+       "taille": 1
+      },
+      {
+       "nom": "Infusion menthe",
+       "taille": 1
+      },
+      {
+       "nom": "Boisson maltée",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Céréales",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Céréales",
+       "taille": 1
+      },
+      {
+       "nom": "Muesli",
+       "taille": 2
+      },
+      {
+       "nom": "Flocons d'avoine",
+       "taille": 2
+      },
+      {
+       "nom": "Corn-flakes",
+       "taille": 1
+      },
+      {
+       "nom": "Céréales chocolatées",
+       "taille": 1
+      },
+      {
+       "nom": "Pétales au miel",
+       "taille": 1
+      },
+      {
+       "nom": "Granola",
+       "taille": 1
+      },
+      {
+       "nom": "Céréales fourrées",
+       "taille": 1
+      },
+      {
+       "nom": "Céréales enfant",
+       "taille": 1
+      },
+      {
+       "nom": "Son d'avoine",
+       "taille": 2
+      },
+      {
+       "nom": "Céréales complètes",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Biscottes et tartines",
+     "ordre": 4,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Biscottes",
+       "taille": 1
+      },
+      {
+       "nom": "Pain grillé",
+       "taille": 2
+      },
+      {
+       "nom": "Tartines craquantes",
+       "taille": 3
+      },
+      {
+       "nom": "Brioche tranchée",
+       "taille": 1
+      },
+      {
+       "nom": "Pains suédois",
+       "taille": 2
+      },
+      {
+       "nom": "Biscottes complètes",
+       "taille": 1
+      },
+      {
+       "nom": "Biscottes sans sel",
+       "taille": 2
+      },
+      {
+       "nom": "Pain azyme",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Confitures et pâtes à tartiner",
+     "ordre": 5,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Confiture de fraises",
+       "taille": 1
+      },
+      {
+       "nom": "Confiture d'abricots",
+       "taille": 2
+      },
+      {
+       "nom": "Miel",
+       "taille": 1
+      },
+      {
+       "nom": "Pâte à tartiner chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Beurre de cacahuète",
+       "taille": 3
+      },
+      {
+       "nom": "Confiture de framboises",
+       "taille": 1
+      },
+      {
+       "nom": "Confiture de cerises",
+       "taille": 1
+      },
+      {
+       "nom": "Confiture d'oranges amères",
+       "taille": 1
+      },
+      {
+       "nom": "Confiture de fruits rouges",
+       "taille": 1
+      },
+      {
+       "nom": "Gelée de groseilles",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte à tartiner noisette",
+       "taille": 1
+      },
+      {
+       "nom": "Crème de marrons",
+       "taille": 1
+      },
+      {
+       "nom": "Miel liquide",
+       "taille": 1
+      },
+      {
+       "nom": "Pâte de spéculoos",
+       "taille": 2
+      },
+      {
+       "nom": "Confiture allégée en sucre",
+       "taille": 2
+      },
+      {
+       "nom": "Lemon curd",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Biscuits et sucré",
+   "ordre": 16,
+   "secteurs": [
+    {
+     "nom": "Biscuits et gâteaux",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Biscuits secs",
+       "taille": 1
+      },
+      {
+       "nom": "Biscuits au chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Gâteaux moelleux",
+       "taille": 1
+      },
+      {
+       "nom": "Barres de céréales",
+       "taille": 2
+      },
+      {
+       "nom": "Pain d'épices",
+       "taille": 2
+      },
+      {
+       "nom": "Crêpes",
+       "taille": 2
+      },
+      {
+       "nom": "Petits-beurre",
+       "taille": 1
+      },
+      {
+       "nom": "Sablés",
+       "taille": 1
+      },
+      {
+       "nom": "Cookies",
+       "taille": 1
+      },
+      {
+       "nom": "Biscuits fourrés",
+       "taille": 1
+      },
+      {
+       "nom": "Galettes bretonnes",
+       "taille": 1
+      },
+      {
+       "nom": "Boudoirs",
+       "taille": 1
+      },
+      {
+       "nom": "Quatre-quarts",
+       "taille": 1
+      },
+      {
+       "nom": "Barres chocolatées",
+       "taille": 1
+      },
+      {
+       "nom": "Spéculoos",
+       "taille": 1
+      },
+      {
+       "nom": "Palmiers",
+       "taille": 1
+      },
+      {
+       "nom": "Tartelettes",
+       "taille": 1
+      },
+      {
+       "nom": "Biscuits pour le goûter",
+       "taille": 1
+      },
+      {
+       "nom": "Cake aux fruits",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Chocolat et confiserie",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Tablette de chocolat noir",
+       "taille": 1
+      },
+      {
+       "nom": "Tablette de chocolat au lait",
+       "taille": 1
+      },
+      {
+       "nom": "Bonbons",
+       "taille": 1
+      },
+      {
+       "nom": "Chewing-gums",
+       "taille": 1
+      },
+      {
+       "nom": "Chocolat pâtissier",
+       "taille": 2
+      },
+      {
+       "nom": "Chocolat blanc",
+       "taille": 1
+      },
+      {
+       "nom": "Chocolat aux noisettes",
+       "taille": 1
+      },
+      {
+       "nom": "Rochers au chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Bonbons sans sucre",
+       "taille": 1
+      },
+      {
+       "nom": "Guimauves",
+       "taille": 1
+      },
+      {
+       "nom": "Réglisse",
+       "taille": 1
+      },
+      {
+       "nom": "Caramels",
+       "taille": 1
+      },
+      {
+       "nom": "Pastilles",
+       "taille": 1
+      },
+      {
+       "nom": "Œufs en chocolat",
+       "taille": 2
+      },
+      {
+       "nom": "Truffes au chocolat",
+       "taille": 2
+      },
+      {
+       "nom": "Chocolats de Noël",
+       "taille": 2
+      },
+      {
+       "nom": "Pâtes de fruits",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Sucre, farine et pâtisserie",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Sucre en poudre",
+       "taille": 1
+      },
+      {
+       "nom": "Sucre en morceaux",
+       "taille": 1
+      },
+      {
+       "nom": "Farine",
+       "taille": 1
+      },
+      {
+       "nom": "Sucre vanillé",
+       "taille": 2
+      },
+      {
+       "nom": "Préparation pour gâteau",
+       "taille": 2
+      },
+      {
+       "nom": "Levure boulangère",
+       "taille": 3
+      },
+      {
+       "nom": "Sucre roux",
+       "taille": 1
+      },
+      {
+       "nom": "Cassonade",
+       "taille": 1
+      },
+      {
+       "nom": "Sucre glace",
+       "taille": 1
+      },
+      {
+       "nom": "Farine complète",
+       "taille": 2
+      },
+      {
+       "nom": "Poudre d'amande",
+       "taille": 1
+      },
+      {
+       "nom": "Arôme vanille",
+       "taille": 1
+      },
+      {
+       "nom": "Gousse de vanille",
+       "taille": 2
+      },
+      {
+       "nom": "Pépites de chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Vermicelles colorés",
+       "taille": 2
+      },
+      {
+       "nom": "Préparation pour crêpes",
+       "taille": 1
+      },
+      {
+       "nom": "Cacao en poudre non sucré",
+       "taille": 2
+      },
+      {
+       "nom": "Sucre de canne",
+       "taille": 2
+      },
+      {
+       "nom": "Noix de coco râpée",
+       "taille": 1
+      },
+      {
+       "nom": "Gélatine",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte à sucre",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Compotes et fruits au sirop",
+     "ordre": 4,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Compote en gourdes",
+       "taille": 2
+      },
+      {
+       "nom": "Compote en pot",
+       "taille": 2
+      },
+      {
+       "nom": "Fruits au sirop",
+       "taille": 2
+      },
+      {
+       "nom": "Compote sans sucre ajouté",
+       "taille": 2
+      },
+      {
+       "nom": "Pêches au sirop",
+       "taille": 2
+      },
+      {
+       "nom": "Ananas au sirop",
+       "taille": 2
+      },
+      {
+       "nom": "Poires au sirop",
+       "taille": 2
+      },
+      {
+       "nom": "Cocktail de fruits",
+       "taille": 2
+      },
+      {
+       "nom": "Purée de fruits",
+       "taille": 2
+      },
+      {
+       "nom": "Abricots au sirop",
+       "taille": 2
+      },
+      {
+       "nom": "Mangue en conserve",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Surgelés",
+   "ordre": 17,
+   "secteurs": [
+    {
+     "nom": "Légumes surgelés",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Petits pois surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Haricots verts surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Épinards surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Poêlée de légumes",
+       "taille": 1
+      },
+      {
+       "nom": "Frites surgelées",
+       "taille": 1
+      },
+      {
+       "nom": "Mélange pour soupe",
+       "taille": 2
+      },
+      {
+       "nom": "Brocolis surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Haricots plats surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Choux-fleurs surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Carottes surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Champignons surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Ratatouille surgelée",
+       "taille": 2
+      },
+      {
+       "nom": "Herbes surgelées",
+       "taille": 1
+      },
+      {
+       "nom": "Oignons surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Potatoes surgelées",
+       "taille": 1
+      },
+      {
+       "nom": "Pommes noisettes",
+       "taille": 1
+      },
+      {
+       "nom": "Légumes pour couscous surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Purée surgelée",
+       "taille": 2
+      },
+      {
+       "nom": "Haricots beurre surgelés",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Viandes et poissons surgelés",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Poisson pané",
+       "taille": 1
+      },
+      {
+       "nom": "Steaks hachés surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Nuggets de poulet",
+       "taille": 2
+      },
+      {
+       "nom": "Crevettes surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Filets de cabillaud surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Filets de saumon surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Moules surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Calamars surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Cordons bleus surgelés",
+       "taille": 1
+      },
+      {
+       "nom": "Escalopes de poulet surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Fruits de mer surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Colin surgelé",
+       "taille": 1
+      },
+      {
+       "nom": "Cuisses de poulet surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Saint-Jacques surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Pavés de merlu surgelés",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Plats et pizzas surgelés",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Pizza surgelée",
+       "taille": 1
+      },
+      {
+       "nom": "Plat cuisiné surgelé",
+       "taille": 2
+      },
+      {
+       "nom": "Lasagnes surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Feuilletés",
+       "taille": 2
+      },
+      {
+       "nom": "Quiche surgelée",
+       "taille": 1
+      },
+      {
+       "nom": "Croque-monsieur surgelé",
+       "taille": 1
+      },
+      {
+       "nom": "Hachis parmentier surgelé",
+       "taille": 1
+      },
+      {
+       "nom": "Gratin surgelé",
+       "taille": 2
+      },
+      {
+       "nom": "Paella surgelée",
+       "taille": 2
+      },
+      {
+       "nom": "Pâte feuilletée surgelée",
+       "taille": 2
+      },
+      {
+       "nom": "Viennoiseries surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Pain surgelé",
+       "taille": 2
+      },
+      {
+       "nom": "Tartes surgelées",
+       "taille": 2
+      },
+      {
+       "nom": "Burgers surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Petits fours surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Samoussas surgelés",
+       "taille": 2
+      },
+      {
+       "nom": "Fruits rouges surgelés",
+       "taille": 1
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Glaces",
+   "ordre": 18,
+   "secteurs": [
+    {
+     "nom": "Glaces",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Glace en bac",
+       "taille": 1
+      },
+      {
+       "nom": "Cônes glacés",
+       "taille": 1
+      },
+      {
+       "nom": "Esquimaux",
+       "taille": 2
+      },
+      {
+       "nom": "Sorbet",
+       "taille": 2
+      },
+      {
+       "nom": "Glace vanille",
+       "taille": 1
+      },
+      {
+       "nom": "Glace chocolat",
+       "taille": 1
+      },
+      {
+       "nom": "Barres glacées",
+       "taille": 1
+      },
+      {
+       "nom": "Glace à l'italienne",
+       "taille": 2
+      },
+      {
+       "nom": "Pots de glace individuels",
+       "taille": 1
+      },
+      {
+       "nom": "Glace sans lactose",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Desserts glacés",
+     "ordre": 2,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Bûche glacée",
+       "taille": 3
+      },
+      {
+       "nom": "Vacherin glacé",
+       "taille": 3
+      },
+      {
+       "nom": "Mini-glaces",
+       "taille": 2
+      },
+      {
+       "nom": "Profiteroles",
+       "taille": 2
+      },
+      {
+       "nom": "Nougat glacé",
+       "taille": 3
+      },
+      {
+       "nom": "Omelette norvégienne",
+       "taille": 3
+      },
+      {
+       "nom": "Tarte glacée",
+       "taille": 3
+      },
+      {
+       "nom": "Macarons glacés",
+       "taille": 3
+      },
+      {
+       "nom": "Mochis glacés",
+       "taille": 3
+      },
+      {
+       "nom": "Coupes glacées",
+       "taille": 2
+      },
+      {
+       "nom": "Gâteau glacé",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Eaux et boissons sans alcool",
+   "ordre": 19,
+   "secteurs": [
+    {
+     "nom": "Eaux",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Eau plate",
+       "taille": 1
+      },
+      {
+       "nom": "Eau gazeuse",
+       "taille": 1
+      },
+      {
+       "nom": "Eau aromatisée",
+       "taille": 2
+      },
+      {
+       "nom": "Eau minérale",
+       "taille": 1
+      },
+      {
+       "nom": "Eau de source",
+       "taille": 1
+      },
+      {
+       "nom": "Petites bouteilles d'eau",
+       "taille": 1
+      },
+      {
+       "nom": "Bonbonne d'eau",
+       "taille": 2
+      },
+      {
+       "nom": "Eau riche en magnésium",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Jus de fruits",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Jus d'orange",
+       "taille": 1
+      },
+      {
+       "nom": "Jus de pomme",
+       "taille": 2
+      },
+      {
+       "nom": "Jus multifruits",
+       "taille": 2
+      },
+      {
+       "nom": "Jus de pamplemousse",
+       "taille": 1
+      },
+      {
+       "nom": "Jus d'ananas",
+       "taille": 1
+      },
+      {
+       "nom": "Jus de raisin",
+       "taille": 1
+      },
+      {
+       "nom": "Jus de tomate",
+       "taille": 1
+      },
+      {
+       "nom": "Nectar d'abricot",
+       "taille": 1
+      },
+      {
+       "nom": "Jus de fruits frais",
+       "taille": 2
+      },
+      {
+       "nom": "Nectar de mangue",
+       "taille": 2
+      },
+      {
+       "nom": "Briquettes de jus",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Sodas et sirops",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Cola",
+       "taille": 1
+      },
+      {
+       "nom": "Limonade",
+       "taille": 1
+      },
+      {
+       "nom": "Sirop",
+       "taille": 1
+      },
+      {
+       "nom": "Thé glacé",
+       "taille": 2
+      },
+      {
+       "nom": "Boisson énergisante",
+       "taille": 3
+      },
+      {
+       "nom": "Cola zéro",
+       "taille": 1
+      },
+      {
+       "nom": "Soda à l'orange",
+       "taille": 1
+      },
+      {
+       "nom": "Tonic",
+       "taille": 1
+      },
+      {
+       "nom": "Ginger ale",
+       "taille": 2
+      },
+      {
+       "nom": "Sirop de menthe",
+       "taille": 1
+      },
+      {
+       "nom": "Sirop de grenadine",
+       "taille": 1
+      },
+      {
+       "nom": "Sirop de citron",
+       "taille": 1
+      },
+      {
+       "nom": "Kombucha",
+       "taille": 2
+      },
+      {
+       "nom": "Sirop d'orgeat",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Cave",
+   "ordre": 20,
+   "secteurs": [
+    {
+     "nom": "Bières et cidres",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Bière blonde",
+       "taille": 1
+      },
+      {
+       "nom": "Bière sans alcool",
+       "taille": 2
+      },
+      {
+       "nom": "Cidre",
+       "taille": 2
+      },
+      {
+       "nom": "Bière ambrée",
+       "taille": 3
+      },
+      {
+       "nom": "Bière blanche",
+       "taille": 1
+      },
+      {
+       "nom": "Bière brune",
+       "taille": 2
+      },
+      {
+       "nom": "Bière IPA",
+       "taille": 2
+      },
+      {
+       "nom": "Bière d'abbaye",
+       "taille": 1
+      },
+      {
+       "nom": "Panaché",
+       "taille": 1
+      },
+      {
+       "nom": "Bière aromatisée",
+       "taille": 2
+      },
+      {
+       "nom": "Cidre doux",
+       "taille": 1
+      },
+      {
+       "nom": "Cidre brut",
+       "taille": 1
+      },
+      {
+       "nom": "Fût de bière",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Vins",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Vin rouge",
+       "taille": 1
+      },
+      {
+       "nom": "Vin blanc",
+       "taille": 1
+      },
+      {
+       "nom": "Vin rosé",
+       "taille": 1
+      },
+      {
+       "nom": "Vin de Bordeaux",
+       "taille": 1
+      },
+      {
+       "nom": "Vin de Bourgogne",
+       "taille": 2
+      },
+      {
+       "nom": "Côtes-du-rhône",
+       "taille": 1
+      },
+      {
+       "nom": "Muscadet",
+       "taille": 2
+      },
+      {
+       "nom": "Vin en cubi",
+       "taille": 1
+      },
+      {
+       "nom": "Vin sans alcool",
+       "taille": 2
+      },
+      {
+       "nom": "Vin moelleux",
+       "taille": 2
+      },
+      {
+       "nom": "Sangria",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Champagnes et mousseux",
+     "ordre": 3,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Champagne",
+       "taille": 2
+      },
+      {
+       "nom": "Mousseux",
+       "taille": 2
+      },
+      {
+       "nom": "Crémant",
+       "taille": 2
+      },
+      {
+       "nom": "Prosecco",
+       "taille": 2
+      },
+      {
+       "nom": "Cava",
+       "taille": 3
+      },
+      {
+       "nom": "Clairette de Die",
+       "taille": 3
+      },
+      {
+       "nom": "Champagne rosé",
+       "taille": 2
+      },
+      {
+       "nom": "Blanquette de Limoux",
+       "taille": 3
+      },
+      {
+       "nom": "Pétillant sans alcool",
+       "taille": 2
+      },
+      {
+       "nom": "Asti",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Alcools et apéritifs",
+     "ordre": 4,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Pastis",
+       "taille": 2
+      },
+      {
+       "nom": "Whisky",
+       "taille": 2
+      },
+      {
+       "nom": "Rhum",
+       "taille": 3
+      },
+      {
+       "nom": "Porto",
+       "taille": 3
+      },
+      {
+       "nom": "Vodka",
+       "taille": 2
+      },
+      {
+       "nom": "Gin",
+       "taille": 2
+      },
+      {
+       "nom": "Martini blanc",
+       "taille": 2
+      },
+      {
+       "nom": "Crème de cassis",
+       "taille": 2
+      },
+      {
+       "nom": "Calvados",
+       "taille": 3
+      },
+      {
+       "nom": "Cognac",
+       "taille": 3
+      },
+      {
+       "nom": "Liqueur",
+       "taille": 2
+      },
+      {
+       "nom": "Rhum arrangé",
+       "taille": 3
+      },
+      {
+       "nom": "Muscat",
+       "taille": 2
+      },
+      {
+       "nom": "Kir",
+       "taille": 2
+      },
+      {
+       "nom": "Spritz",
+       "taille": 2
+      },
+      {
+       "nom": "Tequila",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Bébé",
+   "ordre": 21,
+   "secteurs": [
+    {
+     "nom": "Alimentation bébé",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Lait infantile",
+       "taille": 2
+      },
+      {
+       "nom": "Petits pots",
+       "taille": 2
+      },
+      {
+       "nom": "Céréales bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Compotes bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Plats bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Biscuits bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Petits pots légumes",
+       "taille": 2
+      },
+      {
+       "nom": "Desserts lactés bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Eau pour bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Gourdes bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Jus bébé",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Hygiène bébé",
+     "ordre": 2,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Couches",
+       "taille": 2
+      },
+      {
+       "nom": "Lingettes bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Liniment",
+       "taille": 3
+      },
+      {
+       "nom": "Couches-culottes",
+       "taille": 2
+      },
+      {
+       "nom": "Coton bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Gel lavant bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Crème change",
+       "taille": 2
+      },
+      {
+       "nom": "Lait de toilette bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Shampoing bébé",
+       "taille": 2
+      },
+      {
+       "nom": "Mouche-bébé",
+       "taille": 3
+      },
+      {
+       "nom": "Lingettes à l'eau",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Puériculture",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Biberons",
+       "taille": 3
+      },
+      {
+       "nom": "Tétines",
+       "taille": 3
+      },
+      {
+       "nom": "Thermomètre de bain",
+       "taille": 3
+      },
+      {
+       "nom": "Bavoirs",
+       "taille": 3
+      },
+      {
+       "nom": "Tasse d'apprentissage",
+       "taille": 3
+      },
+      {
+       "nom": "Couverts bébé",
+       "taille": 3
+      },
+      {
+       "nom": "Anneau de dentition",
+       "taille": 3
+      },
+      {
+       "nom": "Goupillon",
+       "taille": 3
+      },
+      {
+       "nom": "Assiette bébé",
+       "taille": 3
+      },
+      {
+       "nom": "Boîte doseuse lait",
+       "taille": 3
+      },
+      {
+       "nom": "Coussinets d'allaitement",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Parfumerie et soins",
+   "ordre": 22,
+   "secteurs": [
+    {
+     "nom": "Toilette et soins du corps",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Gel douche",
+       "taille": 1
+      },
+      {
+       "nom": "Savon",
+       "taille": 1
+      },
+      {
+       "nom": "Déodorant",
+       "taille": 1
+      },
+      {
+       "nom": "Crème hydratante",
+       "taille": 2
+      },
+      {
+       "nom": "Coton",
+       "taille": 2
+      },
+      {
+       "nom": "Cotons-tiges",
+       "taille": 2
+      },
+      {
+       "nom": "Savon liquide",
+       "taille": 1
+      },
+      {
+       "nom": "Gel hydroalcoolique",
+       "taille": 1
+      },
+      {
+       "nom": "Lait corporel",
+       "taille": 2
+      },
+      {
+       "nom": "Gel douche enfant",
+       "taille": 2
+      },
+      {
+       "nom": "Pierre ponce",
+       "taille": 2
+      },
+      {
+       "nom": "Crème pour les pieds",
+       "taille": 2
+      },
+      {
+       "nom": "Gant de toilette",
+       "taille": 2
+      },
+      {
+       "nom": "Huile pour le corps",
+       "taille": 2
+      },
+      {
+       "nom": "Gommage corps",
+       "taille": 2
+      },
+      {
+       "nom": "Talc",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Cheveux",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Shampooing",
+       "taille": 1
+      },
+      {
+       "nom": "Après-shampooing",
+       "taille": 2
+      },
+      {
+       "nom": "Coloration",
+       "taille": 2
+      },
+      {
+       "nom": "Gel coiffant",
+       "taille": 3
+      },
+      {
+       "nom": "Laque",
+       "taille": 3
+      },
+      {
+       "nom": "Shampooing sec",
+       "taille": 2
+      },
+      {
+       "nom": "Masque capillaire",
+       "taille": 2
+      },
+      {
+       "nom": "Shampooing antipelliculaire",
+       "taille": 2
+      },
+      {
+       "nom": "Shampooing enfant",
+       "taille": 2
+      },
+      {
+       "nom": "Mousse coiffante",
+       "taille": 2
+      },
+      {
+       "nom": "Cire coiffante",
+       "taille": 2
+      },
+      {
+       "nom": "Élastiques à cheveux",
+       "taille": 1
+      },
+      {
+       "nom": "Brosse à cheveux",
+       "taille": 2
+      },
+      {
+       "nom": "Peigne",
+       "taille": 1
+      },
+      {
+       "nom": "Barrettes",
+       "taille": 2
+      },
+      {
+       "nom": "Lotion anti-poux",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Santé dentaire",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Dentifrice",
+       "taille": 1
+      },
+      {
+       "nom": "Brosse à dents",
+       "taille": 1
+      },
+      {
+       "nom": "Bain de bouche",
+       "taille": 2
+      },
+      {
+       "nom": "Fil dentaire",
+       "taille": 3
+      },
+      {
+       "nom": "Brossettes interdentaires",
+       "taille": 2
+      },
+      {
+       "nom": "Têtes de brosse à dents électrique",
+       "taille": 2
+      },
+      {
+       "nom": "Brosse à dents enfant",
+       "taille": 1
+      },
+      {
+       "nom": "Dentifrice enfant",
+       "taille": 1
+      },
+      {
+       "nom": "Crème fixative pour appareil dentaire",
+       "taille": 2
+      },
+      {
+       "nom": "Pastilles nettoyantes pour appareil dentaire",
+       "taille": 2
+      },
+      {
+       "nom": "Brosse à dents électrique",
+       "taille": 3
+      },
+      {
+       "nom": "Chewing-gums sans sucre",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Cosmétiques et parfums",
+     "ordre": 4,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Maquillage",
+       "taille": 3
+      },
+      {
+       "nom": "Démaquillant",
+       "taille": 3
+      },
+      {
+       "nom": "Parfum",
+       "taille": 3
+      },
+      {
+       "nom": "Vernis à ongles",
+       "taille": 3
+      },
+      {
+       "nom": "Mascara",
+       "taille": 3
+      },
+      {
+       "nom": "Rouge à lèvres",
+       "taille": 3
+      },
+      {
+       "nom": "Fond de teint",
+       "taille": 3
+      },
+      {
+       "nom": "Crayon pour les yeux",
+       "taille": 3
+      },
+      {
+       "nom": "Dissolvant",
+       "taille": 3
+      },
+      {
+       "nom": "Eau micellaire",
+       "taille": 3
+      },
+      {
+       "nom": "Crème de jour",
+       "taille": 3
+      },
+      {
+       "nom": "Crème de nuit",
+       "taille": 3
+      },
+      {
+       "nom": "Masque visage",
+       "taille": 3
+      },
+      {
+       "nom": "Eau de toilette",
+       "taille": 3
+      },
+      {
+       "nom": "Lime à ongles",
+       "taille": 3
+      },
+      {
+       "nom": "Pince à épiler",
+       "taille": 3
+      },
+      {
+       "nom": "Disques démaquillants",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Hygiène",
+   "ordre": 23,
+   "secteurs": [
+    {
+     "nom": "Hygiène féminine",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Serviettes hygiéniques",
+       "taille": 1
+      },
+      {
+       "nom": "Tampons",
+       "taille": 1
+      },
+      {
+       "nom": "Protège-slips",
+       "taille": 2
+      },
+      {
+       "nom": "Serviettes de nuit",
+       "taille": 1
+      },
+      {
+       "nom": "Coupe menstruelle",
+       "taille": 2
+      },
+      {
+       "nom": "Culotte menstruelle",
+       "taille": 3
+      },
+      {
+       "nom": "Gel toilette intime",
+       "taille": 2
+      },
+      {
+       "nom": "Lingettes intimes",
+       "taille": 2
+      },
+      {
+       "nom": "Protections pour incontinence",
+       "taille": 2
+      },
+      {
+       "nom": "Test de grossesse",
+       "taille": 2
+      },
+      {
+       "nom": "Préservatifs",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Rasage",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Rasoirs",
+       "taille": 1
+      },
+      {
+       "nom": "Mousse à raser",
+       "taille": 2
+      },
+      {
+       "nom": "Lames de rasoir",
+       "taille": 3
+      },
+      {
+       "nom": "Gel à raser",
+       "taille": 1
+      },
+      {
+       "nom": "Après-rasage",
+       "taille": 2
+      },
+      {
+       "nom": "Rasoirs jetables",
+       "taille": 1
+      },
+      {
+       "nom": "Rasoirs femme",
+       "taille": 2
+      },
+      {
+       "nom": "Crème dépilatoire",
+       "taille": 2
+      },
+      {
+       "nom": "Bandes de cire",
+       "taille": 2
+      },
+      {
+       "nom": "Blaireau",
+       "taille": 3
+      },
+      {
+       "nom": "Tondeuse à barbe",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Parapharmacie",
+   "ordre": 24,
+   "secteurs": [
+    {
+     "nom": "Soins et premiers secours",
+     "ordre": 1,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Pansements",
+       "taille": 3
+      },
+      {
+       "nom": "Sérum physiologique",
+       "taille": 3
+      },
+      {
+       "nom": "Désinfectant cutané",
+       "taille": 3
+      },
+      {
+       "nom": "Thermomètre",
+       "taille": 3
+      },
+      {
+       "nom": "Compresses",
+       "taille": 3
+      },
+      {
+       "nom": "Bande Velpeau",
+       "taille": 3
+      },
+      {
+       "nom": "Sparadrap",
+       "taille": 3
+      },
+      {
+       "nom": "Spray nasal",
+       "taille": 3
+      },
+      {
+       "nom": "Antiseptique en spray",
+       "taille": 3
+      },
+      {
+       "nom": "Pansements ampoules",
+       "taille": 3
+      },
+      {
+       "nom": "Alcool à 70°",
+       "taille": 3
+      },
+      {
+       "nom": "Eau oxygénée",
+       "taille": 3
+      },
+      {
+       "nom": "Tensiomètre",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Solaires et soins spécifiques",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Crème solaire",
+       "taille": 3
+      },
+      {
+       "nom": "Crème mains",
+       "taille": 3
+      },
+      {
+       "nom": "Baume à lèvres",
+       "taille": 3
+      },
+      {
+       "nom": "Crème solaire enfant",
+       "taille": 3
+      },
+      {
+       "nom": "Après-soleil",
+       "taille": 3
+      },
+      {
+       "nom": "Huile solaire",
+       "taille": 3
+      },
+      {
+       "nom": "Autobronzant",
+       "taille": 3
+      },
+      {
+       "nom": "Anti-moustiques",
+       "taille": 3
+      },
+      {
+       "nom": "Crème anti-âge",
+       "taille": 3
+      },
+      {
+       "nom": "Crème pieds secs",
+       "taille": 3
+      },
+      {
+       "nom": "Stick lèvres solaire",
+       "taille": 3
+      },
+      {
+       "nom": "Huiles essentielles",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Entretien / Droguerie",
+   "ordre": 25,
+   "secteurs": [
+    {
+     "nom": "Lessives et soin du linge",
+     "ordre": 1,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Lessive liquide",
+       "taille": 1
+      },
+      {
+       "nom": "Lessive en poudre",
+       "taille": 2
+      },
+      {
+       "nom": "Lessive en capsules",
+       "taille": 2
+      },
+      {
+       "nom": "Adoucissant",
+       "taille": 1
+      },
+      {
+       "nom": "Détachant",
+       "taille": 2
+      },
+      {
+       "nom": "Blanchissant",
+       "taille": 3
+      },
+      {
+       "nom": "Lessive linge délicat",
+       "taille": 1
+      },
+      {
+       "nom": "Lessive noire",
+       "taille": 2
+      },
+      {
+       "nom": "Désinfectant linge",
+       "taille": 2
+      },
+      {
+       "nom": "Parfum de linge",
+       "taille": 2
+      },
+      {
+       "nom": "Spray repassage",
+       "taille": 2
+      },
+      {
+       "nom": "Eau déminéralisée",
+       "taille": 1
+      },
+      {
+       "nom": "Lingettes anti-décoloration",
+       "taille": 2
+      },
+      {
+       "nom": "Nettoyant lave-linge",
+       "taille": 2
+      },
+      {
+       "nom": "Teinture textile",
+       "taille": 3
+      },
+      {
+       "nom": "Savon de Marseille",
+       "taille": 1
+      },
+      {
+       "nom": "Pinces à linge",
+       "taille": 1
+      }
+     ]
+    },
+    {
+     "nom": "Produits Vaisselle",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Liquide vaisselle",
+       "taille": 1
+      },
+      {
+       "nom": "Tablettes lave-vaisselle",
+       "taille": 1
+      },
+      {
+       "nom": "Sel régénérant",
+       "taille": 2
+      },
+      {
+       "nom": "Liquide de rinçage",
+       "taille": 2
+      },
+      {
+       "nom": "Éponges",
+       "taille": 1
+      },
+      {
+       "nom": "Liquide vaisselle main",
+       "taille": 1
+      },
+      {
+       "nom": "Nettoyant lave-vaisselle",
+       "taille": 2
+      },
+      {
+       "nom": "Lave-vaisselle tout-en-un en gel",
+       "taille": 2
+      },
+      {
+       "nom": "Grattoirs",
+       "taille": 1
+      },
+      {
+       "nom": "Brosse vaisselle",
+       "taille": 1
+      },
+      {
+       "nom": "Éponges métalliques",
+       "taille": 1
+      },
+      {
+       "nom": "Lavettes microfibre",
+       "taille": 1
+      },
+      {
+       "nom": "Pastilles désodorisantes lave-vaisselle",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Nettoyants ménagers",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Nettoyant multi-usages",
+       "taille": 1
+      },
+      {
+       "nom": "Nettoyant sol",
+       "taille": 1
+      },
+      {
+       "nom": "Nettoyant vitres",
+       "taille": 2
+      },
+      {
+       "nom": "Détartrant",
+       "taille": 2
+      },
+      {
+       "nom": "Désinfectant",
+       "taille": 2
+      },
+      {
+       "nom": "Javel",
+       "taille": 1
+      },
+      {
+       "nom": "Nettoyant WC",
+       "taille": 1
+      },
+      {
+       "nom": "Lingettes nettoyantes",
+       "taille": 1
+      },
+      {
+       "nom": "Dégraissant cuisine",
+       "taille": 1
+      },
+      {
+       "nom": "Vinaigre blanc",
+       "taille": 1
+      },
+      {
+       "nom": "Bicarbonate de soude",
+       "taille": 1
+      },
+      {
+       "nom": "Cristaux de soude",
+       "taille": 2
+      },
+      {
+       "nom": "Savon noir",
+       "taille": 2
+      },
+      {
+       "nom": "Déboucheur canalisations",
+       "taille": 1
+      },
+      {
+       "nom": "Blocs WC",
+       "taille": 1
+      },
+      {
+       "nom": "Désodorisant",
+       "taille": 1
+      },
+      {
+       "nom": "Insecticide",
+       "taille": 1
+      },
+      {
+       "nom": "Nettoyant four",
+       "taille": 2
+      },
+      {
+       "nom": "Nettoyant inox",
+       "taille": 2
+      },
+      {
+       "nom": "Acide citrique",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Accessoires de ménage",
+     "ordre": 4,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Serpillière",
+       "taille": 2
+      },
+      {
+       "nom": "Balai",
+       "taille": 3
+      },
+      {
+       "nom": "Seau",
+       "taille": 3
+      },
+      {
+       "nom": "Gants de ménage",
+       "taille": 2
+      },
+      {
+       "nom": "Balai-brosse",
+       "taille": 2
+      },
+      {
+       "nom": "Pelle et balayette",
+       "taille": 1
+      },
+      {
+       "nom": "Balai à franges",
+       "taille": 2
+      },
+      {
+       "nom": "Chiffons microfibre",
+       "taille": 1
+      },
+      {
+       "nom": "Plumeau",
+       "taille": 2
+      },
+      {
+       "nom": "Brosse WC",
+       "taille": 1
+      },
+      {
+       "nom": "Lingettes sol",
+       "taille": 1
+      },
+      {
+       "nom": "Bassine",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs aspirateur",
+       "taille": 2
+      },
+      {
+       "nom": "Seau avec essoreur",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Salle de bain et cirage",
+     "ordre": 5,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Nettoyant salle de bain",
+       "taille": 2
+      },
+      {
+       "nom": "Anticalcaire",
+       "taille": 2
+      },
+      {
+       "nom": "Cirage",
+       "taille": 3
+      },
+      {
+       "nom": "Nettoyant douche",
+       "taille": 2
+      },
+      {
+       "nom": "Anti-moisissures",
+       "taille": 2
+      },
+      {
+       "nom": "Brosse à chaussures",
+       "taille": 2
+      },
+      {
+       "nom": "Imperméabilisant chaussures",
+       "taille": 2
+      },
+      {
+       "nom": "Lacets",
+       "taille": 2
+      },
+      {
+       "nom": "Semelles",
+       "taille": 2
+      },
+      {
+       "nom": "Rideau de douche",
+       "taille": 3
+      },
+      {
+       "nom": "Tapis de bain",
+       "taille": 3
+      },
+      {
+       "nom": "Ventouses",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Papier",
+     "ordre": 6,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Papier toilette",
+       "taille": 1
+      },
+      {
+       "nom": "Essuie-tout",
+       "taille": 1
+      },
+      {
+       "nom": "Mouchoirs",
+       "taille": 1
+      },
+      {
+       "nom": "Serviettes en papier",
+       "taille": 2
+      },
+      {
+       "nom": "Papier toilette humide",
+       "taille": 1
+      },
+      {
+       "nom": "Mouchoirs en boîte",
+       "taille": 1
+      },
+      {
+       "nom": "Paquets de mouchoirs",
+       "taille": 1
+      },
+      {
+       "nom": "Essuie-mains en papier",
+       "taille": 2
+      },
+      {
+       "nom": "Nappe en papier",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Emballages et Aluminium etc",
+     "ordre": 7,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Sacs poubelle",
+       "taille": 1
+      },
+      {
+       "nom": "Papier aluminium",
+       "taille": 1
+      },
+      {
+       "nom": "Papier cuisson",
+       "taille": 2
+      },
+      {
+       "nom": "Film étirable",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs congélation",
+       "taille": 2
+      },
+      {
+       "nom": "Boîtes alimentaires",
+       "taille": 2
+      },
+      {
+       "nom": "Barquettes aluminium",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs de congélation zip",
+       "taille": 1
+      },
+      {
+       "nom": "Film micro-ondes",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs isothermes",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs de conservation",
+       "taille": 1
+      },
+      {
+       "nom": "Pochettes sandwich",
+       "taille": 2
+      },
+      {
+       "nom": "Liens pour sacs",
+       "taille": 2
+      },
+      {
+       "nom": "Sacs compostables",
+       "taille": 2
+      },
+      {
+       "nom": "Pots en verre",
+       "taille": 2
+      },
+      {
+       "nom": "Moules en papier",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Cuisine et arts de la table",
+   "ordre": 26,
+   "secteurs": [
+    {
+     "nom": "Arts de la table et cuisine",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Ustensiles de cuisine",
+       "taille": 3
+      },
+      {
+       "nom": "Poêle",
+       "taille": 3
+      },
+      {
+       "nom": "Casserole",
+       "taille": 3
+      },
+      {
+       "nom": "Couteaux",
+       "taille": 2
+      },
+      {
+       "nom": "Planche à découper",
+       "taille": 2
+      },
+      {
+       "nom": "Fouet",
+       "taille": 2
+      },
+      {
+       "nom": "Spatule",
+       "taille": 2
+      },
+      {
+       "nom": "Louche",
+       "taille": 2
+      },
+      {
+       "nom": "Économe",
+       "taille": 2
+      },
+      {
+       "nom": "Ouvre-boîte",
+       "taille": 2
+      },
+      {
+       "nom": "Plat à four",
+       "taille": 2
+      },
+      {
+       "nom": "Faitout",
+       "taille": 2
+      },
+      {
+       "nom": "Saladier",
+       "taille": 2
+      },
+      {
+       "nom": "Passoire",
+       "taille": 2
+      },
+      {
+       "nom": "Râpe",
+       "taille": 2
+      },
+      {
+       "nom": "Tire-bouchon",
+       "taille": 2
+      },
+      {
+       "nom": "Moule à gâteau",
+       "taille": 2
+      },
+      {
+       "nom": "Couverts",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Vaisselle jetable",
+     "ordre": 2,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Assiettes en carton",
+       "taille": 2
+      },
+      {
+       "nom": "Gobelets",
+       "taille": 2
+      },
+      {
+       "nom": "Couverts jetables",
+       "taille": 2
+      },
+      {
+       "nom": "Gobelets en carton",
+       "taille": 2
+      },
+      {
+       "nom": "Pailles",
+       "taille": 2
+      },
+      {
+       "nom": "Nappe jetable",
+       "taille": 2
+      },
+      {
+       "nom": "Verres en plastique",
+       "taille": 2
+      },
+      {
+       "nom": "Bols jetables",
+       "taille": 2
+      },
+      {
+       "nom": "Piques apéritif",
+       "taille": 2
+      },
+      {
+       "nom": "Plateaux en carton",
+       "taille": 3
+      },
+      {
+       "nom": "Bougies d'anniversaire",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Vaisselle",
+     "ordre": 3,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Assiette",
+       "taille": 1
+      },
+      {
+       "nom": "Verres",
+       "taille": 1
+      },
+      {
+       "nom": "Bols",
+       "taille": 1
+      },
+      {
+       "nom": "Tasses",
+       "taille": 2
+      },
+      {
+       "nom": "Mugs",
+       "taille": 2
+      },
+      {
+       "nom": "Assiettes creuses",
+       "taille": 2
+      },
+      {
+       "nom": "Assiettes à dessert",
+       "taille": 2
+      },
+      {
+       "nom": "Verres à vin",
+       "taille": 2
+      },
+      {
+       "nom": "Carafe",
+       "taille": 2
+      },
+      {
+       "nom": "Plat de service",
+       "taille": 3
+      },
+      {
+       "nom": "Coquetiers",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Bricolage, auto et jardin",
+   "ordre": 27,
+   "secteurs": [
+    {
+     "nom": "Bricolage et quincaillerie",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Piles",
+       "taille": 2
+      },
+      {
+       "nom": "Ampoules",
+       "taille": 2
+      },
+      {
+       "nom": "Colle",
+       "taille": 2
+      },
+      {
+       "nom": "Multiprise",
+       "taille": 3
+      },
+      {
+       "nom": "Petits outils",
+       "taille": 3
+      },
+      {
+       "nom": "Piles bouton",
+       "taille": 2
+      },
+      {
+       "nom": "Ampoules LED",
+       "taille": 2
+      },
+      {
+       "nom": "Rallonge électrique",
+       "taille": 2
+      },
+      {
+       "nom": "Ruban adhésif d'emballage",
+       "taille": 2
+      },
+      {
+       "nom": "Scotch double face",
+       "taille": 2
+      },
+      {
+       "nom": "Clous",
+       "taille": 2
+      },
+      {
+       "nom": "Vis",
+       "taille": 2
+      },
+      {
+       "nom": "Chevilles",
+       "taille": 2
+      },
+      {
+       "nom": "Crochets adhésifs",
+       "taille": 2
+      },
+      {
+       "nom": "Lampe de poche",
+       "taille": 2
+      },
+      {
+       "nom": "Tournevis",
+       "taille": 2
+      },
+      {
+       "nom": "Mètre ruban",
+       "taille": 2
+      },
+      {
+       "nom": "Allume-feu",
+       "taille": 2
+      },
+      {
+       "nom": "Allumettes",
+       "taille": 2
+      },
+      {
+       "nom": "Briquet",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Jardinage et extérieur",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Terreau",
+       "taille": 3
+      },
+      {
+       "nom": "Engrais",
+       "taille": 3
+      },
+      {
+       "nom": "Petits outils de jardin",
+       "taille": 3
+      },
+      {
+       "nom": "Plants",
+       "taille": 3
+      },
+      {
+       "nom": "Graines de légumes",
+       "taille": 3
+      },
+      {
+       "nom": "Graines de fleurs",
+       "taille": 3
+      },
+      {
+       "nom": "Bulbes",
+       "taille": 3
+      },
+      {
+       "nom": "Gants de jardin",
+       "taille": 3
+      },
+      {
+       "nom": "Tuyau d'arrosage",
+       "taille": 3
+      },
+      {
+       "nom": "Arrosoir",
+       "taille": 3
+      },
+      {
+       "nom": "Pots de fleurs",
+       "taille": 3
+      },
+      {
+       "nom": "Charbon de bois",
+       "taille": 3
+      },
+      {
+       "nom": "Désherbant",
+       "taille": 3
+      },
+      {
+       "nom": "Anti-limaces",
+       "taille": 3
+      },
+      {
+       "nom": "Pierres à barbecue",
+       "taille": 3
+      },
+      {
+       "nom": "Sécateur",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Accessoires automobiles",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Liquide lave-glace",
+       "taille": 3
+      },
+      {
+       "nom": "Huile moteur",
+       "taille": 3
+      },
+      {
+       "nom": "Ampoules auto",
+       "taille": 3
+      },
+      {
+       "nom": "Liquide de refroidissement",
+       "taille": 3
+      },
+      {
+       "nom": "Liquide de frein",
+       "taille": 3
+      },
+      {
+       "nom": "Lingettes voiture",
+       "taille": 3
+      },
+      {
+       "nom": "Shampooing auto",
+       "taille": 3
+      },
+      {
+       "nom": "Désodorisant voiture",
+       "taille": 3
+      },
+      {
+       "nom": "Grattoir à givre",
+       "taille": 3
+      },
+      {
+       "nom": "Raclette pare-brise",
+       "taille": 3
+      },
+      {
+       "nom": "Balais d'essuie-glace",
+       "taille": 3
+      },
+      {
+       "nom": "Nettoyant jantes",
+       "taille": 3
+      },
+      {
+       "nom": "Câbles de démarrage",
+       "taille": 3
+      },
+      {
+       "nom": "Dégivrant",
+       "taille": 3
+      },
+      {
+       "nom": "Gilet jaune",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Loisirs",
+   "ordre": 28,
+   "secteurs": [
+    {
+     "nom": "Papeterie et librairie",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Cahiers",
+       "taille": 2
+      },
+      {
+       "nom": "Stylos",
+       "taille": 2
+      },
+      {
+       "nom": "Ruban adhésif",
+       "taille": 2
+      },
+      {
+       "nom": "Livres",
+       "taille": 3
+      },
+      {
+       "nom": "Magazines",
+       "taille": 3
+      },
+      {
+       "nom": "Crayons de couleur",
+       "taille": 2
+      },
+      {
+       "nom": "Crayons à papier",
+       "taille": 2
+      },
+      {
+       "nom": "Feutres",
+       "taille": 2
+      },
+      {
+       "nom": "Gomme",
+       "taille": 2
+      },
+      {
+       "nom": "Taille-crayon",
+       "taille": 2
+      },
+      {
+       "nom": "Ramettes de papier",
+       "taille": 2
+      },
+      {
+       "nom": "Enveloppes",
+       "taille": 2
+      },
+      {
+       "nom": "Timbres",
+       "taille": 2
+      },
+      {
+       "nom": "Post-it",
+       "taille": 2
+      },
+      {
+       "nom": "Classeurs",
+       "taille": 2
+      },
+      {
+       "nom": "Bâton de colle",
+       "taille": 2
+      },
+      {
+       "nom": "Ciseaux",
+       "taille": 2
+      },
+      {
+       "nom": "Règle",
+       "taille": 2
+      },
+      {
+       "nom": "Surligneurs",
+       "taille": 2
+      },
+      {
+       "nom": "Agenda",
+       "taille": 2
+      },
+      {
+       "nom": "Cartes d'anniversaire",
+       "taille": 2
+      },
+      {
+       "nom": "Papier cadeau",
+       "taille": 2
+      },
+      {
+       "nom": "Journaux",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Jouets",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Jeux de société",
+       "taille": 3
+      },
+      {
+       "nom": "Jouets enfants",
+       "taille": 3
+      },
+      {
+       "nom": "Puzzle",
+       "taille": 3
+      },
+      {
+       "nom": "Jeux de cartes",
+       "taille": 3
+      },
+      {
+       "nom": "Peluches",
+       "taille": 3
+      },
+      {
+       "nom": "Poupées",
+       "taille": 3
+      },
+      {
+       "nom": "Petites voitures",
+       "taille": 3
+      },
+      {
+       "nom": "Jeux de construction",
+       "taille": 3
+      },
+      {
+       "nom": "Pâte à modeler",
+       "taille": 3
+      },
+      {
+       "nom": "Ballons",
+       "taille": 3
+      },
+      {
+       "nom": "Jouets de plage",
+       "taille": 3
+      },
+      {
+       "nom": "Loisirs créatifs",
+       "taille": 3
+      },
+      {
+       "nom": "Bulles de savon",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Bagagerie",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Valises",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs de voyage",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs à dos",
+       "taille": 3
+      },
+      {
+       "nom": "Cartables",
+       "taille": 3
+      },
+      {
+       "nom": "Trousses",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs de sport",
+       "taille": 3
+      },
+      {
+       "nom": "Étiquettes à bagages",
+       "taille": 3
+      },
+      {
+       "nom": "Cadenas de valise",
+       "taille": 3
+      },
+      {
+       "nom": "Trousse de toilette",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs de courses réutilisables",
+       "taille": 3
+      },
+      {
+       "nom": "Sac isotherme",
+       "taille": 3
+      },
+      {
+       "nom": "Coussin de voyage",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Électroménager et décoration",
+   "ordre": 29,
+   "secteurs": [
+    {
+     "nom": "Petit électroménager",
+     "ordre": 1,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Bouilloire",
+       "taille": 3
+      },
+      {
+       "nom": "Grille-pain",
+       "taille": 3
+      },
+      {
+       "nom": "Cafetière",
+       "taille": 3
+      },
+      {
+       "nom": "Mixeur",
+       "taille": 3
+      },
+      {
+       "nom": "Robot pâtissier",
+       "taille": 3
+      },
+      {
+       "nom": "Fer à repasser",
+       "taille": 3
+      },
+      {
+       "nom": "Sèche-cheveux",
+       "taille": 3
+      },
+      {
+       "nom": "Aspirateur",
+       "taille": 3
+      },
+      {
+       "nom": "Micro-ondes",
+       "taille": 3
+      },
+      {
+       "nom": "Blender",
+       "taille": 3
+      },
+      {
+       "nom": "Machine à café à dosettes",
+       "taille": 3
+      },
+      {
+       "nom": "Presse-agrumes",
+       "taille": 3
+      },
+      {
+       "nom": "Gaufrier",
+       "taille": 3
+      },
+      {
+       "nom": "Appareil à raclette",
+       "taille": 3
+      },
+      {
+       "nom": "Friteuse sans huile",
+       "taille": 3
+      },
+      {
+       "nom": "Batteur",
+       "taille": 3
+      },
+      {
+       "nom": "Ventilateur",
+       "taille": 3
+      },
+      {
+       "nom": "Radiateur d'appoint",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Décoration",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Bougies",
+       "taille": 3
+      },
+      {
+       "nom": "Cadres",
+       "taille": 3
+      },
+      {
+       "nom": "Boîtes de rangement",
+       "taille": 3
+      },
+      {
+       "nom": "Bougies parfumées",
+       "taille": 3
+      },
+      {
+       "nom": "Photophores",
+       "taille": 3
+      },
+      {
+       "nom": "Vases",
+       "taille": 3
+      },
+      {
+       "nom": "Coussins",
+       "taille": 3
+      },
+      {
+       "nom": "Plaids",
+       "taille": 3
+      },
+      {
+       "nom": "Miroirs",
+       "taille": 3
+      },
+      {
+       "nom": "Guirlandes lumineuses",
+       "taille": 3
+      },
+      {
+       "nom": "Fleurs artificielles",
+       "taille": 3
+      },
+      {
+       "nom": "Diffuseur de parfum",
+       "taille": 3
+      },
+      {
+       "nom": "Paniers de rangement",
+       "taille": 3
+      },
+      {
+       "nom": "Horloge",
+       "taille": 3
+      },
+      {
+       "nom": "Cintres",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Textile",
+   "ordre": 30,
+   "secteurs": [
+    {
+     "nom": "Vêtements et chaussures",
+     "ordre": 1,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Chaussettes",
+       "taille": 3
+      },
+      {
+       "nom": "T-shirts",
+       "taille": 3
+      },
+      {
+       "nom": "Chaussons",
+       "taille": 3
+      },
+      {
+       "nom": "Pyjamas",
+       "taille": 3
+      },
+      {
+       "nom": "Pulls",
+       "taille": 3
+      },
+      {
+       "nom": "Jeans",
+       "taille": 3
+      },
+      {
+       "nom": "Pantalons",
+       "taille": 3
+      },
+      {
+       "nom": "Sweats",
+       "taille": 3
+      },
+      {
+       "nom": "Leggings",
+       "taille": 3
+      },
+      {
+       "nom": "Baskets",
+       "taille": 3
+      },
+      {
+       "nom": "Tongs",
+       "taille": 3
+      },
+      {
+       "nom": "Bottes de pluie",
+       "taille": 3
+      },
+      {
+       "nom": "Gants",
+       "taille": 3
+      },
+      {
+       "nom": "Bonnets",
+       "taille": 3
+      },
+      {
+       "nom": "Écharpes",
+       "taille": 3
+      },
+      {
+       "nom": "Maillots de bain",
+       "taille": 3
+      },
+      {
+       "nom": "Vêtements bébé",
+       "taille": 3
+      },
+      {
+       "nom": "Chaussures enfant",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Lingerie",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Sous-vêtements",
+       "taille": 3
+      },
+      {
+       "nom": "Collants",
+       "taille": 3
+      },
+      {
+       "nom": "Culottes",
+       "taille": 3
+      },
+      {
+       "nom": "Soutiens-gorge",
+       "taille": 3
+      },
+      {
+       "nom": "Boxers",
+       "taille": 3
+      },
+      {
+       "nom": "Slips",
+       "taille": 3
+      },
+      {
+       "nom": "Caleçons",
+       "taille": 3
+      },
+      {
+       "nom": "Débardeurs",
+       "taille": 3
+      },
+      {
+       "nom": "Chemises de nuit",
+       "taille": 3
+      },
+      {
+       "nom": "Bas",
+       "taille": 3
+      },
+      {
+       "nom": "Mi-bas",
+       "taille": 3
+      },
+      {
+       "nom": "Chaussettes de sport",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Linge de maison",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Torchons",
+       "taille": 3
+      },
+      {
+       "nom": "Serviettes de bain",
+       "taille": 3
+      },
+      {
+       "nom": "Parure de lit",
+       "taille": 3
+      },
+      {
+       "nom": "Rideaux",
+       "taille": 3
+      },
+      {
+       "nom": "Draps housse",
+       "taille": 3
+      },
+      {
+       "nom": "Housses de couette",
+       "taille": 3
+      },
+      {
+       "nom": "Taies d'oreiller",
+       "taille": 3
+      },
+      {
+       "nom": "Oreillers",
+       "taille": 3
+      },
+      {
+       "nom": "Couettes",
+       "taille": 3
+      },
+      {
+       "nom": "Protège-matelas",
+       "taille": 3
+      },
+      {
+       "nom": "Serviettes de toilette",
+       "taille": 3
+      },
+      {
+       "nom": "Draps de plage",
+       "taille": 3
+      },
+      {
+       "nom": "Nappe",
+       "taille": 3
+      },
+      {
+       "nom": "Sets de table",
+       "taille": 3
+      },
+      {
+       "nom": "Tabliers de cuisine",
+       "taille": 3
+      },
+      {
+       "nom": "Peignoirs",
+       "taille": 3
+      },
+      {
+       "nom": "Plaid polaire",
+       "taille": 3
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "nom": "Animaux",
+   "ordre": 31,
+   "secteurs": [
+    {
+     "nom": "Chiens",
+     "ordre": 1,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Croquettes pour chien",
+       "taille": 2
+      },
+      {
+       "nom": "Pâtée pour chien",
+       "taille": 2
+      },
+      {
+       "nom": "Friandises pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Croquettes pour chiot",
+       "taille": 2
+      },
+      {
+       "nom": "Os à mâcher",
+       "taille": 2
+      },
+      {
+       "nom": "Jouets pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs à crottes",
+       "taille": 2
+      },
+      {
+       "nom": "Laisse",
+       "taille": 3
+      },
+      {
+       "nom": "Collier pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Gamelle",
+       "taille": 3
+      },
+      {
+       "nom": "Shampooing pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Antiparasitaire pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Panier pour chien",
+       "taille": 3
+      },
+      {
+       "nom": "Bâtonnets dentaires pour chien",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Chats",
+     "ordre": 2,
+     "taille": 1,
+     "produits": [
+      {
+       "nom": "Croquettes pour chat",
+       "taille": 1
+      },
+      {
+       "nom": "Pâtée pour chat",
+       "taille": 1
+      },
+      {
+       "nom": "Litière",
+       "taille": 1
+      },
+      {
+       "nom": "Friandises pour chat",
+       "taille": 1
+      },
+      {
+       "nom": "Croquettes pour chaton",
+       "taille": 2
+      },
+      {
+       "nom": "Croquettes pour chat stérilisé",
+       "taille": 1
+      },
+      {
+       "nom": "Sachets fraîcheur pour chat",
+       "taille": 1
+      },
+      {
+       "nom": "Lait pour chat",
+       "taille": 2
+      },
+      {
+       "nom": "Litière végétale",
+       "taille": 2
+      },
+      {
+       "nom": "Litière silice",
+       "taille": 2
+      },
+      {
+       "nom": "Bac à litière",
+       "taille": 3
+      },
+      {
+       "nom": "Griffoir",
+       "taille": 3
+      },
+      {
+       "nom": "Jouets pour chat",
+       "taille": 3
+      },
+      {
+       "nom": "Antiparasitaire pour chat",
+       "taille": 3
+      },
+      {
+       "nom": "Herbe à chat",
+       "taille": 2
+      }
+     ]
+    },
+    {
+     "nom": "Autres animaux",
+     "ordre": 3,
+     "taille": 2,
+     "produits": [
+      {
+       "nom": "Graines pour oiseaux",
+       "taille": 2
+      },
+      {
+       "nom": "Nourriture pour rongeurs",
+       "taille": 2
+      },
+      {
+       "nom": "Nourriture pour poissons",
+       "taille": 2
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

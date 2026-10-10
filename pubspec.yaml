@@ -24,6 +24,7 @@ flutter:
   assets:
     - assets/icone_ronde.png
     - assets/donnees_maquette.json
+    - assets/catalogue_type.json
     - assets/catalogue/
   fonts:
     - family: Atkinson
