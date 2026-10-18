@@ -197,8 +197,12 @@ jobs:
           VERSION=$(grep '^version=' publication/version.txt | cut -d= -f2)
           gh release delete derniere-version --yes --cleanup-tag 2>/dev/null || true
           git push -q origin :refs/tags/derniere-version 2>/dev/null || true
+          set +e
           gh release create derniere-version publication/* \
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "Dernière version — $VERSION (${GITHUB_SHA::7})" \
-            --notes "Fichiers récupérés automatiquement par « Mettre a jour.bat ». Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')."
+            --notes "Fichiers récupérés automatiquement par « Mettre a jour.bat ». Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')." 2> erreur.txt
+          code=$?
+          if [ $code -ne 0 ]; then echo "::error title=Publication::$(sed ':a;N;$!ba;s/\n/ | /g' erreur.txt)"; fi
+          exit $code
