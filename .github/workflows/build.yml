@@ -94,10 +94,14 @@ jobs:
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
+      - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
+        run: |
+          flutter build apk --release --target-platform android-x64
+          mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
       - uses: actions/upload-artifact@v4
         with:
           name: Liste de courses Android
-          path: build/Liste de courses.apk
+          path: build/Liste de courses*.apk
 
   windows:
     runs-on: windows-latest
@@ -178,8 +182,9 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           mkdir -p publication
           # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
-          gh release download derniere-version -p Liste-de-courses.apk -p Captures.zip -D publication 2>/dev/null || true
+          gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Captures.zip -D publication 2>/dev/null || true
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
           (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
