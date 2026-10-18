@@ -13,6 +13,7 @@ jobs:
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - uses: actions/checkout@v4
       - name: Télécharger l'APK publié
         run: curl -fsSL -o app.apk https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk
       - uses: reactivecircus/android-emulator-runner@v2
@@ -21,18 +22,7 @@ jobs:
           arch: x86_64
           target: default
           disable-animations: true
-          script: |
-            adb install -r app.apk
-            adb logcat -c
-            adb shell monkey -p fr.listecourses.liste_de_courses -c android.intent.category.LAUNCHER 1
-            sleep 45
-            adb exec-out screencap -p > capture.png
-            adb shell uiautomator dump /sdcard/ecran.xml && adb pull /sdcard/ecran.xml ecran.xml || true
-            echo "::warning title=Textes affichés::$(grep -oE '(text|content-desc)=\"[^\"]+\"' ecran.xml | cut -d'\"' -f2 | head -n 60 | sed ':a;N;$!ba;s/\n/ | /g')"
-            adb logcat -d > logcat.txt || true
-            pid=$(adb shell pidof fr.listecourses.liste_de_courses || true); echo "pid=$pid"
-            sed -n '/Calling main entry com.android.commands.monkey/,$p' logcat.txt | grep -vE "SQLiteDatabase|MediaScanner|dex2oat|chatty|Monkey  :" | grep -iE "flutter|AndroidRuntime|libc|DEBUG|crash|died|liste_de_courses|Exception|Error|ANR" | cut -c1-220 | head -n 45 > extrait.txt || true
-            echo "::warning title=Essai Android (pid=$pid)::$(sed 's/%/%25/g' extrait.txt | sed ':a;N;$!ba;s/\n/%0A/g')"
+          script: bash outils/essai_android.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
