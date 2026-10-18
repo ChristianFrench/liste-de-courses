@@ -1,0 +1,38 @@
+# Essai de l'APK publié sur un émulateur Android (comme LDPlayer : x86_64, Android 9).
+# Lancé à la main depuis GitHub Actions ; donne une capture et le journal du démarrage.
+name: Essai Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  essai:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Activer la virtualisation
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules && sudo udevadm trigger --name-match=kvm
+      - name: Télécharger l'APK publié
+        run: curl -fsSL -o app.apk https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 28
+          arch: x86_64
+          target: default
+          disable-animations: true
+          script: |
+            adb install -r app.apk
+            adb logcat -c
+            adb shell monkey -p fr.listecourses.liste_de_courses -c android.intent.category.LAUNCHER 1
+            sleep 45
+            adb exec-out screencap -p > capture.png
+            adb logcat -d > logcat.txt || true
+            grep -iE "flutter|liste_de_courses|AndroidRuntime|FATAL|sqlite" logcat.txt | tail -n 200 || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Essai Android
+          path: |
+            capture.png
+            logcat.txt
