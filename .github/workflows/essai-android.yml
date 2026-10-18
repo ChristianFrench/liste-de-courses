@@ -27,6 +27,8 @@ jobs:
             adb shell monkey -p fr.listecourses.liste_de_courses -c android.intent.category.LAUNCHER 1
             sleep 45
             adb exec-out screencap -p > capture.png
+            adb shell uiautomator dump /sdcard/ecran.xml && adb pull /sdcard/ecran.xml ecran.xml || true
+            echo "::warning title=Textes affichés::$(grep -oE '(text|content-desc)=\"[^\"]+\"' ecran.xml | cut -d'\"' -f2 | head -n 60 | sed ':a;N;$!ba;s/\n/ | /g')"
             adb logcat -d > logcat.txt || true
             pid=$(adb shell pidof fr.listecourses.liste_de_courses || true); echo "pid=$pid"
             sed -n '/Calling main entry com.android.commands.monkey/,$p' logcat.txt | grep -vE "SQLiteDatabase|MediaScanner|dex2oat|chatty|Monkey  :" | grep -iE "flutter|AndroidRuntime|libc|DEBUG|crash|died|liste_de_courses|Exception|Error|ANR" | cut -c1-220 | head -n 45 > extrait.txt || true
