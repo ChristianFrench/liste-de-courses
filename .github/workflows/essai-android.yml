@@ -29,10 +29,8 @@ jobs:
             adb exec-out screencap -p > capture.png
             adb logcat -d > logcat.txt || true
             pid=$(adb shell pidof fr.listecourses.liste_de_courses || true); echo "pid=$pid"
-            grep -iE "flutter|liste_de_courses|AndroidRuntime|FATAL|sqlite|dlopen|UnsatisfiedLink" logcat.txt | tail -n 60 > extrait.txt || true
-            if [ -n "$pid" ]; then grep " $pid " logcat.txt | tail -n 60 >> extrait.txt || true; fi
-            # Le journal est lisible par l'API GitHub sous forme d'annotation
-            echo "::warning title=Essai Android (pid=$pid)::$(head -c 60000 extrait.txt | sed 's/%/%25/g' | sed ':a;N;$!ba;s/\n/%0A/g')"
+            sed -n '/Calling main entry com.android.commands.monkey/,$p' logcat.txt | grep -vE "SQLiteDatabase|MediaScanner|dex2oat|chatty|Monkey  :" | grep -iE "flutter|AndroidRuntime|libc|DEBUG|crash|died|liste_de_courses|Exception|Error|ANR" | cut -c1-220 | head -n 45 > extrait.txt || true
+            echo "::warning title=Essai Android (pid=$pid)::$(sed 's/%/%25/g' extrait.txt | sed ':a;N;$!ba;s/\n/%0A/g')"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
