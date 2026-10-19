@@ -138,14 +138,15 @@ class Stockage {
     etat['foyer'] = {'id': foyerId, 'nom': foyer['nom'], 'dateCreation': (foyer['cree_le'] as String).substring(0, 10)};
     etat['membres'] = [
       for (final m in _db.select('SELECT * FROM membre WHERE foyer_id = ? ORDER BY rowid', [foyerId]))
-        {'id': m['id'], 'nomAffiche': m['nom_affiche'], 'role': m['role'], 'moi': m['id'] == moi}
+        {'id': m['id'], 'nomAffiche': m['nom_affiche'], 'role': m['role'], 'moi': m['id'] == moi, 'email': m['email'] ?? ''}
     ];
     final inv = _db.select('SELECT * FROM invitation WHERE foyer_id = ? ORDER BY rowid DESC LIMIT 1', [foyerId]);
     etat['invitation'] = inv.isEmpty
         ? {'code': '', 'expiration': etat['foyer']['dateCreation']}
         : {'code': inv.first['code'], 'expiration': inv.first['expire_le']};
     etat['parametres'] = {
-      'preliste': {'presencesMin': foyer['preliste_presences_min'], 'sur': foyer['preliste_sur']}
+      'preliste': {'presencesMin': foyer['preliste_presences_min'], 'sur': foyer['preliste_sur']},
+      if (reglage('options') != null) 'options': jsonDecode(reglage('options')!),
     };
     etat['typesPromotion'] = [
       for (final t in _db.select('SELECT * FROM type_promotion WHERE archive = 0 ORDER BY ordre_affichage, rowid'))
@@ -446,7 +447,13 @@ class Stockage {
       'cree_le': foyer['dateCreation'],
     });
     for (final m in liste('membres')) {
-      res['membre']!.add({'id': m['id'], 'foyer_id': foyerId, 'nom_affiche': m['nomAffiche'], 'role': m['role']});
+      res['membre']!.add({
+        'id': m['id'],
+        'foyer_id': foyerId,
+        'nom_affiche': m['nomAffiche'],
+        'email': (m['email'] as String? ?? '').isEmpty ? null : m['email'],
+        'role': m['role'],
+      });
     }
     final inv = etat['invitation'] as Map?;
     if (inv != null && (inv['code'] as String? ?? '').isNotEmpty) {
@@ -606,6 +613,8 @@ class Stockage {
       if (moi != null) {'cle': 'membre_courant', 'valeur': moi},
       {'cle': 'frequences_preliste', 'valeur': jsonEncode(etat['frequencesPreliste'] ?? {})},
       {'cle': 'corbeille', 'valeur': jsonEncode(etat['corbeille'] ?? [])},
+      if ((etat['parametres'] as Map?)?['options'] != null)
+        {'cle': 'options', 'valeur': jsonEncode((etat['parametres'] as Map)['options'])},
     ]);
     return res;
   }

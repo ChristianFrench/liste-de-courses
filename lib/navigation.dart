@@ -3,32 +3,38 @@ import 'package:flutter/services.dart';
 
 import 'theme.dart';
 
-/// Navigation de la maquette v0.2 (Ecrans.yaml, chapitre « navigation ») :
-/// 4 onglets, chacun avec ses sous-onglets mémorisés et sa propre pile d'écrans
-/// (sous-niveaux : fiche, réglage). Les écrans de travail s'ouvrent par-dessus,
-/// sans barre d'onglets.
+/// Navigation (agencement du 19 octobre 2026) : 3 onglets — Préparer, Courses, Gérer —
+/// chacun avec sa propre pile d'écrans. Gérer ouvre des rubriques (magasins, parcours,
+/// historique, paramètres, corbeille) dont certaines ont des sous-onglets mémorisés.
+/// Les écrans de travail s'ouvrent par-dessus, sans barre d'onglets.
 class Nav extends ChangeNotifier {
   Nav._();
   static final Nav i = Nav._();
 
-  static const int listes = 0;
-  static const int historique = 1;
-  static const int magasin = 2;
-  static const int parametres = 3;
+  // Onglets
+  static const int preparer = 0;
+  static const int courses = 1;
+  static const int gerer = 2;
+  static const int nbOnglets = 3;
 
-  // Sous-onglets
-  static const int preparer = 0, parcours = 1, courses = 2;
+  // Rubriques de Gérer
+  static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14;
+
+  // Sous-onglets des rubriques
   static const int coursesEffectuees = 0, tickets = 1;
   static const int rayons = 0, secteurs = 1, produits = 2;
 
   final racine = GlobalKey<NavigatorState>();
   final messager = GlobalKey<ScaffoldMessengerState>();
-  final piles = List.generate(4, (_) => GlobalKey<NavigatorState>());
+  final piles = List.generate(nbOnglets, (_) => GlobalKey<NavigatorState>());
 
-  int onglet = listes;
-  final sousOnglet = [preparer, coursesEffectuees, rayons, 0];
+  int onglet = preparer;
 
-  // État partagé de l'onglet Magasin
+  /// Rubrique de Gérer affichée (null : menu de Gérer).
+  int? rubrique;
+  final sousOnglet = <int, int>{historique: coursesEffectuees, magasin: rayons};
+
+  // État partagé de la rubrique Magasins
   String? magasinCourant;
   String? filtreRayonSecteurs; // null = Tous
   String? filtreRayonProduits;
@@ -40,12 +46,18 @@ class Nav extends ChangeNotifier {
   /// Mode « rattacher un ticket » (tickets → courses effectuées).
   String? ticketARattacher;
 
-  /// Liste prête choisie pour démarrer des courses (Listes › Courses).
+  /// Liste prête choisie pour démarrer des courses (onglet Courses).
   String? listeAPartir;
 
+  /// Ouvre une rubrique de Gérer ; le constructeur d'écran est fourni par la coquille.
+  static Widget Function(int rubrique)? ecranRubrique;
+
   void reinitialiser() {
-    onglet = listes;
-    sousOnglet.setAll(0, [preparer, coursesEffectuees, rayons, 0]);
+    onglet = preparer;
+    rubrique = null;
+    sousOnglet
+      ..[historique] = coursesEffectuees
+      ..[magasin] = rayons;
     magasinCourant = null;
     filtreRayonSecteurs = filtreRayonProduits = filtreSecteurProduits = null;
     produitAPlacer = ticketARattacher = null;
@@ -55,40 +67,62 @@ class Nav extends ChangeNotifier {
   void signaler() => notifyListeners();
 
   /// Change d'onglet ; toucher l'onglet actif revient à sa racine.
-  void allerOnglet(int o, {int? sous}) {
-    if (o == onglet && sous == null) {
+  void allerOnglet(int o) {
+    if (o == onglet) {
       piles[o].currentState?.popUntil((r) => r.isFirst);
+      if (o == gerer) rubrique = null;
     }
     onglet = o;
-    if (sous != null) sousOnglet[o] = sous;
     notifyListeners();
   }
 
+  /// Sous-onglet de la rubrique affichée.
   void allerSous(int sous) {
-    sousOnglet[onglet] = sous;
+    final r = rubrique;
+    if (r != null) sousOnglet[r] = sous;
     notifyListeners();
   }
 
-  /// Ferme les écrans de travail et revient aux onglets, sur l'onglet et le sous-onglet donnés.
-  void retourOnglets(int o, int sous) {
+  /// Ouvre une rubrique de Gérer (depuis n'importe où) : onglet Gérer, au-dessus de son menu.
+  void ouvrirRubrique(int r, {int? sous}) {
+    racine.currentState?.popUntil((x) => x.isFirst);
+    final pile = piles[gerer].currentState;
+    pile?.popUntil((x) => x.isFirst);
+    onglet = gerer;
+    rubrique = r;
+    if (sous != null) sousOnglet[r] = sous;
+    notifyListeners();
+    if (pile != null && ecranRubrique != null) {
+      pile.push(MaterialPageRoute<void>(builder: (_) => ecranRubrique!(r))).then((_) => _fermeRubrique(r));
+    }
+  }
+
+  void _fermeRubrique(int r) {
+    if (rubrique == r) {
+      rubrique = null;
+      notifyListeners();
+    }
+  }
+
+  /// Ferme les écrans de travail et revient à l'onglet donné.
+  void retourOnglet(int o) {
     racine.currentState?.popUntil((r) => r.isFirst);
     piles[o].currentState?.popUntil((r) => r.isFirst);
+    if (o == gerer) rubrique = null;
     onglet = o;
-    sousOnglet[o] = sous;
     notifyListeners();
   }
 
   /// Retour système (ou Échap sous Windows) sur les onglets : remonte d'un niveau ;
-  /// sur un écran racine, va à Listes › Préparer, puis quitte.
+  /// sur un écran racine, va à Préparer, puis quitte.
   void retour() {
     final pile = piles[onglet].currentState;
     if (pile != null && pile.canPop()) {
       pile.pop();
       return;
     }
-    if (onglet != listes || sousOnglet[listes] != preparer) {
-      onglet = listes;
-      sousOnglet[listes] = preparer;
+    if (onglet != preparer) {
+      onglet = preparer;
       notifyListeners();
       return;
     }

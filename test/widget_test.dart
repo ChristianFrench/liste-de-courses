@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
+import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
@@ -70,6 +71,12 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
 Finder _onglet(String libelle) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(libelle));
 Finder _sousOnglet(String libelle) => find.descendant(of: find.byType(SousOnglets), matching: find.text(libelle));
 
+/// Onglet Gérer, puis la rubrique donnée.
+Future<void> _rubrique(WidgetTester tester, String titre) async {
+  await _toucher(tester, _onglet('Gérer'));
+  await _toucher(tester, find.text(titre));
+}
+
 Future<void> _ciblesTactiles(WidgetTester tester) => expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
 
 void main() {
@@ -102,6 +109,24 @@ void main() {
       expect(e.quantiteInsuffisante(e.ligne(l, 'p2')!), isNull);
     });
 
+    test('mail : la liste est rangée par rayon ; option « tout le foyer » pour les adresses', () {
+      final e = Etat.instance;
+      final l = e.liste('l4')!;
+      final texte = texteListe(e, l);
+      expect(texte, startsWith('Liste de courses · Magasin 1 · 9 articles'));
+      expect(texte.indexOf('FRAIS'), lessThan(texte.indexOf('ÉPICERIE')));
+      expect(texte, contains('NON PLACÉ'));
+      e.modifierEmail(e.membres.first, 'a@exemple.fr');
+      expect(lienMail(e, l).path, '');
+      e.options(envoiFoyer: true);
+      expect(lienMail(e, l).path, 'a@exemple.fr');
+      expect(lienMail(e, l).toString(), isNot(contains('+')));
+      final relu = jsonEncode(e.versJson());
+      e.lire(jsonDecode(relu) as Map<String, dynamic>);
+      expect(e.envoiFoyer, isTrue);
+      expect(e.membres.first.email, 'a@exemple.fr');
+    });
+
     test('enregistrement : les données relues sont identiques', () {
       final e = Etat.instance;
       final avant = jsonEncode(e.versJson());
@@ -121,43 +146,52 @@ void main() {
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
     });
 
-    testWidgets('1 et 2. les 4 onglets et leurs sous-onglets ; chaque onglet retient son sous-onglet', (tester) async {
+    testWidgets('1 et 2. les 3 onglets, les rubriques de Gérer et leurs sous-onglets mémorisés', (tester) async {
       await _accueil(tester);
       await _ciblesTactiles(tester);
-      for (final (onglet, sous) in [
-        ('Listes', ['Parcours', 'Courses', 'Préparer']),
+      await _toucher(tester, _onglet('Courses'));
+      expect(find.text('Voir la liste et partir'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      for (final (rubrique, sous) in [
         ('Historique', ['Tickets de caisse', 'Courses effectuées']),
-        ('Magasin', ['Secteurs', 'Produits', 'Rayons']),
+        ('Magasins et catalogue', ['Secteurs', 'Produits', 'Rayons']),
       ]) {
-        await _toucher(tester, _onglet(onglet));
+        await _rubrique(tester, rubrique);
         for (final s in sous) {
           await _toucher(tester, _sousOnglet(s));
           await _ciblesTactiles(tester);
         }
       }
-      await _toucher(tester, _onglet('Paramètres'));
+      await _rubrique(tester, 'Foyer et paramètres');
       expect(find.text('Types de promotion'), findsOneWidget);
       await _ciblesTactiles(tester);
-
-      await _toucher(tester, _onglet('Listes'));
-      await _toucher(tester, _sousOnglet('Parcours'));
-      await _toucher(tester, _onglet('Historique'));
-      await _toucher(tester, _onglet('Listes'));
+      await _rubrique(tester, 'Parcours');
       expect(find.text('Ordre de passage par secteur · glisser pour réordonner'), findsOneWidget);
+      await _rubrique(tester, 'Corbeille');
+      expect(find.text('Corbeille'), findsWidgets);
+
+      // Le sous-onglet de l'historique est mémorisé
+      await _rubrique(tester, 'Historique');
+      await _toucher(tester, _sousOnglet('Tickets de caisse'));
+      await _toucher(tester, _onglet('Préparer'));
+      await _rubrique(tester, 'Historique');
+      expect(find.text('Non rattaché à une course'), findsOneWidget);
     });
 
     testWidgets('3. la flèche de retour remonte d\'un niveau', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _onglet('Magasin'));
+      await _rubrique(tester, 'Magasins et catalogue');
       await _toucher(tester, _sousOnglet('Produits'));
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('Magasin › Produits'), findsOneWidget);
+      expect(find.text('Gérer › Produits'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('Magasin › Produits'), findsNothing);
+      expect(find.text('Gérer › Produits'), findsNothing);
       expect(find.text('Rechercher un produit, une marque…'), findsOneWidget);
+      await _toucher(tester, find.byTooltip('Retour'));
+      expect(find.text('Magasins et catalogue'), findsOneWidget);
 
-      await _toucher(tester, _onglet('Paramètres'));
+      await _rubrique(tester, 'Foyer et paramètres');
       await _toucher(tester, find.text('Types de promotion'));
       expect(find.text('Remise immédiate'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -216,6 +250,15 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
+    testWidgets('construction : « Tout le rayon » montre les produits de tous ses secteurs', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.text('Interrompue'));
+      await _toucher(tester, find.text('Tout le rayon'));
+      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
+      expect(find.textContaining('Lait demi-écrémé', findRichText: true), findsOneWidget);
+      expect(find.text('+ Produit absent de ce rayon'), findsNothing); // en bas de la liste, pas encore construit
+    });
+
     testWidgets('2. nouvelle liste : la préliste coche les produits fréquents', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text('+ Nouvelle liste'));
@@ -229,7 +272,7 @@ void main() {
 
     testWidgets('9. Pause puis Interrompre ; Reprendre ramène au même secteur avec les mêmes coches', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _sousOnglet('Courses'));
+      await _toucher(tester, _onglet('Courses'));
       expect(find.text('Courses interrompues'.toUpperCase()), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Reprendre les courses'));
@@ -275,7 +318,7 @@ void main() {
 
     testWidgets('démarrer des courses depuis une liste prête', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _sousOnglet('Courses'));
+      await _toucher(tester, _onglet('Courses'));
       await _toucher(tester, find.text('Voir la liste et partir'));
       expect(find.text('Commencer · secteur 1'), findsOneWidget);
       await _toucher(tester, find.text('Commencer · secteur 1'));
@@ -284,7 +327,7 @@ void main() {
 
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _onglet('Historique'));
+      await _rubrique(tester, 'Historique');
       await _toucher(tester, _sousOnglet('Tickets de caisse'));
       expect(find.text('Non rattaché à une course'), findsOneWidget);
       await _toucher(tester, find.text('Rattacher'));
@@ -294,7 +337,7 @@ void main() {
 
     testWidgets('magasin : indiquer le secteur d\'un produit non placé', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _onglet('Magasin'));
+      await _rubrique(tester, 'Magasins et catalogue');
       await _toucher(tester, _sousOnglet('Produits'));
       await _toucher(tester, find.text('Bougies chauffe-plat'));
       await _toucher(tester, find.text('Non placé · indiquer le secteur').first);
@@ -336,7 +379,7 @@ void main() {
 
     testWidgets('écran d\'essai accessible depuis Paramètres', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, _onglet('Paramètres'));
+      await _rubrique(tester, 'Foyer et paramètres');
       await _toucher(tester, find.text('Produits réels — essai Open Food Facts'));
       expect(find.text('Produits réels (essai)'), findsOneWidget);
       await _ciblesTactiles(tester);

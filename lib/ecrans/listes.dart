@@ -7,9 +7,9 @@ import '../theme.dart';
 import 'corbeille.dart';
 import 'travail.dart';
 
-// Onglet Listes : sous-onglets Préparer (écran 1), Parcours (5), Courses (6).
+// Onglet Préparer (écran 1), Gérer › Parcours (5), onglet Courses (6).
 
-/// Écran 1 — Listes › Préparer.
+/// Écran 1 — onglet Préparer.
 class SousEcranPreparer extends StatelessWidget {
   const SousEcranPreparer({super.key});
 
@@ -65,7 +65,7 @@ class SousEcranPreparer extends StatelessWidget {
           Carte(
             onTap: () {
               Nav.i.listeAPartir = l.id;
-              Nav.i.allerSous(Nav.courses);
+              Nav.i.allerOnglet(Nav.courses);
             },
             child: Row(
               children: [
@@ -110,7 +110,7 @@ class _BoutonSupprimerListe extends StatelessWidget {
       );
 }
 
-/// Écran 5 — Listes › Parcours. Enregistrement immédiat.
+/// Écran 5 — Gérer › Parcours. Enregistrement immédiat.
 class SousEcranParcours extends StatefulWidget {
   const SousEcranParcours({super.key});
 
@@ -352,7 +352,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
   }
 }
 
-/// Écran 6 — Listes › Courses.
+/// Écran 6 — onglet Courses.
 class SousEcranCourses extends StatefulWidget {
   const SousEcranCourses({super.key});
 

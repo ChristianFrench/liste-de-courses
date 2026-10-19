@@ -98,7 +98,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
   Widget build(BuildContext context) {
     return PageBase(
       entete: EnTeteSousNiveau(
-        fil: 'Paramètres › Essais',
+        fil: 'Gérer › Essais',
         titre: 'Produits réels (essai)',
         droite: BoutonIcone(
           icone: Icons.cloud_sync_outlined,

@@ -56,11 +56,12 @@ String quandJour(DateTime d) {
 // ---------------------------------------------------------------------------
 
 class Membre {
-  Membre(this.id, this.nomAffiche, this.role, this.moi);
+  Membre(this.id, this.nomAffiche, this.role, this.moi, {this.email = ''});
   final String id;
   final String nomAffiche;
   final String role;
   final bool moi;
+  String email; // pour l'envoi de la liste par mail
   String get roleAffiche => role == 'administrateur' ? 'Administrateur' : 'Membre';
   String get initiales {
     final m = nomAffiche.split(' ');
@@ -293,7 +294,7 @@ class Ticket {
   String? listeId; // course de l'historique, null = non rattaché
   final String magasinId;
   final DateTime date;
-  final double montant;
+  double montant;
   final String source;
 }
 
@@ -347,6 +348,12 @@ class Etat extends ChangeNotifier {
   DateTime invitationExpiration = DateTime(2026, 10, 16);
   int prelistePresencesMin = 3;
   int prelisteSur = 6;
+
+  /// Préparer la liste secteur par secteur (sinon : tout le rayon d'un coup).
+  bool parSecteurs = true;
+
+  /// Envoi de la liste par mail : adresses de tous les membres déjà remplies.
+  bool envoiFoyer = false;
   List<TypePromotion> typesPromotion = [];
   List<Magasin> magasins = [];
   List<Rayon> rayons = [];
@@ -417,13 +424,14 @@ class Etat extends ChangeNotifier {
     final s = _actif!;
     if (s.vide) {
       lire(modeDemo ? await _donneesDemo() : _depart(await _donneesDemo()));
+      if (!modeDemo) await appliquerModele(magasins.first, tailleComplete);
       s.ecrire(versJson());
     } else {
       lire(s.lire());
     }
   }
 
-  /// Premier lancement : un foyer vide, avec son créateur et un premier magasin.
+  /// Premier lancement : un foyer vide, avec son créateur et un premier magasin (rempli d'après le catalogue complet).
   Map<String, dynamic> _depart(Map<String, dynamic> demo) {
     final auj = DateTime.now();
     const lettres = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -500,7 +508,8 @@ class Etat extends ChangeNotifier {
     foyerCreation = _date(f['dateCreation']) ?? foyerCreation;
     membres = [
       for (final m in (j['membres'] as List).cast<Map>())
-        Membre(m['id'] as String, m['nomAffiche'] as String, m['role'] as String, m['moi'] as bool? ?? false)
+        Membre(m['id'] as String, m['nomAffiche'] as String, m['role'] as String, m['moi'] as bool? ?? false,
+            email: m['email'] as String? ?? '')
     ];
     final inv = j['invitation'] as Map;
     invitationCode = inv['code'] as String;
@@ -508,6 +517,9 @@ class Etat extends ChangeNotifier {
     final pl = (j['parametres'] as Map?)?['preliste'] as Map?;
     prelistePresencesMin = (pl?['presencesMin'] as num? ?? 3).toInt();
     prelisteSur = (pl?['sur'] as num? ?? 6).toInt();
+    final options = (j['parametres'] as Map?)?['options'] as Map?;
+    parSecteurs = options?['parSecteurs'] as bool? ?? true;
+    envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
     typesPromotion = [
       for (final t in (j['typesPromotion'] as List).cast<Map>())
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
@@ -570,10 +582,14 @@ class Etat extends ChangeNotifier {
         '_description': _brut['_description'],
         '_ecartsModele': _brut['_ecartsModele'],
         'foyer': {'id': foyerId, 'nom': foyerNom, 'dateCreation': _iso(foyerCreation)!.substring(0, 10)},
-        'membres': [for (final m in membres) {'id': m.id, 'nomAffiche': m.nomAffiche, 'role': m.role, 'moi': m.moi}],
+        'membres': [
+          for (final m in membres)
+            {'id': m.id, 'nomAffiche': m.nomAffiche, 'role': m.role, 'moi': m.moi, if (m.email.isNotEmpty) 'email': m.email}
+        ],
         'invitation': {'code': invitationCode, 'expiration': _iso(invitationExpiration)!.substring(0, 10)},
         'parametres': {
-          'preliste': {'presencesMin': prelistePresencesMin, 'sur': prelisteSur}
+          'preliste': {'presencesMin': prelistePresencesMin, 'sur': prelisteSur},
+          'options': {'parSecteurs': parSecteurs, 'envoiFoyer': envoiFoyer},
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
         'magasins': [for (final m in magasins) {'id': m.id, 'nom': m.nom, 'enseigne': m.enseigne, 'ville': m.ville}],
@@ -886,13 +902,8 @@ class Etat extends ChangeNotifier {
 
   static const String fichierCatalogueType = 'assets/catalogue_type.json';
 
-  /// Modèles proposés à la création d'un magasin : taille → libellé (0 = vide).
-  static const modelesMagasin = {
-    0: 'Vide',
-    1: 'Magasin de proximité',
-    2: 'Supermarché',
-    3: 'Hypermarché',
-  };
+  /// Un nouveau magasin reçoit toujours le catalogue complet, quelle que soit sa taille (décision du 19/10/2026).
+  static const int tailleComplete = 3;
 
   /// Remplit un magasin avec les rayons, secteurs et produits du catalogue type jusqu'à la
   /// [taille] donnée (1 proximité, 2 supermarché, 3 hypermarché). Un produit déjà connu du
@@ -1133,6 +1144,30 @@ class Etat extends ChangeNotifier {
 
   void rattacherTicket(Ticket t, Course c) {
     t.listeId = c.id;
+    modifie();
+  }
+
+  /// Ticket joint à une course (PDF fourni par l'application du magasin).
+  Ticket ajouterTicket(Course c) {
+    final t = Ticket(nouvelId('t'), c.id, c.magasinId, c.dateCourses, 0, 'photo');
+    tickets.add(t);
+    modifie();
+    return t;
+  }
+
+  void montantTicket(Ticket t, double montant) {
+    t.montant = montant;
+    modifie();
+  }
+
+  void modifierEmail(Membre m, String email) {
+    m.email = email.trim();
+    modifie();
+  }
+
+  void options({bool? parSecteurs, bool? envoiFoyer}) {
+    if (parSecteurs != null) this.parSecteurs = parSecteurs;
+    if (envoiFoyer != null) this.envoiFoyer = envoiFoyer;
     modifie();
   }
 }

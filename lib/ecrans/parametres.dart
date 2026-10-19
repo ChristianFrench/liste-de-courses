@@ -7,7 +7,7 @@ import '../theme.dart';
 import 'corbeille.dart';
 import 'e13_produits_reels.dart';
 
-// Onglet Paramètres (17) et Types de promotion (18).
+// Gérer › Foyer et paramètres (17) et Types de promotion (18).
 
 /// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
 class EcranParametres extends StatelessWidget {
@@ -16,7 +16,7 @@ class EcranParametres extends StatelessWidget {
   Future<void> _basculerDemo(BuildContext context, bool oui) async {
     await Etat.instance.basculerDemo(oui);
     Nav.i.reinitialiser();
-    Nav.i.allerOnglet(Nav.parametres);
+    Nav.i.ouvrirRubrique(Nav.parametres);
     if (context.mounted) Nav.message(context, oui ? 'Mode démonstration' : 'Retour à vos données');
   }
 
@@ -44,7 +44,7 @@ class EcranParametres extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: EnTeteNiveau(titre: 'Paramètres', onAppuiLong: () => _reinitialiser(context)),
+        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Foyer et paramètres'),
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
@@ -71,7 +71,12 @@ class EcranParametres extends StatelessWidget {
             for (final m in etat.membres)
               LigneMenu(
                 titre: m.nomAffiche,
-                sousTitre: 'Compte Google',
+                sousTitre: m.email.isEmpty ? 'Adresse mail : touchez pour l\'indiquer' : m.email,
+                onTap: () async {
+                  final email = await demanderTexte(context,
+                      titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
+                  if (email != null) etat.modifierEmail(m, email);
+                },
                 gauche: CadrePointille(
                   rayon: 22,
                   epaisseur: 1.2,
@@ -120,6 +125,18 @@ class EcranParametres extends StatelessWidget {
               titre: 'Types de promotion',
               sousTitre: '${etat.typesPromotion.length} types · libellés proposés en construction de liste',
               onTap: () => Nav.aller(context, const EcranTypesPromotion()),
+            ),
+            _Option(
+              texte: 'Préparer la liste secteur par secteur',
+              aide: 'Sinon, tous les produits du rayon d\'un coup',
+              coche: etat.parSecteurs,
+              onChange: (v) => etat.options(parSecteurs: v),
+            ),
+            _Option(
+              texte: 'Envoyer la liste à tout le foyer',
+              aide: 'Le mail est préparé avec les adresses de tous les membres',
+              coche: etat.envoiFoyer,
+              onChange: (v) => etat.options(envoiFoyer: v),
             ),
             LigneMenu(
               titre: 'Préliste',
@@ -238,7 +255,7 @@ class EcranTypesPromotion extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Paramètres', titre: 'Types de promotion'),
+        entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de promotion'),
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
@@ -284,4 +301,38 @@ class EcranTypesPromotion extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Case à cocher d'une option, sur toute la largeur.
+class _Option extends StatelessWidget {
+  const _Option({required this.texte, required this.aide, required this.coche, required this.onChange});
+  final String texte;
+  final String aide;
+  final bool coche;
+  final ValueChanged<bool> onChange;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: () => onChange(!coche),
+        child: Container(
+          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Row(
+            children: [
+              CaseACocher(coche: coche, taille: 26),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(texte, style: Charte.texte(16, gras: true)),
+                    Text(aide, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
 }

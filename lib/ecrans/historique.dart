@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
+import '../donnees/envoi.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'travail.dart';
 
-// Onglet Historique : Courses effectuées (11), Tickets de caisse (12).
+// Gérer › Historique : Courses effectuées (11), Tickets de caisse (12).
 
 /// Écran 11 — Historique › Courses effectuées. Sert aussi à rattacher un ticket.
 class SousEcranCoursesEffectuees extends StatefulWidget {
@@ -120,13 +121,34 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
                   ],
                 ),
               ),
-              if (t != null) const Etiquette('Ticket', icone: Icons.check) else const Etiquette('Sans ticket', pointille: true),
+              if (t != null)
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _ouvrir(context, t),
+                  child: const SizedBox(height: 44, child: Center(child: Etiquette('Ticket', icone: Icons.check))),
+                )
+              else
+                Lien('Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
             ],
           ),
         ),
       ),
     );
   }
+}
+
+/// Joint à la course le ticket PDF téléchargé depuis l'application du magasin, puis demande le montant.
+Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
+  final t = await joindreTicketPdf(etat, c);
+  if (t == null || !context.mounted) return;
+  final m = await demanderTexte(context, titre: 'Montant du ticket', aide: 'Ex. : 84,30 (facultatif)');
+  final v = double.tryParse((m ?? '').replaceAll(',', '.').replaceAll('€', '').trim());
+  if (v != null) etat.montantTicket(t, v);
+  Nav.message(context, 'Ticket joint à la course du ${jjmm(c.dateCourses)}');
+}
+
+Future<void> _ouvrir(BuildContext context, Ticket t) async {
+  if (!await ouvrirTicket(t.id) && context.mounted) Nav.message(context, 'Pas de PDF pour ce ticket');
 }
 
 /// Écran 12 — Historique › Tickets de caisse.
@@ -196,7 +218,11 @@ class SousEcranTickets extends StatelessWidget {
               ],
             ),
           ),
-          if (c == null) const SizedBox(width: 8),
+          IconButton(
+            tooltip: 'Ouvrir le PDF',
+            icon: const Icon(Icons.picture_as_pdf_outlined, color: Charte.encre),
+            onPressed: () => _ouvrir(context, t),
+          ),
           if (c == null)
             Lien('Rattacher', onTap: () {
               Nav.i.ticketARattacher = t.id;

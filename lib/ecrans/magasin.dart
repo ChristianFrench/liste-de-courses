@@ -36,12 +36,9 @@ class SelecteurMagasin extends StatelessWidget {
           if (v == nouveau) {
             final nom = await demanderTexte(context, titre: 'Nouveau magasin', aide: 'Ex. : Hyper de la gare');
             if (nom == null || nom.isEmpty || !context.mounted) return;
-            final taille = await choisirDansListe<int>(context,
-                titre: 'Remplir le magasin avec…', choix: Etat.modelesMagasin);
-            if (taille == null) return;
             final m = etat.creerMagasin(nom);
             v = m.id;
-            final n = await etat.appliquerModele(m, taille);
+            final n = await etat.appliquerModele(m, Etat.tailleComplete);
             if (n > 0 && context.mounted) Nav.message(context, '$nom : $n produits placés dans ses rayons');
           }
           Nav.i.magasinCourant = v;
@@ -55,7 +52,7 @@ class SelecteurMagasin extends StatelessWidget {
 
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
-/// Écran 13 — Magasin › Rayons.
+/// Écran 13 — Gérer › Magasins › Rayons.
 class SousEcranRayons extends StatelessWidget {
   const SousEcranRayons({super.key});
 
@@ -71,6 +68,17 @@ class SousEcranRayons extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 12),
             child: Text("Ce magasin n'a pas encore de rayons.", style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          ),
+        if (rayons.isEmpty)
+          Bouton(
+            texte: 'Remplir avec le catalogue complet',
+            plein: true,
+            onTap: () async {
+              final mg = etat.magasin(m);
+              if (mg == null) return;
+              final n = await etat.appliquerModele(mg, Etat.tailleComplete);
+              if (context.mounted) Nav.message(context, '${mg.nom} : $n produits placés dans ses rayons');
+            },
           ),
         for (final r in rayons)
           LigneMenu(
@@ -107,7 +115,7 @@ class SousEcranRayons extends StatelessWidget {
   }
 }
 
-/// Écran 14 — Magasin › Secteurs. Sert aussi à indiquer le secteur d'un produit non placé.
+/// Écran 14 — Gérer › Magasins › Secteurs. Sert aussi à indiquer le secteur d'un produit non placé.
 class SousEcranSecteurs extends StatelessWidget {
   const SousEcranSecteurs({super.key});
 
@@ -210,7 +218,7 @@ class SousEcranSecteurs extends StatelessWidget {
   }
 }
 
-/// Écran 15 — Magasin › Produits : filtres rayon et secteur, recherche en direct.
+/// Écran 15 — Gérer › Magasins › Produits : filtres rayon et secteur, recherche en direct.
 class SousEcranProduits extends StatefulWidget {
   const SousEcranProduits({super.key});
 
@@ -368,7 +376,7 @@ class _Vignette extends StatelessWidget {
       );
 }
 
-/// Écran 16 — Fiche produit (sous-niveau de Magasin › Produits).
+/// Écran 16 — Fiche produit (sous-niveau de Gérer › Magasins › Produits).
 /// Avec [listeId] : ouverte depuis la construction, l'ajout revient à cette liste.
 class EcranFicheProduit extends StatelessWidget {
   const EcranFicheProduit({super.key, required this.produitId, this.listeId});
@@ -384,13 +392,13 @@ class EcranFicheProduit extends StatelessWidget {
         final p = etat.produit(produitId);
         if (p == null) {
           return PageBase(
-            entete: const EnTeteSousNiveau(fil: 'Magasin › Produits', titre: 'Produit'),
+            entete: const EnTeteSousNiveau(fil: 'Gérer › Produits', titre: 'Produit'),
             corps: Center(child: Text('Produit introuvable.', style: Charte.texte(16))),
           );
         }
         return PageBase(
           entete: EnTeteSousNiveau(
-            fil: 'Magasin › Produits',
+            fil: 'Gérer › Produits',
             titre: p.nom,
             droite: BoutonIcone(
               icone: Icons.edit_outlined,
@@ -489,13 +497,13 @@ class EcranFicheProduit extends StatelessWidget {
     );
   }
 
-  /// « Non placé · indiquer le secteur » → Magasin › Secteurs, en mode « placer ce produit ».
+  /// « Non placé · indiquer le secteur » → Gérer › Magasins › Secteurs, en mode « placer ce produit ».
   /// Depuis la construction (écran de travail), un choix direct évite de quitter la liste.
   Future<void> _indiquerSecteur(BuildContext context, Etat etat, Produit p, Magasin m) async {
     if (listeId != null || etat.secteursDuMagasin(m.id).isEmpty) {
       final secteurs = etat.secteursDuMagasin(m.id);
       if (secteurs.isEmpty) {
-        Nav.message(context, '${m.nom} n\'a pas encore de rayons : décrivez-les dans l\'onglet Magasin');
+        Nav.message(context, '${m.nom} n\'a pas encore de rayons : décrivez-les dans Gérer › Magasins et catalogue');
         return;
       }
       final sid = await choisirDansListe<String>(context,
@@ -506,8 +514,7 @@ class EcranFicheProduit extends StatelessWidget {
     Nav.i.produitAPlacer = p.id;
     Nav.i.magasinCourant = m.id;
     Nav.i.filtreRayonSecteurs = null;
-    Navigator.of(context).pop();
-    Nav.i.allerSous(Nav.secteurs);
+    Nav.i.ouvrirRubrique(Nav.magasin, sous: Nav.secteurs);
   }
 
   Future<void> _ajouter(BuildContext context, Etat etat, Produit p) async {

@@ -5,23 +5,23 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'corbeille.dart';
 import 'historique.dart';
 import 'listes.dart';
 import 'magasin.dart';
 import 'parametres.dart';
 import 'travail.dart';
 
-/// Barre d'onglets (64) : 4 entrées icône 22 + libellé ; onglet actif = pastille 56 × 30 pleine.
+/// Barre d'onglets (64) : 3 entrées icône 22 + libellé ; onglet actif = pastille 56 × 30 pleine.
 class BarreOnglets extends StatelessWidget {
   const BarreOnglets({super.key, required this.actif, required this.onChoix});
   final int actif;
   final ValueChanged<int> onChoix;
 
   static const entrees = <(IconData, String)>[
-    (Icons.checklist, 'Listes'),
-    (Icons.schedule, 'Historique'),
-    (Icons.storefront_outlined, 'Magasin'),
-    (Icons.settings_outlined, 'Paramètres'),
+    (Icons.edit_note, 'Préparer'),
+    (Icons.shopping_cart_outlined, 'Courses'),
+    (Icons.tune, 'Gérer'),
   ];
 
   @override
@@ -69,7 +69,7 @@ class BarreOnglets extends StatelessWidget {
   }
 }
 
-/// Les quatre onglets, chacun avec sa pile d'écrans.
+/// Les trois onglets, chacun avec sa pile d'écrans.
 class Coquille extends StatelessWidget {
   const Coquille({super.key});
 
@@ -88,7 +88,7 @@ class Coquille extends StatelessWidget {
           body: IndexedStack(
             index: nav.onglet,
             children: [
-              for (var o = 0; o < 4; o++)
+              for (var o = 0; o < Nav.nbOnglets; o++)
                 Navigator(
                   key: nav.piles[o],
                   onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => RacineOnglet(onglet: o)),
@@ -102,36 +102,82 @@ class Coquille extends StatelessWidget {
   }
 }
 
-/// Écran racine d'un onglet : en-tête, sous-onglets, contenu du sous-onglet mémorisé.
+/// Écran racine d'un onglet : Préparer, Courses, ou le menu de Gérer.
 class RacineOnglet extends StatelessWidget {
   const RacineOnglet({super.key, required this.onglet});
   final int onglet;
 
   @override
   Widget build(BuildContext context) {
-    if (onglet == Nav.parametres) return const EcranParametres();
+    Nav.ecranRubrique ??= (r) => EcranRubrique(rubrique: r);
+    return ListenableBuilder(
+      listenable: Listenable.merge([Nav.i, Etat.instance]),
+      builder: (context, _) => switch (onglet) {
+        // Contenus recréés à chaque changement de données (pas de « const ») pour qu'ils se redessinent.
+        Nav.preparer => PageBase(
+            entete: const EnTeteNiveau(titre: 'Préparer', droite: IndicateurSynchro()),
+            corps: SousEcranPreparer(),
+          ),
+        Nav.courses => PageBase(entete: const EnTeteNiveau(titre: 'Courses'), corps: SousEcranCourses()),
+        _ => const MenuGerer(),
+      },
+    );
+  }
+}
+
+/// Onglet Gérer : tout ce qui n'est ni la préparation ni les courses.
+class MenuGerer extends StatelessWidget {
+  const MenuGerer({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    final n = etat.magasins.length;
+    Widget entree(int r, IconData icone, String titre, String sousTitre) => LigneMenu(
+          gauche: Icon(icone, size: 28, color: Charte.encre),
+          titre: titre,
+          sousTitre: sousTitre,
+          onTap: () => Nav.i.ouvrirRubrique(r),
+        );
+    return PageBase(
+      entete: const EnTeteNiveau(titre: 'Gérer'),
+      corps: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: [
+          entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue',
+              '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
+          entree(Nav.parcours, Icons.route, 'Parcours', 'Ordre de passage de chacun dans chaque magasin'),
+          entree(Nav.historique, Icons.schedule, 'Historique', 'Courses terminées, tickets de caisse'),
+          entree(Nav.parametres, Icons.settings_outlined, 'Foyer et paramètres',
+              'Membres, préliste, promotions, démonstration'),
+          entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
+        ],
+      ),
+    );
+  }
+}
+
+/// Rubrique de Gérer, ouverte au-dessus du menu : en-tête avec retour, sous-onglets éventuels.
+class EcranRubrique extends StatelessWidget {
+  const EcranRubrique({super.key, required this.rubrique});
+  final int rubrique;
+
+  @override
+  Widget build(BuildContext context) {
+    if (rubrique == Nav.parametres) return const EcranParametres();
+    if (rubrique == Nav.corbeille) return const EcranCorbeille();
     return ListenableBuilder(
       listenable: Listenable.merge([Nav.i, Etat.instance]),
       builder: (context, _) {
-        final sous = Nav.i.sousOnglet[onglet];
+        final sous = Nav.i.sousOnglet[rubrique] ?? 0;
         late final String titre;
-        late final List<SousOnglet> onglets;
+        List<SousOnglet>? onglets;
         late final Widget contenu;
         Widget? droite;
-        switch (onglet) {
-          case Nav.listes:
-            titre = 'Listes';
-            droite = const IndicateurSynchro();
-            onglets = const [
-              SousOnglet('Préparer', Icons.edit_outlined),
-              SousOnglet('Parcours', Icons.route),
-              SousOnglet('Courses', Icons.shopping_cart_outlined),
-            ];
-            contenu = switch (sous) {
-              Nav.parcours => SousEcranParcours(),
-              Nav.courses => SousEcranCourses(),
-              _ => SousEcranPreparer(),
-            };
+        switch (rubrique) {
+          case Nav.parcours:
+            titre = 'Parcours';
+            contenu = SousEcranParcours();
           case Nav.historique:
             titre = 'Historique';
             onglets = const [
@@ -140,7 +186,7 @@ class RacineOnglet extends StatelessWidget {
             ];
             contenu = sous == Nav.tickets ? SousEcranTickets() : SousEcranCoursesEffectuees();
           default:
-            titre = 'Magasin';
+            titre = 'Magasins';
             droite = const SelecteurMagasin();
             onglets = const [
               SousOnglet('Rayons', Icons.view_agenda_outlined),
@@ -153,10 +199,9 @@ class RacineOnglet extends StatelessWidget {
               _ => SousEcranRayons(),
             };
         }
-        // Contenus recréés à chaque changement de données (pas de « const ») pour qu'ils se redessinent.
         return PageBase(
-          entete: EnTeteNiveau(titre: titre, droite: droite),
-          haut: [SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],
+          entete: EnTeteSousNiveau(fil: 'Gérer', titre: titre, droite: droite),
+          haut: [if (onglets != null) SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],
           corps: contenu,
         );
       },
@@ -211,7 +256,7 @@ class EcranRelance extends StatelessWidget {
                     texte: 'Reprendre les courses',
                     plein: true,
                     onTap: () {
-                      Nav.i.sousOnglet[Nav.listes] = Nav.courses;
+                      Nav.i.onglet = Nav.courses;
                       _versOnglets();
                       Nav.travail(EcranCoursesSecteur(listeId: courses.id));
                     },

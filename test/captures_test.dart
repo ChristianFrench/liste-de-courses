@@ -1,4 +1,4 @@
-// Captures des 18 écrans de la maquette IHM v0.2 au format téléphone (390 × 844),
+// Captures des 19 écrans de la maquette IHM v0.2 au format téléphone (390 × 844),
 // numérotées comme dans ihm/v0.2/Captures, pour comparaison avec la maquette fil de fer.
 // Produites par GitHub (travail « verification ») et rangées dans la branche « captures ».
 // Ignoré lors d'un « flutter test » ordinaire (variable CAPTURES absente).
@@ -54,7 +54,7 @@ Finder _sous(String l) => find.descendant(of: find.byType(SousOnglets), matching
 void main() {
   setUpAll(_polices);
 
-  testWidgets('18 écrans IHM v0.2', (tester) async {
+  testWidgets('19 écrans', (tester) async {
     final e = Etat.instance;
     e.enregistrementActif = false;
     e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
@@ -92,10 +92,12 @@ void main() {
     await tester.pumpAndSettle();
     await _toucher(tester, find.byTooltip('Retour'));
 
-    await _toucher(tester, _sous('Parcours'));
-    await _capture('05 Listes-Parcours');
-    await _toucher(tester, _sous('Courses'));
-    await _capture('06 Listes-Courses');
+    await _toucher(tester, _onglet('Gérer'));
+    await _capture('19 Gerer');
+    await _toucher(tester, find.text('Parcours'));
+    await _capture('05 Gerer-Parcours');
+    await _toucher(tester, _onglet('Courses'));
+    await _capture('06 Courses');
 
     await _toucher(tester, find.text('Reprendre les courses'));
     await _capture('08 Courses-Secteur');
@@ -106,12 +108,16 @@ void main() {
     await _capture('09 Courses-Interrompre');
     await _toucher(tester, find.text('Interrompre'));
 
-    await _toucher(tester, _onglet('Historique'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, find.text('Historique'));
     await _capture('11 Historique-Courses');
     await _toucher(tester, _sous('Tickets de caisse'));
     await _capture('12 Historique-Tickets');
 
-    await _toucher(tester, _onglet('Magasin'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, find.text('Magasins et catalogue'));
     await _capture('13 Magasin-Rayons');
     await _toucher(tester, find.text('Frais'));
     await _capture('14 Magasin-Secteurs');
@@ -121,7 +127,9 @@ void main() {
     await _capture('16 Fiche-Produit');
     await _toucher(tester, find.byTooltip('Retour'));
 
-    await _toucher(tester, _onglet('Paramètres'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, find.text('Foyer et paramètres'));
     await _capture('17 Parametres');
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Parametres-Promos');

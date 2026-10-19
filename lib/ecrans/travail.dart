@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
+import '../donnees/envoi.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -166,8 +167,10 @@ class EcranConstruction extends StatefulWidget {
 class _EcranConstructionState extends State<EcranConstruction> {
   final etat = Etat.instance;
   int rayonIndex = 0;
-  int secteurIndex = 0;
+  int secteurIndex = 0; // -1 : tout le rayon
   static const int seuilHabituel = 5;
+
+  int get _secteurDepart => etat.parSecteurs ? 0 : -1;
 
   Liste? get liste => etat.liste(widget.listeId);
 
@@ -177,6 +180,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final l = liste;
     if (l == null) return;
     // Reprise : rayon et secteur où l'on s'était arrêté
+    secteurIndex = _secteurDepart;
     final rayons = etat.rayonsDu(l.magasinId);
     final ri = rayons.indexWhere((r) => r.id == l.repriseRayonId);
     if (ri >= 0) {
@@ -193,7 +197,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final rayons = etat.rayonsDu(l.magasinId);
     final r = rayons.isEmpty ? null : rayons[rayonIndex.clamp(0, rayons.length - 1)];
     final secteurs = r == null ? <Secteur>[] : etat.secteursDu(r.id);
-    final s = secteurs.isEmpty ? null : secteurs[secteurIndex.clamp(0, secteurs.length - 1)];
+    final s = secteurs.isEmpty || secteurIndex < 0 ? null : secteurs[secteurIndex.clamp(0, secteurs.length - 1)];
     etat.positionConstruction(l, r?.id, s?.id);
   }
 
@@ -249,8 +253,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
             plein: true,
             onTap: () {
               etat.listePrete(l);
-              Nav.i.retourOnglets(Nav.listes, Nav.preparer);
-              Nav.message(context, 'Liste prête : elle apparaît dans Listes › Courses');
+              Nav.i.retourOnglet(Nav.preparer);
+              Nav.message(context, 'Liste prête : elle apparaît dans l\'onglet Courses');
             },
           ),
         ]);
@@ -264,7 +268,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             entete: entete,
             corps: Padding(
               padding: const EdgeInsets.all(16),
-              child: Text("Ce magasin n'a pas encore de rayons : décrivez-les dans l'onglet Magasin.",
+              child: Text("Ce magasin n'a pas encore de rayons : décrivez-les dans Gérer › Magasins et catalogue.",
                   style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             ),
             bas: [barre],
@@ -274,8 +278,12 @@ class _EcranConstructionState extends State<EcranConstruction> {
         final rayon = rayons[rayonIndex];
         final secteurs = etat.secteursDu(rayon.id);
         if (secteurIndex >= secteurs.length) secteurIndex = 0;
-        final secteur = secteurs.isEmpty ? null : secteurs[secteurIndex];
-        final produits = secteur == null ? <Produit>[] : etat.produitsDu(l.magasinId, secteur.id);
+        final secteur = secteurs.isEmpty || secteurIndex < 0 ? null : secteurs[secteurIndex];
+        final produits = secteurIndex < 0
+            ? [for (final s in secteurs) ...etat.produitsDu(l.magasinId, s.id)]
+            : secteur == null
+                ? <Produit>[]
+                : etat.produitsDu(l.magasinId, secteur.id);
         produits.sort((a, b) {
           final ca = etat.ligne(l, a.id) != null ? 0 : 1;
           final cb = etat.ligne(l, b.id) != null ? 0 : 1;
@@ -293,7 +301,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
               onChoix: (i) {
                 setState(() {
                   rayonIndex = i;
-                  secteurIndex = 0;
+                  secteurIndex = _secteurDepart;
                 });
                 _noterPosition();
               },
@@ -302,12 +310,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
               pastille: false,
               fond: Charte.fondBandeau,
               puces: [
+                Puce('Tout le rayon', compteur: etat.nbDansRayon(l, rayon.id)),
                 for (final s in secteurs)
                   Puce(s.nom, compteur: etat.nbDansSecteur(l, s.id), image: cleSecteur(rayon.nom, s.nom)),
               ],
-              selection: secteurIndex,
+              selection: secteurIndex + 1,
               onChoix: (i) {
-                setState(() => secteurIndex = i);
+                setState(() => secteurIndex = i - 1);
                 _noterPosition();
               },
             ),
@@ -322,7 +331,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                  child: Text('+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                  child: Text(secteur == null ? '+ Produit absent de ce rayon' : '+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
                 ),
               ),
             ],
@@ -749,7 +758,18 @@ class EcranListeComplete extends StatelessWidget {
         final commence = l.nbCoches > 0 || l.repriseSecteurId != null;
         var numero = 0;
         return PageBase(
-          entete: EnTeteTravail(titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · $n article${n > 1 ? 's' : ''}'),
+          entete: EnTeteTravail(
+            titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · $n article${n > 1 ? 's' : ''}',
+            action: BoutonIcone(
+              icone: Icons.mail_outline,
+              libelle: 'Envoyer par mail',
+              onTap: () async {
+                if (!await envoyerListe(etat, l) && context.mounted) {
+                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
+                }
+              },
+            ),
+          ),
           haut: [
             Container(
               width: double.infinity,
@@ -979,7 +999,7 @@ class EcranCoursesSecteur extends StatelessWidget {
             const TextSpan(text: '.'),
           ])),
           const SizedBox(height: 10),
-          Text('Vous reprendrez depuis Listes › Courses, ou au prochain lancement de l\'application.',
+          Text('Vous reprendrez depuis l\'onglet Courses, ou au prochain lancement de l\'application.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
         ],
       ),
@@ -989,7 +1009,7 @@ class EcranCoursesSecteur extends StatelessWidget {
     if (interrompre != true) return;
     Etat.instance.etapeCourante(l, e.id);
     Etat.instance.interrompreCourses(l);
-    Nav.i.retourOnglets(Nav.listes, Nav.courses);
+    Nav.i.retourOnglet(Nav.courses);
   }
 
   Future<void> _terminer(BuildContext context, Liste l) async {
@@ -1005,7 +1025,7 @@ class EcranCoursesSecteur extends StatelessWidget {
       if (ok != true) return;
     }
     Etat.instance.terminerCourses(l);
-    Nav.i.retourOnglets(Nav.historique, Nav.coursesEffectuees);
-    Nav.message(context, 'Courses terminées : elles apparaissent dans l\'historique');
+    Nav.i.ouvrirRubrique(Nav.historique, sous: Nav.coursesEffectuees);
+    Nav.message(context, 'Courses terminées : joignez le ticket PDF dans Gérer › Historique');
   }
 }

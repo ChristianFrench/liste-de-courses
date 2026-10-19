@@ -5,7 +5,7 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Suppression avec confirmation, et corbeille (Paramètres › Corbeille) pour tout remettre.
+// Suppression avec confirmation, et corbeille (Gérer › Corbeille) pour tout remettre.
 
 /// Demande confirmation puis supprime [objet] (magasin, rayon, secteur, produit, liste, parcours).
 /// Rend true si la suppression a eu lieu.
@@ -22,7 +22,7 @@ Future<bool> demanderSuppression(BuildContext context, Object objet, String quoi
     titre: 'Supprimer $quoi ?',
     icone: Icons.delete_outline,
     contenu: Text(
-      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Paramètres › Corbeille.',
+      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Gérer › Corbeille.',
       style: Charte.texte(16),
     ),
     plein: 'Annuler',
@@ -54,7 +54,7 @@ class LienSupprimer extends StatelessWidget {
       );
 }
 
-/// Paramètres › Corbeille.
+/// Gérer › Corbeille.
 class EcranCorbeille extends StatelessWidget {
   const EcranCorbeille({super.key});
 
@@ -73,7 +73,7 @@ class EcranCorbeille extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Paramètres', titre: 'Corbeille'),
+        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Corbeille'),
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
