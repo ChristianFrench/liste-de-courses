@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
+import '../composants/pictogramme.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -75,6 +76,7 @@ class SousEcranRayons extends StatelessWidget {
           LigneMenu(
             titre: r.nom,
             titreTaille: 19,
+            gauche: cleRayon(r.nom) == null ? null : Pictogramme(cleRayon(r.nom), taille: 40),
             sousTitre: '${_pluriel(etat.secteursDu(r.id).length, 'secteur')} · ${_pluriel(etat.nbProduitsRayon(m, r.id), 'produit')}',
             onTap: () {
               Nav.i.filtreRayonSecteurs = r.id;
@@ -166,6 +168,7 @@ class SousEcranSecteurs extends StatelessWidget {
               for (final s in secteurs)
                 LigneMenu(
                   titre: s.nom,
+                  gauche: _image(s),
                   sousTitre: '${etat.rayon(s.rayonId)?.nom ?? ''} · ${_pluriel(etat.produitsDu(m, s.id).length, 'produit')}',
                   onTap: () {
                     if (aPlacer != null) {
@@ -559,4 +562,9 @@ class EcranFicheProduit extends StatelessWidget {
           ),
         ),
       );
+}
+
+Widget? _image(Secteur s) {
+  final c = cleSecteur(Etat.instance.rayon(s.rayonId)?.nom ?? '', s.nom);
+  return c == null ? null : Pictogramme(c, taille: 36);
 }

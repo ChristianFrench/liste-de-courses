@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme.dart';
+import 'pictogramme.dart';
 
 // Composants réutilisables (spécification IHM, chapitre 5).
 
@@ -145,11 +146,14 @@ class EnTeteGestion extends StatelessWidget {
 // ----------------------------------------------------------------- Puces
 
 class Puce {
-  const Puce(this.libelle, {this.compteur, this.termine = false, this.icone});
+  const Puce(this.libelle, {this.compteur, this.termine = false, this.icone, this.image});
   final String libelle;
   final int? compteur;
   final bool termine;
   final IconData? icone;
+
+  /// Image du rayon ou du secteur (voir pictogramme.dart).
+  final String? image;
 }
 
 /// Liste horizontale défilante de puces ; la puce sélectionnée reste visible.
@@ -242,7 +246,7 @@ class _BandeauPucesState extends State<BandeauPuces> {
           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
           child: Container(
             height: 36,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            padding: EdgeInsets.only(left: p.image != null ? 4 : 12, right: 12),
             decoration: BoxDecoration(
               color: choisie ? Charte.encre : Charte.fond,
               borderRadius: BorderRadius.circular(rayon),
@@ -251,6 +255,10 @@ class _BandeauPucesState extends State<BandeauPuces> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (p.image != null) ...[
+                  Pictogramme(p.image, taille: 26),
+                  const SizedBox(width: 6),
+                ],
                 if (p.icone != null) ...[
                   Icon(p.icone, size: 16, color: couleurTexte),
                   const SizedBox(width: 4),
@@ -651,8 +659,9 @@ class LigneCompacte extends StatelessWidget {
 
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
-  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false});
+  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image});
   final String nom;
+  final String? image;
   final String? numero;
   final bool nonPlace;
 
@@ -676,6 +685,7 @@ class TitreGroupe extends StatelessWidget {
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
+              if (image != null) ...[Pictogramme(image, taille: 24), const SizedBox(width: 8)],
               Expanded(
                 child: Text(nom.toUpperCase(),
                     maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(12, gras: true, espacement: 0.8)),

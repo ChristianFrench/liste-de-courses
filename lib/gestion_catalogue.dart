@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:window_manager/window_manager.dart';
 
+import 'composants/pictogramme.dart';
 import 'donnees/catalogue_type.dart';
 import 'gestion_catalogue/tableur.dart';
 import 'theme.dart';
@@ -531,7 +532,11 @@ class _EcranCatalogueState extends State<EcranCatalogue> with WindowListener {
                 selected: r == rayon,
                 selectedTileColor: Charte.fondSelection,
                 leading: ReorderableDragStartListener(index: i, child: const Icon(Icons.drag_indicator, size: 18)),
-                title: Text(r.nom, style: Charte.texte(15, gras: r == rayon)),
+                title: Row(children: [
+                  Pictogramme(cleRayon(r.nom), taille: 28),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(r.nom, style: Charte.texte(15, gras: r == rayon))),
+                ]),
                 subtitle: Text('${r.secteurs.length} secteurs · $np produits', style: Charte.secondaire),
                 trailing: _menuLigne([('Renommer', () => _renommerRayon(r)), ('Supprimer', () => _supprimerRayon(r))]),
                 onTap: () => setState(() {
@@ -565,7 +570,11 @@ class _EcranCatalogueState extends State<EcranCatalogue> with WindowListener {
               selected: s == secteur,
               selectedTileColor: Charte.fondSelection,
               leading: ReorderableDragStartListener(index: i, child: const Icon(Icons.drag_indicator, size: 18)),
-              title: Text(s.nom, style: Charte.texte(15, gras: s == secteur)),
+              title: Row(children: [
+                Pictogramme(cleSecteur(r.nom, s.nom), taille: 28),
+                const SizedBox(width: 8),
+                Expanded(child: Text(s.nom, style: Charte.texte(15, gras: s == secteur))),
+              ]),
               subtitle: Text('${s.produits.where(_visible).length} produits', style: Charte.secondaire),
               trailing: Row(mainAxisSize: MainAxisSize.min, children: [
                 _taille(s.taille, (t) => _modifier(() => s.taille = t)),

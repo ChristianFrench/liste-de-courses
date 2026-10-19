@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/pictos.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
@@ -68,6 +69,9 @@ void main() {
     await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
     await tester.runAsync(() async {
       await precacheImage(const AssetImage('assets/icone_ronde.png'), tester.element(find.byType(Scaffold).first));
+      for (final c in pictosDisponibles) {
+        await precacheImage(AssetImage('assets/pictos/png/$c.png'), tester.element(find.byType(Scaffold).first));
+      }
     });
     await tester.pumpAndSettle();
 

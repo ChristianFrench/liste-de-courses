@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
+import '../composants/pictogramme.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -103,7 +104,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           : ListView(
               children: [
                 for (final r in rayons) ...[
-                  _titre(r.nom),
+                  _titre(r.nom, image: cleRayon(r.nom)),
                   for (final id in groupes[r.id]!) _ligne(id, freq[id]!),
                 ],
                 if (nonPlaces.isNotEmpty) ...[
@@ -126,12 +127,15 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     );
   }
 
-  Widget _titre(String nom) => Container(
+  Widget _titre(String nom, {String? image}) => Container(
         height: 30,
         color: Charte.fondBandeau,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         alignment: Alignment.centerLeft,
-        child: Text(nom.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 0.8)),
+        child: Row(children: [
+          if (image != null) ...[Pictogramme(image, taille: 24), const SizedBox(width: 8)],
+          Text(nom.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 0.8)),
+        ]),
       );
 
   Widget _ligne(String id, int n) {
@@ -282,7 +286,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
           entete: entete,
           haut: [
             BandeauPuces(
-              puces: [for (final r in rayons) Puce(r.nom, compteur: etat.nbDansRayon(l, r.id))],
+              puces: [
+                for (final r in rayons) Puce(r.nom, compteur: etat.nbDansRayon(l, r.id), image: cleRayon(r.nom)),
+              ],
               selection: rayonIndex,
               onChoix: (i) {
                 setState(() {
@@ -295,7 +301,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
             BandeauPuces(
               pastille: false,
               fond: Charte.fondBandeau,
-              puces: [for (final s in secteurs) Puce(s.nom, compteur: etat.nbDansSecteur(l, s.id))],
+              puces: [
+                for (final s in secteurs)
+                  Puce(s.nom, compteur: etat.nbDansSecteur(l, s.id), image: cleSecteur(rayon.nom, s.nom)),
+              ],
               selection: secteurIndex,
               onChoix: (i) {
                 setState(() => secteurIndex = i);
@@ -761,7 +770,12 @@ class EcranListeComplete extends StatelessWidget {
               : ListView(
                   children: [
                     for (final e in etapes) ...[
-                      TitreGroupe(nom: e.nom, numero: e.nonPlace ? null : '${++numero}', nonPlace: e.nonPlace),
+                      TitreGroupe(
+                        nom: e.nom,
+                        numero: e.nonPlace ? null : '${++numero}',
+                        nonPlace: e.nonPlace,
+                        image: e.secteur == null ? null : cleSecteur(etat.rayon(e.secteur!.rayonId)?.nom ?? '', e.nom),
+                      ),
                       for (final g in e.lignes)
                         LigneCompacte(
                           nom: etat.produit(g.produitId)?.nom ?? '',
