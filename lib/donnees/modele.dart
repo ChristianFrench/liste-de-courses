@@ -123,7 +123,7 @@ class Marque {
 class Packaging {
   Packaging(this.id, this.libelle);
   final String id;
-  final String libelle;
+  String libelle;
 }
 
 class Produit {
@@ -382,6 +382,9 @@ class Etat extends ChangeNotifier {
   /// Délai de suppression automatique des archives, en mois (0 : jamais).
   int delaiArchives = 0;
 
+  /// Formats de vente du catalogue déjà appliqués aux produits (une seule fois, à la mise à jour).
+  bool formatsAppliques = false;
+
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
   List<Rayon> rayons = [];
@@ -457,6 +460,7 @@ class Etat extends ChangeNotifier {
     } else {
       lire(s.lire());
     }
+    await appliquerFormats();
   }
 
   /// Premier lancement : un foyer vide, avec son créateur et un premier magasin (rempli d'après le catalogue complet).
@@ -552,6 +556,7 @@ class Etat extends ChangeNotifier {
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
+    formatsAppliques = options?['formats'] == 1;
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
@@ -643,6 +648,7 @@ class Etat extends ChangeNotifier {
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
+            if (formatsAppliques) 'formats': 1,
           },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
@@ -1099,6 +1105,11 @@ class Etat extends ChangeNotifier {
           if ((p['taille'] as num) > taille) continue;
           final nom = p['nom'] as String;
           final produit = parNom[nom.toLowerCase()] ??= (Produit(nouvelId('p'), nom, [], [], 0)..let(produits.add));
+          if (produit.packagingIds.isEmpty) {
+            for (final f in (p['formats'] as List? ?? const []).cast<String>()) {
+              produit.packagingIds.add(_packagingNomme(f).id);
+            }
+          }
           if (_trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == produit.id) == null) {
             emplacements.add(Emplacement(m.id, produit.id, secteur.id));
             n++;
@@ -1364,6 +1375,138 @@ class Etat extends ChangeNotifier {
       packagings.add(k);
     }
     return k;
+  }
+
+  /// Mise à jour : donne aux produits sans packaging les formats de vente du catalogue,
+  /// et fait de tous ces formats les types de packaging (Paramètres), rangés par nature.
+  Future<void> appliquerFormats({Map<String, dynamic>? catalogue}) async {
+    if (formatsAppliques) return;
+    try {
+      catalogue ??= await CatalogueType.lireJson();
+    } catch (_) {
+      return; // catalogue illisible : on réessaiera au prochain lancement
+    }
+    final parNom = <String, List<String>>{};
+    final tous = <String>{};
+    for (final r in (catalogue['rayons'] as List).cast<Map>()) {
+      for (final s in (r['secteurs'] as List).cast<Map>()) {
+        for (final p in (s['produits'] as List).cast<Map>()) {
+          final f = (p['formats'] as List? ?? const []).cast<String>();
+          parNom[(p['nom'] as String).toLowerCase()] = f;
+          tous.addAll(f);
+        }
+      }
+    }
+    if (tous.isEmpty) return;
+    for (final p in produits) {
+      if (p.packagingIds.isNotEmpty) continue;
+      for (final f in parNom[p.nom.toLowerCase()] ?? const <String>[]) {
+        p.packagingIds.add(_packagingNomme(f).id);
+      }
+    }
+    for (final f in tous) {
+      final k = _packagingNomme(f);
+      if (!typesPackaging.contains(k.id)) typesPackaging.add(k.id);
+    }
+    // Types de départ (pack de 6 à 2) qu'aucun article n'utilise : retirés
+    typesPackaging.removeWhere((id) =>
+        RegExp(r'^pack de [2-6]$', caseSensitive: false).hasMatch(packaging(id)?.libelle ?? '') && nbProduitsAvecPackaging(id) == 0);
+    trierTypesPackaging();
+    formatsAppliques = true;
+    modifie();
+  }
+
+  /// Range les types : vente à l'unité, poids, volumes, lots, packs ; puis par quantité.
+  void trierTypesPackaging() {
+    (int, double) rang(String id) {
+      final l = (packaging(id)?.libelle ?? '').toLowerCase();
+      final n = double.tryParse(RegExp(r'\d+(?:,\d+)?').firstMatch(l)?.group(0)?.replaceAll(',', '.') ?? '') ?? 0;
+      if (n == 0) return (0, 0);
+      if (RegExp(r'\d\s*k?g\b').hasMatch(l)) return (1, l.contains('kg') ? n * 1000 : n);
+      if (RegExp(r'\d\s*(c|m)?l\b').hasMatch(l)) return (2, l.contains('cl') ? n * 10 : (l.contains('ml') ? n : n * 1000));
+      if (l.startsWith('pack')) return (4, n);
+      return (3, n);
+    }
+
+    typesPackaging.sort((a, b) {
+      final (ga, na) = rang(a);
+      final (gb, nb) = rang(b);
+      return ga != gb ? ga.compareTo(gb) : na.compareTo(nb);
+    });
+  }
+
+  /// Nombre de produits qui proposent ce packaging.
+  int nbProduitsAvecPackaging(String id) => produits.where((p) => p.packagingIds.contains(id)).length;
+
+  List<Produit> produitsAvecPackaging(String id) => produits.where((p) => p.packagingIds.contains(id)).toList()
+    ..sort((a, b) => a.nom.compareTo(b.nom));
+
+  /// Corrige le libellé d'un format : tous les produits qui l'utilisent sont corrigés d'un coup.
+  /// Si le nouveau libellé existe déjà, les deux formats sont fusionnés.
+  void renommerPackaging(String id, String libelle) {
+    final k = packaging(id);
+    if (k == null || libelle.trim().isEmpty) return;
+    final autre = _trouve(packagings, (x) => x.id != id && x.libelle.toLowerCase() == libelle.trim().toLowerCase());
+    if (autre != null) {
+      fusionnerPackaging(id, autre.id);
+      return;
+    }
+    k.libelle = libelle.trim();
+    modifie();
+  }
+
+  /// Remplace partout le format [source] par [cible] (produits, lignes de liste, types) puis l'oublie.
+  void fusionnerPackaging(String source, String cible) {
+    if (source == cible || packaging(cible) == null) return;
+    for (final p in produits) {
+      final i = p.packagingIds.indexOf(source);
+      if (i < 0) continue;
+      if (p.packagingIds.contains(cible)) {
+        p.packagingIds.removeAt(i);
+      } else {
+        p.packagingIds[i] = cible;
+      }
+    }
+    for (final l in listes) {
+      for (final g in l.lignes) {
+        if (g.packagingId == source) g.packagingId = cible;
+      }
+    }
+    final t = typesPackaging.indexOf(source);
+    if (t >= 0) {
+      if (typesPackaging.contains(cible)) {
+        typesPackaging.removeAt(t);
+      } else {
+        typesPackaging[t] = cible;
+      }
+    }
+    couleurs.remove('pack:$source');
+    if (!listes.any((l) => l.lignes.any((g) => g.packagingId == source))) packagings.removeWhere((k) => k.id == source);
+    modifie();
+  }
+
+  /// Retire un format de la liste des types et de tous les produits (les listes déjà faites le gardent).
+  void supprimerPackaging(String id) {
+    for (final p in produits) {
+      p.packagingIds.remove(id);
+    }
+    typesPackaging.remove(id);
+    couleurs.remove('pack:$id');
+    modifie();
+  }
+
+  /// Formats les plus courants des autres produits du même secteur (produit sans format connu).
+  List<String> formatsDuSecteur(String magasinId, String produitId, {int max = 8}) {
+    final s = secteurDe(magasinId, produitId);
+    if (s == null) return [];
+    final n = <String, int>{};
+    for (final e in emplacements.where((e) => e.magasinId == magasinId && e.secteurId == s.id)) {
+      for (final k in produit(e.produitId)?.packagingIds ?? const <String>[]) {
+        n[k] = (n[k] ?? 0) + 1;
+      }
+    }
+    final ids = n.keys.toList()..sort((a, b) => n[b]!.compareTo(n[a]!));
+    return ids.take(max).toList();
   }
 
   void ajouterTypePackaging(String libelle) {

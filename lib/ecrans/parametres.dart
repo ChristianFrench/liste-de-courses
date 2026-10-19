@@ -168,7 +168,7 @@ class EcranParametres extends StatelessWidget {
             ),
             LigneMenu(
               titre: 'Types de packaging',
-              sousTitre: '${etat.typesPackaging.map((id) => etat.packaging(id)?.libelle ?? '').join(', ')} · chacun avec sa couleur',
+              sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
               onTap: () => Nav.aller(context, const EcranTypesPackaging()),
             ),
             _Option(
@@ -443,6 +443,56 @@ class _RondCouleur extends StatelessWidget {
 class EcranTypesPackaging extends StatelessWidget {
   const EcranTypesPackaging({super.key});
 
+  /// Actions sur un format : couleur, correction du libellé (pour tous ses articles), fusion, articles, suppression.
+  Future<void> _agir(BuildContext context, Etat etat, String id) async {
+    final k = etat.packaging(id);
+    if (k == null) return;
+    final n = etat.nbProduitsAvecPackaging(id);
+    final action = await choisirDansListe<String>(context, titre: k.libelle, choix: {
+      'renommer': 'Corriger le libellé (pour ses $n articles)',
+      'fusionner': 'Fusionner avec un autre format',
+      'articles': 'Voir les $n articles',
+      'couleur': 'Changer la couleur',
+      'supprimer': 'Supprimer ce format',
+    });
+    if (action == null || !context.mounted) return;
+    switch (action) {
+      case 'renommer':
+        final nom = await demanderTexte(context, titre: 'Libellé du format', initial: k.libelle, aide: 'Ex. : 500 g, 75 cl, lot de 4');
+        if (nom != null && nom.isNotEmpty) etat.renommerPackaging(id, nom);
+      case 'fusionner':
+        final cible = await choisirDansListe<String>(context,
+            titre: 'Remplacer « ${k.libelle} » par', choix: {for (final x in etat.typesPackaging) if (x != id) x: etat.packaging(x)?.libelle ?? ''});
+        if (cible != null) etat.fusionnerPackaging(id, cible);
+      case 'articles':
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            backgroundColor: Charte.blanc,
+            title: Text('${k.libelle} · $n articles', style: Charte.texte(18, gras: true)),
+            content: SizedBox(
+              width: 360,
+              height: 400,
+              child: ListView(children: [
+                for (final p in etat.produitsAvecPackaging(id))
+                  Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(p.nom, style: Charte.texte(15))),
+              ]),
+            ),
+            actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Fermer', style: Charte.texte(16)))],
+          ),
+        );
+      case 'couleur':
+        await _changerCouleur(context, 'pack:$id', k.libelle);
+      case 'supprimer':
+        final ok = await confirmer(context,
+            titre: 'Supprimer « ${k.libelle} » ?',
+            contenu: Text('Il ne sera plus proposé pour ses $n articles. Les listes déjà faites le gardent.', style: Charte.texte(16)),
+            plein: 'Garder',
+            contour: 'Supprimer');
+        if (ok == true) etat.supprimerPackaging(id);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -450,37 +500,38 @@ class EcranTypesPackaging extends StatelessWidget {
       listenable: etat,
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de packaging'),
+        bas: [
+          BarreAction(boutons: [
+            Bouton(
+              texte: '+ Nouveau format',
+              plein: true,
+              onTap: () async {
+                final nom = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
+                if (nom != null && nom.isNotEmpty) {
+                  etat.ajouterTypePackaging(nom);
+                  etat.trierTypesPackaging();
+                }
+              },
+            ),
+          ]),
+        ],
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
             const SizedBox(height: 12),
-            Text('Proposés pour chaque article de la liste, en plus des packagings propres au produit. '
-                'Un packaging peut aussi avoir une promotion. Touchez un type pour choisir sa couleur.',
-                style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+            Text('Les formats de vente proposés pour les articles. Touchez un format pour corriger son libellé '
+                '(tous ses articles sont corrigés), le fusionner avec un autre, voir ses articles ou changer sa couleur.',
+                style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 6),
             for (final id in etat.typesPackaging)
               if (etat.packaging(id) case final k?)
                 LigneMenu(
                   titre: k.libelle,
-                  titreTaille: 18,
+                  titreTaille: 17,
+                  sousTitre: '${etat.nbProduitsAvecPackaging(id)} articles',
                   gauche: _RondCouleur(etat.couleurPack(id)),
-                  onTap: () => _changerCouleur(context, 'pack:$id', k.libelle),
-                  droite: IconButton(
-                    tooltip: 'Retirer ce type',
-                    icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
-                    onPressed: () => etat.retirerTypePackaging(id),
-                  ),
+                  onTap: () => _agir(context, etat, id),
                 ),
-            const SizedBox(height: 14),
-            Bouton(
-              texte: '+ Ajouter un type de packaging',
-              pointille: true,
-              taille: 16,
-              onTap: () async {
-                final nom = await demanderTexte(context, titre: 'Nouveau type de packaging', aide: 'Ex. : Pack de 8, Lot de 2');
-                if (nom != null && nom.isNotEmpty) etat.ajouterTypePackaging(nom);
-              },
-            ),
             const SizedBox(height: 16),
           ],
         ),

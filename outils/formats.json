@@ -1,0 +1,8551 @@
+{
+ "Fruits et légumes": {
+  "Fruits": {
+   "formats": [
+    "au poids",
+    "1 kg",
+    "500 g",
+    "à la pièce",
+    "250 g",
+    "1,5 kg",
+    "125 g",
+    "lot de 2",
+    "2 kg"
+   ],
+   "produits": {
+    "Pommes": [
+     "au poids",
+     "1,5 kg",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Poires": [
+     "au poids",
+     "1,5 kg",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Bananes": [
+     "au poids",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Oranges": [
+     "au poids",
+     "2 kg",
+     "1,5 kg"
+    ],
+    "Clémentines": [
+     "au poids",
+     "1 kg",
+     "2 kg"
+    ],
+    "Citrons": [
+     "au poids",
+     "500 g",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Raisin": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Kiwis": [
+     "au poids",
+     "à la pièce",
+     "1 kg"
+    ],
+    "Fraises": [
+     "250 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Melon": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Pêches": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Abricots": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Ananas": [
+     "à la pièce"
+    ],
+    "Mangue": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Avocats": [
+     "à la pièce",
+     "500 g",
+     "lot de 2"
+    ],
+    "Nectarines": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Cerises": [
+     "au poids",
+     "500 g",
+     "250 g"
+    ],
+    "Prunes": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Pamplemousse": [
+     "à la pièce",
+     "au poids",
+     "1,5 kg"
+    ],
+    "Mandarines": [
+     "au poids",
+     "1 kg"
+    ],
+    "Figues": [
+     "au poids",
+     "250 g",
+     "500 g"
+    ],
+    "Fruits de la passion": [
+     "à la pièce",
+     "250 g"
+    ],
+    "Citrons verts": [
+     "à la pièce",
+     "au poids",
+     "500 g"
+    ],
+    "Framboises": [
+     "125 g",
+     "250 g"
+    ],
+    "Myrtilles": [
+     "125 g",
+     "250 g",
+     "500 g"
+    ],
+    "Kakis": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Pastèque": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Brugnons": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Cassis": [
+     "125 g",
+     "250 g"
+    ],
+    "Fraises Gariguette": [
+     "250 g",
+     "500 g"
+    ],
+    "Fruit du dragon": [
+     "à la pièce"
+    ],
+    "Groseilles": [
+     "125 g",
+     "250 g"
+    ],
+    "Kiwis jaunes": [
+     "à la pièce",
+     "500 g",
+     "au poids"
+    ],
+    "Mûres": [
+     "125 g",
+     "250 g"
+    ],
+    "Papaye": [
+     "à la pièce"
+    ],
+    "Pommes Golden": [
+     "au poids",
+     "1,5 kg",
+     "1 kg"
+    ],
+    "Prunes rouges": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Raisin rose": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Raisin rouge": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ]
+   }
+  },
+  "Légumes": {
+   "formats": [
+    "au poids",
+    "500 g",
+    "1 kg",
+    "à la pièce",
+    "250 g",
+    "botte",
+    "2 kg",
+    "5 kg",
+    "1,5 kg",
+    "à la coupe"
+   ],
+   "produits": {
+    "Pommes de terre": [
+     "au poids",
+     "2 kg",
+     "5 kg",
+     "1,5 kg",
+     "1 kg"
+    ],
+    "Carottes": [
+     "au poids",
+     "1 kg",
+     "2 kg",
+     "botte"
+    ],
+    "Oignons": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Ail": [
+     "à la pièce",
+     "250 g",
+     "500 g",
+     "au poids"
+    ],
+    "Échalotes": [
+     "au poids",
+     "500 g",
+     "250 g"
+    ],
+    "Tomates": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Courgettes": [
+     "au poids",
+     "1 kg"
+    ],
+    "Concombre": [
+     "à la pièce"
+    ],
+    "Poivrons": [
+     "au poids",
+     "à la pièce",
+     "500 g"
+    ],
+    "Aubergines": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Poireaux": [
+     "au poids",
+     "botte",
+     "1 kg"
+    ],
+    "Haricots verts": [
+     "au poids",
+     "500 g"
+    ],
+    "Brocoli": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Chou-fleur": [
+     "à la pièce"
+    ],
+    "Champignons de Paris": [
+     "250 g",
+     "500 g",
+     "au poids"
+    ],
+    "Endives": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Céleri": [
+     "à la pièce",
+     "botte"
+    ],
+    "Radis": [
+     "botte"
+    ],
+    "Betteraves cuites": [
+     "500 g",
+     "à la pièce"
+    ],
+    "Patates douces": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Navets": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Courge butternut": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Potiron": [
+     "au poids",
+     "à la coupe",
+     "à la pièce"
+    ],
+    "Épinards": [
+     "500 g",
+     "250 g",
+     "au poids"
+    ],
+    "Chou vert": [
+     "à la pièce"
+    ],
+    "Chou rouge": [
+     "à la pièce"
+    ],
+    "Fenouil": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Asperges": [
+     "500 g",
+     "1 kg",
+     "au poids"
+    ],
+    "Artichauts": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Panais": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Tomates cerises": [
+     "250 g",
+     "500 g",
+     "au poids"
+    ],
+    "Gingembre": [
+     "au poids",
+     "125 g",
+     "à la pièce"
+    ],
+    "Ail du Sud-Ouest": [
+     "à la pièce",
+     "250 g",
+     "500 g",
+     "au poids"
+    ],
+    "Ail violet": [
+     "à la pièce",
+     "250 g",
+     "500 g",
+     "au poids"
+    ],
+    "Asperges vertes": [
+     "500 g",
+     "1 kg",
+     "au poids"
+    ],
+    "Choux de Bruxelles": [
+     "500 g",
+     "au poids"
+    ],
+    "Cébettes": [
+     "botte"
+    ],
+    "Oignons blancs": [
+     "botte",
+     "au poids"
+    ],
+    "Oignons rouges": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Pommes de terre à frites": [
+     "au poids",
+     "2 kg",
+     "5 kg",
+     "1,5 kg",
+     "1 kg"
+    ],
+    "Tomates Marmande": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Tomates côtelées": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Tomates grappes": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Tomates noires de Crimée": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Tomates pour sauce": [
+     "au poids",
+     "1 kg",
+     "2 kg"
+    ]
+   }
+  },
+  "Salades et herbes": {
+   "formats": [
+    "à la pièce",
+    "botte",
+    "125 g",
+    "lot de 2",
+    "250 g"
+   ],
+   "produits": {
+    "Salade verte": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Mâche": [
+     "125 g",
+     "250 g"
+    ],
+    "Roquette": [
+     "125 g"
+    ],
+    "Persil": [
+     "botte",
+     "à la pièce"
+    ],
+    "Ciboulette": [
+     "botte",
+     "à la pièce"
+    ],
+    "Basilic": [
+     "botte",
+     "à la pièce"
+    ],
+    "Coriandre": [
+     "botte",
+     "à la pièce"
+    ],
+    "Menthe": [
+     "botte",
+     "à la pièce"
+    ],
+    "Laitue": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Batavia": [
+     "à la pièce"
+    ],
+    "Feuille de chêne": [
+     "à la pièce"
+    ],
+    "Frisée": [
+     "à la pièce"
+    ],
+    "Jeunes pousses d'épinards": [
+     "125 g",
+     "250 g"
+    ],
+    "Aneth": [
+     "botte",
+     "à la pièce"
+    ],
+    "Estragon": [
+     "botte",
+     "à la pièce"
+    ],
+    "Thym frais": [
+     "botte",
+     "à la pièce"
+    ],
+    "Romarin frais": [
+     "botte",
+     "à la pièce"
+    ],
+    "Cerfeuil": [
+     "botte",
+     "à la pièce"
+    ],
+    "Ciboule": [
+     "botte"
+    ],
+    "Herbes fraîches en pot": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Fraîche découpe": {
+   "formats": [
+    "500 g",
+    "250 g",
+    "1 kg",
+    "125 g",
+    "300 g",
+    "à la pièce",
+    "1,5 kg"
+   ],
+   "produits": {
+    "Salade en sachet": [
+     "125 g",
+     "250 g",
+     "300 g"
+    ],
+    "Crudités râpées": [
+     "250 g",
+     "500 g"
+    ],
+    "Fruits découpés": [
+     "250 g",
+     "500 g",
+     "à la pièce"
+    ],
+    "Légumes pour soupe prêts à cuire": [
+     "500 g",
+     "1 kg"
+    ],
+    "Poêlée de légumes fraîche": [
+     "500 g",
+     "1 kg"
+    ],
+    "Légumes pour wok": [
+     "500 g",
+     "250 g"
+    ],
+    "Courgettes en spaghetti": [
+     "250 g",
+     "500 g"
+    ],
+    "Champignons émincés": [
+     "250 g",
+     "500 g"
+    ],
+    "Oignons émincés": [
+     "250 g"
+    ],
+    "Haricots verts équeutés": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pommes de terre épluchées": [
+     "500 g",
+     "1 kg",
+     "1,5 kg"
+    ],
+    "Carottes râpées": [
+     "250 g",
+     "500 g"
+    ],
+    "Laitue iceberg en sachet": [
+     "125 g",
+     "250 g",
+     "300 g"
+    ]
+   }
+  },
+  "Jus de fruits frais": {
+   "formats": [
+    "1 l",
+    "75 cl",
+    "25 cl",
+    "1,5 l",
+    "50 cl",
+    "33 cl"
+   ],
+   "produits": {
+    "Jus d'orange frais": [
+     "1 l",
+     "75 cl",
+     "25 cl",
+     "1,5 l"
+    ],
+    "Smoothie": [
+     "25 cl",
+     "75 cl",
+     "1 l"
+    ],
+    "Jus de pamplemousse frais": [
+     "1 l",
+     "75 cl",
+     "25 cl"
+    ],
+    "Jus de pomme frais": [
+     "1 l",
+     "75 cl",
+     "25 cl"
+    ],
+    "Jus multifruits frais": [
+     "1 l",
+     "75 cl",
+     "25 cl"
+    ],
+    "Gaspacho": [
+     "1 l",
+     "50 cl"
+    ],
+    "Citronnade": [
+     "1 l",
+     "75 cl",
+     "33 cl"
+    ],
+    "Jus de carotte frais": [
+     "75 cl",
+     "25 cl",
+     "1 l"
+    ]
+   }
+  },
+  "Fruits secs et graines": {
+   "formats": [
+    "500 g",
+    "125 g",
+    "250 g",
+    "200 g",
+    "1 kg",
+    "100 g",
+    "au poids",
+    "à la pièce",
+    "400 g"
+   ],
+   "produits": {
+    "Noix": [
+     "au poids",
+     "500 g",
+     "1 kg",
+     "200 g"
+    ],
+    "Amandes": [
+     "125 g",
+     "200 g",
+     "250 g",
+     "500 g"
+    ],
+    "Raisins secs": [
+     "250 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Pruneaux": [
+     "250 g",
+     "500 g",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Noisettes": [
+     "125 g",
+     "200 g",
+     "250 g",
+     "500 g"
+    ],
+    "Graines de courge": [
+     "125 g",
+     "250 g",
+     "500 g"
+    ],
+    "Noix de cajou": [
+     "125 g",
+     "200 g",
+     "500 g"
+    ],
+    "Abricots secs": [
+     "125 g",
+     "200 g",
+     "250 g",
+     "500 g"
+    ],
+    "Dattes": [
+     "500 g",
+     "250 g",
+     "1 kg"
+    ],
+    "Figues sèches": [
+     "125 g",
+     "200 g",
+     "250 g",
+     "500 g"
+    ],
+    "Cranberries séchées": [
+     "125 g",
+     "200 g",
+     "250 g"
+    ],
+    "Graines de tournesol": [
+     "125 g",
+     "250 g",
+     "500 g"
+    ],
+    "Graines de lin": [
+     "125 g",
+     "250 g",
+     "500 g"
+    ],
+    "Mélange étudiant": [
+     "200 g",
+     "125 g",
+     "400 g"
+    ],
+    "Noix de pécan": [
+     "100 g",
+     "125 g",
+     "200 g"
+    ],
+    "Pignons de pin": [
+     "100 g",
+     "125 g"
+    ]
+   }
+  }
+ },
+ "Boucherie": {
+  "Boucherie libre-service": {
+   "formats": [
+    "500 g",
+    "1 kg",
+    "lot de 4",
+    "lot de 2",
+    "lot de 6",
+    "1,5 kg",
+    "400 g",
+    "à la pièce",
+    "lot de 10",
+    "250 g"
+   ],
+   "produits": {
+    "Steak haché": [
+     "lot de 2",
+     "lot de 4",
+     "lot de 10",
+     "lot de 20",
+     "1 kg"
+    ],
+    "Viande hachée": [
+     "400 g",
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Rôti de porc": [
+     "1 kg",
+     "750 g",
+     "1,5 kg",
+     "500 g"
+    ],
+    "Côtes de porc": [
+     "500 g",
+     "1 kg",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Escalopes de veau": [
+     "lot de 2",
+     "lot de 4",
+     "500 g"
+    ],
+    "Bœuf bourguignon": [
+     "1 kg",
+     "500 g",
+     "1,5 kg",
+     "2 kg"
+    ],
+    "Saucisses": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12",
+     "500 g",
+     "1 kg"
+    ],
+    "Merguez": [
+     "lot de 6",
+     "lot de 8",
+     "lot de 12",
+     "500 g",
+     "1 kg"
+    ],
+    "Chipolatas": [
+     "lot de 6",
+     "lot de 8",
+     "lot de 12",
+     "500 g",
+     "1 kg"
+    ],
+    "Pavés de bœuf": [
+     "lot de 2",
+     "lot de 4",
+     "500 g"
+    ],
+    "Bavette": [
+     "lot de 2",
+     "lot de 4",
+     "500 g",
+     "à la pièce"
+    ],
+    "Rumsteck": [
+     "lot de 2",
+     "500 g",
+     "à la pièce"
+    ],
+    "Bœuf pour pot-au-feu": [
+     "1 kg",
+     "1,5 kg",
+     "2 kg"
+    ],
+    "Rôti de bœuf": [
+     "750 g",
+     "1 kg",
+     "500 g",
+     "1,5 kg"
+    ],
+    "Filet mignon de porc": [
+     "à la pièce",
+     "lot de 2",
+     "500 g"
+    ],
+    "Échine de porc": [
+     "500 g",
+     "1 kg",
+     "lot de 4"
+    ],
+    "Poitrine de porc": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Sauté de porc": [
+     "1 kg",
+     "500 g",
+     "1,5 kg",
+     "2 kg"
+    ],
+    "Brochettes de bœuf": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Paupiettes de veau": [
+     "lot de 2",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Côtelettes d'agneau": [
+     "500 g",
+     "lot de 4",
+     "lot de 6",
+     "1 kg"
+    ],
+    "Carpaccio": [
+     "125 g",
+     "200 g",
+     "250 g"
+    ],
+    "Filet de porc": [
+     "500 g",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Grillades": [
+     "500 g",
+     "1 kg",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Haché 15 %": [
+     "500 g",
+     "400 g",
+     "lot de 4",
+     "lot de 10",
+     "1 kg"
+    ],
+    "Haché 5 %": [
+     "400 g",
+     "500 g",
+     "lot de 2",
+     "lot de 4",
+     "lot de 10"
+    ],
+    "Haché de veau": [
+     "400 g",
+     "500 g",
+     "lot de 4"
+    ],
+    "Queue de porc": [
+     "500 g",
+     "au poids"
+    ],
+    "Ribs à griller": [
+     "1 kg",
+     "500 g",
+     "1,5 kg"
+    ]
+   }
+  },
+  "Boucherie traditionnelle et Volailles": {
+   "formats": [
+    "au poids",
+    "à la coupe",
+    "à la pièce"
+   ],
+   "produits": {
+    "Entrecôte": [
+     "à la coupe",
+     "à la pièce",
+     "au poids"
+    ],
+    "Gigot d'agneau": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Côte de bœuf": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Blanquette de veau": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Faux-filet": [
+     "à la coupe",
+     "à la pièce",
+     "au poids"
+    ],
+    "Filet de bœuf": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Tournedos": [
+     "à la coupe",
+     "à la pièce",
+     "au poids"
+    ],
+    "Épaule d'agneau": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Navarin d'agneau": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Jarret de veau": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Osso-buco": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Tête de veau": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Carré d'agneau": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Tendrons de veau": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Joues de bœuf": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Basse côte": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Cervelle d'agneau": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Côtes de veau": [
+     "à la coupe",
+     "à la pièce",
+     "au poids"
+    ],
+    "Foie de veau": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Os à moelle": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Paleron": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Pieds de porc": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Plat de côtes": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Queue de bœuf": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Sauté d'agneau": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Veau à hacher": [
+     "au poids",
+     "à la coupe"
+    ],
+    "Viande pour couscous": [
+     "au poids",
+     "à la coupe"
+    ]
+   }
+  },
+  "Produits du terroir": {
+   "formats": [
+    "à la pièce",
+    "à la coupe",
+    "300 g",
+    "au poids",
+    "lot de 2",
+    "lot de 4",
+    "250 g",
+    "200 g",
+    "100 g",
+    "lot de 12"
+   ],
+   "produits": {
+    "Foie gras": [
+     "à la pièce",
+     "200 g",
+     "300 g",
+     "au poids"
+    ],
+    "Confit de canard": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Spécialités régionales": [
+     "au poids",
+     "à la coupe",
+     "à la pièce"
+    ],
+    "Gésiers confits": [
+     "à la pièce",
+     "250 g"
+    ],
+    "Magret de canard séché": [
+     "100 g",
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Escargots": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 50",
+     "à la pièce"
+    ],
+    "Graisse de canard": [
+     "à la pièce",
+     "300 g"
+    ],
+    "Andouillette": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Andouille": [
+     "à la coupe",
+     "125 g",
+     "250 g",
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Volaille": {
+  "Volaille libre-service": {
+   "formats": [
+    "500 g",
+    "1 kg",
+    "lot de 2",
+    "lot de 4",
+    "à la pièce",
+    "250 g",
+    "1,5 kg",
+    "lot de 6",
+    "750 g",
+    "lot de 10"
+   ],
+   "produits": {
+    "Blancs de poulet": [
+     "lot de 2",
+     "500 g",
+     "1 kg",
+     "lot de 4"
+    ],
+    "Cuisses de poulet": [
+     "1 kg",
+     "500 g",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Poulet entier": [
+     "à la pièce"
+    ],
+    "Escalopes de dinde": [
+     "lot de 2",
+     "lot de 4",
+     "500 g",
+     "1 kg"
+    ],
+    "Aiguillettes de poulet": [
+     "250 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Pilons de poulet": [
+     "500 g",
+     "1 kg",
+     "1,5 kg"
+    ],
+    "Ailes de poulet": [
+     "500 g",
+     "1 kg",
+     "1,5 kg"
+    ],
+    "Hauts de cuisse de poulet": [
+     "1 kg",
+     "500 g",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Magret de canard": [
+     "à la pièce",
+     "lot de 2",
+     "500 g"
+    ],
+    "Cuisses de canard": [
+     "lot de 2",
+     "lot de 4",
+     "1 kg"
+    ],
+    "Rôti de dinde": [
+     "1 kg",
+     "750 g",
+     "500 g"
+    ],
+    "Cordons bleus": [
+     "lot de 2",
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Pintade": [
+     "à la pièce"
+    ],
+    "Lapin": [
+     "à la pièce",
+     "1 kg",
+     "500 g"
+    ],
+    "Brochettes de poulet": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Sauté de dinde": [
+     "500 g",
+     "1 kg"
+    ],
+    "Ailes et manchons de poulet": [
+     "500 g",
+     "1 kg",
+     "1,5 kg"
+    ],
+    "Canard": [
+     "à la pièce"
+    ],
+    "Coquelet": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Croq'ailes": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Cuisses de poulet à la mexicaine": [
+     "1 kg",
+     "500 g",
+     "lot de 4"
+    ],
+    "Filets de dinde": [
+     "lot de 2",
+     "lot de 4",
+     "500 g",
+     "1 kg"
+    ],
+    "Filets de poulet": [
+     "lot de 2",
+     "500 g",
+     "1 kg",
+     "lot de 4"
+    ],
+    "Foies de volaille": [
+     "500 g",
+     "250 g",
+     "1 kg"
+    ],
+    "Grignottes de poulet": [
+     "500 g",
+     "1 kg",
+     "1,5 kg"
+    ],
+    "Steak haché de lapin": [
+     "lot de 2",
+     "250 g"
+    ]
+   }
+  },
+  "Rôtisserie": {
+   "formats": [
+    "à la pièce",
+    "au poids",
+    "lot de 2"
+   ],
+   "produits": {
+    "Poulet rôti": [
+     "à la pièce"
+    ],
+    "Cuisses de poulet rôties": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Pommes de terre rôtisserie": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Jarret de porc rôti": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Travers de porc rôtis": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Pintade rôtie": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Poissonnerie": {
+  "Poissonnerie libre-service": {
+   "formats": [
+    "500 g",
+    "lot de 2",
+    "250 g",
+    "200 g",
+    "300 g",
+    "1 kg",
+    "lot de 4",
+    "400 g",
+    "125 g",
+    "100 g"
+   ],
+   "produits": {
+    "Filets de saumon": [
+     "lot de 2",
+     "lot de 4",
+     "250 g",
+     "500 g"
+    ],
+    "Filets de cabillaud": [
+     "250 g",
+     "400 g",
+     "lot de 2",
+     "500 g"
+    ],
+    "Crevettes cuites": [
+     "200 g",
+     "300 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Saumon fumé": [
+     "lot de 2",
+     "lot de 4",
+     "lot de 6",
+     "lot de 8",
+     "300 g"
+    ],
+    "Surimi": [
+     "lot de 16",
+     "lot de 24",
+     "250 g",
+     "500 g"
+    ],
+    "Moules": [
+     "1 kg",
+     "1,5 kg",
+     "2 kg",
+     "au poids"
+    ],
+    "Filets de lieu": [
+     "250 g",
+     "400 g",
+     "lot de 2",
+     "500 g"
+    ],
+    "Truite fumée": [
+     "lot de 2",
+     "lot de 4",
+     "125 g"
+    ],
+    "Filets de merlu": [
+     "250 g",
+     "400 g",
+     "lot de 2",
+     "500 g"
+    ],
+    "Crevettes crues": [
+     "200 g",
+     "300 g",
+     "500 g"
+    ],
+    "Filets de truite": [
+     "lot de 2",
+     "250 g",
+     "500 g"
+    ],
+    "Harengs marinés": [
+     "250 g",
+     "à la pièce",
+     "500 g"
+    ],
+    "Maquereau fumé": [
+     "200 g",
+     "300 g",
+     "lot de 2"
+    ],
+    "Œufs de lump": [
+     "100 g",
+     "lot de 2"
+    ],
+    "Gambas": [
+     "200 g",
+     "300 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Carpaccio de saumon": [
+     "100 g",
+     "125 g",
+     "200 g"
+    ],
+    "Crevettes grises": [
+     "100 g",
+     "125 g",
+     "200 g"
+    ],
+    "Crevettes roses": [
+     "200 g",
+     "300 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Grosses crevettes": [
+     "200 g",
+     "300 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Pavés de saumon": [
+     "lot de 2",
+     "lot de 4",
+     "250 g",
+     "500 g"
+    ],
+    "Saumon frais": [
+     "à la coupe",
+     "250 g",
+     "500 g",
+     "au poids"
+    ]
+   }
+  },
+  "Poissonnerie traditionnelle": {
+   "formats": [
+    "au poids",
+    "à la pièce",
+    "500 g",
+    "1 kg",
+    "lot de 12",
+    "lot de 24",
+    "lot de 50",
+    "à la coupe",
+    "100 g",
+    "200 g"
+   ],
+   "produits": {
+    "Poisson du jour": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Huîtres": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 50",
+     "au poids"
+    ],
+    "Coquillages": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Bar": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Daurade": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Sole": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Lotte": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Thon frais": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Langoustines": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Bulots": [
+     "au poids",
+     "500 g"
+    ],
+    "Coquilles Saint-Jacques": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Tourteau": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Encornets": [
+     "au poids",
+     "500 g"
+    ],
+    "Merlan": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Raie": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Calamars": [
+     "au poids",
+     "500 g"
+    ],
+    "Caviar": [
+     "100 g",
+     "à la pièce"
+    ],
+    "Darne de saumon": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Filets de morue": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Homard cuit": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Huîtres fines de claire": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 50",
+     "au poids"
+    ],
+    "Morue": [
+     "au poids",
+     "500 g",
+     "1 kg"
+    ],
+    "Noix de Saint-Jacques": [
+     "au poids",
+     "500 g"
+    ],
+    "Palourdes": [
+     "au poids",
+     "1 kg",
+     "500 g"
+    ],
+    "Poulpe": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Queue de lotte": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Saumon pour carpaccio": [
+     "à la coupe",
+     "200 g",
+     "au poids"
+    ],
+    "Supions": [
+     "au poids",
+     "500 g"
+    ]
+   }
+  }
+ },
+ "Crèmerie": {
+  "Lait": {
+   "formats": [
+    "1 l",
+    "pack de 6",
+    "50 cl",
+    "20 cl",
+    "lot de 6",
+    "lot de 4",
+    "1,5 l",
+    "lot de 12"
+   ],
+   "produits": {
+    "Lait demi-écrémé": [
+     "1 l",
+     "pack de 6",
+     "50 cl",
+     "1,5 l"
+    ],
+    "Lait entier": [
+     "1 l",
+     "pack de 6",
+     "50 cl"
+    ],
+    "Lait écrémé": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Lait sans lactose": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Boisson végétale avoine": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Boisson soja": [
+     "1 l",
+     "pack de 6",
+     "20 cl"
+    ],
+    "Lait de chèvre": [
+     "1 l",
+     "50 cl"
+    ],
+    "Lait chocolaté": [
+     "1 l",
+     "lot de 6",
+     "20 cl"
+    ],
+    "Boisson amande": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Boisson riz": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Lait fermenté": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12",
+     "1 l"
+    ],
+    "Lait de croissance": [
+     "1 l",
+     "pack de 6",
+     "lot de 4"
+    ],
+    "Boisson coco": [
+     "1 l",
+     "pack de 6"
+    ],
+    "Lait frais microfiltré": [
+     "1 l",
+     "50 cl"
+    ]
+   }
+  },
+  "Beurre, œufs, crème": {
+   "formats": [
+    "250 g",
+    "500 g",
+    "125 g",
+    "lot de 12",
+    "20 cl",
+    "lot de 6",
+    "lot de 10",
+    "200 g",
+    "50 cl",
+    "1 l"
+   ],
+   "produits": {
+    "Beurre doux": [
+     "250 g",
+     "125 g",
+     "500 g"
+    ],
+    "Beurre demi-sel": [
+     "250 g",
+     "125 g",
+     "500 g"
+    ],
+    "Œufs": [
+     "lot de 6",
+     "lot de 12",
+     "lot de 10",
+     "lot de 30"
+    ],
+    "Crème fraîche épaisse": [
+     "200 g",
+     "400 g",
+     "1 kg",
+     "20 cl"
+    ],
+    "Crème liquide": [
+     "20 cl",
+     "50 cl",
+     "lot de 3",
+     "1 l"
+    ],
+    "Margarine": [
+     "250 g",
+     "500 g"
+    ],
+    "Crème fraîche légère": [
+     "200 g",
+     "400 g",
+     "20 cl",
+     "50 cl"
+    ],
+    "Crème chantilly": [
+     "250 g",
+     "500 g"
+    ],
+    "Beurre allégé": [
+     "250 g",
+     "125 g"
+    ],
+    "Beurre de baratte": [
+     "250 g",
+     "125 g"
+    ],
+    "Crème végétale": [
+     "20 cl",
+     "lot de 3",
+     "1 l"
+    ],
+    "Œufs de caille": [
+     "lot de 12",
+     "lot de 20"
+    ],
+    "Beurre clarifié": [
+     "250 g",
+     "200 g"
+    ],
+    "Blancs d'œufs liquides": [
+     "50 cl",
+     "1 l"
+    ],
+    "Beurre": [
+     "250 g",
+     "125 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Crème chantilly légère": [
+     "250 g"
+    ],
+    "St Hubert allégé doux": [
+     "250 g",
+     "500 g"
+    ],
+    "Œufs bio": [
+     "lot de 6",
+     "lot de 12",
+     "lot de 10"
+    ],
+    "Œufs plein air": [
+     "lot de 6",
+     "lot de 12",
+     "lot de 10",
+     "lot de 30"
+    ]
+   }
+  },
+  "Yaourts et desserts": {
+   "formats": [
+    "lot de 4",
+    "lot de 8",
+    "lot de 12",
+    "500 g",
+    "1 kg",
+    "lot de 2",
+    "lot de 16",
+    "lot de 6",
+    "1 l",
+    "400 g"
+   ],
+   "produits": {
+    "Yaourts nature": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12",
+     "lot de 16",
+     "1 kg"
+    ],
+    "Yaourts aux fruits": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12",
+     "lot de 16"
+    ],
+    "Fromage blanc": [
+     "500 g",
+     "1 kg",
+     "lot de 4",
+     "lot de 8"
+    ],
+    "Petits-suisses": [
+     "lot de 6",
+     "lot de 12",
+     "lot de 20"
+    ],
+    "Crèmes desserts": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Compotes en coupelles": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Skyr": [
+     "500 g",
+     "lot de 4",
+     "1 kg"
+    ],
+    "Yaourts à boire": [
+     "lot de 6",
+     "lot de 4",
+     "1 l"
+    ],
+    "Yaourts à la grecque": [
+     "lot de 4",
+     "500 g",
+     "1 kg"
+    ],
+    "Yaourts au lait de brebis": [
+     "lot de 4",
+     "400 g"
+    ],
+    "Yaourts au soja": [
+     "lot de 4",
+     "400 g",
+     "500 g"
+    ],
+    "Mousse au chocolat": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Riz au lait": [
+     "lot de 4",
+     "lot de 8",
+     "500 g"
+    ],
+    "Flans": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Îles flottantes": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Liégeois": [
+     "lot de 4",
+     "lot de 8"
+    ],
+    "Faisselle": [
+     "lot de 6",
+     "500 g",
+     "1 kg"
+    ],
+    "Yaourts allégés": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12",
+     "lot de 16"
+    ],
+    "Panna cotta": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Tiramisu": [
+     "lot de 2",
+     "lot de 4",
+     "500 g"
+    ],
+    "Gâteau de semoule": [
+     "lot de 4",
+     "lot de 8"
+    ],
+    "Kéfir": [
+     "1 l",
+     "50 cl",
+     "lot de 4"
+    ],
+    "Crème catalane": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Yaos": [
+     "lot de 4",
+     "500 g",
+     "1 kg"
+    ]
+   }
+  }
+ },
+ "Fromagerie": {
+  "Fromages libre-service": {
+   "formats": [
+    "200 g",
+    "à la pièce",
+    "250 g",
+    "125 g",
+    "100 g",
+    "400 g",
+    "au poids",
+    "500 g",
+    "300 g",
+    "1 kg"
+   ],
+   "produits": {
+    "Emmental râpé": [
+     "200 g",
+     "100 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Camembert": [
+     "250 g",
+     "à la pièce"
+    ],
+    "Comté": [
+     "200 g",
+     "250 g",
+     "400 g",
+     "500 g"
+    ],
+    "Mozzarella": [
+     "125 g",
+     "lot de 3",
+     "250 g",
+     "200 g"
+    ],
+    "Chèvre bûche": [
+     "200 g",
+     "300 g",
+     "1 kg"
+    ],
+    "Raclette": [
+     "400 g",
+     "750 g",
+     "au poids"
+    ],
+    "Roquefort": [
+     "100 g",
+     "125 g",
+     "300 g"
+    ],
+    "Fromage à tartiner": [
+     "125 g",
+     "300 g",
+     "lot de 8",
+     "lot de 16"
+    ],
+    "Feta": [
+     "200 g",
+     "400 g"
+    ],
+    "Parmesan": [
+     "200 g",
+     "250 g",
+     "100 g"
+    ],
+    "Coulommiers": [
+     "400 g",
+     "à la pièce"
+    ],
+    "Brie": [
+     "200 g",
+     "500 g",
+     "1 kg",
+     "à la pièce"
+    ],
+    "Reblochon": [
+     "500 g",
+     "à la pièce",
+     "250 g"
+    ],
+    "Emmental en tranches": [
+     "200 g",
+     "400 g"
+    ],
+    "Saint-Nectaire": [
+     "200 g",
+     "à la pièce",
+     "au poids"
+    ],
+    "Cantal": [
+     "200 g",
+     "250 g",
+     "400 g"
+    ],
+    "Morbier": [
+     "200 g",
+     "250 g"
+    ],
+    "Munster": [
+     "200 g",
+     "à la pièce",
+     "125 g"
+    ],
+    "Tomme de Savoie": [
+     "200 g",
+     "250 g",
+     "au poids"
+    ],
+    "Bleu d'Auvergne": [
+     "125 g",
+     "200 g",
+     "250 g"
+    ],
+    "Mimolette": [
+     "200 g",
+     "250 g",
+     "125 g"
+    ],
+    "Ricotta": [
+     "250 g"
+    ],
+    "Mascarpone": [
+     "250 g",
+     "500 g"
+    ],
+    "Burrata": [
+     "125 g",
+     "lot de 2",
+     "200 g"
+    ],
+    "Halloumi": [
+     "200 g",
+     "250 g"
+    ],
+    "Cheddar en tranches": [
+     "200 g"
+    ],
+    "Saint-Marcellin": [
+     "100 g",
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Gouda": [
+     "200 g",
+     "400 g"
+    ],
+    "Chèvre frais": [
+     "125 g",
+     "lot de 4",
+     "200 g"
+    ],
+    "Fromages en portions": [
+     "lot de 8",
+     "lot de 12",
+     "lot de 16",
+     "lot de 24"
+    ],
+    "Apéricube": [
+     "lot de 24",
+     "lot de 50"
+    ],
+    "Apérivrais": [
+     "lot de 24",
+     "lot de 50",
+     "100 g"
+    ],
+    "Boursin ail et fines herbes": [
+     "125 g",
+     "lot de 2",
+     "100 g"
+    ],
+    "Bresse Bleu allégé": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Brie de Meaux": [
+     "200 g",
+     "à la pièce",
+     "au poids"
+    ],
+    "Camembert de Normandie": [
+     "250 g",
+     "à la pièce"
+    ],
+    "Chamois d'Or": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Chaumes": [
+     "200 g",
+     "à la pièce",
+     "au poids"
+    ],
+    "Chaussée aux Moines": [
+     "300 g",
+     "à la pièce",
+     "200 g"
+    ],
+    "Cheddar": [
+     "200 g",
+     "250 g",
+     "125 g"
+    ],
+    "Cubes apéritif": [
+     "125 g",
+     "100 g",
+     "200 g"
+    ],
+    "Cœur de Neufchâtel": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Emmental": [
+     "250 g",
+     "500 g",
+     "1 kg",
+     "au poids"
+    ],
+    "Fromage de brebis": [
+     "200 g",
+     "250 g",
+     "au poids"
+    ],
+    "Fromage de chèvre": [
+     "125 g",
+     "200 g",
+     "à la pièce"
+    ],
+    "Fromage pour burger": [
+     "200 g",
+     "lot de 10"
+    ],
+    "Fromage à tartiner léger": [
+     "125 g",
+     "300 g",
+     "lot de 8"
+    ],
+    "Leerdammer": [
+     "200 g",
+     "400 g"
+    ],
+    "Maroilles": [
+     "200 g",
+     "à la pièce",
+     "750 g"
+    ],
+    "Parmesan râpé": [
+     "100 g",
+     "200 g"
+    ],
+    "Petit Basque": [
+     "200 g",
+     "au poids",
+     "à la pièce"
+    ],
+    "Saint-Albray": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Sainte-Maure": [
+     "250 g",
+     "à la pièce"
+    ]
+   }
+  },
+  "Fromages à la coupe": {
+   "formats": [
+    "à la coupe",
+    "au poids",
+    "200 g",
+    "à la pièce",
+    "250 g"
+   ],
+   "produits": {
+    "Fromage à la coupe": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Beaufort": [
+     "à la coupe",
+     "au poids",
+     "200 g"
+    ],
+    "Chaource": [
+     "à la pièce",
+     "250 g",
+     "à la coupe"
+    ],
+    "Pont-l'évêque": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Abondance": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Ossau-iraty": [
+     "à la coupe",
+     "au poids",
+     "200 g"
+    ],
+    "Époisses": [
+     "à la pièce",
+     "250 g"
+    ],
+    "Livarot": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Salers": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Fourme d'Ambert": [
+     "à la coupe",
+     "au poids",
+     "200 g"
+    ],
+    "Tomme de brebis": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Brie à la truffe": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Gorgonzola": [
+     "à la coupe",
+     "au poids",
+     "200 g"
+    ],
+    "Le Braison": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Mont d'or": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Pecorino": [
+     "à la coupe",
+     "au poids",
+     "200 g"
+    ]
+   }
+  }
+ },
+ "Charcuterie": {
+  "Charcuterie libre-service": {
+   "formats": [
+    "200 g",
+    "250 g",
+    "100 g",
+    "à la pièce",
+    "au poids",
+    "lot de 4",
+    "400 g",
+    "lot de 6",
+    "lot de 2",
+    "300 g"
+   ],
+   "produits": {
+    "Jambon blanc": [
+     "200 g",
+     "250 g",
+     "400 g",
+     "lot de 2"
+    ],
+    "Jambon cru": [
+     "100 g",
+     "200 g",
+     "300 g"
+    ],
+    "Saucisson sec": [
+     "à la pièce",
+     "250 g",
+     "100 g",
+     "300 g"
+    ],
+    "Pâté": [
+     "200 g",
+     "lot de 3",
+     "à la pièce"
+    ],
+    "Rillettes": [
+     "200 g",
+     "500 g"
+    ],
+    "Chorizo": [
+     "100 g",
+     "à la pièce",
+     "250 g",
+     "200 g"
+    ],
+    "Lardons": [
+     "200 g",
+     "lot de 2",
+     "400 g"
+    ],
+    "Allumettes de bacon": [
+     "200 g",
+     "lot de 2"
+    ],
+    "Blanc de poulet tranché": [
+     "200 g",
+     "250 g",
+     "400 g"
+    ],
+    "Jambon de dinde": [
+     "200 g",
+     "250 g"
+    ],
+    "Boudin noir": [
+     "250 g",
+     "lot de 4",
+     "au poids"
+    ],
+    "Boudin blanc": [
+     "lot de 4",
+     "250 g",
+     "lot de 6"
+    ],
+    "Saucisses de Strasbourg": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Mortadelle": [
+     "100 g",
+     "125 g"
+    ],
+    "Coppa": [
+     "100 g"
+    ],
+    "Rosette": [
+     "100 g",
+     "à la pièce",
+     "300 g"
+    ],
+    "Pancetta": [
+     "100 g",
+     "125 g"
+    ],
+    "Poitrine fumée": [
+     "200 g",
+     "250 g",
+     "au poids"
+    ],
+    "Salami": [
+     "100 g",
+     "200 g"
+    ],
+    "Jambon persillé": [
+     "200 g",
+     "à la coupe",
+     "au poids"
+    ],
+    "Viande des Grisons": [
+     "100 g"
+    ],
+    "Fromage de tête": [
+     "200 g",
+     "à la coupe"
+    ],
+    "Bacon": [
+     "100 g",
+     "200 g"
+    ],
+    "Blanc de dinde": [
+     "200 g",
+     "250 g",
+     "400 g"
+    ],
+    "Boudin noir aux oignons": [
+     "250 g",
+     "lot de 4",
+     "au poids"
+    ],
+    "Chorizo fort": [
+     "100 g",
+     "à la pièce",
+     "250 g"
+    ],
+    "Galabart": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon blanc supérieur Label Rouge": [
+     "200 g",
+     "250 g"
+    ],
+    "Jambon blanc supérieur sans nitrite": [
+     "200 g",
+     "250 g",
+     "400 g"
+    ],
+    "Knacki": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Mini boudins apéritif": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Poitrine salée": [
+     "250 g",
+     "au poids"
+    ],
+    "Saucisses cocktail": [
+     "200 g",
+     "250 g"
+    ],
+    "Saucisses de Francfort": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Saucisson à l'ail": [
+     "à la pièce",
+     "200 g",
+     "au poids"
+    ]
+   }
+  },
+  "Charcuterie à la coupe": {
+   "formats": [
+    "au poids",
+    "à la coupe",
+    "à la pièce",
+    "100 g"
+   ],
+   "produits": {
+    "Jambon à la coupe": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Saucisson à la coupe": [
+     "à la coupe",
+     "au poids",
+     "à la pièce"
+    ],
+    "Pâté en croûte": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Terrine à la coupe": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon de Bayonne": [
+     "à la coupe",
+     "au poids",
+     "100 g"
+    ],
+    "Jambon de Parme": [
+     "à la coupe",
+     "au poids",
+     "100 g"
+    ],
+    "Lomo": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Saucisse sèche": [
+     "à la pièce",
+     "au poids",
+     "à la coupe"
+    ],
+    "Galantine": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Tête roulée": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon à l'os": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Finocchiona": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon corse cuit aux herbes": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon cru de la Montagne Noire": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Jambon rôti aux herbes": [
+     "à la coupe",
+     "au poids"
+    ],
+    "Saucisse sèche d'Auvergne label rouge": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Saucisse sèche à l'ail": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Épaule cuite": [
+     "à la coupe",
+     "au poids"
+    ]
+   }
+  }
+ },
+ "Traiteur": {
+  "Traiteur frais": {
+   "formats": [
+    "300 g",
+    "au poids",
+    "à la pièce",
+    "500 g",
+    "lot de 2",
+    "1 kg",
+    "200 g",
+    "400 g",
+    "lot de 4",
+    "lot de 6"
+   ],
+   "produits": {
+    "Taboulé": [
+     "300 g",
+     "500 g",
+     "1 kg",
+     "au poids"
+    ],
+    "Salade piémontaise": [
+     "300 g",
+     "500 g",
+     "au poids"
+    ],
+    "Pizza fraîche": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Quiche lorraine": [
+     "à la pièce",
+     "lot de 2",
+     "400 g"
+    ],
+    "Houmous": [
+     "200 g",
+     "300 g"
+    ],
+    "Plats cuisinés frais": [
+     "300 g",
+     "400 g",
+     "1 kg"
+    ],
+    "Céleri rémoulade": [
+     "300 g",
+     "500 g",
+     "au poids"
+    ],
+    "Salade de pâtes": [
+     "300 g",
+     "500 g",
+     "au poids"
+    ],
+    "Salade de riz": [
+     "300 g",
+     "500 g",
+     "au poids"
+    ],
+    "Tarama": [
+     "100 g",
+     "200 g"
+    ],
+    "Tzatziki": [
+     "200 g"
+    ],
+    "Guacamole": [
+     "200 g"
+    ],
+    "Sandwichs": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Hachis parmentier": [
+     "300 g",
+     "1 kg",
+     "au poids"
+    ],
+    "Lasagnes fraîches": [
+     "300 g",
+     "1 kg",
+     "lot de 2"
+    ],
+    "Nems": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Samoussas": [
+     "lot de 6",
+     "lot de 12",
+     "au poids"
+    ],
+    "Croque-monsieur": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Sushis": [
+     "à la pièce"
+    ],
+    "Accras de morue": [
+     "125 g",
+     "au poids",
+     "à la pièce"
+    ],
+    "Pissaladière": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Salade shopska": [
+     "300 g",
+     "au poids"
+    ]
+   }
+  },
+  "Pâtes fraîches et pâtes à tarte": {
+   "formats": [
+    "lot de 2",
+    "rouleau",
+    "250 g",
+    "à la pièce",
+    "1 kg",
+    "300 g",
+    "400 g",
+    "500 g",
+    "lot de 4",
+    "lot de 6"
+   ],
+   "produits": {
+    "Pâtes fraîches": [
+     "250 g",
+     "400 g",
+     "1 kg",
+     "lot de 2"
+    ],
+    "Raviolis frais": [
+     "250 g",
+     "300 g",
+     "lot de 2"
+    ],
+    "Gnocchis": [
+     "500 g",
+     "lot de 2",
+     "1 kg"
+    ],
+    "Pâte feuilletée": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Pâte brisée": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Pâte à pizza": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Pâte sablée": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Pâte filo": [
+     "à la pièce"
+    ],
+    "Tortellini": [
+     "250 g",
+     "300 g",
+     "lot de 2"
+    ],
+    "Ravioles du Dauphiné": [
+     "250 g",
+     "lot de 4",
+     "1 kg"
+    ],
+    "Galettes de sarrasin": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Pâte à crêpes prête": [
+     "à la pièce"
+    ],
+    "Pâte à pain": [
+     "rouleau",
+     "à la pièce"
+    ],
+    "Pâte à pizza rectangulaire": [
+     "rouleau",
+     "lot de 2"
+    ]
+   }
+  },
+  "Traiteur à la coupe": {
+   "formats": [
+    "à la pièce",
+    "au poids",
+    "lot de 2",
+    "lot de 4"
+   ],
+   "produits": {
+    "Plat du jour traiteur": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Salade traiteur": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Paella": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Choucroute garnie": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Couscous royal": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Pizza à la part": [
+     "à la pièce"
+    ],
+    "Bouchées à la reine": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Brandade de morue": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Choucroute": [
+     "au poids",
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Boulangerie": {
+  "Pain": {
+   "formats": [
+    "à la pièce",
+    "lot de 4",
+    "lot de 6",
+    "lot de 2",
+    "500 g",
+    "au poids",
+    "lot de 3",
+    "à la coupe",
+    "250 g",
+    "750 g"
+   ],
+   "produits": {
+    "Baguette": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Pain de campagne": [
+     "à la pièce",
+     "à la coupe",
+     "au poids"
+    ],
+    "Pain de mie": [
+     "500 g",
+     "250 g",
+     "750 g"
+    ],
+    "Pain complet": [
+     "à la pièce",
+     "500 g"
+    ],
+    "Pains burger": [
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Wraps": [
+     "lot de 6",
+     "lot de 8",
+     "lot de 4"
+    ],
+    "Pain aux céréales": [
+     "à la pièce",
+     "500 g"
+    ],
+    "Pain de seigle": [
+     "à la pièce",
+     "500 g"
+    ],
+    "Ficelle": [
+     "à la pièce"
+    ],
+    "Baguette tradition": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Pain sans gluten": [
+     "à la pièce"
+    ],
+    "Pains hot-dog": [
+     "lot de 6",
+     "lot de 4"
+    ],
+    "Pain pita": [
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Pain précuit": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Bagels": [
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Pain viennois": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Baguette bio": [
+     "à la pièce"
+    ],
+    "Baguette fine": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Baguette fine bio": [
+     "à la pièce"
+    ],
+    "Baguette rustique": [
+     "à la pièce"
+    ],
+    "Fougasse": [
+     "à la pièce"
+    ],
+    "Pain": [
+     "à la pièce",
+     "au poids"
+    ],
+    "Pains croûte fine label rouge": [
+     "à la pièce",
+     "lot de 2"
+    ]
+   }
+  }
+ },
+ "Viennoiserie et pâtisserie": {
+  "Viennoiserie": {
+   "formats": [
+    "à la pièce",
+    "lot de 4",
+    "lot de 6",
+    "lot de 10",
+    "lot de 2",
+    "lot de 12",
+    "au poids",
+    "500 g",
+    "400 g",
+    "lot de 8"
+   ],
+   "produits": {
+    "Croissants": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Pains au chocolat": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Brioche": [
+     "à la pièce",
+     "500 g",
+     "400 g"
+    ],
+    "Pains au lait": [
+     "lot de 10",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Madeleines": [
+     "à la pièce",
+     "lot de 12",
+     "au poids"
+    ],
+    "Pains aux raisins": [
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Chaussons aux pommes": [
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Croissants aux amandes": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Muffins": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Donuts": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Gaufres": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Pancakes": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Chouquettes": [
+     "à la pièce",
+     "au poids",
+     "lot de 12"
+    ],
+    "Galette des rois": [
+     "à la pièce"
+    ],
+    "Couronne des rois briochée": [
+     "à la pièce"
+    ],
+    "Galette des rois brioche": [
+     "à la pièce"
+    ],
+    "Viennoiseries fraîches": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6"
+    ]
+   }
+  },
+  "Pâtisserie": {
+   "formats": [
+    "à la pièce",
+    "à la coupe",
+    "lot de 2",
+    "lot de 4",
+    "lot de 6",
+    "lot de 12"
+   ],
+   "produits": {
+    "Tarte aux fruits": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Éclairs": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Gâteau d'anniversaire": [
+     "à la pièce"
+    ],
+    "Flan pâtissier": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Millefeuille": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Paris-brest": [
+     "à la pièce"
+    ],
+    "Tarte au citron": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Fraisier": [
+     "à la pièce"
+    ],
+    "Choux à la crème": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Macarons": [
+     "lot de 6",
+     "lot de 12",
+     "à la pièce"
+    ],
+    "Bûche de Noël": [
+     "à la pièce"
+    ],
+    "Tropézienne": [
+     "à la pièce"
+    ],
+    "Religieuse": [
+     "à la pièce",
+     "lot de 2"
+    ]
+   }
+  }
+ },
+ "Épicerie salée": {
+  "Pâtes, riz et féculents": {
+   "formats": [
+    "500 g",
+    "1 kg",
+    "250 g",
+    "2 kg",
+    "à la pièce",
+    "5 kg",
+    "lot de 4"
+   ],
+   "produits": {
+    "Pâtes spaghetti": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Pâtes coquillettes": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pâtes penne": [
+     "500 g",
+     "1 kg"
+    ],
+    "Riz long": [
+     "1 kg",
+     "500 g",
+     "2 kg",
+     "5 kg"
+    ],
+    "Riz basmati": [
+     "1 kg",
+     "500 g",
+     "2 kg"
+    ],
+    "Semoule": [
+     "500 g",
+     "1 kg"
+    ],
+    "Lentilles": [
+     "500 g",
+     "1 kg"
+    ],
+    "Quinoa": [
+     "500 g",
+     "250 g"
+    ],
+    "Purée en flocons": [
+     "à la pièce",
+     "lot de 4",
+     "500 g"
+    ],
+    "Pois chiches": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pâtes tagliatelles": [
+     "500 g",
+     "250 g"
+    ],
+    "Pâtes fusilli": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pâtes macaroni": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pâtes à lasagnes": [
+     "500 g",
+     "250 g"
+    ],
+    "Vermicelles": [
+     "250 g",
+     "500 g"
+    ],
+    "Pâtes complètes": [
+     "500 g"
+    ],
+    "Riz rond": [
+     "500 g",
+     "1 kg"
+    ],
+    "Riz thaï": [
+     "1 kg",
+     "500 g",
+     "2 kg"
+    ],
+    "Riz complet": [
+     "1 kg",
+     "500 g"
+    ],
+    "Riz à risotto": [
+     "1 kg",
+     "500 g"
+    ],
+    "Boulgour": [
+     "500 g",
+     "1 kg"
+    ],
+    "Lentilles corail": [
+     "500 g",
+     "1 kg"
+    ],
+    "Polenta": [
+     "500 g",
+     "1 kg"
+    ],
+    "Nouilles chinoises": [
+     "250 g",
+     "500 g",
+     "à la pièce"
+    ],
+    "Pâtes farfalle": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pâtes pipe rigate": [
+     "500 g",
+     "1 kg"
+    ]
+   }
+  },
+  "Conserves": {
+   "formats": [
+    "à la pièce",
+    "lot de 3",
+    "750 g",
+    "400 g",
+    "lot de 4",
+    "500 g"
+   ],
+   "produits": {
+    "Thon en boîte": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Sardines": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Haricots verts en boîte": [
+     "400 g",
+     "750 g",
+     "lot de 3"
+    ],
+    "Petits pois carottes": [
+     "400 g",
+     "750 g",
+     "lot de 3"
+    ],
+    "Maïs": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Tomates pelées": [
+     "400 g",
+     "750 g",
+     "lot de 3"
+    ],
+    "Concentré de tomate": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Ratatouille": [
+     "à la pièce"
+    ],
+    "Cassoulet": [
+     "à la pièce"
+    ],
+    "Raviolis en boîte": [
+     "à la pièce",
+     "750 g"
+    ],
+    "Maquereaux": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Flageolets": [
+     "400 g",
+     "750 g"
+    ],
+    "Champignons en boîte": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Cœurs de palmier": [
+     "à la pièce"
+    ],
+    "Fonds d'artichaut": [
+     "à la pièce"
+    ],
+    "Miettes de crabe": [
+     "à la pièce"
+    ],
+    "Salsifis": [
+     "à la pièce"
+    ],
+    "Épinards en boîte": [
+     "à la pièce",
+     "750 g"
+    ],
+    "Anchois": [
+     "à la pièce"
+    ],
+    "Haricots verts extra-fins": [
+     "400 g",
+     "à la pièce",
+     "750 g"
+    ],
+    "Moules à l'escabèche": [
+     "à la pièce"
+    ],
+    "Petits pois extra-fins": [
+     "400 g",
+     "à la pièce",
+     "750 g"
+    ],
+    "Pulpe de tomate": [
+     "400 g",
+     "500 g",
+     "lot de 3"
+    ],
+    "Sardines à l'huile d'olive vierge bio": [
+     "à la pièce"
+    ],
+    "Thon au naturel": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4"
+    ]
+   }
+  },
+  "Sauces et condiments": {
+   "formats": [
+    "à la pièce",
+    "50 cl",
+    "1 l",
+    "25 cl",
+    "2 l",
+    "5 l",
+    "75 cl"
+   ],
+   "produits": {
+    "Huile de tournesol": [
+     "1 l",
+     "2 l",
+     "5 l"
+    ],
+    "Huile d'olive": [
+     "75 cl",
+     "1 l",
+     "50 cl"
+    ],
+    "Vinaigre": [
+     "1 l",
+     "50 cl"
+    ],
+    "Moutarde": [
+     "à la pièce"
+    ],
+    "Mayonnaise": [
+     "à la pièce"
+    ],
+    "Ketchup": [
+     "à la pièce"
+    ],
+    "Sauce tomate": [
+     "à la pièce"
+    ],
+    "Pesto": [
+     "à la pièce"
+    ],
+    "Sauce soja": [
+     "à la pièce"
+    ],
+    "Cornichons": [
+     "à la pièce"
+    ],
+    "Olives": [
+     "à la pièce"
+    ],
+    "Vinaigrette": [
+     "50 cl",
+     "à la pièce"
+    ],
+    "Huile de colza": [
+     "1 l",
+     "50 cl"
+    ],
+    "Vinaigre balsamique": [
+     "50 cl",
+     "25 cl",
+     "à la pièce"
+    ],
+    "Sauce barbecue": [
+     "à la pièce"
+    ],
+    "Sauce béarnaise": [
+     "à la pièce"
+    ],
+    "Sauce burger": [
+     "à la pièce"
+    ],
+    "Harissa": [
+     "à la pièce"
+    ],
+    "Câpres": [
+     "à la pièce"
+    ],
+    "Sauce bolognaise": [
+     "à la pièce"
+    ],
+    "Tapenade": [
+     "à la pièce"
+    ],
+    "Sauce samouraï": [
+     "à la pièce"
+    ],
+    "Sauce piquante": [
+     "à la pièce"
+    ],
+    "Huile de sésame": [
+     "25 cl",
+     "50 cl"
+    ],
+    "Sauce carbonara": [
+     "à la pièce"
+    ],
+    "Sauce aigre-douce": [
+     "à la pièce"
+    ],
+    "Nuoc-mâm": [
+     "à la pièce"
+    ],
+    "Huile d'arachide": [
+     "1 l",
+     "50 cl"
+    ],
+    "Ketchup hot": [
+     "à la pièce"
+    ],
+    "Sauce frites": [
+     "à la pièce"
+    ],
+    "Sauce moutarde-miel": [
+     "à la pièce"
+    ],
+    "Sauce piri piri": [
+     "à la pièce"
+    ],
+    "Sauce ranch": [
+     "à la pièce"
+    ],
+    "Tapenade noire": [
+     "à la pièce"
+    ],
+    "Vinaigre de vin rouge": [
+     "1 l",
+     "50 cl"
+    ],
+    "Vinaigre de vin vieux": [
+     "50 cl",
+     "1 l"
+    ]
+   }
+  },
+  "Sel, épices et aides culinaires": {
+   "formats": [
+    "à la pièce",
+    "1 kg",
+    "500 g",
+    "lot de 10",
+    "lot de 20",
+    "lot de 8",
+    "250 g"
+   ],
+   "produits": {
+    "Sel": [
+     "1 kg",
+     "à la pièce"
+    ],
+    "Poivre": [
+     "à la pièce"
+    ],
+    "Bouillon cube": [
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Herbes de Provence": [
+     "à la pièce"
+    ],
+    "Paprika": [
+     "à la pièce"
+    ],
+    "Curry": [
+     "à la pièce"
+    ],
+    "Cumin": [
+     "à la pièce"
+    ],
+    "Fond de veau": [
+     "à la pièce"
+    ],
+    "Levure chimique": [
+     "à la pièce",
+     "lot de 8"
+    ],
+    "Fécule de maïs": [
+     "à la pièce",
+     "250 g"
+    ],
+    "Noix de muscade": [
+     "à la pièce"
+    ],
+    "Cannelle": [
+     "à la pièce"
+    ],
+    "Origan": [
+     "à la pièce"
+    ],
+    "Piment d'Espelette": [
+     "à la pièce"
+    ],
+    "Ras el hanout": [
+     "à la pièce"
+    ],
+    "Curcuma": [
+     "à la pièce"
+    ],
+    "Laurier": [
+     "à la pièce"
+    ],
+    "Quatre-épices": [
+     "à la pièce"
+    ],
+    "Fleur de sel": [
+     "à la pièce"
+    ],
+    "Fumet de poisson": [
+     "à la pièce"
+    ],
+    "Piment de Cayenne": [
+     "à la pièce"
+    ],
+    "Roux": [
+     "à la pièce"
+    ],
+    "Ail en poudre": [
+     "à la pièce"
+    ],
+    "Assaisonnement pour paella": [
+     "à la pièce"
+    ],
+    "Chapelure": [
+     "à la pièce"
+    ],
+    "Oignons séchés": [
+     "à la pièce"
+    ],
+    "Paprika fort": [
+     "à la pièce"
+    ],
+    "Safran": [
+     "à la pièce"
+    ],
+    "Sel de Guérande mi-gros": [
+     "1 kg",
+     "à la pièce",
+     "500 g"
+    ],
+    "Sel de céleri": [
+     "à la pièce"
+    ],
+    "Sel rose de l'Himalaya": [
+     "à la pièce",
+     "500 g"
+    ]
+   }
+  },
+  "Soupes et plats préparés": {
+   "formats": [
+    "à la pièce",
+    "1 l",
+    "lot de 2",
+    "50 cl",
+    "lot de 6",
+    "lot de 3"
+   ],
+   "produits": {
+    "Soupe en brique": [
+     "1 l",
+     "50 cl",
+     "lot de 2"
+    ],
+    "Soupe déshydratée": [
+     "à la pièce"
+    ],
+    "Plat cuisiné en conserve": [
+     "à la pièce"
+    ],
+    "Nouilles instantanées": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Croûtons": [
+     "à la pièce"
+    ],
+    "Chili con carne": [
+     "à la pièce"
+    ],
+    "Soupe de poisson": [
+     "à la pièce",
+     "1 l"
+    ],
+    "Soupe miso": [
+     "à la pièce"
+    ],
+    "Plats cuisinés en barquette": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Salade composée en boîte": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Saucisses lentilles": [
+     "à la pièce"
+    ],
+    "Lentilles cuisinées": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Bio, vrac et terroir": {
+  "Diététique et bio": {
+   "formats": [
+    "à la pièce",
+    "1 l",
+    "lot de 6",
+    "lot de 2",
+    "500 g",
+    "250 g",
+    "1 kg"
+   ],
+   "produits": {
+    "Galettes de riz": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Produits sans gluten": [
+     "à la pièce"
+    ],
+    "Lait d'amande": [
+     "1 l",
+     "lot de 6"
+    ],
+    "Graines de chia": [
+     "à la pièce",
+     "250 g",
+     "500 g"
+    ],
+    "Lait d'avoine": [
+     "1 l",
+     "lot de 6"
+    ],
+    "Lait de soja": [
+     "1 l",
+     "lot de 6"
+    ],
+    "Boisson au riz": [
+     "1 l",
+     "lot de 6"
+    ],
+    "Galettes de maïs": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Pâtes sans gluten": [
+     "500 g",
+     "250 g"
+    ],
+    "Farine sans gluten": [
+     "1 kg",
+     "500 g"
+    ],
+    "Tofu": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Edulcorant": [
+     "à la pièce"
+    ],
+    "Biscuits sans sucre": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Vrac": {
+   "formats": [
+    "au poids",
+    "à la pièce"
+   ],
+   "produits": {
+    "Pâtes en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Riz en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Légumineuses en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Fruits secs en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Céréales en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Café en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Bonbons en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Graines en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Farine en vrac": [
+     "au poids",
+     "à la pièce"
+    ],
+    "Flocons d'avoine en vrac": [
+     "au poids",
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Apéritif": {
+  "Chips et biscuits apéritif": {
+   "formats": [
+    "à la pièce",
+    "lot de 6",
+    "200 g",
+    "125 g",
+    "300 g"
+   ],
+   "produits": {
+    "Chips": [
+     "à la pièce",
+     "125 g",
+     "300 g",
+     "lot de 6"
+    ],
+    "Biscuits apéritif": [
+     "à la pièce"
+    ],
+    "Tortillas chips": [
+     "à la pièce",
+     "200 g"
+    ],
+    "Crackers": [
+     "à la pièce"
+    ],
+    "Bretzels": [
+     "à la pièce"
+    ],
+    "Gressins": [
+     "à la pièce"
+    ],
+    "Popcorn": [
+     "à la pièce"
+    ],
+    "Chips de légumes": [
+     "à la pièce"
+    ],
+    "Biscuits soufflés": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Toasts apéritif": [
+     "à la pièce"
+    ],
+    "Sauce pour chips": [
+     "à la pièce"
+    ],
+    "Chips allégées": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Chips allégées en sel": [
+     "à la pièce"
+    ],
+    "Chips barbecue": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Chips de lentilles": [
+     "à la pièce"
+    ],
+    "Chips saveur poulet": [
+     "à la pièce"
+    ],
+    "Chips à la truffe": [
+     "à la pièce"
+    ],
+    "Chips épicées": [
+     "à la pièce"
+    ],
+    "Monaco": [
+     "à la pièce"
+    ],
+    "Monster Munch": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Sauce mexicaine hot": [
+     "à la pièce"
+    ],
+    "Tortillas chips nature": [
+     "à la pièce",
+     "200 g"
+    ]
+   }
+  },
+  "Fruits secs salés et olives": {
+   "formats": [
+    "à la pièce",
+    "500 g",
+    "200 g",
+    "250 g",
+    "125 g"
+   ],
+   "produits": {
+    "Cacahuètes": [
+     "à la pièce",
+     "200 g",
+     "500 g"
+    ],
+    "Pistaches": [
+     "à la pièce",
+     "250 g",
+     "500 g"
+    ],
+    "Olives apéritif": [
+     "à la pièce"
+    ],
+    "Mélange apéritif": [
+     "à la pièce"
+    ],
+    "Amandes grillées": [
+     "à la pièce",
+     "125 g"
+    ],
+    "Olives vertes": [
+     "à la pièce"
+    ],
+    "Olives noires": [
+     "à la pièce"
+    ],
+    "Olives farcies": [
+     "à la pièce"
+    ],
+    "Graines de tournesol salées": [
+     "à la pièce"
+    ],
+    "Tomates séchées": [
+     "à la pièce"
+    ],
+    "Cornichons apéritif": [
+     "à la pièce"
+    ],
+    "Mélange apéritif espagnol": [
+     "à la pièce"
+    ],
+    "Mélange apéritif italien": [
+     "à la pièce"
+    ],
+    "Mélange apéritif japonais": [
+     "à la pièce"
+    ],
+    "Olives farcies aux anchois": [
+     "à la pièce"
+    ],
+    "Olives farcies aux poivrons": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Cuisine du monde": {
+  "Asie": {
+   "formats": [
+    "à la pièce",
+    "500 g",
+    "1 kg",
+    "250 g",
+    "33 cl",
+    "20 cl",
+    "1 l"
+   ],
+   "produits": {
+    "Nouilles de riz": [
+     "à la pièce",
+     "250 g",
+     "500 g"
+    ],
+    "Sauce nuoc-mâm": [
+     "à la pièce"
+    ],
+    "Lait de coco": [
+     "33 cl",
+     "20 cl",
+     "1 l"
+    ],
+    "Riz basmati thaï": [
+     "1 kg",
+     "500 g"
+    ],
+    "Feuilles de riz": [
+     "à la pièce"
+    ],
+    "Pâte de curry thaï": [
+     "à la pièce"
+    ],
+    "Wasabi": [
+     "à la pièce"
+    ],
+    "Riz pour sushi": [
+     "500 g",
+     "1 kg"
+    ],
+    "Algues nori": [
+     "à la pièce"
+    ],
+    "Gingembre mariné": [
+     "à la pièce"
+    ],
+    "Nems surgelés": [
+     "à la pièce"
+    ],
+    "Sauce teriyaki": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Mexique et Amérique": {
+   "formats": [
+    "à la pièce",
+    "400 g",
+    "500 g",
+    "lot de 8",
+    "lot de 6",
+    "750 g",
+    "25 cl",
+    "50 cl"
+   ],
+   "produits": {
+    "Tortillas": [
+     "lot de 8",
+     "lot de 6"
+    ],
+    "Haricots rouges": [
+     "400 g",
+     "750 g",
+     "500 g"
+    ],
+    "Sauce salsa": [
+     "à la pièce"
+    ],
+    "Kit fajitas": [
+     "à la pièce"
+    ],
+    "Kit tacos": [
+     "à la pièce"
+    ],
+    "Piments jalapeños": [
+     "à la pièce"
+    ],
+    "Haricots noirs": [
+     "400 g",
+     "500 g"
+    ],
+    "Sauce chili": [
+     "à la pièce"
+    ],
+    "Sirop d'érable": [
+     "25 cl",
+     "50 cl"
+    ],
+    "Beurre de cacahuète crunchy": [
+     "à la pièce"
+    ],
+    "Épices mexicaines": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Orient et Inde": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 4",
+    "lot de 10"
+   ],
+   "produits": {
+    "Sauce curry": [
+     "à la pièce"
+    ],
+    "Épices du monde": [
+     "à la pièce"
+    ],
+    "Couscous préparé": [
+     "à la pièce"
+    ],
+    "Pâte de curry indienne": [
+     "à la pièce"
+    ],
+    "Galettes naan": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Chutney de mangue": [
+     "à la pièce"
+    ],
+    "Feuilles de brick": [
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Thé à la menthe": [
+     "à la pièce"
+    ],
+    "Épices pour couscous": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Italie": {
+   "formats": [
+    "à la pièce",
+    "250 g"
+   ],
+   "produits": {
+    "Sauce tomate basilic": [
+     "à la pièce"
+    ],
+    "Antipasti": [
+     "à la pièce"
+    ],
+    "Risotto": [
+     "à la pièce"
+    ],
+    "Ravioles fraîches": [
+     "à la pièce"
+    ],
+    "Sauce arrabbiata": [
+     "à la pièce"
+    ],
+    "Pâtes fraîches farcies": [
+     "à la pièce",
+     "250 g"
+    ]
+   }
+  },
+  "Espagne": {
+   "formats": [
+    "à la pièce",
+    "à la coupe",
+    "1 kg",
+    "500 g"
+   ],
+   "produits": {
+    "Paella préparée": [
+     "à la pièce"
+    ],
+    "Riz pour paella": [
+     "1 kg",
+     "500 g"
+    ],
+    "Jambon serrano": [
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Tapas": [
+     "à la pièce"
+    ],
+    "Poivrons piquillos": [
+     "à la pièce"
+    ],
+    "Fromage manchego": [
+     "à la coupe",
+     "à la pièce"
+    ],
+    "Pimentón": [
+     "à la pièce"
+    ],
+    "Calamars à la romaine": [
+     "à la pièce"
+    ],
+    "Turrón": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Petit-déjeuner": {
+  "Café": {
+   "formats": [
+    "250 g",
+    "lot de 20",
+    "lot de 30",
+    "lot de 50",
+    "100 g",
+    "lot de 10",
+    "500 g",
+    "1 kg",
+    "lot de 4",
+    "200 g"
+   ],
+   "produits": {
+    "Café moulu": [
+     "250 g",
+     "lot de 4",
+     "500 g",
+     "1 kg"
+    ],
+    "Café en dosettes": [
+     "lot de 30",
+     "lot de 50",
+     "lot de 20"
+    ],
+    "Café soluble": [
+     "100 g",
+     "200 g",
+     "lot de 24"
+    ],
+    "Café en grains": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Café décaféiné": [
+     "250 g",
+     "100 g",
+     "lot de 10"
+    ],
+    "Capsules de café": [
+     "lot de 10",
+     "lot de 20",
+     "lot de 30"
+    ],
+    "Dosettes souples": [
+     "lot de 30",
+     "lot de 50",
+     "lot de 20"
+    ],
+    "Chicorée": [
+     "250 g",
+     "100 g"
+    ],
+    "Filtres à café": [
+     "lot de 100",
+     "lot de 50"
+    ],
+    "Boisson café au lait soluble": [
+     "lot de 10",
+     "lot de 20",
+     "400 g"
+    ]
+   }
+  },
+  "Thé et chocolat en poudre": {
+   "formats": [
+    "lot de 24",
+    "lot de 20",
+    "lot de 50",
+    "100 g",
+    "400 g",
+    "750 g",
+    "500 g",
+    "lot de 100",
+    "1 kg",
+    "lot de 10"
+   ],
+   "produits": {
+    "Thé": [
+     "lot de 24",
+     "lot de 50",
+     "lot de 100",
+     "100 g"
+    ],
+    "Infusion": [
+     "lot de 20",
+     "lot de 24",
+     "lot de 50"
+    ],
+    "Chocolat en poudre": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Thé vert": [
+     "lot de 24",
+     "lot de 20",
+     "lot de 50",
+     "100 g"
+    ],
+    "Thé noir": [
+     "lot de 24",
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Tisane verveine": [
+     "lot de 20",
+     "lot de 24"
+    ],
+    "Camomille": [
+     "lot de 20",
+     "lot de 24"
+    ],
+    "Rooibos": [
+     "lot de 20",
+     "lot de 24",
+     "100 g"
+    ],
+    "Thé earl grey": [
+     "lot de 24",
+     "lot de 50",
+     "100 g"
+    ],
+    "Chocolat instantané": [
+     "400 g",
+     "750 g",
+     "lot de 10"
+    ],
+    "Infusion menthe": [
+     "lot de 20",
+     "lot de 24",
+     "lot de 50"
+    ],
+    "Boisson maltée": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Chocolat en poudre sans sucre ajouté": [
+     "400 g",
+     "500 g"
+    ],
+    "Infusion feuilles de framboisier": [
+     "lot de 20"
+    ],
+    "Nesquik": [
+     "1 kg",
+     "750 g",
+     "500 g"
+    ],
+    "Tisane verveine menthe": [
+     "lot de 20",
+     "lot de 24"
+    ]
+   }
+  },
+  "Céréales": {
+   "formats": [
+    "400 g",
+    "500 g",
+    "750 g",
+    "1 kg",
+    "250 g"
+   ],
+   "produits": {
+    "Céréales": [
+     "400 g",
+     "500 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Muesli": [
+     "500 g",
+     "750 g",
+     "1 kg",
+     "400 g"
+    ],
+    "Flocons d'avoine": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Corn-flakes": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Céréales chocolatées": [
+     "400 g",
+     "500 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Pétales au miel": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Granola": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Céréales fourrées": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Céréales enfant": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Son d'avoine": [
+     "500 g",
+     "400 g"
+    ],
+    "Céréales complètes": [
+     "400 g",
+     "500 g",
+     "750 g"
+    ],
+    "Chocapic": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Céréales Trésor": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ]
+   }
+  },
+  "Biscottes et tartines": {
+   "formats": [
+    "500 g",
+    "250 g",
+    "300 g",
+    "lot de 30",
+    "lot de 100",
+    "1 kg"
+   ],
+   "produits": {
+    "Biscottes": [
+     "300 g",
+     "lot de 30",
+     "lot de 100"
+    ],
+    "Pain grillé": [
+     "250 g",
+     "500 g"
+    ],
+    "Tartines craquantes": [
+     "250 g",
+     "500 g"
+    ],
+    "Brioche tranchée": [
+     "500 g",
+     "1 kg"
+    ],
+    "Pains suédois": [
+     "250 g",
+     "500 g"
+    ],
+    "Biscottes complètes": [
+     "300 g",
+     "lot de 30"
+    ],
+    "Biscottes sans sel": [
+     "300 g",
+     "lot de 30"
+    ],
+    "Pain azyme": [
+     "250 g",
+     "500 g"
+    ]
+   }
+  },
+  "Confitures et pâtes à tartiner": {
+   "formats": [
+    "400 g",
+    "750 g",
+    "1 kg",
+    "500 g",
+    "250 g",
+    "200 g",
+    "300 g",
+    "100 g"
+   ],
+   "produits": {
+    "Confiture de fraises": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Confiture d'abricots": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Miel": [
+     "500 g",
+     "250 g",
+     "1 kg"
+    ],
+    "Pâte à tartiner chocolat": [
+     "400 g",
+     "750 g",
+     "1 kg"
+    ],
+    "Beurre de cacahuète": [
+     "400 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Confiture de framboises": [
+     "400 g",
+     "750 g"
+    ],
+    "Confiture de cerises": [
+     "400 g",
+     "750 g"
+    ],
+    "Confiture d'oranges amères": [
+     "400 g",
+     "750 g"
+    ],
+    "Confiture de fruits rouges": [
+     "400 g",
+     "750 g"
+    ],
+    "Gelée de groseilles": [
+     "400 g",
+     "750 g"
+    ],
+    "Pâte à tartiner noisette": [
+     "400 g",
+     "750 g"
+    ],
+    "Crème de marrons": [
+     "500 g",
+     "250 g",
+     "1 kg"
+    ],
+    "Miel liquide": [
+     "250 g",
+     "500 g"
+    ],
+    "Pâte de spéculoos": [
+     "400 g"
+    ],
+    "Confiture allégée en sucre": [
+     "400 g",
+     "500 g"
+    ],
+    "Lemon curd": [
+     "300 g"
+    ],
+    "Confipote abricots": [
+     "400 g"
+    ],
+    "Confipote myrtilles": [
+     "400 g"
+    ],
+    "Confiture d'abricots allégée": [
+     "400 g"
+    ],
+    "Confiture d'oignons": [
+     "200 g",
+     "100 g"
+    ],
+    "Confiture de figues": [
+     "400 g",
+     "750 g"
+    ],
+    "Confiture de myrtilles allégée": [
+     "400 g"
+    ],
+    "Miel d'acacia": [
+     "500 g",
+     "250 g"
+    ],
+    "Nutella": [
+     "400 g",
+     "750 g",
+     "1 kg",
+     "200 g"
+    ]
+   }
+  }
+ },
+ "Biscuits et sucré": {
+  "Biscuits et gâteaux": {
+   "formats": [
+    "300 g",
+    "200 g",
+    "lot de 2",
+    "lot de 6",
+    "500 g",
+    "lot de 12",
+    "125 g",
+    "400 g",
+    "250 g",
+    "lot de 10"
+   ],
+   "produits": {
+    "Biscuits secs": [
+     "200 g",
+     "400 g",
+     "lot de 2"
+    ],
+    "Biscuits au chocolat": [
+     "200 g",
+     "300 g",
+     "lot de 2"
+    ],
+    "Gâteaux moelleux": [
+     "lot de 6",
+     "lot de 10",
+     "lot de 12"
+    ],
+    "Barres de céréales": [
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Pain d'épices": [
+     "400 g",
+     "500 g",
+     "lot de 6"
+    ],
+    "Crêpes": [
+     "lot de 6",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Petits-beurre": [
+     "200 g",
+     "lot de 2",
+     "400 g"
+    ],
+    "Sablés": [
+     "125 g",
+     "200 g",
+     "300 g"
+    ],
+    "Cookies": [
+     "200 g",
+     "300 g",
+     "lot de 2"
+    ],
+    "Biscuits fourrés": [
+     "300 g",
+     "500 g",
+     "lot de 2"
+    ],
+    "Galettes bretonnes": [
+     "125 g",
+     "250 g",
+     "500 g"
+    ],
+    "Boudoirs": [
+     "200 g",
+     "300 g"
+    ],
+    "Quatre-quarts": [
+     "300 g",
+     "500 g",
+     "lot de 8"
+    ],
+    "Barres chocolatées": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Spéculoos": [
+     "250 g",
+     "500 g"
+    ],
+    "Palmiers": [
+     "100 g",
+     "200 g"
+    ],
+    "Tartelettes": [
+     "125 g",
+     "250 g"
+    ],
+    "Biscuits pour le goûter": [
+     "lot de 6",
+     "lot de 12",
+     "300 g"
+    ],
+    "Cake aux fruits": [
+     "300 g",
+     "500 g"
+    ],
+    "Biscuits Granola": [
+     "200 g",
+     "lot de 2",
+     "300 g"
+    ],
+    "Biscuits assortis en boîte métal": [
+     "500 g",
+     "1 kg",
+     "300 g"
+    ],
+    "Gâteaux Ourson": [
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Meringues": [
+     "100 g",
+     "200 g"
+    ],
+    "Petit Écolier chocolat noir": [
+     "125 g",
+     "lot de 2"
+    ]
+   }
+  },
+  "Chocolat et confiserie": {
+   "formats": [
+    "200 g",
+    "à la pièce",
+    "100 g",
+    "lot de 3",
+    "1 kg",
+    "250 g",
+    "500 g",
+    "300 g",
+    "400 g",
+    "lot de 16"
+   ],
+   "produits": {
+    "Tablette de chocolat noir": [
+     "100 g",
+     "200 g",
+     "lot de 3"
+    ],
+    "Tablette de chocolat au lait": [
+     "100 g",
+     "lot de 3",
+     "200 g"
+    ],
+    "Bonbons": [
+     "300 g",
+     "100 g",
+     "1 kg"
+    ],
+    "Chewing-gums": [
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Chocolat pâtissier": [
+     "200 g",
+     "400 g"
+    ],
+    "Chocolat blanc": [
+     "100 g",
+     "200 g"
+    ],
+    "Chocolat aux noisettes": [
+     "100 g",
+     "200 g",
+     "lot de 3"
+    ],
+    "Rochers au chocolat": [
+     "lot de 16",
+     "lot de 24",
+     "200 g"
+    ],
+    "Bonbons sans sucre": [
+     "100 g",
+     "à la pièce"
+    ],
+    "Guimauves": [
+     "300 g",
+     "1 kg"
+    ],
+    "Réglisse": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Caramels": [
+     "250 g",
+     "125 g"
+    ],
+    "Pastilles": [
+     "à la pièce",
+     "100 g",
+     "lot de 3"
+    ],
+    "Œufs en chocolat": [
+     "200 g",
+     "500 g",
+     "à la pièce"
+    ],
+    "Truffes au chocolat": [
+     "250 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Chocolats de Noël": [
+     "200 g",
+     "400 g",
+     "1 kg"
+    ],
+    "Pâtes de fruits": [
+     "250 g",
+     "500 g"
+    ],
+    "Bonbons menthe sans sucre": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Calendrier de l'Avent": [
+     "à la pièce"
+    ],
+    "Chocolats de Pâques": [
+     "200 g",
+     "à la pièce"
+    ],
+    "Lapin en chocolat": [
+     "à la pièce"
+    ],
+    "Mini Carambar": [
+     "200 g",
+     "1 kg"
+    ],
+    "Mini œufs After Eight": [
+     "125 g"
+    ],
+    "Nougat de Montélimar": [
+     "200 g",
+     "250 g",
+     "à la pièce"
+    ],
+    "Rochers au chocolat noir": [
+     "lot de 16",
+     "200 g"
+    ],
+    "Sucettes": [
+     "200 g",
+     "lot de 10",
+     "à la pièce"
+    ],
+    "Tablette de chocolat allégée": [
+     "100 g"
+    ],
+    "Tablette de chocolat noir 70 % allégée": [
+     "100 g"
+    ]
+   }
+  },
+  "Sucre, farine et pâtisserie": {
+   "formats": [
+    "500 g",
+    "1 kg",
+    "à la pièce",
+    "750 g",
+    "250 g",
+    "200 g",
+    "125 g",
+    "400 g",
+    "100 g",
+    "2 kg"
+   ],
+   "produits": {
+    "Sucre en poudre": [
+     "1 kg",
+     "750 g",
+     "2 kg"
+    ],
+    "Sucre en morceaux": [
+     "1 kg",
+     "500 g"
+    ],
+    "Farine": [
+     "1 kg",
+     "500 g",
+     "1,5 kg"
+    ],
+    "Sucre vanillé": [
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Préparation pour gâteau": [
+     "400 g",
+     "500 g"
+    ],
+    "Levure boulangère": [
+     "lot de 6",
+     "lot de 3"
+    ],
+    "Sucre roux": [
+     "1 kg",
+     "750 g",
+     "500 g"
+    ],
+    "Cassonade": [
+     "1 kg",
+     "750 g",
+     "500 g"
+    ],
+    "Sucre glace": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Farine complète": [
+     "1 kg",
+     "500 g"
+    ],
+    "Poudre d'amande": [
+     "125 g",
+     "200 g",
+     "100 g"
+    ],
+    "Arôme vanille": [
+     "à la pièce",
+     "20 cl"
+    ],
+    "Gousse de vanille": [
+     "à la pièce"
+    ],
+    "Pépites de chocolat": [
+     "100 g",
+     "200 g"
+    ],
+    "Vermicelles colorés": [
+     "à la pièce"
+    ],
+    "Préparation pour crêpes": [
+     "à la pièce",
+     "400 g"
+    ],
+    "Cacao en poudre non sucré": [
+     "250 g",
+     "125 g"
+    ],
+    "Sucre de canne": [
+     "1 kg",
+     "750 g",
+     "500 g"
+    ],
+    "Noix de coco râpée": [
+     "125 g",
+     "200 g"
+    ],
+    "Gélatine": [
+     "à la pièce"
+    ],
+    "Pâte à sucre": [
+     "250 g",
+     "500 g"
+    ],
+    "Cacao en poudre bio": [
+     "250 g",
+     "200 g"
+    ],
+    "Ingrédients pour cookies": [
+     "à la pièce"
+    ],
+    "Ingrédients pour gâteau au chocolat": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Compotes et fruits au sirop": {
+   "formats": [
+    "lot de 4",
+    "750 g",
+    "400 g",
+    "lot de 12",
+    "lot de 8",
+    "lot de 16",
+    "500 g",
+    "250 g"
+   ],
+   "produits": {
+    "Compote en gourdes": [
+     "lot de 4",
+     "lot de 12",
+     "lot de 16"
+    ],
+    "Compote en pot": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Fruits au sirop": [
+     "750 g",
+     "400 g",
+     "lot de 4"
+    ],
+    "Compote sans sucre ajouté": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Pêches au sirop": [
+     "750 g",
+     "400 g"
+    ],
+    "Ananas au sirop": [
+     "500 g",
+     "250 g"
+    ],
+    "Poires au sirop": [
+     "750 g",
+     "400 g"
+    ],
+    "Cocktail de fruits": [
+     "750 g",
+     "400 g",
+     "lot de 4"
+    ],
+    "Purée de fruits": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Abricots au sirop": [
+     "750 g",
+     "400 g"
+    ],
+    "Mangue en conserve": [
+     "400 g",
+     "750 g"
+    ]
+   }
+  }
+ },
+ "Surgelés": {
+  "Légumes surgelés": {
+   "formats": [
+    "1 kg",
+    "750 g",
+    "2 kg",
+    "500 g",
+    "250 g"
+   ],
+   "produits": {
+    "Petits pois surgelés": [
+     "1 kg",
+     "750 g",
+     "2 kg"
+    ],
+    "Haricots verts surgelés": [
+     "1 kg",
+     "750 g",
+     "2 kg"
+    ],
+    "Épinards surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Poêlée de légumes": [
+     "750 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Frites surgelées": [
+     "1 kg",
+     "2 kg",
+     "750 g"
+    ],
+    "Mélange pour soupe": [
+     "1 kg",
+     "750 g"
+    ],
+    "Brocolis surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Haricots plats surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Choux-fleurs surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Carottes surgelées": [
+     "1 kg",
+     "750 g"
+    ],
+    "Champignons surgelés": [
+     "500 g",
+     "1 kg"
+    ],
+    "Ratatouille surgelée": [
+     "750 g",
+     "1 kg"
+    ],
+    "Herbes surgelées": [
+     "250 g"
+    ],
+    "Oignons surgelés": [
+     "750 g",
+     "1 kg"
+    ],
+    "Potatoes surgelées": [
+     "750 g",
+     "1 kg",
+     "2 kg"
+    ],
+    "Pommes noisettes": [
+     "750 g",
+     "1 kg"
+    ],
+    "Légumes pour couscous surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Purée surgelée": [
+     "750 g",
+     "1 kg"
+    ],
+    "Haricots beurre surgelés": [
+     "1 kg",
+     "750 g"
+    ],
+    "Pommes de terre au four aux herbes": [
+     "750 g",
+     "500 g"
+    ],
+    "Pommes duchesse à la truffe": [
+     "500 g"
+    ]
+   }
+  },
+  "Viandes et poissons surgelés": {
+   "formats": [
+    "1 kg",
+    "lot de 4",
+    "500 g",
+    "400 g",
+    "lot de 10",
+    "lot de 20",
+    "250 g",
+    "lot de 2",
+    "lot de 8",
+    "2 kg"
+   ],
+   "produits": {
+    "Poisson pané": [
+     "lot de 10",
+     "lot de 20",
+     "lot de 4"
+    ],
+    "Steaks hachés surgelés": [
+     "lot de 10",
+     "lot de 4",
+     "lot de 20"
+    ],
+    "Nuggets de poulet": [
+     "400 g",
+     "1 kg"
+    ],
+    "Crevettes surgelées": [
+     "500 g",
+     "1 kg",
+     "250 g"
+    ],
+    "Filets de cabillaud surgelés": [
+     "400 g",
+     "1 kg"
+    ],
+    "Filets de saumon surgelés": [
+     "lot de 4",
+     "1 kg",
+     "lot de 2"
+    ],
+    "Moules surgelées": [
+     "1 kg",
+     "500 g"
+    ],
+    "Calamars surgelés": [
+     "500 g",
+     "1 kg",
+     "400 g"
+    ],
+    "Cordons bleus surgelés": [
+     "lot de 4",
+     "lot de 8"
+    ],
+    "Escalopes de poulet surgelées": [
+     "1 kg",
+     "500 g"
+    ],
+    "Fruits de mer surgelés": [
+     "500 g",
+     "1 kg"
+    ],
+    "Colin surgelé": [
+     "1 kg",
+     "400 g"
+    ],
+    "Cuisses de poulet surgelées": [
+     "1 kg",
+     "2 kg"
+    ],
+    "Saint-Jacques surgelées": [
+     "300 g",
+     "500 g",
+     "1 kg"
+    ],
+    "Pavés de merlu surgelés": [
+     "lot de 4",
+     "1 kg"
+    ],
+    "Croustibat": [
+     "lot de 16",
+     "lot de 30"
+    ],
+    "Mexicain": [
+     "lot de 10",
+     "lot de 4"
+    ]
+   }
+  },
+  "Plats et pizzas surgelés": {
+   "formats": [
+    "300 g",
+    "lot de 4",
+    "lot de 2",
+    "1 kg",
+    "lot de 6",
+    "à la pièce",
+    "500 g",
+    "lot de 12",
+    "lot de 10",
+    "lot de 20"
+   ],
+   "produits": {
+    "Pizza surgelée": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Plat cuisiné surgelé": [
+     "300 g",
+     "500 g"
+    ],
+    "Lasagnes surgelées": [
+     "300 g",
+     "1 kg"
+    ],
+    "Feuilletés": [
+     "lot de 4",
+     "lot de 12"
+    ],
+    "Quiche surgelée": [
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Croque-monsieur surgelé": [
+     "lot de 4",
+     "lot de 2",
+     "lot de 8"
+    ],
+    "Hachis parmentier surgelé": [
+     "300 g",
+     "1 kg"
+    ],
+    "Gratin surgelé": [
+     "300 g",
+     "1 kg"
+    ],
+    "Paella surgelée": [
+     "500 g",
+     "300 g",
+     "1 kg"
+    ],
+    "Pâte feuilletée surgelée": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Viennoiseries surgelées": [
+     "lot de 10",
+     "lot de 20",
+     "lot de 6"
+    ],
+    "Pain surgelé": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 2"
+    ],
+    "Tartes surgelées": [
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Burgers surgelés": [
+     "lot de 2",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Petits fours surgelés": [
+     "lot de 24",
+     "lot de 50",
+     "lot de 30"
+    ],
+    "Samoussas surgelés": [
+     "lot de 12",
+     "lot de 20",
+     "lot de 6"
+    ],
+    "Fruits rouges surgelés": [
+     "500 g",
+     "1 kg",
+     "300 g"
+    ],
+    "Mini pizzas": [
+     "lot de 6",
+     "lot de 12",
+     "lot de 10"
+    ]
+   }
+  }
+ },
+ "Glaces": {
+  "Glaces": {
+   "formats": [
+    "1 l",
+    "50 cl",
+    "lot de 6",
+    "2 l",
+    "lot de 4",
+    "lot de 12",
+    "75 cl",
+    "lot de 10",
+    "lot de 8",
+    "lot de 20"
+   ],
+   "produits": {
+    "Glace en bac": [
+     "1 l",
+     "2 l",
+     "50 cl"
+    ],
+    "Cônes glacés": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Esquimaux": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Sorbet": [
+     "1 l",
+     "50 cl",
+     "75 cl"
+    ],
+    "Glace vanille": [
+     "1 l",
+     "2 l",
+     "50 cl"
+    ],
+    "Glace chocolat": [
+     "1 l",
+     "2 l",
+     "50 cl"
+    ],
+    "Barres glacées": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Glace à l'italienne": [
+     "1 l",
+     "75 cl"
+    ],
+    "Pots de glace individuels": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Glace sans lactose": [
+     "50 cl",
+     "1 l"
+    ],
+    "Bâtonnets glacés": [
+     "lot de 6",
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Glace café": [
+     "1 l",
+     "50 cl"
+    ],
+    "Glace menthe-chocolat": [
+     "1 l",
+     "50 cl"
+    ],
+    "Glace stracciatella": [
+     "1 l",
+     "50 cl"
+    ],
+    "Glace vanille fraise façon italienne": [
+     "1 l",
+     "2 l"
+    ],
+    "Glace vanille-fraise": [
+     "1 l",
+     "2 l"
+    ],
+    "Magnum Classic": [
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Sorbet citron": [
+     "1 l",
+     "50 cl"
+    ],
+    "Sorbet fraise": [
+     "1 l",
+     "50 cl"
+    ]
+   }
+  },
+  "Desserts glacés": {
+   "formats": [
+    "à la pièce",
+    "lot de 12",
+    "lot de 4",
+    "lot de 6",
+    "lot de 8",
+    "lot de 24",
+    "lot de 2"
+   ],
+   "produits": {
+    "Bûche glacée": [
+     "à la pièce"
+    ],
+    "Vacherin glacé": [
+     "à la pièce"
+    ],
+    "Mini-glaces": [
+     "lot de 12",
+     "lot de 8",
+     "lot de 24"
+    ],
+    "Profiteroles": [
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Nougat glacé": [
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Omelette norvégienne": [
+     "à la pièce"
+    ],
+    "Tarte glacée": [
+     "à la pièce"
+    ],
+    "Macarons glacés": [
+     "lot de 12",
+     "lot de 6"
+    ],
+    "Mochis glacés": [
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Coupes glacées": [
+     "lot de 4",
+     "lot de 2",
+     "lot de 6"
+    ],
+    "Gâteau glacé": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Eaux et boissons sans alcool": {
+  "Eaux": {
+   "formats": [
+    "pack de 6",
+    "50 cl",
+    "1,5 l",
+    "pack de 12",
+    "5 l",
+    "1 l",
+    "pack de 4",
+    "pack de 24",
+    "33 cl"
+   ],
+   "produits": {
+    "Eau plate": [
+     "pack de 6",
+     "1,5 l",
+     "50 cl",
+     "pack de 12",
+     "5 l"
+    ],
+    "Eau gazeuse": [
+     "pack de 6",
+     "1 l",
+     "50 cl",
+     "pack de 4"
+    ],
+    "Eau aromatisée": [
+     "1,5 l",
+     "pack de 6",
+     "50 cl"
+    ],
+    "Eau minérale": [
+     "pack de 6",
+     "1,5 l",
+     "50 cl",
+     "pack de 12"
+    ],
+    "Eau de source": [
+     "pack de 6",
+     "1,5 l",
+     "5 l",
+     "50 cl"
+    ],
+    "Petites bouteilles d'eau": [
+     "pack de 6",
+     "pack de 12",
+     "pack de 24",
+     "50 cl",
+     "33 cl"
+    ],
+    "Bonbonne d'eau": [
+     "5 l"
+    ],
+    "Eau riche en magnésium": [
+     "pack de 6",
+     "1 l",
+     "1,5 l"
+    ]
+   }
+  },
+  "Jus de fruits": {
+   "formats": [
+    "1 l",
+    "1,5 l",
+    "pack de 6",
+    "75 cl",
+    "25 cl",
+    "lot de 6",
+    "lot de 10",
+    "lot de 3"
+   ],
+   "produits": {
+    "Jus d'orange": [
+     "1 l",
+     "1,5 l",
+     "pack de 6"
+    ],
+    "Jus de pomme": [
+     "1 l",
+     "1,5 l",
+     "pack de 6"
+    ],
+    "Jus multifruits": [
+     "1 l",
+     "1,5 l"
+    ],
+    "Jus de pamplemousse": [
+     "1 l"
+    ],
+    "Jus d'ananas": [
+     "1 l"
+    ],
+    "Jus de raisin": [
+     "1 l"
+    ],
+    "Jus de tomate": [
+     "1 l"
+    ],
+    "Nectar d'abricot": [
+     "1 l"
+    ],
+    "Jus de fruits frais": [
+     "1 l",
+     "75 cl",
+     "25 cl"
+    ],
+    "Nectar de mangue": [
+     "1 l"
+    ],
+    "Briquettes de jus": [
+     "lot de 6",
+     "lot de 10",
+     "lot de 3"
+    ]
+   }
+  },
+  "Sodas et sirops": {
+   "formats": [
+    "1,5 l",
+    "33 cl",
+    "pack de 6",
+    "75 cl",
+    "1 l",
+    "2 l",
+    "50 cl",
+    "pack de 12",
+    "pack de 4",
+    "25 cl"
+   ],
+   "produits": {
+    "Cola": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl",
+     "2 l",
+     "pack de 12"
+    ],
+    "Limonade": [
+     "1,5 l",
+     "75 cl",
+     "pack de 6"
+    ],
+    "Sirop": [
+     "75 cl",
+     "1 l",
+     "1,5 l"
+    ],
+    "Thé glacé": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl",
+     "2 l"
+    ],
+    "Boisson énergisante": [
+     "25 cl",
+     "pack de 4",
+     "50 cl"
+    ],
+    "Cola zéro": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl",
+     "2 l",
+     "pack de 12"
+    ],
+    "Soda à l'orange": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl"
+    ],
+    "Tonic": [
+     "1 l",
+     "33 cl",
+     "pack de 6"
+    ],
+    "Ginger ale": [
+     "1 l",
+     "33 cl",
+     "pack de 4"
+    ],
+    "Sirop de menthe": [
+     "75 cl",
+     "1 l",
+     "1,5 l"
+    ],
+    "Sirop de grenadine": [
+     "75 cl",
+     "1 l",
+     "1,5 l"
+    ],
+    "Sirop de citron": [
+     "75 cl",
+     "1 l"
+    ],
+    "Kombucha": [
+     "33 cl",
+     "75 cl"
+    ],
+    "Sirop d'orgeat": [
+     "75 cl",
+     "1 l"
+    ],
+    "Coca-Cola light": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl"
+    ],
+    "Concentré de cassis": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Fanta sans sucre": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl",
+     "2 l"
+    ],
+    "Jus de citron concentré": [
+     "50 cl",
+     "20 cl",
+     "1 l"
+    ],
+    "Orangina sans sucre": [
+     "1,5 l",
+     "pack de 6",
+     "33 cl"
+    ],
+    "Sirop de mojito": [
+     "75 cl"
+    ]
+   }
+  }
+ },
+ "Cave": {
+  "Bières et cidres": {
+   "formats": [
+    "pack de 6",
+    "75 cl",
+    "pack de 12",
+    "33 cl",
+    "pack de 4",
+    "1,5 l",
+    "pack de 24",
+    "50 cl",
+    "5 l",
+    "à la pièce"
+   ],
+   "produits": {
+    "Bière blonde": [
+     "pack de 6",
+     "pack de 12",
+     "pack de 24",
+     "75 cl",
+     "50 cl"
+    ],
+    "Bière sans alcool": [
+     "pack de 6",
+     "pack de 12",
+     "33 cl"
+    ],
+    "Cidre": [
+     "75 cl",
+     "1,5 l",
+     "pack de 4"
+    ],
+    "Bière ambrée": [
+     "pack de 6",
+     "75 cl",
+     "pack de 12"
+    ],
+    "Bière blanche": [
+     "pack de 6",
+     "pack de 12",
+     "75 cl"
+    ],
+    "Bière brune": [
+     "pack de 6",
+     "75 cl"
+    ],
+    "Bière IPA": [
+     "pack de 6",
+     "33 cl",
+     "pack de 4"
+    ],
+    "Bière d'abbaye": [
+     "pack de 6",
+     "pack de 12",
+     "75 cl",
+     "pack de 24"
+    ],
+    "Panaché": [
+     "pack de 6",
+     "pack de 12",
+     "33 cl"
+    ],
+    "Bière aromatisée": [
+     "pack de 6",
+     "33 cl"
+    ],
+    "Cidre doux": [
+     "75 cl",
+     "1,5 l",
+     "pack de 4"
+    ],
+    "Cidre brut": [
+     "75 cl",
+     "1,5 l",
+     "pack de 4"
+    ],
+    "Fût de bière": [
+     "5 l",
+     "à la pièce"
+    ]
+   }
+  },
+  "Vins": {
+   "formats": [
+    "75 cl",
+    "2 l",
+    "33 cl",
+    "5 l",
+    "1,5 l",
+    "1 l",
+    "50 cl"
+   ],
+   "produits": {
+    "Vin rouge": [
+     "75 cl",
+     "1 l",
+     "2 l",
+     "5 l",
+     "33 cl"
+    ],
+    "Vin blanc": [
+     "75 cl",
+     "2 l",
+     "5 l",
+     "33 cl",
+     "1 l"
+    ],
+    "Vin rosé": [
+     "75 cl",
+     "2 l",
+     "5 l",
+     "1,5 l",
+     "1 l"
+    ],
+    "Vin de Bordeaux": [
+     "75 cl",
+     "33 cl",
+     "1,5 l",
+     "2 l"
+    ],
+    "Vin de Bourgogne": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Côtes-du-rhône": [
+     "75 cl",
+     "2 l",
+     "5 l",
+     "33 cl"
+    ],
+    "Muscadet": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Vin en cubi": [
+     "2 l",
+     "5 l"
+    ],
+    "Vin sans alcool": [
+     "75 cl"
+    ],
+    "Vin moelleux": [
+     "75 cl",
+     "50 cl",
+     "33 cl"
+    ],
+    "Sangria": [
+     "1,5 l",
+     "75 cl",
+     "2 l"
+    ],
+    "Beaujolais nouveau": [
+     "75 cl",
+     "1,5 l"
+    ]
+   }
+  },
+  "Champagnes et mousseux": {
+   "formats": [
+    "75 cl",
+    "33 cl",
+    "20 cl",
+    "1,5 l"
+   ],
+   "produits": {
+    "Champagne": [
+     "75 cl",
+     "33 cl",
+     "1,5 l",
+     "20 cl"
+    ],
+    "Mousseux": [
+     "75 cl"
+    ],
+    "Crémant": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Prosecco": [
+     "75 cl",
+     "20 cl"
+    ],
+    "Cava": [
+     "75 cl"
+    ],
+    "Clairette de Die": [
+     "75 cl"
+    ],
+    "Champagne rosé": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Blanquette de Limoux": [
+     "75 cl"
+    ],
+    "Pétillant sans alcool": [
+     "75 cl",
+     "20 cl"
+    ],
+    "Asti": [
+     "75 cl"
+    ]
+   }
+  },
+  "Alcools et apéritifs": {
+   "formats": [
+    "75 cl",
+    "1 l",
+    "33 cl",
+    "1,5 l",
+    "50 cl",
+    "pack de 4",
+    "20 cl"
+   ],
+   "produits": {
+    "Pastis": [
+     "1 l",
+     "75 cl",
+     "1,5 l",
+     "50 cl"
+    ],
+    "Whisky": [
+     "75 cl",
+     "1 l",
+     "1,5 l",
+     "33 cl",
+     "20 cl"
+    ],
+    "Rhum": [
+     "75 cl",
+     "1 l",
+     "33 cl"
+    ],
+    "Porto": [
+     "75 cl",
+     "1 l",
+     "1,5 l"
+    ],
+    "Vodka": [
+     "75 cl",
+     "1 l",
+     "33 cl",
+     "1,5 l"
+    ],
+    "Gin": [
+     "75 cl",
+     "1 l",
+     "33 cl"
+    ],
+    "Martini blanc": [
+     "1 l",
+     "75 cl",
+     "1,5 l"
+    ],
+    "Crème de cassis": [
+     "75 cl",
+     "50 cl",
+     "1 l"
+    ],
+    "Calvados": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Cognac": [
+     "75 cl",
+     "33 cl",
+     "1 l"
+    ],
+    "Liqueur": [
+     "75 cl",
+     "50 cl",
+     "33 cl"
+    ],
+    "Rhum arrangé": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Muscat": [
+     "75 cl",
+     "50 cl",
+     "33 cl"
+    ],
+    "Kir": [
+     "75 cl",
+     "1 l",
+     "pack de 4"
+    ],
+    "Spritz": [
+     "75 cl",
+     "pack de 4",
+     "1 l"
+    ],
+    "Tequila": [
+     "75 cl",
+     "33 cl"
+    ],
+    "Get 27": [
+     "75 cl",
+     "1 l"
+    ]
+   }
+  }
+ },
+ "Bébé": {
+  "Alimentation bébé": {
+   "formats": [
+    "lot de 4",
+    "à la pièce",
+    "lot de 2",
+    "lot de 6",
+    "400 g",
+    "1 l",
+    "250 g",
+    "lot de 8",
+    "750 g",
+    "1 kg"
+   ],
+   "produits": {
+    "Lait infantile": [
+     "750 g",
+     "1 kg",
+     "400 g",
+     "1 l"
+    ],
+    "Petits pots": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Céréales bébé": [
+     "400 g",
+     "250 g"
+    ],
+    "Compotes bébé": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Plats bébé": [
+     "lot de 2",
+     "250 g",
+     "à la pièce"
+    ],
+    "Biscuits bébé": [
+     "125 g",
+     "à la pièce"
+    ],
+    "Petits pots légumes": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Desserts lactés bébé": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Eau pour bébé": [
+     "pack de 6",
+     "1,5 l",
+     "1 l"
+    ],
+    "Gourdes bébé": [
+     "lot de 4",
+     "lot de 6",
+     "lot de 12"
+    ],
+    "Jus bébé": [
+     "lot de 4",
+     "25 cl"
+    ]
+   }
+  },
+  "Hygiène bébé": {
+   "formats": [
+    "lot de 50",
+    "50 cl",
+    "à la pièce",
+    "lot de 30",
+    "lot de 3",
+    "lot de 6",
+    "75 cl",
+    "25 cl",
+    "lot de 100",
+    "1 l"
+   ],
+   "produits": {
+    "Couches": [
+     "lot de 30",
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Lingettes bébé": [
+     "lot de 3",
+     "lot de 50",
+     "lot de 6"
+    ],
+    "Liniment": [
+     "50 cl",
+     "1 l"
+    ],
+    "Couches-culottes": [
+     "lot de 20",
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Coton bébé": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Gel lavant bébé": [
+     "50 cl",
+     "75 cl",
+     "25 cl"
+    ],
+    "Crème change": [
+     "100 g",
+     "à la pièce"
+    ],
+    "Lait de toilette bébé": [
+     "50 cl",
+     "75 cl"
+    ],
+    "Shampoing bébé": [
+     "50 cl",
+     "25 cl"
+    ],
+    "Mouche-bébé": [
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Lingettes à l'eau": [
+     "lot de 3",
+     "lot de 50",
+     "lot de 6"
+    ]
+   }
+  },
+  "Puériculture": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 3",
+    "lot de 30",
+    "lot de 50"
+   ],
+   "produits": {
+    "Biberons": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Tétines": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Thermomètre de bain": [
+     "à la pièce"
+    ],
+    "Bavoirs": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Tasse d'apprentissage": [
+     "à la pièce"
+    ],
+    "Couverts bébé": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Anneau de dentition": [
+     "à la pièce"
+    ],
+    "Goupillon": [
+     "à la pièce"
+    ],
+    "Assiette bébé": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Boîte doseuse lait": [
+     "à la pièce"
+    ],
+    "Coussinets d'allaitement": [
+     "lot de 30",
+     "lot de 50"
+    ]
+   }
+  }
+ },
+ "Parfumerie et soins": {
+  "Toilette et soins du corps": {
+   "formats": [
+    "20 cl",
+    "10 cl",
+    "33 cl",
+    "50 cl",
+    "25 cl",
+    "lot de 2",
+    "à la pièce",
+    "75 cl",
+    "1 l",
+    "100 g"
+   ],
+   "produits": {
+    "Gel douche": [
+     "25 cl",
+     "50 cl",
+     "lot de 3",
+     "75 cl",
+     "1 l"
+    ],
+    "Savon": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Déodorant": [
+     "20 cl",
+     "10 cl",
+     "lot de 2"
+    ],
+    "Crème hydratante": [
+     "10 cl",
+     "33 cl",
+     "20 cl"
+    ],
+    "Coton": [
+     "100 g",
+     "200 g"
+    ],
+    "Cotons-tiges": [
+     "lot de 100"
+    ],
+    "Savon liquide": [
+     "33 cl",
+     "50 cl",
+     "1 l"
+    ],
+    "Gel hydroalcoolique": [
+     "10 cl",
+     "33 cl",
+     "50 cl"
+    ],
+    "Lait corporel": [
+     "33 cl",
+     "25 cl"
+    ],
+    "Gel douche enfant": [
+     "25 cl",
+     "75 cl",
+     "50 cl"
+    ],
+    "Pierre ponce": [
+     "à la pièce"
+    ],
+    "Crème pour les pieds": [
+     "10 cl",
+     "20 cl"
+    ],
+    "Gant de toilette": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Huile pour le corps": [
+     "10 cl",
+     "20 cl"
+    ],
+    "Gommage corps": [
+     "20 cl"
+    ],
+    "Talc": [
+     "100 g",
+     "200 g"
+    ],
+    "Brumisateur d'eau": [
+     "20 cl",
+     "33 cl",
+     "10 cl"
+    ]
+   }
+  },
+  "Cheveux": {
+   "formats": [
+    "20 cl",
+    "25 cl",
+    "33 cl",
+    "à la pièce",
+    "10 cl",
+    "lot de 2",
+    "50 cl",
+    "75 cl",
+    "lot de 10",
+    "lot de 6"
+   ],
+   "produits": {
+    "Shampooing": [
+     "25 cl",
+     "33 cl",
+     "lot de 2"
+    ],
+    "Après-shampooing": [
+     "20 cl",
+     "25 cl",
+     "33 cl"
+    ],
+    "Coloration": [
+     "à la pièce"
+    ],
+    "Gel coiffant": [
+     "20 cl"
+    ],
+    "Laque": [
+     "33 cl",
+     "25 cl"
+    ],
+    "Shampooing sec": [
+     "20 cl",
+     "10 cl"
+    ],
+    "Masque capillaire": [
+     "33 cl",
+     "20 cl"
+    ],
+    "Shampooing antipelliculaire": [
+     "25 cl",
+     "33 cl",
+     "50 cl"
+    ],
+    "Shampooing enfant": [
+     "25 cl",
+     "50 cl",
+     "75 cl"
+    ],
+    "Mousse coiffante": [
+     "20 cl"
+    ],
+    "Cire coiffante": [
+     "10 cl"
+    ],
+    "Élastiques à cheveux": [
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Brosse à cheveux": [
+     "à la pièce"
+    ],
+    "Peigne": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Barrettes": [
+     "lot de 6",
+     "à la pièce",
+     "lot de 12"
+    ],
+    "Lotion anti-poux": [
+     "10 cl",
+     "20 cl"
+    ]
+   }
+  },
+  "Santé dentaire": {
+   "formats": [
+    "lot de 2",
+    "à la pièce",
+    "10 cl",
+    "lot de 3",
+    "lot de 4",
+    "lot de 6",
+    "50 cl",
+    "25 cl",
+    "1 l",
+    "lot de 8"
+   ],
+   "produits": {
+    "Dentifrice": [
+     "10 cl",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Brosse à dents": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Bain de bouche": [
+     "50 cl",
+     "25 cl",
+     "1 l"
+    ],
+    "Fil dentaire": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Brossettes interdentaires": [
+     "lot de 6",
+     "lot de 8"
+    ],
+    "Têtes de brosse à dents électrique": [
+     "lot de 2",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Brosse à dents enfant": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Dentifrice enfant": [
+     "10 cl"
+    ],
+    "Crème fixative pour appareil dentaire": [
+     "100 g"
+    ],
+    "Pastilles nettoyantes pour appareil dentaire": [
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Brosse à dents électrique": [
+     "à la pièce"
+    ],
+    "Chewing-gums sans sucre": [
+     "lot de 6",
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Dentifrice blancheur": [
+     "10 cl",
+     "lot de 2"
+    ]
+   }
+  },
+  "Cosmétiques et parfums": {
+   "formats": [
+    "à la pièce",
+    "10 cl",
+    "lot de 2",
+    "20 cl",
+    "33 cl",
+    "25 cl",
+    "75 cl",
+    "lot de 100"
+   ],
+   "produits": {
+    "Maquillage": [
+     "à la pièce"
+    ],
+    "Démaquillant": [
+     "20 cl",
+     "33 cl",
+     "25 cl"
+    ],
+    "Parfum": [
+     "10 cl"
+    ],
+    "Vernis à ongles": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Mascara": [
+     "à la pièce"
+    ],
+    "Rouge à lèvres": [
+     "à la pièce"
+    ],
+    "Fond de teint": [
+     "10 cl"
+    ],
+    "Crayon pour les yeux": [
+     "à la pièce"
+    ],
+    "Dissolvant": [
+     "10 cl",
+     "25 cl"
+    ],
+    "Eau micellaire": [
+     "33 cl",
+     "75 cl",
+     "20 cl"
+    ],
+    "Crème de jour": [
+     "10 cl"
+    ],
+    "Crème de nuit": [
+     "10 cl"
+    ],
+    "Masque visage": [
+     "à la pièce",
+     "10 cl"
+    ],
+    "Eau de toilette": [
+     "10 cl"
+    ],
+    "Lime à ongles": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Pince à épiler": [
+     "à la pièce"
+    ],
+    "Disques démaquillants": [
+     "lot de 100",
+     "lot de 2"
+    ],
+    "Sérum stick Derm Correxion": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Hygiène": {
+  "Hygiène féminine": {
+   "formats": [
+    "lot de 30",
+    "à la pièce",
+    "lot de 16",
+    "lot de 20",
+    "lot de 24",
+    "lot de 10",
+    "lot de 50",
+    "25 cl",
+    "50 cl",
+    "lot de 2"
+   ],
+   "produits": {
+    "Serviettes hygiéniques": [
+     "lot de 16",
+     "lot de 30"
+    ],
+    "Tampons": [
+     "lot de 16",
+     "lot de 24",
+     "lot de 30"
+    ],
+    "Protège-slips": [
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Serviettes de nuit": [
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Coupe menstruelle": [
+     "à la pièce"
+    ],
+    "Culotte menstruelle": [
+     "à la pièce"
+    ],
+    "Gel toilette intime": [
+     "25 cl",
+     "50 cl"
+    ],
+    "Lingettes intimes": [
+     "lot de 20",
+     "lot de 30"
+    ],
+    "Protections pour incontinence": [
+     "lot de 10",
+     "lot de 16",
+     "lot de 20"
+    ],
+    "Test de grossesse": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Préservatifs": [
+     "lot de 12",
+     "lot de 6",
+     "lot de 24"
+    ],
+    "Coloration Olia 6.0": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Rasage": {
+   "formats": [
+    "à la pièce",
+    "lot de 4",
+    "10 cl",
+    "20 cl",
+    "lot de 20",
+    "25 cl",
+    "33 cl",
+    "lot de 2",
+    "lot de 8",
+    "lot de 12"
+   ],
+   "produits": {
+    "Rasoirs": [
+     "à la pièce"
+    ],
+    "Mousse à raser": [
+     "25 cl",
+     "33 cl",
+     "lot de 2"
+    ],
+    "Lames de rasoir": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12"
+    ],
+    "Gel à raser": [
+     "20 cl",
+     "10 cl"
+    ],
+    "Après-rasage": [
+     "10 cl"
+    ],
+    "Rasoirs jetables": [
+     "lot de 4",
+     "lot de 10",
+     "lot de 20"
+    ],
+    "Rasoirs femme": [
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Crème dépilatoire": [
+     "20 cl",
+     "10 cl"
+    ],
+    "Bandes de cire": [
+     "lot de 20",
+     "lot de 50"
+    ],
+    "Blaireau": [
+     "à la pièce"
+    ],
+    "Tondeuse à barbe": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Parapharmacie": {
+  "Soins et premiers secours": {
+   "formats": [
+    "10 cl",
+    "lot de 50",
+    "25 cl",
+    "à la pièce",
+    "lot de 20",
+    "lot de 30",
+    "lot de 10",
+    "lot de 100",
+    "lot de 2",
+    "rouleau"
+   ],
+   "produits": {
+    "Pansements": [
+     "lot de 20",
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Sérum physiologique": [
+     "lot de 50",
+     "lot de 30",
+     "lot de 20"
+    ],
+    "Désinfectant cutané": [
+     "10 cl",
+     "25 cl"
+    ],
+    "Thermomètre": [
+     "à la pièce"
+    ],
+    "Compresses": [
+     "lot de 10",
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Bande Velpeau": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Sparadrap": [
+     "rouleau"
+    ],
+    "Spray nasal": [
+     "10 cl"
+    ],
+    "Antiseptique en spray": [
+     "10 cl"
+    ],
+    "Pansements ampoules": [
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Alcool à 70°": [
+     "25 cl",
+     "50 cl",
+     "10 cl"
+    ],
+    "Eau oxygénée": [
+     "25 cl",
+     "10 cl"
+    ],
+    "Tensiomètre": [
+     "à la pièce"
+    ],
+    "Spasmine": [
+     "lot de 50"
+    ]
+   }
+  },
+  "Solaires et soins spécifiques": {
+   "formats": [
+    "10 cl",
+    "20 cl",
+    "33 cl",
+    "à la pièce",
+    "lot de 2"
+   ],
+   "produits": {
+    "Crème solaire": [
+     "20 cl",
+     "10 cl",
+     "33 cl"
+    ],
+    "Crème mains": [
+     "10 cl"
+    ],
+    "Baume à lèvres": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Crème solaire enfant": [
+     "20 cl",
+     "33 cl",
+     "10 cl"
+    ],
+    "Après-soleil": [
+     "20 cl",
+     "33 cl"
+    ],
+    "Huile solaire": [
+     "20 cl"
+    ],
+    "Autobronzant": [
+     "20 cl",
+     "10 cl"
+    ],
+    "Anti-moustiques": [
+     "10 cl"
+    ],
+    "Crème anti-âge": [
+     "10 cl"
+    ],
+    "Crème pieds secs": [
+     "10 cl"
+    ],
+    "Stick lèvres solaire": [
+     "à la pièce"
+    ],
+    "Huiles essentielles": [
+     "10 cl"
+    ],
+    "Crème solaire SPF 50": [
+     "20 cl",
+     "10 cl",
+     "33 cl"
+    ],
+    "Huile essentielle de ravintsara": [
+     "10 cl"
+    ]
+   }
+  }
+ },
+ "Entretien / Droguerie": {
+  "Lessives et soin du linge": {
+   "formats": [
+    "1 l",
+    "1,5 l",
+    "lot de 30",
+    "2 l",
+    "lot de 20",
+    "500 g",
+    "75 cl",
+    "à la pièce",
+    "1,5 kg",
+    "2 kg"
+   ],
+   "produits": {
+    "Lessive liquide": [
+     "1,5 l",
+     "2 l"
+    ],
+    "Lessive en poudre": [
+     "1,5 kg",
+     "2 kg",
+     "5 kg"
+    ],
+    "Lessive en capsules": [
+     "lot de 20",
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Adoucissant": [
+     "1,5 l",
+     "2 l"
+    ],
+    "Détachant": [
+     "1 l",
+     "500 g",
+     "75 cl"
+    ],
+    "Blanchissant": [
+     "500 g",
+     "1 l",
+     "1 kg"
+    ],
+    "Lessive linge délicat": [
+     "1 l",
+     "1,5 l"
+    ],
+    "Lessive noire": [
+     "1,5 l",
+     "1 l"
+    ],
+    "Désinfectant linge": [
+     "1 l",
+     "1,5 l"
+    ],
+    "Parfum de linge": [
+     "250 g",
+     "75 cl"
+    ],
+    "Spray repassage": [
+     "50 cl"
+    ],
+    "Eau déminéralisée": [
+     "1 l",
+     "5 l"
+    ],
+    "Lingettes anti-décoloration": [
+     "lot de 20",
+     "lot de 30"
+    ],
+    "Nettoyant lave-linge": [
+     "25 cl",
+     "à la pièce"
+    ],
+    "Teinture textile": [
+     "400 g",
+     "à la pièce"
+    ],
+    "Savon de Marseille": [
+     "300 g",
+     "lot de 2",
+     "1 l"
+    ],
+    "Pinces à linge": [
+     "lot de 24",
+     "lot de 30"
+    ]
+   }
+  },
+  "Produits Vaisselle": {
+   "formats": [
+    "lot de 3",
+    "75 cl",
+    "1 l",
+    "lot de 6",
+    "50 cl",
+    "à la pièce",
+    "lot de 30",
+    "lot de 50",
+    "lot de 100",
+    "2 kg"
+   ],
+   "produits": {
+    "Liquide vaisselle": [
+     "50 cl",
+     "75 cl",
+     "1 l"
+    ],
+    "Tablettes lave-vaisselle": [
+     "lot de 30",
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Sel régénérant": [
+     "2 kg",
+     "1,5 kg",
+     "5 kg"
+    ],
+    "Liquide de rinçage": [
+     "50 cl",
+     "75 cl",
+     "1 l"
+    ],
+    "Éponges": [
+     "lot de 3",
+     "lot de 6",
+     "lot de 10"
+    ],
+    "Liquide vaisselle main": [
+     "50 cl",
+     "75 cl",
+     "1 l"
+    ],
+    "Nettoyant lave-vaisselle": [
+     "25 cl",
+     "lot de 3"
+    ],
+    "Lave-vaisselle tout-en-un en gel": [
+     "1 l",
+     "75 cl"
+    ],
+    "Grattoirs": [
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Brosse vaisselle": [
+     "à la pièce"
+    ],
+    "Éponges métalliques": [
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Lavettes microfibre": [
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Pastilles désodorisantes lave-vaisselle": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Tampons verts": [
+     "lot de 3",
+     "lot de 6"
+    ]
+   }
+  },
+  "Nettoyants ménagers": {
+   "formats": [
+    "1 l",
+    "50 cl",
+    "75 cl",
+    "lot de 2",
+    "500 g",
+    "1 kg",
+    "à la pièce",
+    "33 cl",
+    "1,5 l",
+    "2 l"
+   ],
+   "produits": {
+    "Nettoyant multi-usages": [
+     "75 cl",
+     "1 l",
+     "50 cl"
+    ],
+    "Nettoyant sol": [
+     "1 l",
+     "1,5 l",
+     "2 l"
+    ],
+    "Nettoyant vitres": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Détartrant": [
+     "75 cl",
+     "50 cl",
+     "1 l"
+    ],
+    "Désinfectant": [
+     "50 cl",
+     "1 l",
+     "75 cl"
+    ],
+    "Javel": [
+     "1 l",
+     "2 l",
+     "lot de 4",
+     "5 l"
+    ],
+    "Nettoyant WC": [
+     "75 cl",
+     "lot de 2",
+     "1 l"
+    ],
+    "Lingettes nettoyantes": [
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Dégraissant cuisine": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Vinaigre blanc": [
+     "1 l",
+     "1,5 l",
+     "75 cl",
+     "5 l"
+    ],
+    "Bicarbonate de soude": [
+     "500 g",
+     "1 kg"
+    ],
+    "Cristaux de soude": [
+     "1 kg",
+     "500 g"
+    ],
+    "Savon noir": [
+     "1 l",
+     "50 cl",
+     "1 kg"
+    ],
+    "Déboucheur canalisations": [
+     "1 l",
+     "50 cl",
+     "500 g"
+    ],
+    "Blocs WC": [
+     "lot de 2",
+     "lot de 3",
+     "à la pièce"
+    ],
+    "Désodorisant": [
+     "33 cl",
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Insecticide": [
+     "33 cl",
+     "à la pièce"
+    ],
+    "Nettoyant four": [
+     "50 cl",
+     "75 cl"
+    ],
+    "Nettoyant inox": [
+     "50 cl",
+     "33 cl"
+    ],
+    "Acide citrique": [
+     "500 g",
+     "1 kg"
+    ],
+    "Recharges anti-moustiques": [
+     "lot de 2",
+     "lot de 20",
+     "à la pièce"
+    ]
+   }
+  },
+  "Accessoires de ménage": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 6",
+    "lot de 100",
+    "lot de 3",
+    "lot de 20",
+    "lot de 50",
+    "lot de 4"
+   ],
+   "produits": {
+    "Serpillière": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Balai": [
+     "à la pièce"
+    ],
+    "Seau": [
+     "à la pièce"
+    ],
+    "Gants de ménage": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 100"
+    ],
+    "Balai-brosse": [
+     "à la pièce"
+    ],
+    "Pelle et balayette": [
+     "à la pièce"
+    ],
+    "Balai à franges": [
+     "à la pièce"
+    ],
+    "Chiffons microfibre": [
+     "lot de 3",
+     "lot de 2",
+     "lot de 6"
+    ],
+    "Plumeau": [
+     "à la pièce"
+    ],
+    "Brosse WC": [
+     "à la pièce"
+    ],
+    "Lingettes sol": [
+     "lot de 20",
+     "lot de 50"
+    ],
+    "Bassine": [
+     "à la pièce"
+    ],
+    "Sacs aspirateur": [
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Seau avec essoreur": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Salle de bain et cirage": {
+   "formats": [
+    "à la pièce",
+    "75 cl",
+    "50 cl",
+    "lot de 2",
+    "1 l",
+    "33 cl",
+    "lot de 4"
+   ],
+   "produits": {
+    "Nettoyant salle de bain": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Anticalcaire": [
+     "75 cl",
+     "50 cl",
+     "1 l"
+    ],
+    "Cirage": [
+     "à la pièce"
+    ],
+    "Nettoyant douche": [
+     "75 cl",
+     "50 cl"
+    ],
+    "Anti-moisissures": [
+     "50 cl",
+     "75 cl"
+    ],
+    "Brosse à chaussures": [
+     "à la pièce"
+    ],
+    "Imperméabilisant chaussures": [
+     "33 cl"
+    ],
+    "Lacets": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Semelles": [
+     "à la pièce"
+    ],
+    "Rideau de douche": [
+     "à la pièce"
+    ],
+    "Tapis de bain": [
+     "à la pièce"
+    ],
+    "Ventouses": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ]
+   }
+  },
+  "Papier": {
+   "formats": [
+    "lot de 4",
+    "lot de 2",
+    "lot de 100",
+    "lot de 6",
+    "lot de 16",
+    "lot de 30",
+    "lot de 50",
+    "lot de 12",
+    "lot de 24",
+    "lot de 3"
+   ],
+   "produits": {
+    "Papier toilette": [
+     "lot de 12",
+     "lot de 6",
+     "lot de 24",
+     "lot de 4"
+    ],
+    "Essuie-tout": [
+     "lot de 4",
+     "lot de 2",
+     "lot de 6"
+    ],
+    "Mouchoirs": [
+     "lot de 16",
+     "lot de 100",
+     "lot de 30"
+    ],
+    "Serviettes en papier": [
+     "lot de 100",
+     "lot de 50"
+    ],
+    "Papier toilette humide": [
+     "lot de 50",
+     "lot de 2"
+    ],
+    "Mouchoirs en boîte": [
+     "lot de 100",
+     "lot de 3"
+    ],
+    "Paquets de mouchoirs": [
+     "lot de 16",
+     "lot de 30",
+     "lot de 10"
+    ],
+    "Essuie-mains en papier": [
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Nappe en papier": [
+     "rouleau",
+     "à la pièce"
+    ]
+   }
+  },
+  "Emballages et Aluminium etc": {
+   "formats": [
+    "rouleau",
+    "lot de 50",
+    "lot de 20",
+    "lot de 6",
+    "lot de 100",
+    "à la pièce",
+    "lot de 2",
+    "lot de 30",
+    "lot de 3",
+    "lot de 10"
+   ],
+   "produits": {
+    "Sacs poubelle": [
+     "rouleau"
+    ],
+    "Papier aluminium": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Papier cuisson": [
+     "rouleau",
+     "lot de 20"
+    ],
+    "Film étirable": [
+     "rouleau",
+     "lot de 2"
+    ],
+    "Sacs congélation": [
+     "lot de 20",
+     "lot de 30",
+     "lot de 50"
+    ],
+    "Boîtes alimentaires": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Barquettes aluminium": [
+     "lot de 6",
+     "lot de 10",
+     "lot de 3"
+    ],
+    "Sacs de congélation zip": [
+     "lot de 16",
+     "lot de 20",
+     "lot de 30"
+    ],
+    "Film micro-ondes": [
+     "rouleau"
+    ],
+    "Sacs isothermes": [
+     "à la pièce"
+    ],
+    "Sacs de conservation": [
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Pochettes sandwich": [
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Liens pour sacs": [
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Sacs compostables": [
+     "rouleau"
+    ],
+    "Pots en verre": [
+     "lot de 6",
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Moules en papier": [
+     "lot de 50",
+     "lot de 100"
+    ],
+    "Barquettes de congélation": [
+     "lot de 10",
+     "lot de 6",
+     "lot de 20"
+    ]
+   }
+  }
+ },
+ "Cuisine et arts de la table": {
+  "Arts de la table et cuisine": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 3",
+    "lot de 6",
+    "lot de 12",
+    "lot de 4"
+   ],
+   "produits": {
+    "Ustensiles de cuisine": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Poêle": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Casserole": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Couteaux": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Planche à découper": [
+     "à la pièce"
+    ],
+    "Fouet": [
+     "à la pièce"
+    ],
+    "Spatule": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Louche": [
+     "à la pièce"
+    ],
+    "Économe": [
+     "à la pièce"
+    ],
+    "Ouvre-boîte": [
+     "à la pièce"
+    ],
+    "Plat à four": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Faitout": [
+     "à la pièce"
+    ],
+    "Saladier": [
+     "à la pièce"
+    ],
+    "Passoire": [
+     "à la pièce"
+    ],
+    "Râpe": [
+     "à la pièce"
+    ],
+    "Tire-bouchon": [
+     "à la pièce"
+    ],
+    "Moule à gâteau": [
+     "à la pièce"
+    ],
+    "Couverts": [
+     "lot de 6",
+     "lot de 12",
+     "à la pièce"
+    ],
+    "Cuillère de service": [
+     "à la pièce"
+    ],
+    "Cuillère à glace": [
+     "à la pièce"
+    ],
+    "Cuillères à dessert longues": [
+     "lot de 6",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Gant de cuisine": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Hachoir": [
+     "à la pièce"
+    ],
+    "Maniques": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Plaques à pizza": [
+     "à la pièce",
+     "lot de 2"
+    ]
+   }
+  },
+  "Vaisselle jetable": {
+   "formats": [
+    "lot de 50",
+    "lot de 20",
+    "à la pièce",
+    "lot de 10",
+    "lot de 100",
+    "lot de 24",
+    "rouleau",
+    "lot de 3",
+    "lot de 6",
+    "lot de 12"
+   ],
+   "produits": {
+    "Assiettes en carton": [
+     "lot de 20",
+     "lot de 10",
+     "lot de 50"
+    ],
+    "Gobelets": [
+     "lot de 50",
+     "lot de 20",
+     "lot de 100"
+    ],
+    "Couverts jetables": [
+     "lot de 24",
+     "lot de 50",
+     "à la pièce"
+    ],
+    "Gobelets en carton": [
+     "lot de 20",
+     "lot de 50"
+    ],
+    "Pailles": [
+     "lot de 50",
+     "lot de 100",
+     "à la pièce"
+    ],
+    "Nappe jetable": [
+     "rouleau",
+     "à la pièce"
+    ],
+    "Verres en plastique": [
+     "lot de 10",
+     "lot de 20",
+     "lot de 50"
+    ],
+    "Bols jetables": [
+     "lot de 20",
+     "lot de 10",
+     "lot de 50"
+    ],
+    "Piques apéritif": [
+     "lot de 100",
+     "à la pièce"
+    ],
+    "Plateaux en carton": [
+     "lot de 3",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Bougies d'anniversaire": [
+     "lot de 24",
+     "lot de 12",
+     "à la pièce"
+    ],
+    "Lingettes rince-doigts": [
+     "lot de 50",
+     "lot de 20",
+     "lot de 10"
+    ]
+   }
+  },
+  "Vaisselle": {
+   "formats": [
+    "à la pièce",
+    "lot de 6",
+    "lot de 4",
+    "lot de 3",
+    "lot de 20",
+    "lot de 12",
+    "lot de 30"
+   ],
+   "produits": {
+    "Assiette": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 4"
+    ],
+    "Verres": [
+     "lot de 6",
+     "lot de 4",
+     "lot de 3",
+     "à la pièce"
+    ],
+    "Bols": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Tasses": [
+     "lot de 6",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Mugs": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Assiettes creuses": [
+     "lot de 6",
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Assiettes à dessert": [
+     "lot de 6",
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Verres à vin": [
+     "lot de 6",
+     "lot de 4",
+     "lot de 3"
+    ],
+    "Carafe": [
+     "à la pièce"
+    ],
+    "Plat de service": [
+     "à la pièce"
+    ],
+    "Coquetiers": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Service de vaisselle blanc": [
+     "lot de 20",
+     "lot de 12",
+     "lot de 30"
+    ],
+    "Sous-tasses": [
+     "lot de 6",
+     "lot de 4",
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Bricolage, auto et jardin": {
+  "Bricolage et quincaillerie": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 4",
+    "lot de 3",
+    "lot de 6",
+    "rouleau",
+    "lot de 10",
+    "lot de 8",
+    "lot de 12",
+    "lot de 24"
+   ],
+   "produits": {
+    "Piles": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 12",
+     "lot de 2",
+     "lot de 24"
+    ],
+    "Ampoules": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Colle": [
+     "à la pièce"
+    ],
+    "Multiprise": [
+     "à la pièce"
+    ],
+    "Petits outils": [
+     "à la pièce"
+    ],
+    "Piles bouton": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Ampoules LED": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Rallonge électrique": [
+     "à la pièce"
+    ],
+    "Ruban adhésif d'emballage": [
+     "rouleau",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Scotch double face": [
+     "rouleau"
+    ],
+    "Clous": [
+     "à la pièce"
+    ],
+    "Vis": [
+     "à la pièce"
+    ],
+    "Chevilles": [
+     "à la pièce"
+    ],
+    "Crochets adhésifs": [
+     "lot de 4",
+     "lot de 2",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Lampe de poche": [
+     "à la pièce"
+    ],
+    "Tournevis": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Mètre ruban": [
+     "à la pièce"
+    ],
+    "Allume-feu": [
+     "lot de 30",
+     "lot de 50",
+     "à la pièce"
+    ],
+    "Allumettes": [
+     "lot de 10",
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Briquet": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Crochets pour guirlande": [
+     "à la pièce",
+     "lot de 20",
+     "lot de 10"
+    ]
+   }
+  },
+  "Jardinage et extérieur": {
+   "formats": [
+    "à la pièce",
+    "1 l",
+    "1 kg",
+    "5 kg",
+    "lot de 3",
+    "lot de 6",
+    "2 kg",
+    "5 l",
+    "lot de 10",
+    "paire"
+   ],
+   "produits": {
+    "Terreau": [
+     "à la pièce"
+    ],
+    "Engrais": [
+     "1 kg",
+     "1 l",
+     "5 kg",
+     "à la pièce"
+    ],
+    "Petits outils de jardin": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Plants": [
+     "à la pièce",
+     "lot de 6"
+    ],
+    "Graines de légumes": [
+     "à la pièce"
+    ],
+    "Graines de fleurs": [
+     "à la pièce"
+    ],
+    "Bulbes": [
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Gants de jardin": [
+     "paire"
+    ],
+    "Tuyau d'arrosage": [
+     "à la pièce"
+    ],
+    "Arrosoir": [
+     "à la pièce"
+    ],
+    "Pots de fleurs": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Charbon de bois": [
+     "2 kg",
+     "5 kg",
+     "10 kg"
+    ],
+    "Désherbant": [
+     "1 l",
+     "5 l"
+    ],
+    "Anti-limaces": [
+     "1 kg",
+     "500 g",
+     "à la pièce"
+    ],
+    "Pierres à barbecue": [
+     "2 kg",
+     "à la pièce"
+    ],
+    "Sécateur": [
+     "à la pièce"
+    ],
+    "Algicide piscine": [
+     "5 l",
+     "1 l",
+     "2 l"
+    ],
+    "Dalles en bois": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Plant de menthe": [
+     "à la pièce"
+    ],
+    "Thermomètre de piscine": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Accessoires automobiles": {
+   "formats": [
+    "à la pièce",
+    "5 l",
+    "1 l",
+    "50 cl",
+    "2 l",
+    "lot de 2",
+    "75 cl",
+    "25 cl",
+    "lot de 20",
+    "lot de 30"
+   ],
+   "produits": {
+    "Liquide lave-glace": [
+     "5 l",
+     "2 l"
+    ],
+    "Huile moteur": [
+     "5 l",
+     "2 l",
+     "1 l"
+    ],
+    "Ampoules auto": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Liquide de refroidissement": [
+     "5 l",
+     "2 l",
+     "1 l"
+    ],
+    "Liquide de frein": [
+     "50 cl",
+     "25 cl",
+     "1 l"
+    ],
+    "Lingettes voiture": [
+     "lot de 20",
+     "lot de 30",
+     "à la pièce"
+    ],
+    "Shampooing auto": [
+     "1 l",
+     "50 cl",
+     "5 l"
+    ],
+    "Désodorisant voiture": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Grattoir à givre": [
+     "à la pièce"
+    ],
+    "Raclette pare-brise": [
+     "à la pièce"
+    ],
+    "Balais d'essuie-glace": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Nettoyant jantes": [
+     "50 cl",
+     "75 cl"
+    ],
+    "Câbles de démarrage": [
+     "à la pièce"
+    ],
+    "Dégivrant": [
+     "50 cl",
+     "33 cl",
+     "75 cl"
+    ],
+    "Gilet jaune": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Loisirs": {
+  "Papeterie et librairie": {
+   "formats": [
+    "à la pièce",
+    "lot de 6",
+    "lot de 4",
+    "lot de 3",
+    "lot de 12",
+    "lot de 20",
+    "lot de 24",
+    "lot de 2",
+    "lot de 10",
+    "rouleau"
+   ],
+   "produits": {
+    "Cahiers": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Stylos": [
+     "lot de 4",
+     "lot de 10",
+     "à la pièce",
+     "lot de 20"
+    ],
+    "Ruban adhésif": [
+     "rouleau",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Livres": [
+     "à la pièce"
+    ],
+    "Magazines": [
+     "à la pièce"
+    ],
+    "Crayons de couleur": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 20"
+    ],
+    "Crayons à papier": [
+     "lot de 4",
+     "lot de 12",
+     "à la pièce"
+    ],
+    "Feutres": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 20"
+    ],
+    "Gomme": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Taille-crayon": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Ramettes de papier": [
+     "lot de 6"
+    ],
+    "Enveloppes": [
+     "lot de 50",
+     "lot de 24",
+     "lot de 20",
+     "lot de 100"
+    ],
+    "Timbres": [
+     "lot de 12",
+     "à la pièce"
+    ],
+    "Post-it": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce",
+     "lot de 12"
+    ],
+    "Classeurs": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Bâton de colle": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Ciseaux": [
+     "à la pièce"
+    ],
+    "Règle": [
+     "à la pièce"
+    ],
+    "Surligneurs": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Agenda": [
+     "à la pièce"
+    ],
+    "Cartes d'anniversaire": [
+     "à la pièce"
+    ],
+    "Papier cadeau": [
+     "rouleau",
+     "lot de 3"
+    ],
+    "Journaux": [
+     "à la pièce"
+    ],
+    "Cartes à collectionner": [
+     "à la pièce"
+    ],
+    "Chemises à élastiques": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 10"
+    ]
+   }
+  },
+  "Jouets": {
+   "formats": [
+    "à la pièce",
+    "lot de 3",
+    "lot de 6",
+    "lot de 4",
+    "lot de 10",
+    "lot de 8"
+   ],
+   "produits": {
+    "Jeux de société": [
+     "à la pièce"
+    ],
+    "Jouets enfants": [
+     "à la pièce"
+    ],
+    "Puzzle": [
+     "à la pièce"
+    ],
+    "Jeux de cartes": [
+     "à la pièce"
+    ],
+    "Peluches": [
+     "à la pièce"
+    ],
+    "Poupées": [
+     "à la pièce"
+    ],
+    "Petites voitures": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Jeux de construction": [
+     "à la pièce"
+    ],
+    "Pâte à modeler": [
+     "lot de 4",
+     "lot de 8",
+     "lot de 10",
+     "à la pièce"
+    ],
+    "Ballons": [
+     "à la pièce",
+     "lot de 10"
+    ],
+    "Jouets de plage": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Loisirs créatifs": [
+     "à la pièce"
+    ],
+    "Bulles de savon": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 4"
+    ],
+    "Figurine Funko Pop": [
+     "à la pièce"
+    ],
+    "Jeux d'eau pour piscine": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Œuf surprise": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ]
+   }
+  },
+  "Bagagerie": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 4"
+   ],
+   "produits": {
+    "Valises": [
+     "à la pièce"
+    ],
+    "Sacs de voyage": [
+     "à la pièce"
+    ],
+    "Sacs à dos": [
+     "à la pièce"
+    ],
+    "Cartables": [
+     "à la pièce"
+    ],
+    "Trousses": [
+     "à la pièce"
+    ],
+    "Sacs de sport": [
+     "à la pièce"
+    ],
+    "Étiquettes à bagages": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Cadenas de valise": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Trousse de toilette": [
+     "à la pièce"
+    ],
+    "Sacs de courses réutilisables": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Sac isotherme": [
+     "à la pièce"
+    ],
+    "Coussin de voyage": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Électroménager et décoration": {
+  "Petit électroménager": {
+   "formats": [
+    "à la pièce"
+   ],
+   "produits": {
+    "Bouilloire": [
+     "à la pièce"
+    ],
+    "Grille-pain": [
+     "à la pièce"
+    ],
+    "Cafetière": [
+     "à la pièce"
+    ],
+    "Mixeur": [
+     "à la pièce"
+    ],
+    "Robot pâtissier": [
+     "à la pièce"
+    ],
+    "Fer à repasser": [
+     "à la pièce"
+    ],
+    "Sèche-cheveux": [
+     "à la pièce"
+    ],
+    "Aspirateur": [
+     "à la pièce"
+    ],
+    "Micro-ondes": [
+     "à la pièce"
+    ],
+    "Blender": [
+     "à la pièce"
+    ],
+    "Machine à café à dosettes": [
+     "à la pièce"
+    ],
+    "Presse-agrumes": [
+     "à la pièce"
+    ],
+    "Gaufrier": [
+     "à la pièce"
+    ],
+    "Appareil à raclette": [
+     "à la pièce"
+    ],
+    "Friteuse sans huile": [
+     "à la pièce"
+    ],
+    "Batteur": [
+     "à la pièce"
+    ],
+    "Ventilateur": [
+     "à la pièce"
+    ],
+    "Radiateur d'appoint": [
+     "à la pièce"
+    ],
+    "Ventilateur à main": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Décoration": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 3",
+    "lot de 6",
+    "lot de 4",
+    "botte",
+    "10 cl",
+    "20 cl",
+    "lot de 10",
+    "lot de 8"
+   ],
+   "produits": {
+    "Bougies": [
+     "à la pièce",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Cadres": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Boîtes de rangement": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 2"
+    ],
+    "Bougies parfumées": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Photophores": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Vases": [
+     "à la pièce"
+    ],
+    "Coussins": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Plaids": [
+     "à la pièce"
+    ],
+    "Miroirs": [
+     "à la pièce"
+    ],
+    "Guirlandes lumineuses": [
+     "à la pièce"
+    ],
+    "Fleurs artificielles": [
+     "à la pièce",
+     "botte"
+    ],
+    "Diffuseur de parfum": [
+     "10 cl",
+     "à la pièce",
+     "20 cl"
+    ],
+    "Paniers de rangement": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Horloge": [
+     "à la pièce"
+    ],
+    "Cintres": [
+     "lot de 6",
+     "lot de 10",
+     "lot de 8",
+     "lot de 20"
+    ],
+    "Boules de Noël": [
+     "lot de 12",
+     "lot de 6",
+     "lot de 24",
+     "lot de 30"
+    ],
+    "Boîte de rangement sous lit": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Malles de rangement 85 L": [
+     "à la pièce"
+    ],
+    "Tabourets empilables": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Tapis de neige décoratif": [
+     "rouleau",
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Textile": {
+  "Vêtements et chaussures": {
+   "formats": [
+    "à la pièce",
+    "paire",
+    "lot de 2",
+    "lot de 3",
+    "lot de 6",
+    "lot de 8"
+   ],
+   "produits": {
+    "Chaussettes": [
+     "lot de 3",
+     "lot de 6",
+     "paire",
+     "lot de 2",
+     "lot de 8"
+    ],
+    "T-shirts": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Chaussons": [
+     "paire"
+    ],
+    "Pyjamas": [
+     "à la pièce"
+    ],
+    "Pulls": [
+     "à la pièce"
+    ],
+    "Jeans": [
+     "à la pièce"
+    ],
+    "Pantalons": [
+     "à la pièce"
+    ],
+    "Sweats": [
+     "à la pièce"
+    ],
+    "Leggings": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Baskets": [
+     "paire"
+    ],
+    "Tongs": [
+     "paire"
+    ],
+    "Bottes de pluie": [
+     "paire"
+    ],
+    "Gants": [
+     "paire"
+    ],
+    "Bonnets": [
+     "à la pièce"
+    ],
+    "Écharpes": [
+     "à la pièce"
+    ],
+    "Maillots de bain": [
+     "à la pièce"
+    ],
+    "Vêtements bébé": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Chaussures enfant": [
+     "paire"
+    ]
+   }
+  },
+  "Lingerie": {
+   "formats": [
+    "lot de 3",
+    "lot de 2",
+    "à la pièce",
+    "lot de 6",
+    "lot de 4",
+    "paire"
+   ],
+   "produits": {
+    "Sous-vêtements": [
+     "lot de 3",
+     "à la pièce",
+     "lot de 2",
+     "lot de 6"
+    ],
+    "Collants": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Culottes": [
+     "lot de 3",
+     "lot de 6",
+     "à la pièce",
+     "lot de 4"
+    ],
+    "Soutiens-gorge": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Boxers": [
+     "lot de 3",
+     "lot de 2",
+     "lot de 4",
+     "lot de 6"
+    ],
+    "Slips": [
+     "lot de 3",
+     "lot de 6",
+     "lot de 4"
+    ],
+    "Caleçons": [
+     "lot de 3",
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Débardeurs": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 3"
+    ],
+    "Chemises de nuit": [
+     "à la pièce"
+    ],
+    "Bas": [
+     "paire",
+     "lot de 2"
+    ],
+    "Mi-bas": [
+     "lot de 2",
+     "lot de 3",
+     "paire"
+    ],
+    "Chaussettes de sport": [
+     "lot de 3",
+     "lot de 6",
+     "lot de 2"
+    ]
+   }
+  },
+  "Linge de maison": {
+   "formats": [
+    "à la pièce",
+    "lot de 2",
+    "lot de 4",
+    "lot de 3",
+    "lot de 6"
+   ],
+   "produits": {
+    "Torchons": [
+     "lot de 3",
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Serviettes de bain": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Parure de lit": [
+     "à la pièce"
+    ],
+    "Rideaux": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Draps housse": [
+     "à la pièce"
+    ],
+    "Housses de couette": [
+     "à la pièce"
+    ],
+    "Taies d'oreiller": [
+     "lot de 2",
+     "à la pièce"
+    ],
+    "Oreillers": [
+     "à la pièce",
+     "lot de 2"
+    ],
+    "Couettes": [
+     "à la pièce"
+    ],
+    "Protège-matelas": [
+     "à la pièce"
+    ],
+    "Serviettes de toilette": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Draps de plage": [
+     "à la pièce"
+    ],
+    "Nappe": [
+     "à la pièce"
+    ],
+    "Sets de table": [
+     "lot de 4",
+     "lot de 6",
+     "à la pièce"
+    ],
+    "Tabliers de cuisine": [
+     "à la pièce"
+    ],
+    "Peignoirs": [
+     "à la pièce"
+    ],
+    "Plaid polaire": [
+     "à la pièce"
+    ]
+   }
+  }
+ },
+ "Animaux": {
+  "Chiens": {
+   "formats": [
+    "à la pièce",
+    "10 kg",
+    "2 kg",
+    "1,5 kg",
+    "lot de 4",
+    "lot de 3",
+    "lot de 8",
+    "5 kg",
+    "400 g",
+    "lot de 12"
+   ],
+   "produits": {
+    "Croquettes pour chien": [
+     "5 kg",
+     "10 kg",
+     "2 kg",
+     "1,5 kg"
+    ],
+    "Pâtée pour chien": [
+     "400 g",
+     "lot de 4",
+     "lot de 12",
+     "300 g",
+     "1 kg"
+    ],
+    "Friandises pour chien": [
+     "à la pièce",
+     "200 g",
+     "500 g"
+    ],
+    "Croquettes pour chiot": [
+     "2 kg",
+     "1,5 kg",
+     "10 kg"
+    ],
+    "Os à mâcher": [
+     "à la pièce",
+     "lot de 3",
+     "lot de 6"
+    ],
+    "Jouets pour chien": [
+     "à la pièce"
+    ],
+    "Sacs à crottes": [
+     "rouleau",
+     "lot de 4",
+     "lot de 8",
+     "à la pièce"
+    ],
+    "Laisse": [
+     "à la pièce"
+    ],
+    "Collier pour chien": [
+     "à la pièce"
+    ],
+    "Gamelle": [
+     "à la pièce"
+    ],
+    "Shampooing pour chien": [
+     "25 cl",
+     "50 cl",
+     "20 cl"
+    ],
+    "Antiparasitaire pour chien": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Panier pour chien": [
+     "à la pièce"
+    ],
+    "Bâtonnets dentaires pour chien": [
+     "à la pièce",
+     "lot de 8",
+     "lot de 30"
+    ]
+   }
+  },
+  "Chats": {
+   "formats": [
+    "à la pièce",
+    "100 g",
+    "2 kg",
+    "5 kg",
+    "lot de 12",
+    "lot de 4",
+    "1 kg",
+    "10 kg",
+    "400 g",
+    "lot de 24"
+   ],
+   "produits": {
+    "Croquettes pour chat": [
+     "2 kg",
+     "5 kg",
+     "1 kg",
+     "10 kg",
+     "400 g"
+    ],
+    "Pâtée pour chat": [
+     "lot de 12",
+     "400 g",
+     "100 g",
+     "lot de 4"
+    ],
+    "Litière": [
+     "5 kg",
+     "10 kg"
+    ],
+    "Friandises pour chat": [
+     "à la pièce",
+     "100 g"
+    ],
+    "Croquettes pour chaton": [
+     "2 kg",
+     "1,5 kg",
+     "400 g",
+     "5 kg"
+    ],
+    "Croquettes pour chat stérilisé": [
+     "2 kg",
+     "5 kg",
+     "10 kg",
+     "1 kg"
+    ],
+    "Sachets fraîcheur pour chat": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 4",
+     "100 g"
+    ],
+    "Lait pour chat": [
+     "20 cl",
+     "lot de 3",
+     "lot de 6",
+     "1 l"
+    ],
+    "Litière végétale": [
+     "à la pièce"
+    ],
+    "Litière silice": [
+     "5 l"
+    ],
+    "Bac à litière": [
+     "à la pièce"
+    ],
+    "Griffoir": [
+     "à la pièce"
+    ],
+    "Jouets pour chat": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Antiparasitaire pour chat": [
+     "à la pièce",
+     "lot de 3"
+    ],
+    "Herbe à chat": [
+     "à la pièce"
+    ],
+    "Croquettes pour chat senior": [
+     "2 kg",
+     "1 kg",
+     "5 kg"
+    ],
+    "Croquettes pour chat senior au saumon": [
+     "2 kg",
+     "1 kg"
+    ],
+    "Sachets en gelée pour chat": [
+     "lot de 12",
+     "lot de 4",
+     "lot de 24",
+     "100 g"
+    ],
+    "Sachets en sauce pour chat": [
+     "lot de 12",
+     "lot de 4",
+     "lot de 24",
+     "100 g"
+    ],
+    "Sachets pour chat senior en gelée": [
+     "lot de 12",
+     "lot de 4",
+     "100 g"
+    ],
+    "Vermifuge pour chat": [
+     "à la pièce"
+    ]
+   }
+  },
+  "Autres animaux": {
+   "formats": [
+    "1 kg",
+    "5 kg",
+    "500 g",
+    "2 kg",
+    "à la pièce",
+    "10 cl",
+    "25 cl",
+    "lot de 6",
+    "lot de 30",
+    "lot de 12"
+   ],
+   "produits": {
+    "Graines pour oiseaux": [
+     "1 kg",
+     "5 kg",
+     "500 g",
+     "2 kg"
+    ],
+    "Nourriture pour rongeurs": [
+     "1 kg",
+     "2 kg",
+     "5 kg",
+     "500 g"
+    ],
+    "Nourriture pour poissons": [
+     "à la pièce",
+     "10 cl",
+     "25 cl"
+    ],
+    "Boules de graisse pour oiseaux": [
+     "à la pièce",
+     "lot de 6",
+     "lot de 30",
+     "lot de 12"
+    ]
+   }
+  }
+ }
+}

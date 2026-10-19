@@ -535,10 +535,13 @@ class _DialogueRechercheState extends State<_DialogueRecherche> {
 
 /// Code court d'un packaging sur le bouton de la ligne : « ×6 » pour un pack de 6, sinon le début du libellé.
 String codeCourtPackaging(String libelle) {
-  final n = RegExp(r'\d+').firstMatch(libelle)?.group(0);
-  if (n != null && libelle.toLowerCase().startsWith('pack')) return '×$n';
-  final t = libelle.trim();
-  return t.length <= 4 ? t : t.substring(0, 4);
+  final l = libelle.trim().toLowerCase();
+  const unites = {'à la pièce': 'pce', 'au poids': 'kg', 'à la coupe': 'cpe', 'botte': 'bte', 'paire': 'pr', 'rouleau': 'rlx'};
+  if (unites[l] case final u?) return u;
+  final n = RegExp(r'\d+').firstMatch(l)?.group(0);
+  if (n != null && (l.startsWith('pack') || l.startsWith('lot') || l.startsWith('boîte de') || l.startsWith('paquet'))) return '×$n';
+  final t = l.replaceAll(' ', '');
+  return t.length <= 5 ? t : t.substring(0, 5);
 }
 
 /// Volet du packaging (et de la consigne) ou volet de la promotion d'un article.
@@ -678,6 +681,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       for (final id in FeuillePromotion.typesProposes)
         if (etat.typePromotion(id) case final t?) t,
     ];
+    // Formats du produit, sinon ceux de son secteur
+    final proposes = p == null
+        ? <String>[]
+        : (p.packagingIds.isNotEmpty ? p.packagingIds : etat.formatsDuSecteur(widget.liste.magasinId, p.id));
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -699,15 +706,35 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             const TitreSection('Packaging', cote: 0, haut: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
               _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
-              for (final k in {...?p?.packagingIds, ...etat.typesPackaging})
+              for (final k in {...proposes, if (packagingId != null) packagingId!})
                 _pastille(etat.packaging(k)?.libelle ?? '', packagingId == k, () => setState(() => packagingId = k)),
-              _pastille('+ Autre', false, () async {
-                final lib = await demanderTexte(context, titre: 'Nouveau packaging', aide: 'Ex. : Pack de 6, 500 g');
-                if (lib == null || lib.isEmpty || p == null) return;
+              _pastille('Autre format…', false, () async {
+                final autres = [for (final k in etat.typesPackaging) if (!proposes.contains(k)) k];
+                final v = await choisirDansListe<String>(
+                  context,
+                  titre: 'Choisir un format',
+                  choix: {'': '+ Nouveau format…', for (final k in autres) k: etat.packaging(k)?.libelle ?? ''},
+                );
+                if (v == null || p == null) return;
+                if (v.isNotEmpty) {
+                  etat.ajouterPackaging(p, etat.packaging(v)!.libelle);
+                  setState(() => packagingId = v);
+                  return;
+                }
+                if (!context.mounted) return;
+                final lib = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
+                if (lib == null || lib.isEmpty) return;
                 etat.ajouterPackaging(p, lib);
+                etat.ajouterTypePackaging(lib);
                 setState(() => packagingId = p.packagingIds.last);
               }),
             ]),
+            if (p != null && p.packagingIds.isEmpty && proposes.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text('Formats courants du secteur, ce produit n\'en a pas encore.',
+                    style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+              ),
             const TitreSection('Consigne', cote: 0, haut: 14),
             TextField(
               key: const ValueKey('consigne'),

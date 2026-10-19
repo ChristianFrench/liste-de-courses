@@ -15,6 +15,7 @@ import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
+import 'package:liste_de_courses/ecrans/travail.dart' show codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -167,6 +168,39 @@ void main() {
       expect(e.suppressionImpossible(m1), isNull);
       e.supprimer(m1);
       expect(e.listes.where((l) => l.magasinId == 'mg1' && l.statut != StatutListe.terminee), isEmpty);
+    });
+
+    test('formats de vente : appliqués aux produits, corrigés et fusionnés pour tous leurs articles', () async {
+      final e = Etat.instance;
+      final p = e.produits.firstWhere((x) => x.packagingIds.isEmpty, orElse: () => e.produits.first..packagingIds.clear());
+      await e.appliquerFormats(catalogue: {
+        'rayons': [
+          {
+            'nom': 'R',
+            'secteurs': [
+              {
+                'nom': 'S',
+                'taille': 1,
+                'produits': [
+                  {'nom': p.nom, 'taille': 1, 'formats': ['lot de 4', '500 g']}
+                ],
+              }
+            ],
+          }
+        ],
+      });
+      expect(p.packagingIds.map((id) => e.packaging(id)!.libelle), ['lot de 4', '500 g']);
+      final lot = p.packagingIds.first;
+      expect(e.typesPackaging, contains(lot));
+      e.renommerPackaging(lot, 'lot de 6');
+      expect(e.packaging(lot)!.libelle, 'lot de 6');
+      final g500 = p.packagingIds.last;
+      e.renommerPackaging(g500, 'lot de 6'); // libellé existant : fusion
+      expect(p.packagingIds, [lot]);
+      expect(e.formatsAppliques, isTrue);
+      expect(codeCourtPackaging('lot de 6'), '×6');
+      expect(codeCourtPackaging('500 g'), '500g');
+      expect(codeCourtPackaging('au poids'), 'kg');
     });
 
     test('paramètres : couleurs des promotions et des packagings, délai des archives', () {
