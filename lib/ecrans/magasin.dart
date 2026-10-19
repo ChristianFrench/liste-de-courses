@@ -86,36 +86,39 @@ class SousEcranListeMagasins extends StatelessWidget {
 
   Widget _liste(BuildContext context) {
     final etat = Etat.instance;
-    return ListView(
+    return AvecDecision(
+      boutons: [
+        Bouton(
+          texte: '+ Nouveau magasin',
+          plein: true,
+          onTap: () async {
+            final m = await creerMagasinDemande(context);
+            if (m != null) _ouvrir(m.id);
+          },
+        ),
+      ],
+      contenu: ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         for (final m in etat.magasins)
           LigneMenu(
             titre: m.nom,
             titreTaille: 19,
-            gauche: const Icon(Icons.storefront_outlined, size: 28, color: Charte.encre),
+            gauche: Icon(Icons.storefront_outlined, size: 28, color: Charte.couleurIcone(Icons.storefront_outlined)),
             sousTitre: '${_pluriel(etat.rayonsDu(m.id).length, 'rayon')} · '
                 '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
             onTap: () => _ouvrir(m.id),
             droite: IconButton(
               tooltip: 'Supprimer le magasin',
-              icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+              icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
               onPressed: () => demanderSuppression(context, m, 'le magasin ${m.nom}'),
             ),
           ),
         const SizedBox(height: 14),
-        Bouton(
-          texte: '+ Nouveau magasin',
-          pointille: true,
-          onTap: () async {
-            final m = await creerMagasinDemande(context);
-            if (m != null) _ouvrir(m.id);
-          },
-        ),
-        const SizedBox(height: 8),
         Text('Supprimer un magasin efface ses listes en cours (après confirmation) ; son historique de courses part dans Gérer › Archives.',
             style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       ],
+    ),
     );
   }
 }
@@ -211,7 +214,7 @@ class SousEcranSecteurs extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
             child: Row(
               children: [
-                const Icon(Icons.place_outlined, size: 20, color: Charte.encre),
+                Icon(Icons.place_outlined, size: 20, color: Charte.couleurIcone(Icons.place_outlined)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text('Où se trouve « ${aPlacer.nom} » dans ${etat.magasin(m)?.nom ?? ''} ? Touchez son secteur.',
@@ -520,7 +523,7 @@ class EcranFicheProduit extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(10),
                     child: Row(children: [
-                      const Icon(Icons.lock_outline, size: 18, color: Charte.texteSecondaire),
+                      Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text('Déjà utilisé dans une liste : ni suppression ni archivage',
@@ -556,7 +559,7 @@ class EcranFicheProduit extends StatelessWidget {
     final s = etat.secteurDe(m.id, p.id);
     return Container(
       constraints: const BoxConstraints(minHeight: 50),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
       child: Row(
         children: [
           Text(m.nom, style: Charte.texte(16, gras: true)),
@@ -622,7 +625,7 @@ class EcranFicheProduit extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Charte.encre, width: Charte.traitCadre),
+          border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
         ),
         child: Center(widthFactor: 1, child: Text(texte, style: Charte.texte(16))),
       );

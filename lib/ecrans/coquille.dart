@@ -30,9 +30,9 @@ class BarreOnglets extends StatelessWidget {
     return Container(
       height: Charte.barreOnglets + MediaQuery.of(context).padding.bottom,
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
-      decoration: const BoxDecoration(
-        color: Charte.fond,
-        border: Border(top: BorderSide(color: Charte.encre, width: Charte.traitCadre)),
+      decoration: BoxDecoration(
+        color: Charte.fondBandeau,
+        border: Border(top: BorderSide(color: Charte.separateurZone, width: 1)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,10 +52,10 @@ class BarreOnglets extends StatelessWidget {
                         width: 56,
                         height: 30,
                         decoration: BoxDecoration(
-                          color: i == actif ? entrees[i].$3 : null,
+                          color: i == actif ? Charte.accent : null,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(entrees[i].$1, size: 24, color: i == actif ? Colors.white : entrees[i].$3),
+                        child: Icon(entrees[i].$1, size: 24, color: i == actif ? Charte.blanc : Charte.cadre),
                       ),
                       const SizedBox(height: 2),
                       Text(entrees[i].$2, style: Charte.texte(Charte.tNavigation, gras: i == actif)),
@@ -135,7 +135,7 @@ class MenuGerer extends StatelessWidget {
     final etat = Etat.instance;
     final n = etat.magasins.length;
     Widget entree(int r, IconData icone, Color couleur, String titre, String sousTitre) => LigneMenu(
-          gauche: IconeCouleur(icone, couleur),
+          gauche: IconeCouleur(icone, Charte.accent),
           titre: titre,
           sousTitre: sousTitre,
           onTap: () {

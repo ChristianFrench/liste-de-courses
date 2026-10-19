@@ -73,7 +73,7 @@ class PastilleNutriscore extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Charte.encre, width: 1.5),
+          border: Border.all(color: Charte.cadre, width: 1.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

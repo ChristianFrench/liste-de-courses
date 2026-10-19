@@ -2,25 +2,80 @@ import 'dart:ui' show PointerDeviceKind;
 
 import 'package:flutter/material.dart';
 
-/// Charte de la maquette (spécification IHM, chapitre 4) : volontairement monochrome.
+/// Une famille de couleurs : fond des écrans, barres du haut et du bas, boutons actifs ou non,
+/// fonds plus ou moins pâles de la même teinte. Les textes et les traits restent foncés.
+class Palette {
+  const Palette(this.nom, this.accent, this.accentFonce, this.fond, this.fondBarre, this.fondSelection, this.separateur);
+  final String nom;
+  final Color accent; // boutons pleins, puces choisies, cases cochées
+  final Color accentFonce; // cadres des boutons, icônes d'action
+  final Color fond; // fond des écrans
+  final Color fondBarre; // en-têtes, zone de décision, barre des onglets
+  final Color fondSelection; // ligne choisie, titres de groupe
+  final Color separateur;
+}
+
+const palettes = <Palette>[
+  Palette('Sauge', Color(0xFF3F7D5A), Color(0xFF2B5A40), Color(0xFFF5F9F6), Color(0xFFE3EFE7), Color(0xFFD5E8DC), Color(0xFFB9D3C3)),
+  Palette('Océan', Color(0xFF2F6EA5), Color(0xFF1F4E79), Color(0xFFF4F8FC), Color(0xFFE0ECF7), Color(0xFFD0E2F3), Color(0xFFB3CDE6)),
+  Palette('Terracotta', Color(0xFFB85C38), Color(0xFF8A3F22), Color(0xFFFCF7F4), Color(0xFFF6E6DD), Color(0xFFF0D7C9), Color(0xFFE2BFAA)),
+  Palette('Lavande', Color(0xFF6E5AA8), Color(0xFF4E3D80), Color(0xFFF8F6FC), Color(0xFFEAE5F5), Color(0xFFDDD5EF), Color(0xFFC7BCE3)),
+  Palette('Noir et blanc', Color(0xFF222222), Color(0xFF222222), Color(0xFFFFFFFF), Color(0xFFF7F7F7), Color(0xFFF2F2F2), Color(0xFFCCCCCC)),
+];
+
+/// Charte de l'application : les couleurs viennent de la palette choisie dans Paramètres › Apparence.
 class Charte {
   Charte._();
 
   static const String police = 'Atkinson';
 
-  // Couleurs
+  static Palette palette = palettes.first;
+
+  /// Change de palette et redessine toute l'application, sans la relancer.
+  static void choisirPalette(String nom) {
+    palette = palettes.firstWhere((p) => p.nom == nom, orElse: () => palettes.first);
+    void redessiner(Element e) {
+      e.markNeedsBuild();
+      e.visitChildren(redessiner);
+    }
+
+    WidgetsBinding.instance.rootElement?.visitChildren(redessiner);
+  }
+
+  // Couleurs fixes : textes et traits
   static const Color encre = Color(0xFF222222);
-  static const Color fond = Color(0xFFFFFFFF);
-  static const Color fondSelection = Color(0xFFF2F2F2);
-  static const Color fondBandeau = Color(0xFFF7F7F7);
+  static const Color blanc = Color(0xFFFFFFFF);
   static const Color texteSecondaire = Color(0xFF555555);
-  static const Color separateurZone = Color(0xFFCCCCCC);
-  static const Color separateurLigne = Color(0xFFDDDDDD);
   static const Color texteBarre = Color(0xFF777777); // texteCoche
   static const Color texteCoche = Color(0xFF777777);
-  static const Color fondNavActive = Color(0xFFEDEDED);
   static const Color voile = Color(0x73000000); // noir 45 %
   static const Color placeholder = Color(0xFFE6E6E6);
+
+  // Couleurs de la palette
+  static Color get accent => palette.accent;
+  static Color get cadre => palette.accentFonce;
+  static Color get fond => palette.fond;
+  static Color get fondBandeau => palette.fondBarre;
+  static Color get fondSelection => palette.fondSelection;
+  static Color get fondNavActive => palette.fondSelection;
+  static Color get separateurZone => palette.separateur;
+  static Color get separateurLigne => Color.alphaBlend(palette.separateur.withValues(alpha: 0.6), blanc);
+  static Color get desactive => Color.alphaBlend(palette.accent.withValues(alpha: 0.35), blanc);
+
+  /// Couleur d'une icône d'action, la même partout : rouge pour supprimer, bleu pour modifier…
+  static Color couleurIcone(IconData i) {
+    if (i == Icons.delete_outline || i == Icons.close) return rouge;
+    if (i == Icons.edit_outlined || i == Icons.edit_note) return bleu;
+    if (i == Icons.mail_outline) return orange;
+    if (i == Icons.history || i == Icons.schedule) return violet;
+    if (i == Icons.attach_file || i == Icons.link) return turquoise;
+    if (i == Icons.pause || i == Icons.pause_circle_outline || i == Icons.warning_amber_rounded) return orange;
+    if (i == Icons.undo) return orange;
+    if (i == Icons.inventory_2_outlined) return bleu;
+    if (i == Icons.percent || i == Icons.local_offer_outlined) return rouge;
+    if (i == Icons.drag_handle || i == Icons.drag_indicator) return texteSecondaire;
+    return cadre;
+  }
 
   // Hauteurs de référence (points)
   static const double enTeteTravail = 48;
@@ -97,9 +152,9 @@ class Charte {
       useMaterial3: true,
       fontFamily: police,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: encre,
-        primary: encre,
-        onPrimary: fond,
+        seedColor: accent,
+        primary: accent,
+        onPrimary: blanc,
         surface: fond,
         onSurface: encre,
       ),
@@ -108,27 +163,29 @@ class Charte {
     );
     return base.copyWith(
       dividerColor: separateurLigne,
-      snackBarTheme: const SnackBarThemeData(
-        backgroundColor: encre,
-        contentTextStyle: TextStyle(fontFamily: police, fontSize: 15, color: fond),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: cadre,
+        contentTextStyle: const TextStyle(fontFamily: police, fontSize: 15, color: blanc),
         behavior: SnackBarBehavior.floating,
       ),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
         isDense: true,
-        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+        filled: true,
+        fillColor: blanc,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          borderSide: BorderSide(color: encre, width: traitCadre),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          borderSide: BorderSide(color: cadre, width: traitCadre),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          borderSide: BorderSide(color: encre, width: traitCadre),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          borderSide: BorderSide(color: cadre, width: traitCadre),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(8)),
-          borderSide: BorderSide(color: encre, width: 3),
+          borderRadius: const BorderRadius.all(Radius.circular(8)),
+          borderSide: BorderSide(color: accent, width: 3),
         ),
-        hintStyle: TextStyle(fontFamily: police, color: texteSecondaire),
+        hintStyle: const TextStyle(fontFamily: police, color: texteSecondaire),
       ),
     );
   }

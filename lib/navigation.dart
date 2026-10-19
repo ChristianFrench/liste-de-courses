@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'ecrans/coquille.dart' show BarreOnglets;
 import 'theme.dart';
 
 /// Navigation (agencement du 19 octobre 2026) : 3 onglets — Préparer, Courses, Gérer —
 /// chacun avec sa propre pile d'écrans. Gérer ouvre des rubriques (magasins, parcours,
 /// historique, paramètres, corbeille) dont certaines ont des sous-onglets mémorisés.
-/// Les écrans de travail s'ouvrent par-dessus, sans barre d'onglets.
+/// Les écrans de travail s'ouvrent par-dessus, en gardant la barre d'onglets en bas.
 class Nav extends ChangeNotifier {
   Nav._();
   static final Nav i = Nav._();
@@ -139,22 +140,51 @@ class Nav extends ChangeNotifier {
   static Future<T?> aller<T>(BuildContext context, Widget ecran) =>
       Navigator.of(context).push<T>(MaterialPageRoute<T>(builder: (_) => ecran));
 
-  /// Ouvre un écran de travail, par-dessus les onglets (barre d'onglets masquée).
+  /// Ouvre un écran de travail, par-dessus les onglets ; la barre d'onglets reste en bas.
   static Future<T?> travail<T>(Widget ecran) =>
-      i.racine.currentState!.push<T>(MaterialPageRoute<T>(builder: (_) => ecran));
+      i.racine.currentState!.push<T>(MaterialPageRoute<T>(builder: (_) => AvecOnglets(child: ecran)));
 
   static Future<T?> remplacerTravail<T>(Widget ecran) =>
-      i.racine.currentState!.pushReplacement<T, Object?>(MaterialPageRoute<T>(builder: (_) => ecran));
+      i.racine.currentState!.pushReplacement<T, Object?>(MaterialPageRoute<T>(builder: (_) => AvecOnglets(child: ecran)));
 
   static void message(BuildContext? context, String texte) {
     final m = i.messager.currentState;
     m
       ?..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
-        content: Text(texte, style: Charte.texte(15, couleur: Charte.fond)),
+        content: Text(texte, style: Charte.texte(15, couleur: Charte.blanc)),
         duration: const Duration(seconds: 2),
       ));
   }
 
   static void plusTard(BuildContext? context) => message(context, 'Disponible plus tard');
+}
+
+/// Écran de travail avec la barre des onglets en bas. Toucher un onglet quitte l'écran de travail,
+/// sauf pendant les courses : on passe alors par la pause.
+class AvecOnglets extends StatelessWidget {
+  const AvecOnglets({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Charte.fond,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(child: MediaQuery.removePadding(context: context, removeBottom: true, child: child)),
+            BarreOnglets(
+              actif: Nav.i.onglet,
+              onChoix: (o) {
+                final route = ModalRoute.of(context);
+                if (route != null && route.isCurrent && route.popDisposition == RoutePopDisposition.doNotPop) {
+                  Navigator.of(context).maybePop();
+                  return;
+                }
+                Nav.i.retourOnglet(o);
+              },
+            ),
+          ],
+        ),
+      );
 }

@@ -19,7 +19,9 @@ class SousEcranPreparer extends StatelessWidget {
     final etat = Etat.instance;
     final enPreparation = etat.listesStatut(StatutListe.enConstruction);
     final pretes = etat.listesStatut(StatutListe.prete);
-    return ListView(
+    return AvecDecision(
+      boutons: [Bouton(texte: '+ Nouvelle liste', plein: true, taille: 18, onTap: () => Nav.travail(const EcranPreliste()))],
+      contenu: ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         const TitreSection('En préparation', cote: 0, haut: 8),
@@ -53,14 +55,6 @@ class SousEcranPreparer extends StatelessWidget {
           ),
           const SizedBox(height: 10),
         ],
-        const SizedBox(height: 4),
-        Bouton(
-          texte: '+ Nouvelle liste',
-          plein: true,
-          hauteur: 56,
-          taille: 19,
-          onTap: () => Nav.travail(const EcranPreliste()),
-        ),
         const TitreSection('Prêtes pour les courses', cote: 0),
         if (pretes.isEmpty)
           Text('Aucune liste prête.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
@@ -94,6 +88,7 @@ class SousEcranPreparer extends StatelessWidget {
         Text('Une préparation interrompue est conservée telle quelle : touchez-la pour reprendre.',
             style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       ],
+    ),
     );
   }
 }
@@ -109,7 +104,7 @@ class BoutonSupprimerListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IconButton(
         tooltip: 'Supprimer la liste',
-        icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+        icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
         onPressed: () => demanderSuppression(context, liste, 'la liste ${Etat.instance.nomListe(liste)}'),
       );
 }
@@ -121,7 +116,7 @@ class BoutonRenommerListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IconButton(
         tooltip: 'Renommer la liste',
-        icon: const Icon(Icons.edit_outlined, color: Charte.texteSecondaire),
+        icon: Icon(Icons.edit_outlined, color: Charte.couleurIcone(Icons.edit_outlined)),
         onPressed: () async {
           final etat = Etat.instance;
           final nom = await demanderTexte(context, titre: 'Nom de la liste', initial: etat.nomListe(liste));
@@ -137,7 +132,7 @@ class BoutonRemettreEnPreparation extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IconButton(
         tooltip: 'Remettre en préparation',
-        icon: const Icon(Icons.edit_note, color: Charte.texteSecondaire),
+        icon: Icon(Icons.undo, color: Charte.couleurIcone(Icons.undo)),
         onPressed: () {
           Etat.instance.remettreEnPreparation(liste);
           Nav.message(context, '« ${Etat.instance.nomListe(liste)} » est de nouveau en préparation');
@@ -206,7 +201,9 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
 
   Widget _liste(BuildContext context) {
     final mes = etat.parcoursDuMembre(membre.id);
-    return ListView(
+    return AvecDecision(
+      boutons: [Bouton(texte: '+ Nouveau parcours', plein: true, onTap: () => _nouveau(context))],
+      contenu: ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         _choixMembre(),
@@ -225,11 +222,10 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             onTap: () => setState(() => parcoursId = x.id),
           ),
         const SizedBox(height: 14),
-        Bouton(texte: '+ Nouveau parcours', pointille: true, taille: 16, onTap: () => _nouveau(context)),
-        const SizedBox(height: 8),
-        Text('Un nouveau parcours reprend tous les rayons et secteurs du magasin ; ordonnez-les ensuite par rayon ou par secteur.',
+        Text('Un nouveau parcours reprend tous les rayons et secteurs du magasin ; ordonnez-les ensuite dans l\'arborescence.',
             style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       ],
+    ),
     );
   }
 
@@ -250,7 +246,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
               onPressed: () => setState(() => parcoursId = null),
-              icon: const Icon(Icons.chevron_left, color: Charte.encre),
+              icon: Icon(Icons.chevron_left, color: Charte.couleurIcone(Icons.chevron_left)),
               label: Text('Tous les parcours', style: Charte.texte(15)),
             ),
           ),
@@ -264,7 +260,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
               ),
               IconButton(
                 tooltip: 'Renommer le parcours',
-                icon: const Icon(Icons.edit_outlined, color: Charte.texteSecondaire),
+                icon: Icon(Icons.edit_outlined, color: Charte.couleurIcone(Icons.edit_outlined)),
                 onPressed: () async {
                   final nom = await demanderTexte(context, titre: 'Nom du parcours', initial: p.nom);
                   if (nom != null && nom.isNotEmpty) setState(() => etat.renommerParcours(p, nom));
@@ -400,13 +396,13 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             child: Container(
               margin: EdgeInsets.only(left: 16 + retrait, right: 16),
               constraints: const BoxConstraints(minHeight: 52),
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
               child: Row(
                 children: [
                   Expanded(child: contenu),
                   ReorderableDragStartListener(
                     index: index,
-                    child: const SizedBox(width: 44, height: 44, child: Icon(Icons.drag_handle, color: Charte.texteSecondaire)),
+                    child: SizedBox(width: 44, height: 44, child: Icon(Icons.drag_handle, color: Charte.couleurIcone(Icons.drag_handle))),
                   ),
                 ],
               ),
@@ -432,7 +428,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             width: 28,
             height: 28,
             alignment: Alignment.center,
-            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Charte.encre, width: 1.5)),
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Charte.cadre, width: 1.5)),
             child: Text('${r + 1}', style: Charte.texte(14)),
           ),
           const SizedBox(width: 8),
@@ -585,34 +581,24 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
         ],
         for (final l in pretes) ...[
           Carte(
-            chevron: false,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            onTap: () => _partir(context, l),
+            child: Row(
               children: [
-                Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
-                const SizedBox(height: 2),
-                Text(
-                  '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
-                  '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
-                  style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Bouton(
-                        texte: 'Remettre en préparation',
-                        taille: 15,
-                        onTap: () {
-                          etat.remettreEnPreparation(l);
-                          Nav.message(context, '« ${etat.nomListe(l)} » est de nouveau dans Préparer');
-                        },
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
+                        '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''} · touchez pour partir',
+                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(child: Bouton(texte: 'Partir', plein: true, onTap: () => _partir(context, l))),
-                  ],
+                    ],
+                  ),
                 ),
+                BoutonRemettreEnPreparation(l),
               ],
             ),
           ),
@@ -646,12 +632,12 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               height: 12,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Charte.encre, width: 1.5),
+                border: Border.all(color: Charte.cadre, width: 1.5),
               ),
               child: FractionallySizedBox(
                 alignment: Alignment.centerLeft,
                 widthFactor: total == 0 ? 0 : faits / total,
-                child: Container(color: Charte.encre),
+                child: Container(color: Charte.accent),
               ),
             ),
           ),

@@ -83,7 +83,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                   Container(
                     constraints: const BoxConstraints(minHeight: 36),
                     padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
                     child: Text.rich(TextSpan(children: [
                       TextSpan(text: p.nom, style: Charte.texte(16)),
                       if (etat.complement(g, p).isNotEmpty) TextSpan(text: ' · ${etat.complement(g, p)}', style: Charte.secondaire),
@@ -189,10 +189,10 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                     child: Container(
                       constraints: const BoxConstraints(minHeight: 52),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
                       child: Row(
                         children: [
-                          const Icon(Icons.history, size: 20, color: Charte.texteSecondaire),
+                          Icon(Icons.history, size: 20, color: Charte.couleurIcone(Icons.history)),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text.rich(TextSpan(children: [
@@ -203,7 +203,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                               ),
                             ])),
                           ),
-                          const Icon(Icons.chevron_right, color: Charte.texteSecondaire),
+                          Icon(Icons.chevron_right, color: Charte.couleurIcone(Icons.chevron_right)),
                         ],
                       ),
                     ),
@@ -405,7 +405,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   height: 44,
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
                   child: Text(secteur == null ? '+ Produit absent de ce rayon' : '+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
                 ),
               ),
@@ -451,6 +451,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
       codePromo: etat.typePromotion(g?.promotion?.type)?.code ?? (g?.promotion != null ? '?' : null),
       couleurPromo: g?.promotion == null ? null : Color(etat.couleurPromo(g!.promotion!.type)!),
       onPromo: g == null ? null : () => ouvrirFeuillePromotion(context, l, g),
+      codePackaging: g?.packagingId == null ? null : codeCourtPackaging(etat.packaging(g!.packagingId)?.libelle ?? ''),
+      couleurPackaging: g?.packagingId == null ? null : Color(etat.couleurPack(g!.packagingId)!),
+      onPackaging: g == null ? null : () => ouvrirFeuillePromotion(context, l, g, packaging: true),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: () => etat.basculer(l, p.id),
@@ -501,7 +504,7 @@ class _DialogueRechercheState extends State<_DialogueRecherche> {
                       child: Container(
                         constraints: const BoxConstraints(minHeight: 44),
                         padding: const EdgeInsets.symmetric(vertical: 6),
-                        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
                         child: Row(
                           children: [
                             Expanded(child: Text(p.nom, style: Charte.texte(16))),
@@ -530,28 +533,38 @@ class _DialogueRechercheState extends State<_DialogueRecherche> {
 
 // ---------------------------------------------------------------- Écran 4 : volet « Promotion visée »
 
-Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g) {
+/// Code court d'un packaging sur le bouton de la ligne : « ×6 » pour un pack de 6, sinon le début du libellé.
+String codeCourtPackaging(String libelle) {
+  final n = RegExp(r'\d+').firstMatch(libelle)?.group(0);
+  if (n != null && libelle.toLowerCase().startsWith('pack')) return '×$n';
+  final t = libelle.trim();
+  return t.length <= 4 ? t : t.substring(0, 4);
+}
+
+/// Volet du packaging (et de la consigne) ou volet de la promotion d'un article.
+Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g, {bool packaging = false}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
     barrierColor: Charte.voile,
     backgroundColor: Charte.fond,
-    shape: const RoundedRectangleBorder(
+    shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      side: BorderSide(color: Charte.encre, width: Charte.traitCadre),
+      side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
     ),
     builder: (_) => Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: FeuillePromotion(liste: l, ligne: g),
+      child: FeuillePromotion(liste: l, ligne: g, packaging: packaging),
     ),
   );
 }
 
-/// Volet de l'article : packaging (pack de x), promotion visée, consigne.
+/// Volet de l'article : soit le packaging (pack de x) et la consigne, soit la promotion visée.
 class FeuillePromotion extends StatefulWidget {
-  const FeuillePromotion({super.key, required this.liste, required this.ligne});
+  const FeuillePromotion({super.key, required this.liste, required this.ligne, this.packaging = false});
   final Liste liste;
   final LigneListe ligne;
+  final bool packaging;
 
   /// Promotions proposées : lot « 3 dont 1 gratuit », lot pour bénéficier d'une promo, remise simple, autre.
   static const typesProposes = ['lot', 'prixGlobal', 'remise', 'autre'];
@@ -645,14 +658,15 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   void _valider() {
     final id = widget.ligne.produitId;
-    etat.definirPackaging(widget.liste, id, packagingId);
-    if (type == FeuillePromotion.aucune) {
+    if (widget.packaging) {
+      etat.definirPackaging(widget.liste, id, packagingId);
+      etat.definirConsigne(widget.liste, id, consigne.text);
+    } else if (type == FeuillePromotion.aucune) {
       etat.definirPromotion(widget.liste, id, null);
     } else {
       final lib = libelle.text.trim().isEmpty ? _auto() : libelle.text.trim();
       etat.definirPromotion(widget.liste, id, PromotionLigne(type, _parametres(), lib));
     }
-    etat.definirConsigne(widget.liste, id, consigne.text);
     Navigator.of(context).pop();
   }
 
@@ -681,6 +695,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             const SizedBox(height: 12),
             Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
             Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            if (widget.packaging) ...[
             const TitreSection('Packaging', cote: 0, haut: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
               _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
@@ -693,6 +708,16 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 setState(() => packagingId = p.packagingIds.last);
               }),
             ]),
+            const TitreSection('Consigne', cote: 0, haut: 14),
+            TextField(
+              key: const ValueKey('consigne'),
+              controller: consigne,
+              style: Charte.texte(17),
+              maxLines: 2,
+              minLines: 1,
+              decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
+            ),
+            ] else ...[
             const TitreSection('Promotion visée', cote: 0, haut: 14),
             GridView.count(
               crossAxisCount: 3,
@@ -715,15 +740,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 onChanged: (_) => libelleModifie = true,
               ),
             ],
-            const TitreSection('Consigne', cote: 0, haut: 14),
-            TextField(
-              key: const ValueKey('consigne'),
-              controller: consigne,
-              style: Charte.texte(17),
-              maxLines: 2,
-              minLines: 1,
-              decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
-            ),
+            ],
             const SizedBox(height: 14),
             Row(
               children: [
@@ -739,10 +756,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   }
 
   Widget _pastille(String texte, bool choisi, VoidCallback onTap) => Material(
-        color: choisi ? Charte.encre : Charte.fond,
+        color: choisi ? Charte.accent : Charte.blanc,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
-          side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
         ),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -752,7 +769,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             padding: const EdgeInsets.symmetric(horizontal: 14),
             child: Center(
               widthFactor: 1,
-              child: Text(texte, style: Charte.texte(15, gras: choisi, couleur: choisi ? Charte.fond : Charte.encre)),
+              child: Text(texte, style: Charte.texte(15, gras: choisi, couleur: choisi ? Charte.blanc : Charte.encre)),
             ),
           ),
         ),
@@ -762,10 +779,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     final id = t?.id ?? FeuillePromotion.aucune;
     final choisi = id == type;
     return Material(
-      color: choisi ? Charte.encre : Charte.fond,
+      color: choisi ? Charte.accent : Charte.blanc,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+        side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -786,7 +803,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             if (t != null) IconePromo(code: t.code, inverse: choisi) else const SizedBox(height: 4),
             const SizedBox(height: 4),
             Text(_nomCourt(t), textAlign: TextAlign.center,
-                style: Charte.texte(14, gras: choisi, couleur: choisi ? Charte.fond : Charte.encre)),
+                style: Charte.texte(14, gras: choisi, couleur: choisi ? Charte.blanc : Charte.encre)),
           ],
         ),
       ),
@@ -1036,22 +1053,14 @@ class EcranCoursesSecteur extends StatelessWidget {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
-            entete: EnTeteTravail(
-              titre: titre,
-              gauche: BoutonIcone(
-                icone: Icons.format_list_bulleted,
-                libelle: 'Liste complète',
-                onTap: () => Nav.travail(EcranListeComplete(listeId: l.id, depuisCourses: true)),
-              ),
-              action: BoutonPause(onTap: () => _pause(context, l, e)),
-            ),
+            entete: EnTeteTravail(titre: titre),
             haut: [
               BandeauPuces(
                 pastille: false,
                 puces: [
                   for (var k = 0; k < etapes.length; k++)
                     Puce(
-                      etapes[k].nonPlace ? '? Non placé' : '${k + 1} ${court(etapes[k].nom)}',
+                      etapes[k].nonPlace ? '? Non placé' : court(etapes[k].nom),
                       termine: etapes[k].lignes.every((g) => g.coche),
                       image: imageEtape(etat, etapes[k]),
                     ),
@@ -1092,7 +1101,7 @@ class EcranCoursesSecteur extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.check_circle_outline, size: 20, color: Charte.encre),
+                        Icon(Icons.check_circle_outline, size: 20, color: Charte.couleurIcone(Icons.check_circle_outline)),
                         const SizedBox(width: 8),
                         Text(i < etapes.length - 1 ? 'Secteur terminé' : 'Tout est coché', style: Charte.texte(15, gras: true)),
                       ],
@@ -1100,22 +1109,22 @@ class EcranCoursesSecteur extends StatelessWidget {
                   ),
               ],
             ),
+            // Zone de décision : liste complète, pause, fin des courses (les secteurs se choisissent en haut).
             bas: [
               BarreAction(boutons: [
-                if (i > 0)
-                  Bouton(texte: court(etapes[i - 1].nom), icone: Icons.arrow_left, taille: 16, onTap: () => aller(i - 1))
-                else
-                  const Bouton(texte: '', icone: Icons.arrow_left, onTap: null),
-                if (i < etapes.length - 1)
-                  Bouton(
-                    texte: etapes[i + 1].nonPlace ? 'Non placé' : court(etapes[i + 1].nom),
-                    iconeApres: Icons.arrow_right,
-                    taille: termine ? 17 : 16,
-                    plein: true,
-                    onTap: () => aller(i + 1),
-                  )
-                else
-                  Bouton(texte: 'Terminer les courses', taille: 16, plein: true, onTap: () => _terminer(context, l)),
+                Bouton(
+                  texte: 'Liste',
+                  icone: Icons.format_list_bulleted,
+                  taille: 16,
+                  onTap: () => Nav.travail(EcranListeComplete(listeId: l.id, depuisCourses: true)),
+                ),
+                Bouton(texte: 'Pause', icone: Icons.pause, taille: 16, onTap: () => _pause(context, l, e)),
+                Bouton(
+                  texte: 'Terminer les courses',
+                  taille: 15,
+                  plein: l.nbCoches == total,
+                  onTap: () => _terminer(context, l),
+                ),
               ]),
             ],
           ),
@@ -1161,14 +1170,14 @@ class EcranCoursesSecteur extends StatelessWidget {
       child: Container(
         height: 44,
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
         child: Row(
           children: [
-            const Icon(Icons.route_outlined, size: 20, color: Charte.texteSecondaire),
+            Icon(Icons.route_outlined, size: 20, color: Charte.couleurIcone(Icons.route_outlined)),
             const SizedBox(width: 8),
             Expanded(child: Text('Parcours : $actuel', style: Charte.texte(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
             Text('Changer', style: Charte.texte(15, gras: true)),
-            const Icon(Icons.expand_more, color: Charte.encre),
+            Icon(Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
           ],
         ),
       ),

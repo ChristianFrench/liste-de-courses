@@ -234,7 +234,7 @@ class LigneArticle extends StatelessWidget {
         onTap: () => Nav.aller(context, EcranArticle(article: a)),
         child: Container(
           padding: const EdgeInsets.fromLTRB(12, 8, 8, 8),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -255,7 +255,7 @@ class LigneArticle extends StatelessWidget {
                     const SizedBox(height: 4),
                     Row(
                       children: [
-                        const Icon(Icons.qr_code_2, size: 15, color: Charte.texteSecondaire),
+                        Icon(Icons.qr_code_2, size: 15, color: Charte.couleurIcone(Icons.qr_code_2)),
                         const SizedBox(width: 3),
                         Text(a.code, style: Charte.texte(12, couleur: Charte.texteSecondaire)),
                         const Spacer(),
@@ -265,7 +265,7 @@ class LigneArticle extends StatelessWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: Charte.encre),
+              Icon(Icons.chevron_right, color: Charte.couleurIcone(Icons.chevron_right)),
             ],
           ),
         ),
@@ -285,7 +285,7 @@ class EcranArticle extends StatelessWidget {
     Widget ligne(String etiquette, Widget valeur) => Container(
           constraints: const BoxConstraints(minHeight: 44),
           padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
               SizedBox(width: 110, child: Text(etiquette, style: Charte.texte(14, couleur: Charte.texteSecondaire))),
@@ -429,7 +429,7 @@ class _EtatCatalogue extends StatelessWidget {
             Icon(c.enCours ? Icons.sync : Icons.inventory_2_outlined, size: 16, color: Charte.texteSecondaire),
             const SizedBox(width: 8),
             Expanded(child: Text(texte, style: Charte.texte(12, couleur: Charte.texteSecondaire))),
-            const Icon(Icons.chevron_right, size: 18, color: Charte.texteSecondaire),
+            Icon(Icons.chevron_right, size: 18, color: Charte.couleurIcone(Icons.chevron_right)),
           ],
         ),
       ),
@@ -456,7 +456,7 @@ class EcranCatalogue extends StatelessWidget {
         Widget ligne(String etiquette, String valeur) => Container(
               constraints: const BoxConstraints(minHeight: 40),
               padding: const EdgeInsets.symmetric(vertical: 6),
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
               child: Row(
                 children: [
                   SizedBox(width: 150, child: Text(etiquette, style: Charte.texte(14, couleur: Charte.texteSecondaire))),

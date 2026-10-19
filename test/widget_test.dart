@@ -295,11 +295,17 @@ void main() {
 
       // 6 bis : choisir « Lot 3 dont 1 » sur Yaourts nature (quantité 1) → la quantité passe à 3 ; consigne gardée
       final yaourts = find.ancestor(of: find.textContaining('Yaourts nature', findRichText: true), matching: find.byType(LigneChoix)).first;
-      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)));
+      // Bouton packaging (avant la promotion) : volet séparé
+      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)).first);
+      expect(find.text('PACKAGING'), findsOneWidget);
+      expect(find.text('PROMOTION VISÉE'), findsNothing);
+      await tester.enterText(find.byKey(const ValueKey('consigne')), 'les moins sucrés');
+      await _toucher(tester, find.text('Valider'));
+      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)).last);
       expect(find.text('PROMOTION VISÉE'), findsOneWidget);
+      expect(find.text('PACKAGING'), findsNothing);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Lot x dont y'));
-      await tester.enterText(find.byKey(const ValueKey('consigne')), 'les moins sucrés');
       await _toucher(tester, find.text('Valider'));
       final gy = Etat.instance.liste('l1')!.lignes.firstWhere((g) => Etat.instance.produit(g.produitId)!.nom.startsWith('Yaourts nature'));
       expect(gy.quantite, 3);
@@ -311,7 +317,7 @@ void main() {
       final beurre = find.ancestor(of: find.textContaining('Beurre doux', findRichText: true), matching: find.byType(LigneChoix)).first;
       await _toucher(tester, beurre);
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsOneWidget);
-      expect(find.descendant(of: beurre, matching: find.byType(BoutonPromo)), findsOneWidget);
+      expect(find.descendant(of: beurre, matching: find.byType(BoutonPromo)), findsNWidgets(2)); // packaging et promotion
       await _toucher(tester, find.descendant(of: beurre, matching: find.text('−')));
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsNothing);
 
@@ -331,6 +337,7 @@ void main() {
 
       // Ma liste → liste complète
       await _toucher(tester, find.textContaining('Ma liste'));
+      await tester.dragUntilVisible(find.text('NON PLACÉ'), find.byType(Scrollable).last, const Offset(0, -300));
       expect(find.text('NON PLACÉ'), findsOneWidget);
       await _ciblesTactiles(tester);
     });
@@ -386,18 +393,12 @@ void main() {
       expect(find.textContaining('rayon Frais'), findsOneWidget);
       expect(find.text('Jambon'), findsOneWidget);
 
-      // Liste complète depuis les courses
-      await _toucher(tester, find.byTooltip('Liste complète'));
+      // Liste complète depuis les courses (zone de décision en bas)
+      await _toucher(tester, find.text('Liste'));
       expect(find.text('Reprendre les courses'), findsOneWidget);
       await _toucher(tester, find.text('Reprendre les courses'));
 
-      // Aller jusqu'au bout et terminer
-      var tours = 0;
-      while (find.text('Terminer les courses').evaluate().isEmpty && tours < 15) {
-        await tester.tap(find.byType(Bouton).last);
-        await tester.pumpAndSettle();
-        tours++;
-      }
+      // Terminer depuis la zone de décision (articles restants : confirmation)
       await _toucher(tester, find.text('Terminer les courses'));
       await _toucher(tester, find.text('Terminer'));
       expect(find.text('Par date'), findsOneWidget);
@@ -406,8 +407,8 @@ void main() {
     testWidgets('démarrer des courses depuis une liste prête', (tester) async {
       await _accueil(tester);
       await _toucher(tester, _onglet('Courses'));
-      await _toucher(tester, find.text('Partir').first);
-      if (find.text('Partir').evaluate().length > 1) await _toucher(tester, find.text('Partir').last);
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)));
+      if (find.text('Partir').evaluate().isNotEmpty) await _toucher(tester, find.text('Partir'));
       expect(find.text('Pause'), findsOneWidget);
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });

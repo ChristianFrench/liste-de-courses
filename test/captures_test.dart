@@ -85,7 +85,7 @@ void main() {
     await _toucher(tester, find.text('Interrompue'));
     await _capture('03 Construire');
     final lait = find.ancestor(of: find.textContaining('Lait demi-écrémé', findRichText: true), matching: find.byType(LigneChoix)).first;
-    await _toucher(tester, find.descendant(of: lait, matching: find.byType(BoutonPromo)));
+    await _toucher(tester, find.descendant(of: lait, matching: find.byType(BoutonPromo)).last);
     await _capture('04 Construire-Promo');
     Nav.i.racine.currentState!.pop();
     await tester.pumpAndSettle();
@@ -100,7 +100,7 @@ void main() {
 
     await _toucher(tester, find.text('Reprendre les courses'));
     await _capture('08 Courses-Secteur');
-    await _toucher(tester, find.byTooltip('Liste complète'));
+    await _toucher(tester, find.text('Liste'));
     await _capture('07 Liste-Complete');
     await _toucher(tester, find.text('Reprendre les courses'));
     await _toucher(tester, find.text('Pause'));

@@ -41,7 +41,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             color: Charte.fondSelection,
             child: Row(
               children: [
-                const Icon(Icons.link, size: 20, color: Charte.encre),
+                Icon(Icons.link, size: 20, color: Charte.couleurIcone(Icons.link)),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
@@ -80,7 +80,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
           for (final t in libres)
             Container(
               constraints: const BoxConstraints(minHeight: 52),
-              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
               child: Row(
                 children: [
                   Expanded(
@@ -127,7 +127,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
               },
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
               Expanded(

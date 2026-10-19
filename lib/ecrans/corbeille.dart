@@ -47,7 +47,7 @@ class LienSupprimer extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: TextButton.icon(
             onPressed: onTap,
-            icon: const Icon(Icons.delete_outline, size: 20, color: Charte.texteSecondaire),
+            icon: Icon(Icons.delete_outline, size: 20, color: Charte.couleurIcone(Icons.delete_outline)),
             label: Text(texte, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           ),
         ),

@@ -79,7 +79,7 @@ class EcranArchives extends StatelessWidget {
 
   Widget _ligne(BuildContext context, String texte, bool pj, VoidCallback? supprimer) => Container(
         constraints: const BoxConstraints(minHeight: 48),
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
         child: Row(
           children: [
             Expanded(child: Text(texte, style: Charte.texte(15))),
@@ -87,7 +87,7 @@ class EcranArchives extends StatelessWidget {
             if (supprimer != null)
               IconButton(
                 tooltip: 'Supprimer',
-                icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+                icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
                 onPressed: supprimer,
               ),
           ],

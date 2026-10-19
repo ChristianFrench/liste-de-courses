@@ -59,7 +59,7 @@ class EcranFoyer extends StatelessWidget {
                     width: 44,
                     height: 44,
                     alignment: Alignment.center,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: Charte.fondSelection),
+                    decoration: BoxDecoration(shape: BoxShape.circle, color: Charte.fondSelection),
                     child: Text(m.initiales, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                   ),
                 ),
@@ -141,7 +141,26 @@ class EcranParametres extends StatelessWidget {
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            const TitreSection('Listes', cote: 0, haut: 8),
+            const TitreSection('Apparence', cote: 0, haut: 8),
+            Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
+                style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final pal in palettes)
+                  _ChoixPalette(
+                    palette: pal,
+                    choisie: pal.nom == Charte.palette.nom,
+                    onTap: () {
+                      etat.choisirApparence(pal.nom);
+                      Charte.choisirPalette(pal.nom);
+                    },
+                  ),
+              ],
+            ),
+            const TitreSection('Listes', cote: 0),
             LigneMenu(
               titre: 'Types de promotion',
               sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
@@ -338,7 +357,7 @@ class _Option extends StatelessWidget {
         child: Container(
           constraints: const BoxConstraints(minHeight: 56),
           padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
               CaseACocher(coche: coche, taille: 26),
@@ -448,7 +467,7 @@ class EcranTypesPackaging extends StatelessWidget {
                   onTap: () => _changerCouleur(context, 'pack:$id', k.libelle),
                   droite: IconButton(
                     tooltip: 'Retirer ce type',
-                    icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+                    icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
                     onPressed: () => etat.retirerTypePackaging(id),
                   ),
                 ),
@@ -468,4 +487,44 @@ class EcranTypesPackaging extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Pastille d'une palette : ses teintes, du plus foncé au plus pâle, et son nom.
+class _ChoixPalette extends StatelessWidget {
+  const _ChoixPalette({required this.palette, required this.choisie, required this.onTap});
+  final Palette palette;
+  final bool choisie;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        selected: choisie,
+        label: 'Palette ${palette.nom}',
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: Container(
+            width: 104,
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: palette.fond,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: choisie ? palette.accentFonce : palette.separateur, width: choisie ? 3 : 1.5),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    for (final c in [palette.accentFonce, palette.accent, palette.fondSelection, palette.fondBarre])
+                      Expanded(child: Container(height: 22, color: c)),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(palette.nom, style: Charte.texte(13, gras: choisie), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ],
+            ),
+          ),
+        ),
+      );
 }

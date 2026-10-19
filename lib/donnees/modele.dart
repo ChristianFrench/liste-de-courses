@@ -381,6 +381,9 @@ class Etat extends ChangeNotifier {
 
   /// Délai de suppression automatique des archives, en mois (0 : jamais).
   int delaiArchives = 0;
+
+  /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
+  String? apparence;
   List<Rayon> rayons = [];
   List<Secteur> secteurs = [];
   List<Marque> marques = [];
@@ -548,6 +551,7 @@ class Etat extends ChangeNotifier {
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
+    apparence = options?['apparence'] as String?;
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
@@ -638,6 +642,7 @@ class Etat extends ChangeNotifier {
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
+            if (apparence != null) 'apparence': apparence,
           },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
@@ -1390,6 +1395,11 @@ class Etat extends ChangeNotifier {
     } else {
       couleurs[cle] = couleur;
     }
+    modifie();
+  }
+
+  void choisirApparence(String nom) {
+    apparence = nom;
     modifie();
   }
 
