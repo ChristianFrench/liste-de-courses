@@ -137,7 +137,10 @@ class MenuGerer extends StatelessWidget {
           gauche: Icon(icone, size: 28, color: Charte.encre),
           titre: titre,
           sousTitre: sousTitre,
-          onTap: () => Nav.i.ouvrirRubrique(r),
+          onTap: () {
+            if (r == Nav.magasin) Nav.i.choixMagasin = true;
+            Nav.i.ouvrirRubrique(r);
+          },
         );
     return PageBase(
       entete: const EnTeteNiveau(titre: 'Gérer'),
@@ -187,6 +190,10 @@ class EcranRubrique extends StatelessWidget {
             contenu = sous == Nav.tickets ? SousEcranTickets() : SousEcranCoursesEffectuees();
           default:
             titre = 'Magasins';
+            if (Nav.i.choixMagasin) {
+              contenu = const SousEcranListeMagasins();
+              break;
+            }
             droite = const SelecteurMagasin();
             onglets = const [
               SousOnglet('Rayons', Icons.view_agenda_outlined),

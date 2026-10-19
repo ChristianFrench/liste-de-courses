@@ -190,6 +190,8 @@ void main() {
     e.lire(demo());
     final utilise = e.produits.firstWhere(e.produitUtilise);
     expect(e.suppressionImpossible(utilise), isNotNull);
-    expect(e.suppressionImpossible(e.magasins.last), isNull);
+    // Un magasin ne se supprime que si aucune liste ne lui est rattachée.
+    expect(e.suppressionImpossible(e.magasins.last), contains('rattachée'));
+    expect(e.suppressionImpossible(e.creerMagasin('Sans liste')), isNull);
   });
 }

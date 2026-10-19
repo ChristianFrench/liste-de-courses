@@ -176,7 +176,8 @@ class PromotionLigne {
 }
 
 class LigneListe {
-  LigneListe({required this.produitId, this.marqueId, this.packagingId, this.quantite = 1, this.promotion, this.cochePar, this.cocheLe});
+  LigneListe(
+      {required this.produitId, this.marqueId, this.packagingId, this.quantite = 1, this.promotion, this.cochePar, this.cocheLe, this.consigne});
   final String produitId;
   String? marqueId;
   String? packagingId;
@@ -184,6 +185,9 @@ class LigneListe {
   PromotionLigne? promotion;
   String? cochePar;
   DateTime? cocheLe;
+
+  /// Consigne libre pour celui qui fait les courses (« bien mûres », « la moins chère »…).
+  String? consigne;
   bool get coche => cocheLe != null;
 
   Map<String, dynamic> toJson() => {
@@ -193,6 +197,7 @@ class LigneListe {
         'quantite': quantite,
         if (promotion != null) 'promotion': promotion!.toJson(),
         if (cocheLe != null) 'coche': {'par': cochePar, 'le': _iso(cocheLe)},
+        if (consigne != null && consigne!.isNotEmpty) 'consigne': consigne,
       };
 
   static LigneListe depuis(Map<String, dynamic> g) {
@@ -205,6 +210,7 @@ class LigneListe {
       promotion: PromotionLigne.depuis(g['promotion']),
       cochePar: c?['par'] as String?,
       cocheLe: _date(c?['le']),
+      consigne: _texte(g['consigne']),
     );
   }
 }
@@ -225,8 +231,12 @@ class Liste {
     this.modifieeLe,
     this.repriseRayonId,
     this.repriseSecteurId,
+    this.nom,
   });
   final String id;
+
+  /// Nom donné par l'utilisateur ; null = nom par défaut (magasin et date, voir Etat.nomListe).
+  String? nom;
   final String magasinId;
   StatutListe statut;
   final DateTime dateCreation;
@@ -247,6 +257,7 @@ class Liste {
         'id': id,
         'magasinId': magasinId,
         'statut': statut.name,
+        if (nom != null && nom!.isNotEmpty) 'nom': nom,
         'dateCreation': _iso(dateCreation),
         'lignes': [for (final g in lignes) g.toJson()],
         'parcoursId': parcoursId,
@@ -276,6 +287,7 @@ class Liste {
       modifieeLe: _date(l['modifieeLe']),
       repriseRayonId: r?['rayonId'] as String?,
       repriseSecteurId: r?['secteurId'] as String?,
+      nom: _texte(l['nom']),
     );
   }
 }
@@ -738,9 +750,66 @@ class Etat extends ChangeNotifier {
     final g = ligne(l, produitId);
     if (g == null) return;
     g.promotion = promo;
+    // La quantité suit la promotion qui exige un nombre (« 3 dont 1 gratuit » → 3).
+    final requise = promo?.quantiteRequise;
+    if (requise != null && g.quantite < requise) g.quantite = requise;
     _toucheConstruction(l);
     modifie();
   }
+
+  void definirPackaging(Liste l, String produitId, String? packagingId) {
+    final g = ligne(l, produitId);
+    if (g == null) return;
+    g.packagingId = packagingId;
+    _toucheConstruction(l);
+    modifie();
+  }
+
+  void definirConsigne(Liste l, String produitId, String? consigne) {
+    final g = ligne(l, produitId);
+    if (g == null) return;
+    g.consigne = (consigne == null || consigne.trim().isEmpty) ? null : consigne.trim();
+    _toucheConstruction(l);
+    modifie();
+  }
+
+  /// Nom affiché d'une liste : celui donné par l'utilisateur, sinon « magasin du jj/mm/aaaa ».
+  String nomListe(Liste l) => (l.nom != null && l.nom!.isNotEmpty) ? l.nom! : nomParDefaut(l.magasinId, l.dateCreation);
+  String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)}';
+
+  void renommerListe(Liste l, String nom) {
+    l.nom = nom.trim().isEmpty ? null : nom.trim();
+    modifie();
+  }
+
+  /// Une liste prête revient en préparation.
+  void remettreEnPreparation(Liste l) {
+    l.statut = StatutListe.enConstruction;
+    l.membreId = null;
+    l.parcoursId = null;
+    l.repriseRayonId = null;
+    l.repriseSecteurId = null;
+    l.modifieePar = moi.id;
+    l.modifieeLe = DateTime.now();
+    modifie();
+  }
+
+  /// Dernières courses terminées dans un magasin (avec leurs articles), les plus récentes d'abord.
+  List<Liste> dernieresCourses(String magasinId, {int nombre = 6}) {
+    DateTime date(Liste l) => course(l.id)?.dateCourses ?? l.modifieeLe ?? l.dateCreation;
+    final res = listes.where((l) => l.magasinId == magasinId && l.statut == StatutListe.terminee && l.lignes.isNotEmpty).toList()
+      ..sort((a, b) => date(b).compareTo(date(a)));
+    return res.take(nombre).toList();
+  }
+
+  DateTime dateCourses(Liste l) => course(l.id)?.dateCourses ?? l.modifieeLe ?? l.dateCreation;
+
+  /// Articles d'une liste reprise pour une nouvelle préparation (sans coche ni promotion).
+  List<LigneListe> lignesReprises(Liste ancienne) => [
+        for (final g in ancienne.lignes)
+          if (produit(g.produitId) != null)
+            LigneListe(produitId: g.produitId, marqueId: g.marqueId, packagingId: g.packagingId, quantite: g.quantite, consigne: g.consigne)
+      ];
 
   /// Quantité requise par la promotion si la ligne n'y suffit pas (règle 11), sinon null.
   int? quantiteInsuffisante(LigneListe g) {
@@ -761,7 +830,7 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  Liste creerListe(String magasinId, List<LigneListe> lignes) {
+  Liste creerListe(String magasinId, List<LigneListe> lignes, {String? nom}) {
     for (final g in lignes) {
       produit(g.produitId)?.nbUtilisations++; // entrée dans une liste (règle R4)
     }
@@ -773,6 +842,7 @@ class Etat extends ChangeNotifier {
       lignes: lignes,
       modifieePar: moi.id,
       modifieeLe: DateTime.now(),
+      nom: (nom == null || nom.trim().isEmpty) ? null : nom.trim(),
     );
     listes.add(l);
     modifie();
@@ -828,6 +898,38 @@ class Etat extends ChangeNotifier {
     return p;
   }
 
+  void renommerParcours(Parcours p, String nom) {
+    if (nom.trim().isEmpty) return;
+    p.nom = nom.trim();
+    modifie();
+  }
+
+  /// Rayons du parcours dans l'ordre de leur premier passage.
+  List<Rayon> rayonsDuParcours(Parcours p) {
+    final ids = <String>[];
+    for (final sid in p.etapes) {
+      final r = secteur(sid)?.rayonId;
+      if (r != null && !ids.contains(r)) ids.add(r);
+    }
+    return [for (final id in ids) if (rayon(id) != null) rayon(id)!];
+  }
+
+  /// Déplace un rayon entier (tous ses secteurs) dans le parcours ; les secteurs sont regroupés par rayon.
+  void deplacerRayonParcours(Parcours p, int ancien, int nouveau) {
+    final rs = rayonsDuParcours(p);
+    if (ancien < 0 || ancien >= rs.length) return;
+    final r = rs.removeAt(ancien);
+    rs.insert(nouveau.clamp(0, rs.length), r);
+    p.etapes = [
+      for (final x in rs) ...p.etapes.where((sid) => secteur(sid)?.rayonId == x.id),
+      ...p.etapes.where((sid) => secteur(sid) == null),
+    ];
+    modifie();
+  }
+
+  /// Parcours d'un membre, tous magasins confondus.
+  List<Parcours> parcoursDuMembre(String membreId) => parcours.where((p) => p.membreId == membreId).toList();
+
   /// « (retour) » : le rayon de l'étape a déjà été visité plus tôt, mais pas à l'étape précédente (règle 7).
   bool estRetour(List<String> etapes, int i) {
     final r = secteur(etapes[i])?.rayonId;
@@ -879,6 +981,12 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
+  /// Changement de parcours pendant les courses : on garde l'étape en cours si elle existe encore.
+  void changerParcours(Liste l, String? parcoursId) {
+    l.parcoursId = parcoursId;
+    modifie();
+  }
+
   void etapeCourante(Liste l, String etapeId) {
     l.repriseSecteurId = etapeId;
     modifie();
@@ -900,6 +1008,12 @@ class Etat extends ChangeNotifier {
   }
 
   // ------------------------------------------------------------ Magasin et catalogue
+
+  Magasin? magasinNomme(String nom) => _trouve(magasins, (m) => m.nom.trim().toLowerCase() == nom.trim().toLowerCase());
+
+  /// Listes non terminées rattachées à un magasin.
+  List<Liste> listesDuMagasin(String magasinId) =>
+      listes.where((l) => l.magasinId == magasinId && l.statut != StatutListe.terminee).toList();
 
   Magasin creerMagasin(String nom) {
     final m = Magasin(nouvelId('mg'), nom, '', '');
@@ -1007,10 +1121,12 @@ class Etat extends ChangeNotifier {
   String? suppressionImpossible(Object objet) {
     if (objet is Magasin) {
       if (magasins.length <= 1) return 'C\'est le seul magasin : créez-en un autre avant de le supprimer.';
-      if (coursesEnCours?.magasinId == objet.id) return 'Des courses sont en cours dans ce magasin : terminez-les d\'abord.';
+      final n = listesDuMagasin(objet.id).length;
+      if (n > 0) {
+        return '$n liste${n > 1 ? 's sont rattachées' : ' est rattachée'} à ce magasin : supprimez-la${n > 1 ? 's' : ''} ou terminez-la${n > 1 ? 's' : ''} d\'abord.';
+      }
     }
     if (objet is Produit && produitUtilise(objet)) return 'Ce produit a déjà servi dans une liste : il ne peut pas être supprimé.';
-    if (objet is Liste && objet.statut == StatutListe.enCours) return 'Les courses de cette liste sont en cours : terminez-les d\'abord.';
     return null;
   }
 

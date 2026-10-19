@@ -222,6 +222,7 @@ class Stockage {
         'id': id,
         'magasinId': l['magasin_id'],
         'statut': statuts[statut] ?? 'enConstruction',
+        if (l['libelle'] != null) 'nom': l['libelle'],
         'dateCreation': l['cree_le'],
         'lignes': [
           for (final g in lignes)
@@ -237,6 +238,7 @@ class Stockage {
                   'libelle': g['promo_libelle'] ?? '',
                 },
               if (g['cochee'] == 1) 'coche': {'par': g['cochee_par'], 'le': g['cochee_le']},
+              if (g['note'] != null) 'consigne': g['note'],
             }
         ],
         'parcoursId': l['parcours_id'],
@@ -532,6 +534,7 @@ class Stockage {
         'statut': _statuts[l['statut']] ?? 'construction',
         'parcours_id': l['parcoursId'],
         'fait_par_id': l['membreId'],
+        'libelle': l['nom'],
         'date_courses': null,
         'nb_articles': null,
         'ecran_reprise': nonPlace ? 'non_place' : null,
@@ -558,6 +561,7 @@ class Stockage {
           'promo_parametres': promo == null ? null : jsonEncode(promo['parametres'] ?? {}),
           'promo_libelle': promo?['libelle'],
           'ordre': i,
+          'note': g['consigne'],
           'cochee': coche == null ? 0 : 1,
           'cochee_par': coche?['par'],
           'cochee_le': coche?['le'],
@@ -578,6 +582,7 @@ class Stockage {
         'statut': 'terminee',
         'parcours_id': null,
         'fait_par_id': null,
+        'libelle': null,
         'date_courses': null,
         'nb_articles': null,
         'ecran_reprise': null,

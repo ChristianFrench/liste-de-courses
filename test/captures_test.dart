@@ -118,6 +118,7 @@ void main() {
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Magasins et catalogue'));
+    await _toucher(tester, find.text('Magasin 1'));
     await _capture('13 Magasin-Rayons');
     await _toucher(tester, find.text('Frais'));
     await _capture('14 Magasin-Secteurs');

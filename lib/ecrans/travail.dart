@@ -11,7 +11,8 @@ import 'magasin.dart';
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
 
-/// Écran 2 — Nouvelle liste (préliste).
+/// Écran 2 — Nouvelle liste : magasin, nom (par défaut magasin et date), puis
+/// « D'après l'historique » (dernières courses à reprendre + suggestion automatique) ou « Liste vide ».
 class EcranPreliste extends StatefulWidget {
   const EcranPreliste({super.key});
 
@@ -23,6 +24,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   final etat = Etat.instance;
   late String magasinId;
   final Set<String> retenus = {};
+  final nom = TextEditingController();
+  bool nomModifie = false;
+  bool historique = true;
 
   @override
   void initState() {
@@ -31,21 +35,75 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     _initialiser();
   }
 
-  void _initialiser() => retenus
-    ..clear()
-    ..addAll(etat.preliste(magasinId).map((g) => g.produitId));
+  @override
+  void dispose() {
+    nom.dispose();
+    super.dispose();
+  }
 
-  void _creer(bool garder) {
-    final lignes = <LigneListe>[
-      if (garder)
-        for (final id in retenus)
-          LigneListe(
-            produitId: id,
-            packagingId: (etat.produit(id)?.packagingIds.isNotEmpty ?? false) ? etat.produit(id)!.packagingIds.first : null,
-          ),
-    ];
-    final l = etat.creerListe(magasinId, lignes);
+  void _initialiser() {
+    retenus
+      ..clear()
+      ..addAll(etat.preliste(magasinId).map((g) => g.produitId));
+    if (!nomModifie) nom.text = etat.nomParDefaut(magasinId, DateTime.now());
+  }
+
+  String? get _nom => nom.text.trim() == etat.nomParDefaut(magasinId, DateTime.now()) ? null : nom.text;
+
+  void _creer(List<LigneListe> lignes) {
+    final l = etat.creerListe(magasinId, lignes, nom: _nom);
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
+  }
+
+  void _creerSuggestion() => _creer([
+        if (historique)
+          for (final id in retenus)
+            LigneListe(
+              produitId: id,
+              packagingId: (etat.produit(id)?.packagingIds.isNotEmpty ?? false) ? etat.produit(id)!.packagingIds.first : null,
+            ),
+      ]);
+
+  /// Affiche une course passée ; « Reprendre ces articles » la met en préparation dans une nouvelle liste.
+  Future<void> _voirCourse(Liste ancienne) async {
+    final reprendre = await showDialog<bool>(
+      context: context,
+      barrierColor: Charte.voile,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Charte.fond,
+        insetPadding: const EdgeInsets.all(16),
+        title: Text('Courses ${quandJour(etat.dateCourses(ancienne))} · ${ancienne.lignes.length} articles',
+            style: Charte.texte(18, gras: true)),
+        content: SizedBox(
+          width: 360,
+          height: 380,
+          child: ListView(
+            children: [
+              for (final g in ancienne.lignes)
+                if (etat.produit(g.produitId) case final p?)
+                  Container(
+                    constraints: const BoxConstraints(minHeight: 36),
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                    child: Text.rich(TextSpan(children: [
+                      TextSpan(text: p.nom, style: Charte.texte(16)),
+                      if (etat.complement(g, p).isNotEmpty) TextSpan(text: ' · ${etat.complement(g, p)}', style: Charte.secondaire),
+                      if (g.quantite > 1) TextSpan(text: '  × ${g.quantite}', style: Charte.texte(15, gras: true)),
+                    ])),
+                  ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Fermer', style: Charte.texte(16))),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text('Reprendre ces articles', style: Charte.texte(16, gras: true)),
+          ),
+        ],
+      ),
+    );
+    if (reprendre == true && mounted) _creer(etat.lignesReprises(ancienne));
   }
 
   @override
@@ -64,6 +122,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       }
     }
     final rayons = etat.rayonsDu(magasinId).where((r) => groupes.containsKey(r.id)).toList();
+    final passees = etat.dernieresCourses(magasinId);
 
     return PageBase(
       entete: const EnTeteTravail(titre: 'Nouvelle liste'),
@@ -72,8 +131,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
           child: Row(
             children: [
-              Text('Magasin', style: Charte.texte(15)),
-              const SizedBox(width: 12),
+              SizedBox(width: 70, child: Text('Magasin', style: Charte.texte(15))),
               Expanded(
                 child: ChoixDeroulant<String>(
                   valeur: magasinId,
@@ -88,22 +146,75 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           ),
         ),
         Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+          child: Row(
+            children: [
+              SizedBox(width: 70, child: Text('Nom', style: Charte.texte(15))),
+              Expanded(
+                child: TextField(
+                  key: const ValueKey('nom-liste'),
+                  controller: nom,
+                  style: Charte.texte(16),
+                  onChanged: (_) => nomModifie = true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-          child: Text.rich(TextSpan(children: [
-            TextSpan(text: 'Préliste', style: Charte.texte(14, gras: true)),
-            TextSpan(text: ' d\'après vos dernières courses dans ce magasin', style: Charte.texte(14)),
-          ])),
+          child: Bascule(
+            hauteur: 48,
+            options: const ['D\'après l\'historique', 'Liste vide'],
+            index: historique ? 0 : 1,
+            onChange: (i) => setState(() => historique = i == 0),
+          ),
         ),
         Container(height: 1, color: Charte.separateurZone),
       ],
-      corps: freq.isEmpty
+      corps: !historique
           ? Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('Pas encore de courses dans ce magasin : la préliste est vide. Commencez par une liste vide.',
+              child: Text('La liste commencera vide : vous choisirez les produits rayon par rayon.',
                   style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             )
           : ListView(
               children: [
+                if (passees.isNotEmpty) ...[
+                  _titre('Dernières courses dans ce magasin'),
+                  for (final c in passees)
+                    InkWell(
+                      onTap: () => _voirCourse(c),
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 48),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.history, size: 20, color: Charte.texteSecondaire),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text.rich(TextSpan(children: [
+                                TextSpan(text: etat.nomListe(c), style: Charte.texte(15, gras: true)),
+                                TextSpan(
+                                  text: ' · ${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))}',
+                                  style: Charte.secondaire,
+                                ),
+                              ])),
+                            ),
+                            const Icon(Icons.chevron_right, color: Charte.texteSecondaire),
+                          ],
+                        ),
+                      ),
+                    ),
+                ],
+                _titre('Suggestion automatique · produits habituels'),
+                if (freq.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text('Pas encore de courses dans ce magasin : rien à suggérer.',
+                        style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                  ),
                 for (final r in rayons) ...[
                   _titre(r.nom, image: cleRayon(r.nom)),
                   for (final id in groupes[r.id]!) _ligne(id, freq[id]!),
@@ -116,12 +227,11 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             ),
       bas: [
         BarreAction(boutons: [
-          Bouton(texte: 'Liste vide', onTap: () => _creer(false)),
           Bouton(
-            texte: retenus.isEmpty ? 'Compléter' : 'Garder ${retenus.length} et compléter',
+            texte: !historique || retenus.isEmpty ? 'Créer la liste' : 'Créer avec ${retenus.length} articles',
             plein: true,
             taille: 16,
-            onTap: () => _creer(true),
+            onTap: _creerSuggestion,
           ),
         ]),
       ],
@@ -224,7 +334,20 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
-  Future<void> _produitAbsent(Liste l, Secteur? s) async {
+  Future<void> _produitAbsent(Liste l, Rayon rayon, Secteur? s) async {
+    // « Tout le rayon » : le produit doit quand même aller dans un secteur de ce rayon.
+    if (s == null) {
+      final secteurs = etat.secteursDu(rayon.id);
+      if (secteurs.length == 1) {
+        s = secteurs.first;
+      } else if (secteurs.isNotEmpty) {
+        final sid = await choisirDansListe<String>(context,
+            titre: 'Dans quel secteur de ${rayon.nom} ?', choix: {for (final x in secteurs) x.id: x.nom});
+        if (sid == null || !mounted) return;
+        s = etat.secteur(sid);
+      }
+    }
+    if (!mounted) return;
     final nom = await demanderTexte(context, titre: 'Nouveau produit', aide: 'Nom générique (ex. : Riz)');
     if (nom == null || nom.isEmpty || !mounted) return;
     final p = etat.creerProduit(nom);
@@ -244,7 +367,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
             corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
           );
         }
-        final magasin = etat.magasin(l.magasinId);
         final rayons = etat.rayonsDu(l.magasinId);
         final barre = BarreAction(boutons: [
           Bouton(texte: 'Ma liste · ${l.lignes.length}', onTap: () => Nav.travail(EcranListeComplete(listeId: l.id))),
@@ -259,7 +381,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
           ),
         ]);
         final entete = EnTeteTravail(
-          titre: 'Préparer · ${magasin?.nom ?? ''}',
+          titre: etat.nomListe(l),
           sousTitre: 'Enregistré',
           action: BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
         );
@@ -325,7 +447,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             children: [
               for (final p in produits) _ligne(l, p),
               InkWell(
-                onTap: () => _produitAbsent(l, secteur),
+                onTap: () => _produitAbsent(l, rayon, secteur),
                 child: Container(
                   height: 44,
                   alignment: Alignment.centerLeft,
@@ -347,7 +469,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return LigneChoix(
       key: ValueKey(p.id),
       nom: p.nom,
-      complement: etat.complement(g, p),
+      complement: [etat.complement(g, p), if (g?.promotion != null) g!.promotion!.libelle, if (g?.consigne != null) '« ${g!.consigne} »']
+          .where((x) => x.isNotEmpty)
+          .join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
       codePromo: etat.typePromotion(g?.promotion?.type)?.code ?? (g?.promotion != null ? '?' : null),
@@ -448,10 +572,15 @@ Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g)
   );
 }
 
+/// Volet de l'article : packaging (pack de x), promotion visée, consigne.
 class FeuillePromotion extends StatefulWidget {
   const FeuillePromotion({super.key, required this.liste, required this.ligne});
   final Liste liste;
   final LigneListe ligne;
+
+  /// Promotions proposées : lot « 3 dont 1 gratuit », lot pour bénéficier d'une promo, remise simple, autre.
+  static const typesProposes = ['lot', 'prixGlobal', 'remise', 'autre'];
+  static const aucune = '';
 
   @override
   State<FeuillePromotion> createState() => _FeuillePromotionState();
@@ -459,10 +588,11 @@ class FeuillePromotion extends StatefulWidget {
 
 class _FeuillePromotionState extends State<FeuillePromotion> {
   final etat = Etat.instance;
-  late String type;
-  final c1 = TextEditingController(); // achetés, quantité minimale, valeur, gain
-  final c2 = TextEditingController(); // offerts, prix global
+  late String type; // FeuillePromotion.aucune : sans promotion
+  final c1 = TextEditingController(); // lot de, quantité, valeur
+  final c2 = TextEditingController(); // dont gratuits, avantage
   final libelle = TextEditingController();
+  final consigne = TextEditingController();
   bool libelleModifie = false;
   bool enMontant = false;
   String? packagingId;
@@ -471,23 +601,22 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   void initState() {
     super.initState();
     final p = widget.ligne.promotion;
-    type = p?.type ?? 'lot';
+    type = p?.type ?? FeuillePromotion.aucune;
+    packagingId = widget.ligne.packagingId;
+    consigne.text = widget.ligne.consigne ?? '';
     final par = p?.parametres ?? const {};
     String v(String k) => par[k] == null ? '' : '${par[k]}'.replaceAll('.', ',');
     switch (type) {
       case 'lot':
-        c1.text = p == null ? '3' : v('quantiteAchetee');
-        c2.text = p == null ? '1' : v('quantiteOfferte');
+        c1.text = v('quantiteAchetee');
+        c2.text = v('quantiteOfferte');
       case 'prixGlobal':
         c1.text = v('quantiteMinimale');
-        c2.text = v('prixGlobal');
+        c2.text = par['avantage'] as String? ?? (par['prixGlobal'] != null ? '${v('prixGlobal')} €' : '');
       case 'remise':
       case 'fidelite':
         enMontant = par.containsKey('montant');
         c1.text = enMontant ? v('montant') : v('pourcentage');
-      case 'packagingSpecial':
-        c1.text = v('gain');
-        packagingId = par['packagingId'] as String? ?? widget.ligne.packagingId;
     }
     libelle.text = p?.libelle ?? _auto();
     libelleModifie = p != null && p.libelle != _auto();
@@ -498,6 +627,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     c1.dispose();
     c2.dispose();
     libelle.dispose();
+    consigne.dispose();
     super.dispose();
   }
 
@@ -507,15 +637,13 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   String _auto() {
     switch (type) {
       case 'lot':
-        return '${_f(_n(c1))} achetés = ${_f(_n(c2))} offert${_n(c2) > 1 ? 's' : ''}';
+        return '${_f(_n(c1))} dont ${_f(_n(c2))} gratuit${_n(c2) > 1 ? 's' : ''}';
       case 'prixGlobal':
-        return '${_f(_n(c1))} pour ${euros(_n(c2).toDouble())}';
+        return 'Par ${_f(_n(c1))}${c2.text.trim().isEmpty ? '' : ' : ${c2.text.trim()}'}';
       case 'remise':
-        return enMontant ? '−${euros(_n(c1).toDouble())}' : '−${_f(_n(c1))} %';
-      case 'fidelite':
-        return enMontant ? '${euros(_n(c1).toDouble())} sur la carte' : '${_f(_n(c1))} % sur la carte';
-      case 'packagingSpecial':
-        return c1.text.trim().isEmpty ? 'Packaging spécial' : c1.text.trim();
+        return enMontant ? 'Remise de ${euros(_n(c1).toDouble())}' : 'Remise de ${_f(_n(c1))} %';
+      case FeuillePromotion.aucune:
+        return '';
       default:
         return etat.typePromotion(type)?.nom ?? 'Promotion';
     }
@@ -531,23 +659,36 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       case 'lot':
         return {'quantiteAchetee': _n(c1), 'quantiteOfferte': _n(c2)};
       case 'prixGlobal':
-        return {'quantiteMinimale': _n(c1), 'prixGlobal': _n(c2)};
+        return {'quantiteMinimale': _n(c1), 'avantage': c2.text.trim()};
       case 'remise':
       case 'fidelite':
         return enMontant ? {'montant': _n(c1)} : {'pourcentage': _n(c1)};
-      case 'packagingSpecial':
-        return {if (packagingId != null) 'packagingId': packagingId, 'gain': c1.text.trim()};
       default:
         return {};
     }
   }
 
+  void _valider() {
+    final id = widget.ligne.produitId;
+    etat.definirPackaging(widget.liste, id, packagingId);
+    if (type == FeuillePromotion.aucune) {
+      etat.definirPromotion(widget.liste, id, null);
+    } else {
+      final lib = libelle.text.trim().isEmpty ? _auto() : libelle.text.trim();
+      etat.definirPromotion(widget.liste, id, PromotionLigne(type, _parametres(), lib));
+    }
+    etat.definirConsigne(widget.liste, id, consigne.text);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final p = etat.produit(widget.ligne.produitId);
-    final k = etat.packaging(widget.ligne.packagingId);
     final m = etat.magasin(widget.liste.magasinId);
-    final types = etat.typesPromotion;
+    final types = [
+      for (final id in FeuillePromotion.typesProposes)
+        if (etat.typePromotion(id) case final t?) t,
+    ];
     return SafeArea(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -563,12 +704,21 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               ),
             ),
             const SizedBox(height: 12),
-            Text('Promotion visée', style: Charte.texte(21, gras: true)),
-            Text(
-              '${[p?.nom, k?.libelle.toLowerCase(), m?.nom].whereType<String>().join(' · ')} — d\'après le catalogue du magasin',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire),
-            ),
-            const TitreSection('Type', cote: 0, haut: 12),
+            Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
+            Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const TitreSection('Packaging', cote: 0, haut: 12),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
+              for (final k in p?.packagingIds ?? const <String>[])
+                _pastille(etat.packaging(k)?.libelle ?? '', packagingId == k, () => setState(() => packagingId = k)),
+              _pastille('+ Autre', false, () async {
+                final lib = await demanderTexte(context, titre: 'Nouveau packaging', aide: 'Ex. : Pack de 6, 500 g');
+                if (lib == null || lib.isEmpty || p == null) return;
+                etat.ajouterPackaging(p, lib);
+                setState(() => packagingId = p.packagingIds.last);
+              }),
+            ]),
+            const TitreSection('Promotion visée', cote: 0, haut: 14),
             GridView.count(
               crossAxisCount: 3,
               shrinkWrap: true,
@@ -576,42 +726,35 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               mainAxisSpacing: 8,
               crossAxisSpacing: 8,
               childAspectRatio: 1.75,
-              children: [for (final t in types) _tuile(t)],
+              children: [_tuile(null), for (final t in types) _tuile(t)],
             ),
             const SizedBox(height: 12),
             ..._champs(),
-            const SizedBox(height: 10),
-            Text('Libellé', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 4),
+            if (type != FeuillePromotion.aucune) ...[
+              const SizedBox(height: 10),
+              Text('Libellé', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+              const SizedBox(height: 4),
+              TextField(
+                controller: libelle,
+                style: Charte.texte(17),
+                onChanged: (_) => libelleModifie = true,
+              ),
+            ],
+            const TitreSection('Consigne', cote: 0, haut: 14),
             TextField(
-              controller: libelle,
+              key: const ValueKey('consigne'),
+              controller: consigne,
               style: Charte.texte(17),
-              onChanged: (_) => libelleModifie = true,
+              maxLines: 2,
+              minLines: 1,
+              decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
             ),
             const SizedBox(height: 14),
             Row(
               children: [
-                Expanded(
-                  child: Bouton(
-                    texte: 'Sans promotion',
-                    onTap: () {
-                      etat.definirPromotion(widget.liste, widget.ligne.produitId, null);
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
+                Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(context).pop())),
                 const SizedBox(width: 10),
-                Expanded(
-                  child: Bouton(
-                    texte: 'Valider',
-                    plein: true,
-                    onTap: () {
-                      final lib = libelle.text.trim().isEmpty ? _auto() : libelle.text.trim();
-                      etat.definirPromotion(widget.liste, widget.ligne.produitId, PromotionLigne(type, _parametres(), lib));
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ),
+                Expanded(child: Bouton(texte: 'Valider', plein: true, onTap: _valider)),
               ],
             ),
           ],
@@ -620,8 +763,29 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     );
   }
 
-  Widget _tuile(TypePromotion t) {
-    final choisi = t.id == type;
+  Widget _pastille(String texte, bool choisi, VoidCallback onTap) => Material(
+        color: choisi ? Charte.encre : Charte.fond,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: const BorderSide(color: Charte.encre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            child: Center(
+              widthFactor: 1,
+              child: Text(texte, style: Charte.texte(15, gras: choisi, couleur: choisi ? Charte.fond : Charte.encre)),
+            ),
+          ),
+        ),
+      );
+
+  Widget _tuile(TypePromotion? t) {
+    final id = t?.id ?? FeuillePromotion.aucune;
+    final choisi = id == type;
     return Material(
       color: choisi ? Charte.encre : Charte.fond,
       shape: RoundedRectangleBorder(
@@ -631,8 +795,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
-          if (type != t.id) {
-            type = t.id;
+          if (type != id) {
+            type = id;
             enMontant = false;
             libelleModifie = false;
             // Valeurs proposées pour le type choisi
@@ -644,19 +808,22 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconePromo(code: t.code, inverse: choisi),
+            if (t != null) IconePromo(code: t.code, inverse: choisi) else const SizedBox(height: 4),
             const SizedBox(height: 4),
-            Text(_nomCourt(t), style: Charte.texte(14, gras: choisi, couleur: choisi ? Charte.fond : Charte.encre)),
+            Text(_nomCourt(t), textAlign: TextAlign.center,
+                style: Charte.texte(14, gras: choisi, couleur: choisi ? Charte.fond : Charte.encre)),
           ],
         ),
       ),
     );
   }
 
-  static String _nomCourt(TypePromotion t) => switch (t.id) {
+  static String _nomCourt(TypePromotion? t) => switch (t?.id) {
+        null => 'Aucune',
+        'lot' => 'Lot x dont y',
+        'prixGlobal' => 'Lot pour promo',
         'remise' => 'Remise',
-        'packagingSpecial' => 'Packaging',
-        _ => t.nom,
+        _ => t!.nom,
       };
 
   Widget _champ(String etiquette, Widget champ) => Column(
@@ -681,10 +848,29 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   List<Widget> _champs() {
     switch (type) {
+      case FeuillePromotion.aucune:
+        return const [];
       case 'lot':
-        return [_deux(_champ('Achetés', _nombre(c1)), _champ('Offerts', _nombre(c2)))];
+        return [
+          _deux(_champ('Lot de', _nombre(c1)), _champ('dont gratuits', _nombre(c2))),
+          const SizedBox(height: 6),
+          Text('La quantité de la liste est mise au nombre du lot.', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+        ];
       case 'prixGlobal':
-        return [_deux(_champ('Quantité minimale', _nombre(c1)), _champ('Prix global (€)', _nombre(c2)))];
+        return [
+          _deux(
+            _champ('Quantité à acheter', _nombre(c1)),
+            _champ(
+              'Avantage',
+              TextField(
+                controller: c2,
+                style: Charte.texte(17),
+                decoration: const InputDecoration(hintText: '2e à −50 %'),
+                onChanged: (_) => _majLibelle(),
+              ),
+            ),
+          ),
+        ];
       case 'remise':
       case 'fidelite':
         return [
@@ -698,29 +884,6 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
           ),
           const SizedBox(height: 10),
           _champ(enMontant ? 'Montant (€)' : 'Pourcentage (%)', _nombre(c1)),
-        ];
-      case 'packagingSpecial':
-        final p = etat.produit(widget.ligne.produitId);
-        return [
-          _deux(
-            _champ(
-              'Packaging',
-              ChoixDeroulant<String>(
-                valeur: packagingId ?? '',
-                choix: {'': '—', for (final id in p?.packagingIds ?? <String>[]) id: etat.packaging(id)?.libelle ?? ''},
-                onChange: (v) => setState(() => packagingId = v.isEmpty ? null : v),
-              ),
-            ),
-            _champ(
-              'Gain',
-              TextField(
-                controller: c1,
-                style: Charte.texte(17),
-                decoration: const InputDecoration(hintText: '+20 % gratuit'),
-                onChanged: (_) => _majLibelle(),
-              ),
-            ),
-          ),
         ];
       default:
         return [Text('Décrivez l\'offre dans le libellé.', style: Charte.texte(14, couleur: Charte.texteSecondaire))];
@@ -759,7 +922,7 @@ class EcranListeComplete extends StatelessWidget {
         var numero = 0;
         return PageBase(
           entete: EnTeteTravail(
-            titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · $n article${n > 1 ? 's' : ''}',
+            titre: '${etat.nomListe(l)} · $n article${n > 1 ? 's' : ''}',
             action: BoutonIcone(
               icone: Icons.mail_outline,
               libelle: 'Envoyer par mail',
@@ -799,7 +962,11 @@ class EcranListeComplete extends StatelessWidget {
                       for (final g in e.lignes)
                         LigneCompacte(
                           nom: etat.produit(g.produitId)?.nom ?? '',
-                          complement: etat.complement(g, etat.produit(g.produitId)!, marque: false),
+                          complement: [
+                            etat.complement(g, etat.produit(g.produitId)!, marque: false),
+                            if (g.promotion != null) g.promotion!.libelle,
+                            if (g.consigne != null) '« ${g.consigne} »',
+                          ].where((x) => x.isNotEmpty).join(' · '),
                           quantite: g.quantite,
                           promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
                           coche: g.coche,
@@ -903,6 +1070,7 @@ class EcranCoursesSecteur extends StatelessWidget {
                 selection: i,
                 onChoix: aller,
               ),
+              _choixParcours(context, etat, l),
               Container(
                 height: 34,
                 color: Charte.fondBandeau,
@@ -969,7 +1137,11 @@ class EcranCoursesSecteur extends StatelessWidget {
   Widget _ligne(Etat etat, Liste l, LigneListe g) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
-    final morceaux = [etat.complement(g, p), if (g.promotion != null) g.promotion!.libelle].where((x) => x.isNotEmpty);
+    final morceaux = [
+      etat.complement(g, p),
+      if (g.promotion != null) g.promotion!.libelle,
+      if (g.consigne != null) '« ${g.consigne} »',
+    ].where((x) => x.isNotEmpty);
     return LigneCourse(
       key: ValueKey(p.id),
       nom: p.nom,
@@ -979,6 +1151,37 @@ class EcranCoursesSecteur extends StatelessWidget {
       promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
       alerte: etat.quantiteInsuffisante(g),
       onTap: () => etat.cocher(l, p.id),
+    );
+  }
+
+  /// Changer de parcours pendant les courses, quand la personne en a plusieurs (ou un, plus l'ordre des rayons).
+  Widget _choixParcours(BuildContext context, Etat etat, Liste l) {
+    final membreId = l.membreId ?? etat.moi.id;
+    final choix = <String, String>{
+      for (final p in etat.parcoursDe(l.magasinId, membreId)) p.id: p.nom,
+      '': 'Ordre des rayons',
+    };
+    if (choix.length < 2) return const SizedBox.shrink();
+    final actuel = etat.unParcours(l.parcoursId)?.nom ?? 'Ordre des rayons';
+    return InkWell(
+      onTap: () async {
+        final v = await choisirDansListe<String>(context, titre: 'Changer de parcours', choix: choix);
+        if (v != null) etat.changerParcours(l, v.isEmpty ? null : v);
+      },
+      child: Container(
+        height: 44,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+        child: Row(
+          children: [
+            const Icon(Icons.route_outlined, size: 20, color: Charte.texteSecondaire),
+            const SizedBox(width: 8),
+            Expanded(child: Text('Parcours : $actuel', style: Charte.texte(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            Text('Changer', style: Charte.texte(15, gras: true)),
+            const Icon(Icons.expand_more, color: Charte.encre),
+          ],
+        ),
+      ),
     );
   }
 

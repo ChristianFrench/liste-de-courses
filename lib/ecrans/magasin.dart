@@ -22,6 +22,7 @@ String magasinCourant() {
 class SelecteurMagasin extends StatelessWidget {
   const SelecteurMagasin({super.key});
   static const nouveau = '__nouveau__';
+  static const tous = '__tous__';
 
   @override
   Widget build(BuildContext context) {
@@ -31,15 +32,17 @@ class SelecteurMagasin extends StatelessWidget {
       child: ChoixDeroulant<String>(
         hauteur: 48,
         valeur: magasinCourant(),
-        choix: {for (final m in etat.magasins) m.id: m.nom, nouveau: '+ Nouveau magasin'},
+        choix: {for (final m in etat.magasins) m.id: m.nom, nouveau: '+ Nouveau magasin', tous: 'Tous les magasins'},
         onChange: (v) async {
+          if (v == tous) {
+            Nav.i.choixMagasin = true;
+            Nav.i.signaler();
+            return;
+          }
           if (v == nouveau) {
-            final nom = await demanderTexte(context, titre: 'Nouveau magasin', aide: 'Ex. : Hyper de la gare');
-            if (nom == null || nom.isEmpty || !context.mounted) return;
-            final m = etat.creerMagasin(nom);
+            final m = await creerMagasinDemande(context);
+            if (m == null) return;
             v = m.id;
-            final n = await etat.appliquerModele(m, Etat.tailleComplete);
-            if (n > 0 && context.mounted) Nav.message(context, '$nom : $n produits placés dans ses rayons');
           }
           Nav.i.magasinCourant = v;
           Nav.i.filtreRayonSecteurs = Nav.i.filtreRayonProduits = Nav.i.filtreSecteurProduits = null;
@@ -51,6 +54,69 @@ class SelecteurMagasin extends StatelessWidget {
 }
 
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
+
+/// Demande le nom d'un nouveau magasin (refuse un nom déjà pris) et le remplit avec le catalogue complet.
+Future<Magasin?> creerMagasinDemande(BuildContext context) async {
+  final etat = Etat.instance;
+  final nom = await demanderTexte(context, titre: 'Nouveau magasin', aide: 'Ex. : Hyper de la gare');
+  if (nom == null || nom.isEmpty || !context.mounted) return null;
+  if (etat.magasinNomme(nom) != null) {
+    Nav.message(context, 'Un magasin s\'appelle déjà « $nom » : choisissez un autre nom');
+    return null;
+  }
+  final m = etat.creerMagasin(nom);
+  final n = await etat.appliquerModele(m, Etat.tailleComplete);
+  if (n > 0 && context.mounted) Nav.message(context, '$nom : $n produits placés dans ses rayons');
+  return m;
+}
+
+/// Gérer › Magasins : liste des magasins existants, à l'entrée de la rubrique.
+class SousEcranListeMagasins extends StatelessWidget {
+  const SousEcranListeMagasins({super.key});
+
+  void _ouvrir(String id) {
+    Nav.i.magasinCourant = id;
+    Nav.i.choixMagasin = false;
+    Nav.i.filtreRayonSecteurs = Nav.i.filtreRayonProduits = Nav.i.filtreSecteurProduits = null;
+    Nav.i.signaler();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      children: [
+        for (final m in etat.magasins)
+          LigneMenu(
+            titre: m.nom,
+            titreTaille: 19,
+            gauche: const Icon(Icons.storefront_outlined, size: 28, color: Charte.encre),
+            sousTitre: '${_pluriel(etat.rayonsDu(m.id).length, 'rayon')} · '
+                '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
+            onTap: () => _ouvrir(m.id),
+            droite: IconButton(
+              tooltip: 'Supprimer le magasin',
+              icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+              onPressed: () => demanderSuppression(context, m, 'le magasin ${m.nom}'),
+            ),
+          ),
+        const SizedBox(height: 14),
+        Bouton(
+          texte: '+ Nouveau magasin',
+          pointille: true,
+          onTap: () async {
+            final m = await creerMagasinDemande(context);
+            if (m != null) _ouvrir(m.id);
+          },
+        ),
+        const SizedBox(height: 8),
+        Text('Un magasin ne peut être supprimé que si aucune liste ne lui est rattachée.',
+            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      ],
+    );
+  }
+}
 
 /// Écran 13 — Gérer › Magasins › Rayons.
 class SousEcranRayons extends StatelessWidget {
@@ -99,7 +165,7 @@ class SousEcranRayons extends StatelessWidget {
             final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Nom du rayon');
             if (nom == null || nom.isEmpty) return;
             etat.ajouterRayon(m, nom);
-            if (cleRayon(nom) == null && context.mounted) await choisirImageRayon(context, nom);
+            if (context.mounted) await choisirImageRayon(context, nom);
           },
         ),
         LienSupprimer(
@@ -201,9 +267,7 @@ class SousEcranSecteurs extends StatelessWidget {
                     final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${rayonAjout.nom}', aide: 'Nom du secteur');
                     if (nom == null || nom.isEmpty) return;
                     etat.ajouterSecteur(rayonAjout.id, nom);
-                    if (cleSecteur(rayonAjout.nom, nom) == null && context.mounted) {
-                      await choisirImageSecteur(context, rayonAjout.nom, nom);
-                    }
+                    if (context.mounted) await choisirImageSecteur(context, rayonAjout.nom, nom);
                   },
                 ),
               if (etat.rayon(filtre) case final r?)
@@ -519,6 +583,7 @@ class EcranFicheProduit extends StatelessWidget {
     }
     Nav.i.produitAPlacer = p.id;
     Nav.i.magasinCourant = m.id;
+    Nav.i.choixMagasin = false;
     Nav.i.filtreRayonSecteurs = null;
     Nav.i.ouvrirRubrique(Nav.magasin, sous: Nav.secteurs);
   }

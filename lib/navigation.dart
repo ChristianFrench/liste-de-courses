@@ -36,6 +36,9 @@ class Nav extends ChangeNotifier {
 
   // État partagé de la rubrique Magasins
   String? magasinCourant;
+
+  /// Rubrique Magasins ouverte sur la liste des magasins (avant d'en choisir un).
+  bool choixMagasin = false;
   String? filtreRayonSecteurs; // null = Tous
   String? filtreRayonProduits;
   String? filtreSecteurProduits;
@@ -59,6 +62,7 @@ class Nav extends ChangeNotifier {
       ..[historique] = coursesEffectuees
       ..[magasin] = rayons;
     magasinCourant = null;
+    choixMagasin = false;
     filtreRayonSecteurs = filtreRayonProduits = filtreSecteurProduits = null;
     produitAPlacer = ticketARattacher = null;
     notifyListeners();
