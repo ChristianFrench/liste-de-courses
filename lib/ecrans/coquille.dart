@@ -5,6 +5,7 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'archives.dart';
 import 'corbeille.dart';
 import 'historique.dart';
 import 'listes.dart';
@@ -150,9 +151,10 @@ class MenuGerer extends StatelessWidget {
           entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue',
               '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
           entree(Nav.parcours, Icons.route, 'Parcours', 'Ordre de passage de chacun dans chaque magasin'),
-          entree(Nav.historique, Icons.schedule, 'Historique', 'Courses terminées, tickets de caisse'),
-          entree(Nav.parametres, Icons.settings_outlined, 'Foyer et paramètres',
-              'Membres, préliste, promotions, démonstration'),
+          entree(Nav.historique, Icons.schedule, 'Historique', 'Courses terminées et leur ticket PDF'),
+          entree(Nav.archives, Icons.inventory_2_outlined, 'Archives', 'Courses des magasins supprimés'),
+          entree(Nav.foyer, Icons.home_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),
+          entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Promotions, packagings, options, démonstration'),
           entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
         ],
       ),
@@ -168,6 +170,8 @@ class EcranRubrique extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (rubrique == Nav.parametres) return const EcranParametres();
+    if (rubrique == Nav.foyer) return const EcranFoyer();
+    if (rubrique == Nav.archives) return const EcranArchives();
     if (rubrique == Nav.corbeille) return const EcranCorbeille();
     return ListenableBuilder(
       listenable: Listenable.merge([Nav.i, Etat.instance]),
@@ -183,11 +187,7 @@ class EcranRubrique extends StatelessWidget {
             contenu = SousEcranParcours();
           case Nav.historique:
             titre = 'Historique';
-            onglets = const [
-              SousOnglet('Courses effectuées', Icons.shopping_cart_outlined),
-              SousOnglet('Tickets de caisse', Icons.receipt_long_outlined),
-            ];
-            contenu = sous == Nav.tickets ? SousEcranTickets() : SousEcranCoursesEffectuees();
+            contenu = const SousEcranHistorique();
           default:
             titre = 'Magasins';
             if (Nav.i.choixMagasin) {

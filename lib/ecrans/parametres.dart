@@ -4,39 +4,13 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'corbeille.dart';
 import 'e13_produits_reels.dart';
 
-// Gérer › Foyer et paramètres (17) et Types de promotion (18).
+// Gérer › Mon foyer, Gérer › Paramètres (17), Types de promotion (18) et Types de packaging.
 
-/// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
-class EcranParametres extends StatelessWidget {
-  const EcranParametres({super.key});
-
-  Future<void> _basculerDemo(BuildContext context, bool oui) async {
-    await Etat.instance.basculerDemo(oui);
-    Nav.i.reinitialiser();
-    Nav.i.ouvrirRubrique(Nav.parametres);
-    if (context.mounted) Nav.message(context, oui ? 'Mode démonstration' : 'Retour à vos données');
-  }
-
-  Future<void> _reinitialiser(BuildContext context) async {
-    if (!Etat.instance.modeDemo) return;
-    final ok = await confirmer(
-      context,
-      titre: 'Données de démonstration',
-      contenu: Text(
-        'Revenir aux données de démonstration ? Les listes, parcours et produits modifiés pendant les essais seront remplacés.',
-        style: Charte.texte(16),
-      ),
-      plein: 'Annuler',
-      contour: 'Réinitialiser',
-    );
-    if (ok != true) return;
-    await Etat.instance.reinitialiser();
-    Nav.i.reinitialiser();
-    Nav.message(context, 'Données de démonstration rétablies');
-  }
+/// Gérer › Mon foyer : nom du foyer, membres et leurs adresses mail, invitation.
+class EcranFoyer extends StatelessWidget {
+  const EcranFoyer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,11 +18,11 @@ class EcranParametres extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Foyer et paramètres'),
+        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Mon foyer'),
         corps: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            const TitreSection('Foyer', cote: 0),
+            const TitreSection('Foyer', cote: 0, haut: 8),
             Row(
               children: [
                 Expanded(
@@ -120,11 +94,63 @@ class EcranParametres extends StatelessWidget {
                 if (code != null && code.isNotEmpty && context.mounted) Nav.plusTard(context);
               },
             ),
-            const TitreSection('Listes', cote: 0),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
+class EcranParametres extends StatelessWidget {
+  const EcranParametres({super.key});
+
+  Future<void> _basculerDemo(BuildContext context, bool oui) async {
+    await Etat.instance.basculerDemo(oui);
+    Nav.i.reinitialiser();
+    Nav.i.ouvrirRubrique(Nav.parametres);
+    if (context.mounted) Nav.message(context, oui ? 'Mode démonstration' : 'Retour à vos données');
+  }
+
+  Future<void> _reinitialiser(BuildContext context) async {
+    if (!Etat.instance.modeDemo) return;
+    final ok = await confirmer(
+      context,
+      titre: 'Données de démonstration',
+      contenu: Text(
+        'Revenir aux données de démonstration ? Les listes, parcours et produits modifiés pendant les essais seront remplacés.',
+        style: Charte.texte(16),
+      ),
+      plein: 'Annuler',
+      contour: 'Réinitialiser',
+    );
+    if (ok != true) return;
+    await Etat.instance.reinitialiser();
+    Nav.i.reinitialiser();
+    Nav.message(context, 'Données de démonstration rétablies');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return ListenableBuilder(
+      listenable: etat,
+      builder: (context, _) => PageBase(
+        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Paramètres'),
+        corps: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            const TitreSection('Listes', cote: 0, haut: 8),
             LigneMenu(
               titre: 'Types de promotion',
-              sousTitre: '${etat.typesPromotion.length} types · libellés proposés en construction de liste',
+              sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
               onTap: () => Nav.aller(context, const EcranTypesPromotion()),
+            ),
+            LigneMenu(
+              titre: 'Types de packaging',
+              sousTitre: '${etat.typesPackaging.map((id) => etat.packaging(id)?.libelle ?? '').join(', ')} · chacun avec sa couleur',
+              onTap: () => Nav.aller(context, const EcranTypesPackaging()),
             ),
             _Option(
               texte: 'Préparer la liste secteur par secteur',
@@ -150,18 +176,21 @@ class EcranParametres extends StatelessWidget {
                 sousTitre: 'Identifiant · récupération des tickets',
                 onTap: () => Nav.message(context, 'Récupération par compte magasin : option à étudier'),
               ),
+            const TitreSection('Archives', cote: 0),
+            LigneMenu(
+              titre: 'Suppression automatique des archives',
+              sousTitre: etat.delaiArchives == 0 ? 'Jamais : les archives sont gardées' : 'Après ${etat.delaiArchives} mois',
+              onTap: () async {
+                final v = await choisirDansListe<int>(context,
+                    titre: 'Supprimer les archives après', choix: const {0: 'Jamais', 6: '6 mois', 12: '1 an', 24: '2 ans', 60: '5 ans'});
+                if (v != null) etat.reglerDelaiArchives(v);
+              },
+            ),
             const TitreSection('Données', cote: 0),
             Bascule(
               options: const ['Mes données', 'Démonstration'],
               index: etat.modeDemo ? 1 : 0,
               onChange: (i) => _basculerDemo(context, i == 1),
-            ),
-            LigneMenu(
-              titre: 'Corbeille',
-              sousTitre: etat.corbeille.isEmpty
-                  ? 'Vide'
-                  : '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''} supprimé${etat.corbeille.length > 1 ? 's' : ''} · touchez pour restaurer',
-              onTap: () => Nav.aller(context, const EcranCorbeille()),
             ),
             const SizedBox(height: 4),
             Text(
@@ -260,7 +289,7 @@ class EcranTypesPromotion extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
             const SizedBox(height: 12),
-            Text('Proposés quand on indique une promotion visée sur une ligne de la liste. La liste reste ouverte.',
+            Text('Proposés quand on indique une promotion visée sur une ligne de la liste. Touchez un type pour choisir sa couleur.',
                 style: Charte.texte(16, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 6),
             for (final t in etat.typesPromotion)
@@ -269,17 +298,9 @@ class EcranTypesPromotion extends StatelessWidget {
                 titreTaille: 19,
                 sousTitre: '${t.exemple.isEmpty ? '' : (t.id == 'autre' ? t.exemple : 'Ex. : ${t.exemple.replaceAll(' ; ', ' · ')}')}'
                     '\nParamètres : ${t.parametresAffiches}',
-                gauche: Container(
-                  width: 50,
-                  height: 34,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: Charte.encre, width: Charte.traitCadre),
-                  ),
-                  child: Text(t.code, style: Charte.texte(14, gras: true)),
-                ),
-                droite: BoutonIcone(icone: Icons.edit_outlined, taille: 22, libelle: 'Modifier', onTap: () => Nav.plusTard(context)),
+                gauche: Pastille(t.code, couleur: _c(etat.couleurPromo(t.id))),
+                onTap: () => _changerCouleur(context, 'promo:${t.id}', t.nom),
+                droite: _RondCouleur(etat.couleurPromo(t.id)),
               ),
             const SizedBox(height: 14),
             Bouton(
@@ -335,4 +356,116 @@ class _Option extends StatelessWidget {
           ),
         ),
       );
+}
+
+Color? _c(int? v) => v == null ? null : Color(v);
+
+const _palette = <int>[
+  0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF00ACC1, 0xFF1E88E5, 0xFF8E24AA, 0xFFEC407A, 0xFF8D6E63, 0xFF757575,
+];
+
+/// Choix d'une couleur (ou aucune) pour un type de promotion ou de packaging.
+Future<void> _changerCouleur(BuildContext context, String cle, String nom) async {
+  final etat = Etat.instance;
+  final v = await showDialog<int>(
+    context: context,
+    barrierColor: Charte.voile,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: Charte.fond,
+      title: Text('Couleur · $nom', style: Charte.texte(18, gras: true)),
+      content: Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          for (final c in _palette)
+            Semantics(
+              button: true,
+              label: 'Couleur',
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => Navigator.of(ctx).pop(c),
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Color(c), border: Border.all(color: Charte.encre)),
+                ),
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(-1), child: Text('Sans couleur', style: Charte.texte(16))),
+        TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Annuler', style: Charte.texte(16))),
+      ],
+    ),
+  );
+  if (v == null) return;
+  etat.choisirCouleur(cle, v == -1 ? null : v);
+}
+
+class _RondCouleur extends StatelessWidget {
+  const _RondCouleur(this.couleur);
+  final int? couleur;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 26,
+        height: 26,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: couleur == null ? Charte.fond : Color(couleur!),
+          border: Border.all(color: couleur == null ? Charte.separateurZone : Charte.encre),
+        ),
+      );
+}
+
+/// Paramètres › Types de packaging : pack de 6, de 5… proposés pour chaque article, chacun avec sa couleur.
+/// Packaging et promotion s'ajoutent : un pack de 6 peut aussi être en promotion.
+class EcranTypesPackaging extends StatelessWidget {
+  const EcranTypesPackaging({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return ListenableBuilder(
+      listenable: etat,
+      builder: (context, _) => PageBase(
+        entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de packaging'),
+        corps: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          children: [
+            const SizedBox(height: 12),
+            Text('Proposés pour chaque article de la liste, en plus des packagings propres au produit. '
+                'Un packaging peut aussi avoir une promotion. Touchez un type pour choisir sa couleur.',
+                style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 6),
+            for (final id in etat.typesPackaging)
+              if (etat.packaging(id) case final k?)
+                LigneMenu(
+                  titre: k.libelle,
+                  titreTaille: 18,
+                  gauche: _RondCouleur(etat.couleurPack(id)),
+                  onTap: () => _changerCouleur(context, 'pack:$id', k.libelle),
+                  droite: IconButton(
+                    tooltip: 'Retirer ce type',
+                    icon: const Icon(Icons.delete_outline, color: Charte.texteSecondaire),
+                    onPressed: () => etat.retirerTypePackaging(id),
+                  ),
+                ),
+            const SizedBox(height: 14),
+            Bouton(
+              texte: '+ Ajouter un type de packaging',
+              pointille: true,
+              taille: 16,
+              onTap: () async {
+                final nom = await demanderTexte(context, titre: 'Nouveau type de packaging', aide: 'Ex. : Pack de 8, Lot de 2');
+                if (nom != null && nom.isNotEmpty) etat.ajouterTypePackaging(nom);
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    );
+  }
 }

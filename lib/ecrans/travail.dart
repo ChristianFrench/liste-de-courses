@@ -11,8 +11,8 @@ import 'magasin.dart';
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
 
-/// Écran 2 — Nouvelle liste : magasin, nom (par défaut magasin et date), puis
-/// « D'après l'historique » (dernières courses à reprendre + suggestion automatique) ou « Liste vide ».
+/// Écran 2 — Nouvelle liste : magasin et nom (par défaut magasin et date), puis
+/// « Liste vide », « Historique » (copie d'une course effectuée) ou « Générer par IA » (prévu plus tard).
 class EcranPreliste extends StatefulWidget {
   const EcranPreliste({super.key});
 
@@ -23,10 +23,9 @@ class EcranPreliste extends StatefulWidget {
 class _EcranPrelisteState extends State<EcranPreliste> {
   final etat = Etat.instance;
   late String magasinId;
-  final Set<String> retenus = {};
   final nom = TextEditingController();
   bool nomModifie = false;
-  bool historique = true;
+  bool historique = false;
 
   @override
   void initState() {
@@ -42,9 +41,6 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   }
 
   void _initialiser() {
-    retenus
-      ..clear()
-      ..addAll(etat.preliste(magasinId).map((g) => g.produitId));
     if (!nomModifie) nom.text = etat.nomParDefaut(magasinId, DateTime.now());
   }
 
@@ -55,16 +51,19 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
 
-  void _creerSuggestion() => _creer([
-        if (historique)
-          for (final id in retenus)
-            LigneListe(
-              produitId: id,
-              packagingId: (etat.produit(id)?.packagingIds.isNotEmpty ?? false) ? etat.produit(id)!.packagingIds.first : null,
-            ),
-      ]);
+  void _ia() => showDialog<void>(
+        context: context,
+        barrierColor: Charte.voile,
+        builder: (ctx) => AlertDialog(
+          backgroundColor: Charte.fond,
+          title: Text('Générer par IA', style: Charte.texte(18, gras: true)),
+          content: Text('La génération d\'une liste par intelligence artificielle est prévue dans une version future.',
+              style: Charte.texte(16)),
+          actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Compris', style: Charte.texte(16, gras: true)))],
+        ),
+      );
 
-  /// Affiche une course passée ; « Reprendre ces articles » la met en préparation dans une nouvelle liste.
+  /// Affiche une course passée ; « Reprendre ces articles » la copie dans la nouvelle liste.
   Future<void> _voirCourse(Liste ancienne) async {
     final reprendre = await showDialog<bool>(
       context: context,
@@ -108,22 +107,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
 
   @override
   Widget build(BuildContext context) {
-    final freq = etat.frequencesDu(magasinId);
-    final groupes = <String, List<String>>{};
-    final nonPlaces = <String>[];
-    final ids = freq.keys.where((id) => etat.produit(id) != null).toList()
-      ..sort((a, b) => freq[b]!.compareTo(freq[a]!));
-    for (final id in ids) {
-      final r = etat.rayonDe(magasinId, id);
-      if (r == null) {
-        nonPlaces.add(id);
-      } else {
-        groupes.putIfAbsent(r.id, () => []).add(id);
-      }
-    }
-    final rayons = etat.rayonsDu(magasinId).where((r) => groupes.containsKey(r.id)).toList();
     final passees = etat.dernieresCourses(magasinId);
-
     return PageBase(
       entete: const EnTeteTravail(titre: 'Nouvelle liste'),
       haut: [
@@ -146,7 +130,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
           child: Row(
             children: [
               SizedBox(width: 70, child: Text('Nom', style: Charte.texte(15))),
@@ -162,12 +146,22 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-          child: Bascule(
-            hauteur: 48,
-            options: const ['D\'après l\'historique', 'Liste vide'],
-            index: historique ? 0 : 1,
-            onChange: (i) => setState(() => historique = i == 0),
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
+          child: Row(
+            children: [
+              Expanded(child: Bouton(texte: 'Liste vide', plein: true, taille: 16, onTap: () => _creer([]))),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Bouton(
+                  texte: 'Historique',
+                  taille: 16,
+                  plein: historique,
+                  onTap: () => setState(() => historique = true),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(child: Bouton(texte: 'Générer par IA', taille: 15, pointille: true, onTap: _ia)),
+            ],
           ),
         ),
         Container(height: 1, color: Charte.separateurZone),
@@ -175,94 +169,57 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       corps: !historique
           ? Padding(
               padding: const EdgeInsets.all(16),
-              child: Text('La liste commencera vide : vous choisirez les produits rayon par rayon.',
+              child: Text(
+                  '« Liste vide » : vous choisirez les produits rayon par rayon.\n'
+                  '« Historique » : partir d\'une de vos dernières courses dans ce magasin.',
                   style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             )
           : ListView(
               children: [
-                if (passees.isNotEmpty) ...[
-                  _titre('Dernières courses dans ce magasin'),
-                  for (final c in passees)
-                    InkWell(
-                      onTap: () => _voirCourse(c),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 48),
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.history, size: 20, color: Charte.texteSecondaire),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text.rich(TextSpan(children: [
-                                TextSpan(text: etat.nomListe(c), style: Charte.texte(15, gras: true)),
-                                TextSpan(
-                                  text: ' · ${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))}',
-                                  style: Charte.secondaire,
-                                ),
-                              ])),
-                            ),
-                            const Icon(Icons.chevron_right, color: Charte.texteSecondaire),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-                _titre('Suggestion automatique · produits habituels'),
-                if (freq.isEmpty)
+                _titre('Dernières courses dans ce magasin · touchez pour choisir'),
+                if (passees.isEmpty)
                   Padding(
                     padding: const EdgeInsets.all(12),
-                    child: Text('Pas encore de courses dans ce magasin : rien à suggérer.',
+                    child: Text('Aucune course terminée avec ses articles dans ce magasin.',
                         style: Charte.texte(15, couleur: Charte.texteSecondaire)),
                   ),
-                for (final r in rayons) ...[
-                  _titre(r.nom, image: cleRayon(r.nom)),
-                  for (final id in groupes[r.id]!) _ligne(id, freq[id]!),
-                ],
-                if (nonPlaces.isNotEmpty) ...[
-                  _titre('Non placé'),
-                  for (final id in nonPlaces) _ligne(id, freq[id]!),
-                ],
+                for (final c in passees)
+                  InkWell(
+                    onTap: () => _voirCourse(c),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 52),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.history, size: 20, color: Charte.texteSecondaire),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text.rich(TextSpan(children: [
+                              TextSpan(text: etat.nomListe(c), style: Charte.texte(15, gras: true)),
+                              TextSpan(
+                                text: ' · ${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))}',
+                                style: Charte.secondaire,
+                              ),
+                            ])),
+                          ),
+                          const Icon(Icons.chevron_right, color: Charte.texteSecondaire),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
-      bas: [
-        BarreAction(boutons: [
-          Bouton(
-            texte: !historique || retenus.isEmpty ? 'Créer la liste' : 'Créer avec ${retenus.length} articles',
-            plein: true,
-            taille: 16,
-            onTap: _creerSuggestion,
-          ),
-        ]),
-      ],
     );
   }
 
-  Widget _titre(String nom, {String? image}) => Container(
+  Widget _titre(String nom) => Container(
         height: 30,
         color: Charte.fondBandeau,
         padding: const EdgeInsets.symmetric(horizontal: 10),
         alignment: Alignment.centerLeft,
-        child: Row(children: [
-          if (image != null) ...[Pictogramme(image, taille: 24), const SizedBox(width: 8)],
-          Text(nom.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 0.8)),
-        ]),
+        child: Text(nom.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 0.8)),
       );
-
-  Widget _ligne(String id, int n) {
-    final p = etat.produit(id)!;
-    final coche = retenus.contains(id);
-    return LigneChoix(
-      nom: p.nom,
-      complement: etat.complement(null, p),
-      coche: coche,
-      quantite: 1,
-      afficherQuantite: false,
-      droite: Text('$n/${etat.prelisteSur}', style: Charte.texte(12, couleur: Charte.texteSecondaire)),
-      onTap: () => setState(() => coche ? retenus.remove(id) : retenus.add(id)),
-      onQuantite: (_) {},
-    );
-  }
 }
 
 /// Écran 3 — Construction par secteur. Chaque action est enregistrée ; quitter ne perd rien.
@@ -406,11 +363,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             : secteur == null
                 ? <Produit>[]
                 : etat.produitsDu(l.magasinId, secteur.id);
-        produits.sort((a, b) {
-          final ca = etat.ligne(l, a.id) != null ? 0 : 1;
-          final cb = etat.ligne(l, b.id) != null ? 0 : 1;
-          return ca != cb ? ca.compareTo(cb) : b.nbUtilisations.compareTo(a.nbUtilisations);
-        });
+        _ordonner(l, produits);
 
         return PageBase(
           entete: entete,
@@ -462,6 +415,27 @@ class _EcranConstructionState extends State<EcranConstruction> {
         );
       },
     );
+  }
+
+  // Ordre des produits figé tant qu'on reste sur le même rayon ou secteur : cocher ne déplace rien.
+  // En revenant sur ce rayon ou ce secteur, les produits choisis passent en premier.
+  String? _ordreCle;
+  final Map<String, int> _ordre = {};
+
+  void _ordonner(Liste l, List<Produit> produits) {
+    final cle = '$rayonIndex/$secteurIndex';
+    if (cle != _ordreCle) {
+      _ordreCle = cle;
+      final tri = [...produits]..sort((a, b) {
+          final ca = etat.ligne(l, a.id) != null ? 0 : 1;
+          final cb = etat.ligne(l, b.id) != null ? 0 : 1;
+          return ca != cb ? ca.compareTo(cb) : b.nbUtilisations.compareTo(a.nbUtilisations);
+        });
+      _ordre
+        ..clear()
+        ..addAll({for (var i = 0; i < tri.length; i++) tri[i].id: i});
+    }
+    produits.sort((a, b) => (_ordre[a.id] ?? 1 << 20).compareTo(_ordre[b.id] ?? 1 << 20));
   }
 
   Widget _ligne(Liste l, Produit p) {
@@ -709,7 +683,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             const TitreSection('Packaging', cote: 0, haut: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
               _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
-              for (final k in p?.packagingIds ?? const <String>[])
+              for (final k in {...?p?.packagingIds, ...etat.typesPackaging})
                 _pastille(etat.packaging(k)?.libelle ?? '', packagingId == k, () => setState(() => packagingId = k)),
               _pastille('+ Autre', false, () async {
                 final lib = await demanderTexte(context, titre: 'Nouveau packaging', aide: 'Ex. : Pack de 6, 500 g');
@@ -891,6 +865,19 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   }
 }
 
+/// Packaging et promotion d'une ligne, en clair et dans leur couleur.
+List<Pastille> pastillesLigne(Etat etat, LigneListe g, {bool petite = false}) {
+  final p = etat.produit(g.produitId);
+  final k = p == null ? null : etat.packagingDe(g, p);
+  Color? c(int? v) => v == null ? null : Color(v);
+  return [
+    if (k != null) Pastille(k.libelle, couleur: c(etat.couleurPack(k.id)), petite: petite),
+    if (g.promotion != null)
+      Pastille(g.promotion!.libelle.isEmpty ? (etat.typePromotion(g.promotion!.type)?.nom ?? 'Promo') : g.promotion!.libelle,
+          couleur: c(etat.couleurPromo(g.promotion!.type)), petite: petite),
+  ];
+}
+
 // ---------------------------------------------------------------- Écran 7 : liste complète
 
 class EcranListeComplete extends StatelessWidget {
@@ -963,10 +950,10 @@ class EcranListeComplete extends StatelessWidget {
                         LigneCompacte(
                           nom: etat.produit(g.produitId)?.nom ?? '',
                           complement: [
-                            etat.complement(g, etat.produit(g.produitId)!, marque: false),
-                            if (g.promotion != null) g.promotion!.libelle,
+                            etat.complement(g, etat.produit(g.produitId)!, marque: false, avecPackaging: false),
                             if (g.consigne != null) '« ${g.consigne} »',
                           ].where((x) => x.isNotEmpty).join(' · '),
+                          pastilles: pastillesLigne(etat, g, petite: true),
                           quantite: g.quantite,
                           promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
                           coche: g.coche,
@@ -1138,8 +1125,7 @@ class EcranCoursesSecteur extends StatelessWidget {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
     final morceaux = [
-      etat.complement(g, p),
-      if (g.promotion != null) g.promotion!.libelle,
+      etat.complement(g, p, avecPackaging: false),
       if (g.consigne != null) '« ${g.consigne} »',
     ].where((x) => x.isNotEmpty);
     return LigneCourse(
@@ -1149,6 +1135,7 @@ class EcranCoursesSecteur extends StatelessWidget {
       coche: g.coche,
       quantite: g.quantite,
       promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
+      pastilles: pastillesLigne(etat, g),
       alerte: etat.quantiteInsuffisante(g),
       onTap: () => etat.cocher(l, p.id),
     );
@@ -1185,8 +1172,21 @@ class EcranCoursesSecteur extends StatelessWidget {
     );
   }
 
-  /// Écran 9 — « Interrompre les courses ? »
+  /// Écran 9 — « Interrompre les courses ? » ; sans rien de coché, on peut simplement revenir aux listes prêtes.
   Future<void> _pause(BuildContext context, Liste l, Etape e) async {
+    if (l.nbCoches == 0) {
+      final quitter = await confirmer(
+        context,
+        titre: 'Quitter les courses ?',
+        contenu: Text('Rien n\'est encore coché : la liste redevient « prête » dans l\'onglet Courses.', style: Charte.texte(17)),
+        plein: 'Continuer les courses',
+        contour: 'Quitter',
+      );
+      if (quitter != true) return;
+      Etat.instance.annulerDepart(l);
+      Nav.i.retourOnglet(Nav.courses);
+      return;
+    }
     final interrompre = await confirmer(
       context,
       icone: Icons.pause_circle_outline,

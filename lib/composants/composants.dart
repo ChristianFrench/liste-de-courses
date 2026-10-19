@@ -552,6 +552,7 @@ class LigneCourse extends StatelessWidget {
     required this.onTap,
     this.promo,
     this.alerte,
+    this.pastilles = const [],
   });
   final String nom;
   final String complement;
@@ -560,6 +561,9 @@ class LigneCourse extends StatelessWidget {
   final String? promo;
   final int? alerte;
   final VoidCallback onTap;
+
+  /// Packaging et promotion en clair, dans leur couleur (Paramètres).
+  final List<Pastille> pastilles;
 
   @override
   Widget build(BuildContext context) {
@@ -587,6 +591,11 @@ class LigneCourse extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: Charte.texte(17, gras: !coche, couleur: couleur, barre: coche)),
+                      if (pastilles.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3, bottom: 2),
+                          child: Wrap(spacing: 6, runSpacing: 4, children: pastilles),
+                        ),
                       if (complement.isNotEmpty)
                         Text(complement,
                             maxLines: 1,
@@ -608,14 +617,38 @@ class LigneCourse extends StatelessWidget {
   }
 }
 
+/// Packaging ou promotion en clair (« Pack de 6 », « 3 dont 1 gratuit »), sur la couleur choisie dans Paramètres.
+class Pastille extends StatelessWidget {
+  const Pastille(this.texte, {super.key, this.couleur, this.petite = false});
+  final String texte;
+  final Color? couleur;
+  final bool petite;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = couleur;
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : 7, vertical: petite ? 0 : 1),
+      decoration: BoxDecoration(
+        color: c == null ? Charte.fondBandeau : Color.alphaBlend(c.withValues(alpha: 0.22), Charte.fond),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: c ?? Charte.separateurZone, width: 1.2),
+      ),
+      child: Text(texte, style: Charte.texte(petite ? 11 : 13, gras: true)),
+    );
+  }
+}
+
 /// Ligne en lecture seule de la liste complète (32 points).
 class LigneCompacte extends StatelessWidget {
-  const LigneCompacte({super.key, required this.nom, required this.complement, required this.quantite, this.promo, this.coche = false});
+  const LigneCompacte(
+      {super.key, required this.nom, required this.complement, required this.quantite, this.promo, this.coche = false, this.pastilles = const []});
   final String nom;
   final String complement;
   final int quantite;
   final String? promo;
   final bool coche;
+  final List<Pastille> pastilles;
 
   @override
   Widget build(BuildContext context) {
@@ -642,7 +675,8 @@ class LigneCompacte extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                if (promo != null) ...[const SizedBox(width: 6), IconePromo(code: promo!)],
+                for (final p in pastilles) ...[const SizedBox(width: 6), p],
+                if (promo != null && pastilles.isEmpty) ...[const SizedBox(width: 6), IconePromo(code: promo!)],
               ],
             ),
           ),

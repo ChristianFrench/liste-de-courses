@@ -368,7 +368,19 @@ class Etat extends ChangeNotifier {
   /// Envoi de la liste par mail : adresses de tous les membres déjà remplies.
   bool envoiFoyer = false;
   List<TypePromotion> typesPromotion = [];
-  List<Magasin> magasins = [];
+  List<Magasin> magasins = []; // magasins actifs
+
+  /// Magasins supprimés qui avaient un historique : gardés dans Gérer › Archives avec leurs courses.
+  List<Magasin> magasinsArchives = [];
+
+  /// Couleurs choisies (Paramètres) : « promo:<type> » et « pack:<packaging> » → 0xAARRGGBB.
+  Map<String, int> couleurs = {};
+
+  /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
+  List<String> typesPackaging = [];
+
+  /// Délai de suppression automatique des archives, en mois (0 : jamais).
+  int delaiArchives = 0;
   List<Rayon> rayons = [];
   List<Secteur> secteurs = [];
   List<Marque> marques = [];
@@ -533,6 +545,9 @@ class Etat extends ChangeNotifier {
     final options = (j['parametres'] as Map?)?['options'] as Map?;
     parSecteurs = options?['parSecteurs'] as bool? ?? true;
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
+    couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
+    typesPackaging = _ids(options?['typesPackaging']);
+    delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
@@ -541,10 +556,15 @@ class Etat extends ChangeNotifier {
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
             _ids(t['parametres']))
     ];
-    magasins = [
-      for (final m in (j['magasins'] as List).cast<Map>())
-        Magasin(m['id'] as String, m['nom'] as String, m['enseigne'] as String? ?? '', m['ville'] as String? ?? '')
-    ];
+    magasins = [];
+    magasinsArchives = [];
+    for (final m in (j['magasins'] as List).cast<Map>()) {
+      final mg = Magasin(m['id'] as String, m['nom'] as String, m['enseigne'] as String? ?? '', m['ville'] as String? ?? '');
+      final archive = m['archive'] == true || _ids(options?['magasinsArchives']).contains(mg.id);
+      (archive ? magasinsArchives : magasins).add(mg);
+    }
+    // Un magasin restauré depuis la corbeille n'est plus archivé.
+    magasinsArchives.removeWhere((a) => magasins.any((m) => m.id == a.id));
     rayons = [
       for (final r in (j['rayons'] as List).cast<Map>()) Rayon(r['id'] as String, r['magasinId'] as String, r['nom'] as String)
     ];
@@ -553,6 +573,11 @@ class Etat extends ChangeNotifier {
     ];
     marques = [for (final m in (j['marques'] as List).cast<Map>()) Marque(m['id'] as String, m['nom'] as String)];
     packagings = [for (final k in (j['packagings'] as List).cast<Map>()) Packaging(k['id'] as String, k['libelle'] as String)];
+    if (options?['typesPackaging'] == null) {
+      // Types de packaging de départ : pack de 6, 5, 4, 3, 2.
+      typesPackaging = [for (final n in [6, 5, 4, 3, 2]) _packagingNomme('Pack de $n').id];
+    }
+    typesPackaging.removeWhere((id) => packaging(id) == null);
     produits = [
       for (final p in (j['produits'] as List).cast<Map>())
         Produit(p['id'] as String, p['nom'] as String, _ids(p['marqueIds']), _ids(p['packagingIds']),
@@ -609,10 +634,17 @@ class Etat extends ChangeNotifier {
             'parSecteurs': parSecteurs,
             'envoiFoyer': envoiFoyer,
             if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
+            if (couleurs.isNotEmpty) 'couleurs': couleurs,
+            'typesPackaging': typesPackaging,
+            if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
+            if (delaiArchives > 0) 'delaiArchives': delaiArchives,
           },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
-        'magasins': [for (final m in magasins) {'id': m.id, 'nom': m.nom, 'enseigne': m.enseigne, 'ville': m.ville}],
+        'magasins': [
+          for (final m in magasins) {'id': m.id, 'nom': m.nom, 'enseigne': m.enseigne, 'ville': m.ville},
+          for (final m in magasinsArchives) {'id': m.id, 'nom': m.nom, 'enseigne': m.enseigne, 'ville': m.ville, 'archive': true},
+        ],
         'rayons': [for (final r in rayons) {'id': r.id, 'magasinId': r.magasinId, 'nom': r.nom}],
         'secteurs': [for (final s in secteurs) {'id': s.id, 'rayonId': s.rayonId, 'nom': s.nom}],
         'marques': [for (final m in marques) {'id': m.id, 'nom': m.nom}],
@@ -652,7 +684,8 @@ class Etat extends ChangeNotifier {
 
   Membre get moi => _trouve(membres, (m) => m.moi) ?? membres.first;
   Membre? membre(String? id) => _trouve(membres, (m) => m.id == id);
-  Magasin? magasin(String? id) => _trouve(magasins, (m) => m.id == id);
+  Magasin? magasin(String? id) => _trouve(magasins, (m) => m.id == id) ?? _trouve(magasinsArchives, (m) => m.id == id);
+  bool estArchive(String? magasinId) => magasinsArchives.any((m) => m.id == magasinId);
   Rayon? rayon(String? id) => _trouve(rayons, (r) => r.id == id);
   Secteur? secteur(String? id) => _trouve(secteurs, (s) => s.id == id);
   Marque? marque(String? id) => _trouve(marques, (m) => m.id == id);
@@ -687,14 +720,18 @@ class Etat extends ChangeNotifier {
       secteursDu(rayonId).fold(0, (n, s) => n + produitsDu(magasinId, s.id).length);
 
   /// Complément affiché en gris : marque et packaging.
-  String complement(LigneListe? g, Produit p, {bool marque = true}) {
+  String complement(LigneListe? g, Produit p, {bool marque = true, bool avecPackaging = true}) {
     final m = <String>[];
     final mq = this.marque(g?.marqueId);
     if (marque && mq != null) m.add(mq.nom);
-    final k = packaging(g?.packagingId) ?? (p.packagingIds.isNotEmpty ? packaging(p.packagingIds.first) : null);
-    if (k != null) m.add(k.libelle.toLowerCase());
+    final k = packagingDe(g, p);
+    if (avecPackaging && k != null) m.add(k.libelle.toLowerCase());
     return m.join(' · ');
   }
+
+  /// Packaging de la ligne, ou le premier du produit.
+  Packaging? packagingDe(LigneListe? g, Produit p) =>
+      packaging(g?.packagingId) ?? (p.packagingIds.isNotEmpty ? packaging(p.packagingIds.first) : null);
 
   // ------------------------------------------------------------ Listes
 
@@ -987,7 +1024,17 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  void etapeCourante(Liste l, String etapeId) {
+  /// Départ annulé (rien de coché) : la liste redevient prête.
+  void annulerDepart(Liste l) {
+    l.statut = StatutListe.prete;
+    l.membreId = null;
+    l.parcoursId = null;
+    l.repriseSecteurId = null;
+    l.interrompueLe = null;
+    modifie();
+  }
+
+    void etapeCourante(Liste l, String etapeId) {
     l.repriseSecteurId = etapeId;
     modifie();
   }
@@ -1120,11 +1167,8 @@ class Etat extends ChangeNotifier {
   /// Raison pour laquelle [objet] ne peut pas être supprimé, ou null.
   String? suppressionImpossible(Object objet) {
     if (objet is Magasin) {
-      if (magasins.length <= 1) return 'C\'est le seul magasin : créez-en un autre avant de le supprimer.';
-      final n = listesDuMagasin(objet.id).length;
-      if (n > 0) {
-        return '$n liste${n > 1 ? 's sont rattachées' : ' est rattachée'} à ce magasin : supprimez-la${n > 1 ? 's' : ''} ou terminez-la${n > 1 ? 's' : ''} d\'abord.';
-      }
+      if (magasins.contains(objet) && magasins.length <= 1) return 'C\'est le seul magasin : créez-en un autre avant de le supprimer.';
+
     }
     if (objet is Produit && produitUtilise(objet)) return 'Ce produit a déjà servi dans une liste : il ne peut pas être supprimé.';
     return null;
@@ -1135,10 +1179,14 @@ class Etat extends ChangeNotifier {
     String n(int x, String mot) => '$x $mot${x > 1 ? 's' : ''}';
     if (objet is Magasin) {
       final r = rayonsDu(objet.id);
+      if (estArchive(objet.id)) {
+        return 'Ses ${n(listesArchivees(objet.id).length, 'course')} archivée${listesArchivees(objet.id).length > 1 ? 's' : ''} seront supprimées.';
+      }
       final l = listes.where((x) => x.magasinId == objet.id && x.statut != StatutListe.terminee).length;
       return 'Avec ${n(r.length, 'rayon')}, ${n(secteursDuMagasin(objet.id).length, 'secteur')}, '
           'l\'emplacement des produits, ${n(parcours.where((p) => p.magasinId == objet.id).length, 'parcours')} '
-          'et ${n(l, 'liste')} non terminée${l > 1 ? 's' : ''}. L\'historique des courses est gardé.';
+          'et ${l == 0 ? 'aucune liste en cours' : '${n(l, 'liste')} en cours, effacée${l > 1 ? 's' : ''} aussi'}.'
+          '${aUnHistorique(objet) ? ' Son historique de courses part dans Gérer › Archives.' : ''}';
     }
     if (objet is Rayon) {
       return 'Avec ${n(secteursDu(objet.id).length, 'secteur')} ; ses produits deviennent « non placés » dans ce magasin.';
@@ -1178,7 +1226,15 @@ class Etat extends ChangeNotifier {
       retirerSecteurs(secteursDuMagasin(objet.id).map((s) => s.id).toSet());
       retirer('emplacements', (o) => o['magasinId'] == objet.id);
       retirer('parcours', (o) => o['magasinId'] == objet.id);
-      retirer('listes', (o) => o['magasinId'] == objet.id && o['statut'] != StatutListe.terminee.name);
+      final archive = estArchive(objet.id);
+      retirer('listes', (o) => o['magasinId'] == objet.id && (archive || o['statut'] != StatutListe.terminee.name));
+      if (archive) {
+        retirer('historique', (o) => o['magasinId'] == objet.id);
+      } else if (aUnHistorique(objet)) {
+        // L'historique reste : le magasin passe dans les archives.
+        (j['magasins'] as List).add({'id': objet.id, 'nom': objet.nom, 'enseigne': objet.enseigne, 'ville': objet.ville, 'archive': true});
+        libelle = '${objet.nom} (historique gardé dans les archives)';
+      }
     } else if (objet is Rayon) {
       type = 'rayon';
       libelle = '${objet.nom} · ${magasin(objet.magasinId)?.nom ?? ''}';
@@ -1195,8 +1251,9 @@ class Etat extends ChangeNotifier {
       retirer('emplacements', (o) => o['produitId'] == objet.id);
     } else if (objet is Liste) {
       type = 'liste';
-      libelle = 'Liste ${magasin(objet.magasinId)?.nom ?? ''} · ${objet.lignes.length} articles';
+      libelle = 'Liste ${nomListe(objet)} · ${objet.lignes.length} articles';
       retirer('listes', (o) => o['id'] == objet.id);
+      retirer('historique', (o) => o['id'] == objet.id);
     } else if (objet is Parcours) {
       type = 'parcours';
       libelle = 'Parcours ${objet.nom} · ${magasin(objet.magasinId)?.nom ?? ''}';
@@ -1292,6 +1349,75 @@ class Etat extends ChangeNotifier {
   void options({bool? parSecteurs, bool? envoiFoyer}) {
     if (parSecteurs != null) this.parSecteurs = parSecteurs;
     if (envoiFoyer != null) this.envoiFoyer = envoiFoyer;
+    modifie();
+  }
+
+  Packaging _packagingNomme(String libelle) {
+    var k = _trouve(packagings, (k) => k.libelle.toLowerCase() == libelle.toLowerCase());
+    if (k == null) {
+      k = Packaging(nouvelId('k'), libelle);
+      packagings.add(k);
+    }
+    return k;
+  }
+
+  void ajouterTypePackaging(String libelle) {
+    final k = _packagingNomme(libelle);
+    if (!typesPackaging.contains(k.id)) typesPackaging.add(k.id);
+    modifie();
+  }
+
+  void retirerTypePackaging(String id) {
+    typesPackaging.remove(id);
+    modifie();
+  }
+
+  /// Couleur d'un type de promotion ou de packaging, ou null.
+  int? couleurPromo(String? typeId) => typeId == null ? null : couleurs['promo:$typeId'];
+  int? couleurPack(String? packagingId) => packagingId == null ? null : couleurs['pack:$packagingId'];
+
+  void choisirCouleur(String cle, int? couleur) {
+    if (couleur == null) {
+      couleurs.remove(cle);
+    } else {
+      couleurs[cle] = couleur;
+    }
+    modifie();
+  }
+
+  void reglerDelaiArchives(int mois) {
+    delaiArchives = mois;
+    purgerArchives();
+    modifie();
+  }
+
+  /// Courses des magasins archivés.
+  List<Liste> listesArchivees(String magasinId) => listes.where((l) => l.magasinId == magasinId).toList()
+    ..sort((a, b) => dateCourses(b).compareTo(dateCourses(a)));
+
+  /// Supprime les archives plus anciennes que le délai réglé (rien si « jamais »).
+  void purgerArchives() {
+    if (delaiArchives <= 0) return;
+    final limite = DateTime.now().subtract(Duration(days: 30 * delaiArchives));
+    final ids = {
+      for (final m in magasinsArchives)
+        for (final c in historique.where((c) => c.magasinId == m.id && c.dateCourses.isBefore(limite))) c.id
+    };
+    if (ids.isEmpty) return;
+    listes.removeWhere((l) => ids.contains(l.id));
+    historique.removeWhere((c) => ids.contains(c.id));
+    for (final m in [...magasinsArchives]) {
+      if (!historique.any((c) => c.magasinId == m.id) && !listes.any((l) => l.magasinId == m.id)) magasinsArchives.remove(m);
+    }
+  }
+
+  /// Un magasin supprimé qui a un historique part dans les archives ; ses listes non terminées sont effacées.
+  bool aUnHistorique(Magasin m) =>
+      historique.any((c) => c.magasinId == m.id) || listes.any((l) => l.magasinId == m.id && l.statut == StatutListe.terminee);
+
+  void restaurerMagasin(Magasin m) {
+    magasinsArchives.remove(m);
+    if (!magasins.contains(m)) magasins.add(m);
     modifie();
   }
 

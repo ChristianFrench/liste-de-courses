@@ -49,7 +49,6 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
 }
 
 Finder _onglet(String l) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(l));
-Finder _sous(String l) => find.descendant(of: find.byType(SousOnglets), matching: find.text(l));
 
 void main() {
   setUpAll(_polices);
@@ -112,8 +111,8 @@ void main() {
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Historique'));
     await _capture('11 Historique-Courses');
-    await _toucher(tester, _sous('Tickets de caisse'));
-    await _capture('12 Historique-Tickets');
+    await _toucher(tester, find.text('Par magasin'));
+    await _capture('12 Historique-Par-magasin');
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
@@ -130,7 +129,7 @@ void main() {
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, find.text('Foyer et paramètres'));
+    await _toucher(tester, find.text('Paramètres'));
     await _capture('17 Parametres');
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Parametres-Promos');

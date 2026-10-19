@@ -22,14 +22,7 @@ class SousEcranPreparer extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
-        Bouton(
-          texte: '+ Nouvelle liste',
-          plein: true,
-          hauteur: 56,
-          taille: 19,
-          onTap: () => Nav.travail(const EcranPreliste()),
-        ),
-        const TitreSection('En préparation', cote: 0),
+        const TitreSection('En préparation', cote: 0, haut: 8),
         if (enPreparation.isEmpty)
           Text('Aucune liste en préparation.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
         for (final l in enPreparation) ...[
@@ -60,6 +53,14 @@ class SousEcranPreparer extends StatelessWidget {
           ),
           const SizedBox(height: 10),
         ],
+        const SizedBox(height: 4),
+        Bouton(
+          texte: '+ Nouvelle liste',
+          plein: true,
+          hauteur: 56,
+          taille: 19,
+          onTap: () => Nav.travail(const EcranPreliste()),
+        ),
         const TitreSection('Prêtes pour les courses', cote: 0),
         if (pretes.isEmpty)
           Text('Aucune liste prête.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
@@ -157,7 +158,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
   final etat = Etat.instance;
   int membreIndex = 0;
   String? parcoursId; // null : liste des parcours
-  bool parRayon = true;
+  final Set<String> ouverts = {}; // rayons dont les secteurs sont affichés
 
   @override
   void initState() {
@@ -178,10 +179,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
     if (nom == null || nom.isEmpty) return;
     // Tous les rayons et secteurs du magasin, dans l'ordre des rayons : il reste à les ordonner.
     final n = etat.creerParcours(magasinId, membre.id, nom);
-    setState(() {
-      parcoursId = n.id;
-      parRayon = true;
-    });
+    setState(() => parcoursId = n.id);
   }
 
   @override
@@ -236,8 +234,13 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
   }
 
   Widget _edition(BuildContext context, Parcours p) {
-    final rayonsP = etat.rayonsDuParcours(p);
-    final n = parRayon ? rayonsP.length : p.etapes.length;
+    final runs = _runs(p);
+    final items = <_Element>[
+      for (var r = 0; r < runs.length; r++) ...[
+        _Element(r, null),
+        if (ouverts.contains(runs[r].rayonId)) for (final e in runs[r].etapes) _Element(r, e),
+      ],
+    ];
     final haut = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
@@ -269,20 +272,9 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Bascule(
-            hauteur: 48,
-            options: const ['Par rayon', 'Par secteur'],
-            index: parRayon ? 0 : 1,
-            onChange: (i) => setState(() => parRayon = i == 0),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            parRayon
-                ? 'Ordre de passage par rayon · glisser pour réordonner'
-                : 'Ordre de passage par secteur · glisser pour réordonner',
-            style: Charte.texte(13, couleur: Charte.texteSecondaire),
-          ),
+          const SizedBox(height: 4),
+          Text('Glissez un rayon entier, ou ouvrez-le et glissez un de ses secteurs ailleurs dans le parcours.',
+              style: Charte.texte(13, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 4),
         ],
       ),
@@ -293,29 +285,28 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (!parRayon)
-            Bouton(
-              texte: '+ Ajouter un secteur',
-              pointille: true,
-              taille: 16,
-              onTap: () async {
-                final restants = etat.secteursDuMagasin(p.magasinId).where((s) => !p.etapes.contains(s.id)).toList();
-                if (restants.isEmpty) {
-                  Nav.message(context, 'Tous les secteurs du magasin sont déjà dans le parcours');
-                  return;
-                }
-                final sid = await choisirDansListe<String>(
-                  context,
-                  titre: 'Ajouter un secteur',
-                  choix: {for (final s in restants) s.id: '${s.nom} · ${etat.rayon(s.rayonId)?.nom ?? ''}'},
-                );
-                if (sid != null) {
-                  p.etapes.add(sid);
-                  etat.modifie();
-                  setState(() {});
-                }
-              },
-            ),
+          Bouton(
+            texte: '+ Ajouter un secteur',
+            pointille: true,
+            taille: 16,
+            onTap: () async {
+              final restants = etat.secteursDuMagasin(p.magasinId).where((s) => !p.etapes.contains(s.id)).toList();
+              if (restants.isEmpty) {
+                Nav.message(context, 'Tous les secteurs du magasin sont déjà dans le parcours');
+                return;
+              }
+              final sid = await choisirDansListe<String>(
+                context,
+                titre: 'Ajouter un secteur',
+                choix: {for (final s in restants) s.id: '${s.nom} · ${etat.rayon(s.rayonId)?.nom ?? ''}'},
+              );
+              if (sid != null) {
+                p.etapes.add(sid);
+                etat.modifie();
+                setState(() {});
+              }
+            },
+          ),
           const SizedBox(height: 6),
           InkWell(
             onTap: () {
@@ -347,22 +338,58 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
       buildDefaultDragHandles: false,
       header: haut,
       footer: bas,
-      itemCount: n,
+      itemCount: items.length,
       onReorderItem: (ancien, nouveau) {
-        if (parRayon) {
-          etat.deplacerRayonParcours(p, ancien, nouveau);
-        } else {
-          final sid = p.etapes.removeAt(ancien);
-          p.etapes.insert(nouveau, sid);
-          etat.modifie();
-        }
+        _deplacer(p, runs, items, ancien, nouveau);
         setState(() {});
       },
-      itemBuilder: (context, i) => parRayon ? _rayon(context, p, rayonsP[i], i) : _etape(context, p, i),
+      itemBuilder: (context, i) {
+        final e = items[i];
+        return e.etape == null ? _rayon(context, p, runs, e.run, i) : _secteur(context, p, e.etape!, i);
+      },
     );
   }
 
-  Widget _ligneOrdre({required Key key, required int index, required String numero, required Widget texte, VoidCallback? onTap, Widget? image}) =>
+  /// Passages successifs dans un même rayon : un rayon peut revenir plus loin dans le parcours.
+  List<_Passage> _runs(Parcours p) {
+    final res = <_Passage>[];
+    for (final sid in p.etapes) {
+      final r = etat.secteur(sid)?.rayonId ?? '';
+      if (res.isEmpty || res.last.rayonId != r) res.add(_Passage(r, []));
+      res.last.etapes.add(sid);
+    }
+    return res;
+  }
+
+  /// Applique un glisser-déposer de l'arborescence : un rayon fermé emporte tous ses secteurs,
+  /// un rayon ouvert emporte ses secteurs affichés, un secteur se déplace seul.
+  void _deplacer(Parcours p, List<_Passage> runs, List<_Element> items, int ancien, int nouveau) {
+    final l = [...items];
+    final bouge = l.removeAt(ancien);
+    var bloc = [bouge];
+    if (bouge.etape == null && ouverts.contains(runs[bouge.run].rayonId)) {
+      final enfants = <_Element>[];
+      while (ancien < l.length && l[ancien].etape != null && l[ancien].run == bouge.run) {
+        enfants.add(l.removeAt(ancien));
+      }
+      if (nouveau > ancien) nouveau -= enfants.length;
+      if (nouveau < ancien) {
+        // rien à corriger
+      }
+      bloc = [bouge, ...enfants];
+    }
+    l.insertAll(nouveau.clamp(0, l.length), bloc);
+    p.etapes = [
+      for (final e in l)
+        if (e.etape != null)
+          e.etape!
+        else if (!ouverts.contains(runs[e.run].rayonId))
+          ...runs[e.run].etapes,
+    ];
+    etat.modifie();
+  }
+
+  Widget _ligneOrdre({required Key key, required int index, required Widget contenu, VoidCallback? onTap, double retrait = 0}) =>
       ReorderableDelayedDragStartListener(
         key: key,
         index: index,
@@ -371,21 +398,12 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
           child: InkWell(
             onTap: onTap,
             child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              constraints: const BoxConstraints(minHeight: 56),
+              margin: EdgeInsets.only(left: 16 + retrait, right: 16),
+              constraints: const BoxConstraints(minHeight: 52),
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
               child: Row(
                 children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Charte.encre, width: 1.5)),
-                    child: Text(numero, style: Charte.texte(14)),
-                  ),
-                  const SizedBox(width: 10),
-                  if (image != null) ...[image, const SizedBox(width: 8)],
-                  Expanded(child: texte),
+                  Expanded(child: contenu),
                   ReorderableDragStartListener(
                     index: index,
                     child: const SizedBox(width: 44, height: 44, child: Icon(Icons.drag_handle, color: Charte.texteSecondaire)),
@@ -397,29 +415,51 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
         ),
       );
 
-  Widget _rayon(BuildContext context, Parcours p, Rayon r, int i) {
-    final ns = p.etapes.where((sid) => etat.secteur(sid)?.rayonId == r.id).length;
-    final img = cleRayon(r.nom);
+  Widget _rayon(BuildContext context, Parcours p, List<_Passage> runs, int r, int i) {
+    final run = runs[r];
+    final rayon = etat.rayon(run.rayonId);
+    final ouvert = ouverts.contains(run.rayonId);
+    final retour = runs.take(r).any((x) => x.rayonId == run.rayonId);
+    final img = rayon == null ? null : cleRayon(rayon.nom);
+    final n = run.etapes.length;
     return _ligneOrdre(
-      key: ValueKey('rayon-${r.id}'),
+      key: ValueKey('passage-$r-${run.rayonId}'),
       index: i,
-      numero: '${i + 1}',
-      image: img == null ? null : Pictogramme(img, taille: 32),
-      texte: Text.rich(TextSpan(children: [
-        TextSpan(text: r.nom, style: Charte.texte(18, gras: true)),
-        TextSpan(text: ' · $ns secteur${ns > 1 ? 's' : ''}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      ])),
+      onTap: () => setState(() => ouvert ? ouverts.remove(run.rayonId) : ouverts.add(run.rayonId)),
+      contenu: Row(
+        children: [
+          Container(
+            width: 28,
+            height: 28,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Charte.encre, width: 1.5)),
+            child: Text('${r + 1}', style: Charte.texte(14)),
+          ),
+          const SizedBox(width: 8),
+          if (img != null) ...[Pictogramme(img, taille: 30), const SizedBox(width: 8)],
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(text: rayon?.nom ?? '?', style: Charte.texte(18, gras: true)),
+              TextSpan(
+                text: ' · $n secteur${n > 1 ? 's' : ''}${retour ? ' (retour)' : ''}',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire),
+              ),
+            ])),
+          ),
+          Icon(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.encre),
+        ],
+      ),
     );
   }
 
-  Widget _etape(BuildContext context, Parcours p, int i) {
-    final s = etat.secteur(p.etapes[i]);
+  Widget _secteur(BuildContext context, Parcours p, String sid, int i) {
+    final s = etat.secteur(sid);
     final r = etat.rayon(s?.rayonId);
-    final retour = etat.estRetour(p.etapes, i);
+    final img = s == null || r == null ? null : cleSecteur(r.nom, s.nom);
     return _ligneOrdre(
-      key: ValueKey('etape-${p.etapes[i]}'),
+      key: ValueKey('etape-$sid'),
       index: i,
-      numero: '${i + 1}',
+      retrait: 36,
       onTap: () async {
         final retirer = await confirmer(
           context,
@@ -429,20 +469,31 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
           contour: 'Retirer du parcours',
         );
         if (retirer == true) {
-          p.etapes.removeAt(i);
+          p.etapes.remove(sid);
           etat.modifie();
           setState(() {});
         }
       },
-      texte: Text.rich(TextSpan(children: [
-        TextSpan(text: s?.nom ?? '?', style: Charte.texte(18, gras: true)),
-        TextSpan(
-          text: ' · ${r?.nom ?? ''}${retour ? ' (retour)' : ''}',
-          style: Charte.texte(14, couleur: Charte.texteSecondaire),
-        ),
-      ])),
+      contenu: Row(
+        children: [
+          if (img != null) ...[Pictogramme(img, taille: 26), const SizedBox(width: 8)],
+          Expanded(child: Text(s?.nom ?? '?', style: Charte.texte(16))),
+        ],
+      ),
     );
   }
+}
+
+class _Passage {
+  _Passage(this.rayonId, this.etapes);
+  final String rayonId;
+  final List<String> etapes;
+}
+
+class _Element {
+  _Element(this.run, this.etape);
+  final int run;
+  final String? etape; // null : ligne du rayon
 }
 
 /// Écran 6 — onglet Courses : les listes prêtes ; un clic montre les consignes éventuelles puis lance les courses.
@@ -534,31 +585,39 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
         ],
         for (final l in pretes) ...[
           Carte(
-            onTap: () => _partir(context, l),
-            child: Row(
+            chevron: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
-                        '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
-                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                      ),
-                    ],
-                  ),
+                Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
+                const SizedBox(height: 2),
+                Text(
+                  '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
+                  '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
+                  style: Charte.texte(14, couleur: Charte.texteSecondaire),
                 ),
-                BoutonRemettreEnPreparation(l),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Bouton(
+                        texte: 'Remettre en préparation',
+                        taille: 15,
+                        onTap: () {
+                          etat.remettreEnPreparation(l);
+                          Nav.message(context, '« ${etat.nomListe(l)} » est de nouveau dans Préparer');
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(child: Bouton(texte: 'Partir', plein: true, onTap: () => _partir(context, l))),
+                  ],
+                ),
               ],
             ),
           ),
           const SizedBox(height: 10),
         ],
-        if (pretes.isNotEmpty)
-          Text('Touchez une liste pour partir faire les courses.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       ],
     );
   }

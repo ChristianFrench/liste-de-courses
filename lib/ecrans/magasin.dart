@@ -82,7 +82,9 @@ class SousEcranListeMagasins extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: Etat.instance, builder: (context, _) => _liste(context));
+
+  Widget _liste(BuildContext context) {
     final etat = Etat.instance;
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
@@ -111,7 +113,7 @@ class SousEcranListeMagasins extends StatelessWidget {
           },
         ),
         const SizedBox(height: 8),
-        Text('Un magasin ne peut être supprimé que si aucune liste ne lui est rattachée.',
+        Text('Supprimer un magasin efface ses listes en cours (après confirmation) ; son historique de courses part dans Gérer › Archives.',
             style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       ],
     );
@@ -174,6 +176,7 @@ class SousEcranRayons extends StatelessWidget {
             final mg = etat.magasin(m);
             if (mg != null && await demanderSuppression(context, mg, 'le magasin ${mg.nom}')) {
               Nav.i.magasinCourant = null;
+              Nav.i.choixMagasin = true;
               Nav.i.signaler();
             }
           },

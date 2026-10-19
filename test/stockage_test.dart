@@ -147,7 +147,7 @@ void main() {
     e.lire(demo());
     final s = Stockage.ouvrir(chemin);
     s.ecrire(e.versJson());
-    final mg = e.magasins.last;
+    final mg = e.creerMagasin('Essai corbeille');
     e.ajouterSecteur(e.ajouterRayon(mg.id, 'Rayon essai').id, 'Secteur essai');
     s.ecrire(e.versJson());
     final nbRayons = e.rayonsDu(mg.id).length;
@@ -190,8 +190,27 @@ void main() {
     e.lire(demo());
     final utilise = e.produits.firstWhere(e.produitUtilise);
     expect(e.suppressionImpossible(utilise), isNotNull);
-    // Un magasin ne se supprime que si aucune liste ne lui est rattachée.
-    expect(e.suppressionImpossible(e.magasins.last), contains('rattachée'));
-    expect(e.suppressionImpossible(e.creerMagasin('Sans liste')), isNull);
+    // Un magasin avec des listes se supprime : ses listes en cours partent, son historique va aux archives.
+    expect(e.suppressionImpossible(e.magasins.last), isNull);
+  });
+
+  test('un magasin avec historique passe aux archives, même après relecture', () {
+    final chemin = '${dossier.path}/archives.db';
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final mg = e.magasins.firstWhere(e.aUnHistorique);
+    e.supprimer(mg);
+    expect(e.estArchive(mg.id), isTrue);
+    expect(e.magasins.any((m) => m.id == mg.id), isFalse);
+    expect(e.aUnHistorique(e.magasin(mg.id)!), isTrue);
+    final s = Stockage.ouvrir(chemin);
+    s.ecrire(e.versJson());
+    expect(s.erreurs, isEmpty);
+    s.fermer();
+    e.lire(Stockage.ouvrir(chemin).lire());
+    expect(e.estArchive(mg.id), isTrue);
+    expect(e.aUnHistorique(e.magasin(mg.id)!), isTrue);
+    e.restaurerMagasin(e.magasin(mg.id)!);
+    expect(e.estArchive(mg.id), isFalse);
   });
 }

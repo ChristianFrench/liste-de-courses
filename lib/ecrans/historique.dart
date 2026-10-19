@@ -5,35 +5,34 @@ import '../donnees/envoi.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'travail.dart';
 
-// Gérer › Historique : Courses effectuées (11), Tickets de caisse (12).
+// Gérer › Historique (11) : un seul affichage, par date ou par magasin ; chaque course dit si son
+// ticket PDF est joint. Refaire une liste depuis une course se fait au début de la préparation.
 
-/// Écran 11 — Historique › Courses effectuées. Sert aussi à rattacher un ticket.
-class SousEcranCoursesEffectuees extends StatefulWidget {
-  const SousEcranCoursesEffectuees({super.key});
+class SousEcranHistorique extends StatefulWidget {
+  const SousEcranHistorique({super.key});
 
   @override
-  State<SousEcranCoursesEffectuees> createState() => _SousEcranCoursesEffectueesState();
+  State<SousEcranHistorique> createState() => _SousEcranHistoriqueState();
 }
 
-class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees> {
+class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
   static int vue = 0; // 0 : par date, 1 : par magasin (retenu tant que l'application est ouverte)
-  String? choisie;
 
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     final nav = Nav.i;
     final aRattacher = etat.tickets.where((t) => t.id == nav.ticketARattacher).firstOrNull;
-    final courses = etat.historique;
+    final courses = etat.historique.where((c) => !etat.estArchive(c.magasinId)).toList();
     final groupes = <String, List<Course>>{};
     for (final c in courses) {
       final cle = vue == 0 ? moisAnnee(c.dateCourses).toUpperCase() : (etat.magasin(c.magasinId)?.nom ?? '').toUpperCase();
       groupes.putIfAbsent(cle, () => []).add(c);
     }
+    final libres = etat.tickets.where((t) => etat.course(t.listeId) == null).toList();
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       children: [
         if (aRattacher != null)
           Container(
@@ -54,6 +53,7 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
                   onPressed: () {
                     nav.ticketARattacher = null;
                     nav.signaler();
+                    setState(() {});
                   },
                   child: Text('Annuler', style: Charte.texte(14)),
                 ),
@@ -66,23 +66,42 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
           index: vue,
           onChange: (i) => setState(() => vue = i),
         ),
+        if (courses.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: Text('Aucune course terminée.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          ),
         for (final g in groupes.entries) ...[
           TitreSection(g.key, cote: 0, haut: 14),
           for (final c in g.value) _ligne(context, etat, c, aRattacher),
         ],
-        const SizedBox(height: 14),
-        Bouton(
-          texte: 'Refaire une liste à partir d\'une course',
-          taille: 16,
-          onTap: courses.isEmpty
-              ? null
-              : () {
-                  final c = etat.course(choisie) ?? courses.first;
-                  final l = etat.creerListe(c.magasinId, etat.preliste(c.magasinId));
-                  Nav.message(context, 'Nouvelle liste préremplie avec les achats habituels de ${etat.magasin(c.magasinId)?.nom ?? ''}');
-                  Nav.travail(EcranConstruction(listeId: l.id));
-                },
-        ),
+        if (libres.isNotEmpty && aRattacher == null) ...[
+          const TitreSection('Tickets non rattachés', cote: 0, haut: 18),
+          for (final t in libres)
+            Container(
+              constraints: const BoxConstraints(minHeight: 52),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}',
+                            style: Charte.texte(16, gras: true)),
+                        Text('Non rattaché à une course', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                      ],
+                    ),
+                  ),
+                  Lien('Rattacher', onTap: () {
+                    nav.ticketARattacher = t.id;
+                    nav.signaler();
+                    setState(() {});
+                  }),
+                ],
+              ),
+            ),
+        ],
       ],
     );
   }
@@ -92,23 +111,22 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
     final details = [
       '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
       etat.membre(c.membreId)?.nomAffiche ?? '',
-      if (t != null) euros(t.montant),
-    ];
+      if (t != null && t.montant > 0) euros(t.montant),
+    ].where((x) => x.isNotEmpty);
     return Material(
-      color: c.id == choisie ? Charte.fondSelection : Charte.fond,
+      color: Charte.fond,
       child: InkWell(
-        onTap: () {
-          if (aRattacher != null) {
-            etat.rattacherTicket(aRattacher, c);
-            Nav.i.ticketARattacher = null;
-            Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
-            Nav.i.allerSous(Nav.tickets);
-            return;
-          }
-          setState(() => choisie = c.id);
-        },
+        onTap: aRattacher == null
+            ? null
+            : () {
+                etat.rattacherTicket(aRattacher, c);
+                Nav.i.ticketARattacher = null;
+                Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
+                Nav.i.signaler();
+                setState(() {});
+              },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
           decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
@@ -124,11 +142,11 @@ class _SousEcranCoursesEffectueesState extends State<SousEcranCoursesEffectuees>
               if (t != null)
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onTap: () => _ouvrir(context, t),
-                  child: const SizedBox(height: 44, child: Center(child: Etiquette('Ticket', icone: Icons.check))),
+                  onTap: () => ouvrirTicketPdf(context, t),
+                  child: const SizedBox(height: 44, child: Center(child: Etiquette('PJ ticket', icone: Icons.attach_file))),
                 )
               else
-                Lien('Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
+                Lien('Sans PJ · joindre', onTap: () => joindreTicket(context, etat, c)),
             ],
           ),
         ),
@@ -144,92 +162,9 @@ Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
   final m = await demanderTexte(context, titre: 'Montant du ticket', aide: 'Ex. : 84,30 (facultatif)');
   final v = double.tryParse((m ?? '').replaceAll(',', '.').replaceAll('€', '').trim());
   if (v != null) etat.montantTicket(t, v);
-  Nav.message(context, 'Ticket joint à la course du ${jjmm(c.dateCourses)}');
+  if (context.mounted) Nav.message(context, 'Ticket joint à la course du ${jjmm(c.dateCourses)}');
 }
 
-Future<void> _ouvrir(BuildContext context, Ticket t) async {
+Future<void> ouvrirTicketPdf(BuildContext context, Ticket t) async {
   if (!await ouvrirTicket(t.id) && context.mounted) Nav.message(context, 'Pas de PDF pour ce ticket');
-}
-
-/// Écran 12 — Historique › Tickets de caisse.
-class SousEcranTickets extends StatelessWidget {
-  const SousEcranTickets({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Bouton(texte: 'Photographier', icone: Icons.photo_camera_outlined, taille: 16, onTap: () => Nav.plusTard(context)),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Bouton(
-                texte: 'Compte magasin (à étudier)',
-                pointille: true,
-                taille: 14,
-                onTap: () => Nav.message(context, 'Récupération par compte magasin : option à étudier'),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        if (etat.tickets.isEmpty)
-          Text('Aucun ticket.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        for (final t in etat.tickets) _ligne(context, etat, t),
-      ],
-    );
-  }
-
-  Widget _ligne(BuildContext context, Etat etat, Ticket t) {
-    final c = etat.course(t.listeId);
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-      child: Row(
-        children: [
-          CadrePointille(
-            rayon: 2,
-            epaisseur: 1.2,
-            couleur: const Color(0xFF999999),
-            child: Container(
-              width: 46,
-              height: 58,
-              color: Charte.placeholder,
-              alignment: Alignment.center,
-              child: Text('TICKET', style: Charte.texte(9, couleur: Charte.texteSecondaire)),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}', style: Charte.texte(17, gras: true)),
-                if (c != null)
-                  Text('Lié à la course du ${jjmm(c.dateCourses)} · ${c.nbArticles} articles',
-                      style: Charte.texte(14, couleur: Charte.texteSecondaire))
-                else
-                  Text('Non rattaché à une course', style: Charte.texte(14, gras: true)),
-              ],
-            ),
-          ),
-          IconButton(
-            tooltip: 'Ouvrir le PDF',
-            icon: const Icon(Icons.picture_as_pdf_outlined, color: Charte.encre),
-            onPressed: () => _ouvrir(context, t),
-          ),
-          if (c == null)
-            Lien('Rattacher', onTap: () {
-              Nav.i.ticketARattacher = t.id;
-              Nav.i.allerSous(Nav.coursesEffectuees);
-            }),
-        ],
-      ),
-    );
-  }
 }

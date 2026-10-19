@@ -18,7 +18,7 @@ class Nav extends ChangeNotifier {
   static const int nbOnglets = 3;
 
   // Rubriques de Gérer
-  static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14;
+  static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;
 
   // Sous-onglets des rubriques
   static const int coursesEffectuees = 0, tickets = 1;

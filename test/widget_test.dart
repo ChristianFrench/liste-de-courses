@@ -160,11 +160,24 @@ void main() {
       expect(l2.statut, StatutListe.enConstruction);
     });
 
-    test('magasins : pas de doublon de nom ; suppression refusée si une liste est rattachée', () {
+    test('magasins : pas de doublon de nom ; listes en cours effacées à la suppression', () {
       final e = Etat.instance;
       expect(e.magasinNomme(' magasin 1 '), isNotNull);
       final m1 = e.magasin('mg1')!;
-      expect(e.suppressionImpossible(m1), contains('rattachée'));
+      expect(e.suppressionImpossible(m1), isNull);
+      e.supprimer(m1);
+      expect(e.listes.where((l) => l.magasinId == 'mg1' && l.statut != StatutListe.terminee), isEmpty);
+    });
+
+    test('paramètres : couleurs des promotions et des packagings, délai des archives', () {
+      final e = Etat.instance;
+      expect(e.typesPackaging.map((id) => e.packaging(id)?.libelle), contains('Pack de 6'));
+      e.choisirCouleur('promo:Remise', 0xFF1565C0);
+      expect(e.couleurs['promo:Remise'], 0xFF1565C0);
+      e.reglerDelaiArchives(12);
+      e.lire(jsonDecode(jsonEncode(e.versJson())) as Map<String, dynamic>);
+      expect(e.couleurs['promo:Remise'], 0xFF1565C0);
+      expect(e.delaiArchives, 12);
     });
 
     test('parcours : déplacer un rayon déplace tous ses secteurs', () {
@@ -203,7 +216,6 @@ void main() {
       expect(find.text('LISTES PRÊTES'), findsOneWidget);
       await _ciblesTactiles(tester);
       for (final (rubrique, sous) in [
-        ('Historique', ['Tickets de caisse', 'Courses effectuées']),
         ('Magasins et catalogue', ['Secteurs', 'Produits', 'Rayons']),
       ]) {
         await _rubrique(tester, rubrique);
@@ -217,26 +229,32 @@ void main() {
           await _ciblesTactiles(tester);
         }
       }
-      await _rubrique(tester, 'Foyer et paramètres');
+      await _rubrique(tester, 'Historique');
+      expect(find.text('Par magasin'), findsOneWidget);
+      expect(find.text('Non rattaché à une course'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Mon foyer');
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Paramètres');
       expect(find.text('Types de promotion'), findsOneWidget);
+      expect(find.text('Types de packaging'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Archives');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Parcours');
       expect(find.text('+ Nouveau parcours'), findsOneWidget);
       final mien = Etat.instance.parcoursDuMembre(Etat.instance.moi.id).first;
       await _toucher(tester, find.text(mien.nom).first);
-      expect(find.text('Ordre de passage par rayon · glisser pour réordonner'), findsOneWidget);
+      expect(find.textContaining('Glissez un rayon entier'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Par secteur'));
-      expect(find.text('Ordre de passage par secteur · glisser pour réordonner'), findsOneWidget);
+      // Arborescence : les secteurs n'apparaissent qu'en ouvrant le rayon
+      final premier = Etat.instance.secteur(mien.etapes.first)!;
+      expect(find.text(premier.nom), findsNothing);
+      await _toucher(tester, find.textContaining(Etat.instance.rayon(premier.rayonId)!.nom, findRichText: true).first);
+      expect(find.text(premier.nom), findsOneWidget);
+      await _ciblesTactiles(tester);
       await _rubrique(tester, 'Corbeille');
       expect(find.text('Corbeille'), findsWidgets);
-
-      // Le sous-onglet de l'historique est mémorisé
-      await _rubrique(tester, 'Historique');
-      await _toucher(tester, _sousOnglet('Tickets de caisse'));
-      await _toucher(tester, _onglet('Préparer'));
-      await _rubrique(tester, 'Historique');
-      expect(find.text('Non rattaché à une course'), findsOneWidget);
     });
 
     testWidgets('3. la flèche de retour remonte d\'un niveau', (tester) async {
@@ -253,7 +271,7 @@ void main() {
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('Magasins et catalogue'), findsOneWidget);
 
-      await _rubrique(tester, 'Foyer et paramètres');
+      await _rubrique(tester, 'Paramètres');
       await _toucher(tester, find.text('Types de promotion'));
       expect(find.text('Remise immédiate'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -329,10 +347,12 @@ void main() {
     testWidgets('2. nouvelle liste : la préliste coche les produits fréquents', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text('+ Nouvelle liste'));
-      expect(find.text('Créer avec 10 articles'), findsOneWidget);
+      expect(find.text('Générer par IA'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Créer avec 10 articles'));
-      expect(find.textContaining('Ma liste · 10'), findsOneWidget);
+      await _toucher(tester, find.text('Historique'));
+      await _ciblesTactiles(tester);
+      await _toucher(tester, find.text('Liste vide'));
+      expect(find.textContaining('Ma liste · 0'), findsOneWidget);
       await _toucher(tester, find.text('Liste prête'));
       expect(find.text('PRÊTES POUR LES COURSES'), findsOneWidget);
     });
@@ -386,7 +406,8 @@ void main() {
     testWidgets('démarrer des courses depuis une liste prête', (tester) async {
       await _accueil(tester);
       await _toucher(tester, _onglet('Courses'));
-      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)));
+      await _toucher(tester, find.text('Partir').first);
+      if (find.text('Partir').evaluate().length > 1) await _toucher(tester, find.text('Partir').last);
       expect(find.text('Pause'), findsOneWidget);
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });
@@ -394,7 +415,6 @@ void main() {
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Historique');
-      await _toucher(tester, _sousOnglet('Tickets de caisse'));
       expect(find.text('Non rattaché à une course'), findsOneWidget);
       await _toucher(tester, find.text('Rattacher'));
       await _toucher(tester, find.textContaining('Magasin 2').first);
@@ -446,7 +466,7 @@ void main() {
 
     testWidgets('écran d\'essai accessible depuis Paramètres', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Foyer et paramètres');
+      await _rubrique(tester, 'Paramètres');
       await _toucher(tester, find.text('Produits réels — essai Open Food Facts'));
       expect(find.text('Produits réels (essai)'), findsOneWidget);
       await _ciblesTactiles(tester);
