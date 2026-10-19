@@ -134,10 +134,34 @@ jobs:
           foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") {
             Copy-Item "C:\Windows\System32\$f" $dest
           }
+      - name: Mettre de côté l'application
+        shell: bash
+        run: mv build/windows/x64/runner/Release "build/Liste de courses Windows"
+      - name: Compiler « Gestion du catalogue »
+        shell: bash
+        run: |
+          set +e
+          flutter build windows --release -t lib/gestion_catalogue.dart > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Gestion du catalogue"; else tail -n 5 compilation.log; fi
+          exit $code
+      - name: Préparer « Gestion du catalogue »
+        shell: pwsh
+        run: |
+          $dest = "build/Gestion du catalogue"
+          Move-Item build/windows/x64/runner/Release $dest
+          Rename-Item "$dest/liste_de_courses.exe" "Gestion du catalogue.exe"
+          foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") {
+            Copy-Item "C:\Windows\System32\$f" $dest
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: Liste de courses Windows
-          path: build/windows/x64/runner/Release/
+          path: build/Liste de courses Windows/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Gestion du catalogue Windows
+          path: build/Gestion du catalogue/
 
   iphone:
     if: "!contains(github.event.head_commit.message, '[rapide]')"
@@ -186,6 +210,7 @@ jobs:
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
           (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
+          if [ -d "livrables/Gestion du catalogue Windows" ]; then (cd "livrables/Gestion du catalogue Windows" && zip -qr ../../publication/Gestion-du-catalogue-Windows.zip .); fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
           {

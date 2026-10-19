@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
+import 'catalogue_type.dart';
 import 'stockage.dart';
 
 // Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
@@ -898,7 +899,7 @@ class Etat extends ChangeNotifier {
   /// foyer (même nom) est réutilisé. Rend le nombre de produits placés.
   Future<int> appliquerModele(Magasin m, int taille, {Map<String, dynamic>? catalogue}) async {
     if (taille <= 0) return 0;
-    catalogue ??= jsonDecode(await rootBundle.loadString(fichierCatalogueType)) as Map<String, dynamic>;
+    catalogue ??= await CatalogueType.lireJson();
     final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
     var n = 0;
     for (final r in (catalogue['rayons'] as List).cast<Map>()) {
