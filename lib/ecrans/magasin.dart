@@ -152,7 +152,7 @@ class SousEcranRayons extends StatelessWidget {
           LigneMenu(
             titre: r.nom,
             titreTaille: 19,
-            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 40, onTap: () => choisirImageRayon(context, r.nom)),
+            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 52, onTap: () => choisirImageRayon(context, r.nom)),
             sousTitre: '${_pluriel(etat.secteursDu(r.id).length, 'secteur')} · ${_pluriel(etat.nbProduitsRayon(m, r.id), 'produit')}',
             onTap: () {
               Nav.i.filtreRayonSecteurs = r.id;
@@ -647,7 +647,7 @@ class EcranFicheProduit extends StatelessWidget {
 
 Widget _image(BuildContext context, Secteur s) {
   final rayon = Etat.instance.rayon(s.rayonId)?.nom ?? '';
-  return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 36, onTap: () => choisirImageSecteur(context, rayon, s.nom));
+  return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 46, onTap: () => choisirImageSecteur(context, rayon, s.nom));
 }
 
 Future<void> choisirImageRayon(BuildContext context, String rayon) async {

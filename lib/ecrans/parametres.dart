@@ -394,7 +394,7 @@ Future<void> _changerCouleur(BuildContext context, String cle, String nom) async
         ],
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(ctx).pop(-1), child: Text('Sans couleur', style: Charte.texte(16))),
+        TextButton(onPressed: () => Navigator.of(ctx).pop(-1), child: Text('Couleur par défaut', style: Charte.texte(16))),
         TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Annuler', style: Charte.texte(16))),
       ],
     ),

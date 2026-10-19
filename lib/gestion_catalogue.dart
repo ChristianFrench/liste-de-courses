@@ -33,6 +33,7 @@ Future<void> main() async {
     title: 'Gestion du catalogue',
     debugShowCheckedModeBanner: false,
     theme: Charte.theme(),
+    scrollBehavior: Charte.defilement(),
     locale: const Locale('fr', 'FR'),
     supportedLocales: const [Locale('fr', 'FR')],
     localizationsDelegates: const [

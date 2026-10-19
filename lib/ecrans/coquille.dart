@@ -19,10 +19,10 @@ class BarreOnglets extends StatelessWidget {
   final int actif;
   final ValueChanged<int> onChoix;
 
-  static const entrees = <(IconData, String)>[
-    (Icons.edit_note, 'Préparer'),
-    (Icons.shopping_cart_outlined, 'Courses'),
-    (Icons.tune, 'Gérer'),
+  static const entrees = <(IconData, String, Color)>[
+    (Icons.edit_note, 'Préparer', Charte.vert),
+    (Icons.shopping_cart_outlined, 'Courses', Charte.orange),
+    (Icons.tune, 'Gérer', Charte.bleu),
   ];
 
   @override
@@ -52,10 +52,10 @@ class BarreOnglets extends StatelessWidget {
                         width: 56,
                         height: 30,
                         decoration: BoxDecoration(
-                          color: i == actif ? Charte.encre : null,
+                          color: i == actif ? entrees[i].$3 : null,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(entrees[i].$1, size: 22, color: i == actif ? Charte.fond : Charte.encre),
+                        child: Icon(entrees[i].$1, size: 24, color: i == actif ? Colors.white : entrees[i].$3),
                       ),
                       const SizedBox(height: 2),
                       Text(entrees[i].$2, style: Charte.texte(Charte.tNavigation, gras: i == actif)),
@@ -134,8 +134,8 @@ class MenuGerer extends StatelessWidget {
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     final n = etat.magasins.length;
-    Widget entree(int r, IconData icone, String titre, String sousTitre) => LigneMenu(
-          gauche: Icon(icone, size: 28, color: Charte.encre),
+    Widget entree(int r, IconData icone, Color couleur, String titre, String sousTitre) => LigneMenu(
+          gauche: IconeCouleur(icone, couleur),
           titre: titre,
           sousTitre: sousTitre,
           onTap: () {
@@ -148,14 +148,14 @@ class MenuGerer extends StatelessWidget {
       corps: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
-          entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue',
+          entree(Nav.magasin, Icons.storefront_outlined, Charte.vert, 'Magasins et catalogue',
               '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
-          entree(Nav.parcours, Icons.route, 'Parcours', 'Ordre de passage de chacun dans chaque magasin'),
-          entree(Nav.historique, Icons.schedule, 'Historique', 'Courses terminées et leur ticket PDF'),
-          entree(Nav.archives, Icons.inventory_2_outlined, 'Archives', 'Courses des magasins supprimés'),
-          entree(Nav.foyer, Icons.home_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),
-          entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Promotions, packagings, options, démonstration'),
-          entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
+          entree(Nav.parcours, Icons.route, Charte.orange, 'Parcours', 'Ordre de passage de chacun dans chaque magasin'),
+          entree(Nav.historique, Icons.schedule, Charte.bleu, 'Historique', 'Courses terminées et leur ticket PDF'),
+          entree(Nav.archives, Icons.inventory_2_outlined, Charte.brun, 'Archives', 'Courses des magasins supprimés'),
+          entree(Nav.foyer, Icons.home_outlined, Charte.turquoise, 'Mon foyer', 'Membres, adresses mail, invitation'),
+          entree(Nav.parametres, Icons.settings_outlined, Charte.violet, 'Paramètres', 'Promotions, packagings, options, démonstration'),
+          entree(Nav.corbeille, Icons.delete_outline, Charte.gris, 'Corbeille', 'Remettre ce qui a été supprimé'),
         ],
       ),
     );

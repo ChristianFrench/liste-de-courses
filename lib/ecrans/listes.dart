@@ -436,7 +436,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             child: Text('${r + 1}', style: Charte.texte(14)),
           ),
           const SizedBox(width: 8),
-          if (img != null) ...[Pictogramme(img, taille: 30), const SizedBox(width: 8)],
+          if (img != null) ...[Pictogramme(img, taille: 44), const SizedBox(width: 10)],
           Expanded(
             child: Text.rich(TextSpan(children: [
               TextSpan(text: rayon?.nom ?? '?', style: Charte.texte(18, gras: true)),
@@ -476,7 +476,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
       },
       contenu: Row(
         children: [
-          if (img != null) ...[Pictogramme(img, taille: 26), const SizedBox(width: 8)],
+          if (img != null) ...[Pictogramme(img, taille: 38), const SizedBox(width: 10)],
           Expanded(child: Text(s?.nom ?? '?', style: Charte.texte(16))),
         ],
       ),

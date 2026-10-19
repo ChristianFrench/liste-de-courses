@@ -26,6 +26,7 @@ class ListeDeCoursesApp extends StatelessWidget {
       title: 'Liste de courses',
       debugShowCheckedModeBanner: false,
       theme: Charte.theme(),
+      scrollBehavior: Charte.defilement(),
       navigatorKey: Nav.i.racine,
       scaffoldMessengerKey: Nav.i.messager,
       locale: const Locale('fr', 'FR'),

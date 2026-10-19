@@ -449,6 +449,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       coche: g != null,
       quantite: g?.quantite ?? 1,
       codePromo: etat.typePromotion(g?.promotion?.type)?.code ?? (g?.promotion != null ? '?' : null),
+      couleurPromo: g?.promotion == null ? null : Color(etat.couleurPromo(g!.promotion!.type)!),
       onPromo: g == null ? null : () => ouvrirFeuillePromotion(context, l, g),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
@@ -1052,6 +1053,7 @@ class EcranCoursesSecteur extends StatelessWidget {
                     Puce(
                       etapes[k].nonPlace ? '? Non placé' : '${k + 1} ${court(etapes[k].nom)}',
                       termine: etapes[k].lignes.every((g) => g.coche),
+                      image: imageEtape(etat, etapes[k]),
                     ),
                 ],
                 selection: i,
@@ -1059,15 +1061,16 @@ class EcranCoursesSecteur extends StatelessWidget {
               ),
               _choixParcours(context, etat, l),
               Container(
-                height: 34,
+                height: 52,
                 color: Charte.fondBandeau,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
                   children: [
+                    if (imageEtape(etat, e) != null) ...[Pictogramme(imageEtape(etat, e), taille: 44), const SizedBox(width: 10)],
                     Expanded(
                       child: Text.rich(
                         TextSpan(children: [
-                          TextSpan(text: e.nom, style: Charte.texte(15, gras: true)),
+                          TextSpan(text: e.nom, style: Charte.texte(16, gras: true)),
                           if (!e.nonPlace)
                             TextSpan(text: ' · rayon ${etat.rayon(e.secteur!.rayonId)?.nom ?? ''}', style: Charte.texte(15)),
                         ]),
@@ -1231,4 +1234,10 @@ class EcranCoursesSecteur extends StatelessWidget {
     Nav.i.ouvrirRubrique(Nav.historique, sous: Nav.coursesEffectuees);
     Nav.message(context, 'Courses terminées : joignez le ticket PDF dans Gérer › Historique');
   }
+}
+
+/// Image du secteur d'une étape des courses (aucune pour « Non placé »).
+String? imageEtape(Etat etat, Etape e) {
+  final r = e.secteur == null ? null : etat.rayon(e.secteur!.rayonId);
+  return r == null ? null : cleSecteur(r.nom, e.secteur!.nom);
 }

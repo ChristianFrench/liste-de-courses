@@ -143,6 +143,22 @@ class EnTeteGestion extends StatelessWidget {
   }
 }
 
+/// Icône blanche sur un carré arrondi de couleur (menus, onglets).
+class IconeCouleur extends StatelessWidget {
+  const IconeCouleur(this.icone, this.couleur, {super.key, this.taille = 40});
+  final IconData icone;
+  final Color couleur;
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: taille,
+        height: taille,
+        decoration: BoxDecoration(color: couleur, borderRadius: BorderRadius.circular(taille * 0.28)),
+        child: Icon(icone, size: taille * 0.6, color: Colors.white),
+      );
+}
+
 // ----------------------------------------------------------------- Puces
 
 class Puce {
@@ -214,9 +230,10 @@ class _BandeauPucesState extends State<BandeauPuces> {
 
   @override
   Widget build(BuildContext context) {
-    final rayon = widget.pastille ? 18.0 : 8.0;
+    final avecImages = widget.puces.any((p) => p.image != null);
+    final rayon = avecImages ? 14.0 : (widget.pastille ? 18.0 : 8.0);
     return Container(
-      height: Charte.bandeauPuces,
+      height: avecImages ? 72 : Charte.bandeauPuces,
       decoration: BoxDecoration(color: widget.fond, border: const Border(bottom: _bordZone)),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
@@ -224,14 +241,14 @@ class _BandeauPucesState extends State<BandeauPuces> {
         child: Row(
           children: [
             for (var i = 0; i < widget.puces.length; i++)
-              _puce(widget.puces[i], i == widget.selection, rayon, () => widget.onChoix(i), _cles[i]),
+              _puce(widget.puces[i], i == widget.selection, rayon, () => widget.onChoix(i), _cles[i], avecImages),
           ],
         ),
       ),
     );
   }
 
-  Widget _puce(Puce p, bool choisie, double rayon, VoidCallback onTap, Key cle) {
+  Widget _puce(Puce p, bool choisie, double rayon, VoidCallback onTap, Key cle, bool grande) {
     final couleurTexte = choisie ? Charte.fond : (p.termine ? Charte.texteBarre : Charte.encre);
     final bord = p.termine && !choisie ? const Color(0xFF999999) : Charte.encre;
     return GestureDetector(
@@ -245,8 +262,8 @@ class _BandeauPucesState extends State<BandeauPuces> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
           child: Container(
-            height: 36,
-            padding: EdgeInsets.only(left: p.image != null ? 4 : 12, right: 12),
+            height: grande ? 62 : 36,
+            padding: EdgeInsets.only(left: p.image != null ? 5 : 12, right: 12),
             decoration: BoxDecoration(
               color: choisie ? Charte.encre : Charte.fond,
               borderRadius: BorderRadius.circular(rayon),
@@ -256,14 +273,21 @@ class _BandeauPucesState extends State<BandeauPuces> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (p.image != null) ...[
-                  Pictogramme(p.image, taille: 26),
-                  const SizedBox(width: 6),
+                  // Image en couleur sur un rond blanc, lisible même sur la puce choisie (fond noir).
+                  Container(
+                    width: 52,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: Pictogramme(p.image, taille: 44),
+                  ),
+                  const SizedBox(width: 8),
                 ],
                 if (p.icone != null) ...[
                   Icon(p.icone, size: 16, color: couleurTexte),
                   const SizedBox(width: 4),
                 ],
-                Text(p.libelle, style: Charte.texte(15, gras: choisie, couleur: couleurTexte)),
+                Text(p.libelle, style: Charte.texte(grande ? 17 : 15, gras: choisie, couleur: couleurTexte)),
                 if (p.termine && !choisie) ...[
                   const SizedBox(width: 4),
                   Icon(Icons.check, size: 15, color: couleurTexte),
@@ -271,14 +295,14 @@ class _BandeauPucesState extends State<BandeauPuces> {
                 if (p.compteur != null && p.compteur! > 0) ...[
                   const SizedBox(width: 6),
                   Container(
-                    width: 20,
-                    height: 20,
+                    width: grande ? 26 : 20,
+                    height: grande ? 26 : 20,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: couleurTexte, width: 1.5),
                     ),
-                    child: Text('${p.compteur}', style: Charte.texte(11, gras: true, couleur: couleurTexte)),
+                    child: Text('${p.compteur}', style: Charte.texte(grande ? 13 : 11, gras: true, couleur: couleurTexte)),
                   ),
                 ],
               ],
@@ -337,8 +361,9 @@ class IconePromo extends StatelessWidget {
 /// Bouton promotion d'une ligne cochée (34 × 30) : code du type si une promotion est visée,
 /// sinon « % » en pointillé. Zone tactile portée à 44.
 class BoutonPromo extends StatelessWidget {
-  const BoutonPromo({super.key, required this.code, required this.onTap});
+  const BoutonPromo({super.key, required this.code, required this.onTap, this.couleur});
   final String? code;
+  final Color? couleur; // couleur du type de promotion
   final VoidCallback onTap;
 
   @override
@@ -363,8 +388,9 @@ class BoutonPromo extends StatelessWidget {
                 ? CadrePointille(rayon: 6, epaisseur: 1.5, child: contenu)
                 : Container(
                     decoration: BoxDecoration(
+                      color: couleur == null ? null : Color.alphaBlend(couleur!.withValues(alpha: 0.22), Charte.fond),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: Charte.encre, width: 1.5),
+                      border: Border.all(color: couleur ?? Charte.encre, width: 1.5),
                     ),
                     child: contenu,
                   ),
@@ -462,6 +488,7 @@ class LigneChoix extends StatelessWidget {
     required this.onTap,
     required this.onQuantite,
     this.codePromo,
+    this.couleurPromo,
     this.onPromo,
     this.habituel = false,
     this.alerte,
@@ -473,6 +500,7 @@ class LigneChoix extends StatelessWidget {
   final bool coche;
   final int quantite;
   final String? codePromo;
+  final Color? couleurPromo;
   final VoidCallback? onPromo;
   final bool habituel;
   final int? alerte;
@@ -518,7 +546,7 @@ class LigneChoix extends StatelessWidget {
                   ),
                 ),
               ),
-              if (coche && onPromo != null) BoutonPromo(code: codePromo, onTap: onPromo!),
+              if (coche && onPromo != null) BoutonPromo(code: codePromo, couleur: couleurPromo, onTap: onPromo!),
               const SizedBox(width: 4),
               if (droite != null)
                 droite!
@@ -713,16 +741,16 @@ class TitreGroupe extends StatelessWidget {
       children: [
         if (nonPlace) const TraitPointille(),
         Container(
-          height: 30,
+          height: image != null ? 52 : 30,
           color: Charte.fondSelection,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
-              if (image != null) ...[Pictogramme(image, taille: 24), const SizedBox(width: 8)],
+              if (image != null) ...[Pictogramme(image, taille: 44), const SizedBox(width: 10)],
               Expanded(
                 child: Text(nom.toUpperCase(),
-                    maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(12, gras: true, espacement: 0.8)),
+                    maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(image != null ? 14 : 12, gras: true, espacement: 0.8)),
               ),
             ],
           ),

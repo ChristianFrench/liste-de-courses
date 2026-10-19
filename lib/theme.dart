@@ -1,3 +1,5 @@
+import 'dart:ui' show PointerDeviceKind;
+
 import 'package:flutter/material.dart';
 
 /// Charte de la maquette (spécification IHM, chapitre 4) : volontairement monochrome.
@@ -71,6 +73,24 @@ class Charte {
   static TextStyle get ligneCourse => texte(17);
   static TextStyle get secondaire => texte(12, couleur: texteSecondaire);
   static TextStyle get titreGroupe => texte(12, gras: true, espacement: 1.0);
+
+  /// Les bandeaux et listes défilent aussi en glissant à la souris (Windows).
+  static ScrollBehavior defilement() => const MaterialScrollBehavior().copyWith(dragDevices: {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+      });
+
+  // Couleurs des icônes : une par onglet et par rubrique de Gérer.
+  static const vert = Color(0xFF2E7D32);
+  static const orange = Color(0xFFEF6C00);
+  static const bleu = Color(0xFF1565C0);
+  static const violet = Color(0xFF6A1B9A);
+  static const turquoise = Color(0xFF00838F);
+  static const brun = Color(0xFF6D4C41);
+  static const rouge = Color(0xFFC62828);
+  static const gris = Color(0xFF546E7A);
 
   static ThemeData theme() {
     final base = ThemeData(
