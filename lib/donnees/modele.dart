@@ -7,6 +7,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
 
 import 'catalogue_type.dart';
+import 'images_choisies.dart';
 import 'stockage.dart';
 
 // Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
@@ -520,6 +521,9 @@ class Etat extends ChangeNotifier {
     final options = (j['parametres'] as Map?)?['options'] as Map?;
     parSecteurs = options?['parSecteurs'] as bool? ?? true;
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
+    imagesChoisies
+      ..clear()
+      ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
     typesPromotion = [
       for (final t in (j['typesPromotion'] as List).cast<Map>())
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
@@ -589,7 +593,11 @@ class Etat extends ChangeNotifier {
         'invitation': {'code': invitationCode, 'expiration': _iso(invitationExpiration)!.substring(0, 10)},
         'parametres': {
           'preliste': {'presencesMin': prelistePresencesMin, 'sur': prelisteSur},
-          'options': {'parSecteurs': parSecteurs, 'envoiFoyer': envoiFoyer},
+          'options': {
+            'parSecteurs': parSecteurs,
+            'envoiFoyer': envoiFoyer,
+            if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
+          },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
         'magasins': [for (final m in magasins) {'id': m.id, 'nom': m.nom, 'enseigne': m.enseigne, 'ville': m.ville}],
@@ -1168,6 +1176,16 @@ class Etat extends ChangeNotifier {
   void options({bool? parSecteurs, bool? envoiFoyer}) {
     if (parSecteurs != null) this.parSecteurs = parSecteurs;
     if (envoiFoyer != null) this.envoiFoyer = envoiFoyer;
+    modifie();
+  }
+
+  /// Image choisie pour un rayon ou un secteur (clé : voir images_choisies.dart) ; null = image automatique.
+  void choisirImage(String cle, String? picto) {
+    if (picto == null) {
+      imagesChoisies.remove(cle);
+    } else {
+      imagesChoisies[cle] = picto;
+    }
     modifie();
   }
 }

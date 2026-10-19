@@ -9,6 +9,7 @@ import 'package:flutter/material.dart' show Axis, Scrollable, Text, axisDirectio
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
+import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
@@ -125,6 +126,19 @@ void main() {
       e.lire(jsonDecode(relu) as Map<String, dynamic>);
       expect(e.envoiFoyer, isTrue);
       expect(e.membres.first.email, 'a@exemple.fr');
+    });
+
+    test('images : une image choisie pour un rayon ajouté est gardée', () {
+      final e = Etat.instance;
+      expect(cleRayon('Mon rayon perso'), isNull);
+      e.choisirImage(cleChoixRayon('Mon rayon perso'), 'animaux');
+      e.choisirImage(cleChoixSecteur('Mon rayon perso', 'Croquettes'), 'animaux--chats');
+      final relu = jsonEncode(e.versJson());
+      e.choisirImage(cleChoixRayon('Mon rayon perso'), null);
+      expect(cleRayon('Mon rayon perso'), isNull);
+      e.lire(jsonDecode(relu) as Map<String, dynamic>);
+      expect(cleRayon('Mon rayon perso'), 'animaux');
+      expect(cleSecteur('Mon rayon perso', 'Croquettes'), 'animaux--chats');
     });
 
     test('enregistrement : les données relues sont identiques', () {

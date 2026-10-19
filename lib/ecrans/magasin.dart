@@ -84,7 +84,7 @@ class SousEcranRayons extends StatelessWidget {
           LigneMenu(
             titre: r.nom,
             titreTaille: 19,
-            gauche: cleRayon(r.nom) == null ? null : Pictogramme(cleRayon(r.nom), taille: 40),
+            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 40, onTap: () => choisirImageRayon(context, r.nom)),
             sousTitre: '${_pluriel(etat.secteursDu(r.id).length, 'secteur')} · ${_pluriel(etat.nbProduitsRayon(m, r.id), 'produit')}',
             onTap: () {
               Nav.i.filtreRayonSecteurs = r.id;
@@ -97,7 +97,9 @@ class SousEcranRayons extends StatelessWidget {
           pointille: true,
           onTap: () async {
             final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Nom du rayon');
-            if (nom != null && nom.isNotEmpty) etat.ajouterRayon(m, nom);
+            if (nom == null || nom.isEmpty) return;
+            etat.ajouterRayon(m, nom);
+            if (cleRayon(nom) == null && context.mounted) await choisirImageRayon(context, nom);
           },
         ),
         LienSupprimer(
@@ -176,7 +178,7 @@ class SousEcranSecteurs extends StatelessWidget {
               for (final s in secteurs)
                 LigneMenu(
                   titre: s.nom,
-                  gauche: _image(s),
+                  gauche: _image(context, s),
                   sousTitre: '${etat.rayon(s.rayonId)?.nom ?? ''} · ${_pluriel(etat.produitsDu(m, s.id).length, 'produit')}',
                   onTap: () {
                     if (aPlacer != null) {
@@ -197,7 +199,11 @@ class SousEcranSecteurs extends StatelessWidget {
                   taille: 16,
                   onTap: () async {
                     final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${rayonAjout.nom}', aide: 'Nom du secteur');
-                    if (nom != null && nom.isNotEmpty) etat.ajouterSecteur(rayonAjout.id, nom);
+                    if (nom == null || nom.isEmpty) return;
+                    etat.ajouterSecteur(rayonAjout.id, nom);
+                    if (cleSecteur(rayonAjout.nom, nom) == null && context.mounted) {
+                      await choisirImageSecteur(context, rayonAjout.nom, nom);
+                    }
                   },
                 ),
               if (etat.rayon(filtre) case final r?)
@@ -571,7 +577,17 @@ class EcranFicheProduit extends StatelessWidget {
       );
 }
 
-Widget? _image(Secteur s) {
-  final c = cleSecteur(Etat.instance.rayon(s.rayonId)?.nom ?? '', s.nom);
-  return c == null ? null : Pictogramme(c, taille: 36);
+Widget _image(BuildContext context, Secteur s) {
+  final rayon = Etat.instance.rayon(s.rayonId)?.nom ?? '';
+  return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 36, onTap: () => choisirImageSecteur(context, rayon, s.nom));
+}
+
+Future<void> choisirImageRayon(BuildContext context, String rayon) async {
+  final c = await choisirPictogramme(context, titre: 'Image du rayon $rayon');
+  if (c != null) Etat.instance.choisirImage(cleChoixRayon(rayon), c == imageAutomatique ? null : c);
+}
+
+Future<void> choisirImageSecteur(BuildContext context, String rayon, String secteur) async {
+  final c = await choisirPictogramme(context, titre: 'Image du secteur $secteur');
+  if (c != null) Etat.instance.choisirImage(cleChoixSecteur(rayon, secteur), c == imageAutomatique ? null : c);
 }
