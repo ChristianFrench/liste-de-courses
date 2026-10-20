@@ -330,12 +330,12 @@ void main() {
       // 6 bis : choisir « Lot 3 dont 1 » sur Yaourts nature (quantité 1) → la quantité passe à 3 ; consigne gardée
       final yaourts = find.ancestor(of: find.textContaining('Yaourts nature', findRichText: true), matching: find.byType(LigneChoix)).first;
       // Bouton packaging (avant la promotion) : volet séparé
-      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)).first);
+      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(Pastille)).first);
       expect(find.text('PACKAGING'), findsOneWidget);
       expect(find.text('PROMOTION VISÉE'), findsNothing);
       await tester.enterText(find.byKey(const ValueKey('consigne')), 'les moins sucrés');
       await _toucher(tester, find.text('Valider'));
-      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(BoutonPromo)).last);
+      await _toucher(tester, find.descendant(of: yaourts, matching: find.byType(Pastille)).last);
       expect(find.text('PROMOTION VISÉE'), findsOneWidget);
       expect(find.text('PACKAGING'), findsNothing);
       await _ciblesTactiles(tester);
@@ -351,7 +351,7 @@ void main() {
       final beurre = find.ancestor(of: find.textContaining('Beurre doux', findRichText: true), matching: find.byType(LigneChoix)).first;
       await _toucher(tester, beurre);
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsOneWidget);
-      expect(find.descendant(of: beurre, matching: find.byType(BoutonPromo)), findsNWidgets(2)); // packaging et promotion
+      expect(find.descendant(of: beurre, matching: find.byType(Pastille)), findsNWidgets(2)); // packaging et promotion
       await _toucher(tester, find.descendant(of: beurre, matching: find.text('−')));
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsNothing);
 

@@ -548,25 +548,28 @@ class LigneChoix extends StatelessWidget {
                     children: [
                       Text.rich(
                         TextSpan(children: [
-                          TextSpan(text: nom, style: Charte.texte(15, gras: coche)),
+                          TextSpan(text: nom, style: Charte.texte(coche ? 16 : 15, gras: coche)),
                           if (complement.isNotEmpty) TextSpan(text: ' · $complement', style: Charte.secondaire),
                         ]),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      // Comme pendant les courses : packaging et promotion en clair sous le nom ; un appui les choisit.
+                      if (coche && (onPackaging != null || onPromo != null))
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            if (onPackaging != null)
+                              Pastille(codePackaging ?? '+ Packaging',
+                                  couleur: couleurPackaging, vide: codePackaging == null, onTap: onPackaging),
+                            if (onPromo != null)
+                              Pastille(codePromo ?? '+ Promo', couleur: couleurPromo ?? Charte.rouge, vide: codePromo == null, onTap: onPromo),
+                          ],
+                        ),
                     ],
                   ),
                 ),
               ),
-              if (coche && onPackaging != null)
-                BoutonPromo(
-                  code: codePackaging,
-                  couleur: couleurPackaging,
-                  iconeVide: Icons.inventory_2_outlined,
-                  sujet: 'packaging',
-                  onTap: onPackaging!,
-                ),
-              if (coche && onPromo != null) BoutonPromo(code: codePromo, couleur: couleurPromo, onTap: onPromo!),
               const SizedBox(width: 4),
               if (droite != null)
                 droite!
@@ -666,23 +669,43 @@ class LigneCourse extends StatelessWidget {
 }
 
 /// Packaging ou promotion en clair (« Pack de 6 », « 3 dont 1 gratuit »), sur la couleur choisie dans Paramètres.
+/// Avec [onTap], c'est un bouton (préparation) ; [vide] : rien n'est encore choisi (« + Packaging », fond pâle).
 class Pastille extends StatelessWidget {
-  const Pastille(this.texte, {super.key, this.couleur, this.petite = false});
+  const Pastille(this.texte, {super.key, this.couleur, this.petite = false, this.onTap, this.vide = false});
   final String texte;
   final Color? couleur;
   final bool petite;
+  final VoidCallback? onTap;
+  final bool vide;
 
   @override
   Widget build(BuildContext context) {
     final c = couleur;
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : 7, vertical: petite ? 0 : 1),
+    final cadre = Container(
+      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : (onTap != null ? 9 : 7), vertical: petite ? 0 : (onTap != null ? 4 : 1)),
       decoration: BoxDecoration(
-        color: c == null ? Charte.fondBandeau : Color.alphaBlend(c.withValues(alpha: 0.22), Charte.fond),
+        color: c == null
+            ? Charte.fondBandeau
+            : Color.alphaBlend(c.withValues(alpha: vide ? 0.08 : 0.22), Charte.fond),
         borderRadius: BorderRadius.circular(5),
-        border: Border.all(color: c ?? Charte.separateurZone, width: 1.2),
+        border: Border.all(color: c == null ? Charte.separateurZone : (vide ? c.withValues(alpha: 0.45) : c), width: 1.2),
       ),
-      child: Text(texte, style: Charte.texte(petite ? 11 : 13, gras: true)),
+      child: Text(texte,
+          style: Charte.texte(petite ? 11 : (onTap != null ? 14 : 13), gras: true, couleur: vide && c != null ? c : Charte.encre)),
+    );
+    if (onTap == null) return cadre;
+    // Zone tactile d'au moins 44 de haut autour du cadre.
+    return Semantics(
+      button: true,
+      label: texte,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Align(widthFactor: 1, child: cadre),
+        ),
+      ),
     );
   }
 }
@@ -741,11 +764,13 @@ class LigneCompacte extends StatelessWidget {
 
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
-  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite});
+  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite, this.avancement});
   final String nom;
   /// Titre contrasté (couleur d'accent, texte blanc) : sépare nettement les secteurs pendant les courses.
   final bool fort;
   final String? droite;
+  /// Avancement du secteur (cochés, total) : anneau qui se remplit, coche quand tout est fait.
+  final (int, int)? avancement;
   final String? image;
   final String? numero;
   final bool nonPlace;
@@ -790,10 +815,38 @@ class TitreGroupe extends StatelessWidget {
                         gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
               ),
               if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
+              if (avancement != null) _Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+class _Avancement extends StatelessWidget {
+  const _Avancement({required this.fait, required this.total, required this.couleur});
+  final int fait;
+  final int total;
+  final Color couleur;
+
+  @override
+  Widget build(BuildContext context) {
+    final fini = total > 0 && fait >= total;
+    return Semantics(
+      label: '$fait sur $total',
+      child: SizedBox(
+        width: 30,
+        height: 30,
+        child: fini
+            ? Icon(Icons.check_circle, size: 30, color: couleur)
+            : CircularProgressIndicator(
+                value: total == 0 ? 0 : fait / total,
+                strokeWidth: 4,
+                color: couleur,
+                backgroundColor: couleur.withValues(alpha: 0.3),
+              ),
+      ),
     );
   }
 }

@@ -443,16 +443,18 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return LigneChoix(
       key: ValueKey(p.id),
       nom: p.nom,
-      complement: [etat.complement(g, p), if (g?.promotion != null) g!.promotion!.libelle, if (g?.consigne != null) '« ${g!.consigne} »']
+      complement: [etat.complement(g, p, avecPackaging: g == null), if (g?.consigne != null) '« ${g!.consigne} »']
           .where((x) => x.isNotEmpty)
           .join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
-      codePromo: etat.typePromotion(g?.promotion?.type)?.code ?? (g?.promotion != null ? '?' : null),
+      codePromo: g?.promotion == null
+          ? null
+          : (g!.promotion!.libelle.isNotEmpty ? g.promotion!.libelle : (etat.typePromotion(g.promotion!.type)?.nom ?? 'Promo')),
       couleurPromo: g?.promotion == null ? null : Color(etat.couleurPromo(g!.promotion!.type)!),
       onPromo: g == null ? null : () => ouvrirFeuillePromotion(context, l, g),
-      codePackaging: g?.packagingId == null ? null : codeCourtPackaging(etat.packaging(g!.packagingId)?.libelle ?? ''),
-      couleurPackaging: g?.packagingId == null ? null : Color(etat.couleurPack(g!.packagingId)!),
+      codePackaging: g?.packagingId == null ? null : etat.packaging(g!.packagingId)?.libelle,
+      couleurPackaging: Color(etat.couleurPack(g?.packagingId ?? '')!),
       onPackaging: g == null ? null : () => ouvrirFeuillePromotion(context, l, g, packaging: true),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
@@ -1102,7 +1104,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                             nonPlace: x.nonPlace,
                             image: imageEtape(etat, x),
                             fort: true,
-                            droite: '${x.lignes.where((g) => g.coche).length} / ${x.lignes.length}',
+                            avancement: (x.lignes.where((g) => g.coche).length, x.lignes.length),
                           ),
                           for (final g in x.lignes)
                             if (!resteAFaire || !g.coche) _ligne(etat, l, g),
