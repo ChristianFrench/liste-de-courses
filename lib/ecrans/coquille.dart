@@ -154,14 +154,14 @@ class MenuGerer extends StatelessWidget {
             entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue', '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
             entree(Nav.parcours, Icons.route_outlined, 'Parcours', 'Appris pendant les courses, pour chacun dans chaque magasin'),
           ]),
-          GroupeRetractable(cle: 'gerer/courses', titre: 'Courses passées', icone: Icons.history, enfants: [
+          GroupeRetractable(cle: 'gerer/courses', titre: 'Courses passées et corbeille', icone: Icons.history, enfants: [
             entree(Nav.historique, Icons.history, 'Historique', 'Courses terminées et leur ticket PDF'),
             entree(Nav.archives, Icons.inventory_2_outlined, 'Archives', 'Courses des magasins supprimés'),
+            entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
           ]),
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Foyer et application', icone: Icons.home_outlined, enfants: [
             entree(Nav.foyer, Icons.group_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),
             entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Apparence, promotions, packagings, démonstration'),
-            entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
           ]),
         ],
       ),

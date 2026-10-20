@@ -1235,19 +1235,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
 
   /// Écran 9 — « Interrompre les courses ? » ; sans rien de coché, on peut simplement revenir aux listes prêtes.
   Future<void> _pause(BuildContext context, Liste l, Etape e) async {
-    if (l.nbCoches == 0) {
-      final quitter = await confirmer(
-        context,
-        titre: 'Quitter les courses ?',
-        contenu: Text('Rien n\'est encore coché : la liste redevient « prête » dans l\'onglet Courses.', style: Charte.texte(17)),
-        plein: 'Continuer les courses',
-        contour: 'Quitter',
-      );
-      if (quitter != true) return;
-      Etat.instance.annulerDepart(l);
-      Nav.i.retourOnglet(Nav.courses);
-      return;
-    }
+    // Même sans article coché, la course est interrompue (elle reste dans « Courses interrompues »).
     final interrompre = await confirmer(
       context,
       icone: Icons.pause_circle_outline,
@@ -1257,7 +1245,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         children: [
           Text.rich(TextSpan(style: Charte.texte(17), children: [
             const TextSpan(text: 'Rien n\'est perdu : '),
-            TextSpan(text: '${l.nbCoches} articles cochés sur ${l.lignes.length}', style: Charte.texte(17, gras: true)),
+            TextSpan(text: '${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} coché${l.nbCoches > 1 ? 's' : ''} sur ${l.lignes.length}', style: Charte.texte(17, gras: true)),
             const TextSpan(text: ', arrêt au secteur '),
             TextSpan(text: e.nom, style: Charte.texte(17, gras: true)),
             const TextSpan(text: '.'),

@@ -38,7 +38,7 @@ class EcranAccueil extends StatelessWidget {
               cle: 'accueil/preparation',
               titre: 'En préparation',
               icone: Icons.checklist,
-              nombre: enPreparation.length + pretes.length,
+              nombre: enPreparation.length,
               vide: 'Aucune liste en préparation.',
               enfants: [
                 for (final l in enPreparation)
@@ -50,7 +50,16 @@ class EcranAccueil extends StatelessWidget {
                     onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
                     droite: BoutonAction('Reprendre', onTap: () => Nav.travail(EcranConstruction(listeId: l.id))),
                   ),
-                // Une liste prête n'a pas encore servi : elle reste ici, avec de quoi partir faire les courses.
+              ],
+            ),
+            // Listes prêtes : en instance de courses, avec de quoi partir les faire.
+            GroupeRetractable(
+              cle: 'accueil/instance',
+              titre: 'En instance de courses',
+              icone: Icons.shopping_cart_outlined,
+              nombre: pretes.length,
+              vide: 'Aucune liste prête pour les courses.',
+              enfants: [
                 for (final l in pretes)
                   LigneMenu(
                     icone: Icons.shopping_cart_outlined,
@@ -63,8 +72,8 @@ class EcranAccueil extends StatelessWidget {
             ),
             GroupeRetractable(
               cle: 'accueil/courses',
-              titre: 'Courses',
-              icone: Icons.shopping_cart_outlined,
+              titre: 'Courses en cours',
+              icone: Icons.pause_circle_outline,
               nombre: enCours == null ? 0 : 1,
               vide: 'Aucune course en cours.',
               enfants: [
