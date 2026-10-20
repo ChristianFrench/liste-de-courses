@@ -11,8 +11,9 @@ import 'magasin.dart';
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
 
-/// Écran 2 — Nouvelle liste : magasin et nom (par défaut magasin et date), puis
-/// « Liste vide », « Historique » (copie d'une course effectuée) ou « Générer par IA » (prévu plus tard).
+/// Écran 2 — Nouvelle liste : magasin et nom (par défaut magasin, date et heure ; deux listes ne peuvent pas
+/// porter le même nom), puis « Liste type » (tous les articles, rayon par rayon), « Liste personnalisée »
+/// (choisir dans une course passée, rien n'est coché d'avance) ou « Liste calculée » (prévue plus tard).
 class EcranPreliste extends StatefulWidget {
   const EcranPreliste({super.key});
 
@@ -24,8 +25,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   final etat = Etat.instance;
   late String magasinId;
   final nom = TextEditingController();
+  final debut = DateTime.now();
   bool nomModifie = false;
-  bool historique = false;
+  bool personnalisee = false;
 
   @override
   void initState() {
@@ -41,68 +43,69 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   }
 
   void _initialiser() {
-    if (!nomModifie) nom.text = etat.nomParDefaut(magasinId, DateTime.now());
+    if (!nomModifie) nom.text = etat.nomParDefaut(magasinId, debut);
   }
 
-  String? get _nom => nom.text.trim() == etat.nomParDefaut(magasinId, DateTime.now()) ? null : nom.text;
-
   void _creer(List<LigneListe> lignes) {
-    final l = etat.creerListe(magasinId, lignes, nom: _nom);
+    final texte = nom.text.trim().isEmpty ? etat.nomParDefaut(magasinId, debut) : nom.text.trim();
+    if (etat.nomPris(texte)) {
+      Nav.message(context, 'Une liste s\'appelle déjà « $texte » : choisissez un autre nom.');
+      return;
+    }
+    final l = etat.creerListe(magasinId, lignes, nom: texte);
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
 
-  void _ia() => showDialog<void>(
+  void _calculee() => showDialog<void>(
         context: context,
         barrierColor: Charte.voile,
         builder: (ctx) => AlertDialog(
           backgroundColor: Charte.fond,
-          title: Text('Générer par IA', style: Charte.texte(18, gras: true)),
-          content: Text('La génération d\'une liste par intelligence artificielle est prévue dans une version future.',
+          title: Text('Liste calculée', style: Charte.texte(18, gras: true)),
+          content: Text(
+              'La liste calculée à partir de vos tickets de caisse (lecture des tickets, puis choix des produits '
+              'achetés régulièrement) est prévue dans une version future.',
               style: Charte.texte(16)),
           actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Compris', style: Charte.texte(16, gras: true)))],
         ),
       );
 
-  /// Affiche une course passée ; « Reprendre ces articles » la copie dans la nouvelle liste.
+  /// Liste personnalisée : les articles d'une course passée, aucun coché d'avance ; on coche ceux à reprendre.
   Future<void> _voirCourse(Liste ancienne) async {
-    final reprendre = await showDialog<bool>(
-      context: context,
-      barrierColor: Charte.voile,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Charte.fond,
-        insetPadding: const EdgeInsets.all(16),
-        title: Text('Courses ${quandJour(etat.dateCourses(ancienne))} · ${ancienne.lignes.length} articles',
-            style: Charte.texte(18, gras: true)),
-        content: SizedBox(
-          width: 360,
-          height: 380,
-          child: ListView(
-            children: [
-              for (final g in ancienne.lignes)
-                if (etat.produit(g.produitId) case final p?)
-                  Container(
-                    constraints: const BoxConstraints(minHeight: 36),
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                    child: Text.rich(TextSpan(children: [
-                      TextSpan(text: p.nom, style: Charte.texte(16)),
-                      if (etat.complement(g, p).isNotEmpty) TextSpan(text: ' · ${etat.complement(g, p)}', style: Charte.secondaire),
-                      if (g.quantite > 1) TextSpan(text: '  × ${g.quantite}', style: Charte.texte(15, gras: true)),
-                    ])),
-                  ),
-            ],
+    final lignes = etat.lignesReprises(ancienne);
+    final choisis = <int>{};
+    final ok = await modale(
+      context,
+      titre: 'Liste personnalisée',
+      icone: Icons.history,
+      oui: 'Créer la liste',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Courses du ${quandJour(etat.dateCourses(ancienne))} · cochez les articles à reprendre.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Lien(choisis.length == lignes.length ? 'Tout décocher' : 'Tout cocher', onTap: () => maj(() {
+              if (choisis.length == lignes.length) {
+                choisis.clear();
+              } else {
+                choisis.addAll([for (var i = 0; i < lignes.length; i++) i]);
+              }
+            })),
           ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Fermer', style: Charte.texte(16))),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Reprendre ces articles', style: Charte.texte(16, gras: true)),
-          ),
+          for (var i = 0; i < lignes.length; i++)
+            if (etat.produit(lignes[i].produitId) case final p?)
+              CaseModale(
+                texte: '${p.nom}${lignes[i].quantite > 1 ? ' × ${lignes[i].quantite}' : ''}',
+                aide: etat.complement(lignes[i], p).isEmpty ? null : etat.complement(lignes[i], p),
+                coche: choisis.contains(i),
+                onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+              ),
         ],
       ),
     );
-    if (reprendre == true && mounted) _creer(etat.lignesReprises(ancienne));
+    if (ok && mounted) _creer([for (var i = 0; i < lignes.length; i++) if (choisis.contains(i)) lignes[i]]);
   }
 
   @override
@@ -145,55 +148,56 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             ],
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-          child: Row(
-            children: [
-              Expanded(child: Bouton(texte: 'Liste vide', plein: true, taille: 16, onTap: () => _creer([]))),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Bouton(
-                  texte: 'Historique',
-                  taille: 16,
-                  plein: historique,
-                  onTap: () => setState(() => historique = true),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(child: Bouton(texte: 'Générer par IA', taille: 15, pointille: true, onTap: _ia)),
-            ],
-          ),
-        ),
         Container(height: 1, color: Charte.separateurZone),
       ],
-      corps: !historique
-          ? Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                  '« Liste vide » : vous choisirez les produits rayon par rayon.\n'
-                  '« Historique » : partir d\'une de vos dernières courses dans ce magasin.',
-                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            )
-          : ListView(
-              children: [
-                GroupeRetractable(
-                  cle: 'preliste/dernieres',
-                  titre: 'Dernières courses dans ce magasin',
-                  icone: Icons.history,
-                  nombre: passees.length,
-                  vide: 'Aucune course terminée avec ses articles dans ce magasin.',
-                  enfants: [
-                    for (final c in passees)
-                      LigneMenu(
-                        icone: Icons.receipt_long_outlined,
-                        titre: etat.nomListe(c),
-                        sousTitre: '${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))} · touchez pour choisir',
-                        onTap: () => _voirCourse(c),
-                      ),
-                  ],
-                ),
+      corps: ListView(
+        children: [
+          GroupeRetractable(
+            cle: 'preliste/depart',
+            titre: 'Type de liste',
+            icone: Icons.playlist_add,
+            nombre: 3,
+            enfants: [
+              LigneMenu(
+                icone: Icons.note_add_outlined,
+                titre: 'Liste type',
+                sousTitre: 'Tous les articles du magasin, rayon par rayon : vous choisissez',
+                onTap: () => _creer([]),
+              ),
+              LigneMenu(
+                icone: Icons.history,
+                titre: 'Liste personnalisée',
+                sousTitre: 'Choisir dans une de vos dernières courses (rien n\'est coché d\'avance)',
+                onTap: () => setState(() => personnalisee = !personnalisee),
+                droite: Icon(personnalisee ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
+              ),
+              LigneMenu(
+                icone: Icons.calculate_outlined,
+                titre: 'Liste calculée',
+                sousTitre: 'À partir de vos tickets de caisse · prévue plus tard',
+                onTap: _calculee,
+              ),
+            ],
+          ),
+          if (personnalisee)
+            GroupeRetractable(
+              cle: 'preliste/dernieres',
+              titre: 'Dernières courses dans ce magasin',
+              icone: Icons.history,
+              nombre: passees.length,
+              vide: 'Aucune course terminée avec ses articles dans ce magasin.',
+              enfants: [
+                for (final c in passees)
+                  LigneMenu(
+                    icone: Icons.receipt_long_outlined,
+                    titre: etat.nomListe(c),
+                    sousTitre: '${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))} · touchez pour choisir',
+                    onTap: () => _voirCourse(c),
+                  ),
               ],
             ),
+        ],
+      ),
     );
   }
 
@@ -1135,7 +1139,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           },
           child: PageBase(
             entete: EnTeteTravail(titre: titre, action: BoutonReduire(cles: [for (final x in etapes) _cle(x.id)])),
-            haut: [_choixParcours(context, etat, l)],
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
@@ -1230,37 +1233,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
   }
 
-  /// Changer de parcours pendant les courses, quand la personne en a plusieurs (ou un, plus l'ordre des rayons).
-  Widget _choixParcours(BuildContext context, Etat etat, Liste l) {
-    final membreId = l.membreId ?? etat.moi.id;
-    final choix = <String, String>{
-      for (final p in etat.parcoursDe(l.magasinId, membreId)) p.id: p.nom,
-      '': 'Ordre des rayons',
-    };
-    if (choix.length < 2) return const SizedBox.shrink();
-    final actuel = etat.unParcours(l.parcoursId)?.nom ?? 'Ordre des rayons';
-    return InkWell(
-      onTap: () async {
-        final v = await choisirDansListe<String>(context, titre: 'Changer de parcours', choix: choix);
-        if (v != null) etat.changerParcours(l, v.isEmpty ? null : v);
-      },
-      child: Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-        child: Row(
-          children: [
-            Icon(Icons.route_outlined, size: 20, color: Charte.couleurIcone(Icons.route_outlined)),
-            const SizedBox(width: 8),
-            Expanded(child: Text('Parcours : $actuel', style: Charte.texte(15), maxLines: 1, overflow: TextOverflow.ellipsis)),
-            Text('Changer', style: Charte.texte(15, gras: true)),
-            Icon(Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
-          ],
-        ),
-      ),
-    );
-  }
-
   /// Écran 9 — « Interrompre les courses ? » ; sans rien de coché, on peut simplement revenir aux listes prêtes.
   Future<void> _pause(BuildContext context, Liste l, Etape e) async {
     if (l.nbCoches == 0) {
@@ -1330,14 +1302,14 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                 style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ],
           const SizedBox(height: 8),
-          Text('Vous pourrez joindre le ticket PDF dans Gérer › Historique.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          Text('La course attend son ticket de caisse dans l\'onglet Courses (« Terminées sans ticket »).', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         ],
       ),
     );
     if (!ok || !context.mounted) return;
     Etat.instance.terminerCourses(l);
-    Nav.i.ouvrirRubrique(Nav.historique, sous: Nav.coursesEffectuees);
-    Nav.message(context, 'Courses terminées : joignez le ticket PDF dans Gérer › Historique');
+    Nav.i.retourOnglet(Nav.courses);
+    Nav.message(context, 'Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
   }
 }
 

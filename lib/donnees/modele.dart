@@ -377,6 +377,9 @@ class Etat extends ChangeNotifier {
   Map<String, int> couleurs = {};
   /// Courses pendant lesquelles on enregistre le parcours (identifiants de listes).
   Set<String> apprentissage = {};
+
+  /// Courses terminées classées dans l'historique sans ticket de caisse.
+  Set<String> sansTicket = {};
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
   Set<String> parcoursAppris = {};
 
@@ -558,6 +561,7 @@ class Etat extends ChangeNotifier {
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
+    sansTicket = _ids(options?['sansTicket']).toSet();
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
@@ -651,6 +655,7 @@ class Etat extends ChangeNotifier {
             if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
+            if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
@@ -831,7 +836,12 @@ class Etat extends ChangeNotifier {
 
   /// Nom affiché d'une liste : celui donné par l'utilisateur, sinon « magasin du jj/mm/aaaa ».
   String nomListe(Liste l) => (l.nom != null && l.nom!.isNotEmpty) ? l.nom! : nomParDefaut(l.magasinId, l.dateCreation);
-  String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)}';
+  /// Magasin, date et heure : deux listes créées n'ont pas le même nom.
+  String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)} à ${heure(d)}';
+
+  /// Une liste non terminée porte déjà ce nom (deux listes ne peuvent pas avoir le même nom).
+  bool nomPris(String nom, {Liste? sauf}) => listes.any((l) =>
+      l != sauf && l.statut != StatutListe.terminee && nomListe(l).trim().toLowerCase() == nom.trim().toLowerCase());
 
   void renommerListe(Liste l, String nom) {
     l.nom = nom.trim().isEmpty ? null : nom.trim();
@@ -1410,6 +1420,23 @@ class Etat extends ChangeNotifier {
     }
     typesPromotion.add(TypePromotion(nouvelId('tp'), unique, nom, exemple, ['libelle']));
     modifie();
+  }
+
+  /// Courses terminées en instance : ni ticket joint, ni classées sans ticket. Elles restent dans l'onglet Courses.
+  List<Course> get coursesEnInstance =>
+      historique.where((c) => !estArchive(c.magasinId) && ticketDe(c.id) == null && !sansTicket.contains(c.id)).toList();
+  bool enInstance(Course c) => ticketDe(c.id) == null && !sansTicket.contains(c.id);
+
+  void classerSansTicket(Course c) {
+    sansTicket.add(c.id);
+    modifie();
+  }
+
+  Membre ajouterMembre(String nom, String email) {
+    final m = Membre(nouvelId('m'), nom.trim(), 'membre', false, email: email.trim());
+    membres.add(m);
+    modifie();
+    return m;
   }
 
   void rattacherTicket(Ticket t, Course c) {

@@ -120,7 +120,7 @@ void main() {
     await _toucher(tester, find.text('Pause'));
     await _capture('09 Courses-Interrompre');
     await _toucher(tester, find.text('Interrompre'));
-    await _toucher(tester, find.text('Partir'));
+    await _toucher(tester, find.text('Faire les courses').first);
     await _capture('28 Modale-Partir');
     await _toucher(tester, find.text('Annuler'));
 

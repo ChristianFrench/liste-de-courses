@@ -6,6 +6,7 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'corbeille.dart';
+import 'historique.dart';
 import 'travail.dart';
 
 // Onglet Préparer (écran 1), Gérer › Parcours (5), onglet Courses (6).
@@ -79,8 +80,10 @@ class SousEcranPreparer extends StatelessWidget {
 }
 
 /// « Magasin 1 · » quand la liste porte un nom choisi (le nom par défaut contient déjà le magasin).
-String _magasinSiRenommee(Liste l) =>
-    (l.nom == null || l.nom!.isEmpty) ? '' : '${Etat.instance.magasin(l.magasinId)?.nom ?? ''} · ';
+String _magasinSiRenommee(Liste l) {
+  final m = Etat.instance.magasin(l.magasinId)?.nom ?? '';
+  return (l.nom == null || l.nom!.isEmpty || l.nom!.contains(m)) ? '' : '$m · ';
+}
 
 class BoutonSupprimerListe extends StatelessWidget {
   const BoutonSupprimerListe(this.liste, {super.key});
@@ -105,7 +108,12 @@ class BoutonRenommerListe extends StatelessWidget {
         onPressed: () async {
           final etat = Etat.instance;
           final nom = await demanderTexte(context, titre: 'Nom de la liste', initial: etat.nomListe(liste));
-          if (nom != null) etat.renommerListe(liste, nom == etat.nomParDefaut(liste.magasinId, liste.dateCreation) ? '' : nom);
+          if (nom == null) return;
+          if (etat.nomPris(nom, sauf: liste)) {
+            if (context.mounted) Nav.message(context, 'Une liste s\'appelle déjà « $nom » : choisissez un autre nom.');
+            return;
+          }
+          etat.renommerListe(liste, nom == etat.nomParDefaut(liste.magasinId, liste.dateCreation) ? '' : nom);
         },
       );
 }
@@ -481,9 +489,9 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
   final avecConsigne = l.lignes.where((g) => g.consigne != null).toList();
   final ok = await modale(
     context,
-    titre: 'Partir faire les courses',
+    titre: 'Faire les courses',
     icone: Icons.shopping_cart_outlined,
-    oui: 'Partir',
+    oui: 'Faire les courses',
     contenu: (context, maj) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -553,18 +561,12 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
   Widget build(BuildContext context) {
     final enCours = etat.coursesEnCours;
     final pretes = etat.listesStatut(StatutListe.prete);
+    final enInstance = etat.coursesEnInstance;
 
+    // Dans l'ordre de la vie d'une liste : prête, courses interrompues, terminée en attente du ticket.
     return ListView(
       padding: const EdgeInsets.only(bottom: 16),
       children: [
-        if (enCours != null)
-          GroupeRetractable(
-            cle: 'courses/interrompues',
-            titre: 'Courses interrompues',
-            icone: Icons.pause_circle_outline,
-            nombre: 1,
-            enfants: [_carteInterrompues(context, enCours)],
-          ),
         GroupeRetractable(
           cle: 'courses/pretes',
           titre: 'Listes prêtes',
@@ -577,17 +579,61 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
                 icone: Icons.shopping_cart_outlined,
                 titre: etat.nomListe(l),
                 sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
-                    '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''} · touchez pour partir',
+                    '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
                 onTap: () => _partir(context, l),
                 droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                  BoutonAction('Partir', onTap: () => _partir(context, l)),
+                  BoutonAction('Faire les courses', onTap: () => _partir(context, l)),
                   BoutonRemettreEnPreparation(l),
                 ]),
               ),
           ],
         ),
+        GroupeRetractable(
+          cle: 'courses/interrompues',
+          titre: 'Courses interrompues',
+          icone: Icons.pause_circle_outline,
+          nombre: enCours == null ? 0 : 1,
+          vide: 'Aucune course interrompue.',
+          enfants: [if (enCours != null) _carteInterrompues(context, enCours)],
+        ),
+        GroupeRetractable(
+          cle: 'courses/sansTicket',
+          titre: 'Terminées sans ticket',
+          icone: Icons.receipt_long_outlined,
+          nombre: enInstance.length,
+          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans Gérer › Historique.',
+          enfants: [
+            for (final c in enInstance)
+              LigneMenu(
+                icone: Icons.receipt_long_outlined,
+                titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                sousTitre: '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''} · '
+                    '${etat.membre(c.membreId)?.nomAffiche ?? ''} · joignez le ticket pour la classer dans l\'historique',
+                onTap: () => _classer(context, c),
+                droite: BoutonIcone(
+                  icone: Icons.upload_file_outlined,
+                  libelle: 'Joindre le ticket PDF',
+                  onTap: () => joindreTicket(context, etat, c),
+                ),
+              ),
+          ],
+        ),
       ],
     );
+  }
+
+  Future<void> _classer(BuildContext context, Course c) async {
+    final ok = await modale(
+      context,
+      titre: 'Classer sans ticket',
+      icone: Icons.receipt_long_outlined,
+      oui: 'Classer sans ticket',
+      contenu: (context, maj) => Text(
+          'La course du ${jjmm(c.dateCourses)} passera dans Gérer › Historique sans ticket de caisse. '
+          'Vous pourrez encore y joindre le ticket.',
+          style: Charte.texte(16)),
+    );
+    if (ok) etat.classerSansTicket(c);
   }
 
   Widget _carteInterrompues(BuildContext context, Liste l) {

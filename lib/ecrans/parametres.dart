@@ -66,6 +66,18 @@ class EcranFoyer extends StatelessWidget {
                 },
                 gauche: IconeRonde(null, texte: m.initiales),
               ),
+            LigneMenu(
+              icone: Icons.person_add_alt_outlined,
+              titre: 'Ajouter un membre',
+              sousTitre: 'Son nom et, si vous voulez, son adresse mail (sans invitation)',
+              onTap: () => _ajouterMembre(context, etat),
+            ),
+            _Option(
+              texte: 'Envoyer la liste à tout le foyer',
+              aide: 'Le mail est préparé avec les adresses de tous les membres',
+              coche: etat.envoiFoyer,
+              onChange: (v) => etat.options(envoiFoyer: v),
+            ),
                 const SizedBox(height: 8),
               ],
             ),
@@ -112,6 +124,19 @@ class EcranFoyer extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Ajout d'un membre directement par son nom, sans passer par l'invitation.
+Future<void> _ajouterMembre(BuildContext context, Etat etat) async {
+  final nom = await demanderTexte(context, titre: 'Nouveau membre', aide: 'Prénom ou nom', valider: 'Ajouter');
+  if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+  if (etat.membres.any((m) => m.nomAffiche.toLowerCase() == nom.trim().toLowerCase())) {
+    Nav.message(context, '« ${nom.trim()} » fait déjà partie du foyer');
+    return;
+  }
+  final email = await demanderTexte(context, titre: 'Adresse mail · ${nom.trim()}', aide: 'prenom.nom@exemple.fr (facultatif)');
+  etat.ajouterMembre(nom, email ?? '');
+  if (context.mounted) Nav.message(context, '${nom.trim()} fait maintenant partie du foyer');
 }
 
 /// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
@@ -199,12 +224,6 @@ class EcranParametres extends StatelessWidget {
               titre: 'Types de packaging',
               sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
               onTap: () => Nav.aller(context, const EcranTypesPackaging()),
-            ),
-            _Option(
-              texte: 'Envoyer la liste à tout le foyer',
-              aide: 'Le mail est préparé avec les adresses de tous les membres',
-              coche: etat.envoiFoyer,
-              onChange: (v) => etat.options(envoiFoyer: v),
             ),
             LigneMenu(
               icone: Icons.playlist_add_check,

@@ -150,8 +150,12 @@ void main() {
       final e = Etat.instance;
       final l = e.creerListe('mg1', [LigneListe(produitId: e.produits.first.id, quantite: 2, consigne: 'bio')]);
       expect(e.nomListe(l), startsWith('Magasin 1 du '));
+      expect(e.nomListe(l), contains(' à '), reason: 'magasin, date et heure');
+      expect(e.nomPris(e.nomListe(l)), isTrue, reason: 'deux listes ne peuvent pas porter le même nom');
       e.renommerListe(l, 'Barbecue');
       expect(e.nomListe(l), 'Barbecue');
+      expect(e.nomPris('barbecue '), isTrue);
+      expect(e.nomPris('Barbecue', sauf: l), isFalse);
       final relu = jsonEncode(e.versJson());
       e.lire(jsonDecode(relu) as Map<String, dynamic>);
       final l2 = e.liste(l.id)!;
@@ -163,6 +167,18 @@ void main() {
       e.listePrete(l2);
       e.remettreEnPreparation(l2);
       expect(l2.statut, StatutListe.enConstruction);
+    });
+
+    test('foyer : membre ajouté sans invitation ; course sans ticket en instance puis classée', () {
+      final e = Etat.instance;
+      final n = e.membres.length;
+      final m = e.ajouterMembre(' Paul ', 'paul@exemple.fr');
+      expect(e.membres.length, n + 1);
+      expect(m.nomAffiche, 'Paul');
+      final sans = e.coursesEnInstance;
+      expect(sans, isNotEmpty);
+      e.classerSansTicket(sans.first);
+      expect(e.coursesEnInstance.length, sans.length - 1);
     });
 
     test('magasins : pas de doublon de nom ; listes en cours effacées à la suppression', () {
@@ -267,6 +283,7 @@ void main() {
       expect(find.text('COMMENT ÇA MARCHE'), findsOneWidget);
       await _voir(tester, find.text('Reprendre').last);
       expect(find.text('Reprendre'), findsWidgets);
+      expect(find.text('Faire les courses'), findsOneWidget, reason: 'la liste prête reste dans « En préparation »');
       await _ciblesTactiles(tester);
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
     });
@@ -411,11 +428,11 @@ void main() {
     testWidgets('2. nouvelle liste : la préliste coche les produits fréquents', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text('+ Nouvelle liste'));
-      expect(find.text('Générer par IA'), findsOneWidget);
+      expect(find.text('Liste calculée'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Historique'));
+      await _toucher(tester, find.text('Liste personnalisée'));
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Liste vide'));
+      await _toucher(tester, find.text('Liste type'));
       expect(find.textContaining('Ma liste · 0'), findsOneWidget);
       await _toucher(tester, find.text('Liste prête'));
       expect(find.text('Liste prête ?'), findsOneWidget, reason: 'fenêtre modale de validation');
@@ -459,17 +476,18 @@ void main() {
       await _toucher(tester, find.text('Terminer les courses'));
       expect(find.text('Terminer les courses ?'), findsOneWidget);
       await _toucher(tester, find.text('Terminer les courses').last);
-      expect(find.text('Par date'), findsOneWidget);
+      expect(find.text('TERMINÉES SANS TICKET'), findsOneWidget, reason: 'la course attend son ticket dans l\'onglet Courses');
+      expect(Etat.instance.coursesEnInstance.any((c) => c.id == 'l4'), isTrue);
     });
 
     testWidgets('démarrer des courses depuis une liste prête', (tester) async {
       await _accueil(tester);
       await _toucher(tester, _onglet('Courses'));
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)));
-      expect(find.text('Partir faire les courses'), findsOneWidget, reason: 'fenêtre modale de départ');
+      expect(find.text('Faire les courses'), findsWidgets, reason: 'fenêtre modale de départ');
       expect(find.text('Enregistrer le parcours'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Partir').last);
+      await _toucher(tester, find.text('Faire les courses').last);
       expect(find.text('Pause'), findsOneWidget);
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });

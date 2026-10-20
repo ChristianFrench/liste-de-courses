@@ -24,7 +24,11 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     final etat = Etat.instance;
     final nav = Nav.i;
     final aRattacher = etat.tickets.where((t) => t.id == nav.ticketARattacher).firstOrNull;
-    final courses = etat.historique.where((c) => !etat.estArchive(c.magasinId)).toList();
+    // Une course terminée sans ticket reste dans l'onglet Courses tant qu'elle n'est pas classée
+    // (sauf pendant un rattachement de ticket : elle peut alors recevoir le sien).
+    final courses = etat.historique
+        .where((c) => !etat.estArchive(c.magasinId) && (aRattacher != null || !etat.enInstance(c)))
+        .toList();
     final groupes = <String, List<Course>>{};
     for (final c in courses) {
       final cle = vue == 0 ? moisAnnee(c.dateCourses).toUpperCase() : (etat.magasin(c.magasinId)?.nom ?? '').toUpperCase();

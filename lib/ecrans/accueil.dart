@@ -38,7 +38,7 @@ class EcranAccueil extends StatelessWidget {
               cle: 'accueil/preparation',
               titre: 'En préparation',
               icone: Icons.checklist,
-              nombre: enPreparation.length,
+              nombre: enPreparation.length + pretes.length,
               vide: 'Aucune liste en préparation.',
               enfants: [
                 for (final l in enPreparation)
@@ -50,14 +50,23 @@ class EcranAccueil extends StatelessWidget {
                     onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
                     droite: BoutonAction('Reprendre', onTap: () => Nav.travail(EcranConstruction(listeId: l.id))),
                   ),
+                // Une liste prête n'a pas encore servi : elle reste ici, avec de quoi partir faire les courses.
+                for (final l in pretes)
+                  LigneMenu(
+                    icone: Icons.shopping_cart_outlined,
+                    titre: etat.nomListe(l),
+                    sousTitre: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
+                    onTap: () => partirFaireLesCourses(context, l),
+                    droite: BoutonAction('Faire les courses', onTap: () => partirFaireLesCourses(context, l)),
+                  ),
               ],
             ),
             GroupeRetractable(
               cle: 'accueil/courses',
               titre: 'Courses',
               icone: Icons.shopping_cart_outlined,
-              nombre: pretes.length + (enCours == null ? 0 : 1),
-              vide: 'Aucune liste prête pour les courses.',
+              nombre: enCours == null ? 0 : 1,
+              vide: 'Aucune course en cours.',
               enfants: [
                 if (enCours != null)
                   LigneMenu(
@@ -70,14 +79,6 @@ class EcranAccueil extends StatelessWidget {
                     sousTitre: 'Courses interrompues${enCours.interrompueLe != null ? ' ${quand(enCours.interrompueLe!)}' : ''}',
                     onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id)),
                     droite: BoutonAction('Reprendre', plein: true, onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id))),
-                  ),
-                for (final l in pretes)
-                  LigneMenu(
-                    icone: Icons.shopping_cart_outlined,
-                    titre: etat.nomListe(l),
-                    sousTitre: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
-                    onTap: () => partirFaireLesCourses(context, l),
-                    droite: BoutonAction('Partir', onTap: () => partirFaireLesCourses(context, l)),
                   ),
               ],
             ),
