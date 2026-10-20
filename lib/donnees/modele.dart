@@ -837,7 +837,9 @@ class Etat extends ChangeNotifier {
   /// Nom affiché d'une liste : celui donné par l'utilisateur, sinon « magasin du jj/mm/aaaa ».
   String nomListe(Liste l) => (l.nom != null && l.nom!.isNotEmpty) ? l.nom! : nomParDefaut(l.magasinId, l.dateCreation);
   /// Magasin, date et heure : deux listes créées n'ont pas le même nom.
-  String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)} à ${heure(d)}';
+  /// (Sans heure connue, comme dans les données de démonstration, la date seule.)
+  String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)}'
+      '${d.hour == 0 && d.minute == 0 ? '' : ' à ${heure(d)}'}';
 
   /// Une liste non terminée porte déjà ce nom (deux listes ne peuvent pas avoir le même nom).
   bool nomPris(String nom, {Liste? sauf}) => listes.any((l) =>

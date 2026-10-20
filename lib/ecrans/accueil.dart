@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -27,13 +26,7 @@ class EcranAccueil extends StatelessWidget {
         contenu: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const _Bandeau(),
-            GroupeRetractable(
-              cle: 'accueil/comment',
-              titre: 'Comment ça marche',
-              icone: Icons.lightbulb_outline,
-              enfants: const [_Etapes()],
-            ),
+            const _EnTetePhoto(),
             GroupeRetractable(
               cle: 'accueil/preparation',
               titre: 'En préparation',
@@ -99,61 +92,82 @@ class EcranAccueil extends StatelessWidget {
   }
 }
 
-/// Bandeau ludique : quelques images du catalogue sur la couleur de la palette, et le bonjour.
-class _Bandeau extends StatelessWidget {
-  const _Bandeau();
+/// En-tête : la photo de légumes, le bonjour, puis « Comment ça marche » posé sur la même photo,
+/// qui déborde jusque sous les quatre étapes. Un appui sur le titre replie les étapes.
+class _EnTetePhoto extends StatelessWidget {
+  const _EnTetePhoto();
 
-  static const _images = [
-    ('fruits-et-legumes', 64.0, 0.0, 6.0, -0.15),
-    ('boulangerie', 50.0, 58.0, 58.0, 0.12),
-    ('cremerie', 46.0, 6.0, 74.0, -0.08),
-    ('fromagerie', 40.0, 112.0, 14.0, 0.2),
-    ('poissonnerie', 38.0, 104.0, 70.0, -0.18),
-  ];
+  static const _cle = 'accueil/comment';
 
   @override
   Widget build(BuildContext context) {
     final haut = MediaQuery.of(context).padding.top;
-    return Container(
-      height: 130 + haut,
-      padding: EdgeInsets.only(top: haut),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Charte.accent, Charte.cadre],
-        ),
-      ),
-      child: Stack(
-        children: [
-          for (final (cle, taille, droite, hautImage, angle) in _images)
-            Positioned(
-              right: 12 + droite,
-              top: hautImage,
-              child: Transform.rotate(
-                angle: angle,
-                child: Container(
-                  width: taille + 10,
-                  height: taille + 10,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-                  child: Pictogramme(cle, taille: taille),
+    return ListenableBuilder(
+      listenable: Retractables.i,
+      builder: (context, _) {
+        final ouvert = Retractables.i.ouvert(_cle);
+        return Stack(
+          children: [
+            Positioned.fill(child: Image.asset('assets/accueil_photo.jpg', fit: BoxFit.cover, alignment: Alignment.topCenter)),
+            // Voile : lisibilité du texte blanc, plus sombre en bas sous les étapes.
+            const Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0x66000000), Color(0x22000000), Color(0x8C000000), Color(0xB3000000)],
+                    stops: [0, 0.3, 0.6, 1],
+                  ),
                 ),
               ),
             ),
-          Positioned(
-            left: 18,
-            bottom: 18,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Bonjour !', style: Charte.texte(30, gras: true, couleur: Charte.blanc)),
-                Text('Prêt(e) pour vos courses ?', style: Charte.texte(16, couleur: Charte.blanc)),
-              ],
+            Padding(
+              padding: EdgeInsets.only(top: haut),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 40, 18, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Bonjour !', style: Charte.texte(30, gras: true, couleur: Charte.blanc)),
+                        Text('Prêt(e) pour vos courses ?', style: Charte.texte(16, couleur: Charte.blanc)),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Retractables.i.basculer(_cle),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 48),
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0x55FFFFFF)))),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
+                            child: Icon(Icons.lightbulb_outline, size: 19, color: Charte.cadre),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text('COMMENT ÇA MARCHE',
+                                style: Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8)),
+                          ),
+                          Icon(ouvert ? Icons.expand_less : Icons.expand_more, size: 30, color: Charte.blanc),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (ouvert) const _Etapes(),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        );
+      },
     );
   }
 }
@@ -171,7 +185,7 @@ class _Etapes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.fromLTRB(4, 6, 4, 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -197,7 +211,7 @@ class _Etapes extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 6),
-                    Text(_etapes[i].$2, textAlign: TextAlign.center, style: Charte.texte(13)),
+                    Text(_etapes[i].$2, textAlign: TextAlign.center, style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
                   ],
                 ),
               ),
