@@ -303,6 +303,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ]..sort((a, b) => (_ordre[a.id] ?? 1 << 20).compareTo(_ordre[b.id] ?? 1 << 20));
       if (maListe && produits.isEmpty) continue;
       res.add(_Element.titre(s));
+      if (!Retractables.i.ouvert(_cle(s.id))) continue;
       for (final p in produits) {
         res.add(_Element.produit(s, p));
       }
@@ -314,16 +315,19 @@ class _EcranConstructionState extends State<EcranConstruction> {
     ].whereType<Produit>().toList();
     if (nonPlaces.isNotEmpty) {
       res.add(_Element.titre(null));
-      for (final p in nonPlaces) {
+      if (Retractables.i.ouvert(_cle('nonPlace'))) for (final p in nonPlaces) {
         res.add(_Element.produit(null, p));
       }
     }
     return res;
   }
 
+  String _cle(String secteurId) => 'preparation/${widget.listeId}/$secteurId';
+
   /// Fait venir le bandeau d'un secteur en haut de l'écran (hauteurs estimées, puis ajustement).
   void _allerA(Liste l, Secteur s, {bool noter = true}) {
     if (noter) etat.positionConstruction(l, s.rayonId, s.id);
+    if (!Retractables.i.ouvert(_cle(s.id))) Retractables.i.basculer(_cle(s.id));
     if (!_defilement.hasClients) return;
     final elements = _elements(l);
     var y = 0.0;
@@ -361,7 +365,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: etat,
+      listenable: Listenable.merge([etat, Retractables.i]),
       builder: (context, _) {
         final l = liste;
         if (l == null) {
@@ -402,6 +406,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
               },
             ),
             BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
+            BoutonReduire(cles: [for (final s in _secteurs(l)) _cle(s.id), _cle('nonPlace')]),
           ]),
         );
         if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
@@ -459,6 +464,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       image: r == null ? null : cleSecteur(r.nom, s!.nom),
                       fort: true,
                       nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
+                      ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
+                      onTap: () => Retractables.i.basculer(_cle(s?.id ?? 'nonPlace')),
                     );
                   },
                 ),
@@ -1093,7 +1100,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     return ListenableBuilder(
-      listenable: etat,
+      listenable: Listenable.merge([etat, Retractables.i]),
       builder: (context, _) {
         final l = etat.liste(widget.listeId);
         if (l == null || l.statut != StatutListe.enCours) {
@@ -1123,8 +1130,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
-            entete: EnTeteTravail(titre: titre),
-            haut: [_choixParcours(context, etat, l)],
+            entete: EnTeteTravail(titre: titre, action: BoutonReduire(cles: [for (final x in etapes) _cle(x.id)])),
+            haut: [_choixParcours(context, etat, l), _apprentissage(etat, l)],
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
@@ -1139,9 +1146,12 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                             image: imageEtape(etat, x),
                             fort: true,
                             avancement: (x.lignes.where((g) => g.coche).length, x.lignes.length),
+                            ouvert: Retractables.i.ouvert(_cle(x.id)),
+                            onTap: () => Retractables.i.basculer(_cle(x.id)),
                           ),
-                          for (final g in x.lignes)
-                            if (!resteAFaire || !g.coche) _ligne(etat, l, g),
+                          if (Retractables.i.ouvert(_cle(x.id)))
+                            for (final g in x.lignes)
+                              if (!resteAFaire || !g.coche) _ligne(etat, l, g),
                       ],
                       if (resteAFaire && visibles.isEmpty)
                         Padding(
@@ -1181,6 +1191,32 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       },
     );
   }
+
+  String _cle(String etapeId) => 'courses/${widget.listeId}/$etapeId';
+
+  /// « Apprendre le parcours » : l'ordre dans lequel les articles sont cochés donne l'ordre des secteurs,
+  /// enregistré à la fin des courses (nouveau parcours, ou secteurs ajoutés au parcours appris).
+  Widget _apprentissage(Etat etat, Liste l) => Container(
+        height: 48,
+        padding: const EdgeInsets.only(left: 10, right: 4),
+        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+        child: Row(
+          children: [
+            Icon(Icons.school_outlined, size: 20, color: Charte.couleurIcone(Icons.route_outlined)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(etat.apprend(l) ? 'Parcours enregistré au fil des articles cochés' : 'Enregistrer le parcours',
+                  style: Charte.texte(15), maxLines: 1, overflow: TextOverflow.ellipsis),
+            ),
+            Switch(
+              value: etat.apprend(l),
+              activeThumbColor: Charte.blanc,
+              activeTrackColor: Charte.accent,
+              onChanged: (v) => etat.apprendreParcours(l, v),
+            ),
+          ],
+        ),
+      );
 
   /// À la reprise de courses interrompues, la liste s'ouvre sur le secteur où l'on s'était arrêté.
   void _allerALaReprise(Liste l) {

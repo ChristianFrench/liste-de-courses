@@ -32,11 +32,11 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     }
     final libres = etat.tickets.where((t) => etat.course(t.listeId) == null).toList();
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+      padding: const EdgeInsets.only(top: 8, bottom: 16),
       children: [
         if (aRattacher != null)
           Container(
-            margin: const EdgeInsets.only(bottom: 8),
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             padding: const EdgeInsets.fromLTRB(10, 6, 4, 6),
             color: Charte.fondSelection,
             child: Row(
@@ -60,23 +60,35 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
               ],
             ),
           ),
-        Bascule(
-          douce: true,
-          options: const ['Par date', 'Par magasin'],
-          index: vue,
-          onChange: (i) => setState(() => vue = i),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+          child: Bascule(
+            douce: true,
+            options: const ['Par date', 'Par magasin'],
+            index: vue,
+            onChange: (i) => setState(() => vue = i),
+          ),
         ),
         if (courses.isEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 14),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
             child: Text('Aucune course terminée.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           ),
-        for (final g in groupes.entries) ...[
-          TitreSection(g.key, cote: 0, haut: 14),
-          for (final c in g.value) _ligne(context, etat, c, aRattacher),
-        ],
-        if (libres.isNotEmpty && aRattacher == null) ...[
-          const TitreSection('Tickets non rattachés', cote: 0, haut: 18),
+        for (final g in groupes.entries)
+          GroupeRetractable(
+            cle: 'historique/$vue/${g.key}',
+            titre: g.key,
+            icone: vue == 0 ? Icons.calendar_month_outlined : Icons.storefront_outlined,
+            nombre: g.value.length,
+            enfants: [for (final c in g.value) _ligne(context, etat, c, aRattacher)],
+          ),
+        if (libres.isNotEmpty && aRattacher == null)
+          GroupeRetractable(
+            cle: 'historique/tickets',
+            titre: 'Tickets non rattachés',
+            icone: Icons.receipt_long_outlined,
+            nombre: libres.length,
+            enfants: [
           for (final t in libres)
             Container(
               constraints: const BoxConstraints(minHeight: 52),
@@ -101,7 +113,8 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
                 ],
               ),
             ),
-        ],
+            ],
+          ),
       ],
     );
   }

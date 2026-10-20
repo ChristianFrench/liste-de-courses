@@ -761,8 +761,25 @@ class LigneCompacte extends StatelessWidget {
 
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
-  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite, this.avancement, this.nombre});
+  const TitreGroupe(
+      {super.key,
+      required this.nom,
+      this.numero,
+      this.nonPlace = false,
+      this.image,
+      this.fort = false,
+      this.droite,
+      this.avancement,
+      this.nombre,
+      this.icone,
+      this.ouvert,
+      this.onTap});
   final String nom;
+  /// Icône dans un rond blanc, quand le groupe n'a pas d'image.
+  final IconData? icone;
+  /// Groupe rétractable : chevron ouvert ou fermé, et un appui sur le titre l'ouvre ou le ferme.
+  final bool? ouvert;
+  final VoidCallback? onTap;
   /// Titre contrasté (couleur d'accent, texte blanc) : sépare nettement les secteurs pendant les courses.
   final bool fort;
   final String? droite;
@@ -787,13 +804,26 @@ class TitreGroupe extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (nonPlace) const TraitPointille(),
-        Container(
-          height: image != null ? 52 : 30,
+        Material(
           color: fort ? Charte.accent : Charte.fondSelection,
+          child: InkWell(
+          onTap: onTap,
+          child: Container(
+          height: image != null || icone != null ? 52 : (onTap != null ? 44 : 30),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
+              if (icone != null && image == null) ...[
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, shape: BoxShape.circle),
+                  alignment: Alignment.center,
+                  child: Icon(icone, size: 26, color: fort ? Charte.accent : Charte.blanc),
+                ),
+                const SizedBox(width: 10),
+              ],
               if (image != null) ...[
                 fort
                     ? Container(
@@ -810,7 +840,7 @@ class TitreGroupe extends StatelessWidget {
                 child: Text(nom.toUpperCase(),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Charte.texte(image != null ? (fort ? 15 : 14) : 12,
+                    style: Charte.texte(image != null || icone != null ? (fort ? 15 : 14) : (onTap != null ? 14 : 12),
                         gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
               ),
               if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
@@ -824,12 +854,127 @@ class TitreGroupe extends StatelessWidget {
                   child: Text('$nombre', style: Charte.texte(15, gras: true, couleur: fort ? Charte.accent : Charte.blanc)),
                 ),
               if (avancement != null) _Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
+              if (ouvert != null) ...[
+                const SizedBox(width: 4),
+                Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 30, color: fort ? Charte.blanc : Charte.encre),
+              ],
             ],
           ),
+        ),
+        ),
         ),
       ],
     );
   }
+}
+
+/// Groupes rétractables ouverts ou fermés, gardés tant que l'application tourne.
+class Retractables extends ChangeNotifier {
+  Retractables._();
+  static final i = Retractables._();
+  final Map<String, bool> _etat = {};
+
+  bool ouvert(String cle, {bool parDefaut = true}) => _etat[cle] ?? parDefaut;
+  void basculer(String cle, {bool parDefaut = true}) {
+    _etat[cle] = !ouvert(cle, parDefaut: parDefaut);
+    notifyListeners();
+  }
+
+  /// Ouvre ou ferme d'un coup tous les groupes donnés (bouton « Tout réduire » / « Tout développer »).
+  void tous(Iterable<String> cles, bool ouvrir) {
+    for (final c in cles) {
+      _etat[c] = ouvrir;
+    }
+    notifyListeners();
+  }
+
+  bool tousFermes(Iterable<String> cles, {bool parDefaut = true}) => cles.isNotEmpty && cles.every((c) => !ouvert(c, parDefaut: parDefaut));
+}
+
+/// Le modèle de toutes les listes de l'application : un bandeau (titre du groupe, image ou icône, nombre)
+/// qu'un appui ouvre ou ferme, puis les éléments du groupe.
+class GroupeRetractable extends StatelessWidget {
+  const GroupeRetractable({
+    super.key,
+    required this.cle,
+    required this.titre,
+    required this.enfants,
+    this.image,
+    this.icone,
+    this.nombre,
+    this.vide,
+    this.parDefaut = true,
+    this.marge = 16,
+  });
+  final String cle;
+  final String titre;
+  final List<Widget> enfants;
+  final String? image;
+  final IconData? icone;
+  final int? nombre;
+  /// Texte affiché quand le groupe n'a aucun élément.
+  final String? vide;
+  final bool parDefaut;
+  final double marge;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: Retractables.i,
+      builder: (context, _) {
+        final o = Retractables.i.ouvert(cle, parDefaut: parDefaut);
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TitreGroupe(
+              nom: titre,
+              image: image,
+              icone: icone,
+              fort: true,
+              nombre: nombre,
+              ouvert: o,
+              onTap: () => Retractables.i.basculer(cle, parDefaut: parDefaut),
+            ),
+            if (o)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: marge),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (enfants.isEmpty && vide != null)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: Text(vide!, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                      ),
+                    ...enfants,
+                  ],
+                ),
+              ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// Bouton d'en-tête « Tout réduire » / « Tout développer » pour les groupes [cles].
+class BoutonReduire extends StatelessWidget {
+  const BoutonReduire({super.key, required this.cles, this.parDefaut = true});
+  final List<String> cles;
+  final bool parDefaut;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Retractables.i,
+        builder: (context, _) {
+          final fermes = Retractables.i.tousFermes(cles, parDefaut: parDefaut);
+          return BoutonIcone(
+            icone: fermes ? Icons.unfold_more : Icons.unfold_less,
+            libelle: fermes ? 'Tout développer' : 'Tout réduire',
+            onTap: () => Retractables.i.tous(cles, fermes),
+          );
+        },
+      );
 }
 
 class _Avancement extends StatelessWidget {

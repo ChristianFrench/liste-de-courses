@@ -67,6 +67,15 @@ class EcranCorbeille extends StatelessWidget {
     'parcours': Icons.route_outlined,
   };
 
+  static const _titres = {
+    'magasin': 'Magasins',
+    'rayon': 'Rayons',
+    'secteur': 'Secteurs',
+    'produit': 'Produits',
+    'liste': 'Listes',
+    'parcours': 'Parcours',
+  };
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -75,12 +84,15 @@ class EcranCorbeille extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Corbeille'),
         corps: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
           children: [
-            const SizedBox(height: 10),
-            if (etat.corbeille.isEmpty)
-              Text('La corbeille est vide.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            for (final c in etat.corbeille)
+            for (final type in [for (final c in etat.corbeille) c.type].toSet())
+              GroupeRetractable(
+                cle: 'corbeille/$type',
+                titre: _titres[type] ?? type,
+                icone: _icones[type] ?? Icons.delete_outline,
+                nombre: etat.corbeille.where((c) => c.type == type).length,
+                enfants: [
+            for (final c in etat.corbeille.where((c) => c.type == type))
               LigneMenu(
                 titre: c.libelle,
                 titreTaille: 16,
@@ -95,6 +107,13 @@ class EcranCorbeille extends StatelessWidget {
                   etat.restaurer(c);
                   Nav.message(context, 'Restauré : ${c.libelle}');
                 }),
+              ),
+                ],
+              ),
+            if (etat.corbeille.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text('La corbeille est vide.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
               ),
             const SizedBox(height: 16),
           ],

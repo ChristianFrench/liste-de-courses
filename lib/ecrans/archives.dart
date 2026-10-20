@@ -20,17 +20,21 @@ class EcranArchives extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Archives'),
         corps: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+          padding: const EdgeInsets.only(top: 8, bottom: 16),
           children: [
             if (etat.magasinsArchives.isEmpty)
               Padding(
-                padding: const EdgeInsets.only(top: 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Text(
                     'Aucune archive. Quand vous supprimez un magasin qui a un historique de courses, ses courses arrivent ici.',
                     style: Charte.texte(15, couleur: Charte.texteSecondaire)),
               ),
-            for (final m in etat.magasinsArchives) ...[
-              TitreSection(m.nom, cote: 0, haut: 14),
+            for (final m in etat.magasinsArchives)
+              GroupeRetractable(
+                cle: 'archives/${m.id}',
+                titre: m.nom,
+                icone: Icons.inventory_2_outlined,
+                enfants: [
               for (final l in etat.listesArchivees(m.id)) _course(context, etat, l),
               for (final c in etat.historique.where((c) => c.magasinId == m.id && etat.liste(c.id) == null))
                 _ligne(context, '${jjmmaaaa(c.dateCourses)} · ${c.nbArticles} articles', etat.ticketDe(c.id) != null, null),
@@ -56,13 +60,18 @@ class EcranArchives extends StatelessWidget {
                   ),
                 ],
               ),
-            ],
+              const SizedBox(height: 10),
+                ],
+              ),
             const SizedBox(height: 14),
-            Text(
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
               etat.delaiArchives == 0
                   ? 'Les archives sont gardées sans limite (réglage dans Paramètres).'
                   : 'Les archives de plus de ${etat.delaiArchives} mois sont supprimées automatiquement (réglage dans Paramètres).',
               style: Charte.texte(13, couleur: Charte.texteSecondaire),
+            ),
             ),
           ],
         ),

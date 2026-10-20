@@ -22,73 +22,57 @@ class SousEcranPreparer extends StatelessWidget {
     return AvecDecision(
       boutons: [Bouton(texte: '+ Nouvelle liste', plein: true, taille: 18, onTap: () => Nav.travail(const EcranPreliste()))],
       contenu: ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      children: [
-        const TitreSection('En préparation', cote: 0, haut: 8),
-        if (enPreparation.isEmpty)
-          Text('Aucune liste en préparation.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        for (final l in enPreparation) ...[
-          Carte(
-            onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
-                        '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
-                        '${l.interrompueLe != null ? quand(l.interrompueLe!) : quandJour(l.modifieeLe ?? l.dateCreation)}',
-                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                      ),
-                    ],
-                  ),
+        padding: const EdgeInsets.only(bottom: 16),
+        children: [
+          GroupeRetractable(
+            cle: 'preparer/enPreparation',
+            titre: 'En préparation',
+            icone: Icons.edit_note,
+            nombre: enPreparation.length,
+            vide: 'Aucune liste en préparation.',
+            enfants: [
+              for (final l in enPreparation)
+                LigneMenu(
+                  titre: etat.nomListe(l),
+                  sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
+                      '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
+                      '${l.interrompueLe != null ? quand(l.interrompueLe!) : quandJour(l.modifieeLe ?? l.dateCreation)}',
+                  onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
+                  droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                    if (l.interrompueLe != null) const Etiquette('Interrompue', pointille: true),
+                    BoutonRenommerListe(l),
+                    BoutonSupprimerListe(l),
+                  ]),
                 ),
-                if (l.interrompueLe != null) ...[const SizedBox(width: 8), const Etiquette('Interrompue', pointille: true)],
-                BoutonRenommerListe(l),
-                BoutonSupprimerListe(l),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: 10),
-        ],
-        const TitreSection('Prêtes pour les courses', cote: 0),
-        if (pretes.isEmpty)
-          Text('Aucune liste prête.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        for (final l in pretes) ...[
-          Carte(
-            onTap: () => Nav.i.allerOnglet(Nav.courses),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
-                        '${quandJour(l.modifieeLe ?? l.dateCreation)}',
-                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                      ),
-                    ],
-                  ),
+          GroupeRetractable(
+            cle: 'preparer/pretes',
+            titre: 'Prêtes pour les courses',
+            icone: Icons.shopping_cart_outlined,
+            nombre: pretes.length,
+            vide: 'Aucune liste prête.',
+            enfants: [
+              for (final l in pretes)
+                LigneMenu(
+                  titre: etat.nomListe(l),
+                  sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
+                      '${quandJour(l.modifieeLe ?? l.dateCreation)}',
+                  onTap: () => Nav.i.allerOnglet(Nav.courses),
+                  droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                    BoutonRemettreEnPreparation(l),
+                    BoutonSupprimerListe(l),
+                  ]),
                 ),
-                BoutonRemettreEnPreparation(l),
-                BoutonSupprimerListe(l),
-              ],
-            ),
+            ],
           ),
-          const SizedBox(height: 10),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+            child: Text('Une préparation interrompue est conservée telle quelle : touchez-la pour reprendre.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ),
         ],
-        const SizedBox(height: 6),
-        Text('Une préparation interrompue est conservée telle quelle : touchez-la pour reprendre.',
-            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      ],
-    ),
+      ),
     );
   }
 }
@@ -164,19 +148,6 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
 
   Membre get membre => etat.membres[membreIndex.clamp(0, etat.membres.length - 1)];
 
-  Future<void> _nouveau(BuildContext context) async {
-    var magasinId = etat.magasins.length == 1 ? etat.magasins.first.id : null;
-    magasinId ??= await choisirDansListe<String>(context,
-        titre: 'Parcours dans quel magasin ?', choix: {for (final m in etat.magasins) m.id: m.nom});
-    if (magasinId == null || !context.mounted) return;
-    final nom = await demanderTexte(context,
-        titre: 'Nouveau parcours', initial: 'Parcours de ${membre.nomAffiche.split(' ').first}', aide: 'Ex. : Au plus court');
-    if (nom == null || nom.isEmpty) return;
-    // Tous les rayons et secteurs du magasin, dans l'ordre des rayons : il reste à les ordonner.
-    final n = etat.creerParcours(magasinId, membre.id, nom);
-    setState(() => parcoursId = n.id);
-  }
-
   @override
   Widget build(BuildContext context) {
     final p = etat.unParcours(parcoursId);
@@ -201,31 +172,36 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
 
   Widget _liste(BuildContext context) {
     final mes = etat.parcoursDuMembre(membre.id);
-    return AvecDecision(
-      boutons: [Bouton(texte: '+ Nouveau parcours', plein: true, onTap: () => _nouveau(context))],
-      contenu: ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      children: [
-        _choixMembre(),
-        Text('Parcours de ${membre.nomAffiche}', style: Charte.texte(15, gras: true)),
-        const SizedBox(height: 4),
-        if (mes.isEmpty)
+    return ListView(
+        padding: const EdgeInsets.only(top: 8, bottom: 16),
+        children: [
+          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _choixMembre()),
+          for (final m in etat.magasins)
+            GroupeRetractable(
+              cle: 'parcours/${m.id}',
+              titre: m.nom,
+              icone: Icons.storefront_outlined,
+              nombre: mes.where((x) => x.magasinId == m.id).length,
+              vide: 'Aucun parcours : il s\'enregistre pendant les courses (« Enregistrer le parcours »).',
+              enfants: [
+                for (final x in mes.where((x) => x.magasinId == m.id))
+                  LigneMenu(
+                    titre: x.nom,
+                    sousTitre: '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
+                        '${etat.parcoursAppris.contains(x.id) ? ' · appris pendant les courses' : ''}'
+                        '${x.parDefaut ? ' · par défaut' : ''}',
+                    onTap: () => setState(() => parcoursId = x.id),
+                  ),
+              ],
+            ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Text('Aucun parcours pour le moment.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: Text(
+                'Le parcours s\'apprend pendant les courses : activez « Enregistrer le parcours », l\'ordre dans lequel vous cochez '
+                'les articles donne l\'ordre des secteurs. Les courses enregistrées suivantes complètent le parcours appris.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ),
-        for (final x in mes)
-          LigneMenu(
-            titre: x.nom,
-            sousTitre: '${etat.magasin(x.magasinId)?.nom ?? ''} · ${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
-                '${x.parDefaut ? ' · par défaut' : ''}',
-            onTap: () => setState(() => parcoursId = x.id),
-          ),
-        const SizedBox(height: 14),
-        Text('Un nouveau parcours reprend tous les rayons et secteurs du magasin ; ordonnez-les ensuite dans l\'arborescence.',
-            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      ],
-    ),
+        ],
     );
   }
 
@@ -553,57 +529,50 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     final pretes = etat.listesStatut(StatutListe.prete);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.only(bottom: 16),
       children: [
-        if (enCours != null) ...[
-          const TitreSection('Courses interrompues', cote: 0, haut: 8),
-          _carteInterrompues(context, enCours),
-        ],
-        TitreSection('Listes prêtes', cote: 0, haut: enCours == null ? 8 : 16),
-        if (pretes.isEmpty)
-          Text('Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
-              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        if (pretes.isNotEmpty && etat.membres.length > 1) ...[
-          Row(
-            children: [
-              Text('Courses faites par', style: Charte.texte(15)),
-              const SizedBox(width: 10),
-              Expanded(
-                child: ChoixDeroulant<String>(
-                  valeur: membreId,
-                  choix: {for (final m in etat.membres) m.id: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche},
-                  onChange: (v) => setState(() => membreId = v),
+        if (enCours != null)
+          GroupeRetractable(
+            cle: 'courses/interrompues',
+            titre: 'Courses interrompues',
+            icone: Icons.pause_circle_outline,
+            nombre: 1,
+            enfants: [const SizedBox(height: 10), _carteInterrompues(context, enCours), const SizedBox(height: 6)],
+          ),
+        GroupeRetractable(
+          cle: 'courses/pretes',
+          titre: 'Listes prêtes',
+          icone: Icons.shopping_cart_outlined,
+          nombre: pretes.length,
+          vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
+          enfants: [
+            if (pretes.isNotEmpty && etat.membres.length > 1)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    Text('Courses faites par', style: Charte.texte(15)),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ChoixDeroulant<String>(
+                        valeur: membreId,
+                        choix: {for (final m in etat.membres) m.id: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche},
+                        onChange: (v) => setState(() => membreId = v),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 10),
-        ],
-        for (final l in pretes) ...[
-          Carte(
-            onTap: () => _partir(context, l),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(etat.nomListe(l), style: Charte.texte(18, gras: true)),
-                      const SizedBox(height: 2),
-                      Text(
-                        '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
-                        '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''} · touchez pour partir',
-                        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                      ),
-                    ],
-                  ),
-                ),
-                BoutonRemettreEnPreparation(l),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-        ],
+            for (final l in pretes)
+              LigneMenu(
+                titre: etat.nomListe(l),
+                sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
+                    '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''} · touchez pour partir',
+                onTap: () => _partir(context, l),
+                droite: BoutonRemettreEnPreparation(l),
+              ),
+          ],
+        ),
       ],
     );
   }

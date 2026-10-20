@@ -375,6 +375,10 @@ class Etat extends ChangeNotifier {
 
   /// Couleurs choisies (Paramètres) : « promo:<type> » et « pack:<packaging> » → 0xAARRGGBB.
   Map<String, int> couleurs = {};
+  /// Courses pendant lesquelles on enregistre le parcours (identifiants de listes).
+  Set<String> apprentissage = {};
+  /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
+  Set<String> parcoursAppris = {};
 
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
   List<String> typesPackaging = [];
@@ -553,6 +557,8 @@ class Etat extends ChangeNotifier {
     parSecteurs = options?['parSecteurs'] as bool? ?? true;
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
+    apprentissage = _ids(options?['apprentissage']).toSet();
+    parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -644,6 +650,8 @@ class Etat extends ChangeNotifier {
             'envoiFoyer': envoiFoyer,
             if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
+            if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
+            if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -1007,6 +1015,8 @@ class Etat extends ChangeNotifier {
   // ------------------------------------------------------------ Courses
 
   void demarrerCourses(Liste l, String membreId, String? parcoursId) {
+    // Sans parcours dans ce magasin, on propose d'emblée de l'enregistrer.
+    if (parcoursDe(l.magasinId, membreId).isEmpty) apprentissage.add(l.id);
     l.statut = StatutListe.enCours;
     l.membreId = membreId;
     l.parcoursId = parcoursId;
@@ -1035,8 +1045,70 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
+  bool apprend(Liste l) => apprentissage.contains(l.id);
+
+  void apprendreParcours(Liste l, bool oui) {
+    oui ? apprentissage.add(l.id) : apprentissage.remove(l.id);
+    modifie();
+  }
+
+  /// Secteurs dans l'ordre où leurs premiers articles ont été cochés.
+  List<String> secteursDansLOrdre(Liste l) {
+    final cochees = l.lignes.where((g) => g.cocheLe != null).toList()..sort((a, b) => a.cocheLe!.compareTo(b.cocheLe!));
+    final res = <String>[];
+    for (final g in cochees) {
+      final s = secteurDe(l.magasinId, g.produitId)?.id;
+      if (s != null && !res.contains(s)) res.add(s);
+    }
+    return res;
+  }
+
+  /// Fin de courses enregistrées : crée le parcours appris, ou y insère en silence les secteurs nouveaux,
+  /// chacun juste après le secteur visité avant lui (ou juste avant le suivant), sans changer l'ordre existant.
+  Parcours? retenirParcours(Liste l) {
+    if (!apprentissage.remove(l.id)) return null;
+    final suite = secteursDansLOrdre(l);
+    if (suite.isEmpty) return null;
+    final membreId = l.membreId ?? moi.id;
+    final existant = _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id) && p.id == l.parcoursId) ??
+        _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id) && p.parDefaut) ??
+        _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id));
+    if (existant == null) {
+      for (final autre in parcoursDe(l.magasinId, membreId)) {
+        autre.parDefaut = false;
+      }
+      final p = Parcours(nouvelId('pc'), l.magasinId, membreId, 'Parcours appris', true, suite);
+      parcours.add(p);
+      parcoursAppris.add(p.id);
+      return p;
+    }
+    existant.etapes = insererSecteurs(existant.etapes, suite);
+    return existant;
+  }
+
+  /// Insère dans [etapes] les secteurs de [suite] qui n'y sont pas, à leur place relative.
+  static List<String> insererSecteurs(List<String> etapes, List<String> suite) {
+    final res = [...etapes];
+    for (var i = 0; i < suite.length; i++) {
+      final s = suite[i];
+      if (res.contains(s)) continue;
+      var pos = -1;
+      for (var j = i - 1; j >= 0 && pos < 0; j--) {
+        final k = res.indexOf(suite[j]);
+        if (k >= 0) pos = k + 1;
+      }
+      for (var j = i + 1; j < suite.length && pos < 0; j++) {
+        final k = res.indexOf(suite[j]);
+        if (k >= 0) pos = k;
+      }
+      res.insert(pos < 0 ? res.length : pos, s);
+    }
+    return res;
+  }
+
   /// Départ annulé (rien de coché) : la liste redevient prête.
   void annulerDepart(Liste l) {
+    apprentissage.remove(l.id);
     l.statut = StatutListe.prete;
     l.membreId = null;
     l.parcoursId = null;
@@ -1059,6 +1131,7 @@ class Etat extends ChangeNotifier {
     // Dans la base, une course de l'historique est la liste elle-même, au statut « terminee ».
     final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches);
     historique.insert(0, c);
+    retenirParcours(l);
     l.statut = StatutListe.terminee;
     l.interrompueLe = null;
     modifie();

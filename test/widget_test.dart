@@ -70,6 +70,12 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
   await tester.pumpAndSettle();
 }
 
+Future<void> _voir(WidgetTester tester, Finder f) async {
+  if (f.evaluate().isNotEmpty) return;
+  await tester.scrollUntilVisible(f, 150,
+      scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+}
+
 Finder _onglet(String libelle) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(libelle));
 Finder _sousOnglet(String libelle) => find.descendant(of: find.byType(SousOnglets), matching: find.text(libelle));
 
@@ -224,6 +230,30 @@ void main() {
       expect(e.rayonsDuParcours(p).first.id, rayons.last.id);
     });
 
+    test('parcours appris : ordre des articles cochés, puis secteurs nouveaux insérés à leur place', () {
+      expect(Etat.insererSecteurs(['a', 'c', 'e'], ['a', 'b', 'c']), ['a', 'b', 'c', 'e']);
+      expect(Etat.insererSecteurs(['a', 'c'], ['z', 'c']), ['a', 'z', 'c']);
+      expect(Etat.insererSecteurs(['a'], ['x']), ['a', 'x']);
+
+      final e = Etat.instance;
+      final l = e.liste('l3')!;
+      final membre = e.membres.last.id;
+      e.parcours.removeWhere((p) => p.magasinId == l.magasinId && p.membreId == membre);
+      e.demarrerCourses(l, membre, null);
+      expect(e.apprend(l), isTrue, reason: 'sans parcours, on propose de l\'enregistrer');
+      final lignes = [...l.lignes.where((g) => e.secteurDe(l.magasinId, g.produitId) != null)];
+      for (final g in lignes.reversed) {
+        g.cocheLe = DateTime(2026, 1, 1, 10, lignes.length - lignes.indexOf(g));
+      }
+      final attendu = e.secteursDansLOrdre(l);
+      expect(attendu, isNotEmpty);
+      e.terminerCourses(l);
+      final appris = e.parcoursDe(l.magasinId, membre).single;
+      expect(appris.etapes, attendu);
+      expect(appris.parDefaut, isTrue);
+      expect(e.parcoursAppris, contains(appris.id));
+    });
+
     test('enregistrement : les données relues sont identiques', () {
       final e = Etat.instance;
       final avant = jsonEncode(e.versJson());
@@ -265,6 +295,7 @@ void main() {
       }
       await _rubrique(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
+      await _voir(tester, find.text('Non rattaché à une course'));
       expect(find.text('Non rattaché à une course'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Mon foyer');
@@ -276,7 +307,8 @@ void main() {
       await _rubrique(tester, 'Archives');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Parcours');
-      expect(find.text('+ Nouveau parcours'), findsOneWidget);
+      expect(find.text('+ Nouveau parcours'), findsNothing, reason: 'les parcours s\'apprennent pendant les courses');
+      expect(find.byType(GroupeRetractable), findsWidgets);
       final mien = Etat.instance.parcoursDuMembre(Etat.instance.moi.id).first;
       await _toucher(tester, find.text(mien.nom).first);
       expect(find.textContaining('Glissez un rayon entier'), findsOneWidget);
@@ -296,6 +328,7 @@ void main() {
       await _rubrique(tester, 'Magasins et catalogue');
       await _toucher(tester, find.text('Magasin 1'));
       await _toucher(tester, _sousOnglet('Produits'));
+      await _toucher(tester, find.text('CRÈMERIE'));
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.text('Gérer › Produits'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -439,6 +472,7 @@ void main() {
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Historique');
+      await _voir(tester, find.text('Non rattaché à une course'));
       expect(find.text('Non rattaché à une course'), findsOneWidget);
       await _toucher(tester, find.text('Rattacher'));
       await _toucher(tester, find.textContaining('Magasin 2').first);
@@ -450,6 +484,7 @@ void main() {
       await _rubrique(tester, 'Magasins et catalogue');
       await _toucher(tester, find.text('Magasin 1'));
       await _toucher(tester, _sousOnglet('Produits'));
+      await _toucher(tester, find.text('NON PLACÉS DANS CE MAGASIN'));
       await _toucher(tester, find.text('Bougies chauffe-plat'));
       await _toucher(tester, find.text('Non placé · indiquer le secteur').first);
       expect(find.textContaining('Touchez son secteur'), findsOneWidget);
