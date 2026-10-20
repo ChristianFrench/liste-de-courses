@@ -53,7 +53,7 @@ Finder _onglet(String l) => find.descendant(of: find.byType(BarreOnglets), match
 void main() {
   setUpAll(_polices);
 
-  testWidgets('19 écrans', (tester) async {
+  testWidgets('écrans', (tester) async {
     final e = Etat.instance;
     e.enregistrementActif = false;
     e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
@@ -89,12 +89,20 @@ void main() {
     await _capture('04 Construire-Promo');
     Nav.i.racine.currentState!.pop();
     await tester.pumpAndSettle();
+    await _toucher(tester, find.descendant(of: lait, matching: find.byType(BoutonPromo)).first);
+    await _capture('20 Construire-Packaging');
+    Nav.i.racine.currentState!.pop();
+    await tester.pumpAndSettle();
     await _toucher(tester, find.byTooltip('Retour'));
 
     await _toucher(tester, _onglet('Gérer'));
     await _capture('19 Gerer');
     await _toucher(tester, find.text('Parcours'));
     await _capture('05 Gerer-Parcours');
+    if (find.text('Parcours habituel').evaluate().isNotEmpty) {
+      await _toucher(tester, find.text('Parcours habituel'));
+      await _capture('21 Parcours-Detail');
+    }
     await _toucher(tester, _onglet('Courses'));
     await _capture('06 Courses');
 
@@ -117,6 +125,7 @@ void main() {
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Magasins et catalogue'));
+    await _capture('22 Magasins');
     await _toucher(tester, find.text('Magasin 1'));
     await _capture('13 Magasin-Rayons');
     await _toucher(tester, find.text('Frais'));
@@ -133,5 +142,15 @@ void main() {
     await _capture('17 Parametres');
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Parametres-Promos');
+    await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.text('Types de packaging'));
+    await _capture('23 Parametres-Packagings');
+
+    for (final (rubrique, nom) in [('Archives', '24 Archives'), ('Mon foyer', '25 Mon-foyer'), ('Corbeille', '26 Corbeille')]) {
+      await _toucher(tester, _onglet('Gérer'));
+      await _toucher(tester, _onglet('Gérer'));
+      await _toucher(tester, find.text(rubrique));
+      await _capture(nom);
+    }
   }, skip: !_actif);
 }
