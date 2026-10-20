@@ -1036,11 +1036,22 @@ class EcranListeComplete extends StatelessWidget {
 
 // ---------------------------------------------------------------- Écrans 8 et 9 : courses par secteur
 
-class EcranCoursesSecteur extends StatelessWidget {
+class EcranCoursesSecteur extends StatefulWidget {
   const EcranCoursesSecteur({super.key, required this.listeId});
   final String listeId;
 
   static String court(String nom) => nom.split(' ').first;
+
+  @override
+  State<EcranCoursesSecteur> createState() => _EcranCoursesSecteurState();
+}
+
+/// Courses : une seule liste, dans l'ordre du parcours, secteur par secteur ; on la fait défiler du doigt.
+/// « Reste à faire » cache les articles déjà cochés (et les secteurs terminés) ; un nouvel appui remet la liste complète.
+class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
+  bool resteAFaire = false;
+  final _titres = <String, GlobalKey>{};
+  bool _place = false;
 
   @override
   Widget build(BuildContext context) {
@@ -1048,7 +1059,7 @@ class EcranCoursesSecteur extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) {
-        final l = etat.liste(listeId);
+        final l = etat.liste(widget.listeId);
         if (l == null || l.statut != StatutListe.enCours) {
           return PageBase(
             entete: const EnTeteTravail(titre: 'Courses'),
@@ -1056,23 +1067,19 @@ class EcranCoursesSecteur extends StatelessWidget {
           );
         }
         final etapes = etat.etapes(l, l.parcoursId);
-        var i = etapes.indexWhere((e) => e.id == l.repriseSecteurId);
-        if (i < 0) i = 0;
         final total = l.lignes.length;
         final titre = '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total';
-        if (etapes.isEmpty) {
-          return PageBase(
-            entete: EnTeteTravail(titre: titre),
-            corps: Center(child: Text('La liste est vide.', style: Charte.texte(16))),
-            bas: [
-              BarreAction(boutons: [Bouton(texte: 'Terminer les courses', plein: true, onTap: () => _terminer(context, l))]),
-            ],
-          );
+        // Secteur où l'on en est : le premier qui a encore un article à cocher.
+        final e = etapes.firstWhere((x) => x.lignes.any((g) => !g.coche), orElse: () => etapes.isEmpty ? Etape(null, []) : etapes.last);
+        _allerALaReprise(l);
+        final numeros = <String, int>{};
+        for (final x in etapes) {
+          if (!x.nonPlace) numeros[x.id] = numeros.length + 1;
         }
-        final e = etapes[i];
-        final cochesSecteur = e.lignes.where((g) => g.coche).length;
-        final termine = cochesSecteur == e.lignes.length;
-        void aller(int k) => etat.etapeCourante(l, etapes[k].id);
+        final visibles = [
+          for (final x in etapes)
+            if (!resteAFaire || x.lignes.any((g) => !g.coche)) x,
+        ];
 
         return PopScope(
           canPop: false,
@@ -1081,69 +1088,48 @@ class EcranCoursesSecteur extends StatelessWidget {
           },
           child: PageBase(
             entete: EnTeteTravail(titre: titre),
-            haut: [
-              BandeauPuces(
-                pastille: false,
-                puces: [
-                  for (var k = 0; k < etapes.length; k++)
-                    Puce(
-                      etapes[k].nonPlace ? '? Non placé' : court(etapes[k].nom),
-                      termine: etapes[k].lignes.every((g) => g.coche),
-                      image: imageEtape(etat, etapes[k]),
-                    ),
-                ],
-                selection: i,
-                onChoix: aller,
-              ),
-              _choixParcours(context, etat, l),
-              Container(
-                height: 52,
-                color: Charte.fondBandeau,
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Row(
-                  children: [
-                    if (imageEtape(etat, e) != null) ...[Pictogramme(imageEtape(etat, e), taille: 44), const SizedBox(width: 10)],
-                    Expanded(
-                      child: Text.rich(
-                        TextSpan(children: [
-                          TextSpan(text: e.nom, style: Charte.texte(16, gras: true)),
-                          if (!e.nonPlace)
-                            TextSpan(text: ' · rayon ${etat.rayon(e.secteur!.rayonId)?.nom ?? ''}', style: Charte.texte(15)),
-                        ]),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Text('$cochesSecteur / ${e.lignes.length} coché${cochesSecteur > 1 ? 's' : ''}', style: Charte.texte(15)),
-                  ],
-                ),
-              ),
-            ],
-            corps: ListView(
-              children: [
-                for (final g in e.lignes) _ligne(etat, l, g),
-                if (termine)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle_outline, size: 20, color: Charte.couleurIcone(Icons.check_circle_outline)),
-                        const SizedBox(width: 8),
-                        Text(i < etapes.length - 1 ? 'Secteur terminé' : 'Tout est coché', style: Charte.texte(15, gras: true)),
+            haut: [_choixParcours(context, etat, l)],
+            corps: etapes.isEmpty
+                ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
+                : ListView(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    children: [
+                      for (final x in visibles) ...[
+                          TitreGroupe(
+                            key: _titres.putIfAbsent(x.id, GlobalKey.new),
+                            nom: x.nom,
+                            numero: numeros[x.id]?.toString(),
+                            nonPlace: x.nonPlace,
+                            image: imageEtape(etat, x),
+                            fort: true,
+                            droite: '${x.lignes.where((g) => g.coche).length} / ${x.lignes.length}',
+                          ),
+                          for (final g in x.lignes)
+                            if (!resteAFaire || !g.coche) _ligne(etat, l, g),
                       ],
-                    ),
+                      if (resteAFaire && visibles.isEmpty)
+                        Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.check_circle_outline, size: 22, color: Charte.couleurIcone(Icons.check_circle_outline)),
+                              const SizedBox(width: 8),
+                              Text('Tout est coché', style: Charte.texte(16, gras: true)),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
-              ],
-            ),
-            // Zone de décision : liste complète, pause, fin des courses (les secteurs se choisissent en haut).
+            // Zone de décision : reste à faire / liste complète, pause, fin des courses.
             bas: [
               BarreAction(boutons: [
                 Bouton(
-                  texte: 'Liste',
-                  icone: Icons.format_list_bulleted,
+                  texte: resteAFaire ? 'Tout' : 'Reste à faire',
+                  icone: resteAFaire ? Icons.format_list_bulleted : Icons.checklist,
                   taille: 16,
-                  onTap: () => Nav.travail(EcranListeComplete(listeId: l.id, depuisCourses: true)),
+                  plein: resteAFaire,
+                  onTap: () => setState(() => resteAFaire = !resteAFaire),
                 ),
                 Bouton(texte: 'Pause', icone: Icons.pause, taille: 16, onTap: () => _pause(context, l, e)),
                 Bouton(
@@ -1158,6 +1144,18 @@ class EcranCoursesSecteur extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// À la reprise de courses interrompues, la liste s'ouvre sur le secteur où l'on s'était arrêté.
+  void _allerALaReprise(Liste l) {
+    if (_place) return;
+    _place = true;
+    final id = l.repriseSecteurId;
+    if (id == null || l.nbCoches == 0) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _titres[id]?.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c);
+    });
   }
 
   Widget _ligne(Etat etat, Liste l, LigneListe g) {

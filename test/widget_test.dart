@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Axis, Scrollable, Text, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show Axis, Scrollable, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
@@ -398,39 +398,36 @@ void main() {
       expect(find.text('PRÊTES POUR LES COURSES'), findsOneWidget);
     });
 
-    testWidgets('9. Pause puis Interrompre ; Reprendre ramène au même secteur avec les mêmes coches', (tester) async {
+    testWidgets('9. Une seule liste dans l\'ordre du parcours ; Reste à faire ; Pause puis Interrompre', (tester) async {
       await _accueil(tester);
       await _toucher(tester, _onglet('Courses'));
       expect(find.text('Courses interrompues'.toUpperCase()), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Reprendre les courses'));
       expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
-      expect(find.textContaining('rayon Frais'), findsOneWidget);
+      expect(find.byType(BandeauPuces), findsNothing, reason: 'plus de barre des secteurs : ils sont dans la liste');
+      expect(find.text('CRÈMERIE'), findsOneWidget);
       await _ciblesTactiles(tester);
 
-      // Cocher un article, aller au secteur suivant, puis Pause
+      // Cocher un article, puis « Reste à faire » : les articles cochés disparaissent ; « Tout » les remet.
       await _toucher(tester, find.text('Fromage râpé'));
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
-      await _toucher(tester, find.textContaining('Charcuterie').last);
+      await _toucher(tester, find.text('Reste à faire'));
+      expect(find.text('Fromage râpé'), findsNothing);
+      await _toucher(tester, find.text('Tout'));
+      expect(find.text('Fromage râpé'), findsOneWidget);
+
       await _toucher(tester, find.text('Pause'));
       expect(find.text('Interrompre les courses ?'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Interrompre'));
       expect(find.text('Courses interrompues'.toUpperCase()), findsOneWidget);
       final l4 = Etat.instance.liste('l4')!;
-      expect(l4.repriseSecteurId, 's4', reason: 'étape enregistrée à l\'interruption');
-      expect(find.textContaining('arrêt au secteur Charcuterie'), findsOneWidget,
-          reason: [for (final w in tester.widgetList<Text>(find.byType(Text))) w.data ?? ''].join(' | '));
+      final premier = Etat.instance.etapes(l4, l4.parcoursId).firstWhere((x) => x.lignes.any((g) => !g.coche));
+      expect(l4.repriseSecteurId, premier.id, reason: 'secteur où l\'on en est, enregistré à l\'interruption');
 
       await _toucher(tester, find.text('Reprendre les courses'));
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
-      expect(find.textContaining('rayon Frais'), findsOneWidget);
-      expect(find.text('Jambon'), findsOneWidget);
-
-      // Liste complète depuis les courses (zone de décision en bas)
-      await _toucher(tester, find.text('Liste'));
-      expect(find.text('Reprendre les courses'), findsOneWidget);
-      await _toucher(tester, find.text('Reprendre les courses'));
 
       // Terminer depuis la zone de décision (articles restants : confirmation)
       await _toucher(tester, find.text('Terminer les courses'));

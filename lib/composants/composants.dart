@@ -741,8 +741,11 @@ class LigneCompacte extends StatelessWidget {
 
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
-  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image});
+  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite});
   final String nom;
+  /// Titre contrasté (couleur d'accent, texte blanc) : sépare nettement les secteurs pendant les courses.
+  final bool fort;
+  final String? droite;
   final String? image;
   final String? numero;
   final bool nonPlace;
@@ -753,8 +756,8 @@ class TitreGroupe extends StatelessWidget {
       width: 20,
       height: 20,
       alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: Charte.encre, width: 1.2)),
-      child: Text(numero ?? '?', style: Charte.texte(11, gras: true)),
+      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: fort ? Charte.blanc : Charte.encre, width: 1.2)),
+      child: Text(numero ?? '?', style: Charte.texte(11, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
     );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -762,16 +765,31 @@ class TitreGroupe extends StatelessWidget {
         if (nonPlace) const TraitPointille(),
         Container(
           height: image != null ? 52 : 30,
-          color: Charte.fondSelection,
+          color: fort ? Charte.accent : Charte.fondSelection,
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
-              if (image != null) ...[Pictogramme(image, taille: 44), const SizedBox(width: 10)],
+              if (image != null) ...[
+                fort
+                    ? Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
+                        alignment: Alignment.center,
+                        child: Pictogramme(image, taille: 38),
+                      )
+                    : Pictogramme(image, taille: 44),
+                const SizedBox(width: 10),
+              ],
               Expanded(
                 child: Text(nom.toUpperCase(),
-                    maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(image != null ? 14 : 12, gras: true, espacement: 0.8)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Charte.texte(image != null ? (fort ? 15 : 14) : 12,
+                        gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
               ),
+              if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
             ],
           ),
         ),

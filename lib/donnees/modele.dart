@@ -1521,7 +1521,7 @@ class Etat extends ChangeNotifier {
   }
 
   /// Couleur d'un type de promotion ou de packaging, ou null.
-  // Sans couleur choisie : couleurs chaudes pour les promotions, froides pour les packagings, selon le rang du type.
+  // Sans couleur choisie : couleurs chaudes pour les promotions selon le rang du type ; une seule couleur pour tous les packagings.
   static const _chaudes = [0xFFE53935, 0xFFFB8C00, 0xFFEC407A, 0xFFFDD835, 0xFF8E24AA, 0xFF8D6E63];
   static const _froides = [0xFF1E88E5, 0xFF00ACC1, 0xFF43A047, 0xFF3949AB, 0xFF00897B, 0xFF7CB342];
   int _rang(String id, List<String> ids) => (ids.indexOf(id) < 0 ? id.hashCode : ids.indexOf(id)).abs();
@@ -1530,7 +1530,7 @@ class Etat extends ChangeNotifier {
       : couleurs['promo:$typeId'] ?? _chaudes[_rang(typeId, [for (final t in typesPromotion) t.id]) % _chaudes.length];
   int? couleurPack(String? packagingId) => packagingId == null
       ? null
-      : couleurs['pack:$packagingId'] ?? _froides[_rang(packagingId, typesPackaging) % _froides.length];
+      : couleurs['pack:$packagingId'] ?? _froides.first;
 
   void choisirCouleur(String cle, int? couleur) {
     if (couleur == null) {

@@ -108,9 +108,9 @@ void main() {
 
     await _toucher(tester, find.text('Reprendre les courses'));
     await _capture('08 Courses-Secteur');
-    await _toucher(tester, find.text('Liste'));
-    await _capture('07 Liste-Complete');
-    await _toucher(tester, find.text('Reprendre les courses'));
+    await _toucher(tester, find.text('Reste à faire'));
+    await _capture('07 Courses-Reste-a-faire');
+    await _toucher(tester, find.text('Tout'));
     await _toucher(tester, find.text('Pause'));
     await _capture('09 Courses-Interrompre');
     await _toucher(tester, find.text('Interrompre'));
