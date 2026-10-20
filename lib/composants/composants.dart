@@ -145,18 +145,27 @@ class EnTeteGestion extends StatelessWidget {
 }
 
 /// Icône blanche sur un carré arrondi de couleur (menus, onglets).
-class IconeCouleur extends StatelessWidget {
-  const IconeCouleur(this.icone, this.couleur, {super.key, this.taille = 40});
-  final IconData icone;
-  final Color couleur;
+/// L'icône de tête d'un élément de liste, la même partout : un rond pâle, l'icône au trait dans la couleur de la palette.
+/// À la place de l'icône : des initiales ([texte]) ou l'image d'un rayon ou d'un secteur ([image]).
+class IconeRonde extends StatelessWidget {
+  const IconeRonde(this.icone, {super.key, this.texte, this.image, this.taille = 44});
+  final IconData? icone;
+  final String? texte;
+  final String? image;
   final double taille;
 
   @override
   Widget build(BuildContext context) => Container(
         width: taille,
         height: taille,
-        decoration: BoxDecoration(color: couleur, borderRadius: BorderRadius.circular(taille * 0.28)),
-        child: Icon(icone, size: taille * 0.6, color: Colors.white),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: image != null ? Charte.blanc : Charte.fondSelection, shape: BoxShape.circle,
+            border: image != null ? Border.all(color: Charte.separateurZone) : null),
+        child: image != null
+            ? Pictogramme(image, taille: taille * 0.8)
+            : texte != null
+                ? Text(texte!, style: Charte.texte(taille * 0.32, gras: true, couleur: Charte.cadre))
+                : Icon(icone, size: taille * 0.55, color: Charte.cadre),
       );
 }
 
@@ -853,7 +862,7 @@ class TitreGroupe extends StatelessWidget {
                   decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, borderRadius: BorderRadius.circular(15)),
                   child: Text('$nombre', style: Charte.texte(15, gras: true, couleur: fort ? Charte.accent : Charte.blanc)),
                 ),
-              if (avancement != null) _Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
+              if (avancement != null) Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
               if (ouvert != null) ...[
                 const SizedBox(width: 4),
                 Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 30, color: fort ? Charte.blanc : Charte.encre),
@@ -977,8 +986,8 @@ class BoutonReduire extends StatelessWidget {
       );
 }
 
-class _Avancement extends StatelessWidget {
-  const _Avancement({required this.fait, required this.total, required this.couleur});
+class Avancement extends StatelessWidget {
+  const Avancement({required this.fait, required this.total, required this.couleur});
   final int fait;
   final int total;
   final Color couleur;
@@ -1640,9 +1649,40 @@ class Carte extends StatelessWidget {
 }
 
 /// Ligne de menu : titre, sous-titre gris, chevron ; zone tactile 44 au moins.
+/// Action courte au bout d'un élément de liste (« Reprendre », « Partir ») : pilule pleine ou à contour.
+class BoutonAction extends StatelessWidget {
+  const BoutonAction(this.texte, {super.key, required this.onTap, this.plein = false});
+  final String texte;
+  final VoidCallback onTap;
+  final bool plein;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: texte,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(22),
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: plein ? Charte.accent : null,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: plein ? Charte.accent : Charte.cadre, width: 1.6),
+            ),
+            child: Text(texte, style: Charte.texte(15, gras: true, couleur: plein ? Charte.blanc : Charte.cadre)),
+          ),
+        ),
+      );
+}
+
+/// L'élément de liste standard : icône ronde en tête, titre, sous-titre, actions ou chevron à droite.
 class LigneMenu extends StatelessWidget {
-  const LigneMenu({super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite});
+  const LigneMenu({super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite, this.icone});
   final String titre;
+  final IconData? icone;
   final String? sousTitre;
   final VoidCallback? onTap;
   final double titreTaille;
@@ -1656,18 +1696,18 @@ class LigneMenu extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(minHeight: 56),
+          constraints: const BoxConstraints(minHeight: 64),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
-              if (gauche != null) ...[gauche!, const SizedBox(width: 12)],
+              if (gauche != null || icone != null) ...[gauche ?? IconeRonde(icone), const SizedBox(width: 12)],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(titre, style: Charte.texte(titreTaille, gras: true)),
+                    Text(titre, style: Charte.texte(17, gras: true)),
                     if (sousTitre != null)
                       Text(sousTitre!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                   ],
@@ -1724,6 +1764,88 @@ class BoutonPause extends StatelessWidget {
 
 /// Dialogue de confirmation : fond assombri, carte centrée, bouton plein + bouton contour.
 /// Renvoie true pour le bouton contour (action secondaire), false pour le bouton plein, null si fermé.
+/// Fenêtre modale des étapes décisives (valider la liste, partir faire les courses, terminer) :
+/// icône ronde et titre, ce qu'il faut savoir ou choisir, puis l'action (bouton plein) et l'annulation.
+/// Rend true si l'action est choisie.
+Future<bool> modale(
+  BuildContext context, {
+  required String titre,
+  required IconData icone,
+  required Widget Function(BuildContext context, StateSetter maj) contenu,
+  required String oui,
+  String non = 'Annuler',
+}) async {
+  final r = await showDialog<bool>(
+    context: context,
+    barrierColor: Charte.voile,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Dialog(
+        backgroundColor: Charte.blanc,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  IconeRonde(icone),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Flexible(child: SingleChildScrollView(child: contenu(ctx, maj))),
+              const SizedBox(height: 18),
+              Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
+              const SizedBox(height: 10),
+              Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+  return r == true;
+}
+
+/// Case à cocher d'une fenêtre modale (ex. : « Enregistrer le parcours »).
+class CaseModale extends StatelessWidget {
+  const CaseModale({super.key, required this.texte, this.aide, required this.coche, required this.onChange});
+  final String texte;
+  final String? aide;
+  final bool coche;
+  final ValueChanged<bool> onChange;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: () => onChange(!coche),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Row(
+            children: [
+              CaseACocher(coche: coche, taille: 26),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(texte, style: Charte.texte(16, gras: true)),
+                    if (aide != null) Text(aide!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+}
+
 Future<bool?> confirmer(
   BuildContext context, {
   required String titre,
@@ -1750,7 +1872,7 @@ Future<bool?> confirmer(
           children: [
             Row(
               children: [
-                if (icone != null) ...[Icon(icone, size: 28, color: Charte.encre), const SizedBox(width: 10)],
+                if (icone != null) ...[IconeRonde(icone), const SizedBox(width: 12)],
                 Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
               ],
             ),

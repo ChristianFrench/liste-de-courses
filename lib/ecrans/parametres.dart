@@ -20,9 +20,15 @@ class EcranFoyer extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Mon foyer'),
         corps: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            const TitreSection('Foyer', cote: 0, haut: 8),
+            GroupeRetractable(
+              cle: 'foyer/nom',
+              titre: 'Foyer',
+              icone: Icons.home_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             Row(
               children: [
                 Expanded(
@@ -40,35 +46,38 @@ class EcranFoyer extends StatelessWidget {
                 }),
               ],
             ),
-            const SizedBox(height: 6),
-            Container(height: 1, color: Charte.separateurLigne),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'foyer/membres',
+              titre: 'Membres',
+              icone: Icons.group_outlined,
+              enfants: [
+                const SizedBox(height: 8),
             for (final m in etat.membres)
               LigneMenu(
                 titre: m.nomAffiche,
-                sousTitre: m.email.isEmpty ? 'Adresse mail : touchez pour l\'indiquer' : m.email,
+                sousTitre: '${m.roleAffiche} · ${m.email.isEmpty ? 'adresse mail : touchez pour l\'indiquer' : m.email}',
                 onTap: () async {
                   final email = await demanderTexte(context,
                       titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
                   if (email != null) etat.modifierEmail(m, email);
                 },
-                gauche: CadrePointille(
-                  rayon: 22,
-                  epaisseur: 1.2,
-                  couleur: const Color(0xFF999999),
-                  child: Container(
-                    width: 44,
-                    height: 44,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(shape: BoxShape.circle, color: Charte.fondSelection),
-                    child: Text(m.initiales, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ),
-                ),
-                droite: m.role == 'administrateur' ? Etiquette(m.roleAffiche) : _EtiquetteFine(m.roleAffiche),
+                gauche: IconeRonde(null, texte: m.initiales),
               ),
-            const SizedBox(height: 12),
-            Carte(
-              chevron: false,
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'foyer/invitation',
+              titre: 'Invitation',
+              icone: Icons.mail_outline,
+              enfants: [
+                const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
               child: Row(
                 children: [
                   Expanded(
@@ -87,6 +96,7 @@ class EcranFoyer extends StatelessWidget {
               ),
             ),
             LigneMenu(
+              icone: Icons.login,
               titre: 'J\'ai reçu un code : rejoindre un foyer',
               titreTaille: 16,
               onTap: () async {
@@ -94,7 +104,9 @@ class EcranFoyer extends StatelessWidget {
                 if (code != null && code.isNotEmpty && context.mounted) Nav.plusTard(context);
               },
             ),
-            const SizedBox(height: 16),
+                const SizedBox(height: 8),
+              ],
+            ),
           ],
         ),
       ),
@@ -139,9 +151,15 @@ class EcranParametres extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Paramètres'),
         corps: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            const TitreSection('Apparence', cote: 0, haut: 8),
+            GroupeRetractable(
+              cle: 'parametres/apparence',
+              titre: 'Apparence',
+              icone: Icons.palette_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
                 style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 8),
@@ -160,22 +178,27 @@ class EcranParametres extends StatelessWidget {
                   ),
               ],
             ),
-            const TitreSection('Listes', cote: 0),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'parametres/listes',
+              titre: 'Listes',
+              icone: Icons.checklist,
+              enfants: [
+                const SizedBox(height: 8),
+
             LigneMenu(
+              icone: Icons.local_offer_outlined,
               titre: 'Types de promotion',
               sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
               onTap: () => Nav.aller(context, const EcranTypesPromotion()),
             ),
             LigneMenu(
+              icone: Icons.inventory_2_outlined,
               titre: 'Types de packaging',
               sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
               onTap: () => Nav.aller(context, const EcranTypesPackaging()),
-            ),
-            _Option(
-              texte: 'Préparer la liste secteur par secteur',
-              aide: 'Sinon, tous les produits du rayon d\'un coup',
-              coche: etat.parSecteurs,
-              onChange: (v) => etat.options(parSecteurs: v),
             ),
             _Option(
               texte: 'Envoyer la liste à tout le foyer',
@@ -184,19 +207,40 @@ class EcranParametres extends StatelessWidget {
               onChange: (v) => etat.options(envoiFoyer: v),
             ),
             LigneMenu(
+              icone: Icons.playlist_add_check,
               titre: 'Préliste',
               sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
               onTap: () => _reglerPreliste(context, etat),
             ),
-            const TitreSection('Comptes magasin (option à étudier)', cote: 0),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'parametres/comptes',
+              titre: 'Comptes magasin (à étudier)',
+              icone: Icons.badge_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             for (final m in etat.magasins.where((m) => m.enseigne.isNotEmpty))
               LigneMenu(
+                icone: Icons.badge_outlined,
                 titre: m.enseigne,
                 sousTitre: 'Identifiant · récupération des tickets',
                 onTap: () => Nav.message(context, 'Récupération par compte magasin : option à étudier'),
               ),
-            const TitreSection('Archives', cote: 0),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'parametres/archives',
+              titre: 'Archives',
+              icone: Icons.inventory_2_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             LigneMenu(
+              icone: Icons.timer_outlined,
               titre: 'Suppression automatique des archives',
               sousTitre: etat.delaiArchives == 0 ? 'Jamais : les archives sont gardées' : 'Après ${etat.delaiArchives} mois',
               onTap: () async {
@@ -205,7 +249,16 @@ class EcranParametres extends StatelessWidget {
                 if (v != null) etat.reglerDelaiArchives(v);
               },
             ),
-            const TitreSection('Données', cote: 0),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'parametres/donnees',
+              titre: 'Données',
+              icone: Icons.storage_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             Bascule(
               options: const ['Mes données', 'Démonstration'],
               index: etat.modeDemo ? 1 : 0,
@@ -220,17 +273,30 @@ class EcranParametres extends StatelessWidget {
             ),
             if (etat.modeDemo)
               LigneMenu(
+                icone: Icons.restart_alt,
                 titre: 'Rétablir les données de démonstration',
                 titreTaille: 16,
                 onTap: () => _reinitialiser(context),
               ),
-            const TitreSection('Essais', cote: 0),
+                const SizedBox(height: 8),
+              ],
+            ),
+            GroupeRetractable(
+              cle: 'parametres/essais',
+              titre: 'Essais',
+              icone: Icons.science_outlined,
+              enfants: [
+                const SizedBox(height: 8),
+
             LigneMenu(
+              icone: Icons.science_outlined,
               titre: 'Produits réels — essai Open Food Facts',
               sousTitre: 'Catalogue de vrais produits gardé sur l\'appareil',
               onTap: () => Nav.aller(context, const EcranProduitsReels()),
             ),
-            const SizedBox(height: 16),
+                const SizedBox(height: 8),
+              ],
+            ),
           ],
         ),
       ),
@@ -281,18 +347,6 @@ class _Compteur extends StatelessWidget {
       );
 }
 
-class _EtiquetteFine extends StatelessWidget {
-  const _EtiquetteFine(this.texte);
-  final String texte;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: Charte.encre, width: 1)),
-        child: Text(texte, style: Charte.texte(12)),
-      );
-}
-
 /// Écran 18 — Paramètres › Types de promotion.
 class EcranTypesPromotion extends StatelessWidget {
   const EcranTypesPromotion({super.key});
@@ -305,12 +359,19 @@ class EcranTypesPromotion extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de promotion'),
         corps: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            const SizedBox(height: 12),
-            Text('Proposés quand on indique une promotion visée sur une ligne de la liste. Touchez un type pour choisir sa couleur.',
-                style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              child: Text('Proposés quand on indique une promotion visée sur une ligne de la liste. Touchez un type pour choisir sa couleur.',
+                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+            GroupeRetractable(
+              cle: 'types/promotion',
+              titre: 'Types de promotion',
+              icone: Icons.local_offer_outlined,
+              nombre: etat.typesPromotion.length,
+              enfants: [
             for (final t in etat.typesPromotion)
               LigneMenu(
                 titre: t.nom,
@@ -335,7 +396,9 @@ class EcranTypesPromotion extends StatelessWidget {
                 etat.ajouterTypePromotion(code.length > 4 ? code.substring(0, 4) : code, nom, '');
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
+              ],
+            ),
           ],
         ),
       ),
@@ -516,28 +579,53 @@ class EcranTypesPackaging extends StatelessWidget {
           ]),
         ],
         corps: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            const SizedBox(height: 12),
-            Text('Les formats de vente proposés pour les articles. Touchez un format pour corriger son libellé '
-                '(tous ses articles sont corrigés), le fusionner avec un autre, voir ses articles ou changer sa couleur.',
-                style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 6),
-            for (final id in etat.typesPackaging)
-              if (etat.packaging(id) case final k?)
-                LigneMenu(
-                  titre: k.libelle,
-                  titreTaille: 17,
-                  sousTitre: '${etat.nbProduitsAvecPackaging(id)} articles',
-                  gauche: _RondCouleur(etat.couleurPack(id)),
-                  onTap: () => _agir(context, etat, id),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
+              child: Text('Les formats de vente proposés pour les articles. Touchez un format pour corriger son libellé '
+                  '(tous ses articles sont corrigés), le fusionner avec un autre, voir ses articles ou changer sa couleur.',
+                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+            // Un groupe par famille de formats : unité, poids, volume, lots et packs.
+            for (final (famille, icone) in const [
+              ('À l\'unité', Icons.category_outlined),
+              ('Au poids', Icons.scale_outlined),
+              ('En volume', Icons.water_drop_outlined),
+              ('Lots et packs', Icons.inventory_2_outlined),
+            ])
+              if ([for (final id in etat.typesPackaging) if (_famille(etat.packaging(id)?.libelle ?? '') == famille) id] case final ids
+                  when ids.isNotEmpty)
+                GroupeRetractable(
+                  cle: 'types/packaging/$famille',
+                  titre: famille,
+                  icone: icone,
+                  nombre: ids.length,
+                  enfants: [
+                    for (final id in ids)
+                      if (etat.packaging(id) case final k?)
+                        LigneMenu(
+                          titre: k.libelle,
+                          sousTitre: '${etat.nbProduitsAvecPackaging(id)} articles',
+                          gauche: _RondCouleur(etat.couleurPack(id)),
+                          onTap: () => _agir(context, etat, id),
+                        ),
+                  ],
                 ),
-            const SizedBox(height: 16),
           ],
         ),
       ),
     );
   }
+}
+
+/// Famille d'un format de vente, pour le ranger dans son groupe.
+String _famille(String libelle) {
+  final l = libelle.toLowerCase();
+  if (RegExp(r'^(lot|pack|paquet|boîte) ').hasMatch(l)) return 'Lots et packs';
+  if (RegExp(r'\d\s*(g|kg)$').hasMatch(l) || l == 'au poids') return 'Au poids';
+  if (RegExp(r'\d\s*(cl|ml|l)$').hasMatch(l)) return 'En volume';
+  return 'À l\'unité';
 }
 
 /// Pastille d'une palette : ses teintes, du plus foncé au plus pâle, et son nom.

@@ -64,15 +64,7 @@ class Charte {
 
   /// Couleur d'une icône d'action, la même partout : rouge pour supprimer, bleu pour modifier…
   static Color couleurIcone(IconData i) {
-    if (i == Icons.delete_outline || i == Icons.close) return rouge;
-    if (i == Icons.edit_outlined || i == Icons.edit_note) return bleu;
-    if (i == Icons.mail_outline) return orange;
-    if (i == Icons.history || i == Icons.schedule) return violet;
-    if (i == Icons.attach_file || i == Icons.link) return turquoise;
-    if (i == Icons.pause || i == Icons.pause_circle_outline || i == Icons.warning_amber_rounded) return orange;
-    if (i == Icons.undo) return orange;
-    if (i == Icons.inventory_2_outlined) return bleu;
-    if (i == Icons.percent || i == Icons.local_offer_outlined) return rouge;
+    // Une seule famille d'icônes : au trait, d'une seule couleur (celle de la palette).
     if (i == Icons.drag_handle || i == Icons.drag_indicator) return texteSecondaire;
     return cadre;
   }

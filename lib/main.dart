@@ -37,8 +37,8 @@ class ListeDeCoursesApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // Écran de reprise au lancement s'il existe des courses en cours ou une préparation interrompue
-      home: Etat.instance.repriseAuLancement ? const EcranRelance() : const Coquille(),
+      // L'accueil montre ce qui est en cours (préparations, courses) avec de quoi le reprendre.
+      home: const Coquille(),
       builder: (context, enfant) => CallbackShortcuts(
         // Sous Windows, Échap = retour système
         bindings: {

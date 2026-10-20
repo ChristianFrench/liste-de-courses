@@ -49,13 +49,11 @@ Future<void> _lancer(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
-/// Lance l'application et passe l'écran de reprise.
+/// Lance l'application (onglet Accueil) et va dans l'onglet Préparer.
 Future<void> _accueil(WidgetTester tester) async {
   await _lancer(tester);
-  if (find.text('Aller à l\'accueil').evaluate().isNotEmpty) {
-    await tester.tap(find.text('Aller à l\'accueil'));
-    await tester.pumpAndSettle();
-  }
+  await tester.tap(_onglet('Préparer'));
+  await tester.pumpAndSettle();
 }
 
 Future<void> _toucher(WidgetTester tester, Finder f) async {
@@ -263,13 +261,13 @@ void main() {
   });
 
   group('Écrans', () {
-    testWidgets('10. écran de reprise au lancement', (tester) async {
+    testWidgets('10. accueil : comment ça marche, et ce qui est en cours à reprendre', (tester) async {
       await _lancer(tester);
-      expect(find.text('Reprendre où vous en étiez ?'), findsOneWidget);
-      expect(find.textContaining('Courses en cours · Magasin 1'), findsOneWidget);
-      expect(find.textContaining('Liste en préparation · Magasin 1'), findsOneWidget);
+      expect(find.text('Bonjour !'), findsOneWidget);
+      expect(find.text('COMMENT ÇA MARCHE'), findsOneWidget);
+      await _voir(tester, find.text('Reprendre').last);
+      expect(find.text('Reprendre'), findsWidgets);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Aller à l\'accueil'));
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
     });
 
@@ -349,7 +347,7 @@ void main() {
     testWidgets('4, 5, 6 et 8. construction : rayons, secteurs, quantités, promotion, reprise', (tester) async {
       await _accueil(tester);
       // Liste interrompue (Magasin 1) : reprise en Crèmerie
-      await _toucher(tester, find.text('Interrompue'));
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
       expect(find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)), findsOneWidget);
       expect(find.text('Il en faut 3 pour la promotion'), findsWidgets);
       await _ciblesTactiles(tester);
@@ -398,7 +396,7 @@ void main() {
       // 8 : quitter puis revenir ramène au même secteur
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
-      await _toucher(tester, find.text('Interrompue'));
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
       expect(find.text('CHARCUTERIE'), findsOneWidget);
 
       // Ma liste : seulement les articles choisis ; Tout : tout le catalogue
@@ -420,7 +418,10 @@ void main() {
       await _toucher(tester, find.text('Liste vide'));
       expect(find.textContaining('Ma liste · 0'), findsOneWidget);
       await _toucher(tester, find.text('Liste prête'));
-      expect(find.text('PRÊTES POUR LES COURSES'), findsOneWidget);
+      expect(find.text('Liste prête ?'), findsOneWidget, reason: 'fenêtre modale de validation');
+      await _ciblesTactiles(tester);
+      await _toucher(tester, find.text('Valider la liste'));
+      expect(find.text('LISTES PRÊTES'), findsOneWidget);
     });
 
     testWidgets('9. Une seule liste dans l\'ordre du parcours ; Reste à faire ; Pause puis Interrompre', (tester) async {
@@ -428,7 +429,7 @@ void main() {
       await _toucher(tester, _onglet('Courses'));
       expect(find.text('Courses interrompues'.toUpperCase()), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Reprendre les courses'));
+      await _toucher(tester, find.text('Reprendre'));
       expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
       expect(find.byType(BandeauPuces), findsNothing, reason: 'plus de barre des secteurs : ils sont dans la liste');
       expect(find.text('CRÈMERIE'), findsOneWidget);
@@ -451,12 +452,13 @@ void main() {
       final premier = Etat.instance.etapes(l4, l4.parcoursId).firstWhere((x) => x.lignes.any((g) => !g.coche));
       expect(l4.repriseSecteurId, premier.id, reason: 'secteur où l\'on en est, enregistré à l\'interruption');
 
-      await _toucher(tester, find.text('Reprendre les courses'));
+      await _toucher(tester, find.text('Reprendre'));
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
 
       // Terminer depuis la zone de décision (articles restants : confirmation)
       await _toucher(tester, find.text('Terminer les courses'));
-      await _toucher(tester, find.text('Terminer'));
+      expect(find.text('Terminer les courses ?'), findsOneWidget);
+      await _toucher(tester, find.text('Terminer les courses').last);
       expect(find.text('Par date'), findsOneWidget);
     });
 
@@ -464,7 +466,10 @@ void main() {
       await _accueil(tester);
       await _toucher(tester, _onglet('Courses'));
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)));
-      if (find.text('Partir').evaluate().isNotEmpty) await _toucher(tester, find.text('Partir'));
+      expect(find.text('Partir faire les courses'), findsOneWidget, reason: 'fenêtre modale de départ');
+      expect(find.text('Enregistrer le parcours'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _toucher(tester, find.text('Partir').last);
       expect(find.text('Pause'), findsOneWidget);
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });

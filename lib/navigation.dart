@@ -13,10 +13,11 @@ class Nav extends ChangeNotifier {
   static final Nav i = Nav._();
 
   // Onglets
-  static const int preparer = 0;
-  static const int courses = 1;
-  static const int gerer = 2;
-  static const int nbOnglets = 3;
+  static const int accueil = 0;
+  static const int preparer = 1;
+  static const int courses = 2;
+  static const int gerer = 3;
+  static const int nbOnglets = 4;
 
   // Rubriques de Gérer
   static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;
@@ -29,7 +30,7 @@ class Nav extends ChangeNotifier {
   final messager = GlobalKey<ScaffoldMessengerState>();
   final piles = List.generate(nbOnglets, (_) => GlobalKey<NavigatorState>());
 
-  int onglet = preparer;
+  int onglet = accueil;
 
   /// Rubrique de Gérer affichée (null : menu de Gérer).
   int? rubrique;
@@ -57,7 +58,7 @@ class Nav extends ChangeNotifier {
   static Widget Function(int rubrique)? ecranRubrique;
 
   void reinitialiser() {
-    onglet = preparer;
+    onglet = accueil;
     rubrique = null;
     sousOnglet
       ..[historique] = coursesEffectuees
@@ -126,8 +127,8 @@ class Nav extends ChangeNotifier {
       pile.pop();
       return;
     }
-    if (onglet != preparer) {
-      onglet = preparer;
+    if (onglet != accueil) {
+      onglet = accueil;
       notifyListeners();
       return;
     }

@@ -97,7 +97,7 @@ class EcranCorbeille extends StatelessWidget {
                 titre: c.libelle,
                 titreTaille: 16,
                 sousTitre: 'Supprimé ${quand(c.le)}',
-                gauche: Icon(_icones[c.type] ?? Icons.delete_outline, size: 26, color: Charte.encre),
+                icone: _icones[c.type] ?? Icons.delete_outline,
                 droite: Lien('Restaurer', taille: 16, onTap: () {
                   final refus = etat.restaurationImpossible(c);
                   if (refus != null) {

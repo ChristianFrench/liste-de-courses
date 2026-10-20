@@ -86,20 +86,17 @@ class EcranArchives extends StatelessWidget {
         () => demanderSuppression(context, l, 'la course du ${jjmm(etat.dateCourses(l))}'),
       );
 
-  Widget _ligne(BuildContext context, String texte, bool pj, VoidCallback? supprimer) => Container(
-        constraints: const BoxConstraints(minHeight: 48),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-        child: Row(
-          children: [
-            Expanded(child: Text(texte, style: Charte.texte(15))),
-            if (pj) const Etiquette('PJ', icone: Icons.attach_file),
-            if (supprimer != null)
-              IconButton(
-                tooltip: 'Supprimer',
-                icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
-                onPressed: supprimer,
-              ),
-          ],
-        ),
+  Widget _ligne(BuildContext context, String texte, bool pj, VoidCallback? supprimer) => LigneMenu(
+        icone: Icons.receipt_long_outlined,
+        titre: texte,
+        droite: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (pj) Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)),
+          if (supprimer != null)
+            IconButton(
+              tooltip: 'Supprimer',
+              icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
+              onPressed: supprimer,
+            ),
+        ]),
       );
 }

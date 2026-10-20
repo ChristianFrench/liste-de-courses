@@ -27,19 +27,19 @@ class SousEcranPreparer extends StatelessWidget {
           GroupeRetractable(
             cle: 'preparer/enPreparation',
             titre: 'En préparation',
-            icone: Icons.edit_note,
+            icone: Icons.checklist,
             nombre: enPreparation.length,
             vide: 'Aucune liste en préparation.',
             enfants: [
               for (final l in enPreparation)
                 LigneMenu(
+                  icone: Icons.checklist,
                   titre: etat.nomListe(l),
                   sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
                       '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
-                      '${l.interrompueLe != null ? quand(l.interrompueLe!) : quandJour(l.modifieeLe ?? l.dateCreation)}',
+                      '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
                   onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
                   droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                    if (l.interrompueLe != null) const Etiquette('Interrompue', pointille: true),
                     BoutonRenommerListe(l),
                     BoutonSupprimerListe(l),
                   ]),
@@ -55,6 +55,7 @@ class SousEcranPreparer extends StatelessWidget {
             enfants: [
               for (final l in pretes)
                 LigneMenu(
+                  icone: Icons.shopping_cart_outlined,
                   titre: etat.nomListe(l),
                   sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
                       '${quandJour(l.modifieeLe ?? l.dateCreation)}',
@@ -186,6 +187,7 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
               enfants: [
                 for (final x in mes.where((x) => x.magasinId == m.id))
                   LigneMenu(
+                    icone: Icons.route_outlined,
                     titre: x.nom,
                     sousTitre: '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
                         '${etat.parcoursAppris.contains(x.id) ? ' · appris pendant les courses' : ''}'
@@ -468,6 +470,72 @@ class _Element {
   final String? etape; // null : ligne du rayon
 }
 
+/// Départ en courses, dans une fenêtre modale : qui fait les courses, quel parcours, enregistrer le parcours,
+/// et les consignes à lire avant de partir.
+Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
+  final etat = Etat.instance;
+  var membreId = etat.moi.id;
+  String parcoursDefaut() => etat.parcoursParDefaut(l.magasinId, membreId)?.id ?? '';
+  var parcoursId = parcoursDefaut();
+  var apprendre = etat.parcoursDe(l.magasinId, membreId).isEmpty;
+  final avecConsigne = l.lignes.where((g) => g.consigne != null).toList();
+  final ok = await modale(
+    context,
+    titre: 'Partir faire les courses',
+    icone: Icons.shopping_cart_outlined,
+    oui: 'Partir',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('${etat.nomListe(l)} · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}', style: Charte.texte(16)),
+        if (etat.membres.length > 1) ...[
+          const SizedBox(height: 12),
+          Text('Courses faites par', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ChoixDeroulant<String>(
+            valeur: membreId,
+            choix: {for (final m in etat.membres) m.id: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche},
+            onChange: (v) => maj(() {
+              membreId = v;
+              parcoursId = parcoursDefaut();
+              apprendre = etat.parcoursDe(l.magasinId, membreId).isEmpty;
+            }),
+          ),
+        ],
+        const SizedBox(height: 12),
+        Text('Parcours', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        ChoixDeroulant<String>(
+          valeur: parcoursId,
+          choix: {for (final p in etat.parcoursDe(l.magasinId, membreId)) p.id: p.nom, '': 'Ordre des rayons'},
+          onChange: (v) => maj(() => parcoursId = v),
+        ),
+        const SizedBox(height: 4),
+        CaseModale(
+          texte: 'Enregistrer le parcours',
+          aide: 'L\'ordre dans lequel vous cocherez les articles donnera l\'ordre des secteurs de ce magasin.',
+          coche: apprendre,
+          onChange: (v) => maj(() => apprendre = v),
+        ),
+        if (avecConsigne.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text('Consignes', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          for (final g in avecConsigne)
+            Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text.rich(TextSpan(children: [
+                TextSpan(text: '${etat.produit(g.produitId)?.nom ?? ''} : ', style: Charte.texte(16, gras: true)),
+                TextSpan(text: g.consigne, style: Charte.texte(16)),
+              ])),
+            ),
+        ],
+      ],
+    ),
+  );
+  if (!ok) return;
+  etat.demarrerCourses(l, membreId, parcoursId.isEmpty ? null : parcoursId);
+  etat.apprendreParcours(l, apprendre);
+  Nav.travail(EcranCoursesSecteur(listeId: l.id));
+}
+
 /// Écran 6 — onglet Courses : les listes prêtes ; un clic montre les consignes éventuelles puis lance les courses.
 class SousEcranCourses extends StatefulWidget {
   const SousEcranCourses({super.key});
@@ -478,50 +546,8 @@ class SousEcranCourses extends StatefulWidget {
 
 class _SousEcranCoursesState extends State<SousEcranCourses> {
   final etat = Etat.instance;
-  late String membreId;
 
-  @override
-  void initState() {
-    super.initState();
-    membreId = etat.moi.id;
-  }
-
-  Future<void> _partir(BuildContext context, Liste l) async {
-    final avecConsigne = l.lignes.where((g) => g.consigne != null).toList();
-    if (avecConsigne.isNotEmpty) {
-      final ok = await showDialog<bool>(
-        context: context,
-        barrierColor: Charte.voile,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: Charte.fond,
-          title: Text('Consignes · ${etat.nomListe(l)}', style: Charte.texte(18, gras: true)),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                for (final g in avecConsigne)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Text.rich(TextSpan(children: [
-                      TextSpan(text: '${etat.produit(g.produitId)?.nom ?? ''} : ', style: Charte.texte(16, gras: true)),
-                      TextSpan(text: g.consigne, style: Charte.texte(16)),
-                    ])),
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Annuler', style: Charte.texte(16))),
-            TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Partir', style: Charte.texte(16, gras: true))),
-          ],
-        ),
-      );
-      if (ok != true) return;
-    }
-    etat.demarrerCourses(l, membreId, etat.parcoursParDefaut(l.magasinId, membreId)?.id);
-    Nav.travail(EcranCoursesSecteur(listeId: l.id));
-  }
+  Future<void> _partir(BuildContext context, Liste l) => partirFaireLesCourses(context, l);
 
   @override
   Widget build(BuildContext context) {
@@ -537,7 +563,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
             titre: 'Courses interrompues',
             icone: Icons.pause_circle_outline,
             nombre: 1,
-            enfants: [const SizedBox(height: 10), _carteInterrompues(context, enCours), const SizedBox(height: 6)],
+            enfants: [_carteInterrompues(context, enCours)],
           ),
         GroupeRetractable(
           cle: 'courses/pretes',
@@ -546,30 +572,17 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           nombre: pretes.length,
           vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
           enfants: [
-            if (pretes.isNotEmpty && etat.membres.length > 1)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(
-                  children: [
-                    Text('Courses faites par', style: Charte.texte(15)),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ChoixDeroulant<String>(
-                        valeur: membreId,
-                        choix: {for (final m in etat.membres) m.id: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche},
-                        onChange: (v) => setState(() => membreId = v),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
             for (final l in pretes)
               LigneMenu(
+                icone: Icons.shopping_cart_outlined,
                 titre: etat.nomListe(l),
                 sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
                     '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''} · touchez pour partir',
                 onTap: () => _partir(context, l),
-                droite: BoutonRemettreEnPreparation(l),
+                droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                  BoutonAction('Partir', onTap: () => _partir(context, l)),
+                  BoutonRemettreEnPreparation(l),
+                ]),
               ),
           ],
         ),
@@ -578,55 +591,19 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
   }
 
   Widget _carteInterrompues(BuildContext context, Liste l) {
-    final total = l.lignes.length;
-    final faits = l.nbCoches;
     final etape = etat.etapes(l, l.parcoursId).where((e) => e.id == l.repriseSecteurId).toList();
     final arret = etape.isEmpty ? '' : ' · arrêt au secteur ${etape.first.nom}';
-    return Carte(
-      chevron: false,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(child: Text(etat.nomListe(l), style: Charte.texte(18, gras: true))),
-              Text('$faits / $total', style: Charte.texte(18, gras: true)),
-              BoutonSupprimerListe(l),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Container(
-              height: 12,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: Charte.cadre, width: 1.5),
-              ),
-              child: FractionallySizedBox(
-                alignment: Alignment.centerLeft,
-                widthFactor: total == 0 ? 0 : faits / total,
-                child: Container(color: Charte.accent),
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '${etat.membre(l.membreId)?.nomAffiche ?? ''}$arret'
-            '${l.interrompueLe != null ? ' · ${quand(l.interrompueLe!)}' : ''}',
-            style: Charte.texte(14, couleur: Charte.texteSecondaire),
-          ),
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.only(right: 6),
-            child: Bouton(
-              texte: 'Reprendre les courses',
-              plein: true,
-              onTap: () => Nav.travail(EcranCoursesSecteur(listeId: l.id)),
-            ),
-          ),
-        ],
-      ),
+    void reprendre() => Nav.travail(EcranCoursesSecteur(listeId: l.id));
+    return LigneMenu(
+      gauche: SizedBox(width: 44, height: 44, child: Center(child: Avancement(fait: l.nbCoches, total: l.lignes.length, couleur: Charte.accent))),
+      titre: '${etat.nomListe(l)} · ${l.nbCoches} / ${l.lignes.length}',
+      sousTitre: '${etat.membre(l.membreId)?.nomAffiche ?? ''}$arret'
+          '${l.interrompueLe != null ? ' · ${quand(l.interrompueLe!)}' : ''}',
+      onTap: reprendre,
+      droite: Row(mainAxisSize: MainAxisSize.min, children: [
+        BoutonAction('Reprendre', plein: true, onTap: reprendre),
+        BoutonSupprimerListe(l),
+      ]),
     );
   }
 }

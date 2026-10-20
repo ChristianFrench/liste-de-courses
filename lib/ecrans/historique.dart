@@ -90,28 +90,15 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             nombre: libres.length,
             enfants: [
           for (final t in libres)
-            Container(
-              constraints: const BoxConstraints(minHeight: 52),
-              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}',
-                            style: Charte.texte(16, gras: true)),
-                        Text('Non rattaché à une course', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                      ],
-                    ),
-                  ),
-                  Lien('Rattacher', onTap: () {
-                    nav.ticketARattacher = t.id;
-                    nav.signaler();
-                    setState(() {});
-                  }),
-                ],
-              ),
+            LigneMenu(
+              icone: Icons.receipt_long_outlined,
+              titre: '${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}',
+              sousTitre: 'Non rattaché à une course',
+              droite: Lien('Rattacher', onTap: () {
+                nav.ticketARattacher = t.id;
+                nav.signaler();
+                setState(() {});
+              }),
             ),
             ],
           ),
@@ -123,47 +110,27 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     final t = etat.ticketDe(c.id);
     final details = [
       '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+      t == null ? 'sans ticket' : 'ticket joint',
       etat.membre(c.membreId)?.nomAffiche ?? '',
       if (t != null && t.montant > 0) euros(t.montant),
     ].where((x) => x.isNotEmpty);
-    return Material(
-      color: Charte.fond,
-      child: InkWell(
-        onTap: aRattacher == null
-            ? null
-            : () {
-                etat.rattacherTicket(aRattacher, c);
-                Nav.i.ticketARattacher = null;
-                Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
-                Nav.i.signaler();
-                setState(() {});
-              },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}', style: Charte.texte(18, gras: true)),
-                    Text(details.join(' · '), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                  ],
-                ),
-              ),
-              if (t != null)
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => ouvrirTicketPdf(context, t),
-                  child: const SizedBox(height: 44, child: Center(child: Etiquette('PJ ticket', icone: Icons.attach_file))),
-                )
-              else
-                Lien('Sans PJ · joindre', onTap: () => joindreTicket(context, etat, c)),
-            ],
-          ),
-        ),
-      ),
+    return LigneMenu(
+      icone: Icons.receipt_long_outlined,
+      titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+      sousTitre: details.join(' · '),
+      onTap: aRattacher == null
+          ? null
+          : () {
+              etat.rattacherTicket(aRattacher, c);
+              Nav.i.ticketARattacher = null;
+              Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
+              Nav.i.signaler();
+              setState(() {});
+            },
+      // Ticket joint : trombone pour l'ouvrir ; sinon, de quoi le joindre.
+      droite: t != null
+          ? BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t))
+          : BoutonIcone(icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
     );
   }
 }

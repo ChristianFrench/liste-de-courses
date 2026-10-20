@@ -74,16 +74,19 @@ void main() {
     });
     await tester.pumpAndSettle();
 
-    await _capture('10 Relance');
-    await _toucher(tester, find.text('Aller à l\'accueil'));
+    await _capture('10 Accueil');
+    await _toucher(tester, _onglet('Préparer'));
     await _capture('01 Main');
 
     await _toucher(tester, find.text('+ Nouvelle liste'));
     await _capture('02 Preliste');
     await _toucher(tester, find.byTooltip('Retour'));
 
-    await _toucher(tester, find.text('Interrompue'));
+    await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
     await _capture('03 Construire');
+    await _toucher(tester, find.text('Liste prête'));
+    await _capture('27 Modale-Liste-prete');
+    await _toucher(tester, find.text('Continuer la préparation'));
     final lait = find.ancestor(of: find.textContaining('Lait demi-écrémé', findRichText: true), matching: find.byType(LigneChoix)).first;
     await _toucher(tester, find.descendant(of: lait, matching: find.byType(Pastille)).last);
     await _capture('04 Construire-Promo');
@@ -106,14 +109,20 @@ void main() {
     await _toucher(tester, _onglet('Courses'));
     await _capture('06 Courses');
 
-    await _toucher(tester, find.text('Reprendre les courses'));
+    await _toucher(tester, find.text('Reprendre'));
     await _capture('08 Courses-Secteur');
     await _toucher(tester, find.text('Reste à faire'));
     await _capture('07 Courses-Reste-a-faire');
     await _toucher(tester, find.text('Tout'));
+    await _toucher(tester, find.text('Terminer les courses'));
+    await _capture('29 Modale-Terminer');
+    await _toucher(tester, find.text('Continuer les courses'));
     await _toucher(tester, find.text('Pause'));
     await _capture('09 Courses-Interrompre');
     await _toucher(tester, find.text('Interrompre'));
+    await _toucher(tester, find.text('Partir'));
+    await _capture('28 Modale-Partir');
+    await _toucher(tester, find.text('Annuler'));
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));

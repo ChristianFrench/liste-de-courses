@@ -111,7 +111,7 @@ class SousEcranListeMagasins extends StatelessWidget {
           LigneMenu(
             titre: m.nom,
             titreTaille: 19,
-            gauche: Icon(Icons.storefront_outlined, size: 28, color: Charte.couleurIcone(Icons.storefront_outlined)),
+            icone: Icons.storefront_outlined,
             sousTitre: '${_pluriel(etat.rayonsDu(m.id).length, 'rayon')} · '
                 '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
             onTap: () => _ouvrir(m.id),
@@ -145,13 +145,15 @@ class SousEcranRayons extends StatelessWidget {
     final m = magasinCourant();
     final rayons = etat.rayonsDu(m);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      padding: const EdgeInsets.only(bottom: 16),
       children: [
-        if (rayons.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: Text("Ce magasin n'a pas encore de rayons.", style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-          ),
+        GroupeRetractable(
+          cle: 'rayons/$m',
+          titre: 'Rayons',
+          icone: Icons.view_agenda_outlined,
+          nombre: rayons.length,
+          vide: "Ce magasin n'a pas encore de rayons.",
+          enfants: [
         if (rayons.isEmpty)
           Bouton(
             texte: 'Remplir avec le catalogue complet',
@@ -167,7 +169,7 @@ class SousEcranRayons extends StatelessWidget {
           LigneMenu(
             titre: r.nom,
             titreTaille: 19,
-            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 52, onTap: () => choisirImageRayon(context, r.nom)),
+            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 44, onTap: () => choisirImageRayon(context, r.nom)),
             sousTitre: '${_pluriel(etat.secteursDu(r.id).length, 'secteur')} · ${_pluriel(etat.nbProduitsRayon(m, r.id), 'produit')}',
             onTap: () {
               Nav.i.filtreRayonSecteurs = r.id;
@@ -196,6 +198,8 @@ class SousEcranRayons extends StatelessWidget {
               Nav.i.signaler();
             }
           },
+        ),
+          ],
         ),
       ],
     );
@@ -334,7 +338,7 @@ class _SousEcranProduitsState extends State<SousEcranProduits> {
     Widget ligne(Produit p) => LigneMenu(
           titre: p.nom,
           titreTaille: 18,
-          gauche: const _Vignette(),
+          icone: Icons.shopping_basket_outlined,
           droite: const SizedBox.shrink(),
           sousTitre: _description(etat, p),
           onTap: () => Nav.aller(context, EcranFicheProduit(produitId: p.id)),
@@ -419,24 +423,6 @@ class _SousEcranProduitsState extends State<SousEcranProduits> {
     ];
     return morceaux.isEmpty ? 'à compléter' : morceaux.join(' · ');
   }
-}
-
-class _Vignette extends StatelessWidget {
-  const _Vignette();
-
-  @override
-  Widget build(BuildContext context) => CadrePointille(
-        rayon: 4,
-        epaisseur: 1.2,
-        couleur: const Color(0xFF999999),
-        child: Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          color: Charte.placeholder,
-          child: Text('IMG', style: Charte.texte(10, couleur: Charte.texteSecondaire)),
-        ),
-      );
 }
 
 /// Écran 16 — Fiche produit (sous-niveau de Gérer › Magasins › Produits).
@@ -637,7 +623,7 @@ class EcranFicheProduit extends StatelessWidget {
 
 Widget _image(BuildContext context, Secteur s) {
   final rayon = Etat.instance.rayon(s.rayonId)?.nom ?? '';
-  return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 46, onTap: () => choisirImageSecteur(context, rayon, s.nom));
+  return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 44, onTap: () => choisirImageSecteur(context, rayon, s.nom));
 }
 
 Future<void> choisirImageRayon(BuildContext context, String rayon) async {

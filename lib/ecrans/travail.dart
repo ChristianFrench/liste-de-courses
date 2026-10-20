@@ -176,50 +176,27 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             )
           : ListView(
               children: [
-                _titre('Dernières courses dans ce magasin · touchez pour choisir'),
-                if (passees.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text('Aucune course terminée avec ses articles dans ce magasin.',
-                        style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                  ),
-                for (final c in passees)
-                  InkWell(
-                    onTap: () => _voirCourse(c),
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 52),
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                      child: Row(
-                        children: [
-                          Icon(Icons.history, size: 20, color: Charte.couleurIcone(Icons.history)),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text.rich(TextSpan(children: [
-                              TextSpan(text: etat.nomListe(c), style: Charte.texte(15, gras: true)),
-                              TextSpan(
-                                text: ' · ${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))}',
-                                style: Charte.secondaire,
-                              ),
-                            ])),
-                          ),
-                          Icon(Icons.chevron_right, color: Charte.couleurIcone(Icons.chevron_right)),
-                        ],
+                GroupeRetractable(
+                  cle: 'preliste/dernieres',
+                  titre: 'Dernières courses dans ce magasin',
+                  icone: Icons.history,
+                  nombre: passees.length,
+                  vide: 'Aucune course terminée avec ses articles dans ce magasin.',
+                  enfants: [
+                    for (final c in passees)
+                      LigneMenu(
+                        icone: Icons.receipt_long_outlined,
+                        titre: etat.nomListe(c),
+                        sousTitre: '${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))} · touchez pour choisir',
+                        onTap: () => _voirCourse(c),
                       ),
-                    ),
-                  ),
+                  ],
+                ),
               ],
             ),
     );
   }
 
-  Widget _titre(String nom) => Container(
-        height: 30,
-        color: Charte.fondBandeau,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        alignment: Alignment.centerLeft,
-        child: Text(nom.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 0.8)),
-      );
 }
 
 /// Écran 3 — Construction par secteur. Chaque action est enregistrée ; quitter ne perd rien.
@@ -354,6 +331,41 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
+  /// Fenêtre modale « Liste prête » : récapitulatif, envoi par mail éventuel, puis la liste passe dans Courses.
+  Future<void> _valider(Liste l) async {
+    var envoyer = false;
+    final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
+    final ok = await modale(
+      context,
+      titre: 'Liste prête ?',
+      icone: Icons.checklist,
+      oui: 'Valider la liste',
+      non: 'Continuer la préparation',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('${etat.nomListe(l)} : ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} '
+              'dans $nbSecteurs secteur${nbSecteurs > 1 ? 's' : ''}.', style: Charte.texte(16)),
+          const SizedBox(height: 6),
+          Text('Elle passe dans l\'onglet Courses ; vous pourrez encore la remettre en préparation.',
+              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 6),
+          CaseModale(
+            texte: 'Envoyer la liste par mail',
+            aide: etat.envoiFoyer ? 'À tout le foyer' : null,
+            coche: envoyer,
+            onChange: (v) => maj(() => envoyer = v),
+          ),
+        ],
+      ),
+    );
+    if (!ok || !mounted) return;
+    if (envoyer) await envoyerListe(etat, l);
+    etat.listePrete(l);
+    Nav.i.retourOnglet(Nav.courses);
+    if (mounted) Nav.message(context, 'Liste prête : elle est dans l\'onglet Courses');
+  }
+
   Future<void> _produitAbsent(Liste l, Secteur s) async {
     final nom = await demanderTexte(context, titre: 'Nouveau produit', aide: 'Nom générique (ex. : Riz)');
     if (nom == null || nom.isEmpty || !mounted) return;
@@ -382,15 +394,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             plein: maListe,
             onTap: () => setState(() => maListe = !maListe),
           ),
-          Bouton(
-            texte: 'Liste prête',
-            plein: !maListe,
-            onTap: () {
-              etat.listePrete(l);
-              Nav.i.retourOnglet(Nav.preparer);
-              Nav.message(context, 'Liste prête : elle apparaît dans l\'onglet Courses');
-            },
-          ),
+          Bouton(texte: 'Liste prête', plein: !maListe, onTap: () => _valider(l)),
         ]);
         final entete = EnTeteTravail(
           titre: etat.nomListe(l),
@@ -1131,7 +1135,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           },
           child: PageBase(
             entete: EnTeteTravail(titre: titre, action: BoutonReduire(cles: [for (final x in etapes) _cle(x.id)])),
-            haut: [_choixParcours(context, etat, l), _apprentissage(etat, l)],
+            haut: [_choixParcours(context, etat, l)],
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
@@ -1193,30 +1197,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   }
 
   String _cle(String etapeId) => 'courses/${widget.listeId}/$etapeId';
-
-  /// « Apprendre le parcours » : l'ordre dans lequel les articles sont cochés donne l'ordre des secteurs,
-  /// enregistré à la fin des courses (nouveau parcours, ou secteurs ajoutés au parcours appris).
-  Widget _apprentissage(Etat etat, Liste l) => Container(
-        height: 48,
-        padding: const EdgeInsets.only(left: 10, right: 4),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-        child: Row(
-          children: [
-            Icon(Icons.school_outlined, size: 20, color: Charte.couleurIcone(Icons.route_outlined)),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(etat.apprend(l) ? 'Parcours enregistré au fil des articles cochés' : 'Enregistrer le parcours',
-                  style: Charte.texte(15), maxLines: 1, overflow: TextOverflow.ellipsis),
-            ),
-            Switch(
-              value: etat.apprend(l),
-              activeThumbColor: Charte.blanc,
-              activeTrackColor: Charte.accent,
-              onChanged: (v) => etat.apprendreParcours(l, v),
-            ),
-          ],
-        ),
-      );
 
   /// À la reprise de courses interrompues, la liste s'ouvre sur le secteur où l'on s'était arrêté.
   void _allerALaReprise(Liste l) {
@@ -1324,18 +1304,37 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     Nav.i.retourOnglet(Nav.courses);
   }
 
+  /// Fenêtre modale « Terminer les courses » : ce qui est coché, ce qui reste, et le parcours enregistré.
   Future<void> _terminer(BuildContext context, Liste l) async {
-    final reste = l.lignes.where((g) => !g.coche).length;
-    if (reste > 0) {
-      final ok = await confirmer(
-        context,
-        titre: 'Terminer les courses ?',
-        contenu: Text('Il reste $reste article${reste > 1 ? 's' : ''} non coché${reste > 1 ? 's' : ''}.', style: Charte.texte(17)),
-        plein: 'Continuer les courses',
-        contour: 'Terminer',
-      );
-      if (ok != true) return;
-    }
+    final etat = Etat.instance;
+    final reste = [for (final g in l.lignes) if (!g.coche) etat.produit(g.produitId)?.nom ?? ''];
+    final secteurs = etat.secteursDansLOrdre(l).length;
+    final ok = await modale(
+      context,
+      titre: 'Terminer les courses ?',
+      icone: Icons.flag_outlined,
+      oui: 'Terminer les courses',
+      non: 'Continuer les courses',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} coché${l.nbCoches > 1 ? 's' : ''} sur ${l.lignes.length}.',
+              style: Charte.texte(16, gras: true)),
+          if (reste.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Text('Non cochés : ${reste.take(8).join(', ')}${reste.length > 8 ? '…' : ''}', style: Charte.texte(15)),
+          ],
+          if (etat.apprend(l) && secteurs > 0) ...[
+            const SizedBox(height: 8),
+            Text('Le parcours de ce magasin est enregistré : $secteurs secteur${secteurs > 1 ? 's' : ''} dans l\'ordre de vos passages.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ],
+          const SizedBox(height: 8),
+          Text('Vous pourrez joindre le ticket PDF dans Gérer › Historique.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        ],
+      ),
+    );
+    if (!ok || !context.mounted) return;
     Etat.instance.terminerCourses(l);
     Nav.i.ouvrirRubrique(Nav.historique, sous: Nav.coursesEffectuees);
     Nav.message(context, 'Courses terminées : joignez le ticket PDF dans Gérer › Historique');
