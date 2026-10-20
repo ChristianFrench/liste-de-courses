@@ -231,13 +231,25 @@ class EcranConstruction extends StatefulWidget {
   State<EcranConstruction> createState() => _EcranConstructionState();
 }
 
+/// Un élément de la liste de préparation : titre de secteur, produit, ou « + Produit absent ».
+class _Element {
+  _Element.titre(this.secteur) : produit = null, absent = false;
+  _Element.produit(this.secteur, Produit this.produit) : absent = false;
+  _Element.absent(Secteur this.secteur) : produit = null, absent = true;
+  final Secteur? secteur; // null : « Non placé »
+  final Produit? produit;
+  final bool absent;
+}
+
+/// Préparation : la même liste que pendant les courses. Tous les secteurs du magasin, dans l'ordre du parcours
+/// (sans parcours : ordre des rayons), chacun sous son bandeau ; on fait défiler du doigt.
+/// « Ma liste » ne garde que les articles choisis ; un nouvel appui (« Tout ») remet tout le catalogue.
 class _EcranConstructionState extends State<EcranConstruction> {
   final etat = Etat.instance;
-  int rayonIndex = 0;
-  int secteurIndex = 0; // -1 : tout le rayon
   static const int seuilHabituel = 5;
-
-  int get _secteurDepart => etat.parSecteurs ? 0 : -1;
+  bool maListe = false;
+  final _defilement = ScrollController();
+  final _titres = <String, GlobalKey>{};
 
   Liste? get liste => etat.liste(widget.listeId);
 
@@ -246,37 +258,84 @@ class _EcranConstructionState extends State<EcranConstruction> {
     super.initState();
     final l = liste;
     if (l == null) return;
-    // Reprise : rayon et secteur où l'on s'était arrêté
-    secteurIndex = _secteurDepart;
-    final rayons = etat.rayonsDu(l.magasinId);
-    final ri = rayons.indexWhere((r) => r.id == l.repriseRayonId);
-    if (ri >= 0) {
-      rayonIndex = ri;
-      final si = etat.secteursDu(rayons[ri].id).indexWhere((s) => s.id == l.repriseSecteurId);
-      if (si >= 0) secteurIndex = si;
+    _ordonner(l);
+    // Reprise : la liste s'ouvre sur le secteur où l'on s'était arrêté.
+    final s = etat.secteur(l.repriseSecteurId ?? '');
+    if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
+  }
+
+  @override
+  void dispose() {
+    _defilement.dispose();
+    super.dispose();
+  }
+
+  /// Secteurs du magasin dans l'ordre du parcours par défaut, puis ceux qu'il ne cite pas.
+  List<Secteur> _secteurs(Liste l) {
+    final ordre = <String>[...(etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.etapes ?? const <String>[])];
+    for (final s in etat.secteursDuMagasin(l.magasinId)) {
+      if (!ordre.contains(s.id)) ordre.add(s.id);
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _noterPosition());
+    return [for (final id in ordre) etat.secteur(id)].whereType<Secteur>().toList();
   }
 
-  void _noterPosition() {
-    final l = liste;
-    if (l == null || l.statut != StatutListe.enConstruction) return;
-    final rayons = etat.rayonsDu(l.magasinId);
-    final r = rayons.isEmpty ? null : rayons[rayonIndex.clamp(0, rayons.length - 1)];
-    final secteurs = r == null ? <Secteur>[] : etat.secteursDu(r.id);
-    final s = secteurs.isEmpty || secteurIndex < 0 ? null : secteurs[secteurIndex.clamp(0, secteurs.length - 1)];
-    etat.positionConstruction(l, r?.id, s?.id);
+  // Ordre des produits figé pendant la préparation : cocher ne déplace rien.
+  // À l'ouverture, les produits choisis passent en premier dans leur secteur, puis les plus achetés.
+  final Map<String, int> _ordre = {};
+
+  void _ordonner(Liste l) {
+    final tous = [for (final s in etat.secteursDuMagasin(l.magasinId)) ...etat.produitsDu(l.magasinId, s.id)]..sort((a, b) {
+        final ca = etat.ligne(l, a.id) != null ? 0 : 1;
+        final cb = etat.ligne(l, b.id) != null ? 0 : 1;
+        return ca != cb ? ca.compareTo(cb) : b.nbUtilisations.compareTo(a.nbUtilisations);
+      });
+    _ordre
+      ..clear()
+      ..addAll({for (var i = 0; i < tous.length; i++) tous[i].id: i});
   }
 
-  void _allerA(Liste l, Secteur s) {
-    final rayons = etat.rayonsDu(l.magasinId);
-    final ri = rayons.indexWhere((r) => r.id == s.rayonId);
-    if (ri < 0) return;
-    setState(() {
-      rayonIndex = ri;
-      secteurIndex = etat.secteursDu(rayons[ri].id).indexWhere((x) => x.id == s.id).clamp(0, 999);
+  List<_Element> _elements(Liste l) {
+    final res = <_Element>[];
+    for (final s in _secteurs(l)) {
+      final produits = [
+        for (final p in etat.produitsDu(l.magasinId, s.id))
+          if (!maListe || etat.ligne(l, p.id) != null) p,
+      ]..sort((a, b) => (_ordre[a.id] ?? 1 << 20).compareTo(_ordre[b.id] ?? 1 << 20));
+      if (maListe && produits.isEmpty) continue;
+      res.add(_Element.titre(s));
+      for (final p in produits) {
+        res.add(_Element.produit(s, p));
+      }
+      if (!maListe) res.add(_Element.absent(s));
+    }
+    final nonPlaces = [
+      for (final g in l.lignes)
+        if (etat.secteurDe(l.magasinId, g.produitId) == null) etat.produit(g.produitId),
+    ].whereType<Produit>().toList();
+    if (nonPlaces.isNotEmpty) {
+      res.add(_Element.titre(null));
+      for (final p in nonPlaces) {
+        res.add(_Element.produit(null, p));
+      }
+    }
+    return res;
+  }
+
+  /// Fait venir le bandeau d'un secteur en haut de l'écran (hauteurs estimées, puis ajustement).
+  void _allerA(Liste l, Secteur s, {bool noter = true}) {
+    if (noter) etat.positionConstruction(l, s.rayonId, s.id);
+    if (!_defilement.hasClients) return;
+    final elements = _elements(l);
+    var y = 0.0;
+    for (final e in elements) {
+      if (e.produit == null && !e.absent && e.secteur?.id == s.id) break;
+      y += e.produit == null ? 52 : (etat.ligne(l, e.produit!.id) != null ? 110 : Charte.ligneCourses);
+    }
+    _defilement.jumpTo(y.clamp(0, _defilement.position.maxScrollExtent));
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _titres[s.id]?.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c);
     });
-    _noterPosition();
   }
 
   Future<void> _rechercher(Liste l) async {
@@ -291,24 +350,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
-  Future<void> _produitAbsent(Liste l, Rayon rayon, Secteur? s) async {
-    // « Tout le rayon » : le produit doit quand même aller dans un secteur de ce rayon.
-    if (s == null) {
-      final secteurs = etat.secteursDu(rayon.id);
-      if (secteurs.length == 1) {
-        s = secteurs.first;
-      } else if (secteurs.isNotEmpty) {
-        final sid = await choisirDansListe<String>(context,
-            titre: 'Dans quel secteur de ${rayon.nom} ?', choix: {for (final x in secteurs) x.id: x.nom});
-        if (sid == null || !mounted) return;
-        s = etat.secteur(sid);
-      }
-    }
-    if (!mounted) return;
+  Future<void> _produitAbsent(Liste l, Secteur s) async {
     final nom = await demanderTexte(context, titre: 'Nouveau produit', aide: 'Nom générique (ex. : Riz)');
     if (nom == null || nom.isEmpty || !mounted) return;
     final p = etat.creerProduit(nom);
-    if (s != null) etat.placer(l.magasinId, p.id, s.id);
+    etat.placer(l.magasinId, p.id, s.id);
     Nav.travail(EcranFicheProduit(produitId: p.id, listeId: l.id));
   }
 
@@ -324,12 +370,17 @@ class _EcranConstructionState extends State<EcranConstruction> {
             corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
           );
         }
-        final rayons = etat.rayonsDu(l.magasinId);
         final barre = BarreAction(boutons: [
-          Bouton(texte: 'Ma liste · ${l.lignes.length}', onTap: () => Nav.travail(EcranListeComplete(listeId: l.id))),
+          Bouton(
+            texte: maListe ? 'Tout' : 'Ma liste · ${l.lignes.length}',
+            icone: maListe ? Icons.format_list_bulleted : Icons.checklist,
+            taille: 16,
+            plein: maListe,
+            onTap: () => setState(() => maListe = !maListe),
+          ),
           Bouton(
             texte: 'Liste prête',
-            plein: true,
+            plein: !maListe,
             onTap: () {
               etat.listePrete(l);
               Nav.i.retourOnglet(Nav.preparer);
@@ -340,9 +391,20 @@ class _EcranConstructionState extends State<EcranConstruction> {
         final entete = EnTeteTravail(
           titre: etat.nomListe(l),
           sousTitre: 'Enregistré',
-          action: BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
+          action: Row(mainAxisSize: MainAxisSize.min, children: [
+            BoutonIcone(
+              icone: Icons.mail_outline,
+              libelle: 'Envoyer par mail',
+              onTap: () async {
+                if (!await envoyerListe(etat, l) && context.mounted) {
+                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
+                }
+              },
+            ),
+            BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
+          ]),
         );
-        if (rayons.isEmpty) {
+        if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
           return PageBase(
             entete: entete,
             corps: Padding(
@@ -353,89 +415,57 @@ class _EcranConstructionState extends State<EcranConstruction> {
             bas: [barre],
           );
         }
-        if (rayonIndex >= rayons.length) rayonIndex = 0;
-        final rayon = rayons[rayonIndex];
-        final secteurs = etat.secteursDu(rayon.id);
-        if (secteurIndex >= secteurs.length) secteurIndex = 0;
-        final secteur = secteurs.isEmpty || secteurIndex < 0 ? null : secteurs[secteurIndex];
-        final produits = secteurIndex < 0
-            ? [for (final s in secteurs) ...etat.produitsDu(l.magasinId, s.id)]
-            : secteur == null
-                ? <Produit>[]
-                : etat.produitsDu(l.magasinId, secteur.id);
-        _ordonner(l, produits);
+        final elements = _elements(l);
+        final numeros = <String, int>{};
+        for (final e in elements) {
+          if (e.produit == null && !e.absent && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
+        }
 
         return PageBase(
           entete: entete,
-          haut: [
-            BandeauPuces(
-              puces: [
-                for (final r in rayons) Puce(r.nom, compteur: etat.nbDansRayon(l, r.id), image: cleRayon(r.nom)),
-              ],
-              selection: rayonIndex,
-              onChoix: (i) {
-                setState(() {
-                  rayonIndex = i;
-                  secteurIndex = _secteurDepart;
-                });
-                _noterPosition();
-              },
-            ),
-            BandeauPuces(
-              pastille: false,
-              fond: Charte.fondBandeau,
-              puces: [
-                Puce('Tout le rayon', compteur: etat.nbDansRayon(l, rayon.id)),
-                for (final s in secteurs)
-                  Puce(s.nom, compteur: etat.nbDansSecteur(l, s.id), image: cleSecteur(rayon.nom, s.nom)),
-              ],
-              selection: secteurIndex + 1,
-              onChoix: (i) {
-                setState(() => secteurIndex = i - 1);
-                _noterPosition();
-              },
-            ),
-          ],
-          corps: ListView(
-            children: [
-              for (final p in produits) _ligne(l, p),
-              InkWell(
-                onTap: () => _produitAbsent(l, rayon, secteur),
-                child: Container(
-                  height: 44,
-                  alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                  child: Text(secteur == null ? '+ Produit absent de ce rayon' : '+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          corps: elements.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text('La liste est vide.', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                )
+              : ListView.builder(
+                  controller: _defilement,
+                  padding: const EdgeInsets.only(bottom: 16),
+                  itemCount: elements.length,
+                  itemBuilder: (context, i) {
+                    final e = elements[i];
+                    final s = e.secteur;
+                    if (e.produit != null) {
+                      return _ligne(l, e.produit!);
+                    }
+                    if (e.absent) {
+                      return InkWell(
+                        onTap: () => _produitAbsent(l, s!),
+                        child: Container(
+                          height: 44,
+                          alignment: Alignment.centerLeft,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                          child: Text('+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                        ),
+                      );
+                    }
+                    final r = s == null ? null : etat.rayon(s.rayonId);
+                    return TitreGroupe(
+                      key: _titres.putIfAbsent(s?.id ?? 'nonPlace', GlobalKey.new),
+                      nom: s?.nom ?? 'Non placé',
+                      numero: s == null ? null : numeros[s.id]?.toString(),
+                      nonPlace: s == null,
+                      image: r == null ? null : cleSecteur(r.nom, s!.nom),
+                      fort: true,
+                      nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
+                    );
+                  },
                 ),
-              ),
-            ],
-          ),
           bas: [barre],
         );
       },
     );
-  }
-
-  // Ordre des produits figé tant qu'on reste sur le même rayon ou secteur : cocher ne déplace rien.
-  // En revenant sur ce rayon ou ce secteur, les produits choisis passent en premier.
-  String? _ordreCle;
-  final Map<String, int> _ordre = {};
-
-  void _ordonner(Liste l, List<Produit> produits) {
-    final cle = '$rayonIndex/$secteurIndex';
-    if (cle != _ordreCle) {
-      _ordreCle = cle;
-      final tri = [...produits]..sort((a, b) {
-          final ca = etat.ligne(l, a.id) != null ? 0 : 1;
-          final cb = etat.ligne(l, b.id) != null ? 0 : 1;
-          return ca != cb ? ca.compareTo(cb) : b.nbUtilisations.compareTo(a.nbUtilisations);
-        });
-      _ordre
-        ..clear()
-        ..addAll({for (var i = 0; i < tri.length; i++) tri[i].id: i});
-    }
-    produits.sort((a, b) => (_ordre[a.id] ?? 1 << 20).compareTo(_ordre[b.id] ?? 1 << 20));
   }
 
   Widget _ligne(Liste l, Produit p) {
@@ -458,7 +488,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
       onPackaging: g == null ? null : () => ouvrirFeuillePromotion(context, l, g, packaging: true),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
-      onTap: () => etat.basculer(l, p.id),
+      onTap: () {
+        etat.basculer(l, p.id);
+        final s = etat.secteurDe(l.magasinId, p.id);
+        if (s != null) etat.positionConstruction(l, s.rayonId, s.id);
+      },
       onQuantite: (q) => etat.quantite(l, p.id, q),
     );
   }

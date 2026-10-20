@@ -524,40 +524,34 @@ class LigneChoix extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: coche ? Charte.fondSelection : Charte.fond,
+      color: Charte.fond,
       child: InkWell(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(minHeight: Charte.ligneConstruction),
+          constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
           decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Row(
             children: [
-              CaseACocher(coche: coche),
-              const SizedBox(width: 10),
+              CaseACocher(coche: coche, taille: 28),
+              const SizedBox(width: 12),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text.rich(
-                        TextSpan(children: [
-                          TextSpan(text: nom, style: Charte.texte(coche ? 16 : 15, gras: coche)),
-                          if (complement.isNotEmpty) TextSpan(text: ' · $complement', style: Charte.secondaire),
-                        ]),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      // Même présentation que la ligne des courses : nom, pastilles, complément.
+                      Text(nom, maxLines: 2, overflow: TextOverflow.ellipsis, style: Charte.texte(17, gras: coche)),
                       // Comme pendant les courses : packaging et promotion en clair sous le nom ; un appui les choisit.
                       if (coche && (onPackaging != null || onPromo != null))
                         Wrap(
-                          spacing: 8,
+                          spacing: 6,
                           children: [
                             if (onPackaging != null)
                               Pastille(codePackaging ?? '+ Packaging',
@@ -566,6 +560,9 @@ class LigneChoix extends StatelessWidget {
                               Pastille(codePromo ?? '+ Promo', couleur: couleurPromo ?? Charte.rouge, vide: codePromo == null, onTap: onPromo),
                           ],
                         ),
+                      if (complement.isNotEmpty)
+                        Text(complement,
+                            maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(12, couleur: Charte.texteSecondaire)),
                     ],
                   ),
                 ),
@@ -583,7 +580,7 @@ class LigneChoix extends StatelessWidget {
             ],
           ),
           if (alerte != null)
-            Padding(padding: const EdgeInsets.only(left: 32, bottom: 4), child: AlerteQuantite(requise: alerte!)),
+            Padding(padding: const EdgeInsets.only(left: 40, bottom: 4), child: AlerteQuantite(requise: alerte!)),
             ],
           ),
         ),
@@ -682,7 +679,7 @@ class Pastille extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = couleur;
     final cadre = Container(
-      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : (onTap != null ? 9 : 7), vertical: petite ? 0 : (onTap != null ? 4 : 1)),
+      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : 7, vertical: petite ? 0 : 1),
       decoration: BoxDecoration(
         color: c == null
             ? Charte.fondBandeau
@@ -691,10 +688,10 @@ class Pastille extends StatelessWidget {
         border: Border.all(color: c == null ? Charte.separateurZone : (vide ? c.withValues(alpha: 0.45) : c), width: 1.2),
       ),
       child: Text(texte,
-          style: Charte.texte(petite ? 11 : (onTap != null ? 14 : 13), gras: true, couleur: vide && c != null ? c : Charte.encre)),
+          style: Charte.texte(petite ? 11 : 13, gras: true, couleur: vide && c != null ? c : Charte.encre)),
     );
     if (onTap == null) return cadre;
-    // Zone tactile d'au moins 44 de haut autour du cadre.
+    // Zone tactile agrandie autour du cadre (même aspect que pendant les courses).
     return Semantics(
       button: true,
       label: texte,
@@ -764,13 +761,15 @@ class LigneCompacte extends StatelessWidget {
 
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
-  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite, this.avancement});
+  const TitreGroupe({super.key, required this.nom, this.numero, this.nonPlace = false, this.image, this.fort = false, this.droite, this.avancement, this.nombre});
   final String nom;
   /// Titre contrasté (couleur d'accent, texte blanc) : sépare nettement les secteurs pendant les courses.
   final bool fort;
   final String? droite;
   /// Avancement du secteur (cochés, total) : anneau qui se remplit, coche quand tout est fait.
   final (int, int)? avancement;
+  /// Nombre d'articles choisis dans le secteur (préparation), dans une pastille blanche.
+  final int? nombre;
   final String? image;
   final String? numero;
   final bool nonPlace;
@@ -815,6 +814,15 @@ class TitreGroupe extends StatelessWidget {
                         gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
               ),
               if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
+              if (nombre != null && nombre! > 0)
+                Container(
+                  constraints: const BoxConstraints(minWidth: 30),
+                  height: 30,
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, borderRadius: BorderRadius.circular(15)),
+                  child: Text('$nombre', style: Charte.texte(15, gras: true, couleur: fort ? Charte.accent : Charte.blanc)),
+                ),
               if (avancement != null) _Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
             ],
           ),

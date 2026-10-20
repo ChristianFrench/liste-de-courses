@@ -355,34 +355,26 @@ void main() {
       await _toucher(tester, find.descendant(of: beurre, matching: find.text('−')));
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsNothing);
 
-      // 4 : changer de rayon et de secteur met à jour produits et compteurs
-      await _toucher(tester, find.textContaining('Épicerie').first);
-      expect(find.textContaining('Pâtes', findRichText: true), findsOneWidget);
-      await _toucher(tester, find.text('Frais').first);
-      await _toucher(tester, find.text('Charcuterie').first);
-      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
+      // 4 : une seule liste, comme en courses : plus de barres de rayons et de secteurs
+      expect(find.byType(BandeauPuces), findsNothing);
+      expect(find.byType(TitreGroupe), findsWidgets);
+      await tester.dragUntilVisible(find.text('CHARCUTERIE'), find.byType(Scrollable).last, const Offset(0, -300));
+      await _toucher(tester, find.textContaining('Jambon', findRichText: true));
+      expect(Etat.instance.liste('l1')!.repriseSecteurId, 's4', reason: 'secteur du dernier article touché');
 
       // 8 : quitter puis revenir ramène au même secteur
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('+ Nouvelle liste'), findsOneWidget);
       await _toucher(tester, find.text('Interrompue'));
-      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
-      expect(Etat.instance.liste('l1')!.repriseSecteurId, 's4');
+      expect(find.text('CHARCUTERIE'), findsOneWidget);
 
-      // Ma liste → liste complète
-      await _toucher(tester, find.textContaining('Ma liste'));
-      await tester.dragUntilVisible(find.text('NON PLACÉ'), find.byType(Scrollable).last, const Offset(0, -300));
-      expect(find.text('NON PLACÉ'), findsOneWidget);
+      // Ma liste : seulement les articles choisis ; Tout : tout le catalogue
+      final n = Etat.instance.liste('l1')!.lignes.length;
+      await _toucher(tester, find.text('Ma liste · $n'));
+      expect(find.text('+ Produit absent de ce secteur'), findsNothing);
+      expect(find.textContaining('Œufs', findRichText: true), findsNothing);
+      await _toucher(tester, find.text('Tout'));
       await _ciblesTactiles(tester);
-    });
-
-    testWidgets('construction : « Tout le rayon » montre les produits de tous ses secteurs', (tester) async {
-      await _accueil(tester);
-      await _toucher(tester, find.text('Interrompue'));
-      await _toucher(tester, find.text('Tout le rayon'));
-      expect(find.textContaining('Jambon', findRichText: true), findsOneWidget);
-      expect(find.textContaining('Lait demi-écrémé', findRichText: true), findsOneWidget);
-      expect(find.text('+ Produit absent de ce rayon'), findsNothing); // en bas de la liste, pas encore construit
     });
 
     testWidgets('2. nouvelle liste : la préliste coche les produits fréquents', (tester) async {
