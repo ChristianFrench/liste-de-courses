@@ -26,6 +26,26 @@ remplacer("android/app/src/main/AndroidManifest.xml",
 remplacer("android/app/src/main/AndroidManifest.xml",
           r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.INTERNET"/>', regex=True)
 
+# Android : toutes les versions signées avec la même clé (outils/android/debug.keystore),
+# pour qu'une nouvelle version s'installe par-dessus l'ancienne en gardant les données
+remplacer("android/app/build.gradle.kts",
+          """    buildTypes {
+        release {""",
+          """    signingConfigs {
+        create("essai") {
+            storeFile = rootProject.file("../outils/android/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
+    buildTypes {
+        release {""")
+remplacer("android/app/build.gradle.kts",
+          'signingConfig = signingConfigs.getByName("debug")',
+          'signingConfig = signingConfigs.getByName("essai")')
+
 # iPhone : nom sous l'icône
 remplacer("ios/Runner/Info.plist",
           r"(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)",
