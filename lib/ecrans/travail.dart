@@ -256,14 +256,17 @@ class EcranConstruction extends StatefulWidget {
   State<EcranConstruction> createState() => _EcranConstructionState();
 }
 
-/// Un élément de la liste de préparation : titre de secteur, produit, ou « + Produit absent ».
+/// Un élément de la liste de préparation : titre de rayon, titre de secteur, produit, ou « + Produit absent ».
 class _Element {
-  _Element.titre(this.secteur) : produit = null, absent = false;
-  _Element.produit(this.secteur, Produit this.produit) : absent = false;
-  _Element.absent(Secteur this.secteur) : produit = null, absent = true;
+  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false;
+  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false;
+  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false;
+  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true;
+  final Rayon? rayon;
   final Secteur? secteur; // null : « Non placé »
   final Produit? produit;
   final bool absent;
+  bool get titreSecteur => rayon == null && produit == null && !absent;
 }
 
 /// Préparation : la même liste que pendant les courses. Tous les secteurs du magasin, dans l'ordre du parcours
@@ -283,8 +286,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
     super.initState();
     final l = liste;
     if (l == null) return;
-    // À l'ouverture, tous les secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
-    Retractables.i.fixer([for (final s in _secteurs(l)) _cle(s.id), _cle('nonPlace')], false);
+    // À l'ouverture, rayons et secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
+    Retractables.i.fixer(_toutesLesCles(l), false);
     final s = etat.secteur(l.repriseSecteurId ?? '');
     if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
   }
@@ -304,14 +307,22 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return [for (final id in ordre) etat.secteur(id)].whereType<Secteur>().toList();
   }
 
+  /// Rayons, puis leurs secteurs, puis leurs produits : chaque niveau se déplie au doigt.
   List<_Element> _elements(Liste l) {
     final res = <_Element>[];
+    String? rayonCourant;
     for (final s in _secteurs(l)) {
       final produits = [
         for (final p in etat.produitsDu(l.magasinId, s.id))
           if (!maListe || etat.ligne(l, p.id) != null) p,
       ]..sort((a, b) => ordreAlpha(a.nom).compareTo(ordreAlpha(b.nom)));
       if (maListe && produits.isEmpty) continue;
+      if (s.rayonId != rayonCourant) {
+        rayonCourant = s.rayonId;
+        final r = etat.rayon(s.rayonId);
+        if (r != null) res.add(_Element.rayon(r));
+      }
+      if (!Retractables.i.ouvert(_cleRayon(s.rayonId))) continue;
       res.add(_Element.titre(s));
       if (!Retractables.i.ouvert(_cle(s.id))) continue;
       for (final p in produits) {
@@ -333,14 +344,33 @@ class _EcranConstructionState extends State<EcranConstruction> {
   }
 
   String _cle(String secteurId) => 'preparation/${widget.listeId}/$secteurId';
+  String _cleRayon(String rayonId) => 'preparation/${widget.listeId}/rayon/$rayonId';
 
-  /// Un seul secteur ouvert : ouvrir un secteur replie les autres.
-  void _ouvrirSeul(Liste l, String secteurId) {
+  List<String> _toutesLesCles(Liste l) => [
+        for (final s in _secteurs(l)) ...[_cle(s.id), _cleRayon(s.rayonId)],
+        _cle('nonPlace'),
+      ];
+
+  /// Un seul rayon ouvert : ouvrir un rayon replie les autres rayons et tous les secteurs.
+  void _ouvrirRayon(Liste l, String rayonId) {
     Retractables.i.tous([
-      for (final s in _secteurs(l))
+      for (final s in _secteurs(l)) ...[_cle(s.id), if (s.rayonId != rayonId) _cleRayon(s.rayonId)],
+      _cle('nonPlace'),
+    ], false);
+    if (!Retractables.i.ouvert(_cleRayon(rayonId))) Retractables.i.basculer(_cleRayon(rayonId));
+  }
+
+  /// Un seul secteur ouvert : ouvrir un secteur replie les autres (et ouvre son rayon, seul).
+  void _ouvrirSeul(Liste l, String secteurId) {
+    final rayonId = etat.secteur(secteurId)?.rayonId;
+    Retractables.i.tous([
+      for (final s in _secteurs(l)) ...[
         if (s.id != secteurId) _cle(s.id),
+        if (s.rayonId != rayonId) _cleRayon(s.rayonId),
+      ],
       if (secteurId != 'nonPlace') _cle('nonPlace'),
     ], false);
+    if (rayonId != null && !Retractables.i.ouvert(_cleRayon(rayonId))) Retractables.i.basculer(_cleRayon(rayonId));
     if (!Retractables.i.ouvert(_cle(secteurId))) Retractables.i.basculer(_cle(secteurId));
   }
 
@@ -371,7 +401,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final elements = _elements(l);
     var y = 0.0;
     for (final e in elements) {
-      if (e.produit == null && !e.absent && e.secteur?.id == s.id) break;
+      if (e.titreSecteur && e.secteur?.id == s.id) break;
       y += e.produit == null ? 52 : (etat.ligne(l, e.produit!.id) != null ? 110 : Charte.ligneCourses);
     }
     _defilement.jumpTo(y.clamp(0, _defilement.position.maxScrollExtent));
@@ -505,7 +535,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
               },
             ),
             BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
-            BoutonReduire(cles: [for (final s in _secteurs(l)) _cle(s.id), _cle('nonPlace')]),
+            BoutonReduire(cles: _toutesLesCles(l)),
           ]),
         );
         if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
@@ -522,7 +552,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
         final elements = _elements(l);
         final numeros = <String, int>{};
         for (final e in elements) {
-          if (e.produit == null && !e.absent && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
+          if (e.titreSecteur && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
         }
 
         return PageBase(
@@ -539,6 +569,19 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   itemBuilder: (context, i) {
                     final e = elements[i];
                     final s = e.secteur;
+                    if (e.rayon != null) {
+                      final r = e.rayon!;
+                      final cle = _cleRayon(r.id);
+                      return TitreGroupe(
+                        nom: r.nom,
+                        image: cleRayon(r.nom),
+                        icone: Icons.view_week_outlined,
+                        fort: true,
+                        nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
+                        ouvert: Retractables.i.ouvert(cle),
+                        onTap: () => Retractables.i.ouvert(cle) ? Retractables.i.basculer(cle) : _ouvrirRayon(l, r.id),
+                      );
+                    }
                     if (e.produit != null) {
                       return _ligne(l, e.produit!);
                     }
@@ -561,7 +604,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       numero: s == null ? null : numeros[s.id]?.toString(),
                       nonPlace: s == null,
                       image: r == null ? null : cleSecteur(r.nom, s!.nom),
-                      fort: true,
                       nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
                       ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
                       onTap: () => Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace'))

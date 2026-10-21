@@ -446,6 +446,9 @@ void main() {
       // Un seul secteur ouvert : ouvrir Charcuterie replie Crèmerie
       await _toucher(tester, find.text('CHARCUTERIE'));
       expect(find.textContaining('Beurre doux', findRichText: true), findsNothing);
+      // Rayons repliables au-dessus de leurs secteurs : Frais est ouvert, les autres repliés
+      expect(find.text('FRAIS'), findsOneWidget);
+      await _voir(tester, find.textContaining('Jambon', findRichText: true));
       final jambon = find.ancestor(of: find.textContaining('Jambon', findRichText: true), matching: find.byType(LigneChoix)).first;
       await _toucher(tester, find.descendant(of: jambon, matching: find.byType(CaseACocher)));
       expect(Etat.instance.liste('l1')!.repriseSecteurId, 's4', reason: 'secteur du dernier article touché');
@@ -463,6 +466,12 @@ void main() {
       expect(find.textContaining('Œufs', findRichText: true), findsNothing);
       await _toucher(tester, find.text('Tout'));
       await _ciblesTactiles(tester);
+
+      // Un seul rayon ouvert : ouvrir Épicerie replie Frais
+      await _toucher(tester, find.text('ÉPICERIE').first);
+      expect(find.text('CHARCUTERIE'), findsNothing);
+      await _voir(tester, find.text('PETIT-DÉJEUNER'));
+      expect(find.text('PETIT-DÉJEUNER'), findsOneWidget);
     });
 
     testWidgets('2. nouvelle liste : la préliste coche les produits fréquents', (tester) async {
@@ -475,7 +484,9 @@ void main() {
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Liste complète'));
       expect(find.textContaining('Ma liste · 0'), findsOneWidget);
-      expect(find.byType(LigneChoix), findsNothing, reason: 'à la première ouverture, tous les secteurs sont repliés');
+      expect(find.byType(LigneChoix), findsNothing, reason: 'à la première ouverture, tous les rayons sont repliés');
+      expect(find.text('CRÈMERIE'), findsNothing, reason: 'on voit les rayons, pas les secteurs');
+      await _toucher(tester, find.text('FRAIS').first);
       await _toucher(tester, find.text('CRÈMERIE'));
       // Ordre alphabétique dans le secteur
       final noms = [for (final e in find.byType(LigneChoix).evaluate()) (e.widget as LigneChoix).nom];
