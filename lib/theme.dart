@@ -23,6 +23,25 @@ const palettes = <Palette>[
   Palette('Noir et blanc', Color(0xFF222222), Color(0xFF222222), Color(0xFFFFFFFF), Color(0xFFF7F7F7), Color(0xFFF2F2F2), Color(0xFFCCCCCC)),
 ];
 
+/// Palettes de plus, proposées dans une liste déroulante (Paramètres › Apparence › Autres palettes).
+const autresPalettes = <Palette>[
+  Palette('Framboise', Color(0xFFB02E5E), Color(0xFF7F2144), Color(0xFFFBF5F7), Color(0xFFF4E2E8), Color(0xFFEED3DD), Color(0xFFE3B6C7)),
+  Palette('Moutarde', Color(0xFFA67C00), Color(0xFF785900), Color(0xFFFBF8F2), Color(0xFFF3EDDB), Color(0xFFECE3C9), Color(0xFFE0D1A6)),
+  Palette('Pétrole', Color(0xFF1F6F78), Color(0xFF165056), Color(0xFFF4F8F8), Color(0xFFE0EBEC), Color(0xFFD0E1E3), Color(0xFFB1CDD0)),
+  Palette('Ardoise', Color(0xFF4A5A6A), Color(0xFF35414C), Color(0xFFF6F7F8), Color(0xFFE6E8EA), Color(0xFFD9DCE0), Color(0xFFC0C5CB)),
+  Palette('Olive', Color(0xFF6B702A), Color(0xFF4D511E), Color(0xFFF8F8F4), Color(0xFFEAEBE1), Color(0xFFE0E1D2), Color(0xFFCBCDB4)),
+  Palette('Prune', Color(0xFF7A356A), Color(0xFF58264C), Color(0xFFF8F5F8), Color(0xFFECE3EA), Color(0xFFE3D5E0), Color(0xFFD0B8CB)),
+  Palette('Corail', Color(0xFFD05A4E), Color(0xFF964138), Color(0xFFFDF7F6), Color(0xFFF8E8E6), Color(0xFFF5DCDA), Color(0xFFEFC5C1)),
+  Palette('Menthe', Color(0xFF2E8B74), Color(0xFF216454), Color(0xFFF5F9F8), Color(0xFFE2EFEC), Color(0xFFD3E7E2), Color(0xFFB6D6CE)),
+  Palette('Chocolat', Color(0xFF6B4530), Color(0xFF4D3223), Color(0xFFF8F6F5), Color(0xFFEAE5E2), Color(0xFFE0D8D4), Color(0xFFCBBEB7)),
+  Palette('Marine', Color(0xFF233A6B), Color(0xFF192A4D), Color(0xFFF4F5F8), Color(0xFFE0E3EA), Color(0xFFD1D6E0), Color(0xFFB2BACB)),
+  Palette('Cerise', Color(0xFFA81C2E), Color(0xFF791421), Color(0xFFFBF4F5), Color(0xFFF3DFE2), Color(0xFFEDCFD3), Color(0xFFE1B0B6)),
+  Palette('Turquoise', Color(0xFF13849A), Color(0xFF0E5F6F), Color(0xFFF3F9FA), Color(0xFFDEEEF1), Color(0xFFCDE5EA), Color(0xFFACD4DC)),
+];
+
+/// Toutes les palettes : les cinq présentées en pastilles, puis les autres.
+const toutesLesPalettes = <Palette>[...palettes, ...autresPalettes];
+
 /// Charte de l'application : les couleurs viennent de la palette choisie dans Paramètres › Apparence.
 class Charte {
   Charte._();
@@ -33,7 +52,7 @@ class Charte {
 
   /// Change de palette et redessine toute l'application, sans la relancer.
   static void choisirPalette(String nom) {
-    palette = palettes.firstWhere((p) => p.nom == nom, orElse: () => palettes.first);
+    palette = toutesLesPalettes.firstWhere((p) => p.nom == nom, orElse: () => palettes.first);
     void redessiner(Element e) {
       e.markNeedsBuild();
       e.visitChildren(redessiner);

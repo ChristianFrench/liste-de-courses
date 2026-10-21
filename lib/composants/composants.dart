@@ -813,8 +813,13 @@ class TitreGroupe extends StatelessWidget {
       this.nombre,
       this.icone,
       this.ouvert,
+      this.focus = false,
       this.onTap});
   final String nom;
+
+  /// Groupe où l'on travaille (rayon ou secteur ouvert en préparation, secteur en cours pendant les courses) :
+  /// son image est légèrement agrandie.
+  final bool focus;
   /// Icône dans un rond blanc, quand le groupe n'a pas d'image.
   final IconData? icone;
   /// Groupe rétractable : chevron ouvert ou fermé, et un appui sur le titre l'ouvre ou le ferme.
@@ -849,31 +854,31 @@ class TitreGroupe extends StatelessWidget {
           child: InkWell(
           onTap: onTap,
           child: Container(
-          height: image != null || icone != null ? 52 : (onTap != null ? 44 : 30),
+          height: image != null || icone != null ? (focus ? 64 : 52) : (onTap != null ? 44 : 30),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
               if (icone != null && image == null) ...[
                 Container(
-                  width: 46,
-                  height: 46,
+                  width: focus ? 56 : 46,
+                  height: focus ? 56 : 46,
                   decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Icon(icone, size: 26, color: fort ? Charte.accent : Charte.blanc),
+                  child: Icon(icone, size: focus ? 32 : 26, color: fort ? Charte.accent : Charte.blanc),
                 ),
                 const SizedBox(width: 10),
               ],
               if (image != null) ...[
                 fort
                     ? Container(
-                        width: 46,
-                        height: 46,
+                        width: focus ? 56 : 46,
+                        height: focus ? 56 : 46,
                         decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
                         alignment: Alignment.center,
-                        child: Pictogramme(image, taille: 38),
+                        child: Pictogramme(image, taille: focus ? 48 : 38),
                       )
-                    : Pictogramme(image, taille: 44),
+                    : Pictogramme(image, taille: focus ? 56 : 44),
                 const SizedBox(width: 10),
               ],
               Expanded(

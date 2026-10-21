@@ -203,6 +203,19 @@ class EcranParametres extends StatelessWidget {
                   ),
               ],
             ),
+            const SizedBox(height: 12),
+            // Les autres palettes, dans une liste déroulante pour ne pas prendre de place.
+            Text('Autres palettes', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 4),
+            ChoixDeroulant<String>(
+              valeur: autresPalettes.any((p) => p.nom == Charte.palette.nom) ? Charte.palette.nom : '',
+              choix: {'': 'Choisir…', for (final p in autresPalettes) p.nom: p.nom},
+              onChange: (v) {
+                if (v.isEmpty) return;
+                etat.choisirApparence(v);
+                Charte.choisirPalette(v);
+              },
+            ),
                 const SizedBox(height: 8),
               ],
             ),

@@ -6,7 +6,6 @@ import '../donnees/envoi.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'magasin.dart';
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -503,12 +502,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
+  /// « + Produit absent de ce secteur » : la fenêtre de l'article, avec le nom en plus.
   Future<void> _produitAbsent(Liste l, Secteur s) async {
-    final nom = await demanderTexte(context, titre: 'Nouveau produit', aide: 'Nom générique (ex. : Riz)');
-    if (nom == null || nom.isEmpty || !mounted) return;
-    final p = etat.creerProduit(nom);
-    etat.placer(l.magasinId, p.id, s.id);
-    Nav.travail(EcranFicheProduit(produitId: p.id, listeId: l.id));
+    final q = await detailsArticle(context, l, null, nouveauDans: s);
+    if (q == null || !mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _lignes[q.id]?.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3);
+    });
   }
 
   @override
@@ -595,6 +596,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                         fort: true,
                         nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
                         ouvert: Retractables.i.ouvert(cle),
+                        focus: Retractables.i.ouvert(cle),
                         onTap: () => Retractables.i.ouvert(cle) ? Retractables.i.basculer(cle) : _ouvrirRayon(l, r.id),
                       );
                     }
@@ -622,6 +624,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       image: r == null ? null : cleSecteur(r.nom, s!.nom),
                       nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
                       ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
+                      focus: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
                       onTap: () => Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace'))
                           ? Retractables.i.basculer(_cle(s?.id ?? 'nonPlace'))
                           : _ouvrirSeul(l, s?.id ?? 'nonPlace'),
@@ -1135,15 +1138,20 @@ String ordreAlpha(String nom) {
 /// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.
 /// Une marque ajoutée ou un packaging changé crée l'article correspondant (« Camembert Président · 250 g »).
 /// Rend l'article de la ligne après enregistrement (null si abandon).
-Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit p) async {
+/// Fenêtre de l'article. Avec [nouveauDans] (« + Produit absent de ce secteur »), la même fenêtre
+/// commence par le nom du nouveau produit, qui est créé, placé dans ce secteur et ajouté à la liste.
+Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit? produit, {Secteur? nouveauDans}) async {
   final etat = Etat.instance;
-  final g = etat.ligne(l, p.id);
-  if (g == null) return null;
-  var (mesure, lot) = Etat.mesureEtLot(etat.packaging(g.packagingId)?.libelle);
-  var promo = g.promotion?.type ?? '';
-  final precision = TextEditingController(text: g.promotion?.libelle ?? '');
+  final nouveau = produit == null;
+  final p = produit ?? Produit('', '', [], [], 0);
+  final g = nouveau ? null : etat.ligne(l, p.id);
+  if (!nouveau && g == null) return null;
+  var (mesure, lot) = Etat.mesureEtLot(etat.packaging(g?.packagingId)?.libelle);
+  var promo = g?.promotion?.type ?? '';
+  final nom = TextEditingController();
+  final precision = TextEditingController(text: g?.promotion?.libelle ?? '');
   final marque = TextEditingController();
-  final consigne = TextEditingController(text: g.consigne ?? '');
+  final consigne = TextEditingController(text: g?.consigne ?? '');
   final mesures = etat.mesuresProposees(p);
   final lots = etat.lotsProposes(p);
   if (mesure != null && !mesures.contains(mesure)) mesures.insert(0, mesure);
@@ -1154,12 +1162,23 @@ Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit p) async 
       );
   final ok = await modale(
     context,
-    titre: p.nom,
-    icone: Icons.edit_note,
+    titre: nouveau ? 'Nouveau produit · ${nouveauDans?.nom ?? ''}' : p.nom,
+    icone: nouveau ? Icons.add_shopping_cart : Icons.edit_note,
     oui: 'Enregistrer',
     contenu: (context, maj) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        if (nouveau) ...[
+          titre('Nom du produit'),
+          TextField(
+            key: const ValueKey('nom-nouveau-produit'),
+            controller: nom,
+            autofocus: true,
+            textCapitalization: TextCapitalization.sentences,
+            style: Charte.texte(16),
+            decoration: const InputDecoration(hintText: 'Nom générique (ex. : Riz)'),
+          ),
+        ],
         titre('Mesure (poids, contenance, à la pièce…)'),
         ChoixDeroulant<String>(
           valeur: mesure ?? '',
@@ -1193,7 +1212,7 @@ Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit p) async 
           key: const ValueKey('marque-article'),
           controller: marque,
           style: Charte.texte(16),
-          decoration: InputDecoration(hintText: 'Ex. : Président (crée « ${p.nom} Président »)'),
+          decoration: InputDecoration(hintText: nouveau ? 'Ex. : Président' : 'Ex. : Président (crée « ${p.nom} Président »)'),
         ),
         titre('Consigne'),
         TextField(
@@ -1209,7 +1228,23 @@ Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit p) async 
   final textePrecision = precision.text.trim();
   final texteConsigne = consigne.text;
   if (!ok) return null;
-  final avant = g.packagingId;
+  if (nouveau) {
+    final n = nom.text.trim();
+    if (n.isEmpty) {
+      if (context.mounted) Nav.message(context, 'Donnez un nom au produit');
+      return null;
+    }
+    // Nouveau produit : la marque fait partie de son nom, le packaging va sur la ligne.
+    final q = etat.creerProduit(texteMarque.isEmpty ? n : '$n $texteMarque');
+    if (nouveauDans != null) etat.placer(l.magasinId, q.id, nouveauDans.id);
+    etat.ajouterLigne(l, q.id);
+    etat.definirPackaging(l, q.id, etat.packagingCompose(mesure, lot)?.id);
+    if (promo.isNotEmpty) etat.definirPromotion(l, q.id, PromotionLigne(promo, {}, textePrecision));
+    etat.definirConsigne(l, q.id, texteConsigne);
+    if (context.mounted) Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
+    return q;
+  }
+  final avant = g!.packagingId;
   final apres = etat.packagingCompose(mesure, lot)?.id;
   etat.definirPackaging(l, p.id, apres);
   final ancienne = g.promotion;
@@ -1372,6 +1407,17 @@ class EcranCoursesSecteur extends StatefulWidget {
 /// « Reste à faire » cache les articles déjà cochés (et les secteurs terminés) ; un nouvel appui remet la liste complète.
 class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   bool resteAFaire = false;
+  bool _commentaireVu = false;
+
+  /// Fenêtre simple : se ferme par la croix ou un appui à côté.
+  Future<void> _commentaire(BuildContext context, String texte) => modale(
+        context,
+        titre: 'Commentaire',
+        icone: Icons.sticky_note_2_outlined,
+        oui: null,
+        non: null,
+        contenu: (context, maj) => Text(texte, style: Charte.texte(17)),
+      );
   final _titres = <String, GlobalKey>{};
   bool _place = false;
 
@@ -1395,6 +1441,13 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             ? 'Aperçu · $total article${total > 1 ? 's' : ''}'
             : '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total';
         final commentaire = etat.commentaire(l);
+        // Le commentaire de la liste s'affiche une fois à l'ouverture ; l'icône du titre le remontre.
+        if (commentaire != null && !_commentaireVu) {
+          _commentaireVu = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _commentaire(context, commentaire);
+          });
+        }
         // Secteur où l'on en est : le premier qui a encore un article à cocher.
         final e = etapes.firstWhere((x) => x.lignes.any((g) => !g.coche), orElse: () => etapes.isEmpty ? Etape(null, []) : etapes.last);
         if (!apercu) _allerALaReprise(l);
@@ -1413,20 +1466,14 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
-            entete: EnTeteTravail(titre: titre, action: BoutonReduire(cles: [for (final x in etapes) _cle(x.id)])),
-            haut: [
-              if (commentaire != null)
-                Container(
-                  width: double.infinity,
-                  color: Charte.fondBandeau,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Icon(Icons.sticky_note_2_outlined, size: 20, color: Charte.couleurIcone(Icons.sticky_note_2_outlined)),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(commentaire, style: Charte.texte(15))),
-                  ]),
-                ),
-            ],
+            entete: EnTeteTravail(
+              titre: titre,
+              action: Row(mainAxisSize: MainAxisSize.min, children: [
+                if (commentaire != null)
+                  BoutonIcone(icone: Icons.sticky_note_2_outlined, libelle: 'Commentaire', onTap: () => _commentaire(context, commentaire)),
+                BoutonReduire(cles: [for (final x in etapes) _cle(x.id)]),
+              ]),
+            ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
@@ -1443,6 +1490,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                             avancement: apercu ? null : (x.lignes.where((g) => g.coche).length, x.lignes.length),
                             nombre: apercu ? x.lignes.length : null,
                             ouvert: Retractables.i.ouvert(_cle(x.id)),
+                            focus: !apercu && x.id == e.id && l.nbCoches > 0,
                             onTap: () => Retractables.i.basculer(_cle(x.id)),
                           ),
                           if (Retractables.i.ouvert(_cle(x.id)))

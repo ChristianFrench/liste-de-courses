@@ -499,6 +499,15 @@ void main() {
       expect(find.text('Ajouter une marque'), findsOneWidget);
       await _toucher(tester, find.text('Annuler'));
       expect(find.textContaining('Ma liste · 1'), findsOneWidget, reason: 'Annuler garde l\'article déjà coché');
+      // Produit absent : la même fenêtre que l'article, avec le nom en plus
+      await _toucher(tester, find.text('+ Produit absent de ce secteur'));
+      expect(find.text('Ajouter une marque'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('nom-nouveau-produit')), 'Kéfir');
+      await _voir(tester, find.text('Enregistrer'));
+      await _toucher(tester, find.text('Enregistrer'));
+      expect(Etat.instance.produits.any((p) => p.nom == 'Kéfir'), isTrue);
+      expect(find.textContaining('Ma liste · 2'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 6));
       // Aperçu : la liste comme en courses, sans case à cocher
       await _toucher(tester, find.text('Aperçu'));
       expect(find.byType(LigneCourse), findsWidgets);
@@ -522,7 +531,7 @@ void main() {
       await _toucher(tester, find.text('+ Nouvelle liste'));
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
-      expect(find.textContaining('Ma liste · 1'), findsOneWidget);
+      expect(find.textContaining('Ma liste · 2'), findsOneWidget);
     });
 
     testWidgets('9. Une seule liste dans l\'ordre du parcours ; Reste à faire ; Pause puis Interrompre', (tester) async {
@@ -571,7 +580,15 @@ void main() {
       expect(find.text('Faire les courses'), findsWidgets, reason: 'fenêtre modale de départ');
       expect(find.text('Enregistrer le parcours'), findsOneWidget);
       await _ciblesTactiles(tester);
+      Etat.instance.commenter(Etat.instance.liste('l3')!, 'Pharmacie aussi');
       await _toucher(tester, find.text('Faire les courses').last);
+      // Le commentaire s'affiche à l'ouverture, en fenêtre simple
+      expect(find.text('Pharmacie aussi'), findsOneWidget);
+      await _toucher(tester, find.byTooltip('Fermer'));
+      expect(find.text('Pharmacie aussi'), findsNothing);
+      await _toucher(tester, find.byTooltip('Commentaire'));
+      expect(find.text('Pharmacie aussi'), findsOneWidget);
+      await _toucher(tester, find.byTooltip('Fermer'));
       expect(find.text('Pause'), findsOneWidget);
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });
