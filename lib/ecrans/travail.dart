@@ -673,6 +673,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
         }
         final elements = _elements(l);
         final numeros = <String, int>{};
+        final premiers = <String, int>{};
+        for (var i = 0; i < elements.length; i++) {
+          if (elements[i].rayon case final r?) premiers.putIfAbsent(r.id, () => i);
+        }
         for (final e in elements) {
           if (e.titreSecteur && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
         }
@@ -695,6 +699,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       final r = e.rayon!;
                       final cle = _cleRayon(r.id);
                       return TitreGroupe(
+                        // Un rayon peut revenir plus loin dans le parcours : seule sa première apparition porte la clé.
+                        key: premiers[r.id] == i ? _titres.putIfAbsent('rayon:${r.id}', GlobalKey.new) : null,
                         nom: r.nom,
                         image: cleRayon(r.nom),
                         icone: Icons.view_week_outlined,
@@ -702,7 +708,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
                         nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
                         ouvert: Retractables.i.ouvert(cle),
                         focus: Retractables.i.ouvert(cle),
-                        onTap: () => Retractables.i.ouvert(cle) ? Retractables.i.basculer(cle) : _ouvrirRayon(l, r.id),
+                        onTap: () {
+                          if (Retractables.i.ouvert(cle)) {
+                            Retractables.i.basculer(cle);
+                          } else {
+                            _ouvrirRayon(l, r.id);
+                            _montrer('rayon:${r.id}');
+                          }
+                        },
                       );
                     }
                     if (e.produit != null) {
@@ -730,9 +743,15 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
                       ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
                       focus: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-                      onTap: () => Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace'))
-                          ? Retractables.i.basculer(_cle(s?.id ?? 'nonPlace'))
-                          : _ouvrirSeul(l, s?.id ?? 'nonPlace'),
+                      onTap: () {
+                        final id = s?.id ?? 'nonPlace';
+                        if (Retractables.i.ouvert(_cle(id))) {
+                          Retractables.i.basculer(_cle(id));
+                        } else {
+                          _ouvrirSeul(l, id);
+                          _montrer(id);
+                        }
+                      },
                     );
                   },
                 ),
@@ -742,8 +761,30 @@ class _EcranConstructionState extends State<EcranConstruction> {
     );
   }
 
+  /// Après dépliage, le bandeau monte en haut de l'écran : ce qu'il contient est visible dessous,
+  /// même pour le dernier groupe (« Non placé », en fin de liste).
+  void _montrer(String cleTitre) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _titres[cleTitre]?.currentContext;
+      if (c != null && c.mounted) {
+        Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
+      }
+    });
+  }
+
+  /// Article non placé dans ce magasin : on choisit son rayon puis son secteur ; il y rejoint la liste.
+  Future<void> _placer(Liste l, Produit p) async {
+    final s = await choisirSecteur(context, l.magasinId, p.nom);
+    if (s == null || !mounted) return;
+    etat.placer(l.magasinId, p.id, s.id);
+    Nav.message(context, '« ${p.nom} » est placé dans ${s.nom}');
+    _allerA(l, s);
+  }
+
   Widget _ligne(Liste l, Produit p) {
     final g = etat.ligne(l, p.id);
+    // Non placé : la fenêtre de l'article ne sert qu'une fois l'article placé ; toucher son nom propose un secteur.
+    final place = etat.secteurDe(l.magasinId, p.id) != null;
     void basculer() {
       etat.basculer(l, p.id);
       final s = etat.secteurDe(l.magasinId, p.id);
@@ -760,13 +801,17 @@ class _EcranConstructionState extends State<EcranConstruction> {
       versGauche: g == null ? null : retirer,
       actions: [
         if (g == null) ajouter else retirer,
-        ActionLigne(Icons.edit_note, 'Packaging, promotion, marque', () => _modifier(l, p)),
+        if (place)
+          ActionLigne(Icons.edit_note, 'Packaging, promotion, marque', () => _modifier(l, p))
+        else
+          ActionLigne(Icons.place_outlined, 'Choisir son secteur', () => _placer(l, p)),
       ],
       child: LigneChoix(
       key: _lignes.putIfAbsent(p.id, GlobalKey.new),
       nom: p.nom,
       // Packaging, promotion et consigne en clair sous le nom ; l'icône à droite de la coche les modifie.
       complement: [
+        if (!place) 'Touchez pour choisir son secteur',
         etat.complement(g, p),
         if (g?.promotion != null)
           g!.promotion!.libelle.isNotEmpty ? g.promotion!.libelle : (etat.typePromotion(g.promotion!.type)?.nom ?? 'promo'),
@@ -774,9 +819,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ].where((x) => x.isNotEmpty).join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
-      onDetails: g == null ? null : () => _modifier(l, p),
+      onDetails: g == null || !place ? null : () => _modifier(l, p),
       // Article non choisi : toucher la ligne le coche, sans plus ; article choisi : la fenêtre de l'article.
-      onNom: g == null ? basculer : () => _modifier(l, p),
+      onNom: !place ? () => _placer(l, p) : (g == null ? basculer : () => _modifier(l, p)),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: basculer,
@@ -1238,6 +1283,53 @@ String ordreAlpha(String nom) {
   const accents = {'à': 'a', 'â': 'a', 'ä': 'a', 'ç': 'c', 'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i',
       'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', 'ÿ': 'y', 'œ': 'oe', 'æ': 'ae'};
   return nom.toLowerCase().split('').map((c) => accents[c] ?? c).join();
+}
+
+/// Choix du secteur d'un article : les rayons du magasin, un appui déplie leurs secteurs, un appui sur un secteur le choisit.
+Future<Secteur?> choisirSecteur(BuildContext context, String magasinId, String nomProduit) {
+  final etat = Etat.instance;
+  String? ouvert;
+  return showModalBottomSheet<Secteur>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Charte.blanc,
+    showDragHandle: true,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.75,
+        maxChildSize: 0.95,
+        builder: (ctx, defilement) => ListView(
+          controller: defilement,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+              child: Text('Où se trouve « $nomProduit » ? Choisissez le rayon, puis le secteur.',
+                  style: Charte.texte(17, gras: true)),
+            ),
+            for (final r in etat.rayonsDu(magasinId)) ...[
+              TitreGroupe(
+                nom: r.nom,
+                image: cleRayon(r.nom),
+                icone: Icons.view_week_outlined,
+                fort: true,
+                ouvert: ouvert == r.id,
+                onTap: () => maj(() => ouvert = ouvert == r.id ? null : r.id),
+              ),
+              if (ouvert == r.id)
+                for (final s in etat.secteursDu(r.id))
+                  TitreGroupe(
+                    nom: s.nom,
+                    image: cleSecteur(r.nom, s.nom),
+                    onTap: () => Navigator.of(ctx).pop(s),
+                  ),
+            ],
+            const SizedBox(height: 16),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 /// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.

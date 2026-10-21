@@ -535,6 +535,29 @@ void main() {
       expect(find.textContaining('Ma liste · 2'), findsOneWidget);
     });
 
+    testWidgets('non placés : visibles en fin de liste, toucher propose un secteur', (tester) async {
+      final etat = Etat.instance;
+      final l = etat.liste('l1')!;
+      for (var i = 1; i <= 25; i++) {
+        etat.ajouterLigne(l, etat.creerProduit('Article inconnu $i').id);
+      }
+      final truc = etat.creerProduit('Truc mystère');
+      etat.ajouterLigne(l, truc.id);
+      await _accueil(tester);
+      await _toucher(tester, find.text(etat.nomListe(l)));
+      await _toucher(tester, find.text('NON PLACÉ'));
+      await _voir(tester, find.textContaining('Truc mystère', findRichText: true));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Truc mystère', findRichText: true).hitTestable(), findsOneWidget);
+      // Toucher son nom propose un secteur (pas la fenêtre de l'article)
+      await _toucher(tester, find.textContaining('Truc mystère', findRichText: true));
+      expect(find.text('Ajouter une marque'), findsNothing);
+      expect(find.textContaining('Où se trouve « Truc mystère »'), findsOneWidget);
+      await _toucher(tester, find.text('FRAIS').last);
+      await _toucher(tester, find.text('CRÈMERIE').last);
+      expect(etat.secteurDe(l.magasinId, truc.id)?.nom, 'Crèmerie');
+    });
+
     testWidgets('nouvelle liste depuis le texte d\'un mail', (tester) async {
       await tester.runAsync(chargerCorrespondances); // lecture réelle de l'asset, hors horloge simulée
       await _accueil(tester);
