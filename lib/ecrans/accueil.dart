@@ -230,7 +230,7 @@ class _Etapes extends StatelessWidget {
         context,
         titre: '${i + 1}. ${_explications[i].$1}',
         icone: _etapes[i].$1,
-        oui: 'Compris',
+        oui: null,
         non: null,
         contenu: (context, maj) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,

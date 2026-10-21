@@ -15,7 +15,7 @@ import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
-import 'package:liste_de_courses/ecrans/travail.dart' show codeCourtPackaging;
+import 'package:liste_de_courses/ecrans/travail.dart' show codeCourtPackaging, ordreAlpha;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -167,6 +167,27 @@ void main() {
       e.listePrete(l2);
       e.remettreEnPreparation(l2);
       expect(l2.statut, StatutListe.enConstruction);
+    });
+
+    test('courses interrompues remises en préparation : coches perdues', () {
+      final e = Etat.instance;
+      final l = e.liste('l4')!;
+      expect(l.nbCoches, greaterThan(0));
+      e.coursesEnPreparation(l);
+      expect(l.statut, StatutListe.enConstruction);
+      expect(l.nbCoches, 0);
+    });
+
+    test('variante : la marque et le packaging créent l\'article', () {
+      final e = Etat.instance;
+      final l = e.liste('l1')!;
+      final g = l.lignes.first;
+      final p = e.produit(g.produitId)!;
+      final k = e.packagingCompose('1,5 l', 'lot de 6')!;
+      final q = e.produitVariante(l, p, marqueNom: 'Président', packagingId: k.id);
+      expect(q.nom, '${p.nom.split(' · ').first} Président · lot de 6 × 1,5 l');
+      expect(l.lignes.any((x) => x.produitId == q.id), isTrue);
+      expect(e.produit(p.id), isNotNull);
     });
 
     test('packaging : mesure et lot séparés, puis recomposés', () {
@@ -406,8 +427,12 @@ void main() {
       expect(Etat.instance.packaging(gy.packagingId)!.libelle, 'Pack de 12', reason: 'packaging gardé');
 
       // 5 : cocher → quantité et icône de la fenêtre article ; ramener à 0 décoche
+      if (find.textContaining('Beurre doux', findRichText: true).evaluate().isEmpty) {
+        await tester.scrollUntilVisible(find.textContaining('Beurre doux', findRichText: true), -150,
+            scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+      }
       final beurre = find.ancestor(of: find.textContaining('Beurre doux', findRichText: true), matching: find.byType(LigneChoix)).first;
-      await _toucher(tester, beurre);
+      await _toucher(tester, find.descendant(of: beurre, matching: find.byType(CaseACocher)));
       expect(find.descendant(of: beurre, matching: find.byType(SelecteurQuantite)), findsOneWidget);
       expect(find.descendant(of: beurre, matching: find.byTooltip('Packaging, promotion, marque')), findsOneWidget);
       expect(find.text('Ajouter une marque'), findsNothing, reason: 'cocher n\'ouvre rien');
@@ -418,7 +443,11 @@ void main() {
       expect(find.byType(BandeauPuces), findsNothing);
       await tester.dragUntilVisible(find.text('CHARCUTERIE'), find.byType(Scrollable).last, const Offset(0, -300));
       expect(find.byType(TitreGroupe), findsWidgets);
-      await _toucher(tester, find.textContaining('Jambon', findRichText: true));
+      // Un seul secteur ouvert : ouvrir Charcuterie replie Crèmerie
+      await _toucher(tester, find.text('CHARCUTERIE'));
+      expect(find.textContaining('Beurre doux', findRichText: true), findsNothing);
+      final jambon = find.ancestor(of: find.textContaining('Jambon', findRichText: true), matching: find.byType(LigneChoix)).first;
+      await _toucher(tester, find.descendant(of: jambon, matching: find.byType(CaseACocher)));
       expect(Etat.instance.liste('l1')!.repriseSecteurId, 's4', reason: 'secteur du dernier article touché');
 
       // 8 : quitter puis revenir ramène au même secteur
@@ -446,7 +475,18 @@ void main() {
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Liste complète'));
       expect(find.textContaining('Ma liste · 0'), findsOneWidget);
-      await _toucher(tester, find.textContaining('Œufs', findRichText: true).first);
+      expect(find.byType(LigneChoix), findsNothing, reason: 'à la première ouverture, tous les secteurs sont repliés');
+      await _toucher(tester, find.text('CRÈMERIE'));
+      // Ordre alphabétique dans le secteur
+      final noms = [for (final e in find.byType(LigneChoix).evaluate()) (e.widget as LigneChoix).nom];
+      expect(noms, [...noms]..sort((a, b) => ordreAlpha(a).compareTo(ordreAlpha(b))));
+      // Toucher le nom ouvre la fenêtre de l'article (et le coche) ; Annuler le décoche
+      await _toucher(tester, find.textContaining('Œufs', findRichText: true));
+      expect(find.text('Ajouter une marque'), findsOneWidget);
+      await _toucher(tester, find.text('Annuler'));
+      expect(find.textContaining('Ma liste · 0'), findsOneWidget);
+      final oeufs = find.ancestor(of: find.textContaining('Œufs', findRichText: true), matching: find.byType(LigneChoix)).first;
+      await _toucher(tester, find.descendant(of: oeufs, matching: find.byType(CaseACocher)));
       await _toucher(tester, find.text('Liste prête'));
       expect(find.text('Fin de la liste'), findsOneWidget, reason: 'fenêtre modale de fin de liste');
       await _ciblesTactiles(tester);

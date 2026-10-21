@@ -636,6 +636,23 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     if (ok) etat.classerSansTicket(c);
   }
 
+  /// Courses interrompues remises en préparation : on prévient que les coches seront perdues.
+  Future<void> _enPreparation(BuildContext context, Liste l) async {
+    final ok = await modale(
+      context,
+      titre: 'Remettre en préparation ?',
+      icone: Icons.undo,
+      oui: 'Remettre en préparation',
+      contenu: (context, maj) => Text(
+          'Les courses de « ${etat.nomListe(l)} » sont arrêtées. Les ${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} '
+          'déjà coché${l.nbCoches > 1 ? 's' : ''} perdront leur coche ; la liste et ses articles sont gardés.',
+          style: Charte.texte(16)),
+    );
+    if (!ok) return;
+    etat.coursesEnPreparation(l);
+    if (context.mounted) Nav.message(context, '« ${etat.nomListe(l)} » est de nouveau en préparation');
+  }
+
   Widget _carteInterrompues(BuildContext context, Liste l) {
     final etape = etat.etapes(l, l.parcoursId).where((e) => e.id == l.repriseSecteurId).toList();
     final arret = etape.isEmpty ? '' : ' · arrêt au secteur ${etape.first.nom}';
@@ -648,6 +665,11 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
       onTap: reprendre,
       droite: Row(mainAxisSize: MainAxisSize.min, children: [
         BoutonAction('Reprendre', plein: true, onTap: reprendre),
+        IconButton(
+          tooltip: 'Remettre en préparation',
+          icon: Icon(Icons.undo, color: Charte.couleurIcone(Icons.undo)),
+          onPressed: () => _enPreparation(context, l),
+        ),
         BoutonSupprimerListe(l),
       ]),
     );

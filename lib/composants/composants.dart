@@ -513,6 +513,7 @@ class LigneChoix extends StatelessWidget {
     this.afficherQuantite = true,
     this.droite,
     this.onDetails,
+    this.onNom,
   });
   final String nom;
   final String complement;
@@ -521,6 +522,9 @@ class LigneChoix extends StatelessWidget {
 
   /// Icône à droite de la coche (article choisi) : fenêtre packaging, promotion, marque.
   final VoidCallback? onDetails;
+
+  /// Appui sur le nom (hors de la case) : comme l'icône de modification. La case seule coche alors.
+  final VoidCallback? onNom;
   final String? codePromo;
   final Color? couleurPromo;
   final VoidCallback? onPromo;
@@ -539,18 +543,27 @@ class LigneChoix extends StatelessWidget {
     return Material(
       color: Charte.fond,
       child: InkWell(
-        onTap: onTap,
+        onTap: onNom ?? onTap,
         child: Container(
           constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
           decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
+          padding: EdgeInsets.symmetric(horizontal: onNom == null ? 12 : 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
           Row(
             children: [
-              CaseACocher(coche: coche, taille: 28),
+              if (onNom == null)
+                CaseACocher(coche: coche, taille: 28)
+              else
+                Semantics(
+                  checked: coche,
+                  child: InkWell(
+                    onTap: onTap,
+                    child: SizedBox(width: 48, height: 52, child: Center(child: CaseACocher(coche: coche, taille: 28))),
+                  ),
+                ),
               if (coche && onDetails != null)
                 BoutonIcone(icone: Icons.edit_note, libelle: 'Packaging, promotion, marque', onTap: onDetails!)
               else
@@ -902,6 +915,13 @@ class Retractables extends ChangeNotifier {
       _etat[c] = ouvrir;
     }
     notifyListeners();
+  }
+
+  /// Fixe l'état d'ouverture sans prévenir (à la création d'un écran).
+  void fixer(Iterable<String> cles, bool ouvrir) {
+    for (final c in cles) {
+      _etat[c] = ouvrir;
+    }
   }
 
   bool tousFermes(Iterable<String> cles, {bool parDefaut = true}) => cles.isNotEmpty && cles.every((c) => !ouvert(c, parDefaut: parDefaut));
@@ -1779,7 +1799,7 @@ Future<bool> modale(
   required String titre,
   required IconData icone,
   required Widget Function(BuildContext context, StateSetter maj) contenu,
-  required String oui,
+  required String? oui,
   String? non = 'Annuler',
 }) async {
   final r = await showDialog<bool>(
@@ -1804,12 +1824,17 @@ Future<bool> modale(
                   IconeRonde(icone),
                   const SizedBox(width: 12),
                   Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
+                  // Fenêtre d'information sans bouton : une croix pour la fermer (ou un appui à côté).
+                  if (oui == null && non == null)
+                    BoutonIcone(icone: Icons.close, libelle: 'Fermer', onTap: () => Navigator.of(ctx).pop(false)),
                 ],
               ),
               const SizedBox(height: 14),
               Flexible(child: SingleChildScrollView(child: contenu(ctx, maj))),
-              const SizedBox(height: 18),
-              Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
+              if (oui != null) ...[
+                const SizedBox(height: 18),
+                Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
+              ],
               if (non != null) ...[
                 const SizedBox(height: 10),
                 Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),

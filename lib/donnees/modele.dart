@@ -906,28 +906,31 @@ class Etat extends ChangeNotifier {
           if (mesureEtLot(packaging(id)?.libelle).$2 case final l?) l
       }.toList();
 
-  /// Ajouter une marque crée un produit à part (« Camembert » reste ; « Camembert Président » est créé),
-  /// rangé aux mêmes endroits ; la ligne de la liste passe sur ce nouveau produit.
-  Produit produitDeMarque(Liste l, Produit p, String marqueNom) {
-    final nom = '${p.nom} ${marqueNom.trim()}';
+  /// Ajouter une marque ou choisir un packaging crée un article à part (« Camembert » reste ;
+  /// « Camembert Président · 250 g » est créé), rangé aux mêmes endroits ; la ligne passe sur ce nouvel article.
+  Produit produitVariante(Liste l, Produit p, {String? marqueNom, String? packagingId}) {
+    final mq = (marqueNom ?? '').trim();
+    final k = packaging(packagingId);
+    final racine = p.nom.split(' · ').first;
+    final nom = '$racine${mq.isEmpty ? '' : ' $mq'}${k == null ? '' : ' · ${k.libelle}'}';
     var q = _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
     if (q == null) {
-      q = Produit(nouvelId('p'), nom, [], [...p.packagingIds], 0);
+      q = Produit(nouvelId('p'), nom, [...p.marqueIds], [if (k != null) k.id, ...p.packagingIds.where((id) => id != k?.id)], 0);
       produits.add(q);
       for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
         emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
       }
     }
-    ajouterMarque(q, marqueNom.trim());
-    final m = _trouve(marques, (x) => x.nom.toLowerCase() == marqueNom.trim().toLowerCase());
+    if (mq.isNotEmpty) ajouterMarque(q, mq);
+    final m = mq.isEmpty ? null : _trouve(marques, (x) => x.nom.toLowerCase() == mq.toLowerCase());
     final i = l.lignes.indexWhere((g) => g.produitId == p.id);
-    if (i >= 0 && ligne(l, q.id) == null) {
+    if (i >= 0 && q.id != p.id && ligne(l, q.id) == null) {
       final g = l.lignes[i];
       q.nbUtilisations++;
       l.lignes[i] = LigneListe(
           produitId: q.id,
-          marqueId: m?.id,
-          packagingId: g.packagingId,
+          marqueId: m?.id ?? g.marqueId,
+          packagingId: k?.id ?? g.packagingId,
           quantite: g.quantite,
           promotion: g.promotion,
           consigne: g.consigne);
@@ -971,6 +974,17 @@ class Etat extends ChangeNotifier {
   }
 
   /// Une liste prête revient en préparation.
+  /// Courses interrompues remises en préparation : les coches sont perdues.
+  void coursesEnPreparation(Liste l) {
+    for (final g in l.lignes) {
+      g.cocheLe = null;
+      g.cochePar = null;
+    }
+    apprentissage.remove(l.id);
+    l.interrompueLe = null;
+    remettreEnPreparation(l);
+  }
+
   void remettreEnPreparation(Liste l) {
     l.statut = StatutListe.enConstruction;
     l.membreId = null;

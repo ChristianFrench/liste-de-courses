@@ -277,8 +277,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
     super.initState();
     final l = liste;
     if (l == null) return;
-    _ordonner(l);
-    // Reprise : la liste s'ouvre sur le secteur où l'on s'était arrêté.
+    // À l'ouverture, tous les secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
+    Retractables.i.fixer([for (final s in _secteurs(l)) _cle(s.id), _cle('nonPlace')], false);
     final s = etat.secteur(l.repriseSecteurId ?? '');
     if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
   }
@@ -298,28 +298,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return [for (final id in ordre) etat.secteur(id)].whereType<Secteur>().toList();
   }
 
-  // Ordre des produits figé pendant la préparation : cocher ne déplace rien.
-  // À l'ouverture, les produits choisis passent en premier dans leur secteur, puis les plus achetés.
-  final Map<String, int> _ordre = {};
-
-  void _ordonner(Liste l) {
-    final tous = [for (final s in etat.secteursDuMagasin(l.magasinId)) ...etat.produitsDu(l.magasinId, s.id)]..sort((a, b) {
-        final ca = etat.ligne(l, a.id) != null ? 0 : 1;
-        final cb = etat.ligne(l, b.id) != null ? 0 : 1;
-        return ca != cb ? ca.compareTo(cb) : b.nbUtilisations.compareTo(a.nbUtilisations);
-      });
-    _ordre
-      ..clear()
-      ..addAll({for (var i = 0; i < tous.length; i++) tous[i].id: i});
-  }
-
   List<_Element> _elements(Liste l) {
     final res = <_Element>[];
     for (final s in _secteurs(l)) {
       final produits = [
         for (final p in etat.produitsDu(l.magasinId, s.id))
           if (!maListe || etat.ligne(l, p.id) != null) p,
-      ]..sort((a, b) => (_ordre[a.id] ?? 1 << 20).compareTo(_ordre[b.id] ?? 1 << 20));
+      ]..sort((a, b) => ordreAlpha(a.nom).compareTo(ordreAlpha(b.nom)));
       if (maListe && produits.isEmpty) continue;
       res.add(_Element.titre(s));
       if (!Retractables.i.ouvert(_cle(s.id))) continue;
@@ -343,10 +328,39 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   String _cle(String secteurId) => 'preparation/${widget.listeId}/$secteurId';
 
+  /// Un seul secteur ouvert : ouvrir un secteur replie les autres.
+  void _ouvrirSeul(Liste l, String secteurId) {
+    Retractables.i.tous([
+      for (final s in _secteurs(l))
+        if (s.id != secteurId) _cle(s.id),
+      if (secteurId != 'nonPlace') _cle('nonPlace'),
+    ], false);
+    if (!Retractables.i.ouvert(_cle(secteurId))) Retractables.i.basculer(_cle(secteurId));
+  }
+
+  final _lignes = <String, GlobalKey>{};
+
+  /// Fenêtre de l'article ; un article non choisi est d'abord coché (décoché si l'on abandonne).
+  /// Si un nouvel article est créé (marque, packaging), l'écran reste sur lui.
+  Future<void> _modifier(Liste l, Produit p) async {
+    final ajoute = etat.ligne(l, p.id) == null;
+    if (ajoute) etat.basculer(l, p.id);
+    final q = await detailsArticle(context, l, p);
+    if (q == null) {
+      if (ajoute && etat.ligne(l, p.id) != null) etat.basculer(l, p.id);
+      return;
+    }
+    if (q.id == p.id || !mounted) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _lignes[q.id]?.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3);
+    });
+  }
+
   /// Fait venir le bandeau d'un secteur en haut de l'écran (hauteurs estimées, puis ajustement).
   void _allerA(Liste l, Secteur s, {bool noter = true}) {
     if (noter) etat.positionConstruction(l, s.rayonId, s.id);
-    if (!Retractables.i.ouvert(_cle(s.id))) Retractables.i.basculer(_cle(s.id));
+    _ouvrirSeul(l, s.id);
     if (!_defilement.hasClients) return;
     final elements = _elements(l);
     var y = 0.0;
@@ -544,7 +558,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       fort: true,
                       nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
                       ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-                      onTap: () => Retractables.i.basculer(_cle(s?.id ?? 'nonPlace')),
+                      onTap: () => Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace'))
+                          ? Retractables.i.basculer(_cle(s?.id ?? 'nonPlace'))
+                          : _ouvrirSeul(l, s?.id ?? 'nonPlace'),
                     );
                   },
                 ),
@@ -557,7 +573,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
   Widget _ligne(Liste l, Produit p) {
     final g = etat.ligne(l, p.id);
     return LigneChoix(
-      key: ValueKey(p.id),
+      key: _lignes.putIfAbsent(p.id, GlobalKey.new),
       nom: p.nom,
       // Packaging, promotion et consigne en clair sous le nom ; l'icône à droite de la coche les modifie.
       complement: [
@@ -568,7 +584,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ].where((x) => x.isNotEmpty).join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
-      onDetails: g == null ? null : () => detailsArticle(context, l, p),
+      onDetails: g == null ? null : () => _modifier(l, p),
+      onNom: () => _modifier(l, p),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: () {
@@ -1029,11 +1046,20 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   }
 }
 
-/// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque (crée le produit de marque), consigne.
-Future<void> detailsArticle(BuildContext context, Liste l, Produit p) async {
+/// Clé de tri alphabétique : sans majuscules ni accents (« Œufs » avec les O).
+String ordreAlpha(String nom) {
+  const accents = {'à': 'a', 'â': 'a', 'ä': 'a', 'ç': 'c', 'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i',
+      'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', 'ÿ': 'y', 'œ': 'oe', 'æ': 'ae'};
+  return nom.toLowerCase().split('').map((c) => accents[c] ?? c).join();
+}
+
+/// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.
+/// Une marque ajoutée ou un packaging changé crée l'article correspondant (« Camembert Président · 250 g »).
+/// Rend l'article de la ligne après enregistrement (null si abandon).
+Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit p) async {
   final etat = Etat.instance;
   final g = etat.ligne(l, p.id);
-  if (g == null) return;
+  if (g == null) return null;
   var (mesure, lot) = Etat.mesureEtLot(etat.packaging(g.packagingId)?.libelle);
   var promo = g.promotion?.type ?? '';
   final precision = TextEditingController(text: g.promotion?.libelle ?? '');
@@ -1103,8 +1129,10 @@ Future<void> detailsArticle(BuildContext context, Liste l, Produit p) async {
   final texteMarque = marque.text.trim();
   final textePrecision = precision.text.trim();
   final texteConsigne = consigne.text;
-  if (!ok) return;
-  etat.definirPackaging(l, p.id, etat.packagingCompose(mesure, lot)?.id);
+  if (!ok) return null;
+  final avant = g.packagingId;
+  final apres = etat.packagingCompose(mesure, lot)?.id;
+  etat.definirPackaging(l, p.id, apres);
   final ancienne = g.promotion;
   etat.definirPromotion(
       l,
@@ -1113,10 +1141,13 @@ Future<void> detailsArticle(BuildContext context, Liste l, Produit p) async {
           ? null
           : PromotionLigne(promo, ancienne?.type == promo ? ancienne!.parametres : {}, textePrecision));
   etat.definirConsigne(l, p.id, texteConsigne);
-  if (texteMarque.isNotEmpty) {
-    final q = etat.produitDeMarque(l, p, texteMarque);
+  if (texteMarque.isNotEmpty || (apres != null && apres != avant)) {
+    final q = etat.produitVariante(l, p,
+        marqueNom: texteMarque, packagingId: apres != null && apres != avant ? apres : null);
     if (context.mounted) Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
+    return q;
   }
+  return p;
 }
 
 /// Packaging et promotion d'une ligne, en clair et dans leur couleur.
