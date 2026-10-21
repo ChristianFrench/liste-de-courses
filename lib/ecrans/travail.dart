@@ -87,6 +87,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     await chargerCorrespondances();
     if (!mounted) return;
     final texte = TextEditingController();
+    final textes = <String>[];
     final lire = await modale(
       context,
       titre: 'Liste depuis un mail',
@@ -95,14 +96,30 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Copiez la liste dans le mail, puis collez-la ici : un article par ligne.',
+          Text('Copiez la liste dans le mail, puis collez-la ici : un article par ligne. '
+              'Plusieurs mails ? Ajoutez-les un par un : ils seront fusionnés en une seule liste.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-          Align(
-            alignment: Alignment.centerRight,
-            child: Lien('Coller', onTap: () async {
-              final d = await Clipboard.getData(Clipboard.kTextPlain);
-              if (d?.text != null) maj(() => texte.text = d!.text!);
-            }),
+          if (textes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text('${textes.length} mail${textes.length > 1 ? 's' : ''} déjà ajouté${textes.length > 1 ? 's' : ''}',
+                  style: Charte.texte(15, gras: true)),
+            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Lien('Ajouter un autre mail', onTap: () {
+                if (texte.text.trim().isEmpty) return;
+                maj(() {
+                  textes.add(texte.text);
+                  texte.clear();
+                });
+              }),
+              Lien('Coller', onTap: () async {
+                final d = await Clipboard.getData(Clipboard.kTextPlain);
+                if (d?.text != null) maj(() => texte.text = d!.text!);
+              }),
+            ],
           ),
           TextField(
             key: const ValueKey('texte-mail'),
@@ -116,7 +133,8 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       ),
     );
     if (!lire || !mounted) return;
-    final lus = lireTexte(etat, texte.text);
+    if (texte.text.trim().isNotEmpty) textes.add(texte.text);
+    final lus = consoliderTextes(etat, textes);
     if (lus.isEmpty) {
       Nav.message(context, 'Aucun article trouvé dans ce texte');
       return;
@@ -136,7 +154,8 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           for (var i = 0; i < lus.length; i++)
             CaseModale(
               texte: '${lus[i].produit?.nom ?? '${lus[i].nom} (nouveau)'}${lus[i].quantite > 1 ? ' × ${lus[i].quantite}' : ''}',
-              aide: 'Lu : ${lus[i].texte}${lus[i].marque != null ? ' · marque ${lus[i].marque}' : ''}',
+              aide: '${lus[i].mails > 1 ? 'Dans ${lus[i].mails} mails · ' : ''}Lu : ${lus[i].texte}'
+                  '${lus[i].marque != null ? ' · marque ${lus[i].marque}' : ''}',
               coche: choisis.contains(i),
               onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
             ),

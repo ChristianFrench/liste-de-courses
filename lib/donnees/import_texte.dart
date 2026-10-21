@@ -9,7 +9,10 @@ import 'modele.dart';
 
 /// Un article lu dans le texte.
 class ArticleLu {
-  ArticleLu(this.texte, this.nom, this.quantite, {this.produit, this.marque});
+  ArticleLu(this.texte, this.nom, this.quantite, {this.produit, this.marque, this.mails = 1});
+
+  /// Nombre de mails où l'article figure (liste consolidée).
+  final int mails;
 
   /// Ligne d'origine, telle qu'écrite dans le mail.
   final String texte;
@@ -115,6 +118,31 @@ Produit? _chercher(Iterable<Produit> produits, String texte) {
     }
   }
   return meilleur;
+}
+
+/// Plusieurs textes (plusieurs mails) fusionnés en une seule liste : un même produit n'apparaît qu'une fois.
+/// Dans un même texte, les quantités s'additionnent ; d'un texte à l'autre, on garde la plus grande
+/// (deux personnes qui demandent du lait n'en veulent pas forcément deux fois plus).
+List<ArticleLu> consoliderTextes(Etat etat, List<String> textes) {
+  final res = <String, ArticleLu>{};
+  for (final t in textes) {
+    final duTexte = <String, ArticleLu>{};
+    for (final a in lireTexte(etat, t)) {
+      final cle = a.produit?.id ?? 'nouveau:${normaliser(a.nom)}';
+      final d = duTexte[cle];
+      duTexte[cle] = d == null
+          ? a
+          : ArticleLu(d.texte, d.nom, d.quantite + a.quantite, produit: d.produit, marque: d.marque ?? a.marque);
+    }
+    for (final e in duTexte.entries) {
+      final r = res[e.key];
+      res[e.key] = r == null
+          ? e.value
+          : ArticleLu('${r.texte} | ${e.value.texte}', r.nom, r.quantite > e.value.quantite ? r.quantite : e.value.quantite,
+              produit: r.produit, marque: r.marque ?? e.value.marque, mails: r.mails + 1);
+    }
+  }
+  return res.values.toList();
 }
 
 /// Lit le texte collé : un article par ligne (ou séparés par des virgules sur une même ligne).
