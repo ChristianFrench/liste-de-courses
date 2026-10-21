@@ -207,6 +207,7 @@ class _Etapes extends StatelessWidget {
         'Touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
         '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
         '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
+        '• Liste depuis un mail : vous collez le texte d\'un mail, les articles sont reconnus dans le catalogue.',
         'Ouvrez un rayon, puis un secteur, et touchez les articles voulus pour les cocher. Touchez de nouveau un '
             'article coché pour préciser le packaging, la promotion, la marque ou une consigne.',
         '« Aperçu » montre la liste telle qu\'elle se présentera pendant les courses.',

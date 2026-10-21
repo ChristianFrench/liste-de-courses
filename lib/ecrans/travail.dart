@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
 import '../donnees/envoi.dart';
+import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -79,6 +81,84 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Compris', style: Charte.texte(16, gras: true)))],
         ),
       );
+
+  /// Liste depuis un mail : on colle le texte, on vérifie ce qui a été reconnu, puis la liste est créée.
+  Future<void> _depuisMail() async {
+    await chargerCorrespondances();
+    if (!mounted) return;
+    final texte = TextEditingController();
+    final lire = await modale(
+      context,
+      titre: 'Liste depuis un mail',
+      icone: Icons.mail_outline,
+      oui: 'Lire la liste',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Copiez la liste dans le mail, puis collez-la ici : un article par ligne.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Lien('Coller', onTap: () async {
+              final d = await Clipboard.getData(Clipboard.kTextPlain);
+              if (d?.text != null) maj(() => texte.text = d!.text!);
+            }),
+          ),
+          TextField(
+            key: const ValueKey('texte-mail'),
+            controller: texte,
+            minLines: 6,
+            maxLines: 12,
+            style: Charte.texte(15),
+            decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'Lait\n2 baguettes\nTomates x4…'),
+          ),
+        ],
+      ),
+    );
+    if (!lire || !mounted) return;
+    final lus = lireTexte(etat, texte.text);
+    if (lus.isEmpty) {
+      Nav.message(context, 'Aucun article trouvé dans ce texte');
+      return;
+    }
+    final choisis = {for (var i = 0; i < lus.length; i++) i};
+    final ok = await modale(
+      context,
+      titre: 'Articles lus',
+      icone: Icons.mail_outline,
+      oui: 'Créer la liste',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('${lus.where((a) => a.produit != null).length} reconnus dans le catalogue, '
+              '${lus.where((a) => a.produit == null).length} nouveaux produits. Décochez ce qu\'il ne faut pas garder.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          for (var i = 0; i < lus.length; i++)
+            CaseModale(
+              texte: '${lus[i].produit?.nom ?? '${lus[i].nom} (nouveau)'}${lus[i].quantite > 1 ? ' × ${lus[i].quantite}' : ''}',
+              aide: 'Lu : ${lus[i].texte}${lus[i].marque != null ? ' · marque ${lus[i].marque}' : ''}',
+              coche: choisis.contains(i),
+              onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+            ),
+        ],
+      ),
+    );
+    if (!ok || !mounted) return;
+    // Un même produit lu deux fois : une seule ligne, quantités additionnées.
+    final lignes = <String, LigneListe>{};
+    for (var i = 0; i < lus.length; i++) {
+      if (!choisis.contains(i)) continue;
+      final a = lus[i];
+      final p = a.produit ?? etat.creerProduit(a.nom);
+      final g = lignes[p.id];
+      if (g != null) {
+        g.quantite += a.quantite;
+      } else {
+        lignes[p.id] = LigneListe(produitId: p.id, quantite: a.quantite, consigne: a.marque);
+      }
+    }
+    _creer(lignes.values.toList());
+  }
 
   /// Liste personnalisée : les articles d'une course passée, aucun coché d'avance ; on coche ceux à reprendre.
   Future<void> _voirCourse(Liste ancienne) async {
@@ -166,7 +246,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 3,
+            nombre: 4,
             enfants: [
               LigneMenu(
                 icone: Icons.note_add_outlined,
@@ -181,6 +261,12 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 sousTitre: 'Choisir dans une de vos dernières courses (rien n\'est coché d\'avance)',
                 onTap: () => setState(() => personnalisee = !personnalisee),
                 droite: Icon(personnalisee ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
+              ),
+              LigneMenu(
+                icone: Icons.mail_outline,
+                titre: 'Liste depuis un mail',
+                sousTitre: 'Collez le texte d\'un mail : les articles sont reconnus dans le catalogue',
+                onTap: _depuisMail,
               ),
               LigneMenu(
                 icone: Icons.calculate_outlined,

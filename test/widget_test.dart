@@ -12,6 +12,7 @@ import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
+import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
@@ -532,6 +533,24 @@ void main() {
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
       expect(find.textContaining('Ma liste · 2'), findsOneWidget);
+    });
+
+    testWidgets('nouvelle liste depuis le texte d\'un mail', (tester) async {
+      await tester.runAsync(chargerCorrespondances); // lecture réelle de l'asset, hors horloge simulée
+      await _accueil(tester);
+      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Liste depuis un mail'));
+      await tester.enterText(find.byKey(const ValueKey('texte-mail')),
+          'Bonjour,\n\nCRÈMERIE\n- Lait demi écrémé x2\n- beurre doux, bidule introuvable\n\nEnvoyé de mon iPhone');
+      await _toucher(tester, find.text('Lire la liste'));
+      expect(find.text('Lait demi-écrémé × 2'), findsOneWidget);
+      expect(find.text('Beurre doux'), findsOneWidget);
+      expect(find.text('Bidule introuvable (nouveau)'), findsOneWidget);
+      await _toucher(tester, find.text('Bidule introuvable (nouveau)'));
+      await _toucher(tester, find.text('Créer la liste'));
+      final l = Etat.instance.listes.last;
+      expect([for (final g in l.lignes) Etat.instance.produit(g.produitId)!.nom], ['Lait demi-écrémé', 'Beurre doux']);
+      expect(l.lignes.first.quantite, 2);
     });
 
     testWidgets('9. Une seule liste dans l\'ordre du parcours ; Reste à faire ; Pause puis Interrompre', (tester) async {
