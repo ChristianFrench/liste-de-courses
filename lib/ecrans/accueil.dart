@@ -35,14 +35,14 @@ class EcranAccueil extends StatelessWidget {
               vide: 'Aucune liste en préparation.',
               enfants: [
                 for (final l in enPreparation)
-                  LigneMenu(
+                  listeGlissable(context, l, LigneMenu(
                     icone: Icons.checklist,
                     titre: etat.nomListe(l),
                     sousTitre: '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · '
                         '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
                     onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
                     droite: BoutonAction('Reprendre', onTap: () => Nav.travail(EcranConstruction(listeId: l.id))),
-                  ),
+                  )),
               ],
             ),
             // Listes prêtes : en instance de courses, avec de quoi partir les faire.
@@ -54,13 +54,13 @@ class EcranAccueil extends StatelessWidget {
               vide: 'Aucune liste prête pour les courses.',
               enfants: [
                 for (final l in pretes)
-                  LigneMenu(
+                  listeGlissable(context, l, LigneMenu(
                     icone: Icons.shopping_cart_outlined,
                     titre: etat.nomListe(l),
                     sousTitre: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
                     onTap: () => partirFaireLesCourses(context, l),
                     droite: BoutonAction('Faire les courses', onTap: () => partirFaireLesCourses(context, l)),
-                  ),
+                  )),
               ],
             ),
             GroupeRetractable(
@@ -71,7 +71,7 @@ class EcranAccueil extends StatelessWidget {
               vide: 'Aucune course en cours.',
               enfants: [
                 if (enCours != null)
-                  LigneMenu(
+                  listeGlissable(context, enCours, interrompue: true, LigneMenu(
                     gauche: SizedBox(
                       width: 44,
                       height: 44,
@@ -81,7 +81,7 @@ class EcranAccueil extends StatelessWidget {
                     sousTitre: 'Courses interrompues${enCours.interrompueLe != null ? ' ${quand(enCours.interrompueLe!)}' : ''}',
                     onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id)),
                     droite: BoutonAction('Reprendre', plein: true, onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id))),
-                  ),
+                  )),
               ],
             ),
             const SizedBox(height: 12),

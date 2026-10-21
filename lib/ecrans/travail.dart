@@ -47,6 +47,16 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     if (!nomModifie) nom.text = etat.nomLibre(etat.nomParDefaut(magasinId, debut));
   }
 
+  /// Supprimée d'un glissement ; « Annuler » dans le message la remet.
+  void _supprimerListeType(ListeType t) {
+    final etat = Etat.instance;
+    final place = etat.listesTypes.indexOf(t);
+    setState(() => etat.supprimerListeType(t));
+    Nav.message(context, 'Liste type « ${t.nom} » supprimée', annuler: () {
+      if (mounted) setState(() => etat.remettreListeType(t, place));
+    });
+  }
+
   void _creer(List<LigneListe> lignes) {
     final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomParDefaut(magasinId, debut)) : nom.text.trim();
     if (etat.nomPris(texte)) {
@@ -196,25 +206,21 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                   onTap: () => _creer([]),
                 ),
                 for (final t in etat.listesTypes)
-                  LigneMenu(
+                  Glissable(
+                    key: ValueKey('glisser-${t.id}'),
+                    titre: t.nom,
+                    versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => _supprimerListeType(t), danger: true),
+                    actions: [
+                      ActionLigne(Icons.playlist_add, 'Partir de cette liste type', () => _creer(etat.lignesDeListeType(t))),
+                      ActionLigne(Icons.delete_outline, 'Supprimer la liste type', () => _supprimerListeType(t), danger: true),
+                    ],
+                    child: LigneMenu(
                     icone: Icons.note_alt_outlined,
                     titre: t.nom,
                     sousTitre: '${t.lignes.length} article${t.lignes.length > 1 ? 's' : ''}'
                         '${t.magasinId == magasinId ? '' : ' · faite pour ${etat.magasin(t.magasinId)?.nom ?? 'un autre magasin'}'}',
                     onTap: () => _creer(etat.lignesDeListeType(t)),
-                    droite: IconButton(
-                      tooltip: 'Supprimer la liste type',
-                      icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
-                      onPressed: () async {
-                        final ok = await modale(context,
-                            titre: 'Supprimer la liste type ?',
-                            icone: Icons.delete_outline,
-                            oui: 'Supprimer',
-                            contenu: (context, maj) => Text('« ${t.nom} » ne sera plus proposée.', style: Charte.texte(16)));
-                        if (ok) setState(() => etat.supprimerListeType(t));
-                      },
-                    ),
-                  ),
+                  )),
               ],
             ),
           if (personnalisee)
@@ -572,7 +578,25 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   Widget _ligne(Liste l, Produit p) {
     final g = etat.ligne(l, p.id);
-    return LigneChoix(
+    void basculer() {
+      etat.basculer(l, p.id);
+      final s = etat.secteurDe(l.magasinId, p.id);
+      if (s != null) etat.positionConstruction(l, s.rayonId, s.id);
+    }
+
+    // Glisser vers la droite ajoute l'article, vers la gauche le retire ; appui long : menu.
+    final ajouter = ActionLigne(Icons.add_shopping_cart, 'Ajouter', basculer);
+    final retirer = ActionLigne(Icons.remove_shopping_cart_outlined, 'Retirer', basculer, danger: true);
+    return Glissable(
+      key: ValueKey('glisser-${p.id}'),
+      titre: p.nom,
+      versDroite: g == null ? ajouter : null,
+      versGauche: g == null ? null : retirer,
+      actions: [
+        if (g == null) ajouter else retirer,
+        ActionLigne(Icons.edit_note, 'Packaging, promotion, marque', () => _modifier(l, p)),
+      ],
+      child: LigneChoix(
       key: _lignes.putIfAbsent(p.id, GlobalKey.new),
       nom: p.nom,
       // Packaging, promotion et consigne en clair sous le nom ; l'icône à droite de la coche les modifie.
@@ -588,13 +612,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
       onNom: () => _modifier(l, p),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
-      onTap: () {
-        etat.basculer(l, p.id);
-        final s = etat.secteurDe(l.magasinId, p.id);
-        if (s != null) etat.positionConstruction(l, s.rayonId, s.id);
-      },
+      onTap: basculer,
       onQuantite: (q) => etat.quantite(l, p.id, q),
-    );
+    ));
   }
 }
 

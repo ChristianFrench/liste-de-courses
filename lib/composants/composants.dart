@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../theme.dart';
 import 'pictogramme.dart';
@@ -560,7 +561,10 @@ class LigneChoix extends StatelessWidget {
                 Semantics(
                   checked: coche,
                   child: InkWell(
-                    onTap: onTap,
+                    onTap: () {
+                      HapticFeedback.selectionClick();
+                      onTap();
+                    },
                     child: SizedBox(width: 48, height: 52, child: Center(child: CaseACocher(coche: coche, taille: 28))),
                   ),
                 ),
@@ -648,7 +652,11 @@ class LigneCourse extends StatelessWidget {
     return Material(
       color: Charte.fond,
       child: InkWell(
-        onTap: onTap,
+        // Un léger retour au doigt à chaque coche.
+        onTap: () {
+          HapticFeedback.selectionClick();
+          onTap();
+        },
         child: Container(
           constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
           decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
@@ -1921,4 +1929,104 @@ Future<bool?> confirmer(
       ),
     ),
   );
+}
+
+// ------------------------------------------------------------ Gestes tactiles
+
+/// Action d'une ligne, proposée par glissement ou dans le menu de l'appui long.
+class ActionLigne {
+  const ActionLigne(this.icone, this.texte, this.faire, {this.danger = false});
+  final IconData icone;
+  final String texte;
+  final VoidCallback faire;
+
+  /// Suppression : fond rouge quand on glisse.
+  final bool danger;
+}
+
+/// Ligne qu'on fait glisser du doigt : vers la gauche [versGauche] (en général supprimer),
+/// vers la droite [versDroite] (l'action principale) ; un appui long ouvre le menu de toutes les [actions].
+class Glissable extends StatelessWidget {
+  const Glissable({required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.actions = const []})
+      : super(key: key);
+  final Widget child;
+  final ActionLigne? versGauche;
+  final ActionLigne? versDroite;
+  final String? titre;
+  final List<ActionLigne> actions;
+
+  Widget _fond(ActionLigne a, bool aDroite) => Container(
+        color: a.danger ? Charte.rouge : Charte.accent,
+        alignment: aDroite ? Alignment.centerRight : Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(a.icone, color: Charte.blanc, size: 26),
+          const SizedBox(width: 8),
+          Text(a.texte, style: Charte.texte(16, gras: true, couleur: Charte.blanc)),
+        ]),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    Widget w = child;
+    if (actions.isNotEmpty) {
+      w = GestureDetector(
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          menuActions(context, titre: titre, actions: actions);
+        },
+        child: w,
+      );
+    }
+    if (versGauche == null && versDroite == null) return w;
+    final gauche = versGauche, droite = versDroite;
+    return Dismissible(
+      key: key!,
+      direction: gauche != null && droite != null
+          ? DismissDirection.horizontal
+          : (gauche != null ? DismissDirection.endToStart : DismissDirection.startToEnd),
+      dismissThresholds: const {DismissDirection.endToStart: 0.35, DismissDirection.startToEnd: 0.35},
+      background: droite != null ? _fond(droite, false) : _fond(gauche!, true),
+      secondaryBackground: gauche != null && droite != null ? _fond(gauche, true) : null,
+      // La ligne revient toujours en place : c'est l'action (et la mise à jour des données) qui la fait disparaître.
+      confirmDismiss: (sens) async {
+        HapticFeedback.selectionClick();
+        final a = sens == DismissDirection.endToStart ? gauche : droite;
+        a?.faire();
+        return false;
+      },
+      child: w,
+    );
+  }
+}
+
+/// Menu de l'appui long : les actions d'une ligne, en bas de l'écran.
+Future<void> menuActions(BuildContext context, {String? titre, required List<ActionLigne> actions}) async {
+  final choix = await showModalBottomSheet<ActionLigne>(
+    context: context,
+    backgroundColor: Charte.blanc,
+    showDragHandle: true,
+    builder: (ctx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (titre != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+              child: Text(titre, maxLines: 2, overflow: TextOverflow.ellipsis, style: Charte.texte(18, gras: true)),
+            ),
+          for (final a in actions)
+            ListTile(
+              minTileHeight: 56,
+              leading: Icon(a.icone, color: a.danger ? Charte.rouge : Charte.couleurIcone(a.icone)),
+              title: Text(a.texte, style: Charte.texte(17, couleur: a.danger ? Charte.rouge : Charte.encre)),
+              onTap: () => Navigator.of(ctx).pop(a),
+            ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    ),
+  );
+  choix?.faire();
 }

@@ -860,6 +860,13 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
+  /// Annule [supprimerListeType] : la liste type revient à sa place.
+  void remettreListeType(ListeType t, int place) {
+    if (listesTypes.contains(t)) return;
+    listesTypes.insert(place.clamp(0, listesTypes.length), t);
+    modifie();
+  }
+
   /// Articles d'une liste type, à copier dans une nouvelle liste.
   List<LigneListe> lignesDeListeType(ListeType t) => [
         for (final g in t.lignes)

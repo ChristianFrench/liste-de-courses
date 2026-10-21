@@ -34,6 +34,24 @@ Future<bool> demanderSuppression(BuildContext context, Object objet, String quoi
   return true;
 }
 
+/// Suppression d'un geste (glissement, menu) : sans question quand rien d'autre ne part avec,
+/// avec un « Annuler » dans le message ; sinon la confirmation habituelle.
+Future<void> supprimerVite(BuildContext context, Object objet, String quoi) async {
+  final etat = Etat.instance;
+  if (etat.consequences(objet).isNotEmpty) {
+    await demanderSuppression(context, objet, quoi);
+    return;
+  }
+  final refus = etat.suppressionImpossible(objet);
+  if (refus != null) {
+    Nav.message(context, refus);
+    return;
+  }
+  etat.supprimer(objet);
+  final c = etat.corbeille.first;
+  Nav.message(context, 'Supprimé : $quoi', annuler: () => etat.restaurer(c));
+}
+
 /// Bouton discret « Supprimer … », en bas d'un écran.
 class LienSupprimer extends StatelessWidget {
   const LienSupprimer({super.key, required this.texte, required this.onTap});
@@ -76,6 +94,17 @@ class EcranCorbeille extends StatelessWidget {
     'parcours': 'Parcours',
   };
 
+  void _restaurer(BuildContext context, ElementCorbeille c) {
+    final etat = Etat.instance;
+    final refus = etat.restaurationImpossible(c);
+    if (refus != null) {
+      Nav.message(context, refus);
+      return;
+    }
+    etat.restaurer(c);
+    Nav.message(context, 'Restauré : ${c.libelle}');
+  }
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -93,21 +122,18 @@ class EcranCorbeille extends StatelessWidget {
                 nombre: etat.corbeille.where((c) => c.type == type).length,
                 enfants: [
             for (final c in etat.corbeille.where((c) => c.type == type))
-              LigneMenu(
+              Glissable(
+                key: ValueKey('glisser-${c.id}'),
+                titre: c.libelle,
+                versDroite: ActionLigne(Icons.restore, 'Restaurer', () => _restaurer(context, c)),
+                actions: [ActionLigne(Icons.restore, 'Restaurer', () => _restaurer(context, c))],
+                child: LigneMenu(
                 titre: c.libelle,
                 titreTaille: 16,
                 sousTitre: 'Supprimé ${quand(c.le)}',
                 icone: _icones[c.type] ?? Icons.delete_outline,
-                droite: Lien('Restaurer', taille: 16, onTap: () {
-                  final refus = etat.restaurationImpossible(c);
-                  if (refus != null) {
-                    Nav.message(context, refus);
-                    return;
-                  }
-                  etat.restaurer(c);
-                  Nav.message(context, 'Restauré : ${c.libelle}');
-                }),
-              ),
+                droite: Lien('Restaurer', taille: 16, onTap: () => _restaurer(context, c)),
+              )),
                 ],
               ),
             if (etat.corbeille.isEmpty)

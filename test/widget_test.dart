@@ -557,6 +557,32 @@ void main() {
       expect(Etat.instance.liste('l3')!.statut, StatutListe.enCours);
     });
 
+    testWidgets('gestes : glisser une liste, Annuler, appui long', (tester) async {
+      final etat = Etat.instance;
+      final nom = etat.nomListe(etat.liste('l3')!);
+      await _accueil(tester);
+      await _toucher(tester, _onglet('Courses'));
+      // Vers la droite : la liste prête retourne en préparation.
+      await tester.drag(find.text(nom), const Offset(300, 0));
+      await tester.pumpAndSettle();
+      expect(etat.liste('l3')!.statut, StatutListe.enConstruction);
+      await tester.pump(const Duration(seconds: 6));
+      await _toucher(tester, _onglet('Préparer'));
+      // Vers la gauche : supprimée, puis « Annuler » la remet.
+      await tester.drag(find.text(nom), const Offset(-300, 0));
+      await tester.pumpAndSettle();
+      expect(etat.liste('l3'), isNull);
+      await tester.tap(find.text('Annuler'));
+      await tester.pumpAndSettle();
+      expect(etat.liste('l3'), isNotNull);
+      await tester.pump(const Duration(seconds: 6));
+      // Appui long : le menu des actions.
+      await tester.longPress(find.text(nom));
+      await tester.pumpAndSettle();
+      expect(find.text('Renommer'), findsOneWidget);
+      expect(find.text('Supprimer'), findsOneWidget);
+    });
+
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Historique');

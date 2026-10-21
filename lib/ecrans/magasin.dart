@@ -108,25 +108,28 @@ class SousEcranListeMagasins extends StatelessWidget {
           vide: 'Aucun magasin.',
           enfants: [
         for (final m in etat.magasins)
-          LigneMenu(
+          Glissable(
+            key: ValueKey('glisser-${m.id}'),
+            titre: m.nom,
+            versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
+            actions: [
+              ActionLigne(Icons.storefront_outlined, 'Ouvrir le magasin', () => _ouvrir(m.id)),
+              ActionLigne(Icons.delete_outline, 'Supprimer le magasin', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
+            ],
+            child: LigneMenu(
             titre: m.nom,
             titreTaille: 19,
             icone: Icons.storefront_outlined,
             sousTitre: '${_pluriel(etat.rayonsDu(m.id).length, 'rayon')} · '
                 '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
             onTap: () => _ouvrir(m.id),
-            droite: IconButton(
-              tooltip: 'Supprimer le magasin',
-              icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
-              onPressed: () => demanderSuppression(context, m, 'le magasin ${m.nom}'),
-            ),
-          ),
+          )),
           ],
         ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
           child: Text(
-              'Supprimer un magasin efface ses listes en cours (après confirmation) ; son historique de courses part dans Gérer › Archives.',
+              'Glissez un magasin vers la gauche pour le supprimer. Cela efface ses listes en cours (après confirmation) ; son historique de courses part dans Gérer › Archives.',
               style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         ),
       ],

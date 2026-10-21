@@ -33,18 +33,14 @@ class SousEcranPreparer extends StatelessWidget {
             vide: 'Aucune liste en préparation.',
             enfants: [
               for (final l in enPreparation)
-                LigneMenu(
+                listeGlissable(context, l, LigneMenu(
                   icone: Icons.checklist,
                   titre: etat.nomListe(l),
                   sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
                       '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
                       '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
                   onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
-                  droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                    BoutonRenommerListe(l),
-                    BoutonSupprimerListe(l),
-                  ]),
-                ),
+                )),
             ],
           ),
           GroupeRetractable(
@@ -55,22 +51,19 @@ class SousEcranPreparer extends StatelessWidget {
             vide: 'Aucune liste prête.',
             enfants: [
               for (final l in pretes)
-                LigneMenu(
+                listeGlissable(context, l, LigneMenu(
                   icone: Icons.shopping_cart_outlined,
                   titre: etat.nomListe(l),
                   sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
                       '${quandJour(l.modifieeLe ?? l.dateCreation)}',
                   onTap: () => Nav.i.allerOnglet(Nav.courses),
-                  droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                    BoutonRemettreEnPreparation(l),
-                    BoutonSupprimerListe(l),
-                  ]),
-                ),
+                )),
             ],
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Text('Une préparation interrompue est conservée telle quelle : touchez-la pour reprendre.',
+            child: Text('Touchez une liste pour la reprendre. Glissez-la vers la gauche pour la supprimer, '
+                'vers la droite pour la remettre en préparation ; un appui long montre toutes les actions.',
                 style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ),
         ],
@@ -85,52 +78,69 @@ String _magasinSiRenommee(Liste l) {
   return (l.nom == null || l.nom!.isEmpty || l.nom!.contains(m)) ? '' : '$m · ';
 }
 
-class BoutonSupprimerListe extends StatelessWidget {
-  const BoutonSupprimerListe(this.liste, {super.key});
-  final Liste liste;
-
-  @override
-  Widget build(BuildContext context) => IconButton(
-        tooltip: 'Supprimer la liste',
-        icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
-        onPressed: () => demanderSuppression(context, liste, 'la liste ${Etat.instance.nomListe(liste)}'),
-      );
+Future<void> renommerListe(BuildContext context, Liste liste) async {
+  final etat = Etat.instance;
+  final nom = await demanderTexte(context, titre: 'Nom de la liste', initial: etat.nomListe(liste));
+  if (nom == null) return;
+  if (etat.nomPris(nom, sauf: liste)) {
+    if (context.mounted) Nav.message(context, 'Une liste s\'appelle déjà « $nom » : choisissez un autre nom.');
+    return;
+  }
+  etat.renommerListe(liste, nom == etat.nomParDefaut(liste.magasinId, liste.dateCreation) ? '' : nom);
 }
 
-class BoutonRenommerListe extends StatelessWidget {
-  const BoutonRenommerListe(this.liste, {super.key});
-  final Liste liste;
-
-  @override
-  Widget build(BuildContext context) => IconButton(
-        tooltip: 'Renommer la liste',
-        icon: Icon(Icons.edit_outlined, color: Charte.couleurIcone(Icons.edit_outlined)),
-        onPressed: () async {
-          final etat = Etat.instance;
-          final nom = await demanderTexte(context, titre: 'Nom de la liste', initial: etat.nomListe(liste));
-          if (nom == null) return;
-          if (etat.nomPris(nom, sauf: liste)) {
-            if (context.mounted) Nav.message(context, 'Une liste s\'appelle déjà « $nom » : choisissez un autre nom.');
-            return;
-          }
-          etat.renommerListe(liste, nom == etat.nomParDefaut(liste.magasinId, liste.dateCreation) ? '' : nom);
-        },
-      );
+/// Liste prête remise en préparation (rien n'est perdu).
+void remettreEnPreparation(BuildContext context, Liste liste) {
+  Etat.instance.remettreEnPreparation(liste);
+  Nav.message(context, '« ${Etat.instance.nomListe(liste)} » est de nouveau en préparation');
 }
 
-class BoutonRemettreEnPreparation extends StatelessWidget {
-  const BoutonRemettreEnPreparation(this.liste, {super.key});
-  final Liste liste;
+/// Courses interrompues remises en préparation : on prévient que les coches seront perdues.
+Future<void> coursesEnPreparation(BuildContext context, Liste l) async {
+  final etat = Etat.instance;
+  final ok = await modale(
+    context,
+    titre: 'Remettre en préparation ?',
+    icone: Icons.undo,
+    oui: 'Remettre en préparation',
+    contenu: (context, maj) => Text(
+        'Les courses de « ${etat.nomListe(l)} » sont arrêtées. Les ${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} '
+        'déjà coché${l.nbCoches > 1 ? 's' : ''} perdront leur coche ; la liste et ses articles sont gardés.',
+        style: Charte.texte(16)),
+  );
+  if (!ok) return;
+  etat.coursesEnPreparation(l);
+  if (context.mounted) Nav.message(context, '« ${etat.nomListe(l)} » est de nouveau en préparation');
+}
 
-  @override
-  Widget build(BuildContext context) => IconButton(
-        tooltip: 'Remettre en préparation',
-        icon: Icon(Icons.undo, color: Charte.couleurIcone(Icons.undo)),
-        onPressed: () {
-          Etat.instance.remettreEnPreparation(liste);
-          Nav.message(context, '« ${Etat.instance.nomListe(liste)} » est de nouveau en préparation');
-        },
-      );
+/// Gestes d'une liste, partout où elle apparaît : glisser vers la gauche la supprime,
+/// vers la droite la remet en préparation (liste prête ou courses interrompues) ; l'appui long ouvre le menu.
+Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interrompue = false}) {
+  final etat = Etat.instance;
+  final supprimer =
+      ActionLigne(Icons.delete_outline, 'Supprimer', () => supprimerVite(context, l, 'la liste ${etat.nomListe(l)}'), danger: true);
+  final renommer = ActionLigne(Icons.edit_outlined, 'Renommer', () => renommerListe(context, l));
+  ActionLigne? droite;
+  final actions = <ActionLigne>[];
+  if (interrompue) {
+    actions.add(ActionLigne(Icons.play_arrow_outlined, 'Reprendre les courses', () => Nav.travail(EcranCoursesSecteur(listeId: l.id))));
+    droite = ActionLigne(Icons.undo, 'En préparation', () => coursesEnPreparation(context, l));
+  } else if (l.statut == StatutListe.prete) {
+    actions.add(ActionLigne(Icons.shopping_cart_outlined, 'Faire les courses', () => partirFaireLesCourses(context, l)));
+    droite = ActionLigne(Icons.undo, 'En préparation', () => remettreEnPreparation(context, l));
+  } else {
+    actions.add(ActionLigne(Icons.checklist, 'Continuer la préparation', () => Nav.travail(EcranConstruction(listeId: l.id))));
+  }
+  if (droite != null) actions.add(ActionLigne(droite.icone, 'Remettre en préparation', droite.faire));
+  actions..add(renommer)..add(supprimer);
+  return Glissable(
+    key: ValueKey('glisser-${l.id}'),
+    titre: etat.nomListe(l),
+    versGauche: supprimer,
+    versDroite: droite,
+    actions: actions,
+    child: ligne,
+  );
 }
 
 /// Écran 5 — Gérer › Parcours : d'abord les parcours de la personne, puis le parcours choisi,
@@ -575,17 +585,14 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
           enfants: [
             for (final l in pretes)
-              LigneMenu(
+              listeGlissable(context, l, LigneMenu(
                 icone: Icons.shopping_cart_outlined,
                 titre: etat.nomListe(l),
                 sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
                     '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
                 onTap: () => _partir(context, l),
-                droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                  BoutonAction('Faire les courses', onTap: () => _partir(context, l)),
-                  BoutonRemettreEnPreparation(l),
-                ]),
-              ),
+                droite: BoutonAction('Faire les courses', onTap: () => _partir(context, l)),
+              )),
           ],
         ),
         GroupeRetractable(
@@ -604,7 +611,15 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           vide: 'Toutes les courses terminées ont leur ticket : elles sont dans Gérer › Historique.',
           enfants: [
             for (final c in enInstance)
-              LigneMenu(
+              Glissable(
+                key: ValueKey('glisser-${c.id}'),
+                titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                versDroite: ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket', () => joindreTicket(context, etat, c)),
+                actions: [
+                  ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+                  ActionLigne(Icons.receipt_long_outlined, 'Classer sans ticket', () => _classer(context, c)),
+                ],
+                child: LigneMenu(
                 icone: Icons.receipt_long_outlined,
                 titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
                 sousTitre: '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''} · '
@@ -615,7 +630,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
                   libelle: 'Joindre le ticket PDF',
                   onTap: () => joindreTicket(context, etat, c),
                 ),
-              ),
+              )),
           ],
         ),
       ],
@@ -636,42 +651,17 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     if (ok) etat.classerSansTicket(c);
   }
 
-  /// Courses interrompues remises en préparation : on prévient que les coches seront perdues.
-  Future<void> _enPreparation(BuildContext context, Liste l) async {
-    final ok = await modale(
-      context,
-      titre: 'Remettre en préparation ?',
-      icone: Icons.undo,
-      oui: 'Remettre en préparation',
-      contenu: (context, maj) => Text(
-          'Les courses de « ${etat.nomListe(l)} » sont arrêtées. Les ${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} '
-          'déjà coché${l.nbCoches > 1 ? 's' : ''} perdront leur coche ; la liste et ses articles sont gardés.',
-          style: Charte.texte(16)),
-    );
-    if (!ok) return;
-    etat.coursesEnPreparation(l);
-    if (context.mounted) Nav.message(context, '« ${etat.nomListe(l)} » est de nouveau en préparation');
-  }
-
   Widget _carteInterrompues(BuildContext context, Liste l) {
     final etape = etat.etapes(l, l.parcoursId).where((e) => e.id == l.repriseSecteurId).toList();
     final arret = etape.isEmpty ? '' : ' · arrêt au secteur ${etape.first.nom}';
     void reprendre() => Nav.travail(EcranCoursesSecteur(listeId: l.id));
-    return LigneMenu(
+    return listeGlissable(context, l, interrompue: true, LigneMenu(
       gauche: SizedBox(width: 44, height: 44, child: Center(child: Avancement(fait: l.nbCoches, total: l.lignes.length, couleur: Charte.accent))),
       titre: '${etat.nomListe(l)} · ${l.nbCoches} / ${l.lignes.length}',
       sousTitre: '${etat.membre(l.membreId)?.nomAffiche ?? ''}$arret'
           '${l.interrompueLe != null ? ' · ${quand(l.interrompueLe!)}' : ''}',
       onTap: reprendre,
-      droite: Row(mainAxisSize: MainAxisSize.min, children: [
-        BoutonAction('Reprendre', plein: true, onTap: reprendre),
-        IconButton(
-          tooltip: 'Remettre en préparation',
-          icon: Icon(Icons.undo, color: Charte.couleurIcone(Icons.undo)),
-          onPressed: () => _enPreparation(context, l),
-        ),
-        BoutonSupprimerListe(l),
-      ]),
-    );
+      droite: BoutonAction('Reprendre', plein: true, onTap: reprendre),
+    ));
   }
 }

@@ -148,13 +148,15 @@ class Nav extends ChangeNotifier {
   static Future<T?> remplacerTravail<T>(Widget ecran) =>
       i.racine.currentState!.pushReplacement<T, Object?>(MaterialPageRoute<T>(builder: (_) => AvecOnglets(child: ecran)));
 
-  static void message(BuildContext? context, String texte) {
+  /// Message bref en bas de l'écran ; avec [annuler], un bouton « Annuler » (après une suppression par glissement).
+  static void message(BuildContext? context, String texte, {VoidCallback? annuler}) {
     final m = i.messager.currentState;
     m
       ?..hideCurrentSnackBar()
       ..showSnackBar(SnackBar(
         content: Text(texte, style: Charte.texte(15, couleur: Charte.blanc)),
-        duration: const Duration(seconds: 2),
+        duration: Duration(seconds: annuler == null ? 2 : 5),
+        action: annuler == null ? null : SnackBarAction(label: 'Annuler', textColor: Charte.blanc, onPressed: annuler),
       ));
   }
 
