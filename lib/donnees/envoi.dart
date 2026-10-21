@@ -26,6 +26,8 @@ String texteListe(Etat etat, Liste l) {
     }
   }
   final b = StringBuffer('Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.lignes.length} articles\n');
+  final commentaire = etat.commentaire(l);
+  if (commentaire != null) b.write('\n$commentaire\n');
   for (final r in etat.rayonsDu(l.magasinId)) {
     final lignes = parRayon[r.id];
     if (lignes == null) continue;

@@ -491,14 +491,21 @@ void main() {
       // Ordre alphabétique dans le secteur
       final noms = [for (final e in find.byType(LigneChoix).evaluate()) (e.widget as LigneChoix).nom];
       expect(noms, [...noms]..sort((a, b) => ordreAlpha(a).compareTo(ordreAlpha(b))));
-      // Toucher le nom ouvre la fenêtre de l'article (et le coche) ; Annuler le décoche
+      // Article non coché : toucher le nom le coche, sans plus ; coché : la fenêtre de l'article
+      await _toucher(tester, find.textContaining('Œufs', findRichText: true));
+      expect(find.text('Ajouter une marque'), findsNothing);
+      expect(find.textContaining('Ma liste · 1'), findsOneWidget);
       await _toucher(tester, find.textContaining('Œufs', findRichText: true));
       expect(find.text('Ajouter une marque'), findsOneWidget);
       await _toucher(tester, find.text('Annuler'));
-      expect(find.textContaining('Ma liste · 0'), findsOneWidget);
-      final oeufs = find.ancestor(of: find.textContaining('Œufs', findRichText: true), matching: find.byType(LigneChoix)).first;
-      await _toucher(tester, find.descendant(of: oeufs, matching: find.byType(CaseACocher)));
+      expect(find.textContaining('Ma liste · 1'), findsOneWidget, reason: 'Annuler garde l\'article déjà coché');
+      // Aperçu : la liste comme en courses, sans case à cocher
+      await _toucher(tester, find.text('Aperçu'));
+      expect(find.byType(LigneCourse), findsWidgets);
+      expect(find.descendant(of: find.byType(LigneCourse), matching: find.byType(CaseACocher)), findsNothing);
+      await _toucher(tester, find.text('Continuer la préparation'));
       await _toucher(tester, find.text('Liste prête'));
+      await tester.enterText(find.byKey(const ValueKey('commentaire-liste')), 'Pharmacie aussi');
       expect(find.text('Fin de la liste'), findsOneWidget, reason: 'fenêtre modale de fin de liste');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Enregistrer comme liste type'));
@@ -506,6 +513,7 @@ void main() {
       await _toucher(tester, find.text('Valider'));
       expect(find.text('LISTES PRÊTES'), findsOneWidget);
       expect(Etat.instance.listesTypes.map((t) => t.nom), contains('Petit-déjeuner'));
+      expect(Etat.instance.commentaires.values, contains('Pharmacie aussi'));
 
       // La liste type est proposée pour une nouvelle liste, avec ses articles (après disparition du message)
       await tester.pump(const Duration(seconds: 6));

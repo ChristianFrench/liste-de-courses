@@ -429,6 +429,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     var pourCourses = true;
     var enListeType = false;
     final nomType = TextEditingController(text: etat.nomListe(l));
+    final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
     final ok = await modale(
       context,
@@ -442,6 +443,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
           Text('${etat.nomListe(l)} : ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} '
               'dans $nbSecteurs secteur${nbSecteurs > 1 ? 's' : ''}.', style: Charte.texte(16)),
           const SizedBox(height: 6),
+          TextField(
+            key: const ValueKey('commentaire-liste'),
+            controller: commentaire,
+            style: Charte.texte(16),
+            minLines: 1,
+            maxLines: 4,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(
+                labelText: 'Commentaire (facultatif)', hintText: 'Ex. : passer aussi à la pharmacie'),
+          ),
           const SizedBox(height: 6),
           CaseModale(
             texte: 'Prête pour les courses',
@@ -477,6 +488,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     );
     final nom = nomType.text.trim();
     if (!ok || !mounted) return;
+    etat.commenter(l, commentaire.text);
     if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
     if (!pourCourses) {
       if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
@@ -514,10 +526,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
         final barre = BarreAction(boutons: [
           Bouton(
             texte: maListe ? 'Tout' : 'Ma liste · ${l.lignes.length}',
-            icone: maListe ? Icons.format_list_bulleted : Icons.checklist,
-            taille: 16,
+            taille: 15,
             plein: maListe,
             onTap: () => setState(() => maListe = !maListe),
+          ),
+          Bouton(
+            texte: 'Aperçu',
+            taille: 15,
+            onTap: () => Nav.travail(EcranCoursesSecteur(listeId: l.id, apercu: true)),
           ),
           Bouton(texte: 'Liste prête', plein: !maListe, onTap: () => _valider(l)),
         ]);
@@ -651,7 +667,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
       coche: g != null,
       quantite: g?.quantite ?? 1,
       onDetails: g == null ? null : () => _modifier(l, p),
-      onNom: () => _modifier(l, p),
+      // Article non choisi : toucher la ligne le coche, sans plus ; article choisi : la fenêtre de l'article.
+      onNom: g == null ? basculer : () => _modifier(l, p),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: basculer,
@@ -1339,8 +1356,11 @@ class EcranListeComplete extends StatelessWidget {
 // ---------------------------------------------------------------- Écrans 8 et 9 : courses par secteur
 
 class EcranCoursesSecteur extends StatefulWidget {
-  const EcranCoursesSecteur({super.key, required this.listeId});
+  const EcranCoursesSecteur({super.key, required this.listeId, this.apercu = false});
   final String listeId;
+
+  /// Aperçu depuis la préparation : la liste telle qu'elle se présentera en courses, sans coche ni pause.
+  final bool apercu;
 
   static String court(String nom) => nom.split(' ').first;
 
@@ -1362,18 +1382,22 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       listenable: Listenable.merge([etat, Retractables.i]),
       builder: (context, _) {
         final l = etat.liste(widget.listeId);
-        if (l == null || l.statut != StatutListe.enCours) {
+        final apercu = widget.apercu;
+        if (l == null || (!apercu && l.statut != StatutListe.enCours)) {
           return PageBase(
             entete: const EnTeteTravail(titre: 'Courses'),
             corps: Center(child: Text('Pas de courses en cours.', style: Charte.texte(16))),
           );
         }
-        final etapes = etat.etapes(l, l.parcoursId);
+        final etapes = etat.etapes(l, apercu ? etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id : l.parcoursId);
         final total = l.lignes.length;
-        final titre = '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total';
+        final titre = apercu
+            ? 'Aperçu · $total article${total > 1 ? 's' : ''}'
+            : '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total';
+        final commentaire = etat.commentaire(l);
         // Secteur où l'on en est : le premier qui a encore un article à cocher.
         final e = etapes.firstWhere((x) => x.lignes.any((g) => !g.coche), orElse: () => etapes.isEmpty ? Etape(null, []) : etapes.last);
-        _allerALaReprise(l);
+        if (!apercu) _allerALaReprise(l);
         final numeros = <String, int>{};
         for (final x in etapes) {
           if (!x.nonPlace) numeros[x.id] = numeros.length + 1;
@@ -1384,12 +1408,25 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         ];
 
         return PopScope(
-          canPop: false,
+          canPop: apercu,
           onPopInvokedWithResult: (aFerme, _) {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
             entete: EnTeteTravail(titre: titre, action: BoutonReduire(cles: [for (final x in etapes) _cle(x.id)])),
+            haut: [
+              if (commentaire != null)
+                Container(
+                  width: double.infinity,
+                  color: Charte.fondBandeau,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Icon(Icons.sticky_note_2_outlined, size: 20, color: Charte.couleurIcone(Icons.sticky_note_2_outlined)),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(commentaire, style: Charte.texte(15))),
+                  ]),
+                ),
+            ],
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
@@ -1403,13 +1440,14 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                             nonPlace: x.nonPlace,
                             image: imageEtape(etat, x),
                             fort: true,
-                            avancement: (x.lignes.where((g) => g.coche).length, x.lignes.length),
+                            avancement: apercu ? null : (x.lignes.where((g) => g.coche).length, x.lignes.length),
+                            nombre: apercu ? x.lignes.length : null,
                             ouvert: Retractables.i.ouvert(_cle(x.id)),
                             onTap: () => Retractables.i.basculer(_cle(x.id)),
                           ),
                           if (Retractables.i.ouvert(_cle(x.id)))
                             for (final g in x.lignes)
-                              if (!resteAFaire || !g.coche) _ligne(etat, l, g),
+                              if (!resteAFaire || !g.coche) _ligne(etat, l, g, apercu),
                       ],
                       if (resteAFaire && visibles.isEmpty)
                         Padding(
@@ -1427,6 +1465,11 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                   ),
             // Zone de décision : reste à faire / liste complète, pause, fin des courses.
             bas: [
+              if (apercu)
+                BarreAction(boutons: [
+                  Bouton(texte: 'Continuer la préparation', plein: true, onTap: () => Navigator.of(context).maybePop()),
+                ])
+              else
               BarreAction(boutons: [
                 Bouton(
                   texte: resteAFaire ? 'Tout' : 'Reste à faire',
@@ -1450,7 +1493,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
   }
 
-  String _cle(String etapeId) => 'courses/${widget.listeId}/$etapeId';
+  String _cle(String etapeId) => '${widget.apercu ? 'apercu' : 'courses'}/${widget.listeId}/$etapeId';
 
   /// À la reprise de courses interrompues, la liste s'ouvre sur le secteur où l'on s'était arrêté.
   void _allerALaReprise(Liste l) {
@@ -1464,7 +1507,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     });
   }
 
-  Widget _ligne(Etat etat, Liste l, LigneListe g) {
+  Widget _ligne(Etat etat, Liste l, LigneListe g, bool apercu) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
     final morceaux = [
@@ -1475,12 +1518,12 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       key: ValueKey(p.id),
       nom: p.nom,
       complement: morceaux.join(' · '),
-      coche: g.coche,
+      coche: !apercu && g.coche,
       quantite: g.quantite,
       promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
       pastilles: pastillesLigne(etat, g),
       alerte: etat.quantiteInsuffisante(g),
-      onTap: () => etat.cocher(l, p.id),
+      onTap: apercu ? null : () => etat.cocher(l, p.id),
     );
   }
 

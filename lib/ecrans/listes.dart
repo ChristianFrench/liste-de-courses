@@ -589,7 +589,8 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
                 icone: Icons.shopping_cart_outlined,
                 titre: etat.nomListe(l),
                 sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
-                    '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
+                    '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}'
+                    '${etat.commentaire(l) != null ? ' · « ${etat.commentaire(l)} »' : ''}',
                 onTap: () => _partir(context, l),
                 droite: BoutonAction('Faire les courses', onTap: () => _partir(context, l)),
               )),

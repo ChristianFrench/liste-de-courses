@@ -93,7 +93,7 @@ class EcranAccueil extends StatelessWidget {
 }
 
 /// En-tête : la photo de légumes, le bonjour, puis « Comment ça marche » posé sur la même photo,
-/// qui déborde jusque sous les quatre étapes. Un appui sur le titre replie les étapes.
+/// qui déborde jusque sous les cinq étapes. Un appui sur le titre replie les étapes.
 class _EnTetePhoto extends StatelessWidget {
   const _EnTetePhoto();
 
@@ -109,14 +109,14 @@ class _EnTetePhoto extends StatelessWidget {
         return Stack(
           children: [
             Positioned.fill(child: Image.asset('assets/accueil_photo.jpg', fit: BoxFit.cover, alignment: Alignment.topCenter)),
-            // Voile : lisibilité du texte blanc, plus sombre en bas sous les étapes.
+            // Voile léger (la photo reste claire) ; une ombre portée garde le texte blanc lisible.
             const Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
-                    colors: [Color(0x66000000), Color(0x22000000), Color(0x8C000000), Color(0xB3000000)],
+                    colors: [Color(0x33000000), Color(0x00000000), Color(0x26000000), Color(0x4D000000)],
                     stops: [0, 0.3, 0.6, 1],
                   ),
                 ),
@@ -132,8 +132,8 @@ class _EnTetePhoto extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Bonjour !', style: Charte.texte(30, gras: true, couleur: Charte.blanc)),
-                        Text('Prêt(e) pour vos courses ?', style: Charte.texte(16, couleur: Charte.blanc)),
+                        Text('Bonjour !', style: _surPhoto(Charte.texte(30, gras: true, couleur: Charte.blanc))),
+                        Text('Prêt(e) pour vos courses ?', style: _surPhoto(Charte.texte(16, couleur: Charte.blanc))),
                       ],
                     ),
                   ),
@@ -154,7 +154,7 @@ class _EnTetePhoto extends StatelessWidget {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text('COMMENT ÇA MARCHE',
-                                style: Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8)),
+                                style: _surPhoto(Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8))),
                           ),
                           Icon(ouvert ? Icons.expand_less : Icons.expand_more, size: 30, color: Charte.blanc),
                         ],
@@ -172,11 +172,16 @@ class _EnTetePhoto extends StatelessWidget {
   }
 }
 
-/// « Comment ça marche » : les quatre étapes, numérotées.
+/// Texte blanc posé sur la photo : une ombre douce le détache des légumes clairs.
+TextStyle _surPhoto(TextStyle s) =>
+    s.copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6), Shadow(color: Color(0x99000000), blurRadius: 2)]);
+
+/// « Comment ça marche » : les cinq étapes, numérotées, du paramétrage au ticket.
 class _Etapes extends StatelessWidget {
   const _Etapes();
 
   static const _etapes = [
+    (Icons.tune, 'Je\nparamètre'),
     (Icons.checklist, 'Je prépare\nma liste'),
     (Icons.check_circle_outline, 'Je la\nvalide'),
     (Icons.shopping_cart_outlined, 'Je fais\nmes courses'),
@@ -186,20 +191,32 @@ class _Etapes extends StatelessWidget {
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
     (
+      'Je paramètre',
+      [
+        'Une fois au début, dans l\'onglet Gérer :',
+        '• Mon foyer : les membres qui préparent ou font les courses, avec leur adresse mail pour recevoir les listes.',
+        '• Magasins et catalogue : vos magasins. Chacun reçoit le catalogue complet, rayons, secteurs et produits, '
+            'que vous pouvez compléter.',
+        '• Paramètres : l\'apparence, les types de promotion et de packaging.',
+        'Le parcours de chaque magasin n\'est pas à décrire : il s\'apprend pendant vos premières courses.',
+      ],
+    ),
+    (
       'Je prépare ma liste',
       [
         'Touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
         '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
         '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
-        'Cochez les articles voulus et réglez la quantité. L\'icône à droite de la coche précise le packaging, '
-            'la promotion, la marque ou une consigne.',
+        'Ouvrez un rayon, puis un secteur, et touchez les articles voulus pour les cocher. Touchez de nouveau un '
+            'article coché pour préciser le packaging, la promotion, la marque ou une consigne.',
+        '« Aperçu » montre la liste telle qu\'elle se présentera pendant les courses.',
         'Vous pouvez vous arrêter à tout moment : rien n\'est perdu, la liste reste « En préparation ».',
       ],
     ),
     (
       'Je la valide',
       [
-        'Quand la liste est complète, touchez « Liste prête ».',
+        'Quand la liste est complète, touchez « Liste prête ». Vous pouvez y ajouter un commentaire.',
         'Vous pouvez la mettre en instance de courses, l\'enregistrer comme liste type sous un nom de votre choix '
             'pour la réutiliser, et l\'envoyer par mail.',
         'Une liste prête peut encore être remise en préparation.',
@@ -280,7 +297,7 @@ class _Etapes extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text(_etapes[i].$2, textAlign: TextAlign.center, style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
+                Text(_etapes[i].$2, textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],
             ),
           ),

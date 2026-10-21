@@ -394,6 +394,9 @@ class Etat extends ChangeNotifier {
   /// Courses terminées classées dans l'historique sans ticket de caisse.
   Set<String> sansTicket = {};
 
+  /// Commentaire saisi à la validation d'une liste (identifiant de liste → texte), repris en courses et dans le mail.
+  Map<String, String> commentaires = {};
+
   /// Listes types nommées (Préparer › Nouvelle liste › Liste type).
   List<ListeType> listesTypes = [];
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
@@ -578,6 +581,7 @@ class Etat extends ChangeNotifier {
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
+    commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
@@ -673,6 +677,7 @@ class Etat extends ChangeNotifier {
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
+            if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
@@ -1569,6 +1574,17 @@ class Etat extends ChangeNotifier {
   List<Course> get coursesEnInstance =>
       historique.where((c) => !estArchive(c.magasinId) && ticketDe(c.id) == null && !sansTicket.contains(c.id)).toList();
   bool enInstance(Course c) => ticketDe(c.id) == null && !sansTicket.contains(c.id);
+
+  String? commentaire(Liste l) => commentaires[l.id];
+
+  void commenter(Liste l, String texte) {
+    if (texte.trim().isEmpty) {
+      commentaires.remove(l.id);
+    } else {
+      commentaires[l.id] = texte.trim();
+    }
+    modifie();
+  }
 
   void classerSansTicket(Course c) {
     sansTicket.add(c.id);

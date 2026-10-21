@@ -641,7 +641,9 @@ class LigneCourse extends StatelessWidget {
   final int quantite;
   final String? promo;
   final int? alerte;
-  final VoidCallback onTap;
+
+  /// null : aperçu de la liste depuis la préparation, sans case à cocher.
+  final VoidCallback? onTap;
 
   /// Packaging et promotion en clair, dans leur couleur (Paramètres).
   final List<Pastille> pastilles;
@@ -653,18 +655,19 @@ class LigneCourse extends StatelessWidget {
       color: Charte.fond,
       child: InkWell(
         // Un léger retour au doigt à chaque coche.
-        onTap: () {
-          HapticFeedback.selectionClick();
-          onTap();
-        },
+        onTap: onTap == null
+            ? null
+            : () {
+                HapticFeedback.selectionClick();
+                onTap!();
+              },
         child: Container(
           constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
           decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              CaseACocher(coche: coche, taille: 28),
-              const SizedBox(width: 12),
+              if (onTap != null) ...[CaseACocher(coche: coche, taille: 28), const SizedBox(width: 12)],
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6),
