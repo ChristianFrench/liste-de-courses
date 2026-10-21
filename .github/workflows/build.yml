@@ -86,6 +86,8 @@ jobs:
           python3 outils/preparer.py
           flutter pub add dev:flutter_launcher_icons
           dart run flutter_launcher_icons
+      - name: Clé de signature fixe (les nouvelles versions s'installent par-dessus les anciennes)
+        run: mkdir -p ~/.android && cp outils/android/debug.keystore ~/.android/debug.keystore
       - name: Compiler l'APK
         run: |
           set +e
