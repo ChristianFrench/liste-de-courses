@@ -512,11 +512,15 @@ class LigneChoix extends StatelessWidget {
     this.alerte,
     this.afficherQuantite = true,
     this.droite,
+    this.onDetails,
   });
   final String nom;
   final String complement;
   final bool coche;
   final int quantite;
+
+  /// Icône à droite de la coche (article choisi) : fenêtre packaging, promotion, marque.
+  final VoidCallback? onDetails;
   final String? codePromo;
   final Color? couleurPromo;
   final VoidCallback? onPromo;
@@ -547,7 +551,10 @@ class LigneChoix extends StatelessWidget {
           Row(
             children: [
               CaseACocher(coche: coche, taille: 28),
-              const SizedBox(width: 12),
+              if (coche && onDetails != null)
+                BoutonIcone(icone: Icons.edit_note, libelle: 'Packaging, promotion, marque', onTap: onDetails!)
+              else
+                const SizedBox(width: 12),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -1773,7 +1780,7 @@ Future<bool> modale(
   required IconData icone,
   required Widget Function(BuildContext context, StateSetter maj) contenu,
   required String oui,
-  String non = 'Annuler',
+  String? non = 'Annuler',
 }) async {
   final r = await showDialog<bool>(
     context: context,
@@ -1803,8 +1810,10 @@ Future<bool> modale(
               Flexible(child: SingleChildScrollView(child: contenu(ctx, maj))),
               const SizedBox(height: 18),
               Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
-              const SizedBox(height: 10),
-              Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
+              if (non != null) ...[
+                const SizedBox(height: 10),
+                Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
+              ],
             ],
           ),
         ),

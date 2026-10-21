@@ -28,6 +28,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   final debut = DateTime.now();
   bool nomModifie = false;
   bool personnalisee = false;
+  bool types = false;
 
   @override
   void initState() {
@@ -43,11 +44,11 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   }
 
   void _initialiser() {
-    if (!nomModifie) nom.text = etat.nomParDefaut(magasinId, debut);
+    if (!nomModifie) nom.text = etat.nomLibre(etat.nomParDefaut(magasinId, debut));
   }
 
   void _creer(List<LigneListe> lignes) {
-    final texte = nom.text.trim().isEmpty ? etat.nomParDefaut(magasinId, debut) : nom.text.trim();
+    final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomParDefaut(magasinId, debut)) : nom.text.trim();
     if (etat.nomPris(texte)) {
       Nav.message(context, 'Une liste s\'appelle déjà « $texte » : choisissez un autre nom.');
       return;
@@ -161,8 +162,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
               LigneMenu(
                 icone: Icons.note_add_outlined,
                 titre: 'Liste type',
-                sousTitre: 'Tous les articles du magasin, rayon par rayon : vous choisissez',
-                onTap: () => _creer([]),
+                sousTitre: 'Une de vos listes types, ou la liste complète pour en construire une',
+                onTap: () => setState(() => types = !types),
+                droite: Icon(types ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
               ),
               LigneMenu(
                 icone: Icons.history,
@@ -179,6 +181,42 @@ class _EcranPrelisteState extends State<EcranPreliste> {
               ),
             ],
           ),
+          if (types)
+            GroupeRetractable(
+              cle: 'preliste/types',
+              titre: 'Listes types',
+              icone: Icons.note_add_outlined,
+              nombre: etat.listesTypes.length,
+              enfants: [
+                LigneMenu(
+                  icone: Icons.format_list_bulleted,
+                  titre: 'Liste complète',
+                  sousTitre: 'Tous les articles du magasin, rayon par rayon : vous choisissez. '
+                      'À la fin, vous pourrez l\'enregistrer comme liste type.',
+                  onTap: () => _creer([]),
+                ),
+                for (final t in etat.listesTypes)
+                  LigneMenu(
+                    icone: Icons.note_alt_outlined,
+                    titre: t.nom,
+                    sousTitre: '${t.lignes.length} article${t.lignes.length > 1 ? 's' : ''}'
+                        '${t.magasinId == magasinId ? '' : ' · faite pour ${etat.magasin(t.magasinId)?.nom ?? 'un autre magasin'}'}',
+                    onTap: () => _creer(etat.lignesDeListeType(t)),
+                    droite: IconButton(
+                      tooltip: 'Supprimer la liste type',
+                      icon: Icon(Icons.delete_outline, color: Charte.couleurIcone(Icons.delete_outline)),
+                      onPressed: () async {
+                        final ok = await modale(context,
+                            titre: 'Supprimer la liste type ?',
+                            icone: Icons.delete_outline,
+                            oui: 'Supprimer',
+                            contenu: (context, maj) => Text('« ${t.nom} » ne sera plus proposée.', style: Charte.texte(16)));
+                        if (ok) setState(() => etat.supprimerListeType(t));
+                      },
+                    ),
+                  ),
+              ],
+            ),
           if (personnalisee)
             GroupeRetractable(
               cle: 'preliste/dernieres',
@@ -338,12 +376,15 @@ class _EcranConstructionState extends State<EcranConstruction> {
   /// Fenêtre modale « Liste prête » : récapitulatif, envoi par mail éventuel, puis la liste passe dans Courses.
   Future<void> _valider(Liste l) async {
     var envoyer = false;
+    var pourCourses = true;
+    var enListeType = false;
+    final nomType = TextEditingController(text: etat.nomListe(l));
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
     final ok = await modale(
       context,
-      titre: 'Liste prête ?',
+      titre: 'Fin de la liste',
       icone: Icons.checklist,
-      oui: 'Valider la liste',
+      oui: 'Valider',
       non: 'Continuer la préparation',
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -351,23 +392,53 @@ class _EcranConstructionState extends State<EcranConstruction> {
           Text('${etat.nomListe(l)} : ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} '
               'dans $nbSecteurs secteur${nbSecteurs > 1 ? 's' : ''}.', style: Charte.texte(16)),
           const SizedBox(height: 6),
-          Text('Elle passe dans l\'onglet Courses ; vous pourrez encore la remettre en préparation.',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 6),
           CaseModale(
-            texte: 'Envoyer la liste par mail',
-            aide: etat.envoiFoyer ? 'À tout le foyer' : null,
-            coche: envoyer,
-            onChange: (v) => maj(() => envoyer = v),
+            texte: 'Prête pour les courses',
+            aide: 'Elle passe en instance de courses ; vous pourrez encore la remettre en préparation.',
+            coche: pourCourses,
+            onChange: (v) => maj(() => pourCourses = v),
           ),
+          CaseModale(
+            texte: 'Enregistrer comme liste type',
+            aide: 'Proposée ensuite dans « Liste type » pour une nouvelle liste.',
+            coche: enListeType,
+            onChange: (v) => maj(() => enListeType = v),
+          ),
+          if (enListeType)
+            Padding(
+              padding: const EdgeInsets.only(left: 38, bottom: 6),
+              child: TextField(
+                key: const ValueKey('nom-liste-type'),
+                controller: nomType,
+                style: Charte.texte(16),
+                decoration: const InputDecoration(labelText: 'Nom de la liste type'),
+              ),
+            ),
+          if (pourCourses)
+            CaseModale(
+              texte: 'Envoyer la liste par mail',
+              aide: etat.envoiFoyer ? 'À tout le foyer' : null,
+              coche: envoyer,
+              onChange: (v) => maj(() => envoyer = v),
+            ),
         ],
       ),
     );
+    final nom = nomType.text.trim();
     if (!ok || !mounted) return;
+    if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
+    if (!pourCourses) {
+      if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
+      return;
+    }
     if (envoyer) await envoyerListe(etat, l);
     etat.listePrete(l);
     Nav.i.retourOnglet(Nav.courses);
-    if (mounted) Nav.message(context, 'Liste prête : elle est dans l\'onglet Courses');
+    if (mounted) {
+      Nav.message(context, '${enListeType && nom.isNotEmpty ? 'Liste type « $nom » enregistrée. ' : ''}'
+          'Liste prête : elle est dans l\'onglet Courses');
+    }
   }
 
   Future<void> _produitAbsent(Liste l, Secteur s) async {
@@ -488,19 +559,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return LigneChoix(
       key: ValueKey(p.id),
       nom: p.nom,
-      complement: [etat.complement(g, p, avecPackaging: g == null), if (g?.consigne != null) '« ${g!.consigne} »']
-          .where((x) => x.isNotEmpty)
-          .join(' · '),
+      // Packaging, promotion et consigne en clair sous le nom ; l'icône à droite de la coche les modifie.
+      complement: [
+        etat.complement(g, p),
+        if (g?.promotion != null)
+          g!.promotion!.libelle.isNotEmpty ? g.promotion!.libelle : (etat.typePromotion(g.promotion!.type)?.nom ?? 'promo'),
+        if (g?.consigne != null) '« ${g!.consigne} »',
+      ].where((x) => x.isNotEmpty).join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
-      codePromo: g?.promotion == null
-          ? null
-          : (g!.promotion!.libelle.isNotEmpty ? g.promotion!.libelle : (etat.typePromotion(g.promotion!.type)?.nom ?? 'Promo')),
-      couleurPromo: g?.promotion == null ? null : Color(etat.couleurPromo(g!.promotion!.type)!),
-      onPromo: g == null ? null : () => ouvrirFeuillePromotion(context, l, g),
-      codePackaging: g?.packagingId == null ? null : etat.packaging(g!.packagingId)?.libelle,
-      couleurPackaging: Color(etat.couleurPack(g?.packagingId ?? '')!),
-      onPackaging: g == null ? null : () => ouvrirFeuillePromotion(context, l, g, packaging: true),
+      onDetails: g == null ? null : () => detailsArticle(context, l, p),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: () {
@@ -958,6 +1026,96 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       default:
         return [Text('Décrivez l\'offre dans le libellé.', style: Charte.texte(14, couleur: Charte.texteSecondaire))];
     }
+  }
+}
+
+/// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque (crée le produit de marque), consigne.
+Future<void> detailsArticle(BuildContext context, Liste l, Produit p) async {
+  final etat = Etat.instance;
+  final g = etat.ligne(l, p.id);
+  if (g == null) return;
+  var (mesure, lot) = Etat.mesureEtLot(etat.packaging(g.packagingId)?.libelle);
+  var promo = g.promotion?.type ?? '';
+  final precision = TextEditingController(text: g.promotion?.libelle ?? '');
+  final marque = TextEditingController();
+  final consigne = TextEditingController(text: g.consigne ?? '');
+  final mesures = etat.mesuresProposees(p);
+  final lots = etat.lotsProposes(p);
+  if (mesure != null && !mesures.contains(mesure)) mesures.insert(0, mesure);
+  if (lot != null && !lots.contains(lot)) lots.insert(0, lot);
+  Widget titre(String t) => Padding(
+        padding: const EdgeInsets.only(top: 12, bottom: 4),
+        child: Text(t, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      );
+  final ok = await modale(
+    context,
+    titre: p.nom,
+    icone: Icons.edit_note,
+    oui: 'Enregistrer',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        titre('Mesure (poids, contenance, à la pièce…)'),
+        ChoixDeroulant<String>(
+          valeur: mesure ?? '',
+          choix: {'': 'Indifférente', for (final m in mesures) m: m},
+          onChange: (v) => maj(() => mesure = v.isEmpty ? null : v),
+        ),
+        titre('Packaging (nombre d\'articles par lot)'),
+        ChoixDeroulant<String>(
+          valeur: lot ?? '',
+          choix: {'': 'À l\'unité', for (final x in lots) x: x},
+          onChange: (v) => maj(() => lot = v.isEmpty ? null : v),
+        ),
+        titre('Promotion'),
+        ChoixDeroulant<String>(
+          valeur: promo,
+          choix: {'': 'Aucune', for (final t in etat.typesPromotion) t.id: t.nom},
+          onChange: (v) => maj(() => promo = v),
+        ),
+        if (promo.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: TextField(
+              key: const ValueKey('precision-promo'),
+              controller: precision,
+              style: Charte.texte(16),
+              decoration: InputDecoration(labelText: 'Précision (ex. : ${etat.typePromotion(promo)?.exemple ?? ''})'),
+            ),
+          ),
+        titre('Ajouter une marque'),
+        TextField(
+          key: const ValueKey('marque-article'),
+          controller: marque,
+          style: Charte.texte(16),
+          decoration: InputDecoration(hintText: 'Ex. : Président (crée « ${p.nom} Président »)'),
+        ),
+        titre('Consigne'),
+        TextField(
+          key: const ValueKey('consigne-article'),
+          controller: consigne,
+          style: Charte.texte(16),
+          decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
+        ),
+      ],
+    ),
+  );
+  final texteMarque = marque.text.trim();
+  final textePrecision = precision.text.trim();
+  final texteConsigne = consigne.text;
+  if (!ok) return;
+  etat.definirPackaging(l, p.id, etat.packagingCompose(mesure, lot)?.id);
+  final ancienne = g.promotion;
+  etat.definirPromotion(
+      l,
+      p.id,
+      promo.isEmpty
+          ? null
+          : PromotionLigne(promo, ancienne?.type == promo ? ancienne!.parametres : {}, textePrecision));
+  etat.definirConsigne(l, p.id, texteConsigne);
+  if (texteMarque.isNotEmpty) {
+    final q = etat.produitDeMarque(l, p, texteMarque);
+    if (context.mounted) Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
   }
 }
 

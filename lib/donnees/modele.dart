@@ -217,6 +217,19 @@ class LigneListe {
 
 enum StatutListe { enConstruction, prete, enCours, terminee }
 
+/// Liste type : une liste nommée, enregistrée à la fin d'une préparation, pour repartir de ses articles.
+class ListeType {
+  ListeType(this.id, this.nom, this.magasinId, this.lignes);
+  final String id;
+  String nom;
+  final String magasinId;
+  final List<LigneListe> lignes;
+
+  Map<String, dynamic> toJson() => {'id': id, 'nom': nom, 'magasinId': magasinId, 'lignes': [for (final g in lignes) g.toJson()]};
+  static ListeType depuis(Map j) => ListeType(j['id'] as String, j['nom'] as String, j['magasinId'] as String? ?? '',
+      [for (final g in (j['lignes'] as List? ?? const []).cast<Map>()) LigneListe.depuis(Map<String, dynamic>.from(g))]);
+}
+
 class Liste {
   Liste({
     required this.id,
@@ -380,6 +393,9 @@ class Etat extends ChangeNotifier {
 
   /// Courses terminées classées dans l'historique sans ticket de caisse.
   Set<String> sansTicket = {};
+
+  /// Listes types nommées (Préparer › Nouvelle liste › Liste type).
+  List<ListeType> listesTypes = [];
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
   Set<String> parcoursAppris = {};
 
@@ -562,6 +578,7 @@ class Etat extends ChangeNotifier {
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
+    listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
@@ -656,6 +673,7 @@ class Etat extends ChangeNotifier {
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
+            if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
@@ -826,6 +844,99 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
+  // ------------------------------------------------------------ Listes types
+
+  /// Enregistre les articles de la liste sous un nom (sans coche) ; un nom déjà pris remplace l'ancienne liste type.
+  ListeType enregistrerListeType(Liste l, String nom) {
+    listesTypes.removeWhere((t) => t.nom.trim().toLowerCase() == nom.trim().toLowerCase());
+    final t = ListeType(nouvelId('lt'), nom.trim(), l.magasinId, lignesReprises(l));
+    listesTypes.add(t);
+    modifie();
+    return t;
+  }
+
+  void supprimerListeType(ListeType t) {
+    listesTypes.remove(t);
+    modifie();
+  }
+
+  /// Articles d'une liste type, à copier dans une nouvelle liste.
+  List<LigneListe> lignesDeListeType(ListeType t) => [
+        for (final g in t.lignes)
+          if (produit(g.produitId) != null)
+            LigneListe(
+                produitId: g.produitId, marqueId: g.marqueId, packagingId: g.packagingId, quantite: g.quantite, consigne: g.consigne)
+      ];
+
+  // ------------------------------------------------------------ Mesure et lot d'un packaging
+
+  /// Un lot (« lot de 6 », « pack de 4 ») ; le reste est une mesure (« 500 g », « 1,5 l », « à la pièce »).
+  static bool estLot(String libelle) => RegExp(r'^(lot|pack|paquet|boîte) ', caseSensitive: false).hasMatch(libelle.trim());
+
+  /// « lot de 6 × 1,5 l » → (mesure « 1,5 l », lot « lot de 6 »).
+  static (String?, String?) mesureEtLot(String? libelle) {
+    if (libelle == null || libelle.trim().isEmpty) return (null, null);
+    final parts = libelle.split(' × ');
+    if (parts.length == 2) return (parts[1].trim(), parts[0].trim());
+    return estLot(libelle) ? (null, libelle.trim()) : (libelle.trim(), null);
+  }
+
+  /// Packaging correspondant à une mesure et un lot (créé au besoin) ; null si ni l'un ni l'autre.
+  Packaging? packagingCompose(String? mesure, String? lot) {
+    if (mesure == null && lot == null) return null;
+    return _packagingNomme(mesure != null && lot != null ? '$lot × $mesure' : (lot ?? mesure)!);
+  }
+
+  /// Mesures proposées pour un produit : ses formats, sinon tous les types de packaging qui ne sont pas des lots.
+  List<String> mesuresProposees(Produit p) {
+    final siens = <String>{
+      for (final id in p.packagingIds)
+        if (mesureEtLot(packaging(id)?.libelle).$1 case final m?) m
+    };
+    if (siens.isNotEmpty) return siens.toList();
+    return [
+      for (final id in typesPackaging)
+        if (packaging(id) case final k? when !estLot(k.libelle)) k.libelle
+    ];
+  }
+
+  /// Lots proposés : ceux du produit et tous les types de packaging « lot ».
+  List<String> lotsProposes(Produit p) => <String>{
+        for (final id in [...p.packagingIds, ...typesPackaging])
+          if (mesureEtLot(packaging(id)?.libelle).$2 case final l?) l
+      }.toList();
+
+  /// Ajouter une marque crée un produit à part (« Camembert » reste ; « Camembert Président » est créé),
+  /// rangé aux mêmes endroits ; la ligne de la liste passe sur ce nouveau produit.
+  Produit produitDeMarque(Liste l, Produit p, String marqueNom) {
+    final nom = '${p.nom} ${marqueNom.trim()}';
+    var q = _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
+    if (q == null) {
+      q = Produit(nouvelId('p'), nom, [], [...p.packagingIds], 0);
+      produits.add(q);
+      for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
+        emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
+      }
+    }
+    ajouterMarque(q, marqueNom.trim());
+    final m = _trouve(marques, (x) => x.nom.toLowerCase() == marqueNom.trim().toLowerCase());
+    final i = l.lignes.indexWhere((g) => g.produitId == p.id);
+    if (i >= 0 && ligne(l, q.id) == null) {
+      final g = l.lignes[i];
+      q.nbUtilisations++;
+      l.lignes[i] = LigneListe(
+          produitId: q.id,
+          marqueId: m?.id,
+          packagingId: g.packagingId,
+          quantite: g.quantite,
+          promotion: g.promotion,
+          consigne: g.consigne);
+    }
+    _toucheConstruction(l);
+    modifie();
+    return q;
+  }
+
   void definirConsigne(Liste l, String produitId, String? consigne) {
     final g = ligne(l, produitId);
     if (g == null) return;
@@ -840,6 +951,15 @@ class Etat extends ChangeNotifier {
   /// (Sans heure connue, comme dans les données de démonstration, la date seule.)
   String nomParDefaut(String magasinId, DateTime d) => '${magasin(magasinId)?.nom ?? 'Liste'} du ${jjmmaaaa(d)}'
       '${d.hour == 0 && d.minute == 0 ? '' : ' à ${heure(d)}'}';
+
+  /// Nom libre à partir d'un nom proposé : « … (2) », « … (3) » si déjà pris.
+  String nomLibre(String nom) {
+    var n = nom;
+    for (var i = 2; nomPris(n); i++) {
+      n = '$nom ($i)';
+    }
+    return n;
+  }
 
   /// Une liste non terminée porte déjà ce nom (deux listes ne peuvent pas avoir le même nom).
   bool nomPris(String nom, {Liste? sauf}) => listes.any((l) =>

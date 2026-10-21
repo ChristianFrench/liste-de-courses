@@ -88,14 +88,9 @@ void main() {
     await _capture('27 Modale-Liste-prete');
     await _toucher(tester, find.text('Continuer la préparation'));
     final lait = find.ancestor(of: find.textContaining('Lait demi-écrémé', findRichText: true), matching: find.byType(LigneChoix)).first;
-    await _toucher(tester, find.descendant(of: lait, matching: find.byType(Pastille)).last);
-    await _capture('04 Construire-Promo');
-    Nav.i.racine.currentState!.pop();
-    await tester.pumpAndSettle();
-    await _toucher(tester, find.descendant(of: lait, matching: find.byType(Pastille)).first);
-    await _capture('20 Construire-Packaging');
-    Nav.i.racine.currentState!.pop();
-    await tester.pumpAndSettle();
+    await _toucher(tester, find.descendant(of: lait, matching: find.byTooltip('Packaging, promotion, marque')));
+    await _capture('04 Construire-Article');
+    await _toucher(tester, find.text('Annuler'));
     await _toucher(tester, find.byTooltip('Retour'));
 
     await _toucher(tester, _onglet('Gérer'));

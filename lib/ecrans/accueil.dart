@@ -183,39 +183,107 @@ class _Etapes extends StatelessWidget {
     (Icons.receipt_long_outlined, 'Je garde\nle ticket'),
   ];
 
+  // Explication de chaque étape, affichée quand on la touche.
+  static const _explications = [
+    (
+      'Je prépare ma liste',
+      [
+        'Touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
+        '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
+        '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
+        'Cochez les articles voulus et réglez la quantité. L\'icône à droite de la coche précise le packaging, '
+            'la promotion, la marque ou une consigne.',
+        'Vous pouvez vous arrêter à tout moment : rien n\'est perdu, la liste reste « En préparation ».',
+      ],
+    ),
+    (
+      'Je la valide',
+      [
+        'Quand la liste est complète, touchez « Liste prête ».',
+        'Vous pouvez la mettre en instance de courses, l\'enregistrer comme liste type sous un nom de votre choix '
+            'pour la réutiliser, et l\'envoyer par mail.',
+        'Une liste prête peut encore être remise en préparation.',
+      ],
+    ),
+    (
+      'Je fais mes courses',
+      [
+        'Au magasin, touchez « Faire les courses » : indiquez qui fait les courses et le parcours.',
+        'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez un article pour le cocher.',
+        'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
+        'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
+      ],
+    ),
+    (
+      'Je garde le ticket',
+      [
+        'À la fin, touchez « Terminer les courses ».',
+        'La course attend son ticket de caisse dans l\'onglet Courses (« Terminées sans ticket ») : joignez le PDF '
+            'fourni par l\'application du magasin.',
+        'Avec son ticket, la course rejoint l\'historique (Gérer › Historique). Ces courses passées servent ensuite '
+            'à préparer les prochaines listes.',
+      ],
+    ),
+  ];
+
+  static Future<void> _expliquer(BuildContext context, int i) => modale(
+        context,
+        titre: '${i + 1}. ${_explications[i].$1}',
+        icone: _etapes[i].$1,
+        oui: 'Compris',
+        non: null,
+        contenu: (context, maj) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final t in _explications[i].$2)
+              Padding(padding: const EdgeInsets.only(bottom: 8), child: Text(t, style: Charte.texte(16))),
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.fromLTRB(4, 6, 4, 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            for (var i = 0; i < _etapes.length; i++)
-              Expanded(
-                child: Column(
+            for (var i = 0; i < _etapes.length; i++) Expanded(child: _etape(context, i)),
+          ],
+        ),
+      );
+
+  /// Une étape : un appui ouvre son explication.
+  Widget _etape(BuildContext context, int i) => Semantics(
+        button: true,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _expliquer(context, i),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconeRonde(_etapes[i].$1),
-                        Positioned(
-                          left: -4,
-                          top: -4,
-                          child: Container(
-                            width: 20,
-                            height: 20,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(color: Charte.accent, shape: BoxShape.circle),
-                            child: Text('${i + 1}', style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
-                          ),
-                        ),
-                      ],
+                    IconeRonde(_etapes[i].$1),
+                    Positioned(
+                      left: -4,
+                      top: -4,
+                      child: Container(
+                        width: 20,
+                        height: 20,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: Charte.accent, shape: BoxShape.circle),
+                        child: Text('${i + 1}', style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
+                      ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(_etapes[i].$2, textAlign: TextAlign.center, style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
                   ],
                 ),
-              ),
-          ],
+                const SizedBox(height: 6),
+                Text(_etapes[i].$2, textAlign: TextAlign.center, style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
+              ],
+            ),
+          ),
         ),
       );
 }
