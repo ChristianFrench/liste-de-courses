@@ -22,7 +22,7 @@ class EcranAccueil extends StatelessWidget {
     // L'en-tête et la photo restent en haut ; seules les listes défilent.
     // Faire défiler les listes replie « Comment ça marche » pour leur laisser la place.
     return PageBase(
-      entete: const EnTeteFenetre(titre: 'Accueil', sousTitre: 'Version $versionApplication', aide: Aides.accueil),
+      entete: const EnTeteFenetre(icone: Icons.home_outlined, titre: 'Accueil', sousTitre: 'Version $versionApplication', aide: Aides.accueil),
       haut: const [_EnTetePhoto()],
       corps: NotificationListener<ScrollUpdateNotification>(
         onNotification: (n) {

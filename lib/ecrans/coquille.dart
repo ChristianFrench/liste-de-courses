@@ -118,10 +118,10 @@ class RacineOnglet extends StatelessWidget {
         // Contenus recréés à chaque changement de données (pas de « const ») pour qu'ils se redessinent.
         Nav.accueil => EcranAccueil(),
         Nav.preparer => PageBase(
-            entete: const EnTeteFenetre(titre: 'Préparer', aide: Aides.preparer),
+            entete: const EnTeteFenetre(icone: Icons.checklist, titre: 'Préparer', aide: Aides.preparer),
             corps: SousEcranPreparer(),
           ),
-        Nav.courses => PageBase(entete: const EnTeteFenetre(titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
+        Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
         _ => const MenuGerer(),
       },
     );
@@ -146,7 +146,7 @@ class MenuGerer extends StatelessWidget {
           },
         );
     return PageBase(
-      entete: const EnTeteFenetre(titre: 'Gérer', aide: Aides.gerer),
+      entete: const EnTeteFenetre(icone: Icons.tune, titre: 'Gérer', aide: Aides.gerer),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
@@ -217,7 +217,7 @@ class EcranRubrique extends StatelessWidget {
             };
         }
         return PageBase(
-          entete: EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: titre, droite: droite, aide: aide),
+          entete: EnTeteFenetre(retour: true, icone: Icons.tune, sousTitre: 'Gérer', titre: titre, droite: droite, aide: aide),
           haut: [if (onglets != null) SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],
           corps: contenu,
         );
