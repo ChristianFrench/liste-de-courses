@@ -21,10 +21,12 @@ class EcranAccueil extends StatelessWidget {
     final pretes = etat.listesStatut(StatutListe.prete);
     // L'en-tête et la photo restent en haut ; seules les listes défilent.
     // Faire défiler les listes replie « Comment ça marche » pour leur laisser la place.
-    return PageBase(
-      entete: const EnTeteFenetre(icone: Icons.home_outlined, titre: 'Accueil', sousTitre: 'Version $versionApplication', aide: Aides.accueil),
-      haut: const [_EnTetePhoto()],
-      corps: NotificationListener<ScrollUpdateNotification>(
+    // L'accueil n'a pas de bandeau de titre : la photo (version, synchronisation, aide) en tient lieu.
+    return Scaffold(
+      backgroundColor: Charte.fond,
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const _EnTetePhoto(),
+      Expanded(child: NotificationListener<ScrollUpdateNotification>(
         onNotification: (n) {
           if (n.metrics.axis == Axis.vertical && n.metrics.pixels > 24 && Retractables.i.ouvert(_EnTetePhoto._cle)) {
             Retractables.i.basculer(_EnTetePhoto._cle);
@@ -94,7 +96,8 @@ class EcranAccueil extends StatelessWidget {
             const SizedBox(height: 12),
           ],
         ),
-      ),
+      )),
+      ]),
     );
   }
 }
@@ -108,11 +111,18 @@ class _EnTetePhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final haut = MediaQuery.of(context).padding.top;
     return ListenableBuilder(
       listenable: Retractables.i,
       builder: (context, _) {
         final ouvert = Retractables.i.ouvert(_cle);
-        return Stack(
+        return GestureDetector(
+          // Comme sur les bandeaux des autres fenêtres : glisser passe à l'onglet voisin.
+          onHorizontalDragEnd: (d) {
+            final v = d.primaryVelocity ?? 0;
+            if (v.abs() > 200) glisserOnglet(context, v < 0 ? 1 : -1);
+          },
+          child: Stack(
           children: [
             Positioned.fill(child: Image.asset('assets/accueil_photo.jpg', fit: BoxFit.cover, alignment: Alignment.topCenter)),
             // Voile léger (la photo reste claire) ; une ombre portée garde le texte blanc lisible.
@@ -129,12 +139,25 @@ class _EnTetePhoto extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.only(top: haut),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Seuls ajouts au haut de l'accueil : la version, la synchronisation et l'aide.
+                  Row(
+                    children: [
+                      const SizedBox(width: 18),
+                      Expanded(
+                        child: Text('Version $versionApplication',
+                            style: _surPhoto(Charte.texte(11, couleur: const Color(0xEEFFFFFF)))),
+                      ),
+                      boutonEnTete(Icons.cloud_off_outlined, 'Synchronisation', () => montrerSynchro(context)),
+                      boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
+                      const SizedBox(width: 4),
+                    ],
+                  ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -172,7 +195,7 @@ class _EnTetePhoto extends StatelessWidget {
               ),
             ),
           ],
-        );
+        ));
       },
     );
   }

@@ -322,7 +322,8 @@ void main() {
     testWidgets('en-tête : glisser change d\'onglet ; synchronisation et aide dans une fenêtre à croix', (tester) async {
       await _lancer(tester);
       expect(find.textContaining('Version '), findsOneWidget, reason: 'numéro de version en haut de l\'accueil');
-      await tester.fling(find.byType(EnTeteFenetre), const Offset(-200, 0), 1000);
+      expect(find.byType(EnTeteFenetre), findsNothing, reason: 'pas de bandeau de titre sur l\'accueil');
+      await tester.fling(find.text('Bonjour !'), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
       expect(find.text('+ Nouvelle liste'), findsOneWidget, reason: 'glisser à gauche : onglet Préparer');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(-200, 0), 1000);
@@ -565,7 +566,7 @@ void main() {
       await _toucher(tester, find.text('Ajouter un rayon'));
       await tester.enterText(find.byType(TextField).last, 'Animalerie');
       await _toucher(tester, find.text('Suivant'));
-      expect(find.text('Images du catalogue'), findsOneWidget, reason: 'bibliothèque d\'images');
+      expect(find.text('Images de réserve'), findsOneWidget, reason: 'bibliothèque d\'images');
       await _toucher(tester, find.text('Image automatique (selon le nom)'));
       await tester.enterText(find.byType(TextField).last, 'Chats');
       await _toucher(tester, find.text('Ajouter').last);

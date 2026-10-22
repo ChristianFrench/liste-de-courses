@@ -56,9 +56,19 @@ class EnTeteFenetre extends StatelessWidget {
         final v = d.primaryVelocity ?? 0;
         if (v.abs() > 200) glisserOnglet(context, v < 0 ? 1 : -1);
       },
+      // Fond : la photo de l'accueil, assombrie pour que le texte blanc reste lisible
+      // (la couleur pleine est réservée aux bandeaux des groupes de listes).
       child: Container(
         height: hauteur,
-        color: Charte.accent,
+        decoration: const BoxDecoration(
+          color: Color(0xFF3A4A3A),
+          image: DecorationImage(
+            image: AssetImage('assets/accueil_photo.jpg'),
+            fit: BoxFit.cover,
+            alignment: Alignment(0, -0.35),
+            colorFilter: ColorFilter.mode(Color(0x73000000), BlendMode.darken),
+          ),
+        ),
         padding: EdgeInsets.only(left: retour ? 0 : 12, right: 4),
         child: Row(
           children: [
@@ -75,10 +85,10 @@ class EnTeteFenetre extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(21, gras: true, couleur: Charte.blanc)),
+                  Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(21, gras: true, couleur: Charte.blanc))),
                   if (sousTitre != null)
                     Text(sousTitre!,
-                        maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(12, couleur: const Color(0xDDFFFFFF))),
+                        maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(12, couleur: const Color(0xEEFFFFFF)))),
                 ],
               ),
             ),
@@ -94,13 +104,17 @@ class EnTeteFenetre extends StatelessWidget {
   }
 }
 
+/// Texte blanc posé sur la photo : une ombre douce le détache des légumes clairs.
+TextStyle surPhoto(TextStyle s) =>
+    s.copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6), Shadow(color: Color(0x99000000), blurRadius: 2)]);
+
 /// Icône blanche de l'en-tête.
 Widget boutonEnTete(IconData i, String libelle, VoidCallback onTap) => Tooltip(
       message: libelle,
       child: InkResponse(
         onTap: onTap,
         radius: 22,
-        child: SizedBox(width: 44, height: EnTeteFenetre.hauteur, child: Icon(i, size: 24, color: Charte.blanc)),
+        child: SizedBox(width: 44, height: EnTeteFenetre.hauteur, child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
       ),
     );
 
