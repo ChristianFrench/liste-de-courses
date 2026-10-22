@@ -9,7 +9,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/pictos.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
