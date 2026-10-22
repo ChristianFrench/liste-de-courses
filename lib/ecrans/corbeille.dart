@@ -111,7 +111,7 @@ class EcranCorbeille extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Corbeille'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Corbeille'),
         corps: ListView(
           children: [
             for (final type in [for (final c in etat.corbeille) c.type].toSet())

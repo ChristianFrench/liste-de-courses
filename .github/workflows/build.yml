@@ -89,14 +89,14 @@ jobs:
       - name: Compiler l'APK
         run: |
           set +e
-          flutter build apk --release > compilation.log 2>&1
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
       - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
         run: |
-          flutter build apk --release --target-platform android-x64
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --target-platform android-x64
           mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
       - uses: actions/upload-artifact@v4
         with:
@@ -123,7 +123,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          flutter build windows --release > compilation.log 2>&1
+          flutter build windows --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Windows"; else tail -n 20 compilation.log; fi
           exit $code
@@ -182,7 +182,7 @@ jobs:
       - name: Compiler la version iPhone (vérification, sans signature)
         run: |
           set +e
-          flutter build ios --release --no-codesign > compilation.log 2>&1
+          flutter build ios --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --no-codesign > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation iPhone"; else tail -n 20 compilation.log; fi
           exit $code

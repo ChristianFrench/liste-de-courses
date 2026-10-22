@@ -18,7 +18,7 @@ class EcranFoyer extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Mon foyer'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Mon foyer'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -174,7 +174,7 @@ class EcranParametres extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer', titre: 'Paramètres'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Paramètres'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -389,7 +389,7 @@ class EcranTypesPromotion extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de promotion'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Paramètres', titre: 'Types de promotion'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -594,7 +594,7 @@ class EcranTypesPackaging extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteSousNiveau(fil: 'Gérer › Paramètres', titre: 'Types de packaging'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Paramètres', titre: 'Types de packaging'),
         bas: [
           BarreAction(boutons: [
             Bouton(

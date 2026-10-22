@@ -97,14 +97,11 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
   @override
   Widget build(BuildContext context) {
     return PageBase(
-      entete: EnTeteSousNiveau(
-        fil: 'Gérer › Essais',
+      entete: EnTeteFenetre(
+        retour: true,
+        sousTitre: 'Gérer › Essais',
         titre: 'Produits réels (essai)',
-        droite: BoutonIcone(
-          icone: Icons.cloud_sync_outlined,
-          libelle: 'Catalogue et mises à jour',
-          onTap: () => Nav.aller(context, const EcranCatalogue()),
-        ),
+        actions: [ActionLigne(Icons.cloud_sync_outlined, 'Catalogue et mises à jour', () => Nav.aller(context, const EcranCatalogue()))],
       ),
       haut: [
         Padding(
@@ -294,7 +291,7 @@ class EcranArticle extends StatelessWidget {
           ),
         );
     return PageBase(
-      entete: EnTeteSousNiveau(fil: 'Produits réels', titre: a.nom),
+      entete: EnTeteFenetre(retour: true, sousTitre: 'Produits réels', titre: a.nom),
       corps: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         children: [
@@ -380,7 +377,7 @@ class EcranMarque extends StatelessWidget {
   Widget build(BuildContext context) {
     final articles = CatalogueOff.instance.parMarque(marque);
     return PageBase(
-      entete: EnTeteSousNiveau(fil: 'Produits réels', titre: 'Marque · $marque'),
+      entete: EnTeteFenetre(retour: true, sousTitre: 'Produits réels', titre: 'Marque · $marque'),
       corps: ListView.builder(
         itemCount: articles.length + 1,
         itemBuilder: (context, i) {
@@ -466,7 +463,7 @@ class EcranCatalogue extends StatelessWidget {
             );
         final v = c.derniereVerification;
         return PageBase(
-          entete: const EnTeteSousNiveau(fil: 'Produits réels', titre: 'Catalogue des produits réels'),
+          entete: const EnTeteFenetre(retour: true, sousTitre: 'Produits réels', titre: 'Catalogue des produits réels'),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [

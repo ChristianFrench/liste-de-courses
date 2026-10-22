@@ -8,6 +8,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'magasin.dart' show choisirImageRayon, choisirImageSecteur;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -221,7 +222,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   Widget build(BuildContext context) {
     final passees = etat.dernieresCourses(magasinId);
     return PageBase(
-      entete: const EnTeteTravail(titre: 'Nouvelle liste'),
+      entete: const EnTeteFenetre(retour: true, icone: Icons.checklist, titre: 'Nouvelle liste', aide: Aides.nouvelleListe),
       haut: [
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
@@ -362,15 +363,19 @@ class EcranConstruction extends StatefulWidget {
 
 /// Un élément de la liste de préparation : titre de rayon, titre de secteur, produit, ou « + Produit absent ».
 class _Element {
-  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false;
-  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false;
-  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false;
-  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true;
+  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false, ajout = false;
+  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false, ajout = false;
+  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false, ajout = false;
+  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true, ajout = false;
+
+  /// « + Ajouter un secteur » (au [rayon] ouvert) ou, sans rayon, « + Ajouter un rayon ».
+  _Element.ajout(this.rayon) : secteur = null, produit = null, absent = false, ajout = true;
   final Rayon? rayon;
   final Secteur? secteur; // null : « Non placé »
   final Produit? produit;
   final bool absent;
-  bool get titreSecteur => rayon == null && produit == null && !absent;
+  final bool ajout;
+  bool get titreSecteur => rayon == null && produit == null && !absent && !ajout;
 }
 
 /// Préparation : la même liste que pendant les courses. Tous les secteurs du magasin, dans l'ordre du parcours
@@ -406,7 +411,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
   List<Secteur> _secteurs(Liste l) {
     final ordre = <String>[...(etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.etapes ?? const <String>[])];
     for (final s in etat.secteursDuMagasin(l.magasinId)) {
-      if (!ordre.contains(s.id)) ordre.add(s.id);
+      if (ordre.contains(s.id)) continue;
+      // Un secteur que le parcours ne cite pas (ajouté depuis) se range après les autres secteurs de son rayon.
+      final i = ordre.lastIndexWhere((id) => etat.secteur(id)?.rayonId == s.rayonId);
+      if (i < 0) {
+        ordre.add(s.id);
+      } else {
+        ordre.insert(i + 1, s.id);
+      }
     }
     return [for (final id in ordre) etat.secteur(id)].whereType<Secteur>().toList();
   }
@@ -415,6 +427,12 @@ class _EcranConstructionState extends State<EcranConstruction> {
   List<_Element> _elements(Liste l) {
     final res = <_Element>[];
     String? rayonCourant;
+    // Sous les secteurs d'un rayon ouvert : « + Ajouter un secteur ».
+    void finRayon() {
+      final r = etat.rayon(rayonCourant ?? '');
+      if (!maListe && r != null && Retractables.i.ouvert(_cleRayon(r.id))) res.add(_Element.ajout(r));
+    }
+
     for (final s in _secteurs(l)) {
       final produits = [
         for (final p in etat.produitsDu(l.magasinId, s.id))
@@ -422,6 +440,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ]..sort((a, b) => ordreAlpha(a.nom).compareTo(ordreAlpha(b.nom)));
       if (maListe && produits.isEmpty) continue;
       if (s.rayonId != rayonCourant) {
+        finRayon();
         rayonCourant = s.rayonId;
         final r = etat.rayon(s.rayonId);
         if (r != null) res.add(_Element.rayon(r));
@@ -434,6 +453,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
       }
       if (!maListe) res.add(_Element.absent(s));
     }
+    finRayon();
+    if (!maListe) res.add(_Element.ajout(null));
     final nonPlaces = [
       for (final g in l.lignes)
         if (etat.secteurDe(l.magasinId, g.produitId) == null) etat.produit(g.produitId),
@@ -480,21 +501,67 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   final _lignes = <String, GlobalKey>{};
 
-  /// Fenêtre de l'article ; un article non choisi est d'abord coché (décoché si l'on abandonne).
-  /// Si un nouvel article est créé (marque, packaging), l'écran reste sur lui.
-  Future<void> _modifier(Liste l, Produit p) async {
-    final ajoute = etat.ligne(l, p.id) == null;
-    if (ajoute) etat.basculer(l, p.id);
-    final q = await detailsArticle(context, l, p);
-    if (q == null) {
-      if (ajoute && etat.ligne(l, p.id) != null) etat.basculer(l, p.id);
-      return;
-    }
-    if (q.id == p.id || !mounted) return;
+  /// Article touché en dernier : il montre ses quatre pastilles (marque, mesure, packaging, promo).
+  String? _focus;
+
+  void _montrerLigne(String produitId) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final c = _lignes[q.id]?.currentContext;
-      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3);
+      final c = _lignes[produitId]?.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3, alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
     });
+  }
+
+  static const _autre = '\u0000autre';
+  static const _sans = '\u0000sans';
+
+  /// Pastille « Marque » : « Camembert » devient l'article « Camembert Président » (créé au besoin).
+  Future<void> _choisirMarque(Liste l, Produit p) async {
+    final g = etat.ligne(l, p.id);
+    if (g == null) return;
+    final actuelle = etat.marque(g.marqueId)?.nom;
+    final v = await choisirDansListe<String>(context, titre: 'Marque · ${etat.nomSansMarque(g, p)}', choix: {
+      if (actuelle != null) _sans: 'Sans marque',
+      for (final m in etat.marquesProposees(g, p)) m: m,
+      _autre: 'Autre marque…',
+    });
+    if (v == null || !mounted) return;
+    var nom = v == _sans ? '' : v;
+    if (v == _autre) {
+      nom = await demanderTexte(context, titre: 'Marque', aide: 'Ex. : Président') ?? '';
+      if (nom.isEmpty || !mounted) return;
+    }
+    final q = etat.changerMarque(l, p, nom);
+    setState(() => _focus = q.id);
+    _montrerLigne(q.id);
+  }
+
+  /// Pastilles « Mesure » (poids, contenance) et « Packaging » (lot de x).
+  Future<void> _choisirPackaging(Liste l, Produit p, {required bool lot}) async {
+    final g = etat.ligne(l, p.id);
+    if (g == null) return;
+    final (mesure, lotActuel) = Etat.mesureEtLot(etat.packaging(g.packagingId)?.libelle);
+    final v = await choisirDansListe<String>(context, titre: '${lot ? 'Packaging' : 'Mesure'} · ${p.nom}', choix: {
+      '': lot ? 'À l\'unité' : 'Indifférente',
+      for (final x in lot ? etat.lotsProposes(p) : etat.mesuresProposees(p)) x: x,
+      _autre: lot ? 'Autre packaging…' : 'Autre mesure…',
+    });
+    if (v == null || !mounted) return;
+    var x = v;
+    if (v == _autre) {
+      x = await demanderTexte(context, titre: lot ? 'Packaging' : 'Mesure', aide: lot ? 'Ex. : lot de 6' : 'Ex. : 500 g') ?? '';
+      if (x.isEmpty || !mounted) return;
+      if (lot && RegExp(r'^\d+$').hasMatch(x)) x = 'lot de $x';
+    }
+    final choix = x.isEmpty ? null : x;
+    final k = lot ? etat.packagingCompose(mesure, choix) : etat.packagingCompose(choix, lotActuel);
+    etat.definirPackaging(l, p.id, k?.id);
+  }
+
+  Future<void> _consigne(Liste l, Produit p) async {
+    final g = etat.ligne(l, p.id);
+    if (g == null) return;
+    final t = await demanderTexte(context, titre: 'Consigne · ${p.nom}', initial: g.consigne ?? '', aide: 'Ex. : bien mûres, la moins chère');
+    if (t != null) etat.definirConsigne(l, p.id, t);
   }
 
   /// Fait venir le bandeau d'un secteur en haut de l'écran (hauteurs estimées, puis ajustement).
@@ -607,14 +674,17 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
-  /// « + Produit absent de ce secteur » : la fenêtre de l'article, avec le nom en plus.
+  /// « + Produit absent de ce secteur » : son nom suffit ; il est créé, placé ici, coché et touché
+  /// (ses pastilles permettent ensuite d'ajouter marque, mesure, packaging, promo).
   Future<void> _produitAbsent(Liste l, Secteur s) async {
-    final q = await detailsArticle(context, l, null, nouveauDans: s);
-    if (q == null || !mounted) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final c = _lignes[q.id]?.currentContext;
-      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3);
-    });
+    final n = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', aide: 'Nom générique (ex. : Riz)', valider: 'Ajouter');
+    if (n == null || n.isEmpty || !mounted) return;
+    final q = etat.creerProduit(n);
+    etat.placer(l.magasinId, q.id, s.id);
+    etat.ajouterLigne(l, q.id);
+    setState(() => _focus = q.id);
+    Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
+    _montrerLigne(q.id);
   }
 
   @override
@@ -625,15 +695,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
         final l = liste;
         if (l == null) {
           return PageBase(
-            entete: const EnTeteTravail(titre: 'Liste'),
+            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
             corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
           );
         }
         final barre = BarreAction(boutons: [
-          Bouton(
-            texte: maListe ? 'Tout' : 'Ma liste · ${l.lignes.length}',
-            taille: 15,
-            plein: maListe,
+          BoutonEtat(
+            texte: 'Ma liste · ${l.lignes.length}',
+            actif: maListe,
             onTap: () => setState(() => maListe = !maListe),
           ),
           Bouton(
@@ -641,24 +710,23 @@ class _EcranConstructionState extends State<EcranConstruction> {
             taille: 15,
             onTap: () => Nav.travail(EcranCoursesSecteur(listeId: l.id, apercu: true)),
           ),
-          Bouton(texte: 'Liste prête', plein: !maListe, onTap: () => _valider(l)),
+          Bouton(texte: 'Liste prête', plein: true, onTap: () => _valider(l)),
         ]);
-        final entete = EnTeteTravail(
+        final entete = EnTeteFenetre(
+          retour: true,
+          icone: Icons.checklist,
           titre: etat.nomListe(l),
-          sousTitre: 'Enregistré',
-          action: Row(mainAxisSize: MainAxisSize.min, children: [
-            BoutonIcone(
-              icone: Icons.mail_outline,
-              libelle: 'Envoyer par mail',
-              onTap: () async {
-                if (!await envoyerListe(etat, l) && context.mounted) {
-                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
-                }
-              },
-            ),
-            BoutonIcone(icone: Icons.search, libelle: 'Rechercher dans le magasin', onTap: () => _rechercher(l)),
-            BoutonReduire(cles: _toutesLesCles(l)),
-          ]),
+          sousTitre: 'Préparation · enregistrée',
+          aide: Aides.preparation,
+          actions: [
+            ActionLigne(Icons.search, 'Rechercher dans le magasin', () => _rechercher(l)),
+            reduireTout(_toutesLesCles(l)),
+            ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
+              if (!await envoyerListe(etat, l) && context.mounted) {
+                Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
+              }
+            }),
+          ],
         );
         if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
           return PageBase(
@@ -695,6 +763,24 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   itemBuilder: (context, i) {
                     final e = elements[i];
                     final s = e.secteur;
+                    if (e.ajout) {
+                      final r = e.rayon;
+                      return InkWell(
+                        onTap: () => r == null ? _ajouterRayon(l) : _ajouterSecteur(l, r),
+                        child: Container(
+                          height: 48,
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.only(left: r == null ? 12 : 24),
+                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                          child: Row(children: [
+                            Icon(Icons.add_circle_outline, size: 22, color: Charte.cadre),
+                            const SizedBox(width: 8),
+                            Text(r == null ? 'Ajouter un rayon' : 'Ajouter un secteur à ${r.nom}',
+                                style: Charte.texte(15, gras: true, couleur: Charte.cadre)),
+                          ]),
+                        ),
+                      );
+                    }
                     if (e.rayon != null) {
                       final r = e.rayon!;
                       final cle = _cleRayon(r.id);
@@ -772,6 +858,34 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
   }
 
+  /// « + Ajouter un rayon » : son nom, son image (bibliothèque), puis son premier secteur ; il s'ouvre.
+  Future<void> _ajouterRayon(Liste l) async {
+    final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Ex. : Bio, Animalerie', valider: 'Suivant');
+    if (nom == null || nom.isEmpty || !mounted) return;
+    final r = etat.ajouterRayon(l.magasinId, nom);
+    await choisirImageRayon(context, r.nom);
+    if (!mounted) return;
+    final sn = await demanderTexte(context,
+        titre: 'Premier secteur du rayon ${r.nom}', initial: r.nom, aide: 'Nom du secteur', valider: 'Ajouter');
+    if (!mounted) return;
+    final s = etat.ajouterSecteur(r.id, (sn == null || sn.isEmpty) ? r.nom : sn);
+    Nav.message(context, 'Rayon « ${r.nom} » ajouté au magasin');
+    _ouvrirSeul(l, s.id);
+    _montrer('rayon:${r.id}');
+  }
+
+  /// « + Ajouter un secteur » dans un rayon ouvert : son nom, puis son image (bibliothèque) ; il s'ouvre.
+  Future<void> _ajouterSecteur(Liste l, Rayon r) async {
+    final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', aide: 'Nom du secteur', valider: 'Suivant');
+    if (nom == null || nom.isEmpty || !mounted) return;
+    final s = etat.ajouterSecteur(r.id, nom);
+    await choisirImageSecteur(context, r.nom, s.nom);
+    if (!mounted) return;
+    Nav.message(context, 'Secteur « ${s.nom} » ajouté au rayon ${r.nom}');
+    _ouvrirSeul(l, s.id);
+    _montrer(s.id);
+  }
+
   /// Article non placé dans ce magasin : on choisit son rayon puis son secteur ; il y rejoint la liste.
   Future<void> _placer(Liste l, Produit p) async {
     final s = await choisirSecteur(context, l.magasinId, p.nom);
@@ -783,13 +897,36 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   Widget _ligne(Liste l, Produit p) {
     final g = etat.ligne(l, p.id);
-    // Non placé : la fenêtre de l'article ne sert qu'une fois l'article placé ; toucher son nom propose un secteur.
+    // Non placé : toucher son nom propose un secteur ; il pourra ensuite être coché.
     final place = etat.secteurDe(l.magasinId, p.id) != null;
+    final focus = g != null && _focus == p.id;
     void basculer() {
       etat.basculer(l, p.id);
+      final coche = etat.ligne(l, p.id) != null;
+      setState(() => _focus = coche ? p.id : (_focus == p.id ? null : _focus));
       final s = etat.secteurDe(l.magasinId, p.id);
       if (s != null) etat.positionConstruction(l, s.rayonId, s.id);
     }
+
+    final (mesure, lot) = Etat.mesureEtLot(etat.packaging(g?.packagingId)?.libelle);
+    final promo = g?.promotion;
+    final textePromo = promo == null ? null : (promo.libelle.isNotEmpty ? promo.libelle : (etat.typePromotion(promo.type)?.nom ?? 'Promo'));
+    final couleurPromo = promo == null ? null : etat.couleurPromo(promo.type);
+    final pastilles = <Widget>[
+      if (focus) ...[
+        Pastille(etat.marque(g.marqueId)?.nom ?? '+ Marque', vide: g.marqueId == null, onTap: () => _choisirMarque(l, p)),
+        Pastille(mesure ?? '+ Mesure', vide: mesure == null, onTap: () => _choisirPackaging(l, p, lot: false)),
+        Pastille(lot ?? '+ Packaging', vide: lot == null, onTap: () => _choisirPackaging(l, p, lot: true)),
+        Pastille(textePromo ?? '+ Promo',
+            couleur: couleurPromo == null ? Charte.rouge : Color(couleurPromo),
+            vide: promo == null,
+            onTap: () => ouvrirFeuillePromotion(context, l, g)),
+      ] else if (g != null) ...[
+        // Article coché, pas touché en dernier : seulement la mesure et le packaging, s'il y en a.
+        if (mesure != null) Pastille(mesure, petite: true),
+        if (lot != null) Pastille(lot, petite: true),
+      ],
+    ];
 
     // Glisser vers la droite ajoute l'article, vers la gauche le retire ; appui long : menu.
     final ajouter = ActionLigne(Icons.add_shopping_cart, 'Ajouter', basculer);
@@ -801,27 +938,34 @@ class _EcranConstructionState extends State<EcranConstruction> {
       versGauche: g == null ? null : retirer,
       actions: [
         if (g == null) ajouter else retirer,
-        if (place)
-          ActionLigne(Icons.edit_note, 'Packaging, promotion, marque', () => _modifier(l, p))
-        else
-          ActionLigne(Icons.place_outlined, 'Choisir son secteur', () => _placer(l, p)),
+        if (g != null) ActionLigne(Icons.sticky_note_2_outlined, 'Consigne', () => _consigne(l, p)),
+        if (!place) ActionLigne(Icons.place_outlined, 'Choisir son secteur', () => _placer(l, p)),
       ],
       child: LigneChoix(
       key: _lignes.putIfAbsent(p.id, GlobalKey.new),
-      nom: p.nom,
-      // Packaging, promotion et consigne en clair sous le nom ; l'icône à droite de la coche les modifie.
+      nom: g == null ? p.nom : etat.libelleArticle(g, p),
       complement: [
         if (!place) 'Touchez pour choisir son secteur',
-        etat.complement(g, p),
-        if (g?.promotion != null)
-          g!.promotion!.libelle.isNotEmpty ? g.promotion!.libelle : (etat.typePromotion(g.promotion!.type)?.nom ?? 'promo'),
+        if (g == null) etat.complement(g, p),
         if (g?.consigne != null) '« ${g!.consigne} »',
       ].where((x) => x.isNotEmpty).join(' · '),
       coche: g != null,
       quantite: g?.quantite ?? 1,
-      onDetails: g == null || !place ? null : () => _modifier(l, p),
-      // Article non choisi : toucher la ligne le coche, sans plus ; article choisi : la fenêtre de l'article.
-      onNom: !place ? () => _placer(l, p) : (g == null ? basculer : () => _modifier(l, p)),
+      pastilles: pastilles,
+      // La promotion, bien visible à gauche de la quantité (quand ses pastilles sont repliées).
+      avantQuantite: g == null || focus || textePromo == null
+          ? null
+          : Container(
+              constraints: const BoxConstraints(maxWidth: 76),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(color: couleurPromo == null ? Charte.rouge : Color(couleurPromo), borderRadius: BorderRadius.circular(5)),
+              child: Text(textePromo, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
+                  style: Charte.texte(11, gras: true, couleur: Charte.blanc)),
+            ),
+      // Article non choisi : toucher la ligne le coche ; article choisi : il montre (ou replie) ses pastilles.
+      onNom: !place
+          ? () => _placer(l, p)
+          : (g == null ? basculer : () => setState(() => _focus = focus ? null : p.id)),
       habituel: p.nbUtilisations >= seuilHabituel,
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: basculer,
@@ -1334,133 +1478,6 @@ Future<Secteur?> choisirSecteur(BuildContext context, String magasinId, String n
 
 /// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.
 /// Une marque ajoutée ou un packaging changé crée l'article correspondant (« Camembert Président · 250 g »).
-/// Rend l'article de la ligne après enregistrement (null si abandon).
-/// Fenêtre de l'article. Avec [nouveauDans] (« + Produit absent de ce secteur »), la même fenêtre
-/// commence par le nom du nouveau produit, qui est créé, placé dans ce secteur et ajouté à la liste.
-Future<Produit?> detailsArticle(BuildContext context, Liste l, Produit? produit, {Secteur? nouveauDans}) async {
-  final etat = Etat.instance;
-  final nouveau = produit == null;
-  final p = produit ?? Produit('', '', [], [], 0);
-  final g = nouveau ? null : etat.ligne(l, p.id);
-  if (!nouveau && g == null) return null;
-  var (mesure, lot) = Etat.mesureEtLot(etat.packaging(g?.packagingId)?.libelle);
-  var promo = g?.promotion?.type ?? '';
-  final nom = TextEditingController();
-  final precision = TextEditingController(text: g?.promotion?.libelle ?? '');
-  final marque = TextEditingController();
-  final consigne = TextEditingController(text: g?.consigne ?? '');
-  final mesures = etat.mesuresProposees(p);
-  final lots = etat.lotsProposes(p);
-  if (mesure != null && !mesures.contains(mesure)) mesures.insert(0, mesure);
-  if (lot != null && !lots.contains(lot)) lots.insert(0, lot);
-  Widget titre(String t) => Padding(
-        padding: const EdgeInsets.only(top: 12, bottom: 4),
-        child: Text(t, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      );
-  final ok = await modale(
-    context,
-    titre: nouveau ? 'Nouveau produit · ${nouveauDans?.nom ?? ''}' : p.nom,
-    icone: nouveau ? Icons.add_shopping_cart : Icons.edit_note,
-    oui: 'Enregistrer',
-    contenu: (context, maj) => Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (nouveau) ...[
-          titre('Nom du produit'),
-          TextField(
-            key: const ValueKey('nom-nouveau-produit'),
-            controller: nom,
-            autofocus: true,
-            textCapitalization: TextCapitalization.sentences,
-            style: Charte.texte(16),
-            decoration: const InputDecoration(hintText: 'Nom générique (ex. : Riz)'),
-          ),
-        ],
-        titre('Mesure (poids, contenance, à la pièce…)'),
-        ChoixDeroulant<String>(
-          valeur: mesure ?? '',
-          choix: {'': 'Indifférente', for (final m in mesures) m: m},
-          onChange: (v) => maj(() => mesure = v.isEmpty ? null : v),
-        ),
-        titre('Packaging (nombre d\'articles par lot)'),
-        ChoixDeroulant<String>(
-          valeur: lot ?? '',
-          choix: {'': 'À l\'unité', for (final x in lots) x: x},
-          onChange: (v) => maj(() => lot = v.isEmpty ? null : v),
-        ),
-        titre('Promotion'),
-        ChoixDeroulant<String>(
-          valeur: promo,
-          choix: {'': 'Aucune', for (final t in etat.typesPromotion) t.id: t.nom},
-          onChange: (v) => maj(() => promo = v),
-        ),
-        if (promo.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: TextField(
-              key: const ValueKey('precision-promo'),
-              controller: precision,
-              style: Charte.texte(16),
-              decoration: InputDecoration(labelText: 'Précision (ex. : ${etat.typePromotion(promo)?.exemple ?? ''})'),
-            ),
-          ),
-        titre('Ajouter une marque'),
-        TextField(
-          key: const ValueKey('marque-article'),
-          controller: marque,
-          style: Charte.texte(16),
-          decoration: InputDecoration(hintText: nouveau ? 'Ex. : Président' : 'Ex. : Président (crée « ${p.nom} Président »)'),
-        ),
-        titre('Consigne'),
-        TextField(
-          key: const ValueKey('consigne-article'),
-          controller: consigne,
-          style: Charte.texte(16),
-          decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
-        ),
-      ],
-    ),
-  );
-  final texteMarque = marque.text.trim();
-  final textePrecision = precision.text.trim();
-  final texteConsigne = consigne.text;
-  if (!ok) return null;
-  if (nouveau) {
-    final n = nom.text.trim();
-    if (n.isEmpty) {
-      if (context.mounted) Nav.message(context, 'Donnez un nom au produit');
-      return null;
-    }
-    // Nouveau produit : la marque fait partie de son nom, le packaging va sur la ligne.
-    final q = etat.creerProduit(texteMarque.isEmpty ? n : '$n $texteMarque');
-    if (nouveauDans != null) etat.placer(l.magasinId, q.id, nouveauDans.id);
-    etat.ajouterLigne(l, q.id);
-    etat.definirPackaging(l, q.id, etat.packagingCompose(mesure, lot)?.id);
-    if (promo.isNotEmpty) etat.definirPromotion(l, q.id, PromotionLigne(promo, {}, textePrecision));
-    etat.definirConsigne(l, q.id, texteConsigne);
-    if (context.mounted) Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
-    return q;
-  }
-  final avant = g!.packagingId;
-  final apres = etat.packagingCompose(mesure, lot)?.id;
-  etat.definirPackaging(l, p.id, apres);
-  final ancienne = g.promotion;
-  etat.definirPromotion(
-      l,
-      p.id,
-      promo.isEmpty
-          ? null
-          : PromotionLigne(promo, ancienne?.type == promo ? ancienne!.parametres : {}, textePrecision));
-  etat.definirConsigne(l, p.id, texteConsigne);
-  if (texteMarque.isNotEmpty || (apres != null && apres != avant)) {
-    final q = etat.produitVariante(l, p,
-        marqueNom: texteMarque, packagingId: apres != null && apres != avant ? apres : null);
-    if (context.mounted) Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
-    return q;
-  }
-  return p;
-}
-
 /// Packaging et promotion d'une ligne, en clair et dans leur couleur.
 List<Pastille> pastillesLigne(Etat etat, LigneListe g, {bool petite = false}) {
   final p = etat.produit(g.produitId);
@@ -1490,7 +1507,7 @@ class EcranListeComplete extends StatelessWidget {
         final l = etat.liste(listeId);
         if (l == null) {
           return PageBase(
-            entete: const EnTeteTravail(titre: 'Liste'),
+            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
             corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
           );
         }
@@ -1504,17 +1521,16 @@ class EcranListeComplete extends StatelessWidget {
         final commence = l.nbCoches > 0 || l.repriseSecteurId != null;
         var numero = 0;
         return PageBase(
-          entete: EnTeteTravail(
+          entete: EnTeteFenetre(
+            retour: true,
             titre: '${etat.nomListe(l)} · $n article${n > 1 ? 's' : ''}',
-            action: BoutonIcone(
-              icone: Icons.mail_outline,
-              libelle: 'Envoyer par mail',
-              onTap: () async {
+            actions: [
+              ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
                 if (!await envoyerListe(etat, l) && context.mounted) {
                   Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
                 }
-              },
-            ),
+              }),
+            ],
           ),
           haut: [
             Container(
@@ -1628,7 +1644,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         final apercu = widget.apercu;
         if (l == null || (!apercu && l.statut != StatutListe.enCours)) {
           return PageBase(
-            entete: const EnTeteTravail(titre: 'Courses'),
+            entete: const EnTeteFenetre(retour: true, icone: Icons.shopping_cart_outlined, titre: 'Courses'),
             corps: Center(child: Text('Pas de courses en cours.', style: Charte.texte(16))),
           );
         }
@@ -1663,13 +1679,17 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
-            entete: EnTeteTravail(
+            entete: EnTeteFenetre(
+              retour: true,
+              icone: apercu ? Icons.checklist : Icons.shopping_cart_outlined,
               titre: titre,
-              action: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (commentaire != null)
-                  BoutonIcone(icone: Icons.sticky_note_2_outlined, libelle: 'Commentaire', onTap: () => _commentaire(context, commentaire)),
-                BoutonReduire(cles: [for (final x in etapes) _cle(x.id)]),
-              ]),
+              aide: apercu ? Aides.apercu : Aides.enMagasin,
+              droite: commentaire == null
+                  ? null
+                  : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
+              actions: [
+                reduireTout([for (final x in etapes) _cle(x.id)]),
+              ],
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
@@ -1692,7 +1712,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                           ),
                           if (Retractables.i.ouvert(_cle(x.id)))
                             for (final g in x.lignes)
-                              if (!resteAFaire || !g.coche) _ligne(etat, l, g, apercu),
+                              if (!resteAFaire || !(g.coche || etat.manquant(l, g.produitId))) _ligne(etat, l, g, apercu),
                       ],
                       if (resteAFaire && visibles.isEmpty)
                         Padding(
@@ -1716,11 +1736,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                 ])
               else
               BarreAction(boutons: [
-                Bouton(
-                  texte: resteAFaire ? 'Tout' : 'Reste à faire',
-                  icone: resteAFaire ? Icons.format_list_bulleted : Icons.checklist,
-                  taille: 16,
-                  plein: resteAFaire,
+                BoutonEtat(
+                  texte: 'Reste à faire',
+                  actif: resteAFaire,
                   onTap: () => setState(() => resteAFaire = !resteAFaire),
                 ),
                 Bouton(texte: 'Pause', icone: Icons.pause, taille: 16, onTap: () => _pause(context, l, e)),
@@ -1768,8 +1786,33 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
       pastilles: pastillesLigne(etat, g),
       alerte: etat.quantiteInsuffisante(g),
-      onTap: apercu ? null : () => etat.cocher(l, p.id),
+      manquant: !apercu && etat.manquant(l, p.id),
+      onTap: apercu ? null : () => _appui(etat, l, p),
     );
+  }
+
+  String? _dernierAppui;
+  DateTime _dernierAppuiLe = DateTime(2000);
+
+  /// Un appui coche ou décoche ; deux appuis rapprochés sur le même article le marquent manquant en rayon.
+  /// Toucher un article manquant le coche (trouvé finalement).
+  void _appui(Etat etat, Liste l, Produit p) {
+    final maintenant = DateTime.now();
+    final deuxAppuis = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
+    _dernierAppui = deuxAppuis ? null : p.id;
+    _dernierAppuiLe = maintenant;
+    if (deuxAppuis) {
+      HapticFeedback.mediumImpact();
+      etat.marquerManquant(l, p.id, true);
+      Nav.message(context, '« ${p.nom} » : manquant en rayon');
+      return;
+    }
+    if (etat.manquant(l, p.id)) {
+      etat.marquerManquant(l, p.id, false);
+      if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
+      return;
+    }
+    etat.cocher(l, p.id);
   }
 
   /// Écran 9 — « Interrompre les courses ? » ; sans rien de coché, on peut simplement revenir aux listes prêtes.
@@ -1806,7 +1849,18 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   /// Fenêtre modale « Terminer les courses » : ce qui est coché, ce qui reste, et le parcours enregistré.
   Future<void> _terminer(BuildContext context, Liste l) async {
     final etat = Etat.instance;
-    final reste = [for (final g in l.lignes) if (!g.coche) etat.produit(g.produitId)?.nom ?? ''];
+    final manquants = [for (final g in l.lignes) if (etat.manquant(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''];
+    final reste = [for (final g in l.lignes) if (!g.coche && !etat.manquant(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''];
+    Widget liste(String titre, List<String> noms, Color couleur) => Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('$titre (${noms.length})', style: Charte.texte(15, gras: true, couleur: couleur)),
+              for (final n in noms) Text('• $n', style: Charte.texte(15)),
+            ],
+          ),
+        );
     final secteurs = etat.secteursDansLOrdre(l).length;
     final ok = await modale(
       context,
@@ -1819,10 +1873,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         children: [
           Text('${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} coché${l.nbCoches > 1 ? 's' : ''} sur ${l.lignes.length}.',
               style: Charte.texte(16, gras: true)),
-          if (reste.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text('Non cochés : ${reste.take(8).join(', ')}${reste.length > 8 ? '…' : ''}', style: Charte.texte(15)),
-          ],
+          if (manquants.isNotEmpty) liste('Manquants en rayon', manquants, Charte.rouge),
+          if (reste.isNotEmpty) liste('Non cochés', reste, Charte.encre),
           if (etat.apprend(l) && secteurs > 0) ...[
             const SizedBox(height: 8),
             Text('Le parcours de ce magasin est enregistré : $secteurs secteur${secteurs > 1 ? 's' : ''} dans l\'ordre de vos passages.',

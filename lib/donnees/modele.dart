@@ -397,6 +397,9 @@ class Etat extends ChangeNotifier {
   /// Commentaire saisi à la validation d'une liste (identifiant de liste → texte), repris en courses et dans le mail.
   Map<String, String> commentaires = {};
 
+  /// Articles manquants en rayon, signalés pendant les courses (identifiant de liste → produits).
+  Map<String, Set<String>> manquants = {};
+
   /// Listes types nommées (Préparer › Nouvelle liste › Liste type).
   List<ListeType> listesTypes = [];
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
@@ -582,6 +585,7 @@ class Etat extends ChangeNotifier {
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
@@ -678,6 +682,7 @@ class Etat extends ChangeNotifier {
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
+            if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
@@ -946,6 +951,74 @@ class Etat extends ChangeNotifier {
           quantite: g.quantite,
           promotion: g.promotion,
           consigne: g.consigne);
+    }
+    _toucheConstruction(l);
+    modifie();
+    return q;
+  }
+
+  /// Nom de l'article sans la marque de sa ligne (« Camembert Président » → « Camembert »).
+  String nomSansMarque(LigneListe? g, Produit p) {
+    final mq = marque(g?.marqueId)?.nom;
+    if (mq != null && p.nom.toLowerCase().endsWith(' ${mq.toLowerCase()}')) {
+      return p.nom.substring(0, p.nom.length - mq.length - 1);
+    }
+    return p.nom;
+  }
+
+  /// Libellé de l'article dans la liste : son nom, avec la marque de la ligne si le nom ne la porte pas déjà.
+  String libelleArticle(LigneListe? g, Produit p) {
+    final mq = marque(g?.marqueId)?.nom;
+    if (mq == null || p.nom.toLowerCase().contains(mq.toLowerCase())) return p.nom;
+    return '${p.nom} $mq';
+  }
+
+  /// Marques proposées pour un article : celles du produit et de ses variantes (« Camembert Président »…).
+  List<String> marquesProposees(LigneListe? g, Produit p) {
+    final racine = nomSansMarque(g, p).toLowerCase();
+    final ids = <String>{
+      ...p.marqueIds,
+      for (final q in produits)
+        if (q.nom.toLowerCase() == racine || q.nom.toLowerCase().startsWith('$racine ')) ...q.marqueIds,
+    };
+    return [for (final id in ids) if (marque(id)?.nom case final n?) n]..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  }
+
+  /// Change la marque d'un article de la liste : « Camembert » devient l'article « Camembert Président »
+  /// (créé au besoin, rangé aux mêmes endroits) ; sans marque, il redevient « Camembert ».
+  /// La ligne garde sa quantité, son packaging, sa promotion et sa consigne. Rend l'article de la ligne.
+  Produit changerMarque(Liste l, Produit p, String? marqueNom) {
+    final g = ligne(l, p.id);
+    if (g == null) return p;
+    final mq = (marqueNom ?? '').trim();
+    final racine = nomSansMarque(g, p);
+    final nom = mq.isEmpty ? racine : '$racine $mq';
+    var q = nom.toLowerCase() == p.nom.toLowerCase() ? p : _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
+    if (q == null) {
+      q = Produit(nouvelId('p'), nom, [...p.marqueIds], [...p.packagingIds], 0);
+      produits.add(q);
+      for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
+        emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
+      }
+    }
+    if (mq.isNotEmpty) ajouterMarque(q, mq);
+    final m = mq.isEmpty ? null : _trouve(marques, (x) => x.nom.toLowerCase() == mq.toLowerCase());
+    if (q.id != p.id) {
+      final i = l.lignes.indexOf(g);
+      if (ligne(l, q.id) != null) {
+        l.lignes.removeAt(i);
+      } else {
+        q.nbUtilisations++;
+        l.lignes[i] = LigneListe(
+            produitId: q.id,
+            marqueId: m?.id,
+            packagingId: g.packagingId,
+            quantite: g.quantite,
+            promotion: g.promotion,
+            consigne: g.consigne);
+      }
+    } else {
+      g.marqueId = m?.id;
     }
     _toucheConstruction(l);
     modifie();
@@ -1576,6 +1649,23 @@ class Etat extends ChangeNotifier {
   bool enInstance(Course c) => ticketDe(c.id) == null && !sansTicket.contains(c.id);
 
   String? commentaire(Liste l) => commentaires[l.id];
+
+  bool manquant(Liste l, String produitId) => manquants[l.id]?.contains(produitId) ?? false;
+
+  /// Article absent des rayons (double appui sur sa case) : il est décoché et marqué manquant.
+  void marquerManquant(Liste l, String produitId, bool oui) {
+    final g = ligne(l, produitId);
+    if (g == null) return;
+    if (oui) {
+      g.cocheLe = null;
+      g.cochePar = null;
+      (manquants[l.id] ??= {}).add(produitId);
+    } else {
+      manquants[l.id]?.remove(produitId);
+      if (manquants[l.id]?.isEmpty ?? false) manquants.remove(l.id);
+    }
+    modifie();
+  }
 
   void commenter(Liste l, String texte) {
     if (texte.trim().isEmpty) {

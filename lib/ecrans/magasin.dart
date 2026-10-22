@@ -28,7 +28,7 @@ class SelecteurMagasin extends StatelessWidget {
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     return SizedBox(
-      width: 168,
+      width: 130,
       child: ChoixDeroulant<String>(
         hauteur: 48,
         valeur: magasinCourant(),
@@ -444,26 +444,24 @@ class EcranFicheProduit extends StatelessWidget {
         final p = etat.produit(produitId);
         if (p == null) {
           return PageBase(
-            entete: const EnTeteSousNiveau(fil: 'Gérer › Produits', titre: 'Produit'),
+            entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Produits', titre: 'Produit'),
             corps: Center(child: Text('Produit introuvable.', style: Charte.texte(16))),
           );
         }
         return PageBase(
-          entete: EnTeteSousNiveau(
-            fil: 'Gérer › Produits',
+          entete: EnTeteFenetre(
+            retour: true,
+            sousTitre: 'Gérer › Produits',
             titre: p.nom,
-            droite: BoutonIcone(
-              icone: Icons.edit_outlined,
-              taille: 22,
-              libelle: 'Renommer',
-              onTap: () async {
+            actions: [
+              ActionLigne(Icons.edit_outlined, 'Renommer', () async {
                 final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
                 if (nom != null && nom.isNotEmpty) {
                   p.nom = nom;
                   etat.modifie();
                 }
-              },
-            ),
+              }),
+            ],
           ),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),

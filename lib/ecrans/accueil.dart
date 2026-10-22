@@ -19,14 +19,21 @@ class EcranAccueil extends StatelessWidget {
     final enPreparation = etat.listesStatut(StatutListe.enConstruction);
     final enCours = etat.coursesEnCours;
     final pretes = etat.listesStatut(StatutListe.prete);
-    return Scaffold(
-      backgroundColor: Charte.fond,
-      body: AvecDecision(
-        boutons: [Bouton(texte: '+ Nouvelle liste', plein: true, taille: 18, onTap: () => Nav.travail(const EcranPreliste()))],
-        contenu: ListView(
+    // L'en-tête et la photo restent en haut ; seules les listes défilent.
+    // Faire défiler les listes replie « Comment ça marche » pour leur laisser la place.
+    return PageBase(
+      entete: const EnTeteFenetre(titre: 'Accueil', sousTitre: 'Version $versionApplication', aide: Aides.accueil),
+      haut: const [_EnTetePhoto()],
+      corps: NotificationListener<ScrollUpdateNotification>(
+        onNotification: (n) {
+          if (n.metrics.axis == Axis.vertical && n.metrics.pixels > 24 && Retractables.i.ouvert(_EnTetePhoto._cle)) {
+            Retractables.i.basculer(_EnTetePhoto._cle);
+          }
+          return false;
+        },
+        child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const _EnTetePhoto(),
             GroupeRetractable(
               cle: 'accueil/preparation',
               titre: 'En préparation',
@@ -101,7 +108,6 @@ class _EnTetePhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final haut = MediaQuery.of(context).padding.top;
     return ListenableBuilder(
       listenable: Retractables.i,
       builder: (context, _) {
@@ -123,12 +129,12 @@ class _EnTetePhoto extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: haut),
+              padding: EdgeInsets.zero,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 40, 18, 14),
+                    padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -204,7 +210,7 @@ class _Etapes extends StatelessWidget {
     (
       'Je prépare ma liste',
       [
-        'Touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
+        'Dans l\'onglet Préparer, touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
         '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
         '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
         '• Liste depuis un mail : vous collez le texte d\'un mail, les articles sont reconnus dans le catalogue.',

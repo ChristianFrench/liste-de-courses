@@ -118,10 +118,10 @@ class RacineOnglet extends StatelessWidget {
         // Contenus recréés à chaque changement de données (pas de « const ») pour qu'ils se redessinent.
         Nav.accueil => EcranAccueil(),
         Nav.preparer => PageBase(
-            entete: const EnTeteNiveau(titre: 'Préparer', droite: IndicateurSynchro()),
+            entete: const EnTeteFenetre(titre: 'Préparer', aide: Aides.preparer),
             corps: SousEcranPreparer(),
           ),
-        Nav.courses => PageBase(entete: const EnTeteNiveau(titre: 'Courses'), corps: SousEcranCourses()),
+        Nav.courses => PageBase(entete: const EnTeteFenetre(titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
         _ => const MenuGerer(),
       },
     );
@@ -146,7 +146,7 @@ class MenuGerer extends StatelessWidget {
           },
         );
     return PageBase(
-      entete: const EnTeteNiveau(titre: 'Gérer'),
+      entete: const EnTeteFenetre(titre: 'Gérer', aide: Aides.gerer),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
@@ -185,15 +185,18 @@ class EcranRubrique extends StatelessWidget {
       builder: (context, _) {
         final sous = Nav.i.sousOnglet[rubrique] ?? 0;
         late final String titre;
+        var aide = Aides.magasins;
         List<SousOnglet>? onglets;
         late final Widget contenu;
         Widget? droite;
         switch (rubrique) {
           case Nav.parcours:
             titre = 'Parcours';
+            aide = Aides.parcours;
             contenu = SousEcranParcours();
           case Nav.historique:
             titre = 'Historique';
+            aide = Aides.historique;
             contenu = const SousEcranHistorique();
           default:
             titre = 'Magasins';
@@ -214,7 +217,7 @@ class EcranRubrique extends StatelessWidget {
             };
         }
         return PageBase(
-          entete: EnTeteSousNiveau(fil: 'Gérer', titre: titre, droite: droite),
+          entete: EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: titre, droite: droite, aide: aide),
           haut: [if (onglets != null) SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],
           corps: contenu,
         );

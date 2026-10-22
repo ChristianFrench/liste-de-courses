@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import '../theme.dart';
 import 'pictogramme.dart';
 
+export 'entete.dart';
+
 // Composants réutilisables (spécification IHM, chapitre 5).
 
 BorderSide get _bordCadre => BorderSide(color: Charte.cadre, width: Charte.traitCadre);
@@ -48,98 +50,6 @@ class BoutonIcone extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(22),
         child: SizedBox(width: 44, height: 44, child: Icon(icone, size: taille, color: couleur ?? Charte.couleurIcone(icone))),
-      ),
-    );
-  }
-}
-
-/// En-tête des écrans de travail (48 points).
-class EnTeteTravail extends StatelessWidget {
-  const EnTeteTravail({super.key, required this.titre, this.gauche, this.action, this.sousTitre});
-  final String titre;
-  final Widget? gauche;
-  final Widget? action;
-  final String? sousTitre;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: Charte.enTeteTravail,
-      decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(bottom: _bordZone)),
-      child: Row(
-        children: [
-          const SizedBox(width: 2),
-          gauche ??
-              BoutonIcone(
-                icone: Icons.chevron_left,
-                taille: 32,
-                libelle: 'Retour',
-                onTap: () => Navigator.of(context).maybePop(),
-              ),
-          const SizedBox(width: 4),
-          Expanded(
-            child: sousTitre == null
-                ? Text(titre, style: Charte.titreEcran, maxLines: 1, overflow: TextOverflow.ellipsis)
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(titre, style: Charte.titreEcran, maxLines: 1, overflow: TextOverflow.ellipsis),
-                      Row(
-                        children: [
-                          Icon(Icons.check, size: 12, color: Charte.couleurIcone(Icons.check)),
-                          const SizedBox(width: 3),
-                          Text(sousTitre!, style: Charte.texte(11, couleur: Charte.texteSecondaire)),
-                        ],
-                      ),
-                    ],
-                  ),
-          ),
-          if (action != null) action!,
-          const SizedBox(width: 6),
-        ],
-      ),
-    );
-  }
-}
-
-/// En-tête des écrans de gestion (60 points).
-class EnTeteGestion extends StatelessWidget {
-  const EnTeteGestion({super.key, required this.titre, this.retour = true, this.gauche, this.action, this.onTitre});
-  final String titre;
-  final bool retour;
-  final Widget? gauche;
-  final Widget? action;
-  final VoidCallback? onTitre;
-
-  @override
-  Widget build(BuildContext context) {
-    final texte = Text(titre, style: Charte.texte(19, gras: true), maxLines: 1, overflow: TextOverflow.ellipsis);
-    return Container(
-      height: Charte.enTeteGestion,
-      decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(bottom: _bordZone)),
-      padding: const EdgeInsets.only(right: 12),
-      child: Row(
-        children: [
-          if (gauche != null) ...[const SizedBox(width: 12), gauche!, const SizedBox(width: 10)],
-          if (gauche == null && retour)
-            BoutonIcone(
-              icone: Icons.chevron_left,
-              taille: 32,
-              libelle: 'Retour',
-              onTap: () => Navigator.of(context).maybePop(),
-            ),
-          if (gauche == null && !retour) const SizedBox(width: 16),
-          Expanded(
-            child: onTitre == null
-                ? texte
-                : InkWell(
-                    onTap: onTitre,
-                    child: SizedBox(height: 44, child: Align(alignment: Alignment.centerLeft, child: texte)),
-                  ),
-          ),
-          if (action != null) action!,
-        ],
       ),
     );
   }
@@ -513,16 +423,20 @@ class LigneChoix extends StatelessWidget {
     this.alerte,
     this.afficherQuantite = true,
     this.droite,
-    this.onDetails,
     this.onNom,
+    this.pastilles = const [],
+    this.avantQuantite,
   });
   final String nom;
   final String complement;
   final bool coche;
   final int quantite;
 
-  /// Icône à droite de la coche (article choisi) : fenêtre packaging, promotion, marque.
-  final VoidCallback? onDetails;
+  /// Pastilles sous le nom (préparation : marque, mesure, packaging, promo de l'article touché).
+  final List<Widget> pastilles;
+
+  /// Avant la quantité (préparation : la promotion, bien visible).
+  final Widget? avantQuantite;
 
   /// Appui sur le nom (hors de la case) : comme l'icône de modification. La case seule coche alors.
   final VoidCallback? onNom;
@@ -568,10 +482,7 @@ class LigneChoix extends StatelessWidget {
                     child: SizedBox(width: 48, height: 52, child: Center(child: CaseACocher(coche: coche, taille: 28))),
                   ),
                 ),
-              if (coche && onDetails != null)
-                BoutonIcone(icone: Icons.edit_note, libelle: 'Packaging, promotion, marque', onTap: onDetails!)
-              else
-                const SizedBox(width: 12),
+              const SizedBox(width: 8),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -601,6 +512,7 @@ class LigneChoix extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 4),
+              if (avantQuantite != null) ...[avantQuantite!, const SizedBox(width: 4)],
               if (droite != null)
                 droite!
               else if (coche && afficherQuantite)
@@ -612,6 +524,9 @@ class LigneChoix extends StatelessWidget {
                 ),
             ],
           ),
+          // Pastilles sur toute la largeur, sous le nom (elles tiennent sur une ligne).
+          if (pastilles.isNotEmpty)
+            Padding(padding: const EdgeInsets.only(left: 52, right: 8), child: Wrap(spacing: 6, children: pastilles)),
           if (alerte != null)
             Padding(padding: const EdgeInsets.only(left: 40, bottom: 4), child: AlerteQuantite(requise: alerte!)),
             ],
@@ -634,10 +549,14 @@ class LigneCourse extends StatelessWidget {
     this.promo,
     this.alerte,
     this.pastilles = const [],
+    this.manquant = false,
   });
   final String nom;
   final String complement;
   final bool coche;
+
+  /// Absent des rayons (double appui) : case barrée en rouge.
+  final bool manquant;
   final int quantite;
   final String? promo;
   final int? alerte;
@@ -667,7 +586,22 @@ class LigneCourse extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           child: Row(
             children: [
-              if (onTap != null) ...[CaseACocher(coche: coche, taille: 28), const SizedBox(width: 12)],
+              if (onTap != null) ...[
+                if (manquant)
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: Charte.blanc,
+                      borderRadius: BorderRadius.circular(3),
+                      border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
+                    ),
+                    child: Icon(Icons.close, size: 24, color: Charte.rouge),
+                  )
+                else
+                  CaseACocher(coche: coche, taille: 28),
+                const SizedBox(width: 12),
+              ],
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6),
@@ -678,7 +612,8 @@ class LigneCourse extends StatelessWidget {
                       Text(nom,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: Charte.texte(17, gras: !coche, couleur: couleur, barre: coche)),
+                          style: Charte.texte(17, gras: !coche && !manquant, couleur: manquant ? Charte.texteBarre : couleur, barre: coche)),
+                      if (manquant) Text('Manquant en rayon', style: Charte.texte(13, gras: true, couleur: Charte.rouge)),
                       if (pastilles.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 3, bottom: 2),
@@ -1009,26 +944,6 @@ class GroupeRetractable extends StatelessWidget {
   }
 }
 
-/// Bouton d'en-tête « Tout réduire » / « Tout développer » pour les groupes [cles].
-class BoutonReduire extends StatelessWidget {
-  const BoutonReduire({super.key, required this.cles, this.parDefaut = true});
-  final List<String> cles;
-  final bool parDefaut;
-
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(
-        listenable: Retractables.i,
-        builder: (context, _) {
-          final fermes = Retractables.i.tousFermes(cles, parDefaut: parDefaut);
-          return BoutonIcone(
-            icone: fermes ? Icons.unfold_more : Icons.unfold_less,
-            libelle: fermes ? 'Tout développer' : 'Tout réduire',
-            onTap: () => Retractables.i.tous(cles, fermes),
-          );
-        },
-      );
-}
-
 class Avancement extends StatelessWidget {
   const Avancement({required this.fait, required this.total, required this.couleur});
   final int fait;
@@ -1072,6 +987,13 @@ class TitreSection extends StatelessWidget {
 }
 
 // ----------------------------------------------------------------- Boutons
+
+/// Action « Tout replier » / « Tout déplier » des groupes [cles] (menu de l'en-tête).
+ActionLigne reduireTout(List<String> cles, {bool parDefaut = true}) {
+  final fermes = Retractables.i.tousFermes(cles, parDefaut: parDefaut);
+  return ActionLigne(fermes ? Icons.unfold_more : Icons.unfold_less, fermes ? 'Tout déplier' : 'Tout replier',
+      () => Retractables.i.tous(cles, Retractables.i.tousFermes(cles, parDefaut: parDefaut)));
+}
 
 class Bouton extends StatelessWidget {
   const Bouton({
@@ -1135,6 +1057,51 @@ class Bouton extends StatelessWidget {
   }
 }
 
+/// Bouton d'ÉTAT (un filtre qu'on allume ou éteint) : forme de gélule et interrupteur à gauche.
+/// Il se distingue des boutons d'ACTION ([Bouton], rectangles) : son libellé ne change pas,
+/// seul l'interrupteur montre s'il est allumé.
+class BoutonEtat extends StatelessWidget {
+  const BoutonEtat({super.key, required this.texte, required this.actif, required this.onTap, this.taille = 14, this.hauteur = 48});
+  final String texte;
+  final bool actif;
+  final VoidCallback onTap;
+  final double taille;
+  final double hauteur;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        toggled: actif,
+        child: Material(
+          color: actif ? Charte.fondSelection : Charte.fond,
+          shape: StadiumBorder(side: BorderSide(color: actif ? Charte.accent : Charte.separateurZone, width: 1.5)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: SizedBox(
+              height: hauteur,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(width: 4),
+                  Icon(actif ? Icons.toggle_on : Icons.toggle_off_outlined, size: 24, color: actif ? Charte.accent : Charte.texteBarre),
+                  const SizedBox(width: 2),
+                  Flexible(
+                    child: Text(texte,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: Charte.texte(taille, gras: actif, couleur: Charte.encre)),
+                  ),
+                  const SizedBox(width: 4),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
 /// Un ou deux boutons pleine largeur en bas de l'écran (64 points).
 class BarreAction extends StatelessWidget {
   const BarreAction({super.key, required this.boutons});
@@ -1184,8 +1151,9 @@ class Bascule extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: hauteur,
+      // Un choix d'état : forme de gélule, comme [BoutonEtat] (les actions sont rectangulaires).
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(hauteur / 2),
         border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
       ),
       clipBehavior: Clip.antiAlias,
@@ -1567,95 +1535,6 @@ class SousOnglets extends StatelessWidget {
   }
 }
 
-/// En-tête d'un écran racine d'onglet (52) : titre 20 gras, élément à droite.
-class EnTeteNiveau extends StatelessWidget {
-  const EnTeteNiveau({super.key, required this.titre, this.droite, this.onAppuiLong});
-  final String titre;
-  final Widget? droite;
-  final VoidCallback? onAppuiLong;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: Charte.enTeteNiveau,
-      padding: const EdgeInsets.only(left: 16, right: 8),
-      decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(bottom: _bordZone)),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onLongPress: onAppuiLong,
-              child: SizedBox(
-                height: Charte.enTeteNiveau,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(titre, style: Charte.texte(Charte.tTitreNiveau, gras: true)),
-                ),
-              ),
-            ),
-          ),
-          if (droite != null) droite!,
-        ],
-      ),
-    );
-  }
-}
-
-/// En-tête d'un sous-niveau (52) : flèche retour, fil d'Ariane au-dessus du titre, action à droite.
-class EnTeteSousNiveau extends StatelessWidget {
-  const EnTeteSousNiveau({super.key, required this.fil, required this.titre, this.droite});
-  final String fil;
-  final String titre;
-  final Widget? droite;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: Charte.enTeteNiveau,
-      padding: const EdgeInsets.only(right: 6),
-      decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(bottom: _bordZone)),
-      child: Row(
-        children: [
-          BoutonIcone(icone: Icons.chevron_left, taille: 32, libelle: 'Retour', onTap: () => Navigator.of(context).maybePop()),
-          const SizedBox(width: 2),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(fil, style: Charte.texte(11, couleur: Charte.texteSecondaire)),
-                Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(18, gras: true)),
-              ],
-            ),
-          ),
-          if (droite != null) droite!,
-        ],
-      ),
-    );
-  }
-}
-
-/// « ● Synchronisé » (maquette : pas encore de synchronisation réelle).
-class IndicateurSynchro extends StatelessWidget {
-  const IndicateurSynchro({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.circle, size: 10, color: Charte.couleurIcone(Icons.circle)),
-          const SizedBox(width: 6),
-          Text('Synchronisé', style: Charte.texte(13)),
-        ],
-      ),
-    );
-  }
-}
-
 /// Carte : cadre 2, rayon 10 ; cliquable = chevron à droite.
 class Carte extends StatelessWidget {
   const Carte({super.key, required this.child, this.onTap, this.chevron, this.fond, this.padding});
@@ -1705,14 +1584,14 @@ class BoutonAction extends StatelessWidget {
         label: texte,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(8),
           child: Container(
             height: 44,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: plein ? Charte.accent : null,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: plein ? Charte.accent : Charte.cadre, width: 1.6),
             ),
             child: Text(texte, style: Charte.texte(15, gras: true, couleur: plein ? Charte.blanc : Charte.cadre)),
