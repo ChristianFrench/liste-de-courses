@@ -109,6 +109,14 @@ class Synchro extends ChangeNotifier {
 
   /// 'arrete', 'connexion', 'connecte', 'deconnecte'.
   String etatReseau = 'arrete';
+
+  /// Vrai quand un message de contrôle envoyé au serveur est bien revenu (échange réel, pas seulement
+  /// la connexion) ; vérifié à la connexion puis toutes les 30 s.
+  bool liaisonOk = false;
+  DateTime? derniereVerification;
+  int? dureeVerification; // aller-retour en ms
+  Timer? _controle, _delaiControle;
+  int _envoiControle = 0;
   String? derniereErreur;
   final journal = <Evenement>[];
   final appareils = <String, Appareil>{};
@@ -120,6 +128,9 @@ class Synchro extends ChangeNotifier {
   void _definir(String cle, String valeur) => _base?.definirReglage('synchro_$cle', valeur);
 
   String? get code => _reglage('code');
+
+  /// 'maitre' : appareil qui a créé le partage ; 'esclave' : appareil qui l'a rejoint.
+  String? get role => _reglage('role');
   bool get actif => code != null;
   String get noeud => _reglage('noeud') ?? '';
 
@@ -158,6 +169,7 @@ class Synchro extends ChangeNotifier {
     final base = _base;
     if (base == null) return;
     _definir('code', _tirer(10));
+    _definir('role', 'maitre');
     _definir('noeud', _tirer(12));
     base.horloge = Horloge(noeud);
     base.toutJournaliser(_etat.versJson());
@@ -172,6 +184,7 @@ class Synchro extends ChangeNotifier {
     await _etat.rejoindreFoyer(nom);
     final base = _base!;
     _definir('code', codePartage.trim().toUpperCase());
+    _definir('role', 'esclave');
     _definir('noeud', _tirer(12));
     _definirServeur(ancien);
     base.horloge = Horloge(noeud);
@@ -184,6 +197,7 @@ class Synchro extends ChangeNotifier {
   Future<void> arreterPartage() async {
     await _deconnecter();
     _base?.effacerReglage('synchro_code');
+    _base?.effacerReglage('synchro_role');
     _base?.horloge = null;
     etatReseau = 'arrete';
     appareils.clear();
@@ -228,8 +242,12 @@ class Synchro extends ChangeNotifier {
           derniereErreur = null;
           _noter('Connecté à ${serveur.hote}');
           _annoncer();
+          _controler();
+          _controle?.cancel();
+          _controle = Timer.periodic(const Duration(seconds: 30), (_) => _controler());
         } else if (e == 'deconnecte') {
           if (etatReseau == 'connecte') _noter('Hors ligne : les modifications attendent le retour du réseau');
+          liaisonOk = false;
         } else if (e != 'connexion') {
           derniereErreur = e;
           _noter(e, erreur: true);
@@ -248,12 +266,35 @@ class Synchro extends ChangeNotifier {
   Future<void> _deconnecter() async {
     final t = _transport;
     _transport = null;
+    _controle?.cancel();
+    _delaiControle?.cancel();
+    liaisonOk = false;
     if (t != null && t.connecte) t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(false)), retenu: true);
     for (final a in _abonnements) {
       await a.cancel();
     }
     _abonnements.clear();
     await t?.fermer();
+  }
+
+  /// Message de contrôle : l'appareil s'écoute lui-même ; s'il revient, le serveur fonctionne.
+  void _controler() {
+    final t = _transport;
+    if (t == null) return;
+    if (!t.connecte) {
+      _changerLiaison(false);
+      return;
+    }
+    _envoiControle = DateTime.now().millisecondsSinceEpoch;
+    t.publier('$_sujet/controle/$noeud', jsonEncode({'de': noeud, 't': _envoiControle}));
+    _delaiControle?.cancel();
+    _delaiControle = Timer(const Duration(seconds: 10), () => _changerLiaison(false));
+  }
+
+  void _changerLiaison(bool ok) {
+    if (ok != liaisonOk) _noter(ok ? 'Échange avec le serveur vérifié' : 'Le serveur ne répond plus', erreur: !ok);
+    liaisonOk = ok;
+    notifyListeners();
   }
 
   Map<String, Object?> _presence(bool enLigne) => {'de': noeud, 'nom': nomAppareil, 'enLigne': enLigne};
@@ -326,6 +367,15 @@ class Synchro extends ChangeNotifier {
       return;
     }
     final de = m['de'] as String?;
+    if (type == 'controle') {
+      if (de == noeud && m['t'] == _envoiControle) {
+        _delaiControle?.cancel();
+        derniereVerification = DateTime.now();
+        dureeVerification = derniereVerification!.millisecondsSinceEpoch - _envoiControle;
+        _changerLiaison(true);
+      }
+      return;
+    }
     if (de == null || de == noeud) return;
     final a = appareils[de] ??= Appareil(de);
     a.nom = m['nom'] as String? ?? a.nom;

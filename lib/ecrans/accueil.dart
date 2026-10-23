@@ -151,7 +151,7 @@ class _EnTetePhoto extends StatelessWidget {
                         child: Text('Version $versionApplication',
                             style: _surPhoto(Charte.texte(11, couleur: const Color(0xEEFFFFFF)))),
                       ),
-                      boutonEnTete(Icons.cloud_off_outlined, 'Synchronisation', () => montrerSynchro(context)),
+                      const BoutonSynchro(),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
                     ],

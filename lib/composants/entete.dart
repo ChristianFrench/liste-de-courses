@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../donnees/synchro.dart';
 import '../ecrans/coquille.dart' show BarreOnglets;
+import '../ecrans/partage.dart' show EcranPartage;
 import '../navigation.dart';
 import '../theme.dart';
 import 'composants.dart';
@@ -98,7 +100,7 @@ class EnTeteFenetre extends StatelessWidget {
             ),
             if (droite != null) ...[droite!, const SizedBox(width: 4)],
             _BoutonDeplier(deplier),
-            bouton(Icons.cloud_off_outlined, 'Synchronisation', () => montrerSynchro(context)),
+            const BoutonSynchro(),
             // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
             bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
                   ...actions,
@@ -168,30 +170,67 @@ void glisserOnglet(BuildContext context, int sens) {
   Nav.i.allerOnglet(o);
 }
 
-/// État de la synchronisation entre les membres du foyer (fenêtre d'information, croix pour fermer).
-Future<void> montrerSynchro(BuildContext context) => modale(
-      context,
-      titre: 'Synchronisation',
-      icone: Icons.cloud_off_outlined,
-      oui: null,
-      non: null,
-      contenu: (_, __) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Pas encore active', style: Charte.texte(17, gras: true)),
-          const SizedBox(height: 8),
-          Text(
-            'Vos listes, magasins et parcours sont enregistrés sur cet appareil seulement. '
-            'Le partage avec les membres du foyer viendra dans une prochaine version : '
-            'cette icône indiquera alors si tout est à jour, en cours d\'envoi ou en attente du réseau.',
-            style: Charte.texte(15),
+/// Icône de la synchronisation : nuage barré si le foyer n'est pas partagé ; sinon point vert
+/// (un échange avec le serveur vient d'être vérifié) ou rouge (serveur injoignable), et lettre
+/// M (maître : cet appareil a créé le partage) ou S (esclave : il l'a rejoint). Ouvre l'écran du partage.
+class BoutonSynchro extends StatelessWidget {
+  const BoutonSynchro({super.key});
+
+  static const vert = Color(0xFF2E9D46);
+  static const rouge = Color(0xFFE53935);
+
+  static String resume(Synchro s) => !s.actif
+      ? 'Synchronisation : foyer non partagé'
+      : '${s.liaisonOk ? 'Synchronisation : serveur joignable' : 'Synchronisation : serveur injoignable'}'
+          '${s.role == 'maitre' ? ', appareil maître' : s.role == 'esclave' ? ', appareil esclave' : ''}';
+
+  @override
+  Widget build(BuildContext context) {
+    final s = Synchro.instance;
+    const ombre = [Shadow(color: Color(0x99000000), blurRadius: 4)];
+    return ListenableBuilder(
+      listenable: s,
+      builder: (context, _) => Tooltip(
+        message: resume(s),
+        child: Semantics(
+          button: true,
+          label: resume(s),
+          child: InkResponse(
+            onTap: () => Nav.aller<void>(context, const EcranPartage()),
+            radius: 22,
+            child: SizedBox(
+              width: 44,
+              height: EnTeteFenetre.hauteur,
+              child: Stack(alignment: Alignment.center, children: [
+                Icon(s.actif ? Icons.cloud_outlined : Icons.cloud_off_outlined, size: 26, color: Charte.blanc, shadows: ombre),
+                if (s.actif)
+                  Positioned(
+                    right: 5,
+                    top: EnTeteFenetre.hauteur / 2 + 1,
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: s.liaisonOk ? vert : rouge,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Charte.blanc, width: 1.5),
+                      ),
+                    ),
+                  ),
+                if (s.actif && s.role != null)
+                  Positioned(
+                    top: EnTeteFenetre.hauteur / 2 - 6,
+                    child: Text(s.role == 'maitre' ? 'M' : 'S',
+                        style: Charte.texte(10, gras: true, couleur: Charte.blanc).copyWith(shadows: ombre)),
+                  ),
+              ]),
+            ),
           ),
-          const SizedBox(height: 10),
-          Text('En attendant, une liste peut s\'envoyer par mail (menu de la liste).',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        ],
+        ),
       ),
     );
+  }
+}
 
 /// Page d'aide d'une fenêtre (croix pour fermer).
 Future<void> montrerAide(BuildContext context, String titre, String texte) => modale(

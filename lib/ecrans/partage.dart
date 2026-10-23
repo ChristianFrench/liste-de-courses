@@ -24,11 +24,17 @@ class EcranPartage extends StatelessWidget {
           children: [
             if (Etat.instance.modeDemo)
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Text('Mode démonstration : le partage ne concerne que les vraies données du foyer.',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),
-            if (s.actif) ..._actif(context, s) else ..._inactif(context, s),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: s.actif ? _actif(context, s) : _inactif(context, s),
+              ),
+            ),
             GroupeRetractable(
               cle: 'partage/serveur',
               titre: 'Serveur MQTT',
@@ -57,16 +63,79 @@ class EcranPartage extends StatelessWidget {
     );
   }
 
+  /// État de la synchronisation et ce qu'il reste à faire, en tête de l'écran.
+  Widget _etat(Synchro s) {
+    final autres = s.appareils.values.where((a) => a.enLigne).length;
+    final (titre, couleur) = !s.actif
+        ? ('Foyer non partagé', Charte.texteSecondaire)
+        : s.liaisonOk
+            ? ('Serveur joignable', BoutonSynchro.vert)
+            : s.etatReseau == 'connexion'
+                ? ('Connexion au serveur…', _rouge)
+                : ('Serveur injoignable', _rouge);
+    final role = s.role == 'maitre'
+        ? 'Cet appareil est le maître (M) : il a créé le partage, son code est à donner aux autres.'
+        : s.role == 'esclave'
+            ? 'Cet appareil est un esclave (S) : il a rejoint le foyer d\'un autre appareil.'
+            : null;
+    final aFaire = !s.actif
+        ? 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
+            'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).'
+        : !s.liaisonOk
+            ? 'Vérifiez le réseau (Wi-Fi) et les réglages du serveur MQTT plus bas. Les modifications sont gardées et partiront dès que le serveur répondra.'
+            : autres == 0
+                ? (s.role == 'esclave'
+                    ? 'Ouvrez l\'application sur l\'appareil maître pour recevoir les données du foyer.'
+                    : 'Sur les autres appareils : « Rejoindre un foyer » avec le code ci-dessous, et les mêmes réglages de serveur.')
+                : 'Rien à faire : les modifications passent entre les appareils en ligne.';
+    return Container(
+      margin: const EdgeInsets.only(top: 10, bottom: 6),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Charte.fondSelection, borderRadius: BorderRadius.circular(10)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(color: s.actif ? couleur : Charte.placeholder, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 10),
+          Expanded(child: Text(titre, style: Charte.texte(19, gras: true))),
+        ]),
+        if (s.actif && s.liaisonOk && s.derniereVerification != null)
+          Text('Échange vérifié à ${heure(s.derniereVerification!)} (aller-retour ${s.dureeVerification} ms), contrôle toutes les 30 s',
+              style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+        if (s.actif && !s.liaisonOk && s.derniereErreur != null) Text(s.derniereErreur!, style: Charte.texte(13, couleur: _rouge)),
+        if (role != null) ...[const SizedBox(height: 6), Text(role, style: Charte.texte(15))],
+        const SizedBox(height: 6),
+        Text('À faire', style: Charte.texte(15, gras: true)),
+        Text(aFaire, style: Charte.texte(15)),
+      ]),
+    );
+  }
+
+  Widget _appareil(String texte, bool enLigne) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: enLigne ? BoutonSynchro.vert : Charte.placeholder, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text(texte, style: Charte.texte(15))),
+        ]),
+      );
+
   List<Widget> _inactif(BuildContext context, Synchro s) => [
-        const SizedBox(height: 8),
-        Text('Les listes, magasins et produits du foyer peuvent être partagés entre vos téléphones et votre PC. '
-            'Chaque appareil garde tout sur lui et fonctionne sans réseau ; les modifications passent dès que le réseau revient.',
-            style: Charte.texte(15)),
-        const SizedBox(height: 8),
-        LigneMenu(
+        _etat(s),
+        const SizedBox(height: 10),
+        Text('Premier appareil (celui qui a les bonnes données)', style: Charte.texte(15, gras: true)),
+        const SizedBox(height: 6),
+        Bouton(
+          texte: 'Partager ce foyer',
           icone: Icons.share_outlined,
-          titre: 'Partager ce foyer',
-          sousTitre: 'Premier appareil : crée le code à donner aux autres',
+          plein: true,
           onTap: () async {
             // Le bouton à contour confirme (convention de [confirmer] : le bouton plein annule).
             final ok = await confirmer(context,
@@ -82,22 +151,17 @@ class EcranPartage extends StatelessWidget {
             if (context.mounted) Nav.message(context, 'Partage créé : donnez le code aux autres appareils');
           },
         ),
-        LigneMenu(
-          icone: Icons.login,
-          titre: 'Rejoindre un foyer',
-          sousTitre: 'J\'ai reçu un code : cet appareil prend les données du foyer',
-          onTap: () => _rejoindre(context, s),
-        ),
+        const SizedBox(height: 16),
+        Text('Autres appareils (j\'ai reçu un code)', style: Charte.texte(15, gras: true)),
+        const SizedBox(height: 6),
+        Bouton(texte: 'Rejoindre un foyer', icone: Icons.login, onTap: () => _rejoindre(context, s)),
+        const SizedBox(height: 16),
       ];
 
   List<Widget> _actif(BuildContext context, Synchro s) {
-    final (texte, icone, couleur) = switch (s.etatReseau) {
-      'connecte' => ('Connecté', Icons.cloud_done_outlined, Charte.encre),
-      'connexion' => ('Connexion…', Icons.cloud_sync_outlined, Charte.texteSecondaire),
-      _ => ('Hors ligne : les modifications partiront au retour du réseau', Icons.cloud_off_outlined, Charte.texteSecondaire),
-    };
     final autres = s.appareils.values.toList()..sort((a, b) => a.nom.compareTo(b.nom));
     return [
+      _etat(s),
       Container(
         padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
@@ -105,7 +169,7 @@ class EcranPartage extends StatelessWidget {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text('Code de partage', style: Charte.texte(15)),
-              Text(s.code!.split('').join(' '), style: Charte.texte(28, gras: true, espacement: 2)),
+              Text(s.code!.split('').join(' '), maxLines: 1, style: Charte.texte(24, gras: true, espacement: 1)),
               Text('À saisir sur les autres appareils (Rejoindre un foyer)', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ]),
           ),
@@ -115,35 +179,34 @@ class EcranPartage extends StatelessWidget {
           }),
         ]),
       ),
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        child: Row(children: [
-          Icon(icone, size: 26, color: Charte.couleurIcone(icone)),
-          const SizedBox(width: 10),
-          Expanded(child: Text(texte, style: Charte.texte(16, gras: true, couleur: couleur))),
-        ]),
-      ),
-      if (s.derniereErreur != null && s.etatReseau != 'connecte')
-        Text(s.derniereErreur!, style: Charte.texte(13, couleur: _rouge)),
-      Text('Cet appareil : ${s.nomAppareil}', style: Charte.texte(15)),
-      for (final a in autres)
-        Text('${a.enLigne ? '●' : '○'} ${a.nom}${a.enLigne ? ' (en ligne)' : ''}', style: Charte.texte(15)),
+      const SizedBox(height: 10),
+      Text('Appareils', style: Charte.texte(15, gras: true)),
+      _appareil('${s.nomAppareil} (cet appareil${s.role == 'maitre' ? ', maître' : s.role == 'esclave' ? ', esclave' : ''})', s.liaisonOk),
+      for (final a in autres) _appareil('${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})', a.enLigne),
       if (autres.isEmpty) Text('Aucun autre appareil vu pour l\'instant', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       const SizedBox(height: 6),
       Text('${s.envoyes} modifications envoyées, ${s.recus} reçues depuis le lancement'
           '${s.enAttente > 0 ? ' · ${s.enAttente} en attente d\'intégration' : ''}',
           style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-      const SizedBox(height: 8),
-      LigneMenu(
+      const SizedBox(height: 14),
+      Text('Si un autre appareil semble incomplet', style: Charte.texte(15, gras: true)),
+      const SizedBox(height: 6),
+      Bouton(
+        texte: 'Tout renvoyer',
         icone: Icons.sync,
-        titre: 'Tout renvoyer',
-        sousTitre: 'Si un appareil semble incomplet',
-        onTap: s.etatReseau == 'connecte' ? s.toutRenvoyer : null,
+        onTap: s.liaisonOk
+            ? () {
+                s.toutRenvoyer();
+                Nav.message(context, 'Tout le foyer est renvoyé aux autres appareils');
+              }
+            : null,
       ),
-      LigneMenu(
+      const SizedBox(height: 14),
+      Text('Ne plus partager (les données restent sur cet appareil)', style: Charte.texte(15, gras: true)),
+      const SizedBox(height: 6),
+      Bouton(
+        texte: 'Arrêter le partage sur cet appareil',
         icone: Icons.link_off,
-        titre: 'Arrêter le partage sur cet appareil',
-        sousTitre: 'Les données restent ici, elles ne circulent plus',
         onTap: () async {
           final ok = await confirmer(context,
               titre: 'Arrêter le partage ?',
@@ -154,6 +217,7 @@ class EcranPartage extends StatelessWidget {
           if (ok == true) await s.arreterPartage();
         },
       ),
+      const SizedBox(height: 16),
     ];
   }
 

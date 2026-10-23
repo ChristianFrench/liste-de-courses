@@ -339,9 +339,9 @@ void main() {
       expect(find.text('+ Nouvelle liste'), findsNothing, reason: 'glisser sur le texte : onglet Courses');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
-      await _toucher(tester, find.byTooltip('Synchronisation'));
-      expect(find.text('Pas encore active'), findsOneWidget);
-      await _toucher(tester, find.byTooltip('Fermer'));
+      await _toucher(tester, find.byTooltip('Synchronisation : foyer non partagé'));
+      expect(find.text('Foyer non partagé'), findsOneWidget, reason: 'l\'icône ouvre l\'écran du partage');
+      await _toucher(tester, find.byTooltip('Retour'));
       await _toucher(tester, find.byTooltip('Plus d\'actions'));
       await _toucher(tester, find.text('Aide'));
       expect(find.text('Aide · Préparer'), findsOneWidget);
@@ -905,6 +905,7 @@ void main() {
       await _toucher(tester, find.text('Partager ou rejoindre un foyer'));
       expect(find.text('Partager ce foyer'), findsOneWidget);
       expect(find.text('Rejoindre un foyer'), findsOneWidget);
+      expect(find.text('Foyer non partagé'), findsOneWidget);
       await _toucher(tester, find.text('SERVEUR MQTT'));
       final hote = tester.widget<TextField>(find.byKey(const ValueKey('mqtt-hote')));
       expect(hote.controller!.text, 'broker.hivemq.com');

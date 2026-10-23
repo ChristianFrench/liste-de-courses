@@ -50,6 +50,8 @@ void main() {
     final debut = DateTime.now();
     await s.creerPartage();
     await attendre(() => s.etatReseau == 'connecte', secondes: 30);
+    await attendre(() => s.liaisonOk, secondes: 15);
+    expect(s.role, 'maitre');
     notice('A connecté', 'code ${s.code}, ${DateTime.now().difference(debut).inMilliseconds} ms');
 
     // Appareil B : base vide, rejoint avec le code.
