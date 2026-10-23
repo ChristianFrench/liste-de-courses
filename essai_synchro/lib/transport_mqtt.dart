@@ -48,7 +48,7 @@ class TransportMqtt implements Transport {
     c.connectionMessage = MqttConnectMessage()
         .withClientIdentifier(identifiant)
         .withWillTopic(sujetTestament)
-        .withWillMessage(testament)
+        .withWillMessage(_ascii(testament)) // le client refuse les accents dans le testament
         .withWillQos(MqttQos.atLeastOnce)
         .withWillRetain(); // pas de startClean : le serveur garde la session et les messages manqués
     c.onConnected = () => _connecte();
@@ -88,6 +88,10 @@ class TransportMqtt implements Transport {
     _client!.subscribe(_abonnement, MqttQos.atLeastOnce);
     _etats.add('connecte');
   }
+
+  /// Accents écrits en \\uXXXX : le JSON reste identique une fois relu.
+  String _ascii(String s) => s.replaceAllMapped(
+      RegExp(r'[^\x00-\x7F]'), (m) => m[0]!.codeUnits.map((c) => '\\u${c.toRadixString(16).padLeft(4, '0')}').join());
 
   String _court(Object e) {
     final s = '$e';

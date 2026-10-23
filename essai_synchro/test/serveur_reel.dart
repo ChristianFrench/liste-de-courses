@@ -17,7 +17,7 @@ void main() {
           nom: nom,
           plateforme: 'Linux',
         );
-    final a = creer('A', await ouvrirBase(null)), b = creer('B', await ouvrirBase(null));
+    final a = creer('A', await ouvrirBase(null)), b = creer('Téléphone', await ouvrirBase(null));
     await a.demarrer();
     await b.demarrer();
     for (var i = 0; i < 40 && !(a.pairs[b.id]?.enLigne ?? false); i++) {
