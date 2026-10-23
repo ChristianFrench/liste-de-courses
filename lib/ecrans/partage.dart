@@ -68,6 +68,16 @@ class EcranPartage extends StatelessWidget {
           titre: 'Partager ce foyer',
           sousTitre: 'Premier appareil : crée le code à donner aux autres',
           onTap: () async {
+            // Le bouton à contour confirme (convention de [confirmer] : le bouton plein annule).
+            final ok = await confirmer(context,
+                titre: 'Partager ce foyer ?',
+                contenu: Text(
+                    'À faire sur un seul appareil, celui qui a les bonnes données : il crée le code du foyer.\n\n'
+                    'Sur les autres appareils, choisissez « Rejoindre un foyer » et saisissez ce code.',
+                    style: Charte.texte(16)),
+                plein: 'Annuler',
+                contour: 'Créer le code du foyer');
+            if (ok != true) return;
             await s.creerPartage();
             if (context.mounted) Nav.message(context, 'Partage créé : donnez le code aux autres appareils');
           },
@@ -139,8 +149,8 @@ class EcranPartage extends StatelessWidget {
               titre: 'Arrêter le partage ?',
               contenu: Text('Cet appareil garde ses données mais ne reçoit plus les modifications des autres.',
                   style: Charte.texte(16)),
-              plein: 'Arrêter',
-              contour: 'Annuler');
+              plein: 'Annuler',
+              contour: 'Arrêter le partage');
           if (ok == true) await s.arreterPartage();
         },
       ),
@@ -165,8 +175,8 @@ class EcranPartage extends StatelessWidget {
             'Une copie de l\'ancienne base est gardée sur l\'appareil.\n\n'
             'Ouvrez l\'application sur un appareil du foyer pour qu\'il envoie les données.',
             style: Charte.texte(16)),
-        plein: 'Rejoindre',
-        contour: 'Annuler');
+        plein: 'Annuler',
+        contour: 'Rejoindre et remplacer');
     if (ok != true) return;
     await s.rejoindre(net, nom);
     if (context.mounted) Nav.message(context, 'Foyer rejoint : les données arrivent dès qu\'un autre appareil est en ligne');

@@ -910,6 +910,11 @@ void main() {
       expect(hote.controller!.text, 'broker.hivemq.com');
       expect(tester.widget<TextField>(find.byKey(const ValueKey('mqtt-port'))).controller!.text, '8883');
       await _ciblesTactiles(tester);
+      // « Annuler » ne crée pas de partage
+      await _toucher(tester, find.text('Partager ce foyer'));
+      expect(find.text('Créer le code du foyer'), findsOneWidget);
+      await _toucher(tester, find.text('Annuler'));
+      expect(find.text('Partager ce foyer'), findsOneWidget);
     });
   });
 }
