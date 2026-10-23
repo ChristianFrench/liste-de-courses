@@ -1,0 +1,4 @@
+analyzer:
+  exclude:
+    - essai_synchro/**
+    - build/**

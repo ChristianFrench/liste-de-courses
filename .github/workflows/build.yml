@@ -2,6 +2,8 @@ name: Compilation Android, Windows, iPhone
 
 on:
   push:
+    # L'application d'essai de synchronisation a sa propre compilation
+    paths-ignore: ['essai_synchro/**', '.github/workflows/essai-synchro.yml']
   workflow_dispatch:
 
 env:
