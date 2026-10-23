@@ -125,8 +125,12 @@ goto attenteservice
 echo       Le service ne démarre pas. Détails :
 sc query mosquitto
 if exist "%DONNEES%\mosquitto.log" type "%DONNEES%\mosquitto.log"
+icacls "%DONNEES%"
+icacls "%DONNEES%\*"
 echo       Essai de lancement direct :
-start "" /b "%MOSQ%\mosquitto.exe" -c "%MOSQ%\mosquitto.conf" -v
+findstr /v /c:"log_dest" "%MOSQ%\mosquitto.conf" > "%TEMP%\mosquitto-essai.conf"
+>> "%TEMP%\mosquitto-essai.conf" echo log_dest stdout
+start "" /b "%MOSQ%\mosquitto.exe" -c "%TEMP%\mosquitto-essai.conf" -v
 ping -n 4 127.0.0.1 >nul
 taskkill /im mosquitto.exe /f >nul 2>&1
 goto echec
