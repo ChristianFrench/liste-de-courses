@@ -59,13 +59,14 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     });
   }
 
-  void _creer(List<LigneListe> lignes) {
+  void _creer(List<LigneListe> lignes, {bool simple = false}) {
     final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomParDefaut(magasinId, debut)) : nom.text.trim();
     if (etat.nomPris(texte)) {
       Nav.message(context, 'Une liste s\'appelle déjà « $texte » : choisissez un autre nom.');
       return;
     }
     final l = etat.creerListe(magasinId, lignes, nom: texte);
+    if (simple) etat.marquerSimple(l, true);
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
 
@@ -266,8 +267,14 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 4,
+            nombre: 5,
             enfants: [
+              LigneMenu(
+                icone: Icons.edit_note,
+                titre: 'Liste simple',
+                sousTitre: 'Tapez les articles un à un, sans rayons ni secteurs ; rangez-la par rayons à la fin si vous voulez',
+                onTap: () => _creer([], simple: true),
+              ),
               LigneMenu(
                 icone: Icons.note_add_outlined,
                 titre: 'Liste type',
@@ -582,23 +589,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
   }
 
-  Future<void> _rechercher(Liste l) async {
-    final id = await showDialog<String>(context: context, builder: (_) => _DialogueRecherche(magasinId: l.magasinId));
-    if (id == null || !mounted) return;
-    etat.ajouterLigne(l, id);
-    final s = etat.secteurDe(l.magasinId, id);
-    if (s != null) {
-      _allerA(l, s);
-    } else {
-      Nav.message(context, 'Ajouté à la liste (produit non placé dans ce magasin)');
-    }
-  }
-
   /// Fenêtre modale « Liste prête » : récapitulatif, envoi par mail éventuel, puis la liste passe dans Courses.
   Future<void> _valider(Liste l) async {
     var envoyer = false;
     var pourCourses = true;
     var enListeType = false;
+    final simple = etat.estSimple(l);
+    var ranger = true;
     final nomType = TextEditingController(text: etat.nomListe(l));
     final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
@@ -625,6 +622,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 labelText: 'Commentaire (facultatif)', hintText: 'Ex. : passer aussi à la pharmacie'),
           ),
           const SizedBox(height: 6),
+          if (simple)
+            CaseModale(
+              texte: 'Ranger par rayons et secteurs',
+              aide: 'Pendant les courses, la liste suivra l\'ordre du magasin. Sinon, elle garde l\'ordre de saisie.',
+              coche: ranger,
+              onChange: (v) => maj(() => ranger = v),
+            ),
           CaseModale(
             texte: 'Prête pour les courses',
             aide: 'Elle passe en instance de courses ; vous pourrez encore la remettre en préparation.',
@@ -660,6 +664,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nom = nomType.text.trim();
     if (!ok || !mounted) return;
     etat.commenter(l, commentaire.text);
+    if (simple && ranger) etat.marquerSimple(l, false);
     if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
     if (!pourCourses) {
       if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
@@ -699,12 +704,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
             corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
           );
         }
+        final simple = etat.estSimple(l);
         final barre = BarreAction(boutons: [
-          BoutonEtat(
-            texte: 'Ma liste · ${l.lignes.length}',
-            actif: maListe,
-            onTap: () => setState(() => maListe = !maListe),
-          ),
+          if (!simple)
+            BoutonEtat(
+              texte: 'Ma liste · ${l.lignes.length}',
+              actif: maListe,
+              onTap: () => setState(() => maListe = !maListe),
+            ),
           Bouton(
             texte: 'Aperçu',
             taille: 15,
@@ -716,11 +723,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
           retour: true,
           icone: Icons.checklist,
           titre: etat.nomListe(l),
-          sousTitre: 'Préparation · enregistrée',
-          aide: Aides.preparation,
+          sousTitre: simple ? 'Liste simple · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}' : 'Préparation · enregistrée',
+          aide: simple ? Aides.listeSimple : Aides.preparation,
+          deplier: simple ? const [] : _toutesLesCles(l),
           actions: [
-            ActionLigne(Icons.search, 'Rechercher dans le magasin', () => _rechercher(l)),
-            reduireTout(_toutesLesCles(l)),
             ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
               if (!await envoyerListe(etat, l) && context.mounted) {
                 Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
@@ -728,6 +734,39 @@ class _EcranConstructionState extends State<EcranConstruction> {
             }),
           ],
         );
+        String ou(Produit p) {
+          final s = etat.secteurDe(l.magasinId, p.id);
+          if (s == null) return 'Non placé dans ce magasin';
+          return '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
+        }
+
+        final recherche = ChampRecherche(
+          key: ValueKey('recherche-${l.id}'),
+          produits: () => etat.produits,
+          detail: ou,
+          coche: (p) => etat.ligne(l, p.id) != null,
+          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
+          onChoix: (p) => simple ? _ajouterSimple(l, p) : _trouver(l, p),
+          onNouveau: simple ? (n) => _ajouterSimple(l, etat.creerProduit(n)) : null,
+        );
+        if (simple) {
+          return PageBase(
+            entete: entete,
+            haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
+            corps: l.lignes.isEmpty
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus : il s\'ajoute en fin de liste.',
+                        style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                  )
+                : ListView(
+                    controller: _defilement,
+                    padding: const EdgeInsets.only(bottom: 16),
+                    children: [for (final g in l.lignes) if (etat.produit(g.produitId) case final p?) _ligne(l, p, simple: true)],
+                  ),
+            bas: [barre],
+          );
+        }
         if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
           return PageBase(
             entete: entete,
@@ -748,104 +787,203 @@ class _EcranConstructionState extends State<EcranConstruction> {
         for (final e in elements) {
           if (e.titreSecteur && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
         }
+        Widget element(int i) => _element(l, elements[i], i, numeros, premiers);
+
+        // Le rayon ouvert et son secteur ouvert restent en haut de l'écran pendant que leurs articles défilent.
+        final morceaux = <Widget>[];
+        var i = 0;
+        while (i < elements.length) {
+          final e = elements[i];
+          if (e.rayon != null && !e.ajout && Retractables.i.ouvert(_cleRayon(e.rayon!.id))) {
+            final interieur = <Widget>[];
+            var j = i + 1;
+            while (j < elements.length && elements[j].rayon == null && !(elements[j].titreSecteur && elements[j].secteur == null)) {
+              final f = elements[j];
+              if (f.ajout && f.rayon == null) break; // « + Ajouter un rayon » : hors du rayon
+              if (f.titreSecteur && Retractables.i.ouvert(_cle(f.secteur!.id))) {
+                var k = j + 1;
+                while (k < elements.length && (elements[k].produit != null || elements[k].absent) && elements[k].secteur?.id == f.secteur!.id) {
+                  k++;
+                }
+                interieur.add(SliverMainAxisGroup(slivers: [
+                  PinnedHeaderSliver(child: element(j)),
+                  SliverList.list(children: [for (var x = j + 1; x < k; x++) element(x)]),
+                ]));
+                j = k;
+              } else {
+                interieur.add(SliverToBoxAdapter(child: element(j)));
+                j++;
+              }
+            }
+            morceaux.add(SliverMainAxisGroup(slivers: [PinnedHeaderSliver(child: element(i)), ...interieur]));
+            i = j;
+          } else {
+            morceaux.add(SliverToBoxAdapter(child: element(i)));
+            i++;
+          }
+        }
 
         return PageBase(
           entete: entete,
+          haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
           corps: elements.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(16),
                   child: Text('La liste est vide.', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
                 )
-              : ListView.builder(
+              : CustomScrollView(
                   controller: _defilement,
-                  padding: const EdgeInsets.only(bottom: 16),
-                  itemCount: elements.length,
-                  itemBuilder: (context, i) {
-                    final e = elements[i];
-                    final s = e.secteur;
-                    if (e.ajout) {
-                      final r = e.rayon;
-                      return InkWell(
-                        onTap: () => r == null ? _ajouterRayon(l) : _ajouterSecteur(l, r),
-                        child: Container(
-                          height: 48,
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(left: r == null ? 12 : 24),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                          child: Row(children: [
-                            Icon(Icons.add_circle_outline, size: 22, color: Charte.cadre),
-                            const SizedBox(width: 8),
-                            Text(r == null ? 'Ajouter un rayon' : 'Ajouter un secteur à ${r.nom}',
-                                style: Charte.texte(15, gras: true, couleur: Charte.cadre)),
-                          ]),
-                        ),
-                      );
-                    }
-                    if (e.rayon != null) {
-                      final r = e.rayon!;
-                      final cle = _cleRayon(r.id);
-                      return TitreGroupe(
-                        // Un rayon peut revenir plus loin dans le parcours : seule sa première apparition porte la clé.
-                        key: premiers[r.id] == i ? _titres.putIfAbsent('rayon:${r.id}', GlobalKey.new) : null,
-                        nom: r.nom,
-                        image: cleRayon(r.nom),
-                        icone: Icons.view_week_outlined,
-                        fort: true,
-                        nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
-                        ouvert: Retractables.i.ouvert(cle),
-                        focus: Retractables.i.ouvert(cle),
-                        onTap: () {
-                          if (Retractables.i.ouvert(cle)) {
-                            Retractables.i.basculer(cle);
-                          } else {
-                            _ouvrirRayon(l, r.id);
-                            _montrer('rayon:${r.id}');
-                          }
-                        },
-                      );
-                    }
-                    if (e.produit != null) {
-                      return _ligne(l, e.produit!);
-                    }
-                    if (e.absent) {
-                      return InkWell(
-                        onTap: () => _produitAbsent(l, s!),
-                        child: Container(
-                          height: 44,
-                          alignment: Alignment.centerLeft,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                          child: Text('+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                        ),
-                      );
-                    }
-                    final r = s == null ? null : etat.rayon(s.rayonId);
-                    return TitreGroupe(
-                      key: _titres.putIfAbsent(s?.id ?? 'nonPlace', GlobalKey.new),
-                      nom: s?.nom ?? 'Non placé',
-                      numero: s == null ? null : numeros[s.id]?.toString(),
-                      nonPlace: s == null,
-                      image: r == null ? null : cleSecteur(r.nom, s!.nom),
-                      nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
-                      ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-                      focus: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-                      onTap: () {
-                        final id = s?.id ?? 'nonPlace';
-                        if (Retractables.i.ouvert(_cle(id))) {
-                          Retractables.i.basculer(_cle(id));
-                        } else {
-                          _ouvrirSeul(l, id);
-                          _montrer(id);
-                        }
-                      },
-                    );
-                  },
+                  slivers: [...morceaux, const SliverPadding(padding: EdgeInsets.only(bottom: 16))],
                 ),
           bas: [barre],
         );
       },
     );
   }
+
+  Widget _element(Liste l, _Element e, int i, Map<String, int> numeros, Map<String, int> premiers) {
+    final s = e.secteur;
+    if (e.ajout) {
+      final r = e.rayon;
+      return InkWell(
+        onTap: () => r == null ? _ajouterRayon(l) : _ajouterSecteur(l, r),
+        child: Container(
+          height: 48,
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.only(left: r == null ? 12 : 24),
+          decoration: BoxDecoration(color: Charte.fond, border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Row(children: [
+            Icon(Icons.add_circle_outline, size: 22, color: Charte.cadre),
+            const SizedBox(width: 8),
+            Text(r == null ? 'Ajouter un rayon' : 'Ajouter un secteur à ${r.nom}', style: Charte.texte(15, gras: true, couleur: Charte.cadre)),
+          ]),
+        ),
+      );
+    }
+    if (e.rayon != null) {
+      final r = e.rayon!;
+      final cle = _cleRayon(r.id);
+      return TitreGroupe(
+        // Un rayon peut revenir plus loin dans le parcours : seule sa première apparition porte la clé.
+        key: premiers[r.id] == i ? _titres.putIfAbsent('rayon:${r.id}', GlobalKey.new) : null,
+        nom: r.nom,
+        image: cleRayon(r.nom),
+        icone: Icons.view_week_outlined,
+        fort: true,
+        nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
+        ouvert: Retractables.i.ouvert(cle),
+        focus: Retractables.i.ouvert(cle),
+        onTap: () {
+          if (Retractables.i.ouvert(cle)) {
+            Retractables.i.basculer(cle);
+          } else {
+            _ouvrirRayon(l, r.id);
+            _montrer('rayon:${r.id}');
+          }
+        },
+      );
+    }
+    if (e.produit != null) return _ligne(l, e.produit!);
+    if (e.absent) {
+      return InkWell(
+        onTap: () => _produitAbsent(l, s!),
+        child: Container(
+          height: 44,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 12),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Text('+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+        ),
+      );
+    }
+    final r = s == null ? null : etat.rayon(s.rayonId);
+    return TitreGroupe(
+      key: _titres.putIfAbsent(s?.id ?? 'nonPlace', GlobalKey.new),
+      nom: s?.nom ?? 'Non placé',
+      numero: s == null ? null : numeros[s.id]?.toString(),
+      nonPlace: s == null,
+      image: r == null ? null : cleSecteur(r.nom, s!.nom),
+      nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
+      ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
+      focus: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
+      onTap: () {
+        final id = s?.id ?? 'nonPlace';
+        if (Retractables.i.ouvert(_cle(id))) {
+          Retractables.i.basculer(_cle(id));
+        } else {
+          _ouvrirSeul(l, id);
+          _montrer(id);
+        }
+      },
+    );
+  }
+
+  /// Article choisi dans la recherche : son rayon et son secteur s'ouvrent, la ligne vient à l'écran et se signale.
+  void _trouver(Liste l, Produit p) {
+    final s = etat.secteurDe(l.magasinId, p.id);
+    setState(() {
+      maListe = maListe && etat.ligne(l, p.id) != null;
+      _surligne = p.id;
+      if (etat.ligne(l, p.id) != null) _focus = p.id;
+    });
+    if (s == null) {
+      // Absent des rayons de ce magasin : il rejoint la liste, dans « Non placé ».
+      if (etat.ligne(l, p.id) == null) {
+        etat.ajouterLigne(l, p.id);
+        Nav.message(context, '« ${p.nom} » ajouté à la liste (non placé dans ce magasin)');
+      }
+      _ouvrirSeul(l, 'nonPlace');
+      _montrer('nonPlace');
+    } else {
+      _allerA(l, s);
+    }
+    _amener(p.id, essais: 3);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _surligne == p.id) setState(() => _surligne = null);
+    });
+  }
+
+  /// Fait venir la ligne d'un article à l'écran ; si elle n'est pas encore construite (loin dans le secteur),
+  /// on descend d'abord par estimation, puis on ajuste.
+  void _amener(String produitId, {int essais = 1}) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final c = _lignes[produitId]?.currentContext;
+      if (c != null && c.mounted) {
+        Scrollable.ensureVisible(c, alignment: 0.4, duration: const Duration(milliseconds: 200));
+        return;
+      }
+      if (essais <= 0 || !_defilement.hasClients) return;
+      final p = _defilement.position;
+      _defilement.jumpTo((p.pixels + p.viewportDimension * 0.8).clamp(0, p.maxScrollExtent));
+      _amener(produitId, essais: essais - 1);
+    });
+  }
+
+  /// Liste simple : l'article choisi s'ajoute en fin de liste (ou, s'il y est déjà, se signale).
+  void _ajouterSimple(Liste l, Produit p) {
+    final deja = etat.ligne(l, p.id) != null;
+    etat.ajouterLigne(l, p.id);
+    setState(() {
+      _focus = p.id;
+      _surligne = p.id;
+    });
+    if (deja) Nav.message(context, '« ${p.nom} » est déjà dans la liste');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_defilement.hasClients) return;
+      if (deja) {
+        _amener(p.id);
+      } else {
+        _defilement.animateTo(_defilement.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      }
+    });
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _surligne == p.id) setState(() => _surligne = null);
+    });
+  }
+
+  /// Article signalé après une recherche (fond coloré quelques secondes).
+  String? _surligne;
 
   /// Après dépliage, le bandeau monte en haut de l'écran : ce qu'il contient est visible dessous,
   /// même pour le dernier groupe (« Non placé », en fin de liste).
@@ -895,10 +1033,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
     _allerA(l, s);
   }
 
-  Widget _ligne(Liste l, Produit p) {
+  Widget _ligne(Liste l, Produit p, {bool simple = false}) {
     final g = etat.ligne(l, p.id);
-    // Non placé : toucher son nom propose un secteur ; il pourra ensuite être coché.
-    final place = etat.secteurDe(l.magasinId, p.id) != null;
+    // Non placé : toucher son nom propose un secteur ; il pourra ensuite être coché (pas dans une liste simple).
+    final place = simple || etat.secteurDe(l.magasinId, p.id) != null;
     final focus = g != null && _focus == p.id;
     void basculer() {
       etat.basculer(l, p.id);
@@ -941,6 +1079,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
         if (g != null) ActionLigne(Icons.sticky_note_2_outlined, 'Consigne', () => _consigne(l, p)),
         if (!place) ActionLigne(Icons.place_outlined, 'Choisir son secteur', () => _placer(l, p)),
       ],
+      child: Container(
+      foregroundDecoration: _surligne == p.id ? BoxDecoration(border: Border.all(color: Charte.accent, width: 3)) : null,
       child: LigneChoix(
       key: _lignes.putIfAbsent(p.id, GlobalKey.new),
       nom: g == null ? p.nom : etat.libelleArticle(g, p),
@@ -970,76 +1110,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       alerte: g == null ? null : etat.quantiteInsuffisante(g),
       onTap: basculer,
       onQuantite: (q) => etat.quantite(l, p.id, q),
-    ));
-  }
-}
-
-class _DialogueRecherche extends StatefulWidget {
-  const _DialogueRecherche({required this.magasinId});
-  final String magasinId;
-
-  @override
-  State<_DialogueRecherche> createState() => _DialogueRechercheState();
-}
-
-class _DialogueRechercheState extends State<_DialogueRecherche> {
-  String filtre = '';
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    final f = filtre.toLowerCase();
-    final trouves = etat.produits.where((p) => f.isEmpty || p.nom.toLowerCase().contains(f)).toList()
-      ..sort((a, b) => a.nom.compareTo(b.nom));
-    return AlertDialog(
-      backgroundColor: Charte.fond,
-      insetPadding: const EdgeInsets.all(16),
-      title: Text('Rechercher dans le magasin', style: Charte.texte(18, gras: true)),
-      content: SizedBox(
-        width: 360,
-        height: 420,
-        child: Column(
-          children: [
-            TextField(
-              autofocus: true,
-              style: Charte.texte(16),
-              decoration: const InputDecoration(hintText: 'Nom du produit'),
-              onChanged: (v) => setState(() => filtre = v),
-            ),
-            const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                children: [
-                  for (final p in trouves)
-                    InkWell(
-                      onTap: () => Navigator.of(context).pop(p.id),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 44),
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-                        child: Row(
-                          children: [
-                            Expanded(child: Text(p.nom, style: Charte.texte(16))),
-                            Text(_ou(etat, p), style: Charte.texte(12, couleur: Charte.texteSecondaire)),
-                          ],
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('Fermer', style: Charte.texte(16))),
-      ],
-    );
-  }
-
-  String _ou(Etat etat, Produit p) {
-    final s = etat.secteurDe(widget.magasinId, p.id);
-    return s == null ? 'non placé' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
+    )));
   }
 }
 
@@ -1634,6 +1705,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   final _titres = <String, GlobalKey>{};
   bool _place = false;
 
+  /// Aperçu d'une liste simple : sans rayons ni secteurs (ordre de saisie) ou rangée comme en magasin.
+  bool? _aplat;
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -1649,6 +1723,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           );
         }
         final etapes = etat.etapes(l, apercu ? etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id : l.parcoursId);
+        // Liste simple non rangée : les articles dans l'ordre de saisie, sans bandeaux.
+        final simple = etat.estSimple(l);
+        final aplat = apercu ? (_aplat ?? simple) : simple;
         final total = l.lignes.length;
         final titre = apercu
             ? 'Aperçu · $total article${total > 1 ? 's' : ''}'
@@ -1687,12 +1764,18 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
               droite: commentaire == null
                   ? null
                   : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
-              actions: [
-                reduireTout([for (final x in etapes) _cle(x.id)]),
-              ],
+              deplier: aplat ? const [] : [for (final x in etapes) _cle(x.id)],
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
+                : aplat
+                ? ListView(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    children: [
+                      for (final g in l.lignes)
+                        if (!resteAFaire || !(g.coche || etat.manquant(l, g.produitId))) _ligne(etat, l, g, apercu),
+                    ],
+                  )
                 : ListView(
                     padding: const EdgeInsets.only(bottom: 16),
                     children: [
@@ -1732,6 +1815,12 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             bas: [
               if (apercu)
                 BarreAction(boutons: [
+                  if (simple)
+                    BoutonEtat(
+                      texte: 'Rayons et secteurs',
+                      actif: !aplat,
+                      onTap: () => setState(() => _aplat = !aplat),
+                    ),
                   Bouton(texte: 'Continuer la préparation', plein: true, onTap: () => Navigator.of(context).maybePop()),
                 ])
               else

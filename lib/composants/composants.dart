@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../theme.dart';
+import 'entete.dart' show glisserOnglet;
 import 'pictogramme.dart';
 
 export 'entete.dart';
+export 'recherche.dart';
 
 // Composants réutilisables (spécification IHM, chapitre 5).
 
@@ -13,7 +15,7 @@ BorderSide get _bordLigne => BorderSide(color: Charte.separateurLigne, width: Ch
 BorderSide get _bordZone => BorderSide(color: Charte.separateurZone, width: Charte.traitSeparateur);
 
 /// Squelette commun à tous les écrans : en-tête, contenu, puis éléments du bas.
-class PageBase extends StatelessWidget {
+class PageBase extends StatefulWidget {
   const PageBase({super.key, required this.entete, required this.corps, this.haut = const [], this.bas = const []});
   final Widget entete;
   final List<Widget> haut;
@@ -21,17 +23,72 @@ class PageBase extends StatelessWidget {
   final List<Widget> bas;
 
   @override
+  State<PageBase> createState() => _PageBaseState();
+}
+
+class _PageBaseState extends State<PageBase> {
+  final _groupes = GroupesDeLaPage();
+
+  @override
+  void dispose() {
+    _groupes.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Charte.fond,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [entete, ...haut, Expanded(child: corps), ...bas],
+        child: PorteeGroupes(
+          groupes: _groupes,
+          // Glisser le doigt sur une zone libre de la fenêtre passe à l'onglet voisin, comme sur le bandeau
+          // (les lignes qui se glissent gardent leur geste : elles l'emportent).
+          child: GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragEnd: (d) {
+              final v = d.primaryVelocity ?? 0;
+              if (v.abs() > 200) glisserOnglet(context, v < 0 ? 1 : -1);
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [widget.entete, ...widget.haut, Expanded(child: widget.corps), ...widget.bas],
+            ),
+          ),
         ),
       ),
     );
   }
+}
+
+/// Les groupes rétractables affichés dans une fenêtre (clé → ouvert par défaut) :
+/// l'icône « tout déplier / tout replier » de l'en-tête agit sur eux.
+class GroupesDeLaPage extends ChangeNotifier {
+  final Map<String, bool> cles = {};
+  bool _prevenir = false;
+
+  void inscrire(String cle, bool parDefaut) {
+    if (cles.containsKey(cle)) return;
+    cles[cle] = parDefaut;
+    if (_prevenir) return;
+    _prevenir = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _prevenir = false;
+      notifyListeners();
+    });
+  }
+
+  bool get tousFermes => cles.isNotEmpty && cles.entries.every((e) => !Retractables.i.ouvert(e.key, parDefaut: e.value));
+}
+
+class PorteeGroupes extends InheritedWidget {
+  const PorteeGroupes({super.key, required this.groupes, required super.child});
+  final GroupesDeLaPage groupes;
+
+  static GroupesDeLaPage? de(BuildContext context) => context.getInheritedWidgetOfExactType<PorteeGroupes>()?.groupes;
+
+  @override
+  bool updateShouldNotify(PorteeGroupes old) => old.groupes != groupes;
 }
 
 class BoutonIcone extends StatelessWidget {
@@ -789,31 +846,31 @@ class TitreGroupe extends StatelessWidget {
           child: InkWell(
           onTap: onTap,
           child: Container(
-          height: image != null || icone != null ? (focus ? 64 : 52) : (onTap != null ? 44 : 30),
+          height: image != null || icone != null ? (focus ? 58 : 50) : (onTap != null ? 44 : 30),
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Row(
             children: [
               if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
               if (icone != null && image == null) ...[
                 Container(
-                  width: focus ? 56 : 46,
-                  height: focus ? 56 : 46,
+                  width: focus ? 44 : 36,
+                  height: focus ? 44 : 36,
                   decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, shape: BoxShape.circle),
                   alignment: Alignment.center,
-                  child: Icon(icone, size: focus ? 32 : 26, color: fort ? Charte.accent : Charte.blanc),
+                  child: Icon(icone, size: focus ? 25 : 21, color: fort ? Charte.accent : Charte.blanc),
                 ),
                 const SizedBox(width: 10),
               ],
               if (image != null) ...[
                 fort
                     ? Container(
-                        width: focus ? 56 : 46,
-                        height: focus ? 56 : 46,
+                        width: focus ? 44 : 36,
+                        height: focus ? 44 : 36,
                         decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
                         alignment: Alignment.center,
-                        child: Pictogramme(image, taille: focus ? 48 : 38),
+                        child: Pictogramme(image, taille: focus ? 38 : 30),
                       )
-                    : Pictogramme(image, taille: focus ? 56 : 44),
+                    : Pictogramme(image, taille: focus ? 44 : 36),
                 const SizedBox(width: 10),
               ],
               Expanded(
@@ -909,6 +966,7 @@ class GroupeRetractable extends StatelessWidget {
     return ListenableBuilder(
       listenable: Retractables.i,
       builder: (context, _) {
+        PorteeGroupes.de(context)?.inscrire(cle, parDefaut);
         final o = Retractables.i.ouvert(cle, parDefaut: parDefaut);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,

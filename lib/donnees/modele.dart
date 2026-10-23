@@ -400,6 +400,10 @@ class Etat extends ChangeNotifier {
   /// Articles manquants en rayon, signalés pendant les courses (identifiant de liste → produits).
   Map<String, Set<String>> manquants = {};
 
+  /// Listes simples : préparées sans rayons ni secteurs, dans l'ordre où les articles ont été ajoutés.
+  /// À « Liste prête », une liste simple peut être rangée par rayons et secteurs (elle quitte alors cet ensemble).
+  Set<String> simples = {};
+
   /// Listes types nommées (Préparer › Nouvelle liste › Liste type).
   List<ListeType> listesTypes = [];
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
@@ -586,6 +590,7 @@ class Etat extends ChangeNotifier {
     sansTicket = _ids(options?['sansTicket']).toSet();
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
+    simples = _ids(options?['simples']).toSet();
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
@@ -683,6 +688,7 @@ class Etat extends ChangeNotifier {
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
+            if (simples.isNotEmpty) 'simples': simples.toList(),
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
@@ -1665,6 +1671,12 @@ class Etat extends ChangeNotifier {
       if (manquants[l.id]?.isEmpty ?? false) manquants.remove(l.id);
     }
     modifie();
+  }
+
+  bool estSimple(Liste l) => simples.contains(l.id);
+
+  void marquerSimple(Liste l, bool oui) {
+    if (oui ? simples.add(l.id) : simples.remove(l.id)) modifie();
   }
 
   void commenter(Liste l, String texte) {

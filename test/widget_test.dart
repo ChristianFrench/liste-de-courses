@@ -332,10 +332,17 @@ void main() {
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
       expect(find.text('+ Nouvelle liste'), findsOneWidget, reason: 'glisser à droite : retour à Préparer');
+      // Sur une zone libre de la fenêtre, le même geste change aussi d'onglet
+      await tester.fling(find.textContaining('Touchez une liste pour la reprendre'), const Offset(-200, 0), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('+ Nouvelle liste'), findsNothing, reason: 'glisser sur le texte : onglet Courses');
+      await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
+      await tester.pumpAndSettle();
       await _toucher(tester, find.byTooltip('Synchronisation'));
       expect(find.text('Pas encore active'), findsOneWidget);
       await _toucher(tester, find.byTooltip('Fermer'));
-      await _toucher(tester, find.byTooltip('Aide'));
+      await _toucher(tester, find.byTooltip('Plus d\'actions'));
+      await _toucher(tester, find.text('Aide'));
       expect(find.text('Aide · Préparer'), findsOneWidget);
       await _toucher(tester, find.byTooltip('Fermer'));
       expect(find.text('Aide · Préparer'), findsNothing);
@@ -419,6 +426,7 @@ void main() {
       // Liste interrompue (Magasin 1) : reprise en Crèmerie
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
       expect(find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)), findsOneWidget);
+      await _voir(tester, find.text('Il en faut 3 pour la promotion'));
       expect(find.text('Il en faut 3 pour la promotion'), findsWidgets);
       await _ciblesTactiles(tester);
 
@@ -557,6 +565,50 @@ void main() {
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
       expect(find.textContaining('Ma liste · 2'), findsOneWidget);
+    });
+
+    testWidgets('préparation : la recherche ouvre le rayon et le secteur de l\'article', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'ja');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('option-recherche-0')), findsNothing, reason: 'moins de trois lettres');
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'jamb');
+      await tester.pumpAndSettle();
+      expect(find.text('Frais › Charcuterie'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      expect(find.text('Jambon'), findsOneWidget);
+      expect(find.text('Beurre doux'), findsNothing, reason: 'un seul secteur ouvert : Crèmerie s\'est refermé');
+      await tester.pump(const Duration(seconds: 4));
+      // Icône « tout déplier / replier » à droite du bandeau, aide dans le menu des trois points
+      expect(find.byTooltip('Tout replier'), findsOneWidget);
+    });
+
+    testWidgets('liste simple : saisie, aperçu sans rayons, rangement à « Liste prête »', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Liste simple'));
+      final etat = Etat.instance;
+      final l = etat.listes.firstWhere((x) => etat.estSimple(x));
+      for (final t in ['jamb', 'cafe mou', 'pq maison']) {
+        await tester.enterText(find.byKey(const ValueKey('champ-recherche')), t);
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+        await tester.pumpAndSettle();
+      }
+      expect([for (final g in l.lignes) etat.produit(g.produitId)!.nom], ['Jambon', 'Café moulu', 'pq maison'],
+          reason: 'ajoutés en fin de liste, dans l\'ordre');
+      expect(find.text('CHARCUTERIE'), findsNothing, reason: 'ni rayons ni secteurs');
+      await tester.pump(const Duration(seconds: 4));
+      await _toucher(tester, find.text('Aperçu'));
+      expect(find.text('CHARCUTERIE'), findsNothing);
+      await _toucher(tester, find.text('Rayons et secteurs'));
+      expect(find.text('CHARCUTERIE'), findsOneWidget);
+      await _toucher(tester, find.text('Continuer la préparation'));
+      await _toucher(tester, find.text('Liste prête'));
+      await _toucher(tester, find.text('Valider'));
+      expect(etat.estSimple(l), isFalse, reason: 'rangée par rayons et secteurs');
     });
 
     testWidgets('préparation : ajouter un rayon et un secteur, avec leur image', (tester) async {
