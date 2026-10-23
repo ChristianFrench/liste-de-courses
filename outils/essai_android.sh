@@ -74,7 +74,7 @@ r4=$(toucher "Gérer"); r5=$(toucher "Historique")
 echo "::warning title=Après redémarrage (Gérer › Historique)::$r1 $r2 $r3 $r4 $r5 | $(ecran)"
 r6=$(toucher "Tickets non rattachés"); r7=$(toucher "Ouvrir le ticket PDF"); sleep 3
 echo "::warning title=Trombone touché::$r6 $r7 | $(ecran) | $(adb shell dumpsys activity activities | grep -m2 -E 'mResumedActivity|topResumedActivity' | paste -sd'|')"
-adb logcat -d | grep -E "AndroidRuntime|FileProvider|Exception" | tail -n 8 | cut -c1-200 > err.txt
+adb logcat -d | grep -E "Lecture ticket|FATAL|mlkit|MlKit|Exception" | grep -v uiautomator | tail -n 12 | cut -c1-220 > err.txt
 adb exec-out screencap -p > lecteur.png
 echo "::warning title=Erreurs Android::$(paste -sd'|' err.txt)"
 exit 0

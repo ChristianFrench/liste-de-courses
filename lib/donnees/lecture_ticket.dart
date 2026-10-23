@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdfx/pdfx.dart' as px;
@@ -29,9 +30,13 @@ Future<LectureTicket> lireTicketPdf(String chemin) async {
   if (texte.trim().length < 20 && Platform.isAndroid) {
     try {
       texte = await _reconnaitre(chemin);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Lecture ticket : reconnaissance impossible ($e)');
+    }
   }
-  return analyserTicket(texte);
+  final lu = analyserTicket(texte);
+  debugPrint('Lecture ticket : ${texte.length} caractères, date ${lu.date}, montant ${lu.montant}');
+  return lu;
 }
 
 /// Reconnaissance du texte sur les pages dessinées en image, ligne par ligne.
@@ -50,6 +55,7 @@ Future<String> _reconnaitre(String chemin) async {
       final f = File('${dossier.path}${Platform.pathSeparator}ticket-page-$i.png');
       await f.writeAsBytes(image.bytes);
       final resultat = await lecteur.processImage(InputImage.fromFilePath(f.path));
+      debugPrint('Lecture ticket : page $i ${image.width}x${image.height}, ${resultat.blocks.length} blocs');
       await f.delete();
       lignes.addAll(lignesParPosition([
         for (final b in resultat.blocks)
