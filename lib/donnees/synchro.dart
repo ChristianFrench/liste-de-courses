@@ -145,6 +145,9 @@ class Synchro extends ChangeNotifier {
     return deduit;
   }
   bool get actif => code != null;
+
+  /// Partage en pause : l'appareil montre les données de démonstration, qui ne sont pas partagées.
+  bool get enPause => actif && _etat.modeDemo;
   String get noeud => _reglage('noeud') ?? '';
 
   ServeurMqtt get serveur => ServeurMqtt(
@@ -181,11 +184,14 @@ class Synchro extends ChangeNotifier {
   Future<void> creerPartage() async {
     final base = _base;
     if (base == null) return;
+    base.viderJournal();
+    base.effacerReglage('synchro_envoi');
     _definir('code', _tirer(10));
     _definir('role', 'maitre');
     _definir('noeud', _tirer(12));
     base.horloge = Horloge(noeud);
-    base.toutJournaliser(_etat.versJson());
+    // Les vraies données du foyer, même si l'écran montre la démonstration.
+    base.toutJournaliser(base.lire());
     _noter('Partage créé : code ${code!}');
     await _connecter();
   }
@@ -284,6 +290,10 @@ class Synchro extends ChangeNotifier {
       abonnement: '$_sujet/#',
     );
   }
+
+  /// Essais : simule l'arrêt de l'application.
+  @visibleForTesting
+  Future<void> deconnecterPourEssai() => _deconnecter();
 
   Future<void> _deconnecter({bool presence = true}) async {
     final t = _transport;

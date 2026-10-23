@@ -755,6 +755,12 @@ class Stockage {
           r['noeud'] as String: r['h'] as String
       };
 
+  /// Nouveau partage : ce qui a été noté pour un partage précédent ne compte plus.
+  void viderJournal() {
+    _db.execute('DELETE FROM synchro_objet');
+    _db.execute('DELETE FROM synchro_attente');
+  }
+
   /// Appareil qui a envoyé la fiche du foyer : celui qui a créé le partage.
   String? auteurFoyer() {
     final r = _db.select("SELECT noeud FROM synchro_objet WHERE tab = 'foyer' ORDER BY hlc LIMIT 1");

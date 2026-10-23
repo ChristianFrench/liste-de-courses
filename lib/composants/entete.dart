@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../ecrans/coquille.dart' show BarreOnglets;
 import '../ecrans/partage.dart' show EcranPartage;
@@ -91,7 +92,8 @@ class EnTeteFenetre extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(21, gras: true, couleur: Charte.blanc))),
+                  Text(titre,
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(21, gras: true, couleur: Charte.blanc))),
                   if (sousTitre != null)
                     Text(sousTitre!,
                         maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(12, couleur: const Color(0xEEFFFFFF)))),
@@ -102,10 +104,13 @@ class EnTeteFenetre extends StatelessWidget {
             _BoutonDeplier(deplier),
             const BoutonSynchro(),
             // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
-            bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
-                  ...actions,
-                  ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
-                ])),
+            bouton(
+                Icons.more_vert,
+                'Plus d\'actions',
+                () => menuActions(context, titre: titre, actions: [
+                      ...actions,
+                      ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
+                    ])),
           ],
         ),
       ),
@@ -148,7 +153,10 @@ Widget boutonEnTete(IconData i, String libelle, VoidCallback onTap) => Tooltip(
       child: InkResponse(
         onTap: onTap,
         radius: 22,
-        child: SizedBox(width: 44, height: EnTeteFenetre.hauteur, child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
+        child: SizedBox(
+            width: 44,
+            height: EnTeteFenetre.hauteur,
+            child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
       ),
     );
 
@@ -179,17 +187,21 @@ class BoutonSynchro extends StatelessWidget {
   static const vert = Color(0xFF2E9D46);
   static const rouge = Color(0xFFE53935);
 
+  static const orange = Color(0xFFF59E0B);
+
   static String resume(Synchro s) => !s.actif
       ? 'Synchronisation : foyer non partagé'
-      : '${s.liaisonOk ? 'Synchronisation : serveur joignable' : 'Synchronisation : serveur injoignable'}'
-          '${s.role == 'maitre' ? ', appareil maître' : s.role == 'esclave' ? ', appareil esclave' : ''}';
+      : s.enPause
+          ? 'Synchronisation en pause : mode démonstration'
+          : '${s.liaisonOk ? 'Synchronisation : serveur joignable' : 'Synchronisation : serveur injoignable'}'
+              '${s.role == 'maitre' ? ', appareil maître' : s.role == 'esclave' ? ', appareil esclave' : ''}';
 
   @override
   Widget build(BuildContext context) {
     final s = Synchro.instance;
     const ombre = [Shadow(color: Color(0x99000000), blurRadius: 4)];
     return ListenableBuilder(
-      listenable: s,
+      listenable: Listenable.merge([s, Etat.instance]),
       builder: (context, _) => Tooltip(
         message: resume(s),
         child: Semantics(
@@ -211,7 +223,11 @@ class BoutonSynchro extends StatelessWidget {
                       width: 12,
                       height: 12,
                       decoration: BoxDecoration(
-                        color: s.liaisonOk ? vert : rouge,
+                        color: s.enPause
+                            ? orange
+                            : s.liaisonOk
+                                ? vert
+                                : rouge,
                         shape: BoxShape.circle,
                         border: Border.all(color: Charte.blanc, width: 1.5),
                       ),
@@ -299,7 +315,8 @@ class Aides {
       'Mon foyer : son nom et ses membres (avec leur adresse mail pour l\'envoi des listes).\n'
       'Paramètres : couleurs de l\'application, réglages des listes, types de promotion et de packaging, sauvegarde des données.\n$_gestes';
 
-  static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
+  static const nouvelleListe =
+      'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
       'deux listes ne peuvent pas porter le même nom).\n'
       'Liste simple : vous tapez le début du nom des articles, ils s\'ajoutent les uns sous les autres, sans rayons ni secteurs. '
       'À la fin, la liste peut être rangée par rayons et secteurs.\n'

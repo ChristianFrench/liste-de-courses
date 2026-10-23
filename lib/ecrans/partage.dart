@@ -22,7 +22,7 @@ class EcranPartage extends StatelessWidget {
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
-            if (Etat.instance.modeDemo)
+            if (Etat.instance.modeDemo && !Synchro.instance.actif)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Text('Mode démonstration : le partage ne concerne que les vraies données du foyer.',
@@ -52,8 +52,7 @@ class EcranPartage extends StatelessWidget {
                   for (final e in s.journal.take(40))
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Text('${heure(e.t)}  ${e.texte}',
-                          style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
+                      child: Text('${heure(e.t)}  ${e.texte}', style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
                     ),
                 ],
               ),
@@ -68,11 +67,13 @@ class EcranPartage extends StatelessWidget {
     final autres = s.appareils.values.where((a) => a.enLigne).length;
     final (titre, couleur) = !s.actif
         ? ('Foyer non partagé', Charte.texteSecondaire)
-        : s.liaisonOk
-            ? ('Serveur joignable', BoutonSynchro.vert)
-            : s.etatReseau == 'connexion'
-                ? ('Connexion au serveur…', _rouge)
-                : ('Serveur injoignable', _rouge);
+        : s.enPause
+            ? ('Partage en pause : mode démonstration', BoutonSynchro.orange)
+            : s.liaisonOk
+                ? ('Serveur joignable', BoutonSynchro.vert)
+                : s.etatReseau == 'connexion'
+                    ? ('Connexion au serveur…', _rouge)
+                    : ('Serveur injoignable', _rouge);
     final role = s.role == 'maitre'
         ? 'Cet appareil est le maître (M) : il a créé le partage, son code est à donner aux autres.'
         : s.role == 'esclave'
@@ -81,13 +82,16 @@ class EcranPartage extends StatelessWidget {
     final aFaire = !s.actif
         ? 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
             'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).'
-        : !s.liaisonOk
-            ? 'Vérifiez le réseau (Wi-Fi) et les réglages du serveur MQTT plus bas. Les modifications sont gardées et partiront dès que le serveur répondra.'
-            : autres == 0
-                ? (s.role == 'esclave'
-                    ? 'Ouvrez l\'application sur l\'appareil maître pour recevoir les données du foyer.'
-                    : 'Sur les autres appareils : « Rejoindre un foyer » avec le code ci-dessous, et les mêmes réglages de serveur.')
-                : 'Rien à faire : les modifications passent entre les appareils en ligne.';
+        : s.enPause
+            ? 'Cet appareil affiche les données de démonstration : ce que vous y faites n\'est pas partagé. '
+                'Pour partager, passez sur « Mes données » dans Gérer › Paramètres › Données.'
+            : !s.liaisonOk
+                ? 'Vérifiez le réseau (Wi-Fi) et les réglages du serveur MQTT plus bas. Les modifications sont gardées et partiront dès que le serveur répondra.'
+                : autres == 0
+                    ? (s.role == 'esclave'
+                        ? 'Ouvrez l\'application sur l\'appareil maître pour recevoir les données du foyer.'
+                        : 'Sur les autres appareils : « Rejoindre un foyer » avec le code ci-dessous, et les mêmes réglages de serveur.')
+                    : 'Rien à faire : les modifications passent entre les appareils en ligne.';
     return Container(
       margin: const EdgeInsets.only(top: 10, bottom: 6),
       padding: const EdgeInsets.all(12),
@@ -124,8 +128,7 @@ class EcranPartage extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(child: Text(texte, style: Charte.texte(15))),
-          if (retirer != null)
-            OutlinedButton(onPressed: retirer, child: Text('Retirer', style: Charte.texte(14, gras: true))),
+          if (retirer != null) OutlinedButton(onPressed: retirer, child: Text('Retirer', style: Charte.texte(14, gras: true))),
         ]),
       );
 
@@ -183,7 +186,9 @@ class EcranPartage extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Text('Appareils', style: Charte.texte(15, gras: true)),
-      _appareil('${s.nomAppareil} (cet appareil${s.role == 'maitre' ? ', maître' : s.role == 'esclave' ? ', esclave' : ''})', s.liaisonOk),
+      _appareil(
+          '${s.nomAppareil} (cet appareil${s.role == 'maitre' ? ', maître' : s.role == 'esclave' ? ', esclave' : ''})',
+          s.liaisonOk),
       for (final a in autres)
         _appareil(
             '${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})'
@@ -192,7 +197,8 @@ class EcranPartage extends StatelessWidget {
             retirer: a.enLigne ? null : () => s.oublier(a.id)),
       if (autres.isEmpty) Text('Aucun autre appareil vu pour l\'instant', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       const SizedBox(height: 6),
-      Text('${s.envoyes} modifications envoyées, ${s.recus} reçues depuis le lancement'
+      Text(
+          '${s.envoyes} modifications envoyées, ${s.recus} reçues depuis le lancement'
           '${s.enAttente > 0 ? ' · ${s.enAttente} en attente d\'intégration' : ''}',
           style: Charte.texte(13, couleur: Charte.texteSecondaire)),
       const SizedBox(height: 14),
@@ -217,8 +223,7 @@ class EcranPartage extends StatelessWidget {
         onTap: () async {
           final ok = await confirmer(context,
               titre: 'Arrêter le partage ?',
-              contenu: Text('Cet appareil garde ses données mais ne reçoit plus les modifications des autres.',
-                  style: Charte.texte(16)),
+              contenu: Text('Cet appareil garde ses données mais ne reçoit plus les modifications des autres.', style: Charte.texte(16)),
               plein: 'Annuler',
               contour: 'Arrêter le partage');
           if (ok == true) await s.arreterPartage();
@@ -256,7 +261,8 @@ class EcranPartage extends StatelessWidget {
 
 const _rouge = Color(0xFFB00020);
 
-String heure(DateTime t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:${t.second.toString().padLeft(2, '0')}';
+String heure(DateTime t) =>
+    '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:${t.second.toString().padLeft(2, '0')}';
 
 /// Réglages du serveur MQTT, préremplis pour le serveur public HiveMQ.
 class _Serveur extends StatefulWidget {
@@ -306,7 +312,8 @@ class _ServeurState extends State<_Serveur> {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: 6),
-        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (HiveMQ Cloud, gratuit), '
+        Text(
+            'Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (HiveMQ Cloud, gratuit), '
             'indiquez son adresse, le port 8883 et l\'identifiant créé sur le site de HiveMQ. '
             'Tous les appareils du foyer doivent utiliser le même serveur.',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
