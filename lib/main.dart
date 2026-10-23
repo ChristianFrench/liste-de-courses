@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
+import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
 import 'navigation.dart';
 import 'theme.dart';
@@ -16,6 +17,7 @@ Future<void> main() async {
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan
   CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
+  TicketRecu.demarrer();
 }
 
 class ListeDeCoursesApp extends StatelessWidget {

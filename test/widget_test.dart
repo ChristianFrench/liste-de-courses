@@ -15,6 +15,7 @@ import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
+import 'package:liste_de_courses/donnees/ticket_recu.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, codeCourtPackaging, ordreAlpha;
 import 'package:liste_de_courses/main.dart';
@@ -583,6 +584,43 @@ void main() {
       await tester.pump(const Duration(seconds: 4));
       // Icône « tout déplier / replier » à droite du bandeau, aide dans le menu des trois points
       expect(find.byTooltip('Tout replier'), findsOneWidget);
+    });
+
+    testWidgets('ticket PDF reçu d\'une autre application : choix de la course, puis montant', (tester) async {
+      final dossier = Directory.systemTemp.createTempSync('tickets');
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          const MethodChannel('plugins.flutter.io/path_provider'), (_) async => dossier.path);
+      addTearDown(() => tester.binding.defaultBinaryMessenger
+          .setMockMethodCallHandler(const MethodChannel('plugins.flutter.io/path_provider'), null));
+      final pdf = File('${dossier.path}/recu.pdf')..writeAsStringSync('%PDF-1.4 essai');
+      await _lancer(tester);
+      TicketRecu.demarrer();
+      await tester.pumpAndSettle();
+      final etat = Etat.instance;
+      final sansTicket = etat.historique.where((c) => etat.ticketDe(c.id) == null).length;
+      await tester.runAsync(() => tester.binding.defaultBinaryMessenger.handlePlatformMessage('fr.listecourses/ticket',
+          const StandardMethodCodec().encodeMethodCall(MethodCall('ticket', '')), (_) {}));
+      // chemin réel transmis ensuite (le premier appel, vide, ne doit rien casser)
+      await tester.runAsync(() => tester.binding.defaultBinaryMessenger.handlePlatformMessage('fr.listecourses/ticket',
+          StandardMethodCodec().encodeMethodCall(MethodCall('ticket', pdf.path)), (_) {}));
+      await tester.pumpAndSettle();
+      expect(find.text('Ticket de caisse reçu · à quelle course le joindre ?'), findsOneWidget);
+      expect(find.text('Le garder sans course, à rattacher plus tard'), findsOneWidget);
+      await tester.tap(find.textContaining(RegExp(r'^\d\d/\d\d · ')).first);
+      await tester.pumpAndSettle();
+      for (var i = 0; i < 20 && find.text('Montant du ticket').evaluate().isEmpty; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('Montant du ticket'), findsOneWidget);
+      await tester.enterText(find.byType(TextField).last, '12,50');
+      await _toucher(tester, find.text('Valider'));
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
+      await tester.pumpAndSettle();
+      expect(etat.historique.where((c) => etat.ticketDe(c.id) == null).length, sansTicket - 1);
+      final t = etat.tickets.last;
+      expect(t.montant, 12.5);
+      expect(File('${dossier.path}/tickets/${t.id}.pdf').existsSync(), isTrue);
     });
 
     testWidgets('liste simple : saisie, aperçu sans rayons, rangement à « Liste prête »', (tester) async {

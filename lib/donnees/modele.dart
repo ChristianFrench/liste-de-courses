@@ -1729,6 +1729,14 @@ class Etat extends ChangeNotifier {
     return t;
   }
 
+  /// Ticket reçu sans course choisie : il attend dans Gérer › Historique (« Tickets non rattachés »).
+  Ticket ajouterTicketLibre(String magasinId) {
+    final t = Ticket(nouvelId('t'), null, magasinId, DateTime.now(), 0, 'pdf');
+    tickets.add(t);
+    modifie();
+    return t;
+  }
+
   void montantTicket(Ticket t, double montant) {
     t.montant = montant;
     modifie();

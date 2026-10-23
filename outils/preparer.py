@@ -26,6 +26,31 @@ remplacer("android/app/src/main/AndroidManifest.xml",
 remplacer("android/app/src/main/AndroidManifest.xml",
           r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.INTERNET"/>', regex=True)
 
+# Android : l'application reçoit les tickets de caisse PDF (« Partager » et « Ouvrir avec »).
+# Une seule fenêtre de l'application (singleTask) : un PDF partagé rejoint l'application déjà ouverte.
+remplacer("android/app/src/main/AndroidManifest.xml",
+          'android:launchMode="singleTop"', 'android:launchMode="singleTask"')
+remplacer("android/app/src/main/AndroidManifest.xml",
+          r"(<category android:name=\"android.intent.category.LAUNCHER\"/>\s*</intent-filter>)",
+          r"""\1
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/pdf"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="content"/>
+                <data android:scheme="file"/>
+                <data android:mimeType="application/pdf"/>
+            </intent-filter>""", regex=True)
+activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
+if activite.exists():
+    activite.write_text(pathlib.Path("outils/android/MainActivity.kt").read_text(encoding="utf-8"), encoding="utf-8")
+    print(f"remplacé : {activite}")
+
 # Android : toutes les versions signées avec la même clé (outils/android/debug.keystore),
 # pour qu'une nouvelle version s'installe par-dessus l'ancienne en gardant les données
 remplacer("android/app/build.gradle.kts",

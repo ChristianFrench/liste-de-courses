@@ -152,3 +152,44 @@ Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
 Future<void> ouvrirTicketPdf(BuildContext context, Ticket t) async {
   if (!await ouvrirTicket(t.id) && context.mounted) Nav.message(context, 'Pas de PDF pour ce ticket');
 }
+
+/// Ticket de caisse PDF reçu d'une autre application (« Partager » ou « Ouvrir avec » sur Android) :
+/// on choisit la course à laquelle il appartient (les plus récentes sans ticket d'abord),
+/// ou on le garde pour le rattacher plus tard ; puis on donne le montant.
+Future<void> recevoirTicketPdf(BuildContext context, String chemin) async {
+  final etat = Etat.instance;
+  const libre = '\u0000libre';
+  final candidates = [for (final c in etat.historique) if (etat.ticketDe(c.id) == null && !etat.estArchive(c.magasinId)) c]
+    ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
+  final choix = await choisirDansListe<String>(context, titre: 'Ticket de caisse reçu · à quelle course le joindre ?', choix: {
+    for (final c in candidates.take(10))
+      c.id: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''} · ${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+    libre: candidates.isEmpty ? 'Le garder (aucune course n\'attend de ticket)' : 'Le garder sans course, à rattacher plus tard',
+  });
+  if (choix == null || !context.mounted) {
+    if (context.mounted) Nav.message(context, 'Ticket non enregistré');
+    return;
+  }
+  final Ticket t;
+  String fin;
+  if (choix == libre) {
+    var magasinId = etat.magasins.isEmpty ? '' : etat.magasins.first.id;
+    if (etat.magasins.length > 1) {
+      final m = await choisirDansListe<String>(context, titre: 'Magasin du ticket', choix: {for (final m in etat.magasins) m.id: m.nom});
+      if (m == null || !context.mounted) return;
+      magasinId = m;
+    }
+    t = etat.ajouterTicketLibre(magasinId);
+    fin = 'Ticket gardé : rattachez-le dans Gérer › Historique';
+  } else {
+    final c = etat.historique.firstWhere((x) => x.id == choix);
+    t = etat.ajouterTicket(c);
+    fin = 'Ticket joint à la course du ${jjmm(c.dateCourses)}';
+  }
+  await enregistrerPdfTicket(t, chemin);
+  if (!context.mounted) return;
+  final m = await demanderTexte(context, titre: 'Montant du ticket', aide: 'Ex. : 84,30 (facultatif)');
+  final v = double.tryParse((m ?? '').replaceAll(',', '.').replaceAll('€', '').trim());
+  if (v != null) etat.montantTicket(t, v);
+  if (context.mounted) Nav.message(context, fin);
+}

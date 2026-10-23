@@ -85,6 +85,15 @@ Future<Ticket?> joindreTicketPdf(Etat etat, Course c) async {
   return t;
 }
 
+/// Range comme PDF du ticket [t] le fichier reçu d'une autre application ([chemin], copie temporaire).
+Future<void> enregistrerPdfTicket(Ticket t, String chemin) async {
+  final source = File(chemin);
+  await source.copy((await fichierTicket(t.id)).path);
+  try {
+    await source.delete();
+  } catch (_) {}
+}
+
 Future<bool> ticketAPdf(String ticketId) async {
   try {
     return (await fichierTicket(ticketId)).existsSync();
