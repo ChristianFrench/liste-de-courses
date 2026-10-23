@@ -28,4 +28,35 @@ adb shell uiautomator dump /sdcard/ecran2.xml
 adb pull /sdcard/ecran2.xml ecran2.xml
 textes=$(grep -oE '(text|content-desc)="[^"]+"' ecran2.xml | sed -E 's/^[^"]*"//; s/"$//' | head -n 40 | paste -sd'|')
 echo "::warning title=Ticket reçu::${textes:-aucun texte lisible}"
+
+# Touche l'élément dont le texte (ou la description) contient $1 ; rend les textes de l'écran dans $ECRAN.
+toucher() {
+  adb shell uiautomator dump /sdcard/e.xml > /dev/null; adb pull /sdcard/e.xml e.xml > /dev/null
+  xy=$(python3 - "$1" <<'PY'
+import re, sys
+x = open("e.xml", encoding="utf-8").read()
+for n in re.finditer(r'<node [^>]*>', x):
+    t = n.group(0)
+    if re.search(r'(text|content-desc)="[^"]*' + re.escape(sys.argv[1]), t):
+        a, b, c, d = map(int, re.search(r'bounds="\[(\d+),(\d+)\]\[(\d+),(\d+)\]"', t).groups())
+        print((a + c) // 2, (b + d) // 2); break
+PY
+)
+  [ -n "$xy" ] && adb shell input tap $xy && sleep 3
+  echo "${xy:-introuvable}"
+}
+ecran() { adb shell uiautomator dump /sdcard/e.xml > /dev/null; adb pull /sdcard/e.xml e.xml > /dev/null; grep -oE '(text|content-desc)="[^"]+"' e.xml | sed -E 's/^[^"]*"//; s/"$//' | head -n 40 | paste -sd'|'; }
+
+# Le ticket est gardé sans course, l'application est fermée puis rouverte : il doit être là, et s'ouvrir.
+r1=$(toucher "Le garder"); r2=$(toucher "Magasin 1")
+adb shell input text 12.50; sleep 1; r3=$(toucher "Valider")
+sleep 2
+adb shell am force-stop $APP
+adb shell monkey -p $APP -c android.intent.category.LAUNCHER 1 > /dev/null; sleep 20
+r4=$(toucher "Gérer"); r5=$(toucher "Historique")
+echo "::warning title=Après redémarrage (Gérer › Historique)::$r1 $r2 $r3 $r4 $r5 | $(ecran)"
+r6=$(toucher "Tickets non rattachés"); r7=$(toucher "Ouvrir le ticket PDF"); sleep 3
+echo "::warning title=Trombone touché::$r6 $r7 | $(ecran) | $(adb shell dumpsys activity activities | grep -m2 -E 'mResumedActivity|topResumedActivity' | paste -sd'|')"
+adb logcat -d | grep -E "AndroidRuntime|FileProvider|Exception" | tail -n 8 | cut -c1-200 > err.txt
+echo "::warning title=Erreurs Android::$(paste -sd'|' err.txt)"
 exit 0
