@@ -172,6 +172,34 @@ jobs:
           name: Gestion du catalogue Windows
           path: build/Gestion du catalogue/
 
+  serveur_mqtt:
+    name: serveur MQTT Windows (Mosquitto installé et vérifié)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Compiler Verifier-serveur-MQTT.exe
+        shell: bash
+        run: |
+          flutter pub get > /dev/null
+          mkdir -p "build/Serveur MQTT"
+          dart compile exe outils/verifier_serveur_mqtt.dart -o "build/Serveur MQTT/Verifier-serveur-MQTT.exe"
+          cp "outils/mosquitto/Installer le serveur MQTT.bat" outils/mosquitto/LISEZMOI.txt "build/Serveur MQTT/"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Serveur MQTT Windows
+          path: build/Serveur MQTT/
+      - name: Essai du .bat sur ce Windows (installation, service, vérification)
+        shell: cmd
+        run: |
+          xcopy /e /i /q "build\Serveur MQTT" "%RUNNER_TEMP%\essai" > nul
+          call "%RUNNER_TEMP%\essai\Installer le serveur MQTT.bat" courses Essai123 1883 > "%RUNNER_TEMP%\essai.log" 2>&1
+          set code=%errorlevel%
+          type "%RUNNER_TEMP%\essai.log"
+          python outils\annoter_mqtt.py "%RUNNER_TEMP%\essai.log"
+          exit /b %code%
+
   iphone:
     if: "!contains(github.event.head_commit.message, '[rapide]')"
     runs-on: macos-latest
@@ -198,7 +226,7 @@ jobs:
 
   publication:
     name: publication (page « derniere-version »)
-    needs: [verification, android, windows]
+    needs: [verification, android, windows, serveur_mqtt]
     concurrency: publication
     if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && needs.windows.result == 'success' && needs.android.result != 'failure'
     runs-on: ubuntu-latest
@@ -219,6 +247,7 @@ jobs:
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
           (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
+          if [ -d "livrables/Serveur MQTT Windows" ]; then (cd "livrables/Serveur MQTT Windows" && zip -qr ../../publication/Serveur-MQTT-Windows.zip .); fi
           if [ -d "livrables/Gestion du catalogue Windows" ]; then (cd "livrables/Gestion du catalogue Windows" && zip -qr ../../publication/Gestion-du-catalogue-Windows.zip .); fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)

@@ -40,7 +40,12 @@ void main() {
     final env = Platform.environment;
     final serveur = env['MQTT_HOTE'] == null
         ? const ServeurMqtt()
-        : ServeurMqtt(hote: env['MQTT_HOTE']!, port: int.parse(env['MQTT_PORT'] ?? '1883'), tls: false);
+        : ServeurMqtt(
+            hote: env['MQTT_HOTE']!,
+            port: int.parse(env['MQTT_PORT'] ?? '1883'),
+            tls: false,
+            utilisateur: env['MQTT_UTILISATEUR'] ?? '',
+            motDePasse: env['MQTT_MDP'] ?? '');
     await s.changerServeur(serveur);
     final debut = DateTime.now();
     await s.creerPartage();
@@ -120,7 +125,12 @@ void main() {
     final env = Platform.environment;
     final serveur = env['MQTT_HOTE'] == null
         ? const ServeurMqtt()
-        : ServeurMqtt(hote: env['MQTT_HOTE']!, port: int.parse(env['MQTT_PORT'] ?? '1883'), tls: false);
+        : ServeurMqtt(
+            hote: env['MQTT_HOTE']!,
+            port: int.parse(env['MQTT_PORT'] ?? '1883'),
+            tls: false,
+            utilisateur: env['MQTT_UTILISATEUR'] ?? '',
+            motDePasse: env['MQTT_MDP'] ?? '');
     // Appareil A : le foyer de démonstration, déjà partagé ; il répond aux « bonjour ».
     final a = Stockage.ouvrir('${dossier.path}/a.db');
     final demo = jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>;

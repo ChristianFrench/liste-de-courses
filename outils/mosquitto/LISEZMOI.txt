@@ -1,0 +1,34 @@
+Serveur MQTT sur le PC (Mosquitto) pour Liste de courses
+=======================================================
+
+Contenu
+  Installer le serveur MQTT.bat   installe et configure Mosquitto, puis lance la vérification
+  Verifier-serveur-MQTT.exe       vérifie qu'un serveur MQTT convient à l'application
+
+Mise en place
+  1. Décompresser ce dossier, par exemple dans Documents.
+  2. Double-cliquer sur « Installer le serveur MQTT.bat » et accepter la demande d'autorisation de Windows.
+  3. Répondre aux questions : identifiant (courses par défaut), mot de passe (lettres et chiffres,
+     ou vide pour en tirer un au hasard), port (1883 par défaut).
+  4. Le programme installe Mosquitto (winget ou mosquitto.org), crée l'identifiant, n'autorise que
+     les sujets de l'application (ldc/...), garde les messages des appareils hors ligne, démarre le
+     service avec Windows, ouvre le port dans le pare-feu, puis vérifie le tout.
+  5. Les réglages à saisir dans l'application sont affichés et gardés dans
+     « Reglages du serveur MQTT.txt », à côté du .bat.
+
+Dans l'application, sur chaque appareil
+  Gérer > Mon foyer > Partage entre appareils > Serveur MQTT :
+  adresse du PC (ex. 192.168.1.20), port, case « Connexion chiffrée » DÉCOCHÉE, identifiant, mot de passe,
+  puis Enregistrer. Tous les appareils doivent avoir les mêmes réglages.
+
+Bon à savoir
+  - Le PC doit être allumé et le téléphone sur le Wi-Fi de la maison. Hors de la maison, les
+    modifications attendent le retour sur le Wi-Fi (l'application fonctionne sans réseau).
+  - Le .bat peut être relancé pour changer le mot de passe ou le port.
+  - Verifier-serveur-MQTT.exe peut aussi être lancé seul, sur ce PC ou un autre, et pour un autre
+    serveur (HiveMQ : broker.hivemq.com, port 8883, chiffrement oui).
+  - Fichiers du serveur : C:\Program Files\mosquitto\mosquitto.conf (l'ancienne configuration est
+    gardée sous mosquitto.conf.origine) et C:\ProgramData\ListeDeCourses-MQTT (mot de passe, droits,
+    messages gardés, journal mosquitto.log).
+  - Pour tout retirer : Paramètres Windows > Applications > Eclipse Mosquitto > Désinstaller, puis
+    supprimer la règle de pare-feu « Mosquitto MQTT - Liste de courses ».
