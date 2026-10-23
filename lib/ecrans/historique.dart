@@ -187,9 +187,12 @@ class BlocTicket extends StatelessWidget {
     final etat = Etat.instance;
     final t = ticket;
     final libelle = etat.libelleTicket(t);
+    final image = etat.ticketImage(t) && t.montant <= 0;
     final ligne2 = [
-      'Ticket du ${jjmmaaaa(t.date)}',
-      if (t.montant > 0) euros(t.montant) else 'montant non saisi',
+      if (image) 'Ticket en image : date et prix inconnus' else ...[
+        'Ticket du ${jjmmaaaa(t.date)}',
+        if (t.montant > 0) euros(t.montant) else 'montant non saisi',
+      ],
       if (libre) etat.magasin(t.magasinId)?.nom ?? '',
     ].where((x) => x.isNotEmpty).join(' · ');
     return Container(
@@ -228,6 +231,7 @@ Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
 /// Lit la date et le montant sur le PDF, puis les fait confirmer avec le libellé.
 Future<void> lireEtDecrire(BuildContext context, Ticket t) async {
   final lu = await lireTicketPdf((await fichierTicket(t.id)).path);
+  Etat.instance.marquerTicketImage(t, lu.image);
   if (!context.mounted) return;
   await decrireTicket(context, t, lu: lu);
 }
@@ -238,7 +242,8 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
   final libelle = TextEditingController(text: etat.libelleTicket(t));
   final valeur = lu.montant ?? (t.montant > 0 ? t.montant : null);
   final montant = TextEditingController(text: valeur == null ? '' : valeur.toStringAsFixed(2).replaceAll('.', ','));
-  final date = TextEditingController(text: jjmmaaaa(lu.date ?? t.date));
+  final image = lu.image || (etat.ticketImage(t) && t.montant <= 0);
+  final date = TextEditingController(text: image ? '' : jjmmaaaa(lu.date ?? t.date));
   final luSurLeTicket = lu.date != null || lu.montant != null;
   final ok = await showDialog<bool>(
     context: context,
@@ -246,6 +251,9 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
       backgroundColor: Charte.fond,
       title: Text('Ticket de caisse', style: Charte.texte(18, gras: true)),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (image)
+          Text('Ticket en image : date et prix inconnus. Saisissez-les si vous les connaissez.',
+              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         if (luSurLeTicket)
           Text('Date et montant lus sur le ticket : vérifiez-les.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         TextField(

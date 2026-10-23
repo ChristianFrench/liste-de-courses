@@ -69,18 +69,6 @@ gradle = pathlib.Path("android/app/build.gradle.kts")
 if gradle.exists():
     gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n}\n',
                       encoding="utf-8")
-# Android : la reconnaissance de texte (ML Kit) ne garde que l'alphabet latin ; les autres écritures
-# sont absentes volontairement (R8 doit l'accepter). Le module Flutter lit android/app/proguard-rules.pro.
-regles = pathlib.Path("android/app/proguard-rules.pro")
-if regles.parent.exists():
-    regles.write_text("\n".join(f"-dontwarn com.google.mlkit.vision.text.{e}.**"
-                                for e in ("chinese", "devanagari", "japanese", "korean"))
-                      # ML Kit crée ses composants par réflexion : R8 ne doit pas les retirer
-                      + "\n-keep class com.google.mlkit.** { *; }"
-                      + "\n-keep class com.google.android.gms.internal.mlkit_vision_text_common.** { *; }"
-                      + "\n-keep class com.google.android.gms.internal.mlkit_vision_common.** { *; }"
-                      + "\n-keep class com.google.android.gms.internal.mlkit_common.** { *; }\n", encoding="utf-8")
-    print(f"créé : {regles}")
 activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
 if activite.exists():
     activite.write_text(pathlib.Path("outils/android/MainActivity.kt").read_text(encoding="utf-8"), encoding="utf-8")
@@ -110,13 +98,6 @@ remplacer("android/app/build.gradle.kts",
 remplacer("ios/Runner/Info.plist",
           r"(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)",
           rf"\g<1>{NOM}\g<2>", regex=True)
-
-# iPhone : la reconnaissance de texte des tickets (ML Kit) demande iOS 15.5 au minimum
-p = pathlib.Path("ios/Runner.xcodeproj/project.pbxproj")
-if p.exists():
-    p.write_text(re.sub(r"IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;", "IPHONEOS_DEPLOYMENT_TARGET = 15.5;", p.read_text(encoding="utf-8")),
-                 encoding="utf-8")
-    print(f"ajusté : {p}")
 
 # Windows : taille de la fenêtre au format téléphone, ajustée à la hauteur de l'écran
 TAILLE_FENETRE = """// Fenetre au format telephone (rapport %d x %d), ajustee a la hauteur utile de l ecran

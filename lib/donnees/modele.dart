@@ -412,6 +412,9 @@ class Etat extends ChangeNotifier {
   /// Libellés donnés aux tickets de caisse (par identifiant de ticket).
   Map<String, String> libellesTickets = {};
 
+  /// Tickets PDF qui ne sont qu'une image (aucun texte) : date et prix inconnus.
+  Set<String> ticketsImage = {};
+
   /// Listes simples à suivre dans l'ordre de saisie pendant les courses (« Ranger par rayons et secteurs »
   /// décoché à « Liste prête ») ; les autres suivent les rayons et secteurs.
   Set<String> nonRangees = {};
@@ -604,6 +607,7 @@ class Etat extends ChangeNotifier {
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
     libellesTickets = {for (final e in (options?['libellesTickets'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    ticketsImage = _ids(options?['ticketsImage']).toSet();
     nonRangees = _ids(options?['nonRangees']).toSet();
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
@@ -704,6 +708,7 @@ class Etat extends ChangeNotifier {
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
             if (libellesTickets.isNotEmpty) 'libellesTickets': libellesTickets,
+            if (ticketsImage.isNotEmpty) 'ticketsImage': ticketsImage.toList(),
             if (nonRangees.isNotEmpty) 'nonRangees': nonRangees.toList(),
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
@@ -1756,6 +1761,13 @@ class Etat extends ChangeNotifier {
   }
 
   String libelleTicket(Ticket t) => libellesTickets[t.id] ?? '';
+
+  bool ticketImage(Ticket t) => ticketsImage.contains(t.id);
+
+  void marquerTicketImage(Ticket t, bool image) {
+    if (image ? !ticketsImage.add(t.id) : !ticketsImage.remove(t.id)) return;
+    modifie();
+  }
 
   void nommerTicket(Ticket t, String libelle) {
     libelle = libelle.trim();

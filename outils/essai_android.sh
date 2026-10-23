@@ -20,7 +20,7 @@ echo "::warning title=Journal de l'application::$(sed 's/%/%25/g' extrait.txt | 
 # Ticket de caisse PDF « ouvert avec » l'application (comme depuis les téléchargements)
 pip install -q pillow > /dev/null 2>&1
 python3 - <<'PY'
-# Ticket en image, comme ceux de Leclerc (aucun texte dans le PDF) : l'application doit le lire par reconnaissance
+# Ticket en image, comme ceux de Leclerc (aucun texte dans le PDF) : l'application doit le signaler (date et prix inconnus)
 from PIL import Image, ImageDraw, ImageFont
 try:
     police = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 34)
@@ -74,7 +74,7 @@ r4=$(toucher "Gérer"); r5=$(toucher "Historique")
 echo "::warning title=Après redémarrage (Gérer › Historique)::$r1 $r2 $r3 $r4 $r5 | $(ecran)"
 r6=$(toucher "Tickets non rattachés"); r7=$(toucher "Ouvrir le ticket PDF"); sleep 3
 echo "::warning title=Trombone touché::$r6 $r7 | $(ecran) | $(adb shell dumpsys activity activities | grep -m2 -E 'mResumedActivity|topResumedActivity' | paste -sd'|')"
-adb logcat -d | grep -E "Lecture ticket|FATAL|Could not instantiate|mlkit.*Exception" | grep -v uiautomator | tail -n 12 | cut -c1-220 > err.txt
+adb logcat -d | grep -E "Lecture ticket|FATAL|Could not instantiate" | grep -v uiautomator | tail -n 12 | cut -c1-220 > err.txt
 adb exec-out screencap -p > lecteur.png
 echo "::warning title=Erreurs Android::$(paste -sd'|' err.txt)"
 exit 0

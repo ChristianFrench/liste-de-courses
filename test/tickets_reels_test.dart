@@ -20,21 +20,10 @@ void main() {
     }, skip: f.existsSync() ? false : 'ticket absent');
   });
 
-  test('Leclerc (ticket en image) : lignes reconstituées après reconnaissance', () {
-    // Morceaux tels que la reconnaissance de texte les rend : libellé et montant séparés.
-    final lignes = lignesParPosition([
-      (40, 100, 130, 'Caisse 007-0122 01 octobre 2026 16:00'),
-      (40, 140, 170, 'Ticket 01/10/26 @ 07H06'),
-      (40, 600, 630, 'Total 60 articles'),
-      (700, 602, 632, '253.94'),
-      (40, 700, 730, 'CB'),
-      (700, 698, 728, '253.94'),
-      (40, 800, 830, '4   5%50'),
-      (500, 800, 830, '237.19   13.05   250.24'),
-    ]);
-    expect(lignes[2], 'Total 60 articles   253.94');
-    final l = analyserTicket(lignes.join('\n'));
-    expect(l.montant, 253.94);
-    expect(l.date, DateTime(2026, 10, 1));
-  });
+  final leclerc = File('$dossier/Leclerc.pdf');
+  test('Leclerc : ticket en image, date et prix inconnus', () async {
+    final l = await lireTicketPdf(leclerc.path);
+    expect(l.image, isTrue);
+    expect(l.montant, isNull);
+  }, skip: leclerc.existsSync() ? false : 'ticket absent');
 }
