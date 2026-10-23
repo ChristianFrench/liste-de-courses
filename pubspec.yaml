@@ -15,6 +15,7 @@ dependencies:
     sdk: flutter
   path_provider: ^2.1.4
   pdfx: ^2.11.0
+  syncfusion_flutter_pdf: '>=33.2.13 <33.2.14'
   url_launcher: ^6.3.1
   sqlite3: ^2.4.6
   sqlite3_flutter_libs: ^0.5.24

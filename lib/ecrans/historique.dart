@@ -3,6 +3,7 @@ import 'package:pdfx/pdfx.dart';
 
 import '../composants/composants.dart';
 import '../donnees/envoi.dart';
+import '../donnees/lecture_ticket.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -82,21 +83,18 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             nombre: libres.length,
             enfants: [
           for (final t in libres)
-            LigneMenu(
-              icone: Icons.receipt_long_outlined,
-              titre: [
-                jjmm(t.date),
-                etat.magasin(t.magasinId)?.nom ?? '',
-                if (t.montant > 0) euros(t.montant),
-              ].where((x) => x.isNotEmpty).join(' · '),
-              sousTitre: [etat.libelleTicket(t), 'Non rattaché à une course'].where((x) => x.isNotEmpty).join(' · '),
-              droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t)),
-                Lien('Rattacher', onTap: () {
-                  nav.ticketARattacher = t.id;
-                  nav.signaler();
-                  setState(() {});
-                }),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                BlocTicket(ticket: t, libre: true, onChange: () => setState(() {})),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Lien('Rattacher à une course', onTap: () {
+                    nav.ticketARattacher = t.id;
+                    nav.signaler();
+                    setState(() {});
+                  }),
+                ),
               ]),
             ),
             ],
@@ -120,29 +118,101 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
 
   Widget _ligne(BuildContext context, Etat etat, Course c, Ticket? aRattacher) {
     final t = etat.ticketDe(c.id);
+    final liste = etat.liste(c.id);
+    final qui = etat.membre(c.membreId)?.nomAffiche ?? '';
     final details = [
+      'Courses du ${jourEtDate(c.dateCourses)}',
+      etat.magasin(c.magasinId)?.nom ?? '',
       '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
-      t == null ? 'sans ticket' : (etat.libelleTicket(t).isEmpty ? 'ticket joint' : 'ticket « ${etat.libelleTicket(t)} »'),
-      etat.membre(c.membreId)?.nomAffiche ?? '',
-      if (t != null && t.montant > 0) euros(t.montant),
-    ].where((x) => x.isNotEmpty);
-    return LigneMenu(
-      icone: Icons.receipt_long_outlined,
-      titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-      sousTitre: details.join(' · '),
-      onTap: aRattacher == null
-          ? null
-          : () {
-              etat.rattacherTicket(aRattacher, c);
-              Nav.i.ticketARattacher = null;
-              Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
-              Nav.i.signaler();
-              setState(() {});
+      if (qui.isNotEmpty) 'par $qui',
+    ].where((x) => x.isNotEmpty).join(' · ');
+    return Material(
+      color: Charte.fond,
+      child: InkWell(
+        onTap: aRattacher == null
+            ? null
+            : () {
+                etat.rattacherTicket(aRattacher, c);
+                Nav.i.ticketARattacher = null;
+                Nav.message(context, 'Ticket rattaché à la course du ${jjmm(c.dateCourses)}');
+                Nav.i.signaler();
+                setState(() {});
+              },
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(etat.nomCourse(c), style: Charte.texte(17, gras: true)),
+            const SizedBox(height: 2),
+            Text(details, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            if (t != null)
+              BlocTicket(ticket: t, onChange: () => setState(() {}))
+            else
+              Row(children: [
+                Expanded(child: Text('Pas de ticket de caisse', style: Charte.texte(15, couleur: Charte.texteSecondaire))),
+                BoutonIcone(icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
+              ]),
+            if (liste != null && liste.lignes.isNotEmpty && aRattacher == null)
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Lien('Créer une liste type', onTap: () => _creerListeType(context, etat, liste)),
+                ),
+              ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _creerListeType(BuildContext context, Etat etat, Liste l) async {
+    final nom = await demanderTexte(context, titre: 'Nom de la liste type', initial: etat.nomListe(l));
+    if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+    etat.enregistrerListeType(l, nom);
+    Nav.message(context, 'Liste type « ${nom.trim()} » créée (Préparer › Nouvelle liste)');
+  }
+}
+
+/// Le ticket de caisse en gros : libellé, date et montant ; le trombone l'affiche.
+class BlocTicket extends StatelessWidget {
+  const BlocTicket({super.key, required this.ticket, this.onChange, this.libre = false});
+  final Ticket ticket;
+  final VoidCallback? onChange;
+  final bool libre;
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    final t = ticket;
+    final libelle = etat.libelleTicket(t);
+    final ligne2 = [
+      'Ticket du ${jjmmaaaa(t.date)}',
+      if (t.montant > 0) euros(t.montant) else 'montant non saisi',
+      if (libre) etat.magasin(t.magasinId)?.nom ?? '',
+    ].where((x) => x.isNotEmpty).join(' · ');
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
+      decoration: BoxDecoration(color: Charte.fondSelection, borderRadius: BorderRadius.circular(10)),
+      child: Row(children: [
+        Icon(Icons.receipt_long_outlined, size: 30, color: Charte.couleurIcone(Icons.receipt_long_outlined)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: InkWell(
+            onTap: () async {
+              await decrireTicket(context, t);
+              onChange?.call();
             },
-      // Ticket joint : trombone pour l'ouvrir ; sinon, de quoi le joindre.
-      droite: t != null
-          ? BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t))
-          : BoutonIcone(icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(libelle.isEmpty ? 'Ticket sans libellé' : libelle,
+                  style: Charte.texte(19, gras: true, couleur: libelle.isEmpty ? Charte.texteSecondaire : Charte.encre)),
+              Text(ligne2, style: Charte.texte(18)),
+            ]),
+          ),
+        ),
+        BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t)),
+      ]),
     );
   }
 }
@@ -151,21 +221,33 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
 Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
   final t = await joindreTicketPdf(etat, c);
   if (t == null || !context.mounted) return;
-  await decrireTicket(context, t);
+  await lireEtDecrire(context, t);
   if (context.mounted) Nav.message(context, 'Ticket joint à la course du ${jjmm(c.dateCourses)}');
 }
 
-/// Libellé et montant du ticket, demandés ensemble (tous deux facultatifs).
-Future<void> decrireTicket(BuildContext context, Ticket t) async {
+/// Lit la date et le montant sur le PDF, puis les fait confirmer avec le libellé.
+Future<void> lireEtDecrire(BuildContext context, Ticket t) async {
+  final lu = await lireTicketPdf((await fichierTicket(t.id)).path);
+  if (!context.mounted) return;
+  await decrireTicket(context, t, lu: lu);
+}
+
+/// Libellé, date et montant du ticket, demandés ensemble ; [lu] : ce qui a été lu sur le PDF.
+Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = const LectureTicket()}) async {
   final etat = Etat.instance;
   final libelle = TextEditingController(text: etat.libelleTicket(t));
-  final montant = TextEditingController(text: t.montant > 0 ? t.montant.toStringAsFixed(2).replaceAll('.', ',') : '');
+  final valeur = lu.montant ?? (t.montant > 0 ? t.montant : null);
+  final montant = TextEditingController(text: valeur == null ? '' : valeur.toStringAsFixed(2).replaceAll('.', ','));
+  final date = TextEditingController(text: jjmmaaaa(lu.date ?? t.date));
+  final luSurLeTicket = lu.date != null || lu.montant != null;
   final ok = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
       backgroundColor: Charte.fond,
       title: Text('Ticket de caisse', style: Charte.texte(18, gras: true)),
-      content: Column(mainAxisSize: MainAxisSize.min, children: [
+      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        if (luSurLeTicket)
+          Text('Date et montant lus sur le ticket : vérifiez-les.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         TextField(
           key: const ValueKey('ticket-libelle'),
           controller: libelle,
@@ -181,6 +263,14 @@ Future<void> decrireTicket(BuildContext context, Ticket t) async {
           decoration: const InputDecoration(labelText: 'Montant', hintText: 'Ex. : 84,30 (facultatif)'),
           onSubmitted: (_) => Navigator.of(ctx).pop(true),
         ),
+        TextField(
+          key: const ValueKey('ticket-date'),
+          controller: date,
+          style: Charte.texte(16),
+          keyboardType: TextInputType.datetime,
+          decoration: const InputDecoration(labelText: 'Date du ticket', hintText: 'jj/mm/aaaa'),
+          onSubmitted: (_) => Navigator.of(ctx).pop(true),
+        ),
       ]),
       actions: [
         TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Passer', style: Charte.texte(16))),
@@ -192,6 +282,12 @@ Future<void> decrireTicket(BuildContext context, Ticket t) async {
   etat.nommerTicket(t, libelle.text);
   final v = double.tryParse(montant.text.replaceAll(',', '.').replaceAll('€', '').replaceAll(' ', '').trim());
   if (v != null) etat.montantTicket(t, v);
+  final d = RegExp(r'^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2}|\d{4})$').firstMatch(date.text.trim());
+  if (d != null) {
+    final a = int.parse(d[3]!);
+    final jour = DateTime(a < 100 ? 2000 + a : a, int.parse(d[2]!), int.parse(d[1]!));
+    if (jour.day == int.parse(d[1]!)) etat.dateTicket(t, jour);
+  }
 }
 
 /// Affiche le ticket PDF dans l'application (lecteur intégré).
@@ -236,7 +332,7 @@ class _EcranTicketPdfState extends State<EcranTicketPdf> {
           EnTeteFenetre(
             titre: libelle.isEmpty ? 'Ticket de caisse' : libelle,
             icone: Icons.receipt_long_outlined,
-            sousTitre: [jjmm(t.date), etat.magasin(t.magasinId)?.nom ?? '', if (t.montant > 0) euros(t.montant)]
+            sousTitre: [jjmmaaaa(t.date), etat.magasin(t.magasinId)?.nom ?? '', if (t.montant > 0) euros(t.montant)]
                 .where((x) => x.isNotEmpty)
                 .join(' · '),
             retour: true,
@@ -301,6 +397,6 @@ Future<void> recevoirTicketPdf(BuildContext context, String chemin) async {
   }
   await enregistrerPdfTicket(t, chemin);
   if (!context.mounted) return;
-  await decrireTicket(context, t);
+  await lireEtDecrire(context, t);
   if (context.mounted) Nav.message(context, fin);
 }

@@ -371,8 +371,8 @@ void main() {
       }
       await _rubrique(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
-      await _voir(tester, find.text('Non rattaché à une course'));
-      expect(find.text('Non rattaché à une course'), findsOneWidget);
+      await _voir(tester, find.text('Rattacher à une course'));
+      expect(find.text('Rattacher à une course'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Mon foyer');
       await _ciblesTactiles(tester);
@@ -841,11 +841,10 @@ void main() {
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Historique');
-      await _voir(tester, find.text('Non rattaché à une course'));
-      expect(find.text('Non rattaché à une course'), findsOneWidget);
-      await _toucher(tester, find.text('Rattacher'));
+      await _voir(tester, find.text('Rattacher à une course'));
+      await _toucher(tester, find.text('Rattacher à une course'));
       await _toucher(tester, find.textContaining('Magasin 2').first);
-      expect(find.text('Non rattaché à une course'), findsNothing);
+      expect(find.text('Rattacher à une course'), findsNothing);
     });
 
     testWidgets('magasin : indiquer le secteur d\'un produit non placé', (tester) async {

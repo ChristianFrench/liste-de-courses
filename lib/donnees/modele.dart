@@ -21,6 +21,8 @@ String? _texte(dynamic v) => v as String?;
 String deux(int n) => n.toString().padLeft(2, '0');
 String jjmmaaaa(DateTime d) => '${deux(d.day)}/${deux(d.month)}/${d.year}';
 String jjmm(DateTime d) => '${deux(d.day)}/${deux(d.month)}';
+const joursSemaine = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+String jourEtDate(DateTime d) => '${joursSemaine[d.weekday - 1]} ${jjmmaaaa(d)}';
 String heure(DateTime d) => '${d.hour} h ${deux(d.minute)}';
 String euros(double v) => '${v.toStringAsFixed(2).replaceAll('.', ',')} €';
 
@@ -306,8 +308,11 @@ class Liste {
 }
 
 class Course {
-  Course(this.id, this.magasinId, this.dateCourses, this.membreId, this.nbArticles);
+  Course(this.id, this.magasinId, this.dateCourses, this.membreId, this.nbArticles, {this.nom});
   final String id;
+
+  /// Nom donné à la liste (null = nom par défaut, voir Etat.nomCourse).
+  final String? nom;
   final String magasinId;
   final DateTime dateCourses;
   final String membreId;
@@ -319,7 +324,7 @@ class Ticket {
   final String id;
   String? listeId; // course de l'historique, null = non rattaché
   final String magasinId;
-  final DateTime date;
+  DateTime date;
   double montant;
   final String source;
 }
@@ -654,7 +659,7 @@ class Etat extends ChangeNotifier {
     historique = [
       for (final h in (j['historique'] as List).cast<Map>())
         Course(h['id'] as String, h['magasinId'] as String, _date(h['dateCourses']) ?? DateTime.now(),
-            h['membreId'] as String, (h['nbArticles'] as num? ?? 0).toInt())
+            h['membreId'] as String, (h['nbArticles'] as num? ?? 0).toInt(), nom: h['nom'] as String?)
     ]..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
     tickets = [
       for (final t in (j['tickets'] as List? ?? []).cast<Map>())
@@ -732,7 +737,7 @@ class Etat extends ChangeNotifier {
         'listes': [for (final l in listes) l.toJson()],
         'historique': [
           for (final h in historique)
-            {'id': h.id, 'magasinId': h.magasinId, 'dateCourses': _iso(h.dateCourses)!.substring(0, 10), 'membreId': h.membreId, 'nbArticles': h.nbArticles}
+            {'id': h.id, 'magasinId': h.magasinId, 'dateCourses': _iso(h.dateCourses)!.substring(0, 10), 'membreId': h.membreId, 'nbArticles': h.nbArticles, if (h.nom != null) 'nom': h.nom}
         ],
         'tickets': [
           for (final t in tickets)
@@ -1051,6 +1056,13 @@ class Etat extends ChangeNotifier {
   }
 
   /// Nom affiché d'une liste : celui donné par l'utilisateur, sinon « magasin du jj/mm/aaaa ».
+  /// Nom complet de la liste d'une course de l'historique.
+  String nomCourse(Course c) {
+    final l = liste(c.id);
+    if (l != null) return nomListe(l);
+    return (c.nom != null && c.nom!.isNotEmpty) ? c.nom! : nomParDefaut(c.magasinId, c.dateCourses);
+  }
+
   String nomListe(Liste l) => (l.nom != null && l.nom!.isNotEmpty) ? l.nom! : nomParDefaut(l.magasinId, l.dateCreation);
   /// Magasin, date et heure : deux listes créées n'ont pas le même nom.
   /// (Sans heure connue, comme dans les données de démonstration, la date seule.)
@@ -1377,7 +1389,7 @@ class Etat extends ChangeNotifier {
 
   Course terminerCourses(Liste l) {
     // Dans la base, une course de l'historique est la liste elle-même, au statut « terminee ».
-    final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches);
+    final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches, nom: l.nom);
     historique.insert(0, c);
     retenirParcours(l);
     l.statut = StatutListe.terminee;
@@ -1749,6 +1761,12 @@ class Etat extends ChangeNotifier {
     libelle = libelle.trim();
     if (libelle.isEmpty ? libellesTickets.remove(t.id) == null : libellesTickets[t.id] == libelle) return;
     if (libelle.isNotEmpty) libellesTickets[t.id] = libelle;
+    modifie();
+  }
+
+  void dateTicket(Ticket t, DateTime date) {
+    if (t.date == date) return;
+    t.date = date;
     modifie();
   }
 

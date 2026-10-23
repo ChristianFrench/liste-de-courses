@@ -23,7 +23,7 @@ python3 - <<'PY'
 objets = ["<< /Type /Catalog /Pages 2 0 R >>", "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
           "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 400] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
           None, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"]
-flux = b"BT /F1 24 Tf 40 300 Td (TICKET ESSAI 12,50) Tj ET"
+flux = b"BT /F1 18 Tf 30 340 Td (MAGASIN ESSAI 22/10/2026) Tj 0 -40 Td (SOUS-TOTAL 14,50) Tj 0 -40 Td (TOTAL A PAYER 12,50 EUR) Tj ET"
 sortie = bytearray(b"%PDF-1.4\n"); positions = []
 for i, o in enumerate(objets, 1):
     positions.append(len(sortie))
@@ -65,7 +65,9 @@ ecran() { adb shell uiautomator dump /sdcard/e.xml > /dev/null; adb pull /sdcard
 
 # Le ticket est gardé sans course, l'application est fermée puis rouverte : il doit être là, et s'ouvrir.
 r1=$(toucher "Le garder"); r2=$(toucher "Magasin 1")
-adb shell input text Essai; sleep 1; r3=$(toucher "Valider")
+adb shell input text Essai; sleep 1
+echo "::warning title=Fenêtre du ticket (date et montant lus)::$(ecran)"
+r3=$(toucher "Valider")
 sleep 2
 adb shell am force-stop $APP
 adb shell monkey -p $APP -c android.intent.category.LAUNCHER 1 > /dev/null; sleep 20

@@ -214,6 +214,7 @@ class Stockage {
           'dateCourses': (l['date_courses'] as String).substring(0, 10),
           'membreId': l['fait_par_id'],
           'nbArticles': l['nb_articles'] ?? lignes.where((g) => g['cochee'] == 1).length,
+          if (l['libelle'] != null) 'nom': l['libelle'],
         });
       }
       if (statut == 'terminee' && lignes.isEmpty) continue;
@@ -597,6 +598,7 @@ class Stockage {
       l['date_courses'] = h['dateCourses'];
       l['fait_par_id'] = h['membreId'];
       l['nb_articles'] = h['nbArticles'];
+      l['libelle'] ??= h['nom'];
     }
     res['liste']!.addAll(listes.values);
 
