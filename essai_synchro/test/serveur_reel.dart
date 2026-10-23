@@ -28,7 +28,7 @@ void main() {
     await a.essaiVolume(2000);
     a.comparerEmpreintes();
     await Future<void>.delayed(const Duration(seconds: 3));
-    for (final e in a.journal.reversed) {
+    for (final e in a.journal.reversed.where((e) => e.type == 'mesure' || e.type == 'erreur')) {
       stdout.writeln('${e.type == 'erreur' ? '::warning' : '::notice'} title=Serveur réel::${e.texte}');
     }
     expect(a.journal.any((e) => e.texte.contains('bases identiques')), isTrue);
