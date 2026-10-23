@@ -459,16 +459,23 @@ class Etat extends ChangeNotifier {
   Stockage? _demo;
   Stockage? get _actif => modeDemo ? _demo : _foyer;
 
+  /// Base des vraies données du foyer (la seule qui se synchronise).
+  Stockage? get stockageFoyer => _foyer;
+
+  /// Appelé après chaque enregistrement de la base du foyer (synchronisation).
+  VoidCallback? surEnregistrement;
+
   String _chemin(String nom) => '${_dossier!.path}${Platform.pathSeparator}$nom';
 
   Future<Map<String, dynamic>> _donneesDemo() async =>
       jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>;
 
   /// Base du foyer (vraies données) et, en mode démonstration, base de démonstration.
-  Future<void> charger() async {
+  /// [dossier] : dossier des bases (essais) ; par défaut, celui de l'application.
+  Future<void> charger({Directory? dossier}) async {
     if (enregistrementActif) {
       try {
-        final d = await getApplicationSupportDirectory();
+        final d = dossier ?? await getApplicationSupportDirectory();
         if (!d.existsSync()) d.createSync(recursive: true);
         _dossier = d;
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
@@ -569,8 +576,71 @@ class Etat extends ChangeNotifier {
       for (final p in produits) {
         p.nbUtilisations = c[p.id] ?? p.nbUtilisations;
       }
+      if (identical(s, _foyer)) surEnregistrement?.call();
     } catch (e) {
       debugPrint('Enregistrement impossible : $e');
+    }
+  }
+
+  /// Intègre les modifications reçues des autres appareils du foyer, puis relit la base.
+  int integrerDistant(List<Map<String, dynamic>> objets) {
+    final s = _foyer;
+    if (s == null) return 0;
+    if (!modeDemo) enregistrer(); // ce qui vient d'être fait ici passe d'abord
+    final n = s.appliquer(objets);
+    if (n > 0 && !modeDemo) {
+      lire(s.lire());
+      _retrouverMoi(s);
+    }
+    return n;
+  }
+
+  /// Rejoindre un foyer : les données de cet appareil sont mises de côté (fichier gardé)
+  /// et remplacées par un foyer vide, avec [nom] comme membre, qui se remplit de ce que les autres envoient.
+  Future<void> rejoindreFoyer(String nom) async {
+    final demo = await _donneesDemo();
+    if (_dossier == null) {
+      lire(_depart(demo));
+      return;
+    }
+    _foyer?.fermer();
+    final f = File(_chemin(baseFoyer));
+    final horo = DateTime.now().toIso8601String().substring(0, 16).replaceAll(RegExp('[-:T]'), '');
+    if (f.existsSync()) f.renameSync('${f.path}.avant-partage-$horo');
+    final s = _foyer = Stockage.ouvrir(_chemin(baseFoyer));
+    final depart = _depart(demo);
+    final moiJson = (depart['membres'] as List).first as Map;
+    moiJson['nomAffiche'] = nom.trim().isEmpty ? 'Moi' : nom.trim();
+    moiJson['role'] = 'membre';
+    depart['magasins'] = <dynamic>[];
+    depart['parametres'] = {
+      ...(demo['parametres'] as Map? ?? {}),
+      'options': {'formats': 1, 'typesPackaging': <String>[]},
+    };
+    s.ecrire(depart); // avant la synchronisation : rien de ceci ne part vers les autres
+    s.definirReglage('synchro_membre_provisoire', moiJson['id'] as String);
+    modeDemo = false;
+    lire(s.lire());
+  }
+
+  /// Après avoir rejoint un foyer : si le foyer a déjà un membre de ce nom, c'est moi.
+  void _retrouverMoi(Stockage s) {
+    final provisoire = s.reglage('synchro_membre_provisoire');
+    if (provisoire == null) return;
+    final ici = _trouve(membres, (m) => m.id == provisoire);
+    if (ici == null) {
+      s.effacerReglage('synchro_membre_provisoire');
+      return;
+    }
+    final meme = _trouve(membres, (m) => m.id != provisoire && m.nomAffiche.toLowerCase() == ici.nomAffiche.toLowerCase());
+    if (meme != null) {
+      membres
+        ..remove(ici)
+        ..[membres.indexOf(meme)] = Membre(meme.id, meme.nomAffiche, meme.role, true, email: meme.email);
+      s.effacerReglage('synchro_membre_provisoire');
+      modifie();
+    } else if (membres.length > 1) {
+      s.effacerReglage('synchro_membre_provisoire');
     }
   }
 

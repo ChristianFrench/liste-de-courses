@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:sqlite3/sqlite3.dart';
 
 import 'schema_v2.dart';
+import 'synchro.dart' show Horloge;
 
 // Base locale SQLite de l'appareil, au schéma v2 (documents/schema-v2.sql) : une table par
 // entité du modèle de données, avec les règles de gestion imposées par la base (déclencheurs).
@@ -61,6 +62,34 @@ const _ensembles = {
   'parcours_etape': _Ensemble('parcours_etape', 'parcours_id', 'secteur_id', ordre: 'ordre'),
 };
 
+/// Tables dont la colonne foyer_id désigne le foyer local : elle ne circule pas entre appareils,
+/// chacun garde son propre identifiant de foyer (le foyer partagé, c'est le code de partage).
+const _avecFoyer = {'membre', 'liste', 'parcours', 'ticket'};
+
+/// Réglages qui concernent tout le foyer (les autres restent propres à l'appareil).
+const _parametresPartages = {'options', 'frequences_preliste', 'corbeille'};
+
+/// Options propres à l'appareil, jamais envoyées.
+const _optionsLocales = {'apparence'};
+
+const _sqlSynchro = '''
+CREATE TABLE IF NOT EXISTS synchro_objet (
+    tab     TEXT NOT NULL,
+    cle     TEXT NOT NULL,   -- valeurs de la clé, en JSON
+    hlc     TEXT NOT NULL,   -- horloge hybride de la dernière modification
+    noeud   TEXT NOT NULL,   -- appareil auteur de cette modification
+    valeurs TEXT,            -- contenu partagé (JSON) ; NULL = retiré
+    PRIMARY KEY (tab, cle)
+);
+CREATE INDEX IF NOT EXISTS synchro_objet_noeud ON synchro_objet (noeud, hlc);
+CREATE TABLE IF NOT EXISTS synchro_attente (
+    tab     TEXT NOT NULL,
+    cle     TEXT NOT NULL,
+    objet   TEXT NOT NULL,   -- objet reçu refusé par la base, réessayé à la réception suivante
+    PRIMARY KEY (tab, cle)
+);
+''';
+
 const _statuts = {'enConstruction': 'construction', 'prete': 'prete', 'enCours': 'en_cours', 'terminee': 'terminee'};
 
 class Stockage {
@@ -79,6 +108,7 @@ class Stockage {
     db.execute('PRAGMA foreign_keys = ON');
     final s = Stockage._(db);
     if (!s._existe('foyer')) s._creer();
+    db.execute(_sqlSynchro);
     return s;
   }
 
@@ -113,6 +143,8 @@ class Stockage {
 
   void definirReglage(String cle, String valeur) =>
       _db.execute('INSERT OR REPLACE INTO parametre (cle, valeur) VALUES (?, ?)', [cle, valeur]);
+
+  void effacerReglage(String cle) => _db.execute('DELETE FROM parametre WHERE cle = ?', [cle]);
 
   /// Compteurs d'utilisation tenus par la base (déclencheur R4).
   Map<String, int> compteurs() => {
@@ -314,21 +346,15 @@ class Stockage {
           }
           final valeurs = {...ligne, if (t.horodate && !ligne.containsKey('modifie_le')) 'modifie_le': maintenant};
           if (t.horodate) valeurs['synchro'] = 0;
-          final colonnes = valeurs.keys.toList();
-          final maj = [
-            for (final c in colonnes)
-              if (!t.cle.contains(c) && !t.insertionSeule.contains(c)) '$c = excluded.$c'
-          ];
           try {
-            requete('INSERT INTO ${t.nom} (${colonnes.join(', ')}) VALUES (${List.filled(colonnes.length, '?').join(', ')}) '
-                    'ON CONFLICT (${t.cle.join(', ')}) DO ${maj.isEmpty ? 'NOTHING' : 'UPDATE SET ${maj.join(', ')}'}')
-                .execute([for (final c in colonnes) valeurs[c]]);
+            _inserer(t, valeurs, requete);
           } on SqliteException catch (e) {
             // Une règle de la base refuse cette ligne : le reste de l'état est quand même enregistré.
             erreurs.add('${t.nom} ${ligne[t.cle.first]} : ${e.message}');
             continue;
           }
           _ecrit[cle] = empreinte;
+          _journaliser(t.nom, [for (final c in t.cle) ligne[c]], ligne, requete);
         }
         if (t.nom == 'produit' || t.nom == 'parcours') {
           for (final e in _ensembles.values.where((e) => e.parent == '${t.nom}_id')) {
@@ -339,6 +365,8 @@ class Stockage {
       for (final cle in _ecrit.keys.where((c) => !presents.contains(c)).toList()) {
         _retirer(cle, maintenant, requete);
         _ecrit.remove(cle);
+        final morceaux = cle.split(_sep);
+        _journaliser(morceaux.first, morceaux.sublist(1), null, requete);
       }
       _db.execute('COMMIT');
     } catch (_) {
@@ -372,8 +400,21 @@ class Stockage {
         inserer.execute([parent, enfants[i], if (e.ordre != null) i + 1]);
       }
       _ecrit[cle] = empreinte;
+      _journaliser(e.table, [parent], {'enfants': enfants}, requete);
     });
     return presents;
+  }
+
+  /// Insère la ligne, ou met à jour celle qui a la même clé.
+  void _inserer(_Table t, Map<String, Object?> valeurs, PreparedStatement Function(String) requete) {
+    final colonnes = valeurs.keys.toList();
+    final maj = [
+      for (final c in colonnes)
+        if (!t.cle.contains(c) && !t.insertionSeule.contains(c)) '$c = excluded.$c'
+    ];
+    requete('INSERT INTO ${t.nom} (${colonnes.join(', ')}) VALUES (${List.filled(colonnes.length, '?').join(', ')}) '
+            'ON CONFLICT (${t.cle.join(', ')}) DO ${maj.isEmpty ? 'NOTHING' : 'UPDATE SET ${maj.join(', ')}'}')
+        .execute([for (final c in colonnes) valeurs[c]]);
   }
 
   void _retirer(String cle, String maintenant, PreparedStatement Function(String) requete) {
@@ -624,6 +665,211 @@ class Stockage {
         {'cle': 'options', 'valeur': jsonEncode((etat['parametres'] as Map)['options'])},
     ]);
     return res;
+  }
+
+  // ------------------------------------------------------------ Synchronisation (synchro.dart)
+
+  /// Horloge de la synchronisation. Quand elle est réglée, chaque changement enregistré est noté
+  /// dans synchro_objet, d'où il part vers les autres appareils du foyer.
+  Horloge? horloge;
+
+  /// Note un changement à envoyer, sauf s'il ne change rien à ce que les autres appareils ont déjà.
+  void _journaliser(String table, List<Object?> cle, Map<String, Object?>? valeurs, PreparedStatement Function(String) requete) {
+    final h = horloge;
+    if (h == null || table == 'invitation') return;
+    if (table == 'parametre' && !_parametresPartages.contains(cle.first)) return;
+    final k = jsonEncode(table == 'foyer' ? ['foyer'] : cle);
+    final v = valeurs == null ? null : _canonique(_partage(table, valeurs));
+    final r = requete('SELECT valeurs FROM synchro_objet WHERE tab = ? AND cle = ?').select([table, k]);
+    if (r.isNotEmpty && r.first['valeurs'] == v) return;
+    requete('INSERT OR REPLACE INTO synchro_objet (tab, cle, hlc, noeud, valeurs) VALUES (?, ?, ?, ?, ?)')
+        .execute([table, k, h.suivante(), h.noeud, v]);
+  }
+
+  /// Ce qui circule d'une ligne : sans le foyer local ni l'état d'envoi, sans les options de l'appareil.
+  static Map<String, Object?> _partage(String table, Map<String, Object?> valeurs) {
+    final v = Map<String, Object?>.of(valeurs)
+      ..remove('foyer_id')
+      ..remove('synchro');
+    if (table == 'foyer') v.remove('id');
+    if (table == 'parametre' && v['cle'] == 'options' && v['valeur'] is String) {
+      final o = Map<String, dynamic>.from(jsonDecode(v['valeur'] as String) as Map);
+      o.removeWhere((c, _) => _optionsLocales.contains(c));
+      v['valeur'] = _canonique(o);
+    }
+    return v;
+  }
+
+  /// JSON aux clés triées : deux contenus égaux s'écrivent pareil.
+  static String _canonique(Object? x) {
+    Object? trier(Object? x) => x is Map
+        ? {for (final c in (x.keys.map((k) => '$k').toList()..sort())) c: trier(x[c])}
+        : x is List
+            ? [for (final e in x) trier(e)]
+            : x;
+    return jsonEncode(trier(x));
+  }
+
+  /// Note tout le contenu de l'état comme à envoyer (premier appareil du partage), ou seulement [tables].
+  void toutJournaliser(Map<String, dynamic> etat, {Set<String>? tables}) {
+    final lignes = _lignes(etat);
+    final requetes = <String, PreparedStatement>{};
+    PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
+    _db.execute('BEGIN');
+    try {
+      for (final t in _tables) {
+        if (tables != null && !tables.contains(t.nom)) continue;
+        for (final l in lignes[t.nom]!) {
+          _journaliser(t.nom, [for (final c in t.cle) l[c]], l, requete);
+        }
+      }
+      for (final e in _ensembles.values) {
+        if (tables != null && !tables.contains(e.table)) continue;
+        final parParent = <String, List<Object?>>{};
+        for (final l in lignes[e.table]!) {
+          (parParent[l[e.parent] as String] ??= []).add(l[e.enfant]);
+        }
+        parParent.forEach((p, enfants) => _journaliser(e.table, [p], {'enfants': enfants}, requete));
+      }
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    } finally {
+      for (final r in requetes.values) {
+        r.dispose();
+      }
+    }
+  }
+
+  /// Objets modifiés par [noeud] après [apres] (ordre de l'horloge).
+  List<Map<String, Object?>> objetsDe(String noeud, String apres) => [
+        for (final r in _db.select(
+            'SELECT tab, cle, hlc, noeud, valeurs FROM synchro_objet WHERE noeud = ? AND hlc > ? ORDER BY hlc', [noeud, apres]))
+          {'t': r['tab'], 'k': r['cle'], 'h': r['hlc'], 'n': r['noeud'], 'v': r['valeurs']}
+      ];
+
+  /// Pour chaque appareil, sa modification la plus récente connue ici.
+  Map<String, String> connus() => {
+        for (final r in _db.select('SELECT noeud, max(hlc) AS h FROM synchro_objet GROUP BY noeud'))
+          r['noeud'] as String: r['h'] as String
+      };
+
+  int get nbEnAttente => _db.select('SELECT count(*) AS n FROM synchro_attente').first['n'] as int;
+
+  /// Intègre les objets reçus des autres appareils (le plus récent l'emporte). Un objet refusé
+  /// par la base (son secteur n'est pas encore arrivé…) est gardé et réessayé à la réception suivante.
+  /// Rend le nombre d'objets intégrés.
+  int appliquer(List<Map<String, dynamic>> objets) {
+    final maintenant = DateTime.now().toUtc().toIso8601String().substring(0, 19);
+    final foyer = _db.select('SELECT id FROM foyer ORDER BY rowid LIMIT 1');
+    if (foyer.isEmpty) return 0;
+    final foyerId = foyer.first['id'] as String;
+    final rang = {for (var i = 0; i < _tables.length; i++) _tables[i].nom: i};
+    for (final e in _ensembles.keys) {
+      rang[e] = rang[e.startsWith('parcours') ? 'parcours' : 'produit']! ;
+    }
+    final tous = [
+      for (final r in _db.select('SELECT objet FROM synchro_attente')) Map<String, dynamic>.from(jsonDecode(r['objet'] as String) as Map),
+      ...objets,
+    ]..sort((a, b) {
+        final c = (rang[a['t']] ?? 99) - (rang[b['t']] ?? 99);
+        return c != 0 ? c : (a['h'] as String).compareTo(b['h'] as String);
+      });
+    erreurs.clear();
+    var n = 0;
+    final requetes = <String, PreparedStatement>{};
+    PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
+    // Les objets arrivent dans le désordre (un emplacement avant son produit) : pas de contrôle des
+    // références pendant l'intégration.
+    _db.execute('PRAGMA foreign_keys = OFF');
+    _db.execute('BEGIN');
+    try {
+      for (final o in tous) {
+        final t = o['t'] as String, k = o['k'] as String, h = o['h'] as String;
+        if (!rang.containsKey(t) || t == 'invitation') continue;
+        final local = requete('SELECT hlc FROM synchro_objet WHERE tab = ? AND cle = ?').select([t, k]);
+        if (local.isNotEmpty && (local.first['hlc'] as String).compareTo(h) >= 0) {
+          requete('DELETE FROM synchro_attente WHERE tab = ? AND cle = ?').execute([t, k]);
+          continue;
+        }
+        final v = o['v'] as String?;
+        try {
+          _integrer(t, (jsonDecode(k) as List).cast<Object?>(), v == null ? null : Map<String, Object?>.from(jsonDecode(v) as Map),
+              foyerId, maintenant, requete);
+        } on SqliteException catch (e) {
+          erreurs.add('$t $k : ${e.message}');
+          requete('INSERT OR REPLACE INTO synchro_attente (tab, cle, objet) VALUES (?, ?, ?)').execute([t, k, jsonEncode(o)]);
+          continue;
+        }
+        requete('INSERT OR REPLACE INTO synchro_objet (tab, cle, hlc, noeud, valeurs) VALUES (?, ?, ?, ?, ?)')
+            .execute([t, k, h, o['n'], v]);
+        requete('DELETE FROM synchro_attente WHERE tab = ? AND cle = ?').execute([t, k]);
+        horloge?.recevoir(h);
+        n++;
+      }
+      _db.execute('COMMIT');
+    } catch (_) {
+      _db.execute('ROLLBACK');
+      rethrow;
+    } finally {
+      _db.execute('PRAGMA foreign_keys = ON');
+      for (final r in requetes.values) {
+        r.dispose();
+      }
+    }
+    return n;
+  }
+
+  void _integrer(String table, List<Object?> cle, Map<String, Object?>? valeurs, String foyerId, String maintenant,
+      PreparedStatement Function(String) requete) {
+    final ens = _ensembles[table];
+    if (ens != null) {
+      requete('DELETE FROM $table WHERE ${ens.parent} = ?').execute(cle);
+      final enfants = (valeurs?['enfants'] as List?) ?? const [];
+      final colonnes = [ens.parent, ens.enfant, if (ens.ordre != null) ens.ordre!];
+      for (var i = 0; i < enfants.length; i++) {
+        requete('INSERT INTO $table (${colonnes.join(', ')}) VALUES (${List.filled(colonnes.length, '?').join(', ')})')
+            .execute([cle.first, enfants[i], if (ens.ordre != null) i + 1]);
+      }
+      return;
+    }
+    final t = _tables.firstWhere((t) => t.nom == table);
+    if (table == 'foyer') {
+      if (valeurs == null) return;
+      requete('UPDATE foyer SET nom = ?, preliste_presences_min = ?, preliste_sur = ?, modifie_le = ? WHERE id = ?').execute(
+          [valeurs['nom'], valeurs['preliste_presences_min'], valeurs['preliste_sur'], maintenant, foyerId]);
+      return;
+    }
+    if (table == 'parametre') {
+      final c = cle.first as String;
+      if (valeurs == null || !_parametresPartages.contains(c)) return;
+      var valeur = valeurs['valeur'] as String?;
+      if (c == 'options' && valeur != null) {
+        final o = Map<String, dynamic>.from(jsonDecode(valeur) as Map);
+        final ici = reglage('options');
+        if (ici != null) {
+          final locales = jsonDecode(ici) as Map;
+          for (final l in _optionsLocales) {
+            if (locales.containsKey(l)) o[l] = locales[l];
+          }
+        }
+        valeur = jsonEncode(o);
+      }
+      requete('INSERT OR REPLACE INTO parametre (cle, valeur) VALUES (?, ?)').execute([c, valeur]);
+      return;
+    }
+    if (valeurs == null) {
+      _retirer(_cle(table, cle), maintenant, requete);
+      return;
+    }
+    final v = {
+      ...valeurs,
+      if (_avecFoyer.contains(table)) 'foyer_id': foyerId,
+      if (t.horodate && !valeurs.containsKey('modifie_le')) 'modifie_le': maintenant,
+      if (t.horodate) 'synchro': 1,
+    };
+    _inserer(t, v, requete);
   }
 
   // ------------------------------------------------------------ Reprise de la version 1

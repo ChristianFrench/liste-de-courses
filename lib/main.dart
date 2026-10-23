@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
+import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
 import 'navigation.dart';
@@ -18,6 +19,8 @@ Future<void> main() async {
   CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
   TicketRecu.demarrer();
+  // Partage du foyer entre appareils (si cet appareil partage)
+  Synchro.instance.demarrer();
 }
 
 class ListeDeCoursesApp extends StatelessWidget {

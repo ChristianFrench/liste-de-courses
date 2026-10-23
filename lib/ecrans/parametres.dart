@@ -4,11 +4,13 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import '../donnees/synchro.dart';
 import 'e13_produits_reels.dart';
+import 'partage.dart';
 
 // Gérer › Mon foyer, Gérer › Paramètres (17), Types de promotion (18) et Types de packaging.
 
-/// Gérer › Mon foyer : nom du foyer, membres et leurs adresses mail, invitation.
+/// Gérer › Mon foyer : nom du foyer, membres et leurs adresses mail, partage entre appareils.
 class EcranFoyer extends StatelessWidget {
   const EcranFoyer({super.key});
 
@@ -82,41 +84,16 @@ class EcranFoyer extends StatelessWidget {
               ],
             ),
             GroupeRetractable(
-              cle: 'foyer/invitation',
-              titre: 'Invitation',
-              icone: Icons.mail_outline,
+              cle: 'foyer/partage',
+              titre: 'Partage entre appareils',
+              icone: Icons.sync,
               enfants: [
-                const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Code d\'invitation', style: Charte.texte(15)),
-                        Text(etat.invitationCode.split('').join(' '), style: Charte.texte(30, gras: true, espacement: 3)),
-                        Text('valable jusqu\'au ${jjmmaaaa(etat.invitationExpiration)}',
-                            style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                      ],
-                    ),
-                  ),
-                  Lien('Envoyer', taille: 17, onTap: () => Nav.plusTard(context)),
-                ],
-              ),
-            ),
-            LigneMenu(
-              icone: Icons.login,
-              titre: 'J\'ai reçu un code : rejoindre un foyer',
-              titreTaille: 16,
-              onTap: () async {
-                final code = await demanderTexte(context, titre: 'Rejoindre un foyer', aide: 'Code reçu (6 caractères)', valider: 'Rejoindre');
-                if (code != null && code.isNotEmpty && context.mounted) Nav.plusTard(context);
-              },
-            ),
-                const SizedBox(height: 8),
+                LigneMenu(
+                  icone: Icons.devices_outlined,
+                  titre: Synchro.instance.actif ? 'Partagé · code ${Synchro.instance.code}' : 'Partager ou rejoindre un foyer',
+                  sousTitre: 'Téléphones et PC du foyer synchronisés (serveur MQTT)',
+                  onTap: () => Nav.aller<void>(context, const EcranPartage()),
+                ),
               ],
             ),
           ],

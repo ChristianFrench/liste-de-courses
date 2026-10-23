@@ -40,6 +40,13 @@ jobs:
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py tests.log "Tests de recette"; else tail -n 30 tests.log; fi
           exit $code
+      - name: Deux appareils sur le vrai serveur MQTT (broker.hivemq.com)
+        if: always()
+        continue-on-error: true
+        run: |
+          flutter test test/synchro_serveur_reel.dart --reporter expanded > reel.log 2>&1
+          grep -o '::\(notice\|warning\) title=.*' reel.log || true
+          grep -q 'All tests passed' reel.log || { echo "::warning title=Synchronisation, serveur réel::échec"; tail -n 30 reel.log; exit 1; }
       - name: Captures des écrans (branche « captures »)
         if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]')
         env:

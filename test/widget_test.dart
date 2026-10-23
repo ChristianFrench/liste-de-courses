@@ -898,5 +898,18 @@ void main() {
       expect(find.text('Produits réels (essai)'), findsOneWidget);
       await _ciblesTactiles(tester);
     });
+
+    testWidgets('Mon foyer › Partage entre appareils : serveur HiveMQ prérempli', (tester) async {
+      await _lancer(tester);
+      await _rubrique(tester, 'Mon foyer');
+      await _toucher(tester, find.text('Partager ou rejoindre un foyer'));
+      expect(find.text('Partager ce foyer'), findsOneWidget);
+      expect(find.text('Rejoindre un foyer'), findsOneWidget);
+      await _toucher(tester, find.text('SERVEUR MQTT'));
+      final hote = tester.widget<TextField>(find.byKey(const ValueKey('mqtt-hote')));
+      expect(hote.controller!.text, 'broker.hivemq.com');
+      expect(tester.widget<TextField>(find.byKey(const ValueKey('mqtt-port'))).controller!.text, '8883');
+      await _ciblesTactiles(tester);
+    });
   });
 }
