@@ -1,5 +1,9 @@
 import 'dart:io';
+import 'dart:math';
 
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdfx/pdfx.dart' as px;
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 /// Ce que l'on a pu lire sur un ticket de caisse PDF.
@@ -10,18 +14,75 @@ class LectureTicket {
 }
 
 /// Lit le texte du ticket PDF puis y cherche la date et le montant payé.
-/// Un PDF sans texte (ticket photographié) ou illisible donne une lecture vide.
+/// Ticket en image (Leclerc : le PDF ne contient qu'une photo du ticket) : sur Android, le texte est
+/// reconnu sur l'image (ML Kit, sur le téléphone, sans réseau). Sinon, ou si rien n'est lisible, lecture vide.
 Future<LectureTicket> lireTicketPdf(String chemin) async {
+  var texte = '';
   try {
     final doc = PdfDocument(inputBytes: await File(chemin).readAsBytes());
     try {
-      return analyserTicket(PdfTextExtractor(doc).extractText(layoutText: true));
+      texte = PdfTextExtractor(doc).extractText(layoutText: true);
     } finally {
       doc.dispose();
     }
-  } catch (_) {
-    return const LectureTicket();
+  } catch (_) {}
+  if (texte.trim().length < 20 && Platform.isAndroid) {
+    try {
+      texte = await _reconnaitre(chemin);
+    } catch (_) {}
   }
+  return analyserTicket(texte);
+}
+
+/// Reconnaissance du texte sur les pages dessinées en image, ligne par ligne.
+Future<String> _reconnaitre(String chemin) async {
+  final doc = await px.PdfDocument.openFile(chemin);
+  final lecteur = TextRecognizer(script: TextRecognitionScript.latin);
+  final dossier = await getTemporaryDirectory();
+  final lignes = <String>[];
+  try {
+    for (var i = 1; i <= min(doc.pagesCount, 8); i++) {
+      final page = await doc.getPage(i);
+      final image = await page.render(
+          width: page.width * 3, height: page.height * 3, format: px.PdfPageImageFormat.png, backgroundColor: '#FFFFFF');
+      await page.close();
+      if (image == null) continue;
+      final f = File('${dossier.path}${Platform.pathSeparator}ticket-page-$i.png');
+      await f.writeAsBytes(image.bytes);
+      final resultat = await lecteur.processImage(InputImage.fromFilePath(f.path));
+      await f.delete();
+      lignes.addAll(lignesParPosition([
+        for (final b in resultat.blocks)
+          for (final l in b.lines) (l.boundingBox.left, l.boundingBox.top, l.boundingBox.bottom, l.text),
+      ]));
+    }
+  } finally {
+    await lecteur.close();
+    await doc.close();
+  }
+  return lignes.join('\n');
+}
+
+/// Remet sur une même ligne les morceaux de texte alignés horizontalement (libellé à gauche,
+/// montant à droite, que la reconnaissance rend séparément).
+List<String> lignesParPosition(List<(double gauche, double haut, double bas, String texte)> morceaux) {
+  final tries = [...morceaux]..sort((a, b) => (a.$2 + a.$3).compareTo(b.$2 + b.$3));
+  final groupes = <List<(double, double, double, String)>>[];
+  for (final m in tries) {
+    final centre = (m.$2 + m.$3) / 2, hauteur = m.$3 - m.$2;
+    final g = groupes.isEmpty ? null : groupes.last;
+    if (g != null) {
+      final r = g.first;
+      if ((centre - (r.$2 + r.$3) / 2).abs() < max(hauteur, r.$3 - r.$2) / 2) {
+        g.add(m);
+        continue;
+      }
+    }
+    groupes.add([m]);
+  }
+  return [
+    for (final g in groupes) (g..sort((a, b) => a.$1.compareTo(b.$1))).map((m) => m.$4).join('   '),
+  ];
 }
 
 String _sansAccents(String s) => s

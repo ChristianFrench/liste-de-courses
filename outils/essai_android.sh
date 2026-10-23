@@ -18,22 +18,21 @@ sed -n '/Calling main entry com.android.commands.monkey/,$p' logcat.txt \
 echo "::warning title=Journal de l'application::$(sed 's/%/%25/g' extrait.txt | paste -sd'|')"
 
 # Ticket de caisse PDF « ouvert avec » l'application (comme depuis les téléchargements)
+pip install -q pillow > /dev/null 2>&1
 python3 - <<'PY'
-# Petit PDF valide d'une page, avec un texte
-objets = ["<< /Type /Catalog /Pages 2 0 R >>", "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-          "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 400] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
-          None, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"]
-flux = b"BT /F1 18 Tf 30 340 Td (MAGASIN ESSAI 22/10/2026) Tj 0 -40 Td (SOUS-TOTAL 14,50) Tj 0 -40 Td (TOTAL A PAYER 12,50 EUR) Tj ET"
-sortie = bytearray(b"%PDF-1.4\n"); positions = []
-for i, o in enumerate(objets, 1):
-    positions.append(len(sortie))
-    corps = (b"<< /Length %d >>\nstream\n" % len(flux) + flux + b"\nendstream") if o is None else o.encode()
-    sortie += b"%d 0 obj\n" % i + corps + b"\nendobj\n"
-xref = len(sortie)
-sortie += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objets) + 1)
-for p in positions: sortie += b"%010d 00000 n \n" % p
-sortie += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objets) + 1, xref)
-open("ticket.pdf", "wb").write(sortie)
+# Ticket en image, comme ceux de Leclerc (aucun texte dans le PDF) : l'application doit le lire par reconnaissance
+from PIL import Image, ImageDraw, ImageFont
+try:
+    police = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 34)
+except OSError:
+    police = ImageFont.load_default()
+lignes = ["E.LECLERC ESSAI", "Ticket 01/10/26 @ 07H06", "", "LAIT DEMI ECREME          1.15", "CAMEMBERT                 2.89",
+          "", "Total 12 articles        45.60", "", "CB                       45.60"]
+im = Image.new("RGB", (900, 120 + 60 * len(lignes)), "white")
+d = ImageDraw.Draw(im)
+for i, l in enumerate(lignes):
+    d.text((60, 60 + 60 * i), l, fill="black", font=police)
+im.save("ticket.pdf", resolution=200)
 PY
 adb push ticket.pdf /data/local/tmp/ticket.pdf
 adb shell chmod 644 /data/local/tmp/ticket.pdf
@@ -65,7 +64,7 @@ ecran() { adb shell uiautomator dump /sdcard/e.xml > /dev/null; adb pull /sdcard
 
 # Le ticket est gardé sans course, l'application est fermée puis rouverte : il doit être là, et s'ouvrir.
 r1=$(toucher "Le garder"); r2=$(toucher "Magasin 1")
-adb shell input text Essai; sleep 1
+sleep 10; adb shell input text Essai; sleep 1
 echo "::warning title=Fenêtre du ticket (date et montant lus)::$(ecran)"
 r3=$(toucher "Valider")
 sleep 2

@@ -99,6 +99,13 @@ remplacer("ios/Runner/Info.plist",
           r"(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)",
           rf"\g<1>{NOM}\g<2>", regex=True)
 
+# iPhone : la reconnaissance de texte des tickets (ML Kit) demande iOS 15.5 au minimum
+p = pathlib.Path("ios/Runner.xcodeproj/project.pbxproj")
+if p.exists():
+    p.write_text(re.sub(r"IPHONEOS_DEPLOYMENT_TARGET = [0-9.]+;", "IPHONEOS_DEPLOYMENT_TARGET = 15.5;", p.read_text(encoding="utf-8")),
+                 encoding="utf-8")
+    print(f"ajusté : {p}")
+
 # Windows : taille de la fenêtre au format téléphone, ajustée à la hauteur de l'écran
 TAILLE_FENETRE = """// Fenetre au format telephone (rapport %d x %d), ajustee a la hauteur utile de l ecran
   RECT zone;
