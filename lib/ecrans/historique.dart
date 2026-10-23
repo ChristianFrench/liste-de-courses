@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pdfx/pdfx.dart';
 
 import '../composants/composants.dart';
 import '../donnees/envoi.dart';
@@ -73,6 +74,33 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             onChange: (i) => setState(() => vue = i),
           ),
         ),
+        if (libres.isNotEmpty && aRattacher == null)
+          GroupeRetractable(
+            cle: 'historique/tickets',
+            titre: 'Tickets non rattachés',
+            icone: Icons.receipt_long_outlined,
+            nombre: libres.length,
+            enfants: [
+          for (final t in libres)
+            LigneMenu(
+              icone: Icons.receipt_long_outlined,
+              titre: [
+                jjmm(t.date),
+                etat.magasin(t.magasinId)?.nom ?? '',
+                if (t.montant > 0) euros(t.montant),
+              ].where((x) => x.isNotEmpty).join(' · '),
+              sousTitre: [etat.libelleTicket(t), 'Non rattaché à une course'].where((x) => x.isNotEmpty).join(' · '),
+              droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t)),
+                Lien('Rattacher', onTap: () {
+                  nav.ticketARattacher = t.id;
+                  nav.signaler();
+                  setState(() {});
+                }),
+              ]),
+            ),
+            ],
+          ),
         if (courses.isEmpty)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -86,29 +114,6 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             nombre: g.value.length,
             enfants: [for (final c in g.value) _ligne(context, etat, c, aRattacher)],
           ),
-        if (libres.isNotEmpty && aRattacher == null)
-          GroupeRetractable(
-            cle: 'historique/tickets',
-            titre: 'Tickets non rattachés',
-            icone: Icons.receipt_long_outlined,
-            nombre: libres.length,
-            enfants: [
-          for (final t in libres)
-            LigneMenu(
-              icone: Icons.receipt_long_outlined,
-              titre: '${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}',
-              sousTitre: 'Non rattaché à une course',
-              droite: Row(mainAxisSize: MainAxisSize.min, children: [
-                BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t)),
-                Lien('Rattacher', onTap: () {
-                  nav.ticketARattacher = t.id;
-                  nav.signaler();
-                  setState(() {});
-                }),
-              ]),
-            ),
-            ],
-          ),
       ],
     );
   }
@@ -117,7 +122,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     final t = etat.ticketDe(c.id);
     final details = [
       '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
-      t == null ? 'sans ticket' : 'ticket joint',
+      t == null ? 'sans ticket' : (etat.libelleTicket(t).isEmpty ? 'ticket joint' : 'ticket « ${etat.libelleTicket(t)} »'),
       etat.membre(c.membreId)?.nomAffiche ?? '',
       if (t != null && t.montant > 0) euros(t.montant),
     ].where((x) => x.isNotEmpty);
@@ -146,14 +151,119 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
 Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
   final t = await joindreTicketPdf(etat, c);
   if (t == null || !context.mounted) return;
-  final m = await demanderTexte(context, titre: 'Montant du ticket', aide: 'Ex. : 84,30 (facultatif)');
-  final v = double.tryParse((m ?? '').replaceAll(',', '.').replaceAll('€', '').trim());
-  if (v != null) etat.montantTicket(t, v);
+  await decrireTicket(context, t);
   if (context.mounted) Nav.message(context, 'Ticket joint à la course du ${jjmm(c.dateCourses)}');
 }
 
+/// Libellé et montant du ticket, demandés ensemble (tous deux facultatifs).
+Future<void> decrireTicket(BuildContext context, Ticket t) async {
+  final etat = Etat.instance;
+  final libelle = TextEditingController(text: etat.libelleTicket(t));
+  final montant = TextEditingController(text: t.montant > 0 ? t.montant.toStringAsFixed(2).replaceAll('.', ',') : '');
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: Charte.fond,
+      title: Text('Ticket de caisse', style: Charte.texte(18, gras: true)),
+      content: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextField(
+          key: const ValueKey('ticket-libelle'),
+          controller: libelle,
+          autofocus: true,
+          style: Charte.texte(16),
+          decoration: const InputDecoration(labelText: 'Libellé', hintText: 'Ex. : Courses de la semaine (facultatif)'),
+        ),
+        TextField(
+          key: const ValueKey('ticket-montant'),
+          controller: montant,
+          style: Charte.texte(16),
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          decoration: const InputDecoration(labelText: 'Montant', hintText: 'Ex. : 84,30 (facultatif)'),
+          onSubmitted: (_) => Navigator.of(ctx).pop(true),
+        ),
+      ]),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Passer', style: Charte.texte(16))),
+        TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Valider', style: Charte.texte(16, gras: true))),
+      ],
+    ),
+  );
+  if (ok != true) return;
+  etat.nommerTicket(t, libelle.text);
+  final v = double.tryParse(montant.text.replaceAll(',', '.').replaceAll('€', '').replaceAll(' ', '').trim());
+  if (v != null) etat.montantTicket(t, v);
+}
+
+/// Affiche le ticket PDF dans l'application (lecteur intégré).
 Future<void> ouvrirTicketPdf(BuildContext context, Ticket t) async {
-  if (!await ouvrirTicket(t.id) && context.mounted) Nav.message(context, 'Pas de PDF pour ce ticket');
+  if (!await ticketAPdf(t.id)) {
+    if (context.mounted) Nav.message(context, 'Pas de PDF pour ce ticket');
+    return;
+  }
+  final f = await fichierTicket(t.id);
+  if (context.mounted) await Nav.aller<void>(context, EcranTicketPdf(ticket: t, chemin: f.path));
+}
+
+/// Lecteur de ticket PDF : défilement, zoom avec deux doigts ; dans le menu, libellé et montant,
+/// et ouverture dans une autre application.
+class EcranTicketPdf extends StatefulWidget {
+  const EcranTicketPdf({super.key, required this.ticket, required this.chemin});
+  final Ticket ticket;
+  final String chemin;
+
+  @override
+  State<EcranTicketPdf> createState() => _EcranTicketPdfState();
+}
+
+class _EcranTicketPdfState extends State<EcranTicketPdf> {
+  late final _document = PdfController(document: PdfDocument.openFile(widget.chemin));
+
+  @override
+  void dispose() {
+    _document.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    final t = widget.ticket;
+    final libelle = etat.libelleTicket(t);
+    return Scaffold(
+      backgroundColor: Charte.fond,
+      body: SafeArea(
+        child: Column(children: [
+          EnTeteFenetre(
+            titre: libelle.isEmpty ? 'Ticket de caisse' : libelle,
+            icone: Icons.receipt_long_outlined,
+            sousTitre: [jjmm(t.date), etat.magasin(t.magasinId)?.nom ?? '', if (t.montant > 0) euros(t.montant)]
+                .where((x) => x.isNotEmpty)
+                .join(' · '),
+            retour: true,
+            actions: [
+              ActionLigne(Icons.edit_outlined, 'Libellé et montant', () async {
+                await decrireTicket(context, t);
+                if (mounted) setState(() {});
+              }),
+              ActionLigne(Icons.open_in_new, 'Ouvrir dans une autre application', () async {
+                if (!await ouvrirTicket(t.id) && context.mounted) Nav.message(context, 'Aucune application pour ouvrir ce PDF');
+              }),
+            ],
+          ),
+          Expanded(
+            child: ColoredBox(
+              color: const Color(0xFFE6E6E6),
+              child: PdfView(
+                controller: _document,
+                scrollDirection: Axis.vertical,
+                onDocumentError: (e) => Nav.message(context, 'PDF illisible'),
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
 }
 
 /// Ticket de caisse PDF reçu d'une autre application (« Partager » ou « Ouvrir avec » sur Android) :
@@ -191,8 +301,6 @@ Future<void> recevoirTicketPdf(BuildContext context, String chemin) async {
   }
   await enregistrerPdfTicket(t, chemin);
   if (!context.mounted) return;
-  final m = await demanderTexte(context, titre: 'Montant du ticket', aide: 'Ex. : 84,30 (facultatif)');
-  final v = double.tryParse((m ?? '').replaceAll(',', '.').replaceAll('€', '').trim());
-  if (v != null) etat.montantTicket(t, v);
+  await decrireTicket(context, t);
   if (context.mounted) Nav.message(context, fin);
 }

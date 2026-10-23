@@ -249,7 +249,7 @@ class Aides {
       '« Terminées sans ticket » : joignez le ticket de caisse (fichier PDF), ou classez la course sans ticket ; '
       'elle rejoint alors l\'historique (Gérer).\n'
       'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Liste de courses ; '
-      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre.\n$_gestes';
+      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Gérer › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
       'Magasins et catalogue : vos magasins, leurs rayons, secteurs et produits ; vous pouvez ajouter, renommer, déplacer, '

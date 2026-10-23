@@ -18,7 +18,23 @@ sed -n '/Calling main entry com.android.commands.monkey/,$p' logcat.txt \
 echo "::warning title=Journal de l'application::$(sed 's/%/%25/g' extrait.txt | paste -sd'|')"
 
 # Ticket de caisse PDF « ouvert avec » l'application (comme depuis les téléchargements)
-printf '%%PDF-1.4\n%%essai\n' > ticket.pdf
+python3 - <<'PY'
+# Petit PDF valide d'une page, avec un texte
+objets = ["<< /Type /Catalog /Pages 2 0 R >>", "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+          "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 400] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>",
+          None, "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>"]
+flux = b"BT /F1 24 Tf 40 300 Td (TICKET ESSAI 12,50) Tj ET"
+sortie = bytearray(b"%PDF-1.4\n"); positions = []
+for i, o in enumerate(objets, 1):
+    positions.append(len(sortie))
+    corps = (b"<< /Length %d >>\nstream\n" % len(flux) + flux + b"\nendstream") if o is None else o.encode()
+    sortie += b"%d 0 obj\n" % i + corps + b"\nendobj\n"
+xref = len(sortie)
+sortie += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objets) + 1)
+for p in positions: sortie += b"%010d 00000 n \n" % p
+sortie += b"trailer\n<< /Size %d /Root 1 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objets) + 1, xref)
+open("ticket.pdf", "wb").write(sortie)
+PY
 adb push ticket.pdf /data/local/tmp/ticket.pdf
 adb shell chmod 644 /data/local/tmp/ticket.pdf
 echo "::warning title=Applications pour un PDF partagé::$(adb shell pm query-activities -a android.intent.action.SEND -t application/pdf 2>&1 | grep -oE 'packageName=[^ ]+' | sort -u | paste -sd'|')"
@@ -49,7 +65,7 @@ ecran() { adb shell uiautomator dump /sdcard/e.xml > /dev/null; adb pull /sdcard
 
 # Le ticket est gardé sans course, l'application est fermée puis rouverte : il doit être là, et s'ouvrir.
 r1=$(toucher "Le garder"); r2=$(toucher "Magasin 1")
-adb shell input text 12.50; sleep 1; r3=$(toucher "Valider")
+adb shell input text Essai; sleep 1; r3=$(toucher "Valider")
 sleep 2
 adb shell am force-stop $APP
 adb shell monkey -p $APP -c android.intent.category.LAUNCHER 1 > /dev/null; sleep 20
@@ -58,5 +74,6 @@ echo "::warning title=Après redémarrage (Gérer › Historique)::$r1 $r2 $r3 $
 r6=$(toucher "Tickets non rattachés"); r7=$(toucher "Ouvrir le ticket PDF"); sleep 3
 echo "::warning title=Trombone touché::$r6 $r7 | $(ecran) | $(adb shell dumpsys activity activities | grep -m2 -E 'mResumedActivity|topResumedActivity' | paste -sd'|')"
 adb logcat -d | grep -E "AndroidRuntime|FileProvider|Exception" | tail -n 8 | cut -c1-200 > err.txt
+adb exec-out screencap -p > lecteur.png
 echo "::warning title=Erreurs Android::$(paste -sd'|' err.txt)"
 exit 0

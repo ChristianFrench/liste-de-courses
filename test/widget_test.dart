@@ -608,18 +608,20 @@ void main() {
       expect(find.text('Le garder sans course, à rattacher plus tard'), findsOneWidget);
       await tester.tap(find.textContaining(RegExp(r'^\d\d/\d\d · ')).first);
       await tester.pumpAndSettle();
-      for (var i = 0; i < 20 && find.text('Montant du ticket').evaluate().isEmpty; i++) {
+      for (var i = 0; i < 20 && find.byKey(const ValueKey('ticket-montant')).evaluate().isEmpty; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
         await tester.pumpAndSettle();
       }
-      expect(find.text('Montant du ticket'), findsOneWidget);
-      await tester.enterText(find.byType(TextField).last, '12,50');
+      expect(find.text('Ticket de caisse'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('ticket-libelle')), 'Leclerc samedi');
+      await tester.enterText(find.byKey(const ValueKey('ticket-montant')), '12,50');
       await _toucher(tester, find.text('Valider'));
       await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
       await tester.pumpAndSettle();
       expect(etat.historique.where((c) => etat.ticketDe(c.id) == null).length, sansTicket - 1);
       final t = etat.tickets.last;
       expect(t.montant, 12.5);
+      expect(etat.libelleTicket(t), 'Leclerc samedi');
       expect(File('${dossier.path}/tickets/${t.id}.pdf').existsSync(), isTrue);
     });
 
