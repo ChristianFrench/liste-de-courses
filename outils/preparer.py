@@ -74,7 +74,12 @@ if gradle.exists():
 regles = pathlib.Path("android/app/proguard-rules.pro")
 if regles.parent.exists():
     regles.write_text("\n".join(f"-dontwarn com.google.mlkit.vision.text.{e}.**"
-                                for e in ("chinese", "devanagari", "japanese", "korean")) + "\n", encoding="utf-8")
+                                for e in ("chinese", "devanagari", "japanese", "korean"))
+                      # ML Kit crée ses composants par réflexion : R8 ne doit pas les retirer
+                      + "\n-keep class com.google.mlkit.** { *; }"
+                      + "\n-keep class com.google.android.gms.internal.mlkit_vision_text_common.** { *; }"
+                      + "\n-keep class com.google.android.gms.internal.mlkit_vision_common.** { *; }"
+                      + "\n-keep class com.google.android.gms.internal.mlkit_common.** { *; }\n", encoding="utf-8")
     print(f"créé : {regles}")
 activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
 if activite.exists():
