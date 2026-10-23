@@ -130,7 +130,17 @@ class Synchro extends ChangeNotifier {
   String? get code => _reglage('code');
 
   /// 'maitre' : appareil qui a créé le partage ; 'esclave' : appareil qui l'a rejoint.
-  String? get role => _reglage('role');
+  /// « maitre » sur l'appareil qui a créé le partage, « esclave » sur ceux qui l'ont rejoint.
+  /// Un partage créé avant que le rôle soit noté : l'appareil qui a envoyé la fiche du foyer est le maître.
+  String? get role {
+    final r = _reglage('role');
+    if (r != null || !actif) return r;
+    final auteur = _base?.auteurFoyer();
+    if (auteur == null || noeud.isEmpty) return null;
+    final deduit = auteur == noeud ? 'maitre' : 'esclave';
+    _definir('role', deduit);
+    return deduit;
+  }
   bool get actif => code != null;
   String get noeud => _reglage('noeud') ?? '';
 

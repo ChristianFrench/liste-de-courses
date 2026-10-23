@@ -755,6 +755,12 @@ class Stockage {
           r['noeud'] as String: r['h'] as String
       };
 
+  /// Appareil qui a envoyé la fiche du foyer : celui qui a créé le partage.
+  String? auteurFoyer() {
+    final r = _db.select("SELECT noeud FROM synchro_objet WHERE tab = 'foyer' ORDER BY hlc LIMIT 1");
+    return r.isEmpty ? null : r.first['noeud'] as String;
+  }
+
   int get nbEnAttente => _db.select('SELECT count(*) AS n FROM synchro_attente').first['n'] as int;
 
   /// Intègre les objets reçus des autres appareils (le plus récent l'emporte). Un objet refusé

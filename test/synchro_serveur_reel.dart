@@ -116,6 +116,12 @@ void main() {
     }, secondes: 30);
     notice('Ajout de A reçu par B', '${DateTime.now().difference(t2).inMilliseconds} ms');
 
+    // A supprime la liste (elle part dans la corbeille) : elle disparaît chez B.
+    final t3 = DateTime.now();
+    etat.supprimer(etat.liste(listeA.id)!);
+    await attendre(() => !(b.lire()['listes'] as List).any((l) => l['id'] == listeA.id), secondes: 30);
+    notice('Suppression de A reçue par B', '${DateTime.now().difference(t3).inMilliseconds} ms');
+
     await tb.fermer();
     await s.arreterPartage();
   }, timeout: const Timeout(Duration(minutes: 4)));
@@ -169,6 +175,17 @@ void main() {
     expect(etat.moi.id, ((demo['membres'] as List)[1] as Map)['id'], reason: 'le membre existant est repris');
     expect(etat.membres.length, (demo['membres'] as List).length);
     expect(dossier.listSync().isNotEmpty, isTrue);
+
+    // A supprime une liste après coup : elle disparaît de l'application.
+    final ja = a.lire();
+    final partie = (ja['listes'] as List).first as Map;
+    final avantA = a.objetsDe('NOEUDA', '').last['h'] as String;
+    (ja['listes'] as List).remove(partie);
+    a.ecrire(ja);
+    final t1 = DateTime.now();
+    ta.publier('$base/modifs/NOEUDA', jsonEncode({'de': 'NOEUDA', 'objets': a.objetsDe('NOEUDA', avantA)}));
+    await attendre(() => etat.liste(partie['id'] as String) == null, secondes: 30);
+    notice('Suppression reçue par l\'application', '${DateTime.now().difference(t1).inMilliseconds} ms');
     await ta.fermer();
     await s.arreterPartage();
   }, timeout: const Timeout(Duration(minutes: 4)));
