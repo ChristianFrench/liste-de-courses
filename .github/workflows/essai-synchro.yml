@@ -34,7 +34,8 @@ jobs:
       - name: Deux appareils sur le vrai serveur MQTT (broker.hivemq.com)
         continue-on-error: true
         run: |
-          flutter test test/serveur_reel.dart --reporter expanded 2>&1 | tee reel.log | grep '^::' || true
+          flutter test test/serveur_reel.dart --reporter expanded > reel.log 2>&1
+          grep -o '::\(notice\|warning\) title=.*' reel.log || true
           grep -q 'All tests passed' reel.log || { echo "::warning title=Serveur réel::échec"; tail -n 30 reel.log; exit 1; }
 
   android:
