@@ -87,6 +87,9 @@ class Appareil {
   final String id;
   String nom = '?';
   bool enLigne = false;
+
+  /// Avance de son horloge sur la nôtre, en secondes (annoncée avec sa présence).
+  int? decalage;
 }
 
 class Synchro extends ChangeNotifier {
@@ -205,13 +208,22 @@ class Synchro extends ChangeNotifier {
 
   /// Cet appareil ne partage plus : ses données restent, elles ne circulent plus.
   Future<void> arreterPartage() async {
-    await _deconnecter();
+    // La présence gardée par le serveur est effacée : les autres ne voient plus cet appareil.
+    _transport?.publier('$_sujet/presence/$noeud', '', retenu: true);
+    await _deconnecter(presence: false);
     _base?.effacerReglage('synchro_code');
     _base?.effacerReglage('synchro_role');
     _base?.horloge = null;
     etatReseau = 'arrete';
     appareils.clear();
     _noter('Partage arrêté sur cet appareil');
+  }
+
+  /// Retire de la liste un appareil hors ligne (il a quitté le partage ou rejoint sous un autre nom).
+  void oublier(String id) {
+    _transport?.publier('$_sujet/presence/$id', '', retenu: true);
+    appareils.remove(id);
+    notifyListeners();
   }
 
   Future<void> changerServeur(ServeurMqtt s) async {
@@ -273,13 +285,13 @@ class Synchro extends ChangeNotifier {
     );
   }
 
-  Future<void> _deconnecter() async {
+  Future<void> _deconnecter({bool presence = true}) async {
     final t = _transport;
     _transport = null;
     _controle?.cancel();
     _delaiControle?.cancel();
     liaisonOk = false;
-    if (t != null && t.connecte) t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(false)), retenu: true);
+    if (presence && t != null && t.connecte) t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(false)), retenu: true);
     for (final a in _abonnements) {
       await a.cancel();
     }
@@ -307,7 +319,8 @@ class Synchro extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, Object?> _presence(bool enLigne) => {'de': noeud, 'nom': nomAppareil, 'enLigne': enLigne};
+  Map<String, Object?> _presence(bool enLigne) =>
+      {'de': noeud, 'nom': nomAppareil, 'enLigne': enLigne, 'heure': DateTime.now().millisecondsSinceEpoch};
 
   void _annoncer() {
     final t = _transport, base = _base;
@@ -368,8 +381,13 @@ class Synchro extends ChangeNotifier {
   // ------------------------------------------------------------ Réception
 
   void _recevoir(String sujet, String contenu) {
-    if (!sujet.startsWith('$_sujet/') || contenu.isEmpty) return;
+    if (!sujet.startsWith('$_sujet/')) return;
     final type = sujet.substring(_sujet.length + 1).split('/').first;
+    if (contenu.isEmpty) {
+      // Présence effacée : l'appareil a quitté le partage.
+      if (type == 'presence' && appareils.remove(sujet.split('/').last) != null) notifyListeners();
+      return;
+    }
     final Map<String, dynamic> m;
     try {
       m = jsonDecode(contenu) as Map<String, dynamic>;
@@ -393,6 +411,8 @@ class Synchro extends ChangeNotifier {
       case 'presence':
         final avant = a.enLigne;
         a.enLigne = m['enLigne'] == true;
+        final heure = m['heure'] as int?;
+        if (a.enLigne && heure != null) a.decalage = ((heure - DateTime.now().millisecondsSinceEpoch) / 1000).round();
         if (!avant && a.enLigne) {
           _noter('${a.nom} est en ligne');
           _bonjour(); // il peut avoir des modifications pour moi
@@ -434,7 +454,11 @@ class Synchro extends ChangeNotifier {
     try {
       final n = _etat.integrerDistant(lot);
       recus += n;
-      if (n > 0) _noter('Reçu : ${_resume(lot)}');
+      final ignores = _base?.ignores ?? 0, attente = _base?.nbEnAttente ?? 0;
+      final de = {for (final o in lot) appareils[o['n']]?.nom ?? '?'}.join(', ');
+      _noter('Reçu de $de : ${_resume(lot)}'
+          '${ignores > 0 ? ' ; $ignores déjà plus récents ici, laissés de côté' : ''}'
+          '${attente > 0 ? ' ; $attente en attente' : ''}');
       for (final e in _base?.erreurs ?? const <String>[]) {
         debugPrint('Synchronisation, en attente : $e');
       }

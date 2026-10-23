@@ -761,6 +761,9 @@ class Stockage {
     return r.isEmpty ? null : r.first['noeud'] as String;
   }
 
+  /// Objets reçus mais laissés de côté à la dernière intégration : la version d'ici est plus récente.
+  int ignores = 0;
+
   int get nbEnAttente => _db.select('SELECT count(*) AS n FROM synchro_attente').first['n'] as int;
 
   /// Intègre les objets reçus des autres appareils (le plus récent l'emporte). Un objet refusé
@@ -783,6 +786,7 @@ class Stockage {
         return c != 0 ? c : (a['h'] as String).compareTo(b['h'] as String);
       });
     erreurs.clear();
+    ignores = 0;
     var n = 0;
     final requetes = <String, PreparedStatement>{};
     PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
@@ -797,6 +801,7 @@ class Stockage {
         final local = requete('SELECT hlc FROM synchro_objet WHERE tab = ? AND cle = ?').select([t, k]);
         if (local.isNotEmpty && (local.first['hlc'] as String).compareTo(h) >= 0) {
           requete('DELETE FROM synchro_attente WHERE tab = ? AND cle = ?').execute([t, k]);
+          ignores++;
           continue;
         }
         final v = o['v'] as String?;

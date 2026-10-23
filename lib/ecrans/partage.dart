@@ -114,7 +114,7 @@ class EcranPartage extends StatelessWidget {
     );
   }
 
-  Widget _appareil(String texte, bool enLigne) => Padding(
+  Widget _appareil(String texte, bool enLigne, {VoidCallback? retirer}) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(children: [
           Container(
@@ -124,6 +124,8 @@ class EcranPartage extends StatelessWidget {
           ),
           const SizedBox(width: 8),
           Expanded(child: Text(texte, style: Charte.texte(15))),
+          if (retirer != null)
+            OutlinedButton(onPressed: retirer, child: Text('Retirer', style: Charte.texte(14, gras: true))),
         ]),
       );
 
@@ -182,7 +184,12 @@ class EcranPartage extends StatelessWidget {
       const SizedBox(height: 10),
       Text('Appareils', style: Charte.texte(15, gras: true)),
       _appareil('${s.nomAppareil} (cet appareil${s.role == 'maitre' ? ', maître' : s.role == 'esclave' ? ', esclave' : ''})', s.liaisonOk),
-      for (final a in autres) _appareil('${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})', a.enLigne),
+      for (final a in autres)
+        _appareil(
+            '${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})'
+            '${a.enLigne && (a.decalage ?? 0).abs() >= 5 ? ' · horloge décalée de ${a.decalage} s' : ''}',
+            a.enLigne,
+            retirer: a.enLigne ? null : () => s.oublier(a.id)),
       if (autres.isEmpty) Text('Aucun autre appareil vu pour l\'instant', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
       const SizedBox(height: 6),
       Text('${s.envoyes} modifications envoyées, ${s.recus} reçues depuis le lancement'
