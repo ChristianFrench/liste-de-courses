@@ -595,7 +595,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     var pourCourses = true;
     var enListeType = false;
     final simple = etat.estSimple(l);
-    var ranger = true;
+    var ranger = etat.estRangee(l);
     final nomType = TextEditingController(text: etat.nomListe(l));
     final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
@@ -625,7 +625,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
           if (simple)
             CaseModale(
               texte: 'Ranger par rayons et secteurs',
-              aide: 'Pendant les courses, la liste suivra l\'ordre du magasin. Sinon, elle garde l\'ordre de saisie.',
+              aide: 'Pendant les courses, la liste suivra l\'ordre du magasin. Sinon, elle garde l\'ordre de saisie. '
+                  'En préparation, elle reste une liste simple.',
               coche: ranger,
               onChange: (v) => maj(() => ranger = v),
             ),
@@ -664,7 +665,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nom = nomType.text.trim();
     if (!ok || !mounted) return;
     etat.commenter(l, commentaire.text);
-    if (simple && ranger) etat.marquerSimple(l, false);
+    if (simple) etat.ranger(l, ranger);
     if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
     if (!pourCourses) {
       if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
@@ -1725,7 +1726,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         final etapes = etat.etapes(l, apercu ? etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id : l.parcoursId);
         // Liste simple non rangée : les articles dans l'ordre de saisie, sans bandeaux.
         final simple = etat.estSimple(l);
-        final aplat = apercu ? (_aplat ?? simple) : simple;
+        final aplat = apercu ? (_aplat ?? simple) : etat.aPlat(l);
         final total = l.lignes.length;
         final titre = apercu
             ? 'Aperçu · $total article${total > 1 ? 's' : ''}'

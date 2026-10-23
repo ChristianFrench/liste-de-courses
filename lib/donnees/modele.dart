@@ -401,8 +401,12 @@ class Etat extends ChangeNotifier {
   Map<String, Set<String>> manquants = {};
 
   /// Listes simples : préparées sans rayons ni secteurs, dans l'ordre où les articles ont été ajoutés.
-  /// À « Liste prête », une liste simple peut être rangée par rayons et secteurs (elle quitte alors cet ensemble).
+  /// Elles le restent en préparation, même reprises après « Liste prête ».
   Set<String> simples = {};
+
+  /// Listes simples à suivre dans l'ordre de saisie pendant les courses (« Ranger par rayons et secteurs »
+  /// décoché à « Liste prête ») ; les autres suivent les rayons et secteurs.
+  Set<String> nonRangees = {};
 
   /// Listes types nommées (Préparer › Nouvelle liste › Liste type).
   List<ListeType> listesTypes = [];
@@ -591,6 +595,7 @@ class Etat extends ChangeNotifier {
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
+    nonRangees = _ids(options?['nonRangees']).toSet();
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
@@ -689,6 +694,7 @@ class Etat extends ChangeNotifier {
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
+            if (nonRangees.isNotEmpty) 'nonRangees': nonRangees.toList(),
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             'typesPackaging': typesPackaging,
@@ -1678,6 +1684,16 @@ class Etat extends ChangeNotifier {
   void marquerSimple(Liste l, bool oui) {
     if (oui ? simples.add(l.id) : simples.remove(l.id)) modifie();
   }
+
+  /// Liste simple suivie par rayons et secteurs pendant les courses.
+  bool estRangee(Liste l) => !nonRangees.contains(l.id);
+
+  void ranger(Liste l, bool oui) {
+    if (oui ? nonRangees.remove(l.id) : nonRangees.add(l.id)) modifie();
+  }
+
+  /// Liste montrée sans rayons ni secteurs pendant les courses : simple et non rangée.
+  bool aPlat(Liste l) => estSimple(l) && !estRangee(l);
 
   void commenter(Liste l, String texte) {
     if (texte.trim().isEmpty) {

@@ -16,7 +16,7 @@ import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
-import 'package:liste_de_courses/ecrans/travail.dart' show codeCourtPackaging, ordreAlpha;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, codeCourtPackaging, ordreAlpha;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -608,7 +608,13 @@ void main() {
       await _toucher(tester, find.text('Continuer la préparation'));
       await _toucher(tester, find.text('Liste prête'));
       await _toucher(tester, find.text('Valider'));
-      expect(etat.estSimple(l), isFalse, reason: 'rangée par rayons et secteurs');
+      expect(etat.estRangee(l), isTrue, reason: 'rangée par rayons et secteurs pour les courses');
+      expect(etat.estSimple(l), isTrue, reason: 'elle reste une liste simple en préparation');
+      // Reprise en préparation : toujours le mode simple, sans rayons
+      Nav.travail(EcranConstruction(listeId: l.id));
+      await tester.pumpAndSettle();
+      expect(find.text('Ajouter un article (3 lettres ou plus)'), findsOneWidget);
+      expect(find.text('CHARCUTERIE'), findsNothing);
     });
 
     testWidgets('préparation : ajouter un rayon et un secteur, avec leur image', (tester) async {
