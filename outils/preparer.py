@@ -69,6 +69,13 @@ gradle = pathlib.Path("android/app/build.gradle.kts")
 if gradle.exists():
     gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n}\n',
                       encoding="utf-8")
+# Android : la reconnaissance de texte (ML Kit) ne garde que l'alphabet latin ; les autres écritures
+# sont absentes volontairement (R8 doit l'accepter). Le module Flutter lit android/app/proguard-rules.pro.
+regles = pathlib.Path("android/app/proguard-rules.pro")
+if regles.parent.exists():
+    regles.write_text("\n".join(f"-dontwarn com.google.mlkit.vision.text.{e}.**"
+                                for e in ("chinese", "devanagari", "japanese", "korean")) + "\n", encoding="utf-8")
+    print(f"créé : {regles}")
 activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
 if activite.exists():
     activite.write_text(pathlib.Path("outils/android/MainActivity.kt").read_text(encoding="utf-8"), encoding="utf-8")
