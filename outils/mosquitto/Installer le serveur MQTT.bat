@@ -83,6 +83,8 @@ if not exist "%DONNEES%" mkdir "%DONNEES%"
 if exist "%DONNEES%\passwd" del "%DONNEES%\passwd"
 "%MOSQ%\mosquitto_passwd.exe" -c -b "%DONNEES%\passwd" %UTIL% %MDP%
 if errorlevel 1 (echo       Création du mot de passe impossible. & goto echec)
+rem Le fichier est réservé à son créateur : le service (compte SYSTEM, S-1-5-18) doit pouvoir le lire
+icacls "%DONNEES%\passwd" /grant *S-1-5-18:R >nul
 > "%DONNEES%\acl" echo user %UTIL%
 >> "%DONNEES%\acl" echo topic readwrite ldc/#
 echo       ok : %UTIL%, sujets ldc/#
