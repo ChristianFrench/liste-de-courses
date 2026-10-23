@@ -114,7 +114,23 @@ sc query mosquitto >nul 2>&1 || "%MOSQ%\mosquitto.exe" install
 sc config mosquitto start= auto >nul
 net stop mosquitto >nul 2>&1
 net start mosquitto >nul 2>&1
-sc query mosquitto | findstr /c:"RUNNING" >nul || (echo       Le service ne démarre pas : voir %DONNEES%\mosquitto.log & goto echec)
+set /a ESSAIS=0
+:attenteservice
+sc query mosquitto | findstr /c:"RUNNING" >nul && goto servicedemarre
+set /a ESSAIS+=1
+if %ESSAIS% geq 15 goto servicearrete
+timeout /t 1 /nobreak >nul 2>&1 || ping -n 2 127.0.0.1 >nul
+goto attenteservice
+:servicearrete
+echo       Le service ne démarre pas. Détails :
+sc query mosquitto
+if exist "%DONNEES%\mosquitto.log" type "%DONNEES%\mosquitto.log"
+echo       Essai de lancement direct :
+start "" /b "%MOSQ%\mosquitto.exe" -c "%MOSQ%\mosquitto.conf" -v
+ping -n 4 127.0.0.1 >nul
+taskkill /im mosquitto.exe /f >nul 2>&1
+goto echec
+:servicedemarre
 echo       ok : service mosquitto démarré, démarrage automatique
 
 rem --- 5. Pare-feu : le port est ouvert pour les réseaux privés (maison)
