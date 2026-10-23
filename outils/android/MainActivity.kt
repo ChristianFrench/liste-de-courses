@@ -3,6 +3,7 @@ package fr.listecourses.liste_de_courses
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -23,6 +24,8 @@ class MainActivity : FlutterActivity() {
                 if (appel.method == "ticketRecu") {
                     resultat.success(enAttente)
                     enAttente = null
+                } else if (appel.method == "ouvrirPdf") {
+                    resultat.success(ouvrirPdf(appel.arguments as String))
                 } else {
                     resultat.notImplemented()
                 }
@@ -37,6 +40,20 @@ class MainActivity : FlutterActivity() {
         val chemin = copier(intent) ?: return
         val c = canal
         if (c == null) enAttente = chemin else c.invokeMethod("ticket", chemin)
+    }
+
+    // Ticket rangé dans les fichiers de l'application : prêté au lecteur de PDF (FileProvider
+    // « <application>.tickets », déclaré par outils/preparer.py).
+    private fun ouvrirPdf(chemin: String): Boolean {
+        return try {
+            val uri = FileProvider.getUriForFile(this, "$packageName.tickets", File(chemin))
+            val voir = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/pdf")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            startActivity(Intent.createChooser(voir, "Ouvrir le ticket").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     private fun copier(intent: Intent?): String? {

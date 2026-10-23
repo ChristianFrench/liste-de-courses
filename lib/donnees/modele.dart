@@ -1730,8 +1730,9 @@ class Etat extends ChangeNotifier {
   }
 
   /// Ticket reçu sans course choisie : il attend dans Gérer › Historique (« Tickets non rattachés »).
+  /// (Source « photo » : la seule, avec « compte_magasin », que la base accepte.)
   Ticket ajouterTicketLibre(String magasinId) {
-    final t = Ticket(nouvelId('t'), null, magasinId, DateTime.now(), 0, 'pdf');
+    final t = Ticket(nouvelId('t'), null, magasinId, DateTime.now(), 0, 'photo');
     tickets.add(t);
     modifie();
     return t;

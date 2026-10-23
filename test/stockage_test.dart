@@ -56,6 +56,19 @@ void main() {
     relu.fermer();
   });
 
+  test('un ticket reçu sans course est gardé par la base', () {
+    final chemin = '${dossier.path}/essai.db';
+    final s = Stockage.ouvrir(chemin);
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final t = e.ajouterTicketLibre(e.magasins.first.id);
+    s.ecrire(jsonDecode(jsonEncode(e.versJson())) as Map<String, dynamic>);
+    expect(s.erreurs, isEmpty);
+    s.fermer();
+    final lu = Stockage.ouvrir(chemin).lire();
+    expect((lu['tickets'] as List).any((x) => x['id'] == t.id && x['listeId'] == null), isTrue);
+  });
+
   test('un magasin retiré ne revient pas', () {
     final chemin = '${dossier.path}/essai.db';
     final s = Stockage.ouvrir(chemin);

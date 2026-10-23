@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -104,5 +105,21 @@ Future<bool> ticketAPdf(String ticketId) async {
 
 Future<bool> ouvrirTicket(String ticketId) async {
   final f = await fichierTicket(ticketId);
-  return f.existsSync() && await launchUrl(Uri.file(f.path));
+  if (!f.existsSync()) return false;
+  if (Platform.isAndroid) {
+    // Android refuse de passer un chemin de fichier à une autre application : le code Android
+    // (outils/android/MainActivity.kt) le transmet au lecteur de PDF par un FileProvider.
+    try {
+      return await const MethodChannel('fr.listecourses/ticket').invokeMethod<bool>('ouvrirPdf', f.path) ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+  try {
+    return await launchUrl(Uri.file(f.path));
+  } catch (_) {
+    return false;
+  }
 }

@@ -46,6 +46,29 @@ remplacer("android/app/src/main/AndroidManifest.xml",
                 <data android:scheme="file"/>
                 <data android:mimeType="application/pdf"/>
             </intent-filter>""", regex=True)
+# Android : les tickets rangés dans l'application peuvent être prêtés au lecteur de PDF.
+remplacer("android/app/src/main/AndroidManifest.xml",
+          r"(\s*</application>)",
+          r'''
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.tickets"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/chemins_tickets"/>
+        </provider>\1''', regex=True)
+chemins = pathlib.Path("android/app/src/main/res/xml/chemins_tickets.xml")
+if chemins.parent.parent.exists():
+    chemins.parent.mkdir(exist_ok=True)
+    chemins.write_text('<?xml version="1.0" encoding="utf-8"?>\n<paths>\n    <files-path name="fichiers" path="."/>\n</paths>\n',
+                       encoding="utf-8")
+    print(f"créé : {chemins}")
+gradle = pathlib.Path("android/app/build.gradle.kts")
+if gradle.exists():
+    gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n}\n',
+                      encoding="utf-8")
 activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
 if activite.exists():
     activite.write_text(pathlib.Path("outils/android/MainActivity.kt").read_text(encoding="utf-8"), encoding="utf-8")

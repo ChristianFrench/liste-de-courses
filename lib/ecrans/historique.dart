@@ -98,11 +98,14 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
               icone: Icons.receipt_long_outlined,
               titre: '${jjmm(t.date)} · ${etat.magasin(t.magasinId)?.nom ?? ''} · ${euros(t.montant)}',
               sousTitre: 'Non rattaché à une course',
-              droite: Lien('Rattacher', onTap: () {
-                nav.ticketARattacher = t.id;
-                nav.signaler();
-                setState(() {});
-              }),
+              droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                BoutonIcone(icone: Icons.attach_file, libelle: 'Ouvrir le ticket PDF', onTap: () => ouvrirTicketPdf(context, t)),
+                Lien('Rattacher', onTap: () {
+                  nav.ticketARattacher = t.id;
+                  nav.signaler();
+                  setState(() {});
+                }),
+              ]),
             ),
             ],
           ),
