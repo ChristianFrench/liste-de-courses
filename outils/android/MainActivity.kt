@@ -1,5 +1,6 @@
 package fr.listecourses.liste_de_courses
 
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -49,7 +50,12 @@ class MainActivity : FlutterActivity() {
             val uri = FileProvider.getUriForFile(this, "$packageName.tickets", File(chemin))
             val voir = Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/pdf")
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            startActivity(Intent.createChooser(voir, "Ouvrir le ticket").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+            // L'application elle-même sait recevoir un PDF : on l'écarte, pour ne proposer que les lecteurs.
+            val choix = Intent.createChooser(voir, "Ouvrir le ticket").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (Build.VERSION.SDK_INT >= 24) {
+                choix.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(this, MainActivity::class.java)))
+            }
+            startActivity(choix)
             true
         } catch (e: Exception) {
             false
