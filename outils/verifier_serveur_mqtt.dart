@@ -123,6 +123,13 @@ Future<void> main(List<String> args) async {
     return i >= 0 && i + 1 < args.length ? args[i + 1] : null;
   }
 
+  if (Platform.isWindows) {
+    // Console en UTF-8, pour les accents
+    try {
+      Process.runSync('cmd', ['/c', 'chcp 65001 >nul']);
+    } catch (_) {}
+    stdout.encoding = utf8;
+  }
   stdout.writeln('Vérification d\'un serveur MQTT pour Liste de courses');
   stdout.writeln('====================================================');
   final interactif = arg('hote') == null;
