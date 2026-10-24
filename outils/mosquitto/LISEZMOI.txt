@@ -21,7 +21,7 @@ Pour se synchroniser aussi hors de la maison (pendant les courses)
   1. Sur la box (Freebox : Paramètres de la Freebox > Gestion des ports) : rediriger le port TCP 8883
      vers ce PC, et donner au PC une adresse fixe (bail DHCP statique). Ne pas rediriger le port 1883,
      qui n'est pas chiffré. Chez Free, l'adresse IPv4 doit être « fullstack » (espace abonné, gratuit).
-  2. Dans l'application, sur chaque appareil, Gérer > Mon foyer > Partage entre appareils > Serveur MQTT :
+  2. Dans l'application, sur chaque appareil, Gérer > MQTT > Partage entre appareils > Serveur MQTT :
      adresse Internet de la box (affichée par le .bat), port 8883, case « Connexion chiffrée » COCHÉE,
      identifiant, mot de passe, puis Enregistrer.
   3. À la première connexion, l'application reconnaît le certificat du serveur et affiche son empreinte :

@@ -205,7 +205,7 @@ set "PUBLIQUE="
 for /f "delims=" %%a in ('curl -s -4 --max-time 8 https://api.ipify.org 2^>nul') do set "PUBLIQUE=%%a"
 if not defined PUBLIQUE set "PUBLIQUE=(inconnue : voir l'interface de la box)"
 set "REGLAGES=%ICI%Reglages du serveur MQTT.txt"
-> "%REGLAGES%" echo Liste de courses : Gerer ^> Mon foyer ^> Partage entre appareils ^> Serveur MQTT
+> "%REGLAGES%" echo Liste de courses : Gerer ^> MQTT ^> Partage entre appareils ^> Serveur MQTT
 >> "%REGLAGES%" echo.
 >> "%REGLAGES%" echo A LA MAISON ET A L'EXTERIEUR (chiffre, recommande)
 >> "%REGLAGES%" echo   Adresse du serveur : %PUBLIQUE%   (adresse Internet de la box)

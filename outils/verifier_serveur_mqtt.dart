@@ -180,7 +180,7 @@ Future<void> main(List<String> args) async {
   if (_echecs == 0) {
     stdout.writeln('RESULTAT : le serveur convient à la synchronisation${_alertes > 0 ? ' ($_alertes point(s) d\'attention ci-dessus)' : ''}.');
     stdout.writeln();
-    stdout.writeln('A saisir dans l\'application (Gérer > Mon foyer > Partage entre appareils > Serveur MQTT) :');
+    stdout.writeln('A saisir dans l\'application (Gérer > MQTT > Partage entre appareils > Serveur MQTT) :');
     final adresses = await adressesDuPc();
     final locale = hote == '127.0.0.1' || hote == 'localhost';
     info('Adresse du serveur : ${locale && adresses.isNotEmpty ? adresses.join('  ou  ') : hote}');

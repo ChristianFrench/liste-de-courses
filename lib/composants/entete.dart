@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../donnees/synchro.dart';
 import '../ecrans/coquille.dart' show BarreOnglets;
-import '../ecrans/partage.dart' show EcranPartage;
+import '../ecrans/partage.dart' show montrerEtatSynchro;
 import '../navigation.dart';
 import '../theme.dart';
 import 'composants.dart';
@@ -138,6 +138,7 @@ class _BoutonDeplier extends StatelessWidget {
       listenable: Listenable.merge([Retractables.i, if (page != null) page]),
       builder: (context, _) {
         if (cles case final c?) {
+          if (c.isEmpty) return const SizedBox.shrink(); // rien à déplier ni replier
           final a = reduireTout(c);
           return boutonEnTete(a.icone, a.texte, a.faire);
         }
@@ -219,7 +220,7 @@ class BoutonSynchro extends StatelessWidget {
           button: true,
           label: resume(s),
           child: InkResponse(
-            onTap: () => Nav.aller<void>(context, const EcranPartage()),
+            onTap: () => montrerEtatSynchro(context),
             radius: 22,
             child: SizedBox(
               width: 44,
@@ -398,7 +399,9 @@ class Aides {
       '« Liste prête » : cochez « Ranger par rayons et secteurs » pour que la liste suive l\'ordre du magasin pendant les courses ; '
       'sinon elle garde l\'ordre de saisie.\n$_gestes';
 
-  static const apercu = 'La liste telle qu\'elle sera pendant les courses, dans l\'ordre des rayons et de votre parcours. '
+  static const apercu = 'La liste telle qu\'elle sera pendant les courses, dans l\'ordre des rayons et de votre parcours, '
+      'tout déployé. Par défaut elle est condensée : les articles serrés sous leur secteur, avec leur quantité. '
+      '« Détail » enfoncé montre aussi mesures, packagings et promotions. '
       'Rien ne se coche ici. « Continuer la préparation » revient à la liste.';
 
   static const enMagasin = 'La liste suit l\'ordre des allées, secteur par secteur ; chaque bandeau montre l\'avancement du secteur.\n'

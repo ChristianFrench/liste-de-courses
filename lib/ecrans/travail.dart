@@ -793,14 +793,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
           produits: () => etat.produits,
           detail: ou,
           aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher',
-          largeur: simple ? null : 190,
           // Par défaut, l'article trouvé s'ajoute ; « Parcourir » enfoncé : tout le catalogue, la recherche y amène.
           droite: simple
               ? null
               : SizedBox(
-                  width: 120,
+                  width: 112,
                   child: BoutonEtat(
                     texte: 'Parcourir',
+                    hauteur: 44,
                     actif: !etat.ajoutParRecherche,
                     onTap: () {
                       final rechercher = !etat.ajoutParRecherche;
@@ -1807,6 +1807,10 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   /// Aperçu d'une liste simple : sans rayons ni secteurs (ordre de saisie) ou rangée comme en magasin.
   bool? _aplat;
 
+  /// Aperçu : tout est déployé ; « Détail » enfoncé montre mesures, packagings, promotions et filets,
+  /// sinon (par défaut) la liste est condensée, les articles serrés sous leur secteur.
+  bool _detail = false;
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -1860,10 +1864,22 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
               icone: apercu ? Icons.checklist : Icons.shopping_cart_outlined,
               titre: titre,
               aide: apercu ? Aides.apercu : Aides.enMagasin,
-              droite: commentaire == null
-                  ? null
-                  : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
-              deplier: aplat ? const [] : [for (final x in etapes) _cle(x.id)],
+              droite: !apercu && commentaire == null ? null : Row(mainAxisSize: MainAxisSize.min, children: [
+                if (apercu)
+                  SizedBox(
+                    width: 100,
+                    child: BoutonEtat(
+                      texte: 'Détail',
+                      taille: 15,
+                      hauteur: EnTeteFenetre.hauteurBouton,
+                      actif: _detail,
+                      onTap: () => setState(() => _detail = !_detail),
+                    ),
+                  ),
+                if (commentaire != null)
+                  boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
+              ]),
+              deplier: aplat || apercu ? const [] : [for (final x in etapes) _cle(x.id)],
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
@@ -1879,6 +1895,23 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                     padding: const EdgeInsets.only(bottom: 16),
                     children: [
                       for (final x in visibles) ...[
+                          if (apercu && !_detail)
+                            // Condensé : bandeau mince du secteur, sans image
+                            Container(
+                              key: _titres.putIfAbsent(x.id, GlobalKey.new),
+                              color: Charte.accent,
+                              margin: const EdgeInsets.only(top: 2),
+                              padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
+                              child: Row(children: [
+                                Expanded(
+                                    child: Text(x.nom.toUpperCase(),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
+                                Text('${x.lignes.length}', style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+                              ]),
+                            )
+                          else
                           TitreGroupe(
                             key: _titres.putIfAbsent(x.id, GlobalKey.new),
                             nom: x.nom,
@@ -1888,11 +1921,12 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                             fort: true,
                             avancement: apercu ? null : (x.lignes.where((g) => g.coche).length, x.lignes.length),
                             nombre: apercu ? x.lignes.length : null,
-                            ouvert: Retractables.i.ouvert(_cle(x.id)),
+                            // Aperçu : toujours tout déployé, sans chevron
+                            ouvert: apercu ? null : Retractables.i.ouvert(_cle(x.id)),
                             focus: !apercu && x.id == e.id && l.nbCoches > 0,
-                            onTap: () => Retractables.i.basculer(_cle(x.id)),
+                            onTap: apercu ? null : () => Retractables.i.basculer(_cle(x.id)),
                           ),
-                          if (Retractables.i.ouvert(_cle(x.id)))
+                          if (apercu || Retractables.i.ouvert(_cle(x.id)))
                             for (final g in x.lignes)
                               if (!resteAFaire || !(g.coche || etat.manquant(l, g.produitId))) _ligne(etat, l, g, apercu),
                       ],
@@ -1961,6 +1995,17 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   Widget _ligne(Etat etat, Liste l, LigneListe g, bool apercu) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
+    if (apercu && !_detail) {
+      // Condensé : le nom et la quantité, lignes serrées, sans mesure, packaging, promotion ni filet.
+      return Padding(
+        key: ValueKey(p.id),
+        padding: const EdgeInsets.fromLTRB(16, 2, 14, 2),
+        child: Row(children: [
+          Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
+          if (g.quantite > 1) Text('×${g.quantite}', style: Charte.texte(15, gras: true)),
+        ]),
+      );
+    }
     final morceaux = [
       etat.complement(g, p, avecPackaging: false),
       if (g.consigne != null) '« ${g.consigne} »',

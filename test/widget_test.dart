@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Axis, Scrollable, TextField, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show Axis, Icons, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
@@ -341,8 +341,8 @@ void main() {
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
       await _toucher(tester, find.byTooltip('Synchronisation : foyer non partagé'));
-      expect(find.text('Foyer non partagé'), findsOneWidget, reason: 'l\'icône ouvre l\'écran du partage');
-      await _toucher(tester, find.byTooltip('Retour'));
+      expect(find.text('Foyer non partagé'), findsOneWidget, reason: 'l\'icône ouvre l\'état du partage');
+      await _toucher(tester, find.byTooltip('Fermer'));
       await _toucher(tester, find.byTooltip('Plus d\'actions'));
       await _toucher(tester, find.text('Aide'));
       expect(find.text('Aide · Préparer'), findsOneWidget);
@@ -545,6 +545,10 @@ void main() {
       await tester.pump(const Duration(seconds: 6));
       // Aperçu : la liste comme en courses, sans case à cocher
       await _toucher(tester, find.text('Aperçu'));
+      expect(find.byType(LigneCourse), findsNothing, reason: 'condensé par défaut');
+      expect(find.text('Kéfir'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _toucher(tester, find.text('Détail'));
       expect(find.byType(LigneCourse), findsWidgets);
       expect(find.descendant(of: find.byType(LigneCourse), matching: find.byType(CaseACocher)), findsNothing);
       await _toucher(tester, find.text('Continuer la préparation'));
@@ -932,10 +936,9 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('Mon foyer › Partage entre appareils : serveur HiveMQ prérempli', (tester) async {
+    testWidgets('Gérer › MQTT › Partage entre appareils : serveur HiveMQ prérempli', (tester) async {
       await _lancer(tester);
-      await _rubrique(tester, 'Mon foyer');
-      await _toucher(tester, find.text('Partager ou rejoindre un foyer'));
+      await _rubrique(tester, 'Partage entre appareils');
       expect(find.text('Partager ce foyer'), findsOneWidget);
       expect(find.text('Rejoindre un foyer'), findsOneWidget);
       expect(find.text('Foyer non partagé'), findsOneWidget);
@@ -949,6 +952,17 @@ void main() {
       expect(find.text('Créer le code du foyer'), findsOneWidget);
       await _toucher(tester, find.text('Annuler'));
       expect(find.text('Partager ce foyer'), findsOneWidget);
+    });
+
+    testWidgets('le nuage montre seulement l\'état : voyant, sa signification, appareils', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.byIcon(Icons.cloud_outlined).first);
+      expect(find.text('Synchronisation'), findsOneWidget);
+      expect(find.text('Foyer non partagé'), findsOneWidget);
+      expect(find.text('Signification du voyant'), findsOneWidget);
+      expect(find.text('Rouge : pas de connexion au serveur MQTT ou pas de réseau'), findsOneWidget);
+      expect(find.text('Partager ce foyer'), findsNothing);
+      expect(find.text('SERVEUR MQTT'), findsNothing);
     });
   });
 }

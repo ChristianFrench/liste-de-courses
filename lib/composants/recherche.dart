@@ -83,7 +83,7 @@ class _ChampRechercheState extends State<ChampRecherche> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
+      padding: const EdgeInsets.fromLTRB(8, 3, 8, 3),
       child: Row(
         children: [
           if (widget.largeur case final l?) SizedBox(width: l, child: _champ()) else Expanded(child: _champ()),
@@ -124,17 +124,22 @@ class _ChampRechercheState extends State<ChampRecherche> {
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             isDense: true,
-            contentPadding: const EdgeInsets.symmetric(vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(vertical: 4),
             hintText: widget.aide,
             hintMaxLines: 2,
-            hintStyle: Charte.texte(widget.largeur == null ? 14 : 17, couleur: Charte.texteSecondaire),
+            hintStyle: Charte.texte(widget.largeur == null && widget.droite == null ? 14 : 17, couleur: Charte.texteSecondaire),
             prefixIcon: Icon(Icons.search, color: Charte.cadre),
-            prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 40),
+            prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 34),
             suffixIcon: ListenableBuilder(
               listenable: controleur,
               builder: (context, _) => controleur.text.isEmpty
                   ? const SizedBox.shrink()
-                  : IconButton(tooltip: 'Effacer', icon: const Icon(Icons.close), onPressed: _fini),
+                  : IconButton(
+                      tooltip: 'Effacer',
+                      icon: const Icon(Icons.close),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 44, minHeight: 40),
+                      onPressed: _fini),
             ),
             filled: true,
             fillColor: Charte.blanc,

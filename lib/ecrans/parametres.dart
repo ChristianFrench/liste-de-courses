@@ -6,7 +6,6 @@ import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
 import 'e13_produits_reels.dart';
-import 'partage.dart';
 
 // Gérer › Mon foyer, Gérer › Paramètres (17), Types de promotion (18) et Types de packaging.
 
@@ -81,19 +80,6 @@ class EcranFoyer extends StatelessWidget {
               onChange: (v) => etat.options(envoiFoyer: v),
             ),
                 const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'foyer/partage',
-              titre: 'Partage entre appareils',
-              icone: Icons.sync,
-              enfants: [
-                LigneMenu(
-                  icone: Icons.devices_outlined,
-                  titre: Synchro.instance.actif ? 'Partagé · code ${Synchro.instance.code}' : 'Partager ou rejoindre un foyer',
-                  sousTitre: 'Téléphones et PC du foyer synchronisés (serveur MQTT)',
-                  onTap: () => Nav.aller<void>(context, const EcranPartage()),
-                ),
               ],
             ),
           ],

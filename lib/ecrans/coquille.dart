@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
+import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'accueil.dart';
@@ -12,6 +13,7 @@ import 'historique.dart';
 import 'listes.dart';
 import 'magasin.dart';
 import 'parametres.dart';
+import 'partage.dart';
 
 /// Barre d'onglets (64) : 3 entrées icône 22 + libellé ; onglet actif = pastille 56 × 30 pleine.
 class BarreOnglets extends StatelessWidget {
@@ -158,6 +160,14 @@ class MenuGerer extends StatelessWidget {
             entree(Nav.historique, Icons.history, 'Historique', 'Courses terminées et leur ticket PDF'),
             entree(Nav.archives, Icons.inventory_2_outlined, 'Archives', 'Courses des magasins supprimés'),
             entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
+          ]),
+          GroupeRetractable(cle: 'gerer/mqtt', titre: 'MQTT', icone: Icons.sync, enfants: [
+            LigneMenu(
+              icone: Icons.devices_outlined,
+              titre: Synchro.instance.actif ? 'Partage entre appareils · code ${Synchro.instance.code}' : 'Partage entre appareils',
+              sousTitre: 'Partager ou rejoindre un foyer, serveur MQTT, journal des échanges',
+              onTap: () => Nav.aller<void>(context, const EcranPartage()),
+            ),
           ]),
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Foyer et application', icone: Icons.home_outlined, enfants: [
             entree(Nav.foyer, Icons.group_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),

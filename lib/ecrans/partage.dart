@@ -7,7 +7,90 @@ import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Gérer › Mon foyer › Partage entre appareils : code de partage, état du réseau, serveur MQTT.
+// Gérer › MQTT : partage entre appareils (code, état du réseau, serveur MQTT, journal des échanges).
+// L'appui sur le nuage de la barre de titre ouvre seulement l'état : [montrerEtatSynchro].
+
+/// Titre de l'état du partage, selon le voyant.
+String titreEtatSynchro(Synchro s) {
+  final autres = s.autresEnLigne;
+  return switch (s.pastille) {
+    'blanc' => 'Foyer non partagé',
+    'rouge' => s.etatReseau == 'connexion' ? 'Connexion au serveur…' : 'Pas de connexion au serveur',
+    'orange' => 'Aucun autre appareil connecté',
+    _ => s.enEchange ? 'Synchronisation en cours…' : 'À jour avec $autres appareil${autres > 1 ? 's' : ''}',
+  };
+}
+
+/// Fenêtre ouverte par le nuage : l'état actuel, la signification du voyant, les appareils. Rien d'autre.
+Future<void> montrerEtatSynchro(BuildContext context) => modale(
+      context,
+      titre: 'Synchronisation',
+      icone: Icons.cloud_outlined,
+      oui: null,
+      non: null,
+      contenu: (context, _) => ListenableBuilder(
+        listenable: Synchro.instance,
+        builder: (context, _) {
+          final s = Synchro.instance;
+          final actuel = s.pastille == 'vert' && s.enEchange ? 'clignotant' : s.pastille;
+          Widget voyant(String cle, Color couleur, String texte) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 3),
+                child: Row(children: [
+                  PointSynchro(taille: 16, couleur: couleur),
+                  const SizedBox(width: 10),
+                  Expanded(
+                      child: Text(texte,
+                          style: Charte.texte(15, gras: cle == actuel, couleur: cle == actuel ? Charte.encre : Charte.texteSecondaire))),
+                ]),
+              );
+          final autres = s.appareils.values.toList()..sort((a, b) => a.nom.compareTo(b.nom));
+          return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Row(children: [
+              PointSynchro(taille: 20, couleur: BoutonSynchro.couleur(s.pastille), clignote: actuel == 'clignotant'),
+              const SizedBox(width: 10),
+              Expanded(child: Text(titreEtatSynchro(s), style: Charte.texte(19, gras: true))),
+            ]),
+            const SizedBox(height: 14),
+            Text('Signification du voyant', style: Charte.texte(15, gras: true)),
+            voyant('blanc', Charte.blanc, 'Blanc : foyer non partagé'),
+            voyant('rouge', BoutonSynchro.rouge, 'Rouge : pas de connexion au serveur MQTT ou pas de réseau'),
+            voyant('orange', BoutonSynchro.orange, 'Orange : connecté, aucun autre appareil du foyer en ligne'),
+            voyant('vert', BoutonSynchro.vert, 'Vert : synchronisé avec au moins un autre appareil'),
+            voyant('clignotant', BoutonSynchro.vert.withValues(alpha: 0.45), 'Vert clignotant : échange en cours'),
+            if (s.actif) ...[
+              const SizedBox(height: 14),
+              Text('Appareils', style: Charte.texte(15, gras: true)),
+              _Appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
+              for (final a in autres) _Appareil('${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})', a.enLigne),
+              if (autres.isEmpty) Text('Aucun autre appareil vu pour l\'instant', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            ],
+          ]);
+        },
+      ),
+    );
+
+class _Appareil extends StatelessWidget {
+  const _Appareil(this.texte, this.enLigne, {this.retirer});
+  final String texte;
+  final bool enLigne;
+  final VoidCallback? retirer;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
+        child: Row(children: [
+          Container(
+            width: 10,
+            height: 10,
+            decoration: BoxDecoration(color: enLigne ? BoutonSynchro.vert : Charte.placeholder, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text(texte, style: Charte.texte(15))),
+          if (retirer != null)
+            OutlinedButton(onPressed: retirer, child: Text('Retirer', style: Charte.texte(14, gras: true))),
+        ]),
+      );
+}
 
 class EcranPartage extends StatelessWidget {
   const EcranPartage({super.key});
@@ -18,7 +101,7 @@ class EcranPartage extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([s, Etat.instance]),
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Mon foyer', titre: 'Partage entre appareils'),
+        entete: const EnTeteFenetre(retour: true, icone: Icons.sync, sousTitre: 'Gérer', titre: 'MQTT · partage entre appareils'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -59,13 +142,7 @@ class EcranPartage extends StatelessWidget {
 
   /// État de la synchronisation et ce qu'il reste à faire, en tête de l'écran.
   Widget _etat(Synchro s) {
-    final autres = s.autresEnLigne;
-    final titre = switch (s.pastille) {
-      'blanc' => 'Foyer non partagé',
-      'rouge' => s.etatReseau == 'connexion' ? 'Connexion au serveur…' : 'Pas de connexion au serveur',
-      'orange' => 'Aucun autre appareil connecté',
-      _ => s.enEchange ? 'Synchronisation en cours…' : 'À jour avec $autres appareil${autres > 1 ? 's' : ''}',
-    };
+    final titre = titreEtatSynchro(s);
     final aFaire = switch (s.pastille) {
       'blanc' => 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
           'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).',
@@ -100,21 +177,6 @@ class EcranPartage extends StatelessWidget {
       ]),
     );
   }
-
-  Widget _appareil(String texte, bool enLigne, {VoidCallback? retirer}) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 2),
-        child: Row(children: [
-          Container(
-            width: 10,
-            height: 10,
-            decoration: BoxDecoration(color: enLigne ? BoutonSynchro.vert : Charte.placeholder, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: Text(texte, style: Charte.texte(15))),
-          if (retirer != null)
-            OutlinedButton(onPressed: retirer, child: Text('Retirer', style: Charte.texte(14, gras: true))),
-        ]),
-      );
 
   List<Widget> _inactif(BuildContext context, Synchro s) => [
         _etat(s),
@@ -170,9 +232,9 @@ class EcranPartage extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Text('Appareils', style: Charte.texte(15, gras: true)),
-      _appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
+      _Appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
       for (final a in autres)
-        _appareil(
+        _Appareil(
             '${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})'
             '${a.enLigne && (a.decalage ?? 0).abs() >= 5 ? ' · horloge décalée de ${a.decalage} s' : ''}',
             a.enLigne,
