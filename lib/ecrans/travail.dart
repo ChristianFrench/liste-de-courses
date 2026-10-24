@@ -404,6 +404,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
     if (l == null) return;
     // À l'ouverture, rayons et secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
     Retractables.i.fixer(_toutesLesCles(l), false);
+    // Mode « Rechercher » : on ne voit que les articles déjà choisis.
+    maListe = etat.ajoutParRecherche && l.lignes.isNotEmpty;
     final s = etat.secteur(l.repriseSecteurId ?? '');
     if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
   }
@@ -746,9 +748,31 @@ class _EcranConstructionState extends State<EcranConstruction> {
           produits: () => etat.produits,
           detail: ou,
           coche: (p) => etat.ligne(l, p.id) != null,
-          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
-          onChoix: (p) => simple ? _ajouterSimple(l, p) : _trouver(l, p),
-          onNouveau: simple ? (n) => _ajouterSimple(l, etat.creerProduit(n)) : null,
+          aide: simple || etat.ajoutParRecherche ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
+          onChoix: (p) => simple
+              ? _ajouterSimple(l, p)
+              : etat.ajoutParRecherche
+                  ? _ajouterTrouve(l, p)
+                  : _trouver(l, p),
+          onNouveau: simple
+              ? (n) => _ajouterSimple(l, etat.creerProduit(n))
+              : etat.ajoutParRecherche
+                  ? (n) => _ajouterTrouve(l, etat.creerProduit(n))
+                  : null,
+        );
+        // Deux façons de choisir : parcourir le catalogue, ou rechercher (l'article trouvé s'ajoute).
+        final mode = Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
+          child: Bascule(
+            options: const ['Parcourir', 'Rechercher'],
+            index: etat.ajoutParRecherche ? 1 : 0,
+            hauteur: 48,
+            douce: true,
+            onChange: (i) {
+              etat.options(ajoutParRecherche: i == 1);
+              setState(() => maListe = i == 1 && l.lignes.isNotEmpty);
+            },
+          ),
         );
         if (simple) {
           return PageBase(
@@ -826,11 +850,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
         return PageBase(
           entete: entete,
-          haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
+          haut: [recherche, mode, Container(height: 1, color: Charte.separateurZone)],
           corps: elements.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(16),
-                  child: Text('La liste est vide.', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                  child: Text(
+                      etat.ajoutParRecherche
+                          ? 'Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste, '
+                              'rangé dans son rayon et son secteur.'
+                          : 'La liste est vide.',
+                      style: Charte.texte(16, couleur: Charte.texteSecondaire)),
                 )
               : CustomScrollView(
                   controller: _defilement,
@@ -939,6 +968,30 @@ class _EcranConstructionState extends State<EcranConstruction> {
       _allerA(l, s);
     }
     _amener(p.id, essais: 3);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _surligne == p.id) setState(() => _surligne = null);
+    });
+  }
+
+  /// Mode « Rechercher » : l'article choisi entre dans la liste (s'il n'y est pas) ; on ne voit plus que la liste,
+  /// avec seuls son rayon et son secteur ouverts, et l'on est sur l'article, prêt pour la marque, la mesure…
+  void _ajouterTrouve(Liste l, Produit p) {
+    final deja = etat.ligne(l, p.id) != null;
+    if (!deja) etat.ajouterLigne(l, p.id);
+    setState(() {
+      maListe = true;
+      _focus = p.id;
+      _surligne = p.id;
+    });
+    final s = etat.secteurDe(l.magasinId, p.id);
+    if (s == null) {
+      _ouvrirSeul(l, 'nonPlace');
+      _montrer('nonPlace');
+    } else {
+      _allerA(l, s);
+    }
+    _amener(p.id, essais: 3);
+    if (deja) Nav.message(context, '« ${p.nom} » est déjà dans la liste');
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _surligne == p.id) setState(() => _surligne = null);
     });

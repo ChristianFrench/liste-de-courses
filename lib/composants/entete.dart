@@ -363,7 +363,12 @@ class Aides {
       'Liste calculée : à partir de vos tickets de caisse, prévue plus tard.';
 
   static const preparation = 'Le champ de recherche, sous le titre : tapez au moins trois lettres, la liste des articles '
-      'dont un mot commence ainsi s\'affiche. Touchez-en un : son rayon et son secteur s\'ouvrent et l\'article est signalé.\n'
+      'dont un mot commence ainsi s\'affiche.\n'
+      'Deux façons de choisir, sous le champ :\n'
+      '« Rechercher » : touchez l\'article proposé, il s\'ajoute aussitôt à la liste. L\'écran ne montre que votre liste, '
+      'avec seuls son rayon et son secteur ouverts, et vous êtes sur l\'article pour sa marque, sa mesure, son packaging ou sa promo.\n'
+      '« Parcourir » : tout le catalogue est là. La recherche ouvre le rayon et le secteur de l\'article et le signale ; '
+      'touchez-le pour le cocher.\n'
       'Sinon, les rayons sont repliés : touchez-en un pour voir ses secteurs, puis un secteur pour voir ses articles. '
       'Un seul rayon et un seul secteur sont ouverts à la fois ; leurs bandeaux restent en haut pendant que les articles défilent.\n'
       'Toucher un article le coche ; − et + règlent la quantité. L\'article touché affiche quatre pastilles : marque, mesure, '

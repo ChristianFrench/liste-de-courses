@@ -33,6 +33,7 @@ void _donnees() {
   final e = Etat.instance;
   e.enregistrementActif = false;
   e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
+  e.ajoutParRecherche = false; // les essais de la préparation parcourent le catalogue, sauf mention contraire
   Nav.i.reinitialiser();
 }
 
@@ -655,6 +656,27 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Ajouter un article (3 lettres ou plus)'), findsOneWidget);
       expect(find.text('CHARCUTERIE'), findsNothing);
+    });
+
+    testWidgets('préparation, mode Rechercher : l\'article trouvé s\'ajoute, seul son secteur est ouvert', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
+      await _toucher(tester, find.text('Rechercher'));
+      expect(Etat.instance.ajoutParRecherche, isTrue);
+      final l = Etat.instance.liste('l1')!;
+      final huile = Etat.instance.produits.firstWhere((p) => p.nom == 'Huile d\'olive');
+      expect(Etat.instance.ligne(l, huile.id), isNull);
+      expect(find.text('Lait demi-écrémé'), findsNothing, reason: 'seule la liste est montrée, rayons repliés');
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'huile oli');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      expect(Etat.instance.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
+      expect(find.text('Huile d\'olive'), findsOneWidget);
+      expect(find.text('+ Marque'), findsOneWidget, reason: 'on est sur l\'article, ses pastilles sont visibles');
+      expect(find.text('+ Produit absent de ce secteur'), findsNothing, reason: 'la liste seule, pas le catalogue');
+      await tester.pump(const Duration(seconds: 4));
+      await _ciblesTactiles(tester);
     });
 
     testWidgets('préparation : ajouter un rayon et un secteur, avec leur image', (tester) async {

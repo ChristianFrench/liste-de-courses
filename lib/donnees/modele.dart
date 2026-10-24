@@ -387,6 +387,10 @@ class Etat extends ChangeNotifier {
 
   /// Envoi de la liste par mail : adresses de tous les membres déjà remplies.
   bool envoiFoyer = false;
+
+  /// Préparation, mode « Rechercher » : l'article trouvé est aussitôt ajouté à la liste, rangé dans son rayon
+  /// et son secteur, seuls ouverts ; sinon (« Parcourir »), la recherche ne fait qu'amener à l'article.
+  bool ajoutParRecherche = true;
   List<TypePromotion> typesPromotion = [];
   List<Magasin> magasins = []; // magasins actifs
 
@@ -709,6 +713,7 @@ class Etat extends ChangeNotifier {
     final options = (j['parametres'] as Map?)?['options'] as Map?;
     parSecteurs = options?['parSecteurs'] as bool? ?? true;
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
+    ajoutParRecherche = options?['ajoutParRecherche'] as bool? ?? true;
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
@@ -809,6 +814,7 @@ class Etat extends ChangeNotifier {
           'options': {
             'parSecteurs': parSecteurs,
             'envoiFoyer': envoiFoyer,
+            'ajoutParRecherche': ajoutParRecherche,
             if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
@@ -1901,9 +1907,10 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  void options({bool? parSecteurs, bool? envoiFoyer}) {
+  void options({bool? parSecteurs, bool? envoiFoyer, bool? ajoutParRecherche}) {
     if (parSecteurs != null) this.parSecteurs = parSecteurs;
     if (envoiFoyer != null) this.envoiFoyer = envoiFoyer;
+    if (ajoutParRecherche != null) this.ajoutParRecherche = ajoutParRecherche;
     modifie();
   }
 
