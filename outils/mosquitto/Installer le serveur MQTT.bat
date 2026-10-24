@@ -37,19 +37,32 @@ echo  Serveur MQTT pour Liste de courses
 echo  ==================================
 echo.
 if defined AUTO goto choixfaits
+rem Chaque reponse est verifiee ; une reponse refusee est redemandee (un signe special ne casse plus le script).
+:q_util
+set "UTIL="
 set /p "UTIL=Identifiant des appareils [courses] : "
-if "%UTIL%"=="" set "UTIL=courses"
-echo Mot de passe : lettres et chiffres seulement. Laissez vide pour en tirer un au hasard.
+if not defined UTIL set "UTIL=courses"
+call :valide UTIL "[A-Za-z0-9_-]*" || (echo   Identifiant refuse : lettres, chiffres, - et _ seulement. & goto q_util)
+echo Mot de passe : lettres, chiffres, - et _ seulement. Laissez vide pour en tirer un au hasard.
+:q_mdp
+set "MDP="
 set /p "MDP=Mot de passe : "
+if not defined MDP set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
+call :valide MDP "[A-Za-z0-9_-]*" || (echo   Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto q_mdp)
+:q_port
+set "PORT="
 set /p "PORT=Port [1883] : "
-if "%PORT%"=="" set "PORT=1883"
+if not defined PORT set "PORT=1883"
+call :valide PORT "[0-9][0-9]*" || (echo   Port refuse : un nombre, par exemple 1883. & goto q_port)
+goto choixverifies
 
 :choixfaits
 rem Mot de passe tire au hasard (chiffres) quand il est laisse vide
-if "%MDP%"=="" set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
-echo %UTIL%| findstr /r /x "[A-Za-z0-9_-]*" >nul || (echo Identifiant refuse : lettres, chiffres, - et _ seulement. & goto echec)
-echo %MDP%| findstr /r /x "[A-Za-z0-9_-]*" >nul || (echo Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto echec)
-echo %PORT%| findstr /r /x "[0-9][0-9]*" >nul || (echo Port refuse : un nombre, par exemple 1883. & goto echec)
+if not defined MDP set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
+call :valide UTIL "[A-Za-z0-9_-]*" || (echo Identifiant refuse : lettres, chiffres, - et _ seulement. & goto echec)
+call :valide MDP "[A-Za-z0-9_-]*" || (echo Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto echec)
+call :valide PORT "[0-9][0-9]*" || (echo Port refuse : un nombre, par exemple 1883. & goto echec)
+:choixverifies
 
 rem --- 1. Installation de Mosquitto
 echo.
@@ -195,3 +208,13 @@ echo.
 echo Mise en place interrompue.
 if not defined AUTO pause
 exit /b 1
+
+rem Le contenu de la variable %1 correspond-il entierement a l'expression %2 ? Il est lu sans etre
+rem interprete (expansion retardee, fichier plutot que | ) : & | < > ne peuvent rien casser.
+:valide
+setlocal EnableDelayedExpansion
+> "%TEMP%\ldc-valeur.txt" echo(!%~1!
+findstr /r /x /c:%2 "%TEMP%\ldc-valeur.txt" >nul
+set "R=%errorlevel%"
+del "%TEMP%\ldc-valeur.txt" >nul 2>&1
+endlocal & exit /b %R%
