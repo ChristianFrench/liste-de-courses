@@ -1132,7 +1132,8 @@ class BoutonEtat extends StatelessWidget {
         toggled: actif,
         child: Material(
           color: actif ? Charte.fondSelection : Charte.fond,
-          shape: StadiumBorder(side: BorderSide(color: actif ? Charte.accent : Charte.separateurZone, width: 1.5)),
+          // Sans cadre : l'interrupteur et le fond disent l'état.
+          shape: const StadiumBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
             onTap: onTap,

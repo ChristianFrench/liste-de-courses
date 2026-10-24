@@ -415,6 +415,9 @@ class Etat extends ChangeNotifier {
   /// Elles le restent en préparation, même reprises après « Liste prête ».
   Set<String> simples = {};
 
+  /// Date prévue des courses, par liste (aaaa-mm-jj), choisie à la création.
+  Map<String, String> datesPrevues = {};
+
   /// Libellés donnés aux tickets de caisse (par identifiant de ticket).
   Map<String, String> libellesTickets = {};
 
@@ -720,6 +723,7 @@ class Etat extends ChangeNotifier {
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
+    datesPrevues = {for (final e in (options?['datesPrevues'] as Map? ?? {}).entries) e.key as String: e.value as String};
     libellesTickets = {for (final e in (options?['libellesTickets'] as Map? ?? {}).entries) e.key as String: e.value as String};
     ticketsImage = _ids(options?['ticketsImage']).toSet();
     nonRangees = _ids(options?['nonRangees']).toSet();
@@ -822,6 +826,7 @@ class Etat extends ChangeNotifier {
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
+            if (datesPrevues.isNotEmpty) 'datesPrevues': datesPrevues,
             if (libellesTickets.isNotEmpty) 'libellesTickets': libellesTickets,
             if (ticketsImage.isNotEmpty) 'ticketsImage': ticketsImage.toList(),
             if (nonRangees.isNotEmpty) 'nonRangees': nonRangees.toList(),
@@ -1817,6 +1822,20 @@ class Etat extends ChangeNotifier {
   }
 
   bool estSimple(Liste l) => simples.contains(l.id);
+
+  DateTime? datePrevue(Liste l) => DateTime.tryParse(datesPrevues[l.id] ?? '');
+
+  void fixerDatePrevue(Liste l, DateTime d) {
+    datesPrevues[l.id] = _iso(DateTime(d.year, d.month, d.day))!.substring(0, 10);
+    modifie();
+  }
+
+  /// Nom proposé à la création : le magasin et le jour prévu des courses (« Intermarché · samedi 25/10 »).
+  String nomPrevu(String magasinId, DateTime prevue) =>
+      '${magasin(magasinId)?.nom ?? 'Liste'} · ${joursSemaine[prevue.weekday - 1]} ${jjmm(prevue)}';
+
+  /// Deuxième ligne de l'en-tête d'une liste : date de création.
+  String creeeLe(Liste l) => 'Créée le ${jjmm(l.dateCreation)} à ${heure(l.dateCreation)}';
 
   void marquerSimple(Liste l, bool oui) {
     if (oui ? simples.add(l.id) : simples.remove(l.id)) modifie();

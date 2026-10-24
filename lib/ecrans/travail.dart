@@ -28,6 +28,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   late String magasinId;
   final nom = TextEditingController();
   final debut = DateTime.now();
+
+  /// Jour prévu des courses : aujourd'hui par défaut.
+  late DateTime prevue = DateTime(debut.year, debut.month, debut.day);
   bool nomModifie = false;
   bool personnalisee = false;
   bool types = false;
@@ -46,7 +49,30 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   }
 
   void _initialiser() {
-    if (!nomModifie) nom.text = etat.nomLibre(etat.nomParDefaut(magasinId, debut));
+    if (!nomModifie) nom.text = etat.nomLibre(etat.nomPrevu(magasinId, prevue));
+  }
+
+  /// 0 : aujourd'hui, 1 : demain, 2 : un autre jour.
+  int get _choixJour {
+    final j = DateTime(debut.year, debut.month, debut.day);
+    return prevue == j ? 0 : prevue == j.add(const Duration(days: 1)) ? 1 : 2;
+  }
+
+  Future<void> _choisirJour(int i) async {
+    final j = DateTime(debut.year, debut.month, debut.day);
+    DateTime? d = i == 0 ? j : i == 1 ? j.add(const Duration(days: 1)) : null;
+    d ??= await showDatePicker(
+      context: context,
+      initialDate: prevue,
+      firstDate: j,
+      lastDate: j.add(const Duration(days: 365)),
+      helpText: 'Jour prévu des courses',
+    );
+    if (d == null || !mounted) return;
+    setState(() {
+      prevue = d!;
+      _initialiser();
+    });
   }
 
   /// Supprimée d'un glissement ; « Annuler » dans le message la remet.
@@ -60,12 +86,13 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   }
 
   void _creer(List<LigneListe> lignes, {bool simple = false}) {
-    final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomParDefaut(magasinId, debut)) : nom.text.trim();
+    final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomPrevu(magasinId, prevue)) : nom.text.trim();
     if (etat.nomPris(texte)) {
       Nav.message(context, 'Une liste s\'appelle déjà « $texte » : choisissez un autre nom.');
       return;
     }
     final l = etat.creerListe(magasinId, lignes, nom: texte);
+    etat.fixerDatePrevue(l, prevue);
     if (simple) etat.marquerSimple(l, true);
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
@@ -238,6 +265,22 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                     magasinId = v;
                     _initialiser();
                   }),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
+          child: Row(
+            children: [
+              SizedBox(width: 70, child: Text('Courses', style: Charte.texte(15))),
+              Expanded(
+                child: Bascule(
+                  options: ['Aujourd\'hui', 'Demain', _choixJour == 2 ? jjmm(prevue) : 'Autre jour'],
+                  index: _choixJour,
+                  douce: true,
+                  onChange: _choisirJour,
                 ),
               ),
             ],
@@ -726,7 +769,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
           retour: true,
           icone: Icons.checklist,
           titre: etat.nomListe(l),
-          sousTitre: simple ? 'Liste simple · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}' : 'Préparation · enregistrée',
+          sousTitre: simple
+              ? 'Liste simple · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · ${etat.creeeLe(l)}'
+              : etat.creeeLe(l),
           aide: simple ? Aides.listeSimple : Aides.preparation,
           deplier: simple ? const [] : _toutesLesCles(l),
           actions: [
@@ -747,7 +792,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
           key: ValueKey('recherche-${l.id}'),
           produits: () => etat.produits,
           detail: ou,
-          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
+          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher',
+          largeur: simple ? null : 190,
           // Par défaut, l'article trouvé s'ajoute ; « Parcourir » enfoncé : tout le catalogue, la recherche y amène.
           droite: simple
               ? null

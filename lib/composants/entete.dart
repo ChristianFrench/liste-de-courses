@@ -49,7 +49,8 @@ class EnTeteFenetre extends StatelessWidget {
   /// Groupes visés par l'icône « tout déplier / tout replier » ; par défaut, les groupes rétractables de la fenêtre.
   final List<String>? deplier;
 
-  static const hauteur = 64.0;
+  /// Hauteur d'un bouton de l'en-tête (deuxième ligne).
+  static const hauteurBouton = 44.0;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +65,8 @@ class EnTeteFenetre extends StatelessWidget {
       },
       // Fond : la photo de l'accueil, assombrie pour que le texte blanc reste lisible
       // (la couleur pleine est réservée aux bandeaux des groupes de listes).
+      // Deux lignes : le titre en entier (sur deux lignes au besoin), puis le sous-titre et les boutons.
       child: Container(
-        height: hauteur,
         decoration: const BoxDecoration(
           color: Color(0xFF3A4A3A),
           image: DecorationImage(
@@ -75,37 +76,48 @@ class EnTeteFenetre extends StatelessWidget {
             colorFilter: ColorFilter.mode(Color(0x38000000), BlendMode.darken),
           ),
         ),
-        padding: EdgeInsets.only(left: retour ? 0 : 12, right: 4),
-        child: Row(
+        padding: EdgeInsets.only(left: retour ? 0 : 12, right: 4, top: 6),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
-            Container(
-              width: 38,
-              height: 38,
-              decoration: const BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-              child: Icon(ico, size: 23, color: Charte.accent),
+            Row(
+              children: [
+                if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
+                  child: Icon(ico, size: 23, color: Charte.accent),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(titre,
+                      maxLines: 2, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(20, gras: true, couleur: Charte.blanc))),
+                ),
+                const SizedBox(width: 8),
+              ],
             ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(21, gras: true, couleur: Charte.blanc))),
-                  if (sousTitre != null)
-                    Text(sousTitre!,
-                        maxLines: 1, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(12, couleur: const Color(0xEEFFFFFF)))),
-                ],
-              ),
+            Row(
+              children: [
+                SizedBox(width: retour ? 12 : 0),
+                Expanded(
+                  child: sousTitre == null
+                      ? const SizedBox.shrink()
+                      : Text(sousTitre!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: surPhoto(Charte.texte(13, couleur: const Color(0xEEFFFFFF)))),
+                ),
+                if (droite != null) ...[droite!, const SizedBox(width: 4)],
+                _BoutonDeplier(deplier),
+                const BoutonSynchro(),
+                // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
+                bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
+                      ...actions,
+                      ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
+                    ])),
+              ],
             ),
-            if (droite != null) ...[droite!, const SizedBox(width: 4)],
-            _BoutonDeplier(deplier),
-            const BoutonSynchro(),
-            // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
-            bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
-                  ...actions,
-                  ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
-                ])),
           ],
         ),
       ),
@@ -148,7 +160,7 @@ Widget boutonEnTete(IconData i, String libelle, VoidCallback onTap) => Tooltip(
       child: InkResponse(
         onTap: onTap,
         radius: 22,
-        child: SizedBox(width: 44, height: EnTeteFenetre.hauteur, child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
+        child: SizedBox(width: 44, height: EnTeteFenetre.hauteurBouton, child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
       ),
     );
 
@@ -211,12 +223,12 @@ class BoutonSynchro extends StatelessWidget {
             radius: 22,
             child: SizedBox(
               width: 44,
-              height: EnTeteFenetre.hauteur,
+              height: EnTeteFenetre.hauteurBouton,
               child: Stack(alignment: Alignment.center, children: [
                 const Icon(Icons.cloud_outlined, size: 26, color: Charte.blanc, shadows: ombre),
                 Positioned(
                   right: 2,
-                  top: EnTeteFenetre.hauteur / 2 - 1,
+                  top: EnTeteFenetre.hauteurBouton / 2 - 1,
                   child: PointSynchro(taille: 16, couleur: couleur(s.pastille), clignote: s.pastille == 'vert' && s.enEchange),
                 ),
               ]),

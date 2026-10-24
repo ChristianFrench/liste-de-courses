@@ -38,6 +38,7 @@ class ChampRecherche extends StatefulWidget {
     this.onNouveau,
     this.detail,
     this.droite,
+    this.largeur,
     this.aide = 'Rechercher un article',
   });
   final Iterable<Produit> Function() produits;
@@ -49,6 +50,9 @@ class ChampRecherche extends StatefulWidget {
 
   /// Bouton à droite du champ (ex. : « Parcourir »).
   final Widget? droite;
+
+  /// Largeur du champ ; par défaut, toute la largeur (moins [droite]).
+  final double? largeur;
   final String aide;
 
   @override
@@ -82,8 +86,8 @@ class _ChampRechercheState extends State<ChampRecherche> {
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
       child: Row(
         children: [
-          Expanded(child: _champ()),
-          if (widget.droite != null) ...[const SizedBox(width: 8), widget.droite!],
+          if (widget.largeur case final l?) SizedBox(width: l, child: _champ()) else Expanded(child: _champ()),
+          if (widget.droite != null) ...[const SizedBox(width: 6), widget.droite!],
         ],
       ),
     );
@@ -116,14 +120,16 @@ class _ChampRechercheState extends State<ChampRecherche> {
           key: const ValueKey('champ-recherche'),
           controller: controleur,
           focusNode: focus,
-          style: Charte.texte(16),
+          style: Charte.texte(18),
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
             isDense: true,
+            contentPadding: const EdgeInsets.symmetric(vertical: 8),
             hintText: widget.aide,
             hintMaxLines: 2,
-            hintStyle: Charte.texte(13, couleur: Charte.texteSecondaire),
+            hintStyle: Charte.texte(widget.largeur == null ? 14 : 17, couleur: Charte.texteSecondaire),
             prefixIcon: Icon(Icons.search, color: Charte.cadre),
+            prefixIconConstraints: const BoxConstraints(minWidth: 38, minHeight: 40),
             suffixIcon: ListenableBuilder(
               listenable: controleur,
               builder: (context, _) => controleur.text.isEmpty
@@ -142,62 +148,68 @@ class _ChampRechercheState extends State<ChampRecherche> {
             ),
           ),
         ),
-        optionsViewBuilder: (context, choisir, options) => Align(
+        // La liste des trouvés peut être plus large qu'un champ étroit : toute la largeur de l'écran.
+        optionsViewBuilder: (context, choisir, options) => OverflowBox(
           alignment: Alignment.topLeft,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Charte.blanc,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: Charte.separateurZone),
-              boxShadow: const [BoxShadow(color: Color(0x2E000000), blurRadius: 10, offset: Offset(0, 3))],
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: Material(
-              type: MaterialType.transparency,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(maxHeight: 320, maxWidth: contraintes.maxWidth),
-                child: ListView(
-                  padding: EdgeInsets.zero,
-                  shrinkWrap: true,
-                  children: [
-                    for (final (i, o) in options.indexed)
-                      InkWell(
-                        key: ValueKey('option-recherche-$i'),
-                        onTap: () => choisir(o),
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 48),
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(
-                            border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
-                          ),
-                          child: o is Produit
-                              ? Row(
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(o.nom, style: Charte.texte(16)),
-                                          if (widget.detail?.call(o) case final d? when d.isNotEmpty)
-                                            Text(d, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                                        ],
+          minWidth: 0,
+          maxWidth: MediaQuery.sizeOf(context).width - 20,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Charte.blanc,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Charte.separateurZone),
+                boxShadow: const [BoxShadow(color: Color(0x2E000000), blurRadius: 10, offset: Offset(0, 3))],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Material(
+                type: MaterialType.transparency,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: 320, maxWidth: MediaQuery.sizeOf(context).width - 20),
+                  child: ListView(
+                    padding: EdgeInsets.zero,
+                    shrinkWrap: true,
+                    children: [
+                      for (final (i, o) in options.indexed)
+                        InkWell(
+                          key: ValueKey('option-recherche-$i'),
+                          onTap: () => choisir(o),
+                          child: Container(
+                            constraints: const BoxConstraints(minHeight: 48),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(
+                              border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
+                            ),
+                            child: o is Produit
+                                ? Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(o.nom, style: Charte.texte(16)),
+                                            if (widget.detail?.call(o) case final d? when d.isNotEmpty)
+                                              Text(d, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                )
-                              : Row(
-                                  children: [
-                                    Icon(Icons.add_circle_outline, color: Charte.cadre),
-                                    const SizedBox(width: 8),
-                                    Expanded(
-                                      child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      Icon(Icons.add_circle_outline, color: Charte.cadre),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
+                                      ),
+                                    ],
+                                  ),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
