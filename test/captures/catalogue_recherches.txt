@@ -1,0 +1,72 @@
+== Pâtes : Catégorie « pâtes alimentaires » : 1705 produits
+   3240931548111 | Gnocchi à poêler | Lustucru | 325 g
+   3240931548135 | Lustucru gnocchi a poêler format xxl 720g | Lustucru | 720 g
+   3240931548128 | Lustucru gnocchi a poêler 520g | Lustucru | 520 g
+   8076809529433 | Pätes penne rigate blé complet integral 500g | Barilla | 500g
+   8076800376999 | BARILLA LASAGNE ALL'UOVO 500g | Barilla | 500 g
+   3175681170841 | Ravioli au tofu, tomates, basilic | Céréales bio | 267 g
+   8001665726580 | Ricotta & Épinards | Giovanni Rana | 250 g
+   3240931547213 | Gnocchi aux pommes de terre | Lustucru | 390 g
+== pâte à tartiner : Catégorie « Pâtes à tartiner » : 458 produits
+   3760020507350 | Pur beurre de cacahuète | NATURENVIE | 350 g
+   8052575090254 | Rigoni di Asiago - Nocciolata bio | Rigoni di Asiago | 650 g
+   3017620425035 | Nutella | Nutella | 1 kg
+   8052575090230 | Nocciolata | Rigoni Di Asiago | 250 g
+   3608580065340 | Pâte à tartiner noisettes et cacao | Bonne Maman | 360 gram
+   3017620429484 | Nutella | Nutella | 825 g
+   3608580124047 | Be Nuts ! - Pâte à tartiner Cacahuète | Andros | 325 g
+   3608580124108 | Be Nuts! Pâte à tartiner Cacahuète | Andros | 325 g
+== Lait demi-écrémé : Catégorie « Laits demi-écrémés » : 262 produits
+   3248340054063 | Lait demi-écrémé UHT | C\'est qui le patron | 1 l
+   3270190025337 | Lait demi-écrémé Stérilisé UHT | Carrefour BIO | 1 l
+   3176571983008 | Viva lait 1/2 écrémé | candia | 1 L
+   3428273980046 | matin leger | Lactel | 1 L
+   3564700005552 | Lait demi-écrémé | Délisse | 1L
+   3428272950057 | Lait Bio Demi-Écrémé sans lactose | Lactel | 1 Litre
+   3564707000246 | lait demi-écrémé | Bio Village | 1 L
+   3250390204930 | Lait uht 1/2 ecreme bio bt 1l | Pâturages | 1000 ml
+== Café moulu : Catégorie « Cafés moulus » : 119 produits
+   3187570015447 | Café moulu pur arabica des petits producteurs | Malongo | 250g e
+   3261342002108 | Pur Arabica Moulu biologique | Cafés Méo | 500 g
+   8000070200289 | Café torréfié moulu | Carte Noire | 250 g e
+   3187570072440 | PUR ARABICA DES PETITS PRODUCTEURS l'original | Malongo | 500 g
+   3187570015317 | Deca Aqua | Malongo | 250 g
+   3261342003723 | Café | MÉO | 250g
+   8711000892091 | Familial | Grand’mère | 250 grammes
+   8711000523360 | Notes de Bahia Brésil | Jacques Vabre | 250 g
+== Yaourt nature : Catégorie « Yaourts natures » : 432 produits
+   3033490004521 | Danone le nature 125 g x 4 | Danone | 0.5 kg
+   3023291122005 | Yaos Yaourt à la Grecque Nature | Nestlé | 4 x 150g
+   3560070845408 | Yaourt nature au lait entier | Carrefour | 125 g
+   3023290634578 | Yaos le yaourt à la Grecque | Nestlé | 125 g
+   20665241 | Yaourt à la grecque | Envia | 4x150 g
+   3278692111145 | Yaourt nature | Malo | 4x125g
+   3273220530351 | Yaourt nature 4 x 125 g | Vrai | 500 g
+   3033490004514 | Yaourt le nature | Danone | 1 kg (8x125 g)
+== Beurre doux : Catégorie « Beurres doux » : 159 produits
+   3451790988677 | Le beurre tendre | Elle&Vire | 250 g
+   3155251205500 | Beurre doux gastronomique | Président | 250 g
+   3155251205524 | Beurre tendre doux | Président | 250g
+   3451790011245 | Le Beurre Doux Leger 41%MG Barquette | Elle et Vire | 250 g
+   3412290015980 | beurre doux | paysan breton | 250 g
+   3451790563256 | Beurre à teneur réduite en MG (60%) | Montfleuri | 250g
+   3700342358933 | beurre bio doux | C\'est qui le patron ?! | 250 g
+   3228020215090 | Beurre gastronomique doux | Président | 250g
+== Jambon : Catégorie « Jambons » : 700 produits
+   3154230809869 | Jambon à l'étouffée sans nitrite | HERTA | 140 g
+   3154230810131 | LE BON PARIS | HERTA | 140 g
+   3302740047404 | Le Supérieur -25% de Sel - Conservation sans Nitrite | Fleury Michon | 140 g
+   3302740047367 | Le Supérieur - à l'Etouffée - Conservation sans Nitrite | Fleury Michon | 140 g
+   3302740050268 | Jambon Simplement Bio - Conservation sans nitrite | Fleury Michon | 120 g
+   3154230809890 | jambon | HERTA | 210 g
+   3095758049019 | Le Torchon - Cuit à l'Etouffée  - 25% de sel* | Fleury Michon | 120 g
+   3302740025136 | ZERO NITRITE - LE SUPERIEUR | Fleury Michon | 120 g
+== Panzani : Nom ou marque contenant « Panzani » : 173 produits
+   3038354199603 | Panzani sauce pesto basilic 200g | Panzani | 200 g
+   3038359004544 | Sauce Tomate concentrée cuisinée aux petits légumes | Panzani | 180 g
+   3038352875035 | Tomacouli Nature | Panzani | 3 x 200 g
+   3038359011450 | Panzani sce provencale 425g | Panzani | 425 g
+   3038352880305 | Le Ravioli pur boeuf | PANZANI | 800 g
+   3038359011481 | Sauce basilic aux tomates fraîches de saison | Panzani | 210 g
+   3038352880206 | Ravioli pur bœuf  sans colorant ni conservateur | PANZANI | 400 g
+   3038352876506 | Panzani sce tomapizza tomates & origan 390g | Panzani | 390 g
