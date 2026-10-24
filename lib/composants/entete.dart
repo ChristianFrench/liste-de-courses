@@ -352,18 +352,17 @@ class Aides {
       'puis la liste s\'affiche dans l\'ordre des allées.\n'
       '« Courses interrompues » : des courses mises en pause ; « Reprendre » les continue.\n'
       '« Terminées sans ticket » : joignez le ticket de caisse (fichier PDF), ou classez la course sans ticket ; '
-      'elle rejoint alors l\'historique (Gérer).\n'
+      'elle rejoint alors l\'historique.\n'
+      'En bas : Historique (courses terminées et tickets), Archives (magasins supprimés), Corbeille (à remettre ou effacer).\n'
       'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Liste de courses ; '
-      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Gérer › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
+      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Courses › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
-      'Magasins et catalogue : vos magasins, leurs rayons, secteurs et produits ; vous pouvez ajouter, renommer, déplacer, '
-      'supprimer, et choisir l\'image d\'un rayon ou d\'un secteur.\n'
-      'Parcours : l\'ordre des secteurs appris pendant vos courses, pour chaque membre et chaque magasin.\n'
-      'Historique : les courses terminées, par date ou par magasin, avec leur ticket. Archives : les magasins supprimés qui ont un historique. '
-      'Corbeille : ce qui a été supprimé, à remettre ou à effacer pour de bon.\n'
-      'Mon foyer : son nom et ses membres (avec leur adresse mail pour l\'envoi des listes).\n'
-      'Paramètres : couleurs de l\'application, réglages des listes, types de promotion et de packaging, sauvegarde des données.\n$_gestes';
+      'Mon foyer : le foyer (son nom, repartir d\'un foyer neuf) et ses membres (avec leur adresse mail pour l\'envoi des listes).\n'
+      'Magasins : magasins et catalogue (rayons, secteurs, produits, images), parcours appris pendant vos courses, '
+      'réglages des listes (types de promotion et de packaging, préliste), produits réels (essai).\n'
+      'Paramètres : apparence (couleurs), données (listes exemples, suppression des archives), MQTT (configuration du partage entre appareils).\n'
+      'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
       'deux listes ne peuvent pas porter le même nom).\n'

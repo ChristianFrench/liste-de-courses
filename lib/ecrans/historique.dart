@@ -8,7 +8,7 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Gérer › Historique (11) : un seul affichage, par date ou par magasin ; chaque course dit si son
+// Courses › Historique (11) : un seul affichage, par date ou par magasin ; chaque course dit si son
 // ticket PDF est joint. Refaire une liste depuis une course se fait au début de la préparation.
 
 class SousEcranHistorique extends StatefulWidget {
@@ -397,7 +397,7 @@ Future<void> recevoirTicketPdf(BuildContext context, String chemin) async {
       magasinId = m;
     }
     t = etat.ajouterTicketLibre(magasinId);
-    fin = 'Ticket gardé : rattachez-le dans Gérer › Historique';
+    fin = 'Ticket gardé : rattachez-le dans Courses › Historique';
   } else {
     final c = etat.historique.firstWhere((x) => x.id == choix);
     t = etat.ajouterTicket(c);

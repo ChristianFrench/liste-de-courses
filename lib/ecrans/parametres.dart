@@ -5,87 +5,91 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
-import 'e13_produits_reels.dart';
 
-// Gérer › Mon foyer, Gérer › Paramètres (17), Types de promotion (18) et Types de packaging.
+// Écrans de Gérer : Mon foyer (Foyer, Membres), Magasins › Listes, Paramètres (Apparence, Données),
+// Types de promotion (18) et Types de packaging.
 
-/// Gérer › Mon foyer : nom du foyer, membres et leurs adresses mail, partage entre appareils.
+/// Page simple de Gérer : en-tête avec retour, contenu en colonne.
+Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu) => ListenableBuilder(
+      listenable: Etat.instance,
+      builder: (context, _) => PageBase(
+        entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre),
+        corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
+      ),
+    );
+
+/// Gérer › Mon foyer › Foyer : son nom, et repartir d'un foyer neuf.
 class EcranFoyer extends StatelessWidget {
   const EcranFoyer({super.key});
 
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
-    return ListenableBuilder(
-      listenable: etat,
-      builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Mon foyer'),
-        corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
-          children: [
-            GroupeRetractable(
-              cle: 'foyer/nom',
-              titre: 'Foyer',
-              icone: Icons.home_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            Row(
+    return _page('Gérer › Mon foyer', 'Foyer', Icons.home_outlined, [
+      Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
-                      Text('Créé le ${jjmmaaaa(etat.foyerCreation)}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                    ],
-                  ),
-                ),
-                Lien('Renommer', taille: 17, onTap: () async {
-                  final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
-                  if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
-                }),
+                Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
+                Text('Créé le ${jjmmaaaa(etat.foyerCreation)}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ],
             ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'foyer/membres',
-              titre: 'Membres',
-              icone: Icons.group_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-            for (final m in etat.membres)
-              LigneMenu(
-                titre: m.nomAffiche,
-                sousTitre: '${m.roleAffiche} · ${m.email.isEmpty ? 'adresse mail : touchez pour l\'indiquer' : m.email}',
-                onTap: () async {
-                  final email = await demanderTexte(context,
-                      titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
-                  if (email != null) etat.modifierEmail(m, email);
-                },
-                gauche: IconeRonde(null, texte: m.initiales),
-              ),
-            LigneMenu(
-              icone: Icons.person_add_alt_outlined,
-              titre: 'Ajouter un membre',
-              sousTitre: 'Son nom et, si vous voulez, son adresse mail (sans invitation)',
-              onTap: () => _ajouterMembre(context, etat),
-            ),
-            _Option(
-              texte: 'Envoyer la liste à tout le foyer',
-              aide: 'Le mail est préparé avec les adresses de tous les membres',
-              coche: etat.envoiFoyer,
-              onChange: (v) => etat.options(envoiFoyer: v),
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ],
-        ),
+          ),
+          Lien('Renommer', taille: 17, onTap: () async {
+            final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
+            if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
+          }),
+        ],
       ),
-    );
+      const SizedBox(height: 12),
+      Text(
+        'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
+        'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
+        style: Charte.texte(14, couleur: Charte.texteSecondaire),
+      ),
+      LigneMenu(
+        icone: Icons.restart_alt,
+        titre: 'Repartir d\'un foyer neuf',
+        titreTaille: 16,
+        onTap: () => _neuf(context),
+      ),
+    ]);
+  }
+}
+
+/// Gérer › Mon foyer › Membres : membres et leurs adresses mail.
+class EcranMembres extends StatelessWidget {
+  const EcranMembres({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return _page('Gérer › Mon foyer', 'Membres', Icons.group_outlined, [
+      for (final m in etat.membres)
+        LigneMenu(
+          titre: m.nomAffiche,
+          sousTitre: '${m.roleAffiche} · ${m.email.isEmpty ? 'adresse mail : touchez pour l\'indiquer' : m.email}',
+          onTap: () async {
+            final email = await demanderTexte(context, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
+            if (email != null) etat.modifierEmail(m, email);
+          },
+          gauche: IconeRonde(null, texte: m.initiales),
+        ),
+      LigneMenu(
+        icone: Icons.person_add_alt_outlined,
+        titre: 'Ajouter un membre',
+        sousTitre: 'Son nom et, si vous voulez, son adresse mail (sans invitation)',
+        onTap: () => _ajouterMembre(context, etat),
+      ),
+      _Option(
+        texte: 'Envoyer la liste à tout le foyer',
+        aide: 'Le mail est préparé avec les adresses de tous les membres',
+        coche: etat.envoiFoyer,
+        onChange: (v) => etat.options(envoiFoyer: v),
+      ),
+    ]);
   }
 }
 
@@ -102,244 +106,175 @@ Future<void> _ajouterMembre(BuildContext context, Etat etat) async {
   if (context.mounted) Nav.message(context, '${nom.trim()} fait maintenant partie du foyer');
 }
 
-/// Écran 17 — Paramètres.
-class EcranParametres extends StatelessWidget {
-  const EcranParametres({super.key});
+Future<void> _exemples(BuildContext context) async {
+  final ok = await confirmer(
+    context,
+    titre: 'Listes exemples',
+    contenu: Text(
+      'Remettre les trois listes exemples (en préparation, prête, courses en cours) ? '
+      'Les exemples encore présents sont remplacés ; vos listes ne changent pas.',
+      style: Charte.texte(16),
+    ),
+    plein: 'Annuler',
+    contour: 'Remettre les exemples',
+  );
+  if (ok != true) return;
+  Etat.instance.creerExemples();
+  if (context.mounted) Nav.message(context, 'Listes exemples remises');
+}
 
-  Future<void> _exemples(BuildContext context) async {
-    final ok = await confirmer(
-      context,
-      titre: 'Listes exemples',
-      contenu: Text(
-        'Remettre les trois listes exemples (en préparation, prête, courses en cours) ? '
-        'Les exemples encore présents sont remplacés ; vos listes ne changent pas.',
-        style: Charte.texte(16),
-      ),
-      plein: 'Annuler',
-      contour: 'Remettre les exemples',
-    );
-    if (ok != true) return;
-    Etat.instance.creerExemples();
-    if (context.mounted) Nav.message(context, 'Listes exemples remises');
-  }
+Future<void> _neuf(BuildContext context) async {
+  final partage = Synchro.instance.actif;
+  final ok = await confirmer(
+    context,
+    titre: 'Repartir d\'un foyer neuf',
+    icone: Icons.restart_alt,
+    contenu: Text(
+      'Le foyer repart du contenu de départ : le catalogue, les enseignes et les trois listes exemples. '
+      'Vos listes, parcours, tickets et modifications du catalogue disparaissent de l\'application '
+      '(une copie reste dans un fichier sur cet appareil).'
+      '${partage ? '\n\nLe partage entre appareils est arrêté sur cet appareil.' : ''}',
+      style: Charte.texte(16),
+    ),
+    plein: 'Annuler',
+    contour: 'Repartir à neuf',
+  );
+  if (ok != true) return;
+  if (partage) await Synchro.instance.arreterPartage();
+  await Etat.instance.repartirANeuf();
+  Nav.i.reinitialiser();
+  Nav.i.retourOnglet(Nav.gerer);
+  if (context.mounted) Nav.message(context, 'Foyer neuf');
+}
 
-  Future<void> _neuf(BuildContext context) async {
-    final partage = Synchro.instance.actif;
-    final ok = await confirmer(
-      context,
-      titre: 'Repartir d\'un foyer neuf',
-      icone: Icons.restart_alt,
-      contenu: Text(
-        'Le foyer repart du contenu de départ : le catalogue, les enseignes et les trois listes exemples. '
-        'Vos listes, parcours, tickets et modifications du catalogue disparaissent de l\'application '
-        '(une copie reste dans un fichier sur cet appareil).'
-        '${partage ? '\n\nLe partage entre appareils est arrêté sur cet appareil.' : ''}',
-        style: Charte.texte(16),
-      ),
-      plein: 'Annuler',
-      contour: 'Repartir à neuf',
-    );
-    if (ok != true) return;
-    if (partage) await Synchro.instance.arreterPartage();
-    await Etat.instance.repartirANeuf();
-    Nav.i.reinitialiser();
-    Nav.i.ouvrirRubrique(Nav.parametres);
-    if (context.mounted) Nav.message(context, 'Foyer neuf');
-  }
+/// Gérer › Paramètres › Apparence : palettes de couleurs.
+class EcranApparence extends StatelessWidget {
+  const EcranApparence({super.key});
 
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
-    return ListenableBuilder(
-      listenable: etat,
-      builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Paramètres'),
-        corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
+    return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
+      Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
+          style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      const SizedBox(height: 8),
+      Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          for (final pal in palettes)
+            _ChoixPalette(
+              palette: pal,
+              choisie: pal.nom == Charte.palette.nom,
+              onTap: () {
+                etat.choisirApparence(pal.nom);
+                Charte.choisirPalette(pal.nom);
+              },
+            ),
+        ],
+      ),
+      const SizedBox(height: 12),
+      // Les autres palettes, dans une liste déroulante pour ne pas prendre de place.
+      Text('Autres palettes', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      const SizedBox(height: 4),
+      ChoixDeroulant<String>(
+        valeur: autresPalettes.any((p) => p.nom == Charte.palette.nom) ? Charte.palette.nom : '',
+        choix: {'': 'Choisir…', for (final p in autresPalettes) p.nom: p.nom},
+        onChange: (v) {
+          if (v.isEmpty) return;
+          etat.choisirApparence(v);
+          Charte.choisirPalette(v);
+        },
+      ),
+    ]);
+  }
+}
+
+/// Gérer › Magasins › Listes : types de promotion, types de packaging, préliste.
+class EcranReglagesListes extends StatelessWidget {
+  const EcranReglagesListes({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return _page('Gérer › Magasins', 'Listes', Icons.checklist, [
+      LigneMenu(
+        icone: Icons.local_offer_outlined,
+        titre: 'Types de promotion',
+        sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
+        onTap: () => Nav.aller(context, const EcranTypesPromotion()),
+      ),
+      LigneMenu(
+        icone: Icons.inventory_2_outlined,
+        titre: 'Types de packaging',
+        sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
+        onTap: () => Nav.aller(context, const EcranTypesPackaging()),
+      ),
+      LigneMenu(
+        icone: Icons.playlist_add_check,
+        titre: 'Préliste',
+        sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
+        onTap: () => _reglerPreliste(context, etat),
+      ),
+    ]);
+  }
+}
+
+/// Gérer › Paramètres › Données : listes exemples, puis suppression automatique des archives.
+class EcranDonnees extends StatelessWidget {
+  const EcranDonnees({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, [
+      LigneMenu(
+        icone: Icons.playlist_add_check,
+        titre: 'Remettre les listes exemples',
+        titreTaille: 16,
+        onTap: () => _exemples(context),
+      ),
+      LigneMenu(
+        icone: Icons.timer_outlined,
+        titre: 'Suppression automatique des archives',
+        sousTitre: etat.delaiArchives == 0 ? 'Jamais : les archives sont gardées' : 'Après ${etat.delaiArchives} mois',
+        onTap: () async {
+          final v = await choisirDansListe<int>(context,
+              titre: 'Supprimer les archives après', choix: const {0: 'Jamais', 6: '6 mois', 12: '1 an', 24: '2 ans', 60: '5 ans'});
+          if (v != null) etat.reglerDelaiArchives(v);
+        },
+      ),
+    ]);
+  }
+}
+
+Future<void> _reglerPreliste(BuildContext context, Etat etat) async {
+  var presences = etat.prelistePresencesMin;
+  var sur = etat.prelisteSur;
+  final ok = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => AlertDialog(
+        backgroundColor: Charte.fond,
+        title: Text('Règle de la préliste', style: Charte.texte(18, gras: true)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GroupeRetractable(
-              cle: 'parametres/apparence',
-              titre: 'Apparence',
-              icone: Icons.palette_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
-                style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 8),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final pal in palettes)
-                  _ChoixPalette(
-                    palette: pal,
-                    choisie: pal.nom == Charte.palette.nom,
-                    onTap: () {
-                      etat.choisirApparence(pal.nom);
-                      Charte.choisirPalette(pal.nom);
-                    },
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            // Les autres palettes, dans une liste déroulante pour ne pas prendre de place.
-            Text('Autres palettes', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 4),
-            ChoixDeroulant<String>(
-              valeur: autresPalettes.any((p) => p.nom == Charte.palette.nom) ? Charte.palette.nom : '',
-              choix: {'': 'Choisir…', for (final p in autresPalettes) p.nom: p.nom},
-              onChange: (v) {
-                if (v.isEmpty) return;
-                etat.choisirApparence(v);
-                Charte.choisirPalette(v);
-              },
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'parametres/listes',
-              titre: 'Listes',
-              icone: Icons.checklist,
-              enfants: [
-                const SizedBox(height: 8),
-
-            LigneMenu(
-              icone: Icons.local_offer_outlined,
-              titre: 'Types de promotion',
-              sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
-              onTap: () => Nav.aller(context, const EcranTypesPromotion()),
-            ),
-            LigneMenu(
-              icone: Icons.inventory_2_outlined,
-              titre: 'Types de packaging',
-              sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
-              onTap: () => Nav.aller(context, const EcranTypesPackaging()),
-            ),
-            LigneMenu(
-              icone: Icons.playlist_add_check,
-              titre: 'Préliste',
-              sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
-              onTap: () => _reglerPreliste(context, etat),
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'parametres/comptes',
-              titre: 'Comptes magasin (à étudier)',
-              icone: Icons.badge_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            for (final m in etat.magasins.where((m) => m.enseigne.isNotEmpty))
-              LigneMenu(
-                icone: Icons.badge_outlined,
-                titre: m.enseigne,
-                sousTitre: 'Identifiant · récupération des tickets',
-                onTap: () => Nav.message(context, 'Récupération par compte magasin : option à étudier'),
-              ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'parametres/archives',
-              titre: 'Archives',
-              icone: Icons.inventory_2_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            LigneMenu(
-              icone: Icons.timer_outlined,
-              titre: 'Suppression automatique des archives',
-              sousTitre: etat.delaiArchives == 0 ? 'Jamais : les archives sont gardées' : 'Après ${etat.delaiArchives} mois',
-              onTap: () async {
-                final v = await choisirDansListe<int>(context,
-                    titre: 'Supprimer les archives après', choix: const {0: 'Jamais', 6: '6 mois', 12: '1 an', 24: '2 ans', 60: '5 ans'});
-                if (v != null) etat.reglerDelaiArchives(v);
-              },
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'parametres/donnees',
-              titre: 'Données',
-              icone: Icons.storage_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            Text(
-              'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
-              'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire),
-            ),
-            LigneMenu(
-              icone: Icons.playlist_add_check,
-              titre: 'Remettre les listes exemples',
-              titreTaille: 16,
-              onTap: () => _exemples(context),
-            ),
-            LigneMenu(
-              icone: Icons.restart_alt,
-              titre: 'Repartir d\'un foyer neuf',
-              titreTaille: 16,
-              onTap: () => _neuf(context),
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
-            GroupeRetractable(
-              cle: 'parametres/essais',
-              titre: 'Essais',
-              icone: Icons.science_outlined,
-              enfants: [
-                const SizedBox(height: 8),
-
-            LigneMenu(
-              icone: Icons.science_outlined,
-              titre: 'Produits réels — essai Open Food Facts',
-              sousTitre: 'Catalogue de vrais produits gardé sur l\'appareil',
-              onTap: () => Nav.aller(context, const EcranProduitsReels()),
-            ),
-                const SizedBox(height: 8),
-              ],
-            ),
+            Text('Un produit entre dans la préliste s\'il figure au moins', style: Charte.texte(15)),
+            _Compteur(valeur: presences, min: 1, max: sur, onChange: (v) => maj(() => presences = v)),
+            Text('fois sur les dernières courses du magasin, au nombre de', style: Charte.texte(15)),
+            _Compteur(valeur: sur, min: presences, max: 20, onChange: (v) => maj(() => sur = v)),
           ],
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Annuler', style: Charte.texte(16))),
+          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Valider', style: Charte.texte(16, gras: true))),
+        ],
       ),
-    );
-  }
-
-  Future<void> _reglerPreliste(BuildContext context, Etat etat) async {
-    var presences = etat.prelistePresencesMin;
-    var sur = etat.prelisteSur;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, maj) => AlertDialog(
-          backgroundColor: Charte.fond,
-          title: Text('Règle de la préliste', style: Charte.texte(18, gras: true)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Un produit entre dans la préliste s\'il figure au moins', style: Charte.texte(15)),
-              _Compteur(valeur: presences, min: 1, max: sur, onChange: (v) => maj(() => presences = v)),
-              Text('fois sur les dernières courses du magasin, au nombre de', style: Charte.texte(15)),
-              _Compteur(valeur: sur, min: presences, max: 20, onChange: (v) => maj(() => sur = v)),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Annuler', style: Charte.texte(16))),
-            TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Valider', style: Charte.texte(16, gras: true))),
-          ],
-        ),
-      ),
-    );
-    if (ok == true) etat.reglerPreliste(presences, sur);
-  }
+    ),
+  );
+  if (ok == true) etat.reglerPreliste(presences, sur);
 }
 
 class _Compteur extends StatelessWidget {
@@ -366,7 +301,7 @@ class EcranTypesPromotion extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Paramètres', titre: 'Types de promotion'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Magasins › Listes', titre: 'Types de promotion'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -571,7 +506,7 @@ class EcranTypesPackaging extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Paramètres', titre: 'Types de packaging'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Magasins › Listes', titre: 'Types de packaging'),
         bas: [
           BarreAction(boutons: [
             Bouton(

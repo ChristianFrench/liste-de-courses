@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
-import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'accueil.dart';
 import 'archives.dart';
 import 'corbeille.dart';
+import 'e13_produits_reels.dart';
 import 'historique.dart';
 import 'listes.dart';
 import 'magasin.dart';
@@ -138,6 +138,8 @@ class MenuGerer extends StatelessWidget {
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     final n = etat.magasins.length;
+    Widget ecran(IconData icone, String titre, String sousTitre, Widget e) =>
+        LigneMenu(icone: icone, titre: titre, sousTitre: sousTitre, onTap: () => Nav.aller<void>(context, e));
     Widget entree(int r, IconData icone, String titre, String sousTitre) => LigneMenu(
           icone: icone,
           titre: titre,
@@ -152,26 +154,21 @@ class MenuGerer extends StatelessWidget {
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
+          GroupeRetractable(cle: 'gerer/foyer', titre: 'Mon foyer', icone: Icons.home_outlined, enfants: [
+            ecran(Icons.home_outlined, 'Foyer', '${etat.foyerNom} · repartir d\'un foyer neuf', const EcranFoyer()),
+            ecran(Icons.group_outlined, 'Membres', '${etat.membres.length} membre${etat.membres.length > 1 ? 's' : ''} · adresses mail',
+                const EcranMembres()),
+          ]),
           GroupeRetractable(cle: 'gerer/magasins', titre: 'Magasins', icone: Icons.storefront_outlined, enfants: [
             entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue', '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
             entree(Nav.parcours, Icons.route_outlined, 'Parcours', 'Appris pendant les courses, pour chacun dans chaque magasin'),
+            ecran(Icons.checklist, 'Listes', 'Types de promotion, types de packaging, préliste', const EcranReglagesListes()),
+            ecran(Icons.science_outlined, 'Produits réels', 'Essai Open Food Facts : catalogue de vrais produits', const EcranProduitsReels()),
           ]),
-          GroupeRetractable(cle: 'gerer/courses', titre: 'Courses passées et corbeille', icone: Icons.history, enfants: [
-            entree(Nav.historique, Icons.history, 'Historique', 'Courses terminées et leur ticket PDF'),
-            entree(Nav.archives, Icons.inventory_2_outlined, 'Archives', 'Courses des magasins supprimés'),
-            entree(Nav.corbeille, Icons.delete_outline, 'Corbeille', 'Remettre ce qui a été supprimé'),
-          ]),
-          GroupeRetractable(cle: 'gerer/mqtt', titre: 'MQTT', icone: Icons.sync, enfants: [
-            LigneMenu(
-              icone: Icons.devices_outlined,
-              titre: Synchro.instance.actif ? 'Partage entre appareils · code ${Synchro.instance.code}' : 'Partage entre appareils',
-              sousTitre: 'Partager ou rejoindre un foyer, serveur MQTT, journal des échanges',
-              onTap: () => Nav.aller<void>(context, const EcranPartage()),
-            ),
-          ]),
-          GroupeRetractable(cle: 'gerer/foyer', titre: 'Foyer et application', icone: Icons.home_outlined, enfants: [
-            entree(Nav.foyer, Icons.group_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),
-            entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Apparence, promotions, packagings, données'),
+          GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
+            ecran(Icons.palette_outlined, 'Apparence', 'Couleurs de l\'application', const EcranApparence()),
+            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, suppression automatique des archives', const EcranDonnees()),
+            ecran(Icons.sync, 'MQTT', 'Configuration du partage entre appareils', const EcranPartage()),
           ]),
         ],
       ),
@@ -186,7 +183,7 @@ class EcranRubrique extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (rubrique == Nav.parametres) return const EcranParametres();
+    if (rubrique == Nav.parametres) return const EcranDonnees();
     if (rubrique == Nav.foyer) return const EcranFoyer();
     if (rubrique == Nav.archives) return const EcranArchives();
     if (rubrique == Nav.corbeille) return const EcranCorbeille();

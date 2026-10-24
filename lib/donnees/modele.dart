@@ -394,7 +394,7 @@ class Etat extends ChangeNotifier {
   List<TypePromotion> typesPromotion = [];
   List<Magasin> magasins = []; // magasins actifs
 
-  /// Magasins supprimés qui avaient un historique : gardés dans Gérer › Archives avec leurs courses.
+  /// Magasins supprimés qui avaient un historique : gardés dans Courses › Archives avec leurs courses.
   List<Magasin> magasinsArchives = [];
 
   /// Couleurs choisies (Paramètres) : « promo:<type> » et « pack:<packaging> » → 0xAARRGGBB.
@@ -1660,7 +1660,7 @@ class Etat extends ChangeNotifier {
       return 'Avec ${n(r.length, 'rayon')}, ${n(secteursDuMagasin(objet.id).length, 'secteur')}, '
           'l\'emplacement des produits, ${n(parcours.where((p) => p.magasinId == objet.id).length, 'parcours')} '
           'et ${l == 0 ? 'aucune liste en cours' : '${n(l, 'liste')} en cours, effacée${l > 1 ? 's' : ''} aussi'}.'
-          '${aUnHistorique(objet) ? ' Son historique de courses part dans Gérer › Archives.' : ''}';
+          '${aUnHistorique(objet) ? ' Son historique de courses part dans Courses › Archives.' : ''}';
     }
     if (objet is Rayon) {
       return 'Avec ${n(secteursDu(objet.id).length, 'secteur')} ; ses produits deviennent « non placés » dans ce magasin.';
@@ -1885,7 +1885,7 @@ class Etat extends ChangeNotifier {
     return t;
   }
 
-  /// Ticket reçu sans course choisie : il attend dans Gérer › Historique (« Tickets non rattachés »).
+  /// Ticket reçu sans course choisie : il attend dans Courses › Historique (« Tickets non rattachés »).
   /// (Source « photo » : la seule, avec « compte_magasin », que la base accepte.)
   Ticket ajouterTicketLibre(String magasinId) {
     final t = Ticket(nouvelId('t'), null, magasinId, DateTime.now(), 0, 'photo');

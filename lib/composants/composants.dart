@@ -1142,15 +1142,35 @@ class BoutonEtat extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const SizedBox(width: 4),
-                  Icon(actif ? Icons.toggle_on : Icons.toggle_off_outlined, size: 24, color: actif ? Charte.accent : Charte.texteBarre),
                   const SizedBox(width: 2),
+                  // Interrupteur à la hauteur des icônes de l'application (24) ; tout le bouton reste sensible.
+                  ExcludeSemantics(
+                    child: IgnorePointer(
+                      child: SizedBox(
+                    width: 40,
+                    height: 24,
+                    child: FittedBox(
+                      child: Switch(
+                        value: actif,
+                        onChanged: (_) => onTap(),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        activeThumbColor: Charte.blanc,
+                        activeTrackColor: Charte.accent,
+                        inactiveThumbColor: Charte.texteBarre,
+                        inactiveTrackColor: Charte.blanc,
+                        trackOutlineColor: WidgetStatePropertyAll(actif ? Charte.accent : Charte.texteBarre),
+                      ),
+                    ),
+                  ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
                   Flexible(
-                    child: Text(texte,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: Charte.texte(taille, gras: actif, couleur: Charte.encre)),
+                    // Une seule ligne : le libellé rapetisse plutôt que de passer à la ligne.
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(texte, maxLines: 1, style: Charte.texte(taille, gras: actif, couleur: Charte.encre)),
+                    ),
                   ),
                   const SizedBox(width: 4),
                 ],

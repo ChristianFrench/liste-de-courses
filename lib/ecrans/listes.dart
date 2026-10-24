@@ -5,6 +5,7 @@ import '../composants/pictogramme.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'archives.dart';
 import 'corbeille.dart';
 import 'historique.dart';
 import 'travail.dart';
@@ -608,7 +609,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           titre: 'Terminées sans ticket',
           icone: Icons.receipt_long_outlined,
           nombre: enInstance.length,
-          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans Gérer › Historique.',
+          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique, plus bas.',
           enfants: [
             for (final c in enInstance)
               Glissable(
@@ -633,9 +634,25 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               )),
           ],
         ),
+        // Après la vie des listes : ce qui est passé, dans cet ordre.
+        _vers(context, 'Historique', Icons.history, () => PageBase(
+              entete: const EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Courses', titre: 'Historique', aide: Aides.historique),
+              corps: const SousEcranHistorique(),
+            )),
+        _vers(context, 'Archives', Icons.inventory_2_outlined, () => const EcranArchives()),
+        _vers(context, 'Corbeille', Icons.delete_outline, () => const EcranCorbeille()),
       ],
     );
   }
+
+  /// Bandeau comme ceux des groupes, qui ouvre un écran.
+  Widget _vers(BuildContext context, String titre, IconData icone, Widget Function() ecran) => TitreGroupe(
+        nom: titre,
+        icone: icone,
+        fort: true,
+        droite: '›',
+        onTap: () => Nav.aller<void>(context, ecran()),
+      );
 
   Future<void> _classer(BuildContext context, Course c) async {
     final ok = await modale(
@@ -644,7 +661,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
       icone: Icons.receipt_long_outlined,
       oui: 'Classer sans ticket',
       contenu: (context, maj) => Text(
-          'La course du ${jjmm(c.dateCourses)} passera dans Gérer › Historique sans ticket de caisse. '
+          'La course du ${jjmm(c.dateCourses)} passera dans Courses › Historique sans ticket de caisse. '
           'Vous pourrez encore y joindre le ticket.',
           style: Charte.texte(16)),
     );

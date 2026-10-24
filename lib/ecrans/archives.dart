@@ -18,7 +18,7 @@ class EcranArchives extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Archives'),
+        entete: const EnTeteFenetre(retour: true, sousTitre: 'Courses', titre: 'Archives'),
         corps: ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 16),
           children: [

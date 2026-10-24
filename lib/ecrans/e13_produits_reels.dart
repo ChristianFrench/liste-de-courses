@@ -99,7 +99,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
     return PageBase(
       entete: EnTeteFenetre(
         retour: true,
-        sousTitre: 'Gérer › Essais',
+        sousTitre: 'Gérer › Magasins',
         titre: 'Produits réels (essai)',
         actions: [ActionLigne(Icons.cloud_sync_outlined, 'Catalogue et mises à jour', () => Nav.aller(context, const EcranCatalogue()))],
       ),

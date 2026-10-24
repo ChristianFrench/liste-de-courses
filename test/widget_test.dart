@@ -83,7 +83,22 @@ Finder _sousOnglet(String libelle) => find.descendant(of: find.byType(SousOnglet
 /// Onglet Gérer, puis la rubrique donnée.
 Future<void> _rubrique(WidgetTester tester, String titre) async {
   await _toucher(tester, _onglet('Gérer'));
+  Nav.i.retourOnglet(Nav.gerer); // depuis une rubrique ouverte : retour au menu de Gérer
+  await tester.pumpAndSettle();
   await _toucher(tester, find.text(titre));
+}
+
+/// Historique, Archives, Corbeille : en bas de l'onglet Courses.
+Future<void> _depuisCourses(WidgetTester tester, String titre) async {
+  await _toucher(tester, _onglet('Courses'));
+  Nav.i.retourOnglet(Nav.courses);
+  await tester.pumpAndSettle();
+  final f = find.text(titre.toUpperCase()); // bandeau en capitales
+  if (f.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(f, 200,
+        scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).hitTestable().first);
+  }
+  await _toucher(tester, f);
 }
 
 Future<void> _ciblesTactiles(WidgetTester tester) => expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
@@ -370,18 +385,18 @@ void main() {
           await _ciblesTactiles(tester);
         }
       }
-      await _rubrique(tester, 'Historique');
+      await _depuisCourses(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
       await _voir(tester, find.text('Rattacher à une course'));
       expect(find.text('Rattacher à une course'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Mon foyer');
+      await _rubrique(tester, 'Membres');
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Paramètres');
+      await _rubrique(tester, 'Listes');
       expect(find.text('Types de promotion'), findsOneWidget);
       expect(find.text('Types de packaging'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Archives');
+      await _depuisCourses(tester, 'Archives');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Parcours');
       expect(find.text('+ Nouveau parcours'), findsNothing, reason: 'les parcours s\'apprennent pendant les courses');
@@ -396,7 +411,7 @@ void main() {
       await _toucher(tester, find.textContaining(Etat.instance.rayon(premier.rayonId)!.nom, findRichText: true).first);
       expect(find.text(premier.nom), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Corbeille');
+      await _depuisCourses(tester, 'Corbeille');
       expect(find.text('Corbeille'), findsWidgets);
     });
 
@@ -415,7 +430,7 @@ void main() {
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('Magasins et catalogue'), findsOneWidget);
 
-      await _rubrique(tester, 'Paramètres');
+      await _rubrique(tester, 'Listes');
       await _toucher(tester, find.text('Types de promotion'));
       expect(find.text('Remise immédiate'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -877,7 +892,7 @@ void main() {
 
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Historique');
+      await _depuisCourses(tester, 'Historique');
       await _voir(tester, find.text('Rattacher à une course'));
       await _toucher(tester, find.text('Rattacher à une course'));
       await _toucher(tester, find.textContaining('Magasin 2').first);
@@ -928,21 +943,19 @@ void main() {
       expect(c.rechercher('panzani').articles.single.nom, 'Spaghetti n°5');
     });
 
-    testWidgets('écran d\'essai accessible depuis Paramètres', (tester) async {
+    testWidgets('écran d\'essai accessible depuis Gérer › Magasins', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Paramètres');
-      await _toucher(tester, find.text('Produits réels — essai Open Food Facts'));
+      await _rubrique(tester, 'Produits réels');
       expect(find.text('Produits réels (essai)'), findsOneWidget);
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('Gérer › MQTT › Partage entre appareils : serveur HiveMQ prérempli', (tester) async {
+    testWidgets('Gérer › Paramètres › MQTT : serveur HiveMQ prérempli', (tester) async {
       await _lancer(tester);
-      await _rubrique(tester, 'Partage entre appareils');
+      await _rubrique(tester, 'MQTT');
       expect(find.text('Partager ce foyer'), findsOneWidget);
       expect(find.text('Rejoindre un foyer'), findsOneWidget);
-      expect(find.text('Foyer non partagé'), findsOneWidget);
-      await _toucher(tester, find.text('SERVEUR MQTT'));
+      expect(find.text('SERVEUR MQTT'), findsOneWidget, reason: 'configuration seulement, serveur déplié');
       final hote = tester.widget<TextField>(find.byKey(const ValueKey('mqtt-hote')));
       expect(hote.controller!.text, 'broker.hivemq.com');
       expect(tester.widget<TextField>(find.byKey(const ValueKey('mqtt-port'))).controller!.text, '8883');
