@@ -1119,20 +1119,23 @@ class Bouton extends StatelessWidget {
 /// Il se distingue des boutons d'ACTION ([Bouton], rectangles) : son libellé ne change pas,
 /// seul l'interrupteur montre s'il est allumé.
 class BoutonEtat extends StatelessWidget {
-  const BoutonEtat({super.key, required this.texte, required this.actif, required this.onTap, this.taille = 14, this.hauteur = 48});
+  const BoutonEtat({super.key, required this.texte, required this.actif, required this.onTap, this.taille = 14, this.hauteur = 48, this.surPhoto = false});
   final String texte;
   final bool actif;
   final VoidCallback onTap;
   final double taille;
   final double hauteur;
 
+  /// Posé sur la photo de la barre de titre : libellé blanc ombré.
+  final bool surPhoto;
+
   @override
   Widget build(BuildContext context) => Semantics(
         button: true,
         toggled: actif,
         child: Material(
-          color: actif ? Charte.fondSelection : Charte.fond,
-          // Sans cadre : l'interrupteur et le fond disent l'état.
+          // Ni cadre ni fond : l'interrupteur seul dit l'état.
+          type: MaterialType.transparency,
           shape: const StadiumBorder(),
           clipBehavior: Clip.antiAlias,
           child: InkWell(
@@ -1169,7 +1172,12 @@ class BoutonEtat extends StatelessWidget {
                     // Une seule ligne : le libellé rapetisse plutôt que de passer à la ligne.
                     child: FittedBox(
                       fit: BoxFit.scaleDown,
-                      child: Text(texte, maxLines: 1, style: Charte.texte(taille, gras: actif, couleur: Charte.encre)),
+                      child: Text(texte,
+                          maxLines: 1,
+                          style: surPhoto
+                              ? Charte.texte(taille, gras: actif, couleur: Charte.blanc)
+                                  .copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6)])
+                              : Charte.texte(taille, gras: actif, couleur: Charte.encre)),
                     ),
                   ),
                   const SizedBox(width: 4),

@@ -1871,6 +1871,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                     child: BoutonEtat(
                       texte: 'Détail',
                       taille: 15,
+                      surPhoto: true,
                       hauteur: EnTeteFenetre.hauteurBouton,
                       actif: _detail,
                       onTap: () => setState(() => _detail = !_detail),
