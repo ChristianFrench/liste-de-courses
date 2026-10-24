@@ -121,6 +121,35 @@ class Synchro extends ChangeNotifier {
   Timer? _controle, _delaiControle;
   int _envoiControle = 0;
   String? derniereErreur;
+  /// Des modifications partent ou arrivent en ce moment (le point vert clignote).
+  bool enEchange = false;
+  Timer? _finEchange;
+
+  void _marquerEchange() {
+    _finEchange?.cancel();
+    if (!enEchange) {
+      enEchange = true;
+      notifyListeners();
+    }
+    _finEchange = Timer(const Duration(seconds: 2), () {
+      enEchange = false;
+      notifyListeners();
+    });
+  }
+
+  /// Autres appareils du foyer connectés en ce moment.
+  int get autresEnLigne => appareils.values.where((a) => a.enLigne).length;
+
+  /// Couleur du point de l'icône : blanc (pas de partage), rouge (pas de serveur ou de réseau),
+  /// orange (aucun autre appareil connecté), vert (synchronisé avec au moins un autre appareil).
+  String get pastille => !actif
+      ? 'blanc'
+      : !liaisonOk
+          ? 'rouge'
+          : autresEnLigne == 0
+              ? 'orange'
+              : 'vert';
+
   final journal = <Evenement>[];
   final appareils = <String, Appareil>{};
   int envoyes = 0, recus = 0;
@@ -381,6 +410,7 @@ class Synchro extends ChangeNotifier {
       t.publier('$_sujet/modifs/$noeud', jsonEncode({'de': noeud, 'pour': pour, 'objets': lot}));
       envoyes += lot.length;
     }
+    if (objets.isNotEmpty) _marquerEchange();
     if (pour == null) _noter('Envoyé : ${_resume(objets)}');
     notifyListeners();
   }
@@ -434,6 +464,7 @@ class Synchro extends ChangeNotifier {
         final pour = m['pour'] as String?;
         if (pour != null && pour != noeud) return;
         a.enLigne = true;
+        _marquerEchange();
         _recus.addAll([for (final o in m['objets'] as List) Map<String, dynamic>.from(o as Map)]);
         _receptionDifferee ??= Timer(const Duration(milliseconds: 400), _integrer);
     }

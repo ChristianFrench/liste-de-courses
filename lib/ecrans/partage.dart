@@ -59,40 +59,32 @@ class EcranPartage extends StatelessWidget {
 
   /// État de la synchronisation et ce qu'il reste à faire, en tête de l'écran.
   Widget _etat(Synchro s) {
-    final autres = s.appareils.values.where((a) => a.enLigne).length;
-    final (titre, couleur) = !s.actif
-        ? ('Foyer non partagé', Charte.texteSecondaire)
-        : s.liaisonOk
-            ? ('Serveur joignable', BoutonSynchro.vert)
-            : s.etatReseau == 'connexion'
-                ? ('Connexion au serveur…', _rouge)
-                : ('Serveur injoignable', _rouge);
-    final role = s.role == 'maitre'
-        ? 'Cet appareil est le maître (M) : il a créé le partage, son code est à donner aux autres.'
-        : s.role == 'esclave'
-            ? 'Cet appareil est un esclave (S) : il a rejoint le foyer d\'un autre appareil.'
-            : null;
-    final aFaire = !s.actif
-        ? 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
-            'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).'
-        : !s.liaisonOk
-            ? 'Vérifiez le réseau (Wi-Fi) et les réglages du serveur MQTT plus bas. Les modifications sont gardées et partiront dès que le serveur répondra.'
-            : autres == 0
-                ? (s.role == 'esclave'
-                    ? 'Ouvrez l\'application sur l\'appareil maître pour recevoir les données du foyer.'
-                    : 'Sur les autres appareils : « Rejoindre un foyer » avec le code ci-dessous, et les mêmes réglages de serveur.')
-                : 'Rien à faire : les modifications passent entre les appareils en ligne.';
+    final autres = s.autresEnLigne;
+    final titre = switch (s.pastille) {
+      'blanc' => 'Foyer non partagé',
+      'rouge' => s.etatReseau == 'connexion' ? 'Connexion au serveur…' : 'Pas de connexion au serveur',
+      'orange' => 'Aucun autre appareil connecté',
+      _ => s.enEchange ? 'Synchronisation en cours…' : 'À jour avec $autres appareil${autres > 1 ? 's' : ''}',
+    };
+    final aFaire = switch (s.pastille) {
+      'blanc' => 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
+          'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).',
+      'rouge' => 'Vérifiez le réseau (Wi-Fi ou données mobiles) et les réglages du serveur MQTT plus bas. '
+          'Les modifications sont gardées et partiront dès que le serveur répondra.',
+      'orange' => 'Ouvrez l\'application sur un autre appareil du foyer. Pour un nouvel appareil : « Rejoindre un foyer » '
+          'avec le code ci-dessous et les mêmes réglages de serveur. Vos modifications sont gardées et partiront à sa connexion.',
+      _ => 'Rien à faire : les modifications passent entre les appareils connectés.',
+    };
     return Container(
       margin: const EdgeInsets.only(top: 10, bottom: 6),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Charte.fondSelection, borderRadius: BorderRadius.circular(10)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(
-            width: 16,
-            height: 16,
-            decoration: BoxDecoration(color: s.actif ? couleur : Charte.placeholder, shape: BoxShape.circle),
-          ),
+          PointSynchro(
+              taille: 18,
+              couleur: s.actif ? BoutonSynchro.couleur(s.pastille) : Charte.placeholder,
+              clignote: s.pastille == 'vert' && s.enEchange),
           const SizedBox(width: 10),
           Expanded(child: Text(titre, style: Charte.texte(19, gras: true))),
         ]),
@@ -100,7 +92,6 @@ class EcranPartage extends StatelessWidget {
           Text('Échange vérifié à ${heure(s.derniereVerification!)} (aller-retour ${s.dureeVerification} ms), contrôle toutes les 30 s',
               style: Charte.texte(13, couleur: Charte.texteSecondaire)),
         if (s.actif && !s.liaisonOk && s.derniereErreur != null) Text(s.derniereErreur!, style: Charte.texte(13, couleur: _rouge)),
-        if (role != null) ...[const SizedBox(height: 6), Text(role, style: Charte.texte(15))],
         const SizedBox(height: 6),
         Text('À faire', style: Charte.texte(15, gras: true)),
         Text(aFaire, style: Charte.texte(15)),
@@ -177,7 +168,7 @@ class EcranPartage extends StatelessWidget {
       ),
       const SizedBox(height: 10),
       Text('Appareils', style: Charte.texte(15, gras: true)),
-      _appareil('${s.nomAppareil} (cet appareil${s.role == 'maitre' ? ', maître' : s.role == 'esclave' ? ', esclave' : ''})', s.liaisonOk),
+      _appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
       for (final a in autres)
         _appareil(
             '${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})'

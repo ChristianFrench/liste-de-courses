@@ -170,19 +170,30 @@ void glisserOnglet(BuildContext context, int sens) {
   Nav.i.allerOnglet(o);
 }
 
-/// Icône de la synchronisation : nuage barré si le foyer n'est pas partagé ; sinon point vert
-/// (un échange avec le serveur vient d'être vérifié) ou rouge (serveur injoignable), et lettre
-/// M (maître : cet appareil a créé le partage) ou S (esclave : il l'a rejoint). Ouvre l'écran du partage.
+/// Icône de la synchronisation : un nuage et un point dont la couleur dit l'état du partage
+/// (voir [Synchro.pastille]) ; le point vert clignote pendant un échange. Ouvre l'écran du partage.
 class BoutonSynchro extends StatelessWidget {
   const BoutonSynchro({super.key});
 
   static const vert = Color(0xFF2E9D46);
   static const rouge = Color(0xFFE53935);
+  static const orange = Color(0xFFF59E0B);
 
-  static String resume(Synchro s) => !s.actif
-      ? 'Synchronisation : foyer non partagé'
-      : '${s.liaisonOk ? 'Synchronisation : serveur joignable' : 'Synchronisation : serveur injoignable'}'
-          '${s.role == 'maitre' ? ', appareil maître' : s.role == 'esclave' ? ', appareil esclave' : ''}';
+  static Color couleur(String pastille) => switch (pastille) {
+        'rouge' => rouge,
+        'orange' => orange,
+        'vert' => vert,
+        _ => Charte.blanc,
+      };
+
+  static String resume(Synchro s) => switch (s.pastille) {
+        'blanc' => 'Synchronisation : foyer non partagé',
+        'rouge' => 'Synchronisation : pas de connexion au serveur',
+        'orange' => 'Synchronisation : aucun autre appareil connecté',
+        _ => s.enEchange
+            ? 'Synchronisation en cours'
+            : 'Synchronisation : à jour avec ${s.autresEnLigne} appareil${s.autresEnLigne > 1 ? 's' : ''}',
+      };
 
   @override
   Widget build(BuildContext context) {
@@ -202,27 +213,12 @@ class BoutonSynchro extends StatelessWidget {
               width: 44,
               height: EnTeteFenetre.hauteur,
               child: Stack(alignment: Alignment.center, children: [
-                Icon(s.actif ? Icons.cloud_outlined : Icons.cloud_off_outlined, size: 26, color: Charte.blanc, shadows: ombre),
-                if (s.actif)
-                  Positioned(
-                    right: 5,
-                    top: EnTeteFenetre.hauteur / 2 + 1,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: s.liaisonOk ? vert : rouge,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Charte.blanc, width: 1.5),
-                      ),
-                    ),
-                  ),
-                if (s.actif && s.role != null)
-                  Positioned(
-                    top: EnTeteFenetre.hauteur / 2 - 6,
-                    child: Text(s.role == 'maitre' ? 'M' : 'S',
-                        style: Charte.texte(10, gras: true, couleur: Charte.blanc).copyWith(shadows: ombre)),
-                  ),
+                const Icon(Icons.cloud_outlined, size: 26, color: Charte.blanc, shadows: ombre),
+                Positioned(
+                  right: 2,
+                  top: EnTeteFenetre.hauteur / 2 - 1,
+                  child: PointSynchro(taille: 16, couleur: couleur(s.pastille), clignote: s.pastille == 'vert' && s.enEchange),
+                ),
               ]),
             ),
           ),
@@ -230,6 +226,63 @@ class BoutonSynchro extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Point coloré de l'état du partage, qui peut clignoter (échange en cours).
+class PointSynchro extends StatefulWidget {
+  const PointSynchro({super.key, required this.taille, required this.couleur, this.clignote = false});
+  final double taille;
+  final Color couleur;
+  final bool clignote;
+
+  @override
+  State<PointSynchro> createState() => _PointSynchroState();
+}
+
+class _PointSynchroState extends State<PointSynchro> with SingleTickerProviderStateMixin {
+  late final _anim = AnimationController(vsync: this, duration: const Duration(milliseconds: 450), lowerBound: 0.25);
+
+  @override
+  void initState() {
+    super.initState();
+    _suivre();
+  }
+
+  @override
+  void didUpdateWidget(PointSynchro avant) {
+    super.didUpdateWidget(avant);
+    if (avant.clignote != widget.clignote) _suivre();
+  }
+
+  void _suivre() {
+    if (widget.clignote) {
+      _anim.repeat(reverse: true);
+    } else {
+      _anim
+        ..stop()
+        ..value = 1;
+    }
+  }
+
+  @override
+  void dispose() {
+    _anim.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FadeTransition(
+        opacity: _anim,
+        child: Container(
+          width: widget.taille,
+          height: widget.taille,
+          decoration: BoxDecoration(
+            color: widget.couleur,
+            shape: BoxShape.circle,
+            border: Border.all(color: widget.couleur == Charte.blanc ? const Color(0xFF9E9E9E) : Charte.blanc, width: 2),
+          ),
+        ),
+      );
 }
 
 /// Page d'aide d'une fenêtre (croix pour fermer).
