@@ -199,6 +199,15 @@ jobs:
           type "%RUNNER_TEMP%\essai.log"
           python outils\annoter_mqtt.py "%RUNNER_TEMP%\essai.log"
           exit /b %code%
+      - name: Essai du .bat avec les questions (comme un double-clic, mot de passe laissé vide)
+        shell: cmd
+        run: |
+          (echo courses& echo.& echo 1883& echo n& echo.& echo.& echo.) | "%RUNNER_TEMP%\essai\Installer le serveur MQTT.bat" > "%RUNNER_TEMP%\essai2.log" 2>&1
+          set code=%errorlevel%
+          type "%RUNNER_TEMP%\essai2.log"
+          python outils\annoter_mqtt.py "%RUNNER_TEMP%\essai2.log"
+          findstr /c:"Serveur MQTT pret" "%RUNNER_TEMP%\essai2.log" > nul || exit /b 1
+          exit /b %code%
 
   iphone:
     if: "!contains(github.event.head_commit.message, '[rapide]')"

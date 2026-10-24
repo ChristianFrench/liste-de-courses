@@ -15,11 +15,10 @@ rem --- Droits administrateur (installation, service, pare-feu)
 net session >nul 2>&1
 if not errorlevel 1 goto admin
 echo Droits administrateur necessaires : Windows va demander l'autorisation.
-if "%~1"=="" (
-  powershell -NoProfile -Command "Start-Process -FilePath '%~f0' -Verb RunAs"
-) else (
-  powershell -NoProfile -Command "Start-Process -FilePath '%~f0' -ArgumentList '%*' -Verb RunAs"
-)
+rem La fenetre reste ouverte a la fin (cmd /k) : en cas d'erreur, le message reste lisible.
+set "LDC_BAT=%~f0"
+set "LDC_ARGS=%*"
+powershell -NoProfile -Command "Start-Process -FilePath cmd.exe -ArgumentList ('/k ' + [char]34 + [char]34 + $env:LDC_BAT + [char]34 + ' ' + $env:LDC_ARGS + [char]34) -Verb RunAs"
 exit /b
 
 :admin
@@ -46,7 +45,8 @@ set /p "PORT=Port [1883] : "
 if "%PORT%"=="" set "PORT=1883"
 
 :choixfaits
-if "%MDP%"=="" for /f "delims=" %%p in ('powershell -NoProfile -Command "-join ((48..57)+(65..90)+(97..122) | Get-Random -Count 12 | ForEach-Object {[char]$_})"') do set "MDP=%%p"
+rem Mot de passe tire au hasard (chiffres) quand il est laisse vide
+if "%MDP%"=="" set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
 echo %UTIL%| findstr /r /x "[A-Za-z0-9_-]*" >nul || (echo Identifiant refuse : lettres, chiffres, - et _ seulement. & goto echec)
 echo %MDP%| findstr /r /x "[A-Za-z0-9_-]*" >nul || (echo Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto echec)
 echo %PORT%| findstr /r /x "[0-9][0-9]*" >nul || (echo Port refuse : un nombre, par exemple 1883. & goto echec)
