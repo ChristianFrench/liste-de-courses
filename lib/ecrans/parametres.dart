@@ -116,33 +116,49 @@ Future<void> _ajouterMembre(BuildContext context, Etat etat) async {
   if (context.mounted) Nav.message(context, '${nom.trim()} fait maintenant partie du foyer');
 }
 
-/// Écran 17 — Paramètres. En mode démonstration, appui long sur le titre : rétablir les données de démonstration.
+/// Écran 17 — Paramètres.
 class EcranParametres extends StatelessWidget {
   const EcranParametres({super.key});
 
-  Future<void> _basculerDemo(BuildContext context, bool oui) async {
-    await Etat.instance.basculerDemo(oui);
-    Nav.i.reinitialiser();
-    Nav.i.ouvrirRubrique(Nav.parametres);
-    if (context.mounted) Nav.message(context, oui ? 'Mode démonstration' : 'Retour à vos données');
-  }
-
-  Future<void> _reinitialiser(BuildContext context) async {
-    if (!Etat.instance.modeDemo) return;
+  Future<void> _exemples(BuildContext context) async {
     final ok = await confirmer(
       context,
-      titre: 'Données de démonstration',
+      titre: 'Listes exemples',
       contenu: Text(
-        'Revenir aux données de démonstration ? Les listes, parcours et produits modifiés pendant les essais seront remplacés.',
+        'Remettre les trois listes exemples (en préparation, prête, courses en cours) ? '
+        'Les exemples encore présents sont remplacés ; vos listes ne changent pas.',
         style: Charte.texte(16),
       ),
       plein: 'Annuler',
-      contour: 'Réinitialiser',
+      contour: 'Remettre les exemples',
     );
     if (ok != true) return;
-    await Etat.instance.reinitialiser();
+    Etat.instance.creerExemples();
+    if (context.mounted) Nav.message(context, 'Listes exemples remises');
+  }
+
+  Future<void> _neuf(BuildContext context) async {
+    final partage = Synchro.instance.actif;
+    final ok = await confirmer(
+      context,
+      titre: 'Repartir d\'un foyer neuf',
+      icone: Icons.restart_alt,
+      contenu: Text(
+        'Le foyer repart du contenu de départ : le catalogue, les enseignes et les trois listes exemples. '
+        'Vos listes, parcours, tickets et modifications du catalogue disparaissent de l\'application '
+        '(une copie reste dans un fichier sur cet appareil).'
+        '${partage ? '\n\nLe partage entre appareils est arrêté sur cet appareil.' : ''}',
+        style: Charte.texte(16),
+      ),
+      plein: 'Annuler',
+      contour: 'Repartir à neuf',
+    );
+    if (ok != true) return;
+    if (partage) await Synchro.instance.arreterPartage();
+    await Etat.instance.repartirANeuf();
     Nav.i.reinitialiser();
-    Nav.message(context, 'Données de démonstration rétablies');
+    Nav.i.ouvrirRubrique(Nav.parametres);
+    if (context.mounted) Nav.message(context, 'Foyer neuf');
   }
 
   @override
@@ -268,25 +284,23 @@ class EcranParametres extends StatelessWidget {
               enfants: [
                 const SizedBox(height: 8),
 
-            Bascule(
-              options: const ['Mes données', 'Démonstration'],
-              index: etat.modeDemo ? 1 : 0,
-              onChange: (i) => _basculerDemo(context, i == 1),
-            ),
-            const SizedBox(height: 4),
             Text(
-              etat.modeDemo
-                  ? 'Données fictives pour essayer l\'application. Vos données sont gardées à part.'
-                  : 'Vos données sont enregistrées sur cet appareil.',
-              style: Charte.texte(13, couleur: Charte.texteSecondaire),
+              'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
+              'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
+              style: Charte.texte(14, couleur: Charte.texteSecondaire),
             ),
-            if (etat.modeDemo)
-              LigneMenu(
-                icone: Icons.restart_alt,
-                titre: 'Rétablir les données de démonstration',
-                titreTaille: 16,
-                onTap: () => _reinitialiser(context),
-              ),
+            LigneMenu(
+              icone: Icons.playlist_add_check,
+              titre: 'Remettre les listes exemples',
+              titreTaille: 16,
+              onTap: () => _exemples(context),
+            ),
+            LigneMenu(
+              icone: Icons.restart_alt,
+              titre: 'Repartir d\'un foyer neuf',
+              titreTaille: 16,
+              onTap: () => _neuf(context),
+            ),
                 const SizedBox(height: 8),
               ],
             ),

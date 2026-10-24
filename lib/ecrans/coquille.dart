@@ -161,7 +161,7 @@ class MenuGerer extends StatelessWidget {
           ]),
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Foyer et application', icone: Icons.home_outlined, enfants: [
             entree(Nav.foyer, Icons.group_outlined, 'Mon foyer', 'Membres, adresses mail, invitation'),
-            entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Apparence, promotions, packagings, démonstration'),
+            entree(Nav.parametres, Icons.settings_outlined, 'Paramètres', 'Apparence, promotions, packagings, données'),
           ]),
         ],
       ),

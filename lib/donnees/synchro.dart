@@ -146,8 +146,6 @@ class Synchro extends ChangeNotifier {
   }
   bool get actif => code != null;
 
-  /// Partage en pause : l'appareil montre les données de démonstration, qui ne sont pas partagées.
-  bool get enPause => actif && _etat.modeDemo;
   String get noeud => _reglage('noeud') ?? '';
 
   ServeurMqtt get serveur => ServeurMqtt(
@@ -190,7 +188,6 @@ class Synchro extends ChangeNotifier {
     _definir('role', 'maitre');
     _definir('noeud', _tirer(12));
     base.horloge = Horloge(noeud);
-    // Les vraies données du foyer, même si l'écran montre la démonstration.
     base.toutJournaliser(base.lire());
     _noter('Partage créé : code ${code!}');
     await _connecter();

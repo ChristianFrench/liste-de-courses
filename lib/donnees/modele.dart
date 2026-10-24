@@ -360,15 +360,17 @@ class Etat extends ChangeNotifier {
   static final Etat instance = Etat._();
 
   static const String fichierDonnees = 'assets/donnees_maquette.json';
-  static const String fichierAncien = 'etat_maquette.json'; // maquette 0.6 et avant
   static const String baseFoyer = 'liste_de_courses.db';
-  static const String baseDemo = 'demonstration.db';
+  static const String baseDemo = 'demonstration.db'; // ancienne base de démonstration (avant le 24/10/2026)
 
   /// Désactive l'enregistrement sur disque (tests).
   bool enregistrementActif = true;
 
-  /// Mode démonstration : données fictives, gardées dans une base à part.
-  bool modeDemo = false;
+  /// Enseignes présentes dans tout nouveau foyer, chacune avec le catalogue complet.
+  static const enseignesDeDepart = ['Carrefour', 'E.Leclerc', 'Auchan', 'Intermarché', 'Super U', 'Lidl'];
+
+  /// Début du nom des listes exemples (une en préparation, une prête, une course en cours).
+  static const prefixeExemple = 'Exemple · ';
 
   late Map<String, dynamic> _brut; // champs conservés tels quels (description, écarts…)
   String foyerId = 'f1';
@@ -456,8 +458,7 @@ class Etat extends ChangeNotifier {
 
   Directory? _dossier;
   Stockage? _foyer;
-  Stockage? _demo;
-  Stockage? get _actif => modeDemo ? _demo : _foyer;
+  Stockage? get _actif => _foyer;
 
   /// Base des vraies données du foyer (la seule qui se synchronise).
   Stockage? get stockageFoyer => _foyer;
@@ -479,43 +480,102 @@ class Etat extends ChangeNotifier {
         if (!d.existsSync()) d.createSync(recursive: true);
         _dossier = d;
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
-        modeDemo = _foyer!.reglage('mode_demo') == '1';
-        _reprendreAncienFichier();
+        _reprendreDemonstration();
         await _ouvrirActif();
         return;
       } catch (e) {
         debugPrint('Base locale indisponible : $e');
-        _foyer = _demo = null;
+        _foyer = null;
       }
     }
     lire(await _donneesDemo());
   }
 
-  /// Le fichier de la maquette 0.6 contient des essais sur les données fictives :
-  /// il devient le contenu de la base de démonstration.
-  void _reprendreAncienFichier() {
-    final f = File(_chemin(fichierAncien));
-    if (!f.existsSync()) return;
-    try {
-      final demo = _demo ??= Stockage.ouvrir(_chemin(baseDemo));
-      if (demo.vide) demo.ecrire(jsonDecode(f.readAsStringSync()) as Map<String, dynamic>);
-      f.renameSync('${f.path}.ancien');
-    } catch (e) {
-      debugPrint('Reprise du fichier $fichierAncien impossible : $e');
-    }
+  static String _horodatage() => DateTime.now().toIso8601String().substring(0, 16).replaceAll(RegExp('[-:T]'), '');
+
+  /// Il n'y a plus de mode démonstration (24/10/2026). Un appareil qui l'affichait garde ce qu'il
+  /// montrait : la base de démonstration devient celle du foyer, l'autre est gardée dans un fichier à part.
+  void _reprendreDemonstration() {
+    final f = _foyer!;
+    if (f.reglage('mode_demo') != '1') return;
+    final demo = File(_chemin(baseDemo));
+    f.definirReglage('mode_demo', '0');
+    if (!demo.existsSync()) return;
+    f.fermer();
+    File(_chemin(baseFoyer)).renameSync('${_chemin(baseFoyer)}.avant-fusion-${_horodatage()}');
+    demo.renameSync(_chemin(baseFoyer));
+    _foyer = Stockage.ouvrir(_chemin(baseFoyer));
   }
 
   Future<void> _ouvrirActif() async {
-    if (modeDemo) _demo ??= Stockage.ouvrir(_chemin(baseDemo));
     final s = _actif!;
     if (s.vide) {
-      lire(modeDemo ? await _donneesDemo() : _depart(await _donneesDemo()));
-      if (!modeDemo) await appliquerModele(magasins.first, tailleComplete);
+      lire(_depart(await _donneesDemo()));
+      final catalogue = await CatalogueType.lireJson();
+      for (final m in magasins) {
+        await appliquerModele(m, tailleComplete, catalogue: catalogue);
+      }
+      creerExemples(enregistrer: false);
       s.ecrire(versJson());
     } else {
       lire(s.lire());
     }
     await appliquerFormats();
+  }
+
+  /// Repartir d'un foyer neuf : la base actuelle est gardée dans un fichier à part sur l'appareil.
+  Future<void> repartirANeuf() async {
+    if (_dossier == null) {
+      lire(await _donneesDemo());
+      return;
+    }
+    _foyer?.fermer();
+    final f = File(_chemin(baseFoyer));
+    if (f.existsSync()) f.renameSync('${f.path}.avant-neuf-${_horodatage()}');
+    _foyer = Stockage.ouvrir(_chemin(baseFoyer));
+    await _ouvrirActif();
+    notifyListeners();
+  }
+
+  /// Trois listes exemples, dans le premier magasin : une en préparation, une prête, une course
+  /// interrompue. Les exemples précédents sont remplacés.
+  void creerExemples({bool enregistrer = true}) {
+    if (magasins.isEmpty) return;
+    listes.removeWhere((l) => (l.nom ?? '').startsWith(prefixeExemple) && l.statut != StatutListe.terminee);
+    final m = _trouve(magasins, (m) => m.nom == 'Intermarché') ?? magasins.first;
+    final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
+    List<LigneListe> lignes(List<String> noms) => [
+          for (final n in noms)
+            if (parNom[n.toLowerCase()] case final p?) LigneListe(produitId: p.id)
+        ];
+    final maintenant = DateTime.now();
+    Liste nouvelle(String nom, StatutListe statut, List<String> noms) {
+      final l = Liste(
+        id: nouvelId('l'),
+        magasinId: m.id,
+        statut: statut,
+        dateCreation: maintenant,
+        lignes: lignes(noms),
+        modifieePar: moi.id,
+        modifieeLe: maintenant,
+        nom: '$prefixeExemple$nom',
+      );
+      listes.add(l);
+      return l;
+    }
+
+    nouvelle('liste en préparation', StatutListe.enConstruction, ['Lait demi-écrémé', 'Pain de mie', 'Beurre doux', 'Pommes', 'Yaourts nature', 'Café moulu']);
+    nouvelle('liste prête pour les courses', StatutListe.prete, ['Pâtes spaghetti', 'Riz basmati', 'Tomates', 'Œufs', 'Emmental râpé', 'Papier toilette']);
+    final enCours = nouvelle('courses en cours', StatutListe.enCours,
+        ['Bananes', 'Carottes', 'Jambon blanc', 'Camembert', 'Eau minérale', 'Liquide vaisselle', 'Baguette']);
+    enCours
+      ..membreId = moi.id
+      ..interrompueLe = maintenant;
+    for (final g in enCours.lignes.take(2)) {
+      g.cocheLe = maintenant;
+      g.cochePar = moi.id;
+    }
+    if (enregistrer) modifie();
   }
 
   /// Premier lancement : un foyer vide, avec son créateur et un premier magasin (rempli d'après le catalogue complet).
@@ -535,31 +595,12 @@ class Etat extends ChangeNotifier {
       'parametres': demo['parametres'],
       'typesPromotion': demo['typesPromotion'],
       'magasins': [
-        {'id': nouvelId('mg'), 'nom': 'Mon magasin', 'enseigne': '', 'ville': ''}
+        for (final e in enseignesDeDepart) {'id': nouvelId('mg'), 'nom': e, 'enseigne': e, 'ville': ''}
       ],
       for (final cle in ['rayons', 'secteurs', 'marques', 'packagings', 'produits', 'emplacements', 'parcours', 'listes', 'historique', 'tickets'])
         cle: <dynamic>[],
       'frequencesPreliste': {'_regle': (demo['frequencesPreliste'] as Map?)?['_regle'] ?? ''},
     };
-  }
-
-  /// Passe des vraies données à la démonstration, ou l'inverse. Rien n'est effacé.
-  Future<void> basculerDemo(bool oui) async {
-    if (oui == modeDemo) return;
-    modeDemo = oui;
-    if (_foyer == null) {
-      lire(oui ? await _donneesDemo() : _depart(await _donneesDemo()));
-      return;
-    }
-    _foyer!.definirReglage('mode_demo', oui ? '1' : '0');
-    await _ouvrirActif();
-  }
-
-  /// Mode démonstration : revient aux données de démonstration d'origine.
-  Future<void> reinitialiser() async {
-    if (!modeDemo) return;
-    lire(await _donneesDemo());
-    await enregistrer();
   }
 
   Future<void> enregistrer() async {
@@ -586,9 +627,9 @@ class Etat extends ChangeNotifier {
   int integrerDistant(List<Map<String, dynamic>> objets) {
     final s = _foyer;
     if (s == null) return 0;
-    if (!modeDemo) enregistrer(); // ce qui vient d'être fait ici passe d'abord
+    enregistrer(); // ce qui vient d'être fait ici passe d'abord
     final n = s.appliquer(objets);
-    if (n > 0 && !modeDemo) {
+    if (n > 0) {
       lire(s.lire());
       _retrouverMoi(s);
     }
@@ -605,8 +646,7 @@ class Etat extends ChangeNotifier {
     }
     _foyer?.fermer();
     final f = File(_chemin(baseFoyer));
-    final horo = DateTime.now().toIso8601String().substring(0, 16).replaceAll(RegExp('[-:T]'), '');
-    if (f.existsSync()) f.renameSync('${f.path}.avant-partage-$horo');
+    if (f.existsSync()) f.renameSync('${f.path}.avant-partage-${_horodatage()}');
     final s = _foyer = Stockage.ouvrir(_chemin(baseFoyer));
     final depart = _depart(demo);
     final moiJson = (depart['membres'] as List).first as Map;
@@ -619,7 +659,6 @@ class Etat extends ChangeNotifier {
     };
     s.ecrire(depart); // avant la synchronisation : rien de ceci ne part vers les autres
     s.definirReglage('synchro_membre_provisoire', moiJson['id'] as String);
-    modeDemo = false;
     lire(s.lire());
   }
 
