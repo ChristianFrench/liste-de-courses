@@ -116,9 +116,9 @@ void main() {
     await _capture('28 Modale-Partir');
     await _toucher(tester, find.text('Annuler'));
 
-    await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, find.text('Historique'));
+    await _toucher(tester, _onglet('Courses'));
+    await _toucher(tester, _onglet('Courses'));
+    await _toucher(tester, find.text('HISTORIQUE'));
     await _capture('11 Historique-Courses');
     await _toucher(tester, find.text('Par magasin'));
     await _capture('12 Historique-Par-magasin');
@@ -139,17 +139,24 @@ void main() {
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, find.text('Paramètres'));
-    await _capture('17 Parametres');
+    await _capture('17 Gerer');
+    await _toucher(tester, find.text('Listes'));
+    await _capture('17 Listes');
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Parametres-Promos');
     await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.text('Types de packaging'));
     await _capture('23 Parametres-Packagings');
 
-    for (final (rubrique, nom) in [('Archives', '24 Archives'), ('Mon foyer', '25 Mon-foyer'), ('Corbeille', '26 Corbeille')]) {
-      await _toucher(tester, _onglet('Gérer'));
-      await _toucher(tester, _onglet('Gérer'));
+    for (final (onglet, rubrique, nom) in [
+      ('Courses', 'ARCHIVES', '24 Archives'),
+      ('Gérer', 'Foyer', '25 Foyer'),
+      ('Gérer', 'Membres', '25 Membres'),
+      ('Gérer', 'MQTT', '27 MQTT'),
+      ('Courses', 'CORBEILLE', '26 Corbeille'),
+    ]) {
+      await _toucher(tester, _onglet(onglet));
+      await _toucher(tester, _onglet(onglet));
       await _toucher(tester, find.text(rubrique));
       await _capture(nom);
     }
