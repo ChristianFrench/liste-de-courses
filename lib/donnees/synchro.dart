@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
@@ -52,12 +53,21 @@ class Horloge {
 
 /// Serveur MQTT ; par défaut le serveur public de HiveMQ.
 class ServeurMqtt {
-  const ServeurMqtt({this.hote = hoteHiveMq, this.port = 8883, this.tls = true, this.utilisateur = '', this.motDePasse = ''});
+  const ServeurMqtt(
+      {this.hote = hoteHiveMq, this.port = 8883, this.tls = true, this.utilisateur = '', this.motDePasse = '', this.empreinte = ''});
   static const hoteHiveMq = 'broker.hivemq.com';
   final String hote;
   final int port;
   final bool tls;
   final String utilisateur, motDePasse;
+
+  /// Certificat non signé par une autorité (Mosquitto sur le PC) : empreinte SHA-256 acceptée à la
+  /// première connexion. Un autre certificat est ensuite refusé tant que l'utilisateur ne l'a pas accepté.
+  final String empreinte;
+
+  /// Les 16 premiers chiffres de l'empreinte, comme Verifier-serveur-MQTT.exe les affiche.
+  static String empreinteCourte(String hex) =>
+      hex.length < 16 ? hex : [for (var i = 0; i < 16; i += 4) hex.substring(i, i + 4).toUpperCase()].join(' ');
 }
 
 /// Le réseau, isolé pour pouvoir essayer la synchronisation sans serveur.
@@ -121,6 +131,9 @@ class Synchro extends ChangeNotifier {
   Timer? _controle, _delaiControle;
   int _envoiControle = 0;
   String? derniereErreur;
+
+  /// Empreinte d'un certificat refusé parce qu'il diffère de celui accepté au départ.
+  String? certificatRefuse;
   /// Des modifications partent ou arrivent en ce moment (le point vert clignote).
   bool enEchange = false;
   Timer? _finEchange;
@@ -183,6 +196,7 @@ class Synchro extends ChangeNotifier {
         tls: _reglage('tls') != '0',
         utilisateur: _reglage('utilisateur') ?? '',
         motDePasse: _reglage('mdp') ?? '',
+        empreinte: _reglage('empreinte') ?? '',
       );
 
   String get _sujet => 'ldc/$code';
@@ -259,6 +273,10 @@ class Synchro extends ChangeNotifier {
   }
 
   Future<void> changerServeur(ServeurMqtt s) async {
+    final avant = serveur;
+    // Autre serveur : son certificat sera accepté à la première connexion
+    if (s.hote.trim() != avant.hote || s.port != avant.port) _base?.effacerReglage('synchro_empreinte');
+    certificatRefuse = null;
     _definirServeur(s);
     if (actif) {
       await _deconnecter();
@@ -273,6 +291,20 @@ class Synchro extends ChangeNotifier {
     _definir('tls', s.tls ? '1' : '0');
     _definir('utilisateur', s.utilisateur);
     _definir('mdp', s.motDePasse);
+  }
+
+  /// Le serveur présente un autre certificat que celui accepté au départ : l'utilisateur le confirme.
+  Future<void> accepterCertificat() async {
+    final e = certificatRefuse;
+    if (e == null) return;
+    _definir('empreinte', e);
+    certificatRefuse = null;
+    _noter('Nouveau certificat du serveur accepté : ${ServeurMqtt.empreinteCourte(e)}');
+    if (actif) {
+      await _deconnecter();
+      await _connecter();
+    }
+    notifyListeners();
   }
 
   /// Renvoie tout ce que cet appareil connaît (après un changement de serveur, par exemple).
@@ -292,7 +324,20 @@ class Synchro extends ChangeNotifier {
     _abonnements
       ..add(t.messages.listen((m) => _recevoir(m.$1, m.$2)))
       ..add(t.etats.listen((e) {
+        if (e.startsWith('certificat:')) {
+          final empreinte = e.substring(11);
+          _definir('empreinte', empreinte);
+          _noter('Certificat du serveur accepté : ${ServeurMqtt.empreinteCourte(empreinte)}');
+          return;
+        }
+        if (e.startsWith('certificat-refuse:')) {
+          certificatRefuse = e.substring(18);
+          _noter('Le serveur présente un autre certificat (${ServeurMqtt.empreinteCourte(certificatRefuse!)}) : connexion refusée',
+              erreur: true);
+          return;
+        }
         if (e == 'connecte') {
+          certificatRefuse = null;
           derniereErreur = null;
           _noter('Connecté à ${serveur.hote}');
           _annoncer();
@@ -542,6 +587,7 @@ class TransportMqtt implements Transport {
   final ServeurMqtt serveur;
 
   MqttServerClient? _client;
+  late String _empreinte = serveur.empreinte;
   final _messages = StreamController<(String, String)>.broadcast();
   final _etats = StreamController<String>.broadcast();
   StreamSubscription? _sub;
@@ -566,6 +612,7 @@ class TransportMqtt implements Transport {
     _abonnement = abonnement;
     final c = MqttServerClient.withPort(serveur.hote, identifiant, serveur.port)
       ..secure = serveur.tls
+      ..onBadCertificate = _certificat
       ..keepAlivePeriod = 30
       ..autoReconnect = true
       ..resubscribeOnAutoReconnect = true
@@ -613,6 +660,20 @@ class TransportMqtt implements Transport {
         }
       }
     });
+  }
+
+  /// Certificat non signé par une autorité (Mosquitto sur le PC) : accepté la première fois,
+  /// ensuite seulement s'il est le même.
+  bool _certificat(Object c) {
+    final e = sha256.convert((c as X509Certificate).der).toString();
+    if (_empreinte.isEmpty) {
+      _empreinte = e;
+      _etats.add('certificat:$e');
+      return true;
+    }
+    if (e == _empreinte) return true;
+    _etats.add('certificat-refuse:$e');
+    return false;
   }
 
   void _connecte() {

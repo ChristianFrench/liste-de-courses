@@ -7,7 +7,8 @@ rem  Installe et configure Mosquitto (serveur MQTT) sur ce PC pour la synchronis
 rem  de Liste de courses, puis verifie le serveur avec Verifier-serveur-MQTT.exe.
 rem
 rem  Double-clic : les questions sont posees a l'ecran.
-rem  Sans question : "Installer le serveur MQTT.bat" identifiant motdepasse [port]
+rem  Sans question : "Installer le serveur MQTT.bat" identifiant motdepasse [port] [port chiffre]
+rem  Deux ports : 1883 sans chiffrement (maison), 8883 chiffre (a rediriger par la box pour l'exterieur).
 rem  Peut etre relance sans risque (changer de mot de passe, de port...).
 rem ==========================================================================================
 
@@ -28,9 +29,12 @@ set "DONNEES=%ProgramData%\ListeDeCourses-MQTT"
 set "UTIL=%~1"
 set "MDP=%~2"
 set "PORT=%~3"
+set "PORTTLS=%~4"
+set "VERIF=%ICI%Verifier-serveur-MQTT.exe"
 set "AUTO="
 if not "%UTIL%"=="" set "AUTO=1"
 if "%PORT%"=="" set "PORT=1883"
+if "%PORTTLS%"=="" set "PORTTLS=8883"
 
 echo.
 echo  Serveur MQTT pour Liste de courses
@@ -51,9 +55,15 @@ if not defined MDP set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
 call :valide MDP "[A-Za-z0-9_-]*" || (echo   Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto q_mdp)
 :q_port
 set "PORT="
-set /p "PORT=Port [1883] : "
+set /p "PORT=Port a la maison, sans chiffrement [1883] : "
 if not defined PORT set "PORT=1883"
 call :valide PORT "[0-9][0-9]*" || (echo   Port refuse : un nombre, par exemple 1883. & goto q_port)
+:q_porttls
+set "PORTTLS="
+set /p "PORTTLS=Port chiffre, pour l'exterieur [8883] : "
+if not defined PORTTLS set "PORTTLS=8883"
+call :valide PORTTLS "[0-9][0-9]*" || (echo   Port refuse : un nombre, par exemple 8883. & goto q_porttls)
+if "%PORTTLS%"=="%PORT%" (echo   Les deux ports doivent etre differents. & goto q_porttls)
 goto choixverifies
 
 :choixfaits
@@ -62,11 +72,14 @@ if not defined MDP set "MDP=mq%RANDOM%%RANDOM%%RANDOM%"
 call :valide UTIL "[A-Za-z0-9_-]*" || (echo Identifiant refuse : lettres, chiffres, - et _ seulement. & goto echec)
 call :valide MDP "[A-Za-z0-9_-]*" || (echo Mot de passe refuse : lettres, chiffres, - et _ seulement. & goto echec)
 call :valide PORT "[0-9][0-9]*" || (echo Port refuse : un nombre, par exemple 1883. & goto echec)
+call :valide PORTTLS "[0-9][0-9]*" || (echo Port chiffre refuse : un nombre, par exemple 8883. & goto echec)
+if "%PORTTLS%"=="%PORT%" (echo Les deux ports doivent etre differents. & goto echec)
 :choixverifies
+if not exist "%VERIF%" (echo Verifier-serveur-MQTT.exe doit etre a cote de ce .bat : decompressez tout le dossier. & goto echec)
 
 rem --- 1. Installation de Mosquitto
 echo.
-echo [1/6] Mosquitto
+echo [1/7] Mosquitto
 if exist "%MOSQ%\mosquitto.exe" (
   echo       deja installe dans %MOSQ%
   goto installe
@@ -91,7 +104,7 @@ if not exist "%MOSQ%\mosquitto.exe" (echo       L'installation de Mosquitto a ec
 echo       ok
 
 rem --- 2. Identifiant, mot de passe et droits : les appareils n'ont acces qu'aux sujets ldc/...
-echo [2/6] Identifiant et droits d'acces
+echo [2/7] Identifiant et droits d'acces
 if not exist "%DONNEES%" mkdir "%DONNEES%"
 if exist "%DONNEES%\passwd" del "%DONNEES%\passwd"
 "%MOSQ%\mosquitto_passwd.exe" -c -b "%DONNEES%\passwd" %UTIL% %MDP%
@@ -102,8 +115,20 @@ icacls "%DONNEES%\passwd" /grant *S-1-5-18:R >nul
 >> "%DONNEES%\acl" echo topic readwrite ldc/#
 echo       ok : %UTIL%, sujets ldc/#
 
-rem --- 3. Configuration (l'ancienne est gardee une fois sous mosquitto.conf.origine)
-echo [3/6] Configuration
+rem --- 3. Certificat du serveur (chiffrement) : fait une fois, garde ensuite (les appareils le reconnaissent)
+echo [3/7] Certificat pour le chiffrement
+if exist "%DONNEES%\serveur.crt" if exist "%DONNEES%\serveur.key" goto certificatpret
+"%VERIF%" --creer-certificat "%DONNEES%" >nul
+if not exist "%DONNEES%\serveur.key" (echo       Creation du certificat impossible. & goto echec)
+:certificatpret
+icacls "%DONNEES%\serveur.crt" /grant *S-1-5-18:R >nul
+icacls "%DONNEES%\serveur.key" /grant *S-1-5-18:R >nul
+set "EMPREINTE="
+set /p EMPREINTE=< "%DONNEES%\empreinte.txt"
+echo       ok : empreinte %EMPREINTE%
+
+rem --- 4. Configuration (l'ancienne est gardee une fois sous mosquitto.conf.origine)
+echo [4/7] Configuration
 if exist "%MOSQ%\mosquitto.conf" if not exist "%MOSQ%\mosquitto.conf.origine" copy "%MOSQ%\mosquitto.conf" "%MOSQ%\mosquitto.conf.origine" >nul
 > "%MOSQ%\mosquitto.conf" echo # Liste de courses : configuration ecrite par Installer le serveur MQTT.bat
 >> "%MOSQ%\mosquitto.conf" echo listener %PORT%
@@ -121,10 +146,14 @@ if exist "%MOSQ%\mosquitto.conf" if not exist "%MOSQ%\mosquitto.conf.origine" co
 >> "%MOSQ%\mosquitto.conf" echo log_type warning
 >> "%MOSQ%\mosquitto.conf" echo log_type notice
 >> "%MOSQ%\mosquitto.conf" echo connection_messages true
-echo       ok : %MOSQ%\mosquitto.conf, port %PORT%
+>> "%MOSQ%\mosquitto.conf" echo # Port chiffre (TLS), le seul a ouvrir sur Internet par la box
+>> "%MOSQ%\mosquitto.conf" echo listener %PORTTLS%
+>> "%MOSQ%\mosquitto.conf" echo certfile %DONNEES%\serveur.crt
+>> "%MOSQ%\mosquitto.conf" echo keyfile %DONNEES%\serveur.key
+echo       ok : %MOSQ%\mosquitto.conf, ports %PORT% et %PORTTLS% (chiffre)
 
-rem --- 4. Service Windows : demarre avec le PC
-echo [4/6] Service Windows
+rem --- 5. Service Windows : demarre avec le PC
+echo [5/7] Service Windows
 sc query mosquitto >nul 2>&1 || "%MOSQ%\mosquitto.exe" install
 sc config mosquitto start= auto >nul
 net stop mosquitto >nul 2>&1
@@ -152,11 +181,11 @@ goto echec
 :servicedemarre
 echo       ok : service mosquitto demarre, demarrage automatique
 
-rem --- 5. Pare-feu : le port est ouvert pour les reseaux prives (maison)
-echo [5/6] Pare-feu
+rem --- 6. Pare-feu : les ports sont ouverts pour les reseaux prives (maison, et box qui redirige)
+echo [6/7] Pare-feu
 netsh advfirewall firewall delete rule name="Mosquitto MQTT - Liste de courses" >nul 2>&1
-netsh advfirewall firewall add rule name="Mosquitto MQTT - Liste de courses" dir=in action=allow protocol=TCP localport=%PORT% profile=private,domain >nul
-echo       ok : port %PORT% ouvert sur les reseaux prives
+netsh advfirewall firewall add rule name="Mosquitto MQTT - Liste de courses" dir=in action=allow protocol=TCP localport=%PORT%,%PORTTLS% profile=private,domain >nul
+echo       ok : ports %PORT% et %PORTTLS% ouverts sur les reseaux prives
 powershell -NoProfile -Command "if (Get-NetConnectionProfile | Where-Object NetworkCategory -eq 'Public') { exit 1 }" && goto reseauok
 echo       ATTENTION : le reseau de ce PC est declare " public " : les telephones ne pourront pas joindre le serveur.
 if defined AUTO goto reseauok
@@ -167,33 +196,48 @@ powershell -NoProfile -Command "Get-NetConnectionProfile | Where-Object NetworkC
 echo       ok : reseau declare prive
 :reseauok
 
-rem --- 6. Reglages pour l'application, puis verification
-echo [6/6] Reglages a saisir dans l'application
+rem --- 7. Reglages pour l'application, puis verification
+echo [7/7] Reglages a saisir dans l'application
 set "ADRESSES="
 for /f "delims=" %%a in ('powershell -NoProfile -Command "(Get-NetIPAddress -AddressFamily IPv4 | Where-Object { $_.IPAddress -notlike '127.*' -and $_.IPAddress -notlike '169.254.*' }).IPAddress -join '  ou  '"') do set "ADRESSES=%%a"
+rem Adresse Internet de la box (celle que l'on joint de l'exterieur)
+set "PUBLIQUE="
+for /f "delims=" %%a in ('curl -s -4 --max-time 8 https://api.ipify.org 2^>nul') do set "PUBLIQUE=%%a"
+if not defined PUBLIQUE set "PUBLIQUE=(inconnue : voir l'interface de la box)"
 set "REGLAGES=%ICI%Reglages du serveur MQTT.txt"
 > "%REGLAGES%" echo Liste de courses : Gerer ^> Mon foyer ^> Partage entre appareils ^> Serveur MQTT
 >> "%REGLAGES%" echo.
+>> "%REGLAGES%" echo A LA MAISON ET A L'EXTERIEUR (chiffre, recommande)
+>> "%REGLAGES%" echo   Adresse du serveur : %PUBLIQUE%   (adresse Internet de la box)
+>> "%REGLAGES%" echo   Port : %PORTTLS%
+>> "%REGLAGES%" echo   Connexion chiffree TLS : cochee
+>> "%REGLAGES%" echo   Identifiant : %UTIL%
+>> "%REGLAGES%" echo   Mot de passe : %MDP%
+>> "%REGLAGES%" echo   Certificat : l'application doit afficher %EMPREINTE%
+>> "%REGLAGES%" echo   Sur la box : rediriger le port TCP %PORTTLS% vers ce PC (%ADRESSES%),
+>> "%REGLAGES%" echo   et donner a ce PC une adresse fixe (bail DHCP statique). Ne pas rediriger le port %PORT%.
+>> "%REGLAGES%" echo.
+>> "%REGLAGES%" echo A LA MAISON SEULEMENT (sans chiffrement)
 >> "%REGLAGES%" echo   Adresse du serveur : %ADRESSES%
 >> "%REGLAGES%" echo   Port : %PORT%
 >> "%REGLAGES%" echo   Connexion chiffree TLS : decochee
->> "%REGLAGES%" echo   Identifiant : %UTIL%
->> "%REGLAGES%" echo   Mot de passe : %MDP%
+>> "%REGLAGES%" echo   Identifiant et mot de passe : les memes
 >> "%REGLAGES%" echo.
->> "%REGLAGES%" echo Le telephone doit etre sur le Wi-Fi de la maison, le PC allume.
+>> "%REGLAGES%" echo Le PC doit rester allume (sans mise en veille). Tous les appareils ont les memes reglages.
 type "%REGLAGES%"
 echo.
 echo   Ces reglages sont gardes dans "%REGLAGES%"
 echo.
 
-set "VERIF=%ICI%Verifier-serveur-MQTT.exe"
-if not exist "%VERIF%" goto fin
-echo Verification du serveur...
+echo Verification du serveur, port %PORT% puis port chiffre %PORTTLS%...
+echo.
+"%VERIF%" --hote 127.0.0.1 --port %PORT% --utilisateur %UTIL% --mot-de-passe %MDP% --sans-pause
+if errorlevel 1 goto echec
 echo.
 if defined AUTO (
-  "%VERIF%" --hote 127.0.0.1 --port %PORT% --utilisateur %UTIL% --mot-de-passe %MDP% --sans-pause
+  "%VERIF%" --hote 127.0.0.1 --port %PORTTLS% --tls --utilisateur %UTIL% --mot-de-passe %MDP% --sans-pause
 ) else (
-  "%VERIF%" --hote 127.0.0.1 --port %PORT% --utilisateur %UTIL% --mot-de-passe %MDP%
+  "%VERIF%" --hote 127.0.0.1 --port %PORTTLS% --tls --utilisateur %UTIL% --mot-de-passe %MDP%
 )
 if errorlevel 1 goto echec
 

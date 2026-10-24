@@ -3,11 +3,15 @@
 //
 // Usage : Verifier-serveur-MQTT.exe [--hote 127.0.0.1] [--port 1883] [--tls] [--utilisateur u] [--mot-de-passe p] [--sans-pause]
 // Sans paramètre, les réponses sont demandées à l'écran.
+// Verifier-serveur-MQTT.exe --creer-certificat <dossier> : écrit serveur.crt, serveur.key et empreinte.txt
+// (certificat du serveur Mosquitto, fait ici : Windows n'a pas openssl).
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:basic_utils/basic_utils.dart';
+import 'package:crypto/crypto.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 
@@ -35,11 +39,36 @@ String demander(String question, String defaut) {
 late String hote, utilisateur, motDePasse;
 late int port;
 late bool tls;
+String? certificatDuPc;
+
+/// Les 16 premiers chiffres de l'empreinte SHA-256, comme l'application les affiche.
+String empreinteCourte(String hex) =>
+    [for (var i = 0; i < 16; i += 4) hex.substring(i, i + 4).toUpperCase()].join(' ');
+
+/// Certificat du serveur Mosquitto, valable 20 ans, et sa clé.
+void creerCertificat(String dossier) {
+  final paire = CryptoUtils.generateRSAKeyPair();
+  final prive = paire.privateKey as RSAPrivateKey, public = paire.publicKey as RSAPublicKey;
+  final csr = X509Utils.generateRsaCsrPem({'CN': 'Liste de courses MQTT', 'O': 'Liste de courses'}, prive, public);
+  final crt = X509Utils.generateSelfSignedCertificate(prive, csr, 365 * 20);
+  final der = CryptoUtils.getBytesFromPEMString(crt);
+  final empreinte = empreinteCourte(sha256.convert(der).toString());
+  Directory(dossier).createSync(recursive: true);
+  File('$dossier/serveur.crt').writeAsStringSync('$crt\n');
+  File('$dossier/serveur.key').writeAsStringSync('${CryptoUtils.encodeRSAPrivateKeyToPem(prive)}\n');
+  File('$dossier/empreinte.txt').writeAsStringSync(empreinte);
+  stdout.writeln('Certificat créé, empreinte $empreinte');
+}
 
 /// Client connecté, ou null (la raison est affichée).
 Future<MqttServerClient?> client(String id, {bool propre = true, bool anonyme = false, bool silencieux = false, String? testament}) async {
   final c = MqttServerClient.withPort(hote, id, port)
     ..secure = tls
+    // Certificat fait sur le PC (Mosquitto) : il n'est signé par aucune autorité, l'empreinte est affichée
+    ..onBadCertificate = (Object c) {
+      certificatDuPc ??= empreinteCourte(sha256.convert((c as X509Certificate).der).toString());
+      return true;
+    }
     ..keepAlivePeriod = 20
     ..connectTimeoutPeriod = 6000
     ..autoReconnect = false
@@ -130,6 +159,11 @@ Future<void> main(List<String> args) async {
     } catch (_) {}
     stdout.encoding = utf8;
   }
+  final dossierCertificat = arg('creer-certificat');
+  if (dossierCertificat != null) {
+    creerCertificat(dossierCertificat);
+    exit(0);
+  }
   stdout.writeln('Vérification d\'un serveur MQTT pour Liste de courses');
   stdout.writeln('====================================================');
   final interactif = arg('hote') == null;
@@ -152,8 +186,13 @@ Future<void> main(List<String> args) async {
     info('Adresse du serveur : ${locale && adresses.isNotEmpty ? adresses.join('  ou  ') : hote}');
     info('Port : $port');
     info('Connexion chiffrée (TLS) : ${tls ? 'cochée' : 'décochée'}');
+    if (certificatDuPc != null) info('Certificat du serveur : $certificatDuPc (l\'application affiche le même)');
     if (utilisateur.isNotEmpty) info('Identifiant : $utilisateur   (et son mot de passe)');
-    if (locale) info('Le téléphone doit être sur le même réseau Wi-Fi que ce PC.');
+    if (locale) {
+      info(tls
+          ? 'Hors de la maison : adresse Internet de la box, avec le port $port redirigé vers ce PC.'
+          : 'Le téléphone doit être sur le même réseau Wi-Fi que ce PC.');
+    }
   } else {
     stdout.writeln('RESULTAT : $_echecs vérification(s) en échec, le serveur ne convient pas encore.');
   }
@@ -195,6 +234,7 @@ Future<void> verifier() async {
   final a = await client('ldc-verif-a-$essai');
   if (a == null) return;
   ok('connecté');
+  if (certificatDuPc != null) info('certificat fait sur le PC (non signé par une autorité), empreinte $certificatDuPc');
   if (utilisateur.isNotEmpty) {
     final anonyme = await client('ldc-verif-anonyme-$essai', anonyme: true, silencieux: true);
     if (anonyme != null) {

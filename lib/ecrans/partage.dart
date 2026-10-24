@@ -69,6 +69,8 @@ class EcranPartage extends StatelessWidget {
     final aFaire = switch (s.pastille) {
       'blanc' => 'Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » avec le code obtenu. '
           'Tous doivent avoir les mêmes réglages de serveur MQTT (plus bas).',
+      'rouge' when s.certificatRefuse != null =>
+        'Le serveur présente un autre certificat que celui reconnu au départ : voyez « Serveur MQTT » plus bas.',
       'rouge' => 'Vérifiez le réseau (Wi-Fi ou données mobiles) et les réglages du serveur MQTT plus bas. '
           'Les modifications sont gardées et partiront dès que le serveur répondra.',
       'orange' => 'Ouvrez l\'application sur un autre appareil du foyer. Pour un nouvel appareil : « Rejoindre un foyer » '
@@ -291,8 +293,8 @@ class _ServeurState extends State<_Serveur> {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: 6),
-        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (HiveMQ Cloud, gratuit), '
-            'indiquez son adresse, le port 8883 et l\'identifiant créé sur le site de HiveMQ. '
+        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (HiveMQ Cloud, gratuit, '
+            'ou Mosquitto sur votre PC), indiquez son adresse, son port et son identifiant. '
             'Tous les appareils du foyer doivent utiliser le même serveur.',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
         const SizedBox(height: 6),
@@ -310,6 +312,22 @@ class _ServeurState extends State<_Serveur> {
             ]),
           ),
         ),
+        if (Synchro.instance.certificatRefuse case final refuse?) ...[
+          Text('Le serveur présente un autre certificat (${ServeurMqtt.empreinteCourte(refuse)}) que celui reconnu '
+              'au départ (${ServeurMqtt.empreinteCourte(widget.serveur.empreinte)}). Acceptez-le seulement si vous '
+              'avez réinstallé votre serveur : comparez avec l\'empreinte affichée par le .bat.',
+              style: Charte.texte(14, couleur: _rouge)),
+          const SizedBox(height: 6),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: BoutonAction('Accepter ce certificat', onTap: Synchro.instance.accepterCertificat),
+          ),
+          const SizedBox(height: 8),
+        ] else if (tls && widget.serveur.empreinte.isNotEmpty) ...[
+          Text('Certificat du serveur reconnu : ${ServeurMqtt.empreinteCourte(widget.serveur.empreinte)}',
+              style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 8),
+        ],
         _champ('Identifiant', utilisateur, aide: 'vide pour le serveur public'),
         _champ('Mot de passe', mdp, secret: true),
         const SizedBox(height: 6),
