@@ -661,8 +661,8 @@ void main() {
     testWidgets('préparation, mode Rechercher : l\'article trouvé s\'ajoute, seul son secteur est ouvert', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
-      await _toucher(tester, find.text('Rechercher'));
-      expect(Etat.instance.ajoutParRecherche, isTrue);
+      await _toucher(tester, find.text('Parcourir'));
+      expect(Etat.instance.ajoutParRecherche, isTrue, reason: '« Parcourir » relâché : mode recherche');
       final l = Etat.instance.liste('l1')!;
       final huile = Etat.instance.produits.firstWhere((p) => p.nom == 'Huile d\'olive');
       expect(Etat.instance.ligne(l, huile.id), isNull);
@@ -675,6 +675,17 @@ void main() {
       expect(find.text('Huile d\'olive'), findsOneWidget);
       expect(find.text('+ Marque'), findsOneWidget, reason: 'on est sur l\'article, ses pastilles sont visibles');
       expect(find.text('+ Produit absent de ce secteur'), findsNothing, reason: 'la liste seule, pas le catalogue');
+      expect(find.byKey(const ValueKey('option-recherche-0')), findsNothing, reason: 'liste des trouvés fermée');
+      expect(tester.widget<TextField>(find.byKey(const ValueKey('champ-recherche'))).controller!.text, isEmpty);
+
+      // Article déjà dans la liste : on va dessus, sans rien ajouter.
+      final n = l.lignes.length;
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'huile oli');
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('option-recherche-0')), findsOneWidget, reason: 'la recherche répond encore');
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      expect(l.lignes.length, n);
       await tester.pump(const Duration(seconds: 4));
       await _ciblesTactiles(tester);
     });

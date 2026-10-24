@@ -747,8 +747,22 @@ class _EcranConstructionState extends State<EcranConstruction> {
           key: ValueKey('recherche-${l.id}'),
           produits: () => etat.produits,
           detail: ou,
-          coche: (p) => etat.ligne(l, p.id) != null,
-          aide: simple || etat.ajoutParRecherche ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
+          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher un article (3 lettres ou plus)',
+          // Par défaut, l'article trouvé s'ajoute ; « Parcourir » enfoncé : tout le catalogue, la recherche y amène.
+          droite: simple
+              ? null
+              : SizedBox(
+                  width: 120,
+                  child: BoutonEtat(
+                    texte: 'Parcourir',
+                    actif: !etat.ajoutParRecherche,
+                    onTap: () {
+                      final rechercher = !etat.ajoutParRecherche;
+                      etat.options(ajoutParRecherche: rechercher);
+                      setState(() => maListe = rechercher && l.lignes.isNotEmpty);
+                    },
+                  ),
+                ),
           onChoix: (p) => simple
               ? _ajouterSimple(l, p)
               : etat.ajoutParRecherche
@@ -759,20 +773,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
               : etat.ajoutParRecherche
                   ? (n) => _ajouterTrouve(l, etat.creerProduit(n))
                   : null,
-        );
-        // Deux façons de choisir : parcourir le catalogue, ou rechercher (l'article trouvé s'ajoute).
-        final mode = Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 8),
-          child: Bascule(
-            options: const ['Parcourir', 'Rechercher'],
-            index: etat.ajoutParRecherche ? 1 : 0,
-            hauteur: 48,
-            douce: true,
-            onChange: (i) {
-              etat.options(ajoutParRecherche: i == 1);
-              setState(() => maListe = i == 1 && l.lignes.isNotEmpty);
-            },
-          ),
         );
         if (simple) {
           return PageBase(
@@ -850,7 +850,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
         return PageBase(
           entete: entete,
-          haut: [recherche, mode, Container(height: 1, color: Charte.separateurZone)],
+          haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
           corps: elements.isEmpty
               ? Padding(
                   padding: const EdgeInsets.all(16),
@@ -991,7 +991,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
       _allerA(l, s);
     }
     _amener(p.id, essais: 3);
-    if (deja) Nav.message(context, '« ${p.nom} » est déjà dans la liste');
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _surligne == p.id) setState(() => _surligne = null);
     });

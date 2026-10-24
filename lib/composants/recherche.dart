@@ -37,7 +37,7 @@ class ChampRecherche extends StatefulWidget {
     required this.onChoix,
     this.onNouveau,
     this.detail,
-    this.coche,
+    this.droite,
     this.aide = 'Rechercher un article',
   });
   final Iterable<Produit> Function() produits;
@@ -47,8 +47,8 @@ class ChampRecherche extends StatefulWidget {
   /// Ligne d'explication sous le nom (ex. : rayon › secteur).
   final String Function(Produit p)? detail;
 
-  /// Article déjà dans la liste : une coche s'affiche à droite.
-  final bool Function(Produit p)? coche;
+  /// Bouton à droite du champ (ex. : « Parcourir »).
+  final Widget? droite;
   final String aide;
 
   @override
@@ -66,69 +66,93 @@ class _ChampRechercheState extends State<ChampRecherche> {
     super.dispose();
   }
 
+  /// Le champ est recréé après chaque choix : la liste des articles trouvés ne peut pas rester affichée
+  /// sous un champ vide.
+  int _generation = 0;
+
   void _fini() {
     _texte.clear();
     _focus.unfocus();
+    setState(() => _generation++);
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(10, 8, 10, 8),
-      child: LayoutBuilder(
-        builder: (context, contraintes) => RawAutocomplete<Object>(
-          textEditingController: _texte,
-          focusNode: _focus,
-          displayStringForOption: (_) => '',
-          optionsBuilder: (v) {
-            final t = v.text.trim();
-            if (normaliser(t).length < lettresRecherche) return const [];
-            final res = <Object>[...chercherProduits(widget.produits(), t)];
-            final existe = res.any((p) => normaliser((p as Produit).nom) == normaliser(t));
-            if (widget.onNouveau != null && !existe) res.add(t);
-            return res;
-          },
-          onSelected: (o) {
-            _fini();
-            if (o is Produit) {
-              widget.onChoix(o);
-            } else if (o is String) {
-              widget.onNouveau?.call(o);
-            }
-          },
-          fieldViewBuilder: (context, controleur, focus, valider) => TextField(
-            key: const ValueKey('champ-recherche'),
-            controller: controleur,
-            focusNode: focus,
-            style: Charte.texte(16),
-            textInputAction: TextInputAction.search,
-            decoration: InputDecoration(
-              isDense: true,
-              hintText: widget.aide,
-              prefixIcon: Icon(Icons.search, color: Charte.cadre),
-              suffixIcon: ListenableBuilder(
-                listenable: controleur,
-                builder: (context, _) => controleur.text.isEmpty
-                    ? const SizedBox.shrink()
-                    : IconButton(tooltip: 'Effacer', icon: const Icon(Icons.close), onPressed: _fini),
-              ),
-              filled: true,
-              fillColor: Charte.blanc,
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: Charte.separateurZone)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(24), borderSide: BorderSide(color: Charte.separateurZone)),
+      child: Row(
+        children: [
+          Expanded(child: _champ()),
+          if (widget.droite != null) ...[const SizedBox(width: 8), widget.droite!],
+        ],
+      ),
+    );
+  }
+
+  Widget _champ() {
+    return LayoutBuilder(
+      builder: (context, contraintes) => RawAutocomplete<Object>(
+        key: ValueKey(_generation),
+        textEditingController: _texte,
+        focusNode: _focus,
+        displayStringForOption: (_) => '',
+        optionsBuilder: (v) {
+          final t = v.text.trim();
+          if (normaliser(t).length < lettresRecherche) return const [];
+          final res = <Object>[...chercherProduits(widget.produits(), t)];
+          final existe = res.any((p) => normaliser((p as Produit).nom) == normaliser(t));
+          if (widget.onNouveau != null && !existe) res.add(t);
+          return res;
+        },
+        onSelected: (o) {
+          _fini();
+          if (o is Produit) {
+            widget.onChoix(o);
+          } else if (o is String) {
+            widget.onNouveau?.call(o);
+          }
+        },
+        fieldViewBuilder: (context, controleur, focus, valider) => TextField(
+          key: const ValueKey('champ-recherche'),
+          controller: controleur,
+          focusNode: focus,
+          style: Charte.texte(16),
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            isDense: true,
+            hintText: widget.aide,
+            hintMaxLines: 2,
+            hintStyle: Charte.texte(13, couleur: Charte.texteSecondaire),
+            prefixIcon: Icon(Icons.search, color: Charte.cadre),
+            suffixIcon: ListenableBuilder(
+              listenable: controleur,
+              builder: (context, _) => controleur.text.isEmpty
+                  ? const SizedBox.shrink()
+                  : IconButton(tooltip: 'Effacer', icon: const Icon(Icons.close), onPressed: _fini),
+            ),
+            filled: true,
+            fillColor: Charte.blanc,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: BorderSide(color: Charte.separateurZone),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(24),
+              borderSide: BorderSide(color: Charte.separateurZone),
             ),
           ),
-          optionsViewBuilder: (context, choisir, options) => Align(
-            alignment: Alignment.topLeft,
-            child: Container(
-              decoration: BoxDecoration(
-                color: Charte.blanc,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Charte.separateurZone),
-                boxShadow: const [BoxShadow(color: Color(0x2E000000), blurRadius: 10, offset: Offset(0, 3))],
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: Material(
+        ),
+        optionsViewBuilder: (context, choisir, options) => Align(
+          alignment: Alignment.topLeft,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Charte.blanc,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Charte.separateurZone),
+              boxShadow: const [BoxShadow(color: Color(0x2E000000), blurRadius: 10, offset: Offset(0, 3))],
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: Material(
               type: MaterialType.transparency,
               child: ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: 320, maxWidth: contraintes.maxWidth),
@@ -143,32 +167,38 @@ class _ChampRechercheState extends State<ChampRecherche> {
                         child: Container(
                           constraints: const BoxConstraints(minHeight: 48),
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                          decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
+                          ),
                           child: o is Produit
-                              ? Row(children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(o.nom, style: Charte.texte(16)),
-                                        if (widget.detail?.call(o) case final d? when d.isNotEmpty)
-                                          Text(d, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                                      ],
+                              ? Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(o.nom, style: Charte.texte(16)),
+                                          if (widget.detail?.call(o) case final d? when d.isNotEmpty)
+                                            Text(d, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  if (widget.coche?.call(o) ?? false) Icon(Icons.check, color: Charte.cadre),
-                                ])
-                              : Row(children: [
-                                  Icon(Icons.add_circle_outline, color: Charte.cadre),
-                                  const SizedBox(width: 8),
-                                  Expanded(child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre))),
-                                ]),
+                                  ],
+                                )
+                              : Row(
+                                  children: [
+                                    Icon(Icons.add_circle_outline, color: Charte.cadre),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
+                                    ),
+                                  ],
+                                ),
                         ),
                       ),
                   ],
                 ),
-              ),
               ),
             ),
           ),
