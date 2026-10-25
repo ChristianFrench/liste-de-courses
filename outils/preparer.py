@@ -94,11 +94,6 @@ remplacer("android/app/build.gradle.kts",
           'signingConfig = signingConfigs.getByName("debug")',
           'signingConfig = signingConfigs.getByName("essai")')
 
-# iPhone : nom sous l'icône
-remplacer("ios/Runner/Info.plist",
-          r"(<key>CFBundleDisplayName</key>\s*<string>)[^<]*(</string>)",
-          rf"\g<1>{NOM}\g<2>", regex=True)
-
 # Windows : taille de la fenêtre au format téléphone, ajustée à la hauteur de l'écran
 TAILLE_FENETRE = """// Fenetre au format telephone (rapport %d x %d), ajustee a la hauteur utile de l ecran
   RECT zone;
