@@ -118,3 +118,12 @@ remplacer("windows/runner/main.cpp",
 remplacer("windows/runner/win32_window.cpp",
           r"\bWS_OVERLAPPEDWINDOW\b(?! &)",
           "(WS_OVERLAPPEDWINDOW & ~WS_THICKFRAME & ~WS_MAXIMIZEBOX)", regex=True)
+
+# Web : nom, langue et couleurs (page d'accueil et application installée sur l'écran d'accueil)
+remplacer("web/index.html", "<html>", '<html lang="fr">')
+remplacer("web/index.html", "<title>liste_de_courses</title>", f"<title>{NOM}</title>")
+remplacer("web/index.html", 'content="liste_de_courses"', f'content="{NOM}"')
+remplacer("web/index.html", 'content="A new Flutter project."', f'content="{NOM} partagée du foyer"')
+remplacer("web/manifest.json", r'"(short_)?name": "liste_de_courses"', lambda m: f'"{m[1] or ""}name": "{NOM}"', regex=True)
+remplacer("web/manifest.json", '"A new Flutter project."', f'"{NOM} partagée du foyer"')
+remplacer("web/manifest.json", '"#0175C2"', '"#3F7D5A"')

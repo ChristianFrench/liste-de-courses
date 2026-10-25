@@ -4,8 +4,8 @@ import 'dart:math' show Random;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:path_provider/path_provider.dart';
 
+import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'images_choisies.dart';
 import 'stockage.dart';
@@ -463,7 +463,7 @@ class Etat extends ChangeNotifier {
 
   // ------------------------------------------------------------ Chargement et enregistrement
 
-  Directory? _dossier;
+  String? _dossier;
   Stockage? _foyer;
   Stockage? get _actif => _foyer;
 
@@ -473,7 +473,7 @@ class Etat extends ChangeNotifier {
   /// Appelé après chaque enregistrement de la base du foyer (synchronisation).
   VoidCallback? surEnregistrement;
 
-  String _chemin(String nom) => '${_dossier!.path}${Platform.pathSeparator}$nom';
+  String _chemin(String nom) => cheminBase(_dossier!, nom);
 
   Future<Map<String, dynamic>> _donneesDemo() async =>
       jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>;
@@ -483,11 +483,9 @@ class Etat extends ChangeNotifier {
   Future<void> charger({Directory? dossier}) async {
     if (enregistrementActif) {
       try {
-        final d = dossier ?? await getApplicationSupportDirectory();
-        if (!d.existsSync()) d.createSync(recursive: true);
-        _dossier = d;
+        _dossier = await preparerDossierBases(dossier?.path);
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
-        _reprendreDemonstration();
+        await _reprendreDemonstration();
         await _ouvrirActif();
         return;
       } catch (e) {
@@ -502,15 +500,15 @@ class Etat extends ChangeNotifier {
 
   /// Il n'y a plus de mode démonstration (24/10/2026). Un appareil qui l'affichait garde ce qu'il
   /// montrait : la base de démonstration devient celle du foyer, l'autre est gardée dans un fichier à part.
-  void _reprendreDemonstration() {
+  Future<void> _reprendreDemonstration() async {
     final f = _foyer!;
     if (f.reglage('mode_demo') != '1') return;
-    final demo = File(_chemin(baseDemo));
+    final demo = _chemin(baseDemo);
     f.definirReglage('mode_demo', '0');
-    if (!demo.existsSync()) return;
+    if (!baseExiste(demo)) return;
     f.fermer();
-    File(_chemin(baseFoyer)).renameSync('${_chemin(baseFoyer)}.avant-fusion-${_horodatage()}');
-    demo.renameSync(_chemin(baseFoyer));
+    await renommerBase(_chemin(baseFoyer), '${_chemin(baseFoyer)}.avant-fusion-${_horodatage()}');
+    await renommerBase(demo, _chemin(baseFoyer));
     _foyer = Stockage.ouvrir(_chemin(baseFoyer));
   }
 
@@ -537,8 +535,8 @@ class Etat extends ChangeNotifier {
       return;
     }
     _foyer?.fermer();
-    final f = File(_chemin(baseFoyer));
-    if (f.existsSync()) f.renameSync('${f.path}.avant-neuf-${_horodatage()}');
+    final f = _chemin(baseFoyer);
+    if (baseExiste(f)) await renommerBase(f, '$f.avant-neuf-${_horodatage()}');
     _foyer = Stockage.ouvrir(_chemin(baseFoyer));
     await _ouvrirActif();
     notifyListeners();
@@ -652,8 +650,8 @@ class Etat extends ChangeNotifier {
       return;
     }
     _foyer?.fermer();
-    final f = File(_chemin(baseFoyer));
-    if (f.existsSync()) f.renameSync('${f.path}.avant-partage-${_horodatage()}');
+    final f = _chemin(baseFoyer);
+    if (baseExiste(f)) await renommerBase(f, '$f.avant-partage-${_horodatage()}');
     final s = _foyer = Stockage.ouvrir(_chemin(baseFoyer));
     final depart = _depart(demo);
     final moiJson = (depart['membres'] as List).first as Map;

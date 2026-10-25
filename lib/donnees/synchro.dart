@@ -10,14 +10,13 @@
 // simultanées du même objet, la plus récente l'emporte, sur tous les appareils.
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
-import 'package:mqtt_client/mqtt_server_client.dart';
 
+import 'client_mqtt.dart';
 import 'modele.dart';
 import 'stockage.dart';
 
@@ -201,14 +200,7 @@ class Synchro extends ChangeNotifier {
 
   String get _sujet => 'ldc/$code';
   String get nomAppareil {
-    final systeme = Platform.isAndroid
-        ? 'Android'
-        : Platform.isIOS
-            ? 'iPhone'
-            : Platform.isWindows
-                ? 'Windows'
-                : Platform.operatingSystem;
-    return '${_etat.moi.nomAffiche} · $systeme';
+    return '${_etat.moi.nomAffiche} · $nomSysteme';
   }
 
   int get enAttente => _base?.nbEnAttente ?? 0;
@@ -586,7 +578,7 @@ class TransportMqtt implements Transport {
   TransportMqtt(this.serveur);
   final ServeurMqtt serveur;
 
-  MqttServerClient? _client;
+  MqttClient? _client;
   late String _empreinte = serveur.empreinte;
   final _messages = StreamController<(String, String)>.broadcast();
   final _etats = StreamController<String>.broadcast();
@@ -610,9 +602,7 @@ class TransportMqtt implements Transport {
     required String abonnement,
   }) async {
     _abonnement = abonnement;
-    final c = MqttServerClient.withPort(serveur.hote, identifiant, serveur.port)
-      ..secure = serveur.tls
-      ..onBadCertificate = _certificat
+    final c = creerClientMqtt(serveur.hote, serveur.port, serveur.tls, identifiant, _certificat)
       ..keepAlivePeriod = 30
       ..autoReconnect = true
       ..resubscribeOnAutoReconnect = true
@@ -664,8 +654,8 @@ class TransportMqtt implements Transport {
 
   /// Certificat non signé par une autorité (Mosquitto sur le PC) : accepté la première fois,
   /// ensuite seulement s'il est le même.
-  bool _certificat(Object c) {
-    final e = sha256.convert((c as X509Certificate).der).toString();
+  bool _certificat(List<int> der) {
+    final e = sha256.convert(der).toString();
     if (_empreinte.isEmpty) {
       _empreinte = e;
       _etats.add('certificat:$e');

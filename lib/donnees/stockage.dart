@@ -1,6 +1,8 @@
 import 'dart:convert';
 
-import 'package:sqlite3/sqlite3.dart';
+import 'package:sqlite3/common.dart';
+
+import 'base_locale.dart';
 
 import 'schema_v2.dart';
 import 'synchro.dart' show Horloge;
@@ -95,7 +97,7 @@ const _statuts = {'enConstruction': 'construction', 'prete': 'prete', 'enCours':
 class Stockage {
   Stockage._(this._db);
 
-  final Database _db;
+  final CommonDatabase _db;
 
   /// Dernière valeur écrite, par « table | clé » : évite de réécrire ce qui n'a pas changé.
   final Map<String, String> _ecrit = {};
@@ -104,7 +106,7 @@ class Stockage {
   final List<String> erreurs = [];
 
   static Stockage ouvrir(String chemin) {
-    final db = sqlite3.open(chemin);
+    final db = ouvrirBase(chemin);
     db.execute('PRAGMA foreign_keys = ON');
     final s = Stockage._(db);
     if (!s._existe('foyer')) s._creer();
@@ -317,8 +319,8 @@ class Stockage {
     final maintenant = DateTime.now().toUtc().toIso8601String().substring(0, 19);
     final lignes = _lignes(etat);
     erreurs.clear();
-    final requetes = <String, PreparedStatement>{};
-    PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
+    final requetes = <String, CommonPreparedStatement>{};
+    CommonPreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
 
     _db.execute('BEGIN');
     try {
@@ -382,7 +384,7 @@ class Stockage {
 
   /// Réécrit les liens d'un parent quand ils ont changé ; rend les clés présentes.
   Set<String> _ecrireEnsemble(
-      _Ensemble e, List<Map<String, Object?>> liens, PreparedStatement Function(String) requete) {
+      _Ensemble e, List<Map<String, Object?>> liens, CommonPreparedStatement Function(String) requete) {
     final parParent = <String, List<Object?>>{};
     for (final l in liens) {
       (parParent[l[e.parent] as String] ??= []).add(l[e.enfant]);
@@ -406,7 +408,7 @@ class Stockage {
   }
 
   /// Insère la ligne, ou met à jour celle qui a la même clé.
-  void _inserer(_Table t, Map<String, Object?> valeurs, PreparedStatement Function(String) requete) {
+  void _inserer(_Table t, Map<String, Object?> valeurs, CommonPreparedStatement Function(String) requete) {
     final colonnes = valeurs.keys.toList();
     final maj = [
       for (final c in colonnes)
@@ -417,7 +419,7 @@ class Stockage {
         .execute([for (final c in colonnes) valeurs[c]]);
   }
 
-  void _retirer(String cle, String maintenant, PreparedStatement Function(String) requete) {
+  void _retirer(String cle, String maintenant, CommonPreparedStatement Function(String) requete) {
     final morceaux = cle.split(_sep);
     final nom = morceaux.first;
     final valeurs = morceaux.sublist(1);
@@ -674,7 +676,7 @@ class Stockage {
   Horloge? horloge;
 
   /// Note un changement à envoyer, sauf s'il ne change rien à ce que les autres appareils ont déjà.
-  void _journaliser(String table, List<Object?> cle, Map<String, Object?>? valeurs, PreparedStatement Function(String) requete) {
+  void _journaliser(String table, List<Object?> cle, Map<String, Object?>? valeurs, CommonPreparedStatement Function(String) requete) {
     final h = horloge;
     if (h == null || table == 'invitation') return;
     if (table == 'parametre' && !_parametresPartages.contains(cle.first)) return;
@@ -713,8 +715,8 @@ class Stockage {
   /// Note tout le contenu de l'état comme à envoyer (premier appareil du partage), ou seulement [tables].
   void toutJournaliser(Map<String, dynamic> etat, {Set<String>? tables}) {
     final lignes = _lignes(etat);
-    final requetes = <String, PreparedStatement>{};
-    PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
+    final requetes = <String, CommonPreparedStatement>{};
+    CommonPreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
     _db.execute('BEGIN');
     try {
       for (final t in _tables) {
@@ -794,8 +796,8 @@ class Stockage {
     erreurs.clear();
     ignores = 0;
     var n = 0;
-    final requetes = <String, PreparedStatement>{};
-    PreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
+    final requetes = <String, CommonPreparedStatement>{};
+    CommonPreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
     // Les objets arrivent dans le désordre (un emplacement avant son produit) : pas de contrôle des
     // références pendant l'intégration.
     _db.execute('PRAGMA foreign_keys = OFF');
@@ -839,7 +841,7 @@ class Stockage {
   }
 
   void _integrer(String table, List<Object?> cle, Map<String, Object?>? valeurs, String foyerId, String maintenant,
-      PreparedStatement Function(String) requete) {
+      CommonPreparedStatement Function(String) requete) {
     final ens = _ensembles[table];
     if (ens != null) {
       requete('DELETE FROM $table WHERE ${ens.parent} = ?').execute(cle);

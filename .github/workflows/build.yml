@@ -1,4 +1,4 @@
-name: Compilation Android, Windows, iPhone
+name: Compilation Android, Windows, iPhone, web
 
 on:
   push:
@@ -246,6 +246,60 @@ jobs:
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation iPhone"; else tail -n 20 compilation.log; fi
           exit $code
+
+  web:
+    # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
+    if: "!contains(github.event.head_commit.message, '[rapide]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        run: |
+          flutter create --org fr.listecourses --project-name liste_de_courses --platforms web .
+          python3 outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons -f outils/web/icones.yaml
+          # sqlite3 compilé en WebAssembly, de la même version que le paquet Dart
+          V=$(python3 -c "import re; print(re.search(r'\n  sqlite3:\n(?:    .*\n)*?    version: \"([^\"]+)\"', open('pubspec.lock').read())[1])")
+          curl -fsSL -o web/sqlite3.wasm "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-$V/sqlite3.wasm"
+      - name: Compiler la version web
+        run: |
+          set +e
+          flutter build web --release --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
+          exit $code
+      - name: Assembler le site (page de présentation + application)
+        run: |
+          mkdir site
+          cp -r docs/. site/
+          cp -r build/web site/web
+          touch site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+
+  site_web:
+    name: publication de la version web (GitHub Pages)
+    needs: web
+    if: github.ref == 'refs/heads/main'
+    concurrency: site_web
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}web/
+    steps:
+      - name: Publier le site par GitHub Actions (au lieu du dossier docs/)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X PUT repos/${{ github.repository }}/pages -f build_type=workflow || echo "::warning::Réglage Pages à faire à la main : Settings > Pages > Source = GitHub Actions"
+      - id: deploiement
+        uses: actions/deploy-pages@v4
 
   publication:
     name: publication (page « derniere-version »)

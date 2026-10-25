@@ -1,0 +1,8 @@
+# Icônes de la version web (compilation GitHub Actions, tâche « web »)
+flutter_launcher_icons:
+  image_path: "assets/icone.png"
+  web:
+    generate: true
+    image_path: "assets/icone.png"
+    background_color: "#FFFFFF"
+    theme_color: "#3F7D5A"

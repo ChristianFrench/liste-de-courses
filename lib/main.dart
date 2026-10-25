@@ -15,10 +15,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Etat.instance.charger();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
-  // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan
-  CatalogueOff.instance.demarrer();
+  // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
+  if (!kIsWeb) CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
-  TicketRecu.demarrer();
+  if (!kIsWeb) TicketRecu.demarrer();
   // Partage du foyer entre appareils (si cet appareil partage)
   Synchro.instance.demarrer();
 }
@@ -59,8 +59,9 @@ class ListeDeCoursesApp extends StatelessWidget {
 const tailleTelephone = Size(390, 844);
 
 /// Sous Windows, l'application est dessinée sur un écran virtuel de téléphone (390 × 844)
-/// puis ajustée à la fenêtre (390 × 844 si l'écran le permet). Sur téléphone, seule la taille
-/// des caractères choisie dans les réglages est bornée, pour éviter les textes coupés.
+/// puis ajustée à la fenêtre (390 × 844 si l'écran le permet) ; de même dans le navigateur d'un PC.
+/// Sur téléphone, seule la taille des caractères choisie dans les réglages est bornée, pour éviter
+/// les textes coupés.
 class FormatTelephone extends StatelessWidget {
   const FormatTelephone({super.key, required this.child});
   final Widget child;
@@ -69,11 +70,12 @@ class FormatTelephone extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final bornee = media.copyWith(textScaler: media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.15));
-    if (kIsWeb || defaultTargetPlatform != TargetPlatform.windows) {
+    final navigateurPc = kIsWeb && media.size.width > 600;
+    if (!navigateurPc && (kIsWeb || defaultTargetPlatform != TargetPlatform.windows)) {
       return MediaQuery(data: bornee, child: child);
     }
     return ColoredBox(
-      color: Colors.white,
+      color: navigateurPc ? const Color(0xFFDDE5DF) : Colors.white,
       child: FittedBox(
         child: SizedBox.fromSize(
           size: tailleTelephone,

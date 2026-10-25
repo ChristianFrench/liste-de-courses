@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
 
@@ -222,6 +223,10 @@ class BlocTicket extends StatelessWidget {
 
 /// Joint à la course le ticket PDF téléchargé depuis l'application du magasin, puis demande le montant.
 Future<void> joindreTicket(BuildContext context, Etat etat, Course c) async {
+  if (kIsWeb) {
+    Nav.message(context, 'Les tickets PDF ne sont pas disponibles dans la version web');
+    return;
+  }
   final t = await joindreTicketPdf(etat, c);
   if (t == null || !context.mounted) return;
   await lireEtDecrire(context, t);
