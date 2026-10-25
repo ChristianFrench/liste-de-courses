@@ -358,10 +358,10 @@ class Aides {
       'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Courses › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
-      'Mon foyer : le foyer (son nom, repartir d\'un foyer neuf) et ses membres (avec leur adresse mail pour l\'envoi des listes).\n'
-      'Magasins : magasins et catalogue (rayons, secteurs, produits, images), parcours appris pendant vos courses, '
-      'réglages des listes (types de promotion et de packaging, préliste), produits réels (essai).\n'
-      'Paramètres : apparence (couleurs), données (listes exemples, suppression des archives), MQTT (configuration du partage entre appareils).\n'
+      'Mon foyer : le foyer (son nom, ses membres avec leur adresse mail, repartir d\'un foyer neuf).\n'
+      'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins), '
+      'les types de promotion, les marques, les types de packaging et les produits réels (essai).\n'
+      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), MQTT (configuration du partage entre appareils).\n'
       'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
@@ -410,9 +410,17 @@ class Aides {
       '« Terminer les courses » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
       'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n$_gestes';
 
-  static const magasins = 'Vos magasins, avec leurs rayons, secteurs et produits. Choisissez le magasin en haut à droite.\n'
-      'Touchez un rayon pour ses secteurs, un secteur pour ses produits, un produit pour sa fiche. '
-      'Un appui long ouvre les actions de la ligne.\n$_gestes';
+  static const magasins = 'Vos magasins. Ils ont tous le même catalogue ; touchez un magasin pour ses parcours, '
+      'le renommer ou le supprimer.\n$_gestes';
+
+  static const catalogue = 'Le catalogue du foyer, le même dans tous les magasins : ses rayons, ses secteurs et ses produits. '
+      'Les rayons et les secteurs ne changent pas ; vous pouvez ajouter des produits (ici, ou depuis la recherche d\'une liste) '
+      'et les modifier.\n'
+      'Un petit + signale un produit ajouté par le foyer, un petit crayon un produit modifié ; '
+      '« Ajoutés ou modifiés » les rassemble pour les corriger ou les supprimer.\n$_gestes';
+
+  static const marques = 'Les marques portées par vos produits. Touchez une marque pour la renommer, voir ses produits, '
+      'ou la supprimer si plus aucun produit ne la porte.\n$_gestes';
 
   static const parcours = 'L\'ordre des secteurs appris pendant vos courses, pour chaque membre et chaque magasin. '
       'Il se complète tout seul quand vous passez par de nouveaux secteurs.\n$_gestes';

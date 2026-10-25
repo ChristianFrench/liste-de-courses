@@ -223,10 +223,10 @@ class _Etapes extends StatelessWidget {
       'Je paramètre',
       [
         'Une fois au début, dans l\'onglet Gérer :',
-        '• Mon foyer : les membres qui préparent ou font les courses, avec leur adresse mail pour recevoir les listes.',
-        '• Magasins et catalogue : vos magasins. Chacun reçoit le catalogue complet, rayons, secteurs et produits, '
-            'que vous pouvez compléter.',
-        '• Paramètres : l\'apparence, les types de promotion et de packaging.',
+        '• Mon foyer : le foyer et ses membres, avec leur adresse mail pour recevoir les listes.',
+        '• Courses : vos magasins et leurs parcours, puis le catalogue, le même pour tous les magasins, '
+            'auquel vous pouvez ajouter des produits ; les types de promotion, les marques et les packagings.',
+        '• Paramètres : l\'apparence, les données, la synchronisation.',
         'Le parcours de chaque magasin n\'est pas à décrire : il s\'apprend pendant vos premières courses.',
       ],
     ),

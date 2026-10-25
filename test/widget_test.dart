@@ -5,11 +5,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Axis, Icons, Scrollable, TextField, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show Axis, Icons, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
+import 'package:liste_de_courses/composants/signe_perso.dart';
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
@@ -78,12 +79,15 @@ Future<void> _voir(WidgetTester tester, Finder f) async {
 }
 
 Finder _onglet(String libelle) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(libelle));
-Finder _sousOnglet(String libelle) => find.descendant(of: find.byType(SousOnglets), matching: find.text(libelle));
 
 /// Onglet Gérer, puis la rubrique donnée.
 Future<void> _rubrique(WidgetTester tester, String titre) async {
   await _toucher(tester, _onglet('Gérer'));
   Nav.i.retourOnglet(Nav.gerer); // depuis une rubrique ouverte : retour au menu de Gérer
+  await tester.pumpAndSettle();
+  // Le menu a pu rester défilé vers le bas : on remonte en haut.
+  await tester.drag(find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first,
+      const Offset(0, 2000));
   await tester.pumpAndSettle();
   await _toucher(tester, find.text(titre));
 }
@@ -93,12 +97,7 @@ Future<void> _depuisCourses(WidgetTester tester, String titre) async {
   await _toucher(tester, _onglet('Courses'));
   Nav.i.retourOnglet(Nav.courses);
   await tester.pumpAndSettle();
-  final f = find.text(titre.toUpperCase()); // bandeau en capitales
-  if (f.evaluate().isEmpty) {
-    await tester.scrollUntilVisible(f, 200,
-        scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).hitTestable().first);
-  }
-  await _toucher(tester, f);
+  await _toucher(tester, find.descendant(of: find.byType(BarreAction), matching: find.text(titre)));
 }
 
 Future<void> _ciblesTactiles(WidgetTester tester) => expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
@@ -371,37 +370,35 @@ void main() {
       await _toucher(tester, _onglet('Courses'));
       expect(find.text('LISTES PRÊTES'), findsOneWidget);
       await _ciblesTactiles(tester);
-      for (final (rubrique, sous) in [
-        ('Magasins et catalogue', ['Secteurs', 'Produits', 'Rayons']),
-      ]) {
-        await _rubrique(tester, rubrique);
-        if (rubrique == 'Magasins et catalogue') {
-          expect(find.text('+ Nouveau magasin'), findsOneWidget);
-          await _ciblesTactiles(tester);
-          await _toucher(tester, find.text('Magasin 1'));
-        }
-        for (final s in sous) {
-          await _toucher(tester, _sousOnglet(s));
-          await _ciblesTactiles(tester);
-        }
-      }
+      await _rubrique(tester, 'Magasins');
+      expect(find.text('+ Nouveau magasin'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Catalogue');
+      expect(find.text('+ Nouveau produit'), findsOneWidget);
+      expect(find.text('FRAIS'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Marques');
+      await _ciblesTactiles(tester);
       await _depuisCourses(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
       await _voir(tester, find.text('Rattacher à une course'));
       expect(find.text('Rattacher à une course'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Membres');
+      await _rubrique(tester, 'Foyer');
+      expect(find.text('+ Membre'), findsOneWidget, reason: 'les membres sont dans le foyer');
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Listes');
-      expect(find.text('Types de promotion'), findsOneWidget);
-      expect(find.text('Types de packaging'), findsOneWidget);
+      await _rubrique(tester, 'Types de promotion');
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Packaging');
       await _ciblesTactiles(tester);
       await _depuisCourses(tester, 'Archives');
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Parcours');
+      // Les parcours d'un magasin sont dans sa fiche (Gérer › Courses › Magasins).
+      final mien = Etat.instance.parcoursDuMembre(Etat.instance.moi.id).first;
+      await _rubrique(tester, 'Magasins');
+      await _toucher(tester, find.text(Etat.instance.magasin(mien.magasinId)!.nom));
       expect(find.text('+ Nouveau parcours'), findsNothing, reason: 'les parcours s\'apprennent pendant les courses');
       expect(find.byType(GroupeRetractable), findsWidgets);
-      final mien = Etat.instance.parcoursDuMembre(Etat.instance.moi.id).first;
       await _toucher(tester, find.text(mien.nom).first);
       expect(find.textContaining('Glissez un rayon entier'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -417,21 +414,18 @@ void main() {
 
     testWidgets('3. la flèche de retour remonte d\'un niveau', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Magasins et catalogue');
-      await _toucher(tester, find.text('Magasin 1'));
-      await _toucher(tester, _sousOnglet('Produits'));
-      await _toucher(tester, find.text('CRÈMERIE'));
+      await _rubrique(tester, 'Catalogue');
+      await _toucher(tester, find.text('FRAIS'));
+      await _toucher(tester, find.text('Crèmerie').last);
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('Gérer › Produits'), findsOneWidget);
+      expect(find.text('À la liste'), findsOneWidget, reason: 'fiche produit');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('Gérer › Produits'), findsNothing);
-      expect(find.text('Rechercher un produit, une marque…'), findsOneWidget);
+      expect(find.text('À la liste'), findsNothing);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('Magasins et catalogue'), findsOneWidget);
+      expect(find.text('+ Nouveau produit'), findsOneWidget);
 
-      await _rubrique(tester, 'Listes');
-      await _toucher(tester, find.text('Types de promotion'));
+      await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
@@ -656,6 +650,8 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
         await tester.pumpAndSettle();
+        // Article absent du catalogue : on peut le ranger, ou non.
+        if (find.text('Ne pas ranger').evaluate().isNotEmpty) await _toucher(tester, find.text('Ne pas ranger'));
       }
       expect([for (final g in l.lignes) etat.produit(g.produitId)!.nom], ['Jambon', 'Café moulu', 'pq maison'],
           reason: 'ajoutés en fin de liste, dans l\'ordre');
@@ -709,29 +705,6 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('préparation : ajouter un rayon et un secteur, avec leur image', (tester) async {
-      await _accueil(tester);
-      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
-      await _voir(tester, find.text('Ajouter un rayon'));
-      await _toucher(tester, find.text('Ajouter un rayon'));
-      await tester.enterText(find.byType(TextField).last, 'Animalerie');
-      await _toucher(tester, find.text('Suivant'));
-      expect(find.text('Images de réserve'), findsOneWidget, reason: 'bibliothèque d\'images');
-      await _toucher(tester, find.text('Image automatique (selon le nom)'));
-      await tester.enterText(find.byType(TextField).last, 'Chats');
-      await _toucher(tester, find.text('Ajouter').last);
-      expect(find.text('ANIMALERIE'), findsOneWidget);
-      expect(find.text('CHATS'), findsOneWidget);
-      // Dans le rayon ouvert : « Ajouter un secteur »
-      await _toucher(tester, find.text('Ajouter un secteur à Animalerie'));
-      await tester.enterText(find.byType(TextField).last, 'Chiens');
-      await _toucher(tester, find.text('Suivant'));
-      await _toucher(tester, find.text('Image automatique (selon le nom)'));
-      expect(find.text('CHIENS'), findsOneWidget);
-      final m = Etat.instance.liste('l1')!.magasinId;
-      expect(Etat.instance.secteursDuMagasin(m).where((s) => s.nom == 'Chiens' || s.nom == 'Chats').length, 2);
-    });
-
     testWidgets('non placés : visibles en fin de liste, toucher propose un secteur', (tester) async {
       final etat = Etat.instance;
       final l = etat.liste('l1')!;
@@ -749,7 +722,7 @@ void main() {
       // Toucher son nom propose un secteur (pas la fenêtre de l'article)
       await _toucher(tester, find.textContaining('Truc mystère', findRichText: true));
       expect(find.text('Ajouter une marque'), findsNothing);
-      expect(find.textContaining('Où se trouve « Truc mystère »'), findsOneWidget);
+      expect(find.textContaining('Où ranger « Truc mystère »'), findsOneWidget);
       await _toucher(tester, find.text('FRAIS').last);
       await _toucher(tester, find.text('CRÈMERIE').last);
       expect(etat.secteurDe(l.magasinId, truc.id)?.nom, 'Crèmerie');
@@ -899,17 +872,26 @@ void main() {
       expect(find.text('Rattacher à une course'), findsNothing);
     });
 
-    testWidgets('magasin : indiquer le secteur d\'un produit non placé', (tester) async {
+    testWidgets('catalogue : ranger un produit non rangé, créer un produit, le retrouver dans « Ajoutés ou modifiés »', (tester) async {
+      final etat = Etat.instance;
+      etat.harmoniserCatalogue(); // fait à l'ouverture du foyer
+      final truc = etat.creerProduit('Truc mystère');
       await _accueil(tester);
-      await _rubrique(tester, 'Magasins et catalogue');
-      await _toucher(tester, find.text('Magasin 1'));
-      await _toucher(tester, _sousOnglet('Produits'));
-      await _toucher(tester, find.text('NON PLACÉS DANS CE MAGASIN'));
-      await _toucher(tester, find.text('Bougies chauffe-plat'));
-      await _toucher(tester, find.text('Non placé · indiquer le secteur').first);
-      expect(find.textContaining('Touchez son secteur'), findsOneWidget);
-      await _toucher(tester, find.text('Papier et entretien'));
-      expect(Etat.instance.secteurDe('mg1', 'p21')?.id, 's10');
+      await _rubrique(tester, 'Catalogue');
+      await _voir(tester, find.text('Truc mystère'));
+      await _toucher(tester, find.text('Truc mystère'));
+      expect(find.byType(SignePerso), findsWidgets, reason: 'petit signe des produits ajoutés');
+      await _toucher(tester, find.text('Changer'));
+      await _toucher(tester, find.text('FRAIS').last);
+      await _toucher(tester, find.text('CRÈMERIE').last);
+      for (final m in etat.magasins) {
+        expect(etat.secteurDe(m.id, truc.id)?.nom, 'Crèmerie', reason: 'le même rangement dans tous les magasins');
+      }
+      await _toucher(tester, find.byTooltip('Retour'));
+      await _rubrique(tester, 'Catalogue');
+      await _toucher(tester, find.textContaining('Ajoutés, modifiés'));
+      expect(find.text('Truc mystère'), findsOneWidget);
+      await _ciblesTactiles(tester);
     });
   });
 
@@ -943,7 +925,7 @@ void main() {
       expect(c.rechercher('panzani').articles.single.nom, 'Spaghetti n°5');
     });
 
-    testWidgets('écran d\'essai accessible depuis Gérer › Magasins', (tester) async {
+    testWidgets('écran d\'essai accessible depuis Gérer › Courses', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Produits réels');
       expect(find.text('Produits réels (essai)'), findsOneWidget);

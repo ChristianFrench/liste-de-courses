@@ -5,7 +5,7 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Suppression avec confirmation, et corbeille (Gérer › Corbeille) pour tout remettre.
+// Suppression avec confirmation, et corbeille (Courses › Corbeille) pour tout remettre.
 
 /// Demande confirmation puis supprime [objet] (magasin, rayon, secteur, produit, liste, parcours).
 /// Rend true si la suppression a eu lieu.
@@ -22,7 +22,7 @@ Future<bool> demanderSuppression(BuildContext context, Object objet, String quoi
     titre: 'Supprimer $quoi ?',
     icone: Icons.delete_outline,
     contenu: Text(
-      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Gérer › Corbeille.',
+      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Courses › Corbeille.',
       style: Charte.texte(16),
     ),
     plein: 'Annuler',
@@ -52,27 +52,7 @@ Future<void> supprimerVite(BuildContext context, Object objet, String quoi) asyn
   Nav.message(context, 'Supprimé : $quoi', annuler: () => etat.restaurer(c));
 }
 
-/// Bouton discret « Supprimer … », en bas d'un écran.
-class LienSupprimer extends StatelessWidget {
-  const LienSupprimer({super.key, required this.texte, required this.onTap});
-  final String texte;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(top: 18),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: onTap,
-            icon: Icon(Icons.delete_outline, size: 20, color: Charte.couleurIcone(Icons.delete_outline)),
-            label: Text(texte, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-          ),
-        ),
-      );
-}
-
-/// Gérer › Corbeille.
+/// Courses › Corbeille.
 class EcranCorbeille extends StatelessWidget {
   const EcranCorbeille({super.key});
 

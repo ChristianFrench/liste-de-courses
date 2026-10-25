@@ -1455,7 +1455,7 @@ class Etiquette extends StatelessWidget {
   }
 }
 
-/// Lien souligné (« + Signaler une promotion », « Renommer »…), zone tactile 44 points.
+/// Petit bouton d'action secondaire (« Copier », « Restaurer »…), à bord fin.
 class Lien extends StatelessWidget {
   const Lien(this.texte, {super.key, required this.onTap, this.taille = 16, this.italique = false});
   final String texte;
@@ -1463,20 +1463,28 @@ class Lien extends StatelessWidget {
   final double taille;
   final bool italique;
 
+  // Une action est toujours un bouton (jamais un texte souligné) : petit bouton à bord fin.
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: ConstrainedBox(
-        constraints: const BoxConstraints(minHeight: 44),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          widthFactor: 1,
-          child: Text(
-            texte,
-            style: Charte.texte(taille, couleur: Charte.cadre).copyWith(
-              decoration: TextDecoration.underline,
-              fontStyle: italique ? FontStyle.italic : FontStyle.normal,
+    return Align(
+      alignment: Alignment.centerLeft,
+      widthFactor: 1,
+      child: Material(
+        color: Charte.fond,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            alignment: Alignment.center,
+            child: Text(
+              texte,
+              style: Charte.texte(taille, couleur: Charte.cadre).copyWith(fontStyle: italique ? FontStyle.italic : FontStyle.normal),
             ),
           ),
         ),
@@ -1689,8 +1697,12 @@ class BoutonAction extends StatelessWidget {
 
 /// L'élément de liste standard : icône ronde en tête, titre, sous-titre, actions ou chevron à droite.
 class LigneMenu extends StatelessWidget {
-  const LigneMenu({super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite, this.icone});
+  const LigneMenu(
+      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite, this.icone, this.apresTitre});
   final String titre;
+
+  /// Petit signe après le titre (ex. : produit ajouté ou modifié par le foyer).
+  final Widget? apresTitre;
   final IconData? icone;
   final String? sousTitre;
   final VoidCallback? onTap;
@@ -1716,7 +1728,14 @@ class LigneMenu extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(titre, style: Charte.texte(17, gras: true)),
+                    if (apresTitre == null)
+                      Text(titre, style: Charte.texte(17, gras: true))
+                    else
+                      Row(children: [
+                        Flexible(child: Text(titre, style: Charte.texte(17, gras: true))),
+                        const SizedBox(width: 6),
+                        apresTitre!,
+                      ]),
                     if (sousTitre != null)
                       Text(sousTitre!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                   ],

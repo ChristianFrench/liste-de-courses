@@ -8,7 +8,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'magasin.dart' show choisirImageRayon, choisirImageSecteur;
+import 'catalogue.dart' show choisirSecteur, nouveauProduit;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -413,19 +413,16 @@ class EcranConstruction extends StatefulWidget {
 
 /// Un élément de la liste de préparation : titre de rayon, titre de secteur, produit, ou « + Produit absent ».
 class _Element {
-  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false, ajout = false;
-  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false, ajout = false;
-  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false, ajout = false;
-  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true, ajout = false;
+  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false;
+  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false;
+  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false;
+  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true;
 
-  /// « + Ajouter un secteur » (au [rayon] ouvert) ou, sans rayon, « + Ajouter un rayon ».
-  _Element.ajout(this.rayon) : secteur = null, produit = null, absent = false, ajout = true;
   final Rayon? rayon;
   final Secteur? secteur; // null : « Non placé »
   final Produit? produit;
   final bool absent;
-  final bool ajout;
-  bool get titreSecteur => rayon == null && produit == null && !absent && !ajout;
+  bool get titreSecteur => rayon == null && produit == null && !absent;
 }
 
 /// Préparation : la même liste que pendant les courses. Tous les secteurs du magasin, dans l'ordre du parcours
@@ -479,11 +476,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
   List<_Element> _elements(Liste l) {
     final res = <_Element>[];
     String? rayonCourant;
-    // Sous les secteurs d'un rayon ouvert : « + Ajouter un secteur ».
-    void finRayon() {
-      final r = etat.rayon(rayonCourant ?? '');
-      if (!maListe && r != null && Retractables.i.ouvert(_cleRayon(r.id))) res.add(_Element.ajout(r));
-    }
 
     for (final s in _secteurs(l)) {
       final produits = [
@@ -492,7 +484,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ]..sort((a, b) => ordreAlpha(a.nom).compareTo(ordreAlpha(b.nom)));
       if (maListe && produits.isEmpty) continue;
       if (s.rayonId != rayonCourant) {
-        finRayon();
         rayonCourant = s.rayonId;
         final r = etat.rayon(s.rayonId);
         if (r != null) res.add(_Element.rayon(r));
@@ -505,8 +496,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
       }
       if (!maListe) res.add(_Element.absent(s));
     }
-    finRayon();
-    if (!maListe) res.add(_Element.ajout(null));
     final nonPlaces = [
       for (final g in l.lignes)
         if (etat.secteurDe(l.magasinId, g.produitId) == null) etat.produit(g.produitId),
@@ -730,8 +719,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
   Future<void> _produitAbsent(Liste l, Secteur s) async {
     final n = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', aide: 'Nom générique (ex. : Riz)', valider: 'Ajouter');
     if (n == null || n.isEmpty || !mounted) return;
-    final q = etat.creerProduit(n);
-    etat.placer(l.magasinId, q.id, s.id);
+    final q = etat.creerProduit(n, secteur: s);
     etat.ajouterLigne(l, q.id);
     setState(() => _focus = q.id);
     Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
@@ -814,11 +802,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
               : etat.ajoutParRecherche
                   ? _ajouterTrouve(l, p)
                   : _trouver(l, p),
-          onNouveau: simple
-              ? (n) => _ajouterSimple(l, etat.creerProduit(n))
-              : etat.ajoutParRecherche
-                  ? (n) => _ajouterTrouve(l, etat.creerProduit(n))
-                  : null,
+          onNouveau: simple || etat.ajoutParRecherche
+              ? (n) async {
+                  final p = await nouveauProduit(context, nom: n);
+                  if (p == null || !mounted) return;
+                  simple ? _ajouterSimple(l, p) : _ajouterTrouve(l, p);
+                }
+              : null,
         );
         if (simple) {
           return PageBase(
@@ -843,7 +833,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             entete: entete,
             corps: Padding(
               padding: const EdgeInsets.all(16),
-              child: Text("Ce magasin n'a pas encore de rayons : décrivez-les dans Gérer › Magasins et catalogue.",
+              child: Text("Ce magasin n'a pas encore de rayons : le catalogue du foyer est vide (Gérer › Courses › Catalogue).",
                   style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             ),
             bas: [barre],
@@ -865,12 +855,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
         var i = 0;
         while (i < elements.length) {
           final e = elements[i];
-          if (e.rayon != null && !e.ajout && Retractables.i.ouvert(_cleRayon(e.rayon!.id))) {
+          if (e.rayon != null && Retractables.i.ouvert(_cleRayon(e.rayon!.id))) {
             final interieur = <Widget>[];
             var j = i + 1;
             while (j < elements.length && elements[j].rayon == null && !(elements[j].titreSecteur && elements[j].secteur == null)) {
               final f = elements[j];
-              if (f.ajout && f.rayon == null) break; // « + Ajouter un rayon » : hors du rayon
               if (f.titreSecteur && Retractables.i.ouvert(_cle(f.secteur!.id))) {
                 var k = j + 1;
                 while (k < elements.length && (elements[k].produit != null || elements[k].absent) && elements[k].secteur?.id == f.secteur!.id) {
@@ -919,23 +908,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   Widget _element(Liste l, _Element e, int i, Map<String, int> numeros, Map<String, int> premiers) {
     final s = e.secteur;
-    if (e.ajout) {
-      final r = e.rayon;
-      return InkWell(
-        onTap: () => r == null ? _ajouterRayon(l) : _ajouterSecteur(l, r),
-        child: Container(
-          height: 48,
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.only(left: r == null ? 12 : 24),
-          decoration: BoxDecoration(color: Charte.fond, border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-          child: Row(children: [
-            Icon(Icons.add_circle_outline, size: 22, color: Charte.cadre),
-            const SizedBox(width: 8),
-            Text(r == null ? 'Ajouter un rayon' : 'Ajouter un secteur à ${r.nom}', style: Charte.texte(15, gras: true, couleur: Charte.cadre)),
-          ]),
-        ),
-      );
-    }
     if (e.rayon != null) {
       final r = e.rayon!;
       final cle = _cleRayon(r.id);
@@ -1095,37 +1067,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
   }
 
-  /// « + Ajouter un rayon » : son nom, son image (bibliothèque), puis son premier secteur ; il s'ouvre.
-  Future<void> _ajouterRayon(Liste l) async {
-    final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Ex. : Bio, Animalerie', valider: 'Suivant');
-    if (nom == null || nom.isEmpty || !mounted) return;
-    final r = etat.ajouterRayon(l.magasinId, nom);
-    await choisirImageRayon(context, r.nom);
-    if (!mounted) return;
-    final sn = await demanderTexte(context,
-        titre: 'Premier secteur du rayon ${r.nom}', initial: r.nom, aide: 'Nom du secteur', valider: 'Ajouter');
-    if (!mounted) return;
-    final s = etat.ajouterSecteur(r.id, (sn == null || sn.isEmpty) ? r.nom : sn);
-    Nav.message(context, 'Rayon « ${r.nom} » ajouté au magasin');
-    _ouvrirSeul(l, s.id);
-    _montrer('rayon:${r.id}');
-  }
-
-  /// « + Ajouter un secteur » dans un rayon ouvert : son nom, puis son image (bibliothèque) ; il s'ouvre.
-  Future<void> _ajouterSecteur(Liste l, Rayon r) async {
-    final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', aide: 'Nom du secteur', valider: 'Suivant');
-    if (nom == null || nom.isEmpty || !mounted) return;
-    final s = etat.ajouterSecteur(r.id, nom);
-    await choisirImageSecteur(context, r.nom, s.nom);
-    if (!mounted) return;
-    Nav.message(context, 'Secteur « ${s.nom} » ajouté au rayon ${r.nom}');
-    _ouvrirSeul(l, s.id);
-    _montrer(s.id);
-  }
-
   /// Article non placé dans ce magasin : on choisit son rayon puis son secteur ; il y rejoint la liste.
   Future<void> _placer(Liste l, Produit p) async {
-    final s = await choisirSecteur(context, l.magasinId, p.nom);
+    final s = (await choisirSecteur(context, titre: p.nom))?.$1;
     if (s == null || !mounted) return;
     etat.placer(l.magasinId, p.id, s.id);
     Nav.message(context, '« ${p.nom} » est placé dans ${s.nom}');
@@ -1597,53 +1541,6 @@ String ordreAlpha(String nom) {
   const accents = {'à': 'a', 'â': 'a', 'ä': 'a', 'ç': 'c', 'é': 'e', 'è': 'e', 'ê': 'e', 'ë': 'e', 'î': 'i', 'ï': 'i',
       'ô': 'o', 'ö': 'o', 'ù': 'u', 'û': 'u', 'ü': 'u', 'ÿ': 'y', 'œ': 'oe', 'æ': 'ae'};
   return nom.toLowerCase().split('').map((c) => accents[c] ?? c).join();
-}
-
-/// Choix du secteur d'un article : les rayons du magasin, un appui déplie leurs secteurs, un appui sur un secteur le choisit.
-Future<Secteur?> choisirSecteur(BuildContext context, String magasinId, String nomProduit) {
-  final etat = Etat.instance;
-  String? ouvert;
-  return showModalBottomSheet<Secteur>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Charte.blanc,
-    showDragHandle: true,
-    builder: (ctx) => StatefulBuilder(
-      builder: (ctx, maj) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: 0.75,
-        maxChildSize: 0.95,
-        builder: (ctx, defilement) => ListView(
-          controller: defilement,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-              child: Text('Où se trouve « $nomProduit » ? Choisissez le rayon, puis le secteur.',
-                  style: Charte.texte(17, gras: true)),
-            ),
-            for (final r in etat.rayonsDu(magasinId)) ...[
-              TitreGroupe(
-                nom: r.nom,
-                image: cleRayon(r.nom),
-                icone: Icons.view_week_outlined,
-                fort: true,
-                ouvert: ouvert == r.id,
-                onTap: () => maj(() => ouvert = ouvert == r.id ? null : r.id),
-              ),
-              if (ouvert == r.id)
-                for (final s in etat.secteursDu(r.id))
-                  TitreGroupe(
-                    nom: s.nom,
-                    image: cleSecteur(r.nom, s.nom),
-                    onTap: () => Navigator.of(ctx).pop(s),
-                  ),
-            ],
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    ),
-  );
 }
 
 /// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.

@@ -367,7 +367,7 @@ class _ServeurState extends State<_Serveur> {
         _champ('Mot de passe', mdp, secret: true),
         const SizedBox(height: 6),
         Row(children: [
-          Lien('Valeurs HiveMQ', taille: 16, onTap: _hivemq),
+          Lien('Serveur public', taille: 16, onTap: _hivemq),
           const Spacer(),
           BoutonAction('Enregistrer', plein: true, onTap: () async {
             final p = int.tryParse(port.text.trim());

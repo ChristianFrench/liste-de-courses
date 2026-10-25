@@ -7,11 +7,11 @@ import '../navigation.dart';
 import '../theme.dart';
 import 'accueil.dart';
 import 'archives.dart';
+import 'catalogue.dart';
 import 'corbeille.dart';
 import 'e13_produits_reels.dart';
 import 'historique.dart';
 import 'listes.dart';
-import 'magasin.dart';
 import 'parametres.dart';
 import 'partage.dart';
 
@@ -123,7 +123,7 @@ class RacineOnglet extends StatelessWidget {
             entete: const EnTeteFenetre(icone: Icons.checklist, titre: 'Préparer', aide: Aides.preparer),
             corps: SousEcranPreparer(),
           ),
-        Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
+        Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses(), bas: [barreCourses(context)]),
         _ => const MenuGerer(),
       },
     );
@@ -140,34 +140,29 @@ class MenuGerer extends StatelessWidget {
     final n = etat.magasins.length;
     Widget ecran(IconData icone, String titre, String sousTitre, Widget e) =>
         LigneMenu(icone: icone, titre: titre, sousTitre: sousTitre, onTap: () => Nav.aller<void>(context, e));
-    Widget entree(int r, IconData icone, String titre, String sousTitre) => LigneMenu(
-          icone: icone,
-          titre: titre,
-          sousTitre: sousTitre,
-          onTap: () {
-            if (r == Nav.magasin) Nav.i.choixMagasin = true;
-            Nav.i.ouvrirRubrique(r);
-          },
-        );
     return PageBase(
       entete: const EnTeteFenetre(icone: Icons.tune, titre: 'Gérer', aide: Aides.gerer),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Mon foyer', icone: Icons.home_outlined, enfants: [
-            ecran(Icons.home_outlined, 'Foyer', '${etat.foyerNom} · repartir d\'un foyer neuf', const EcranFoyer()),
-            ecran(Icons.group_outlined, 'Membres', '${etat.membres.length} membre${etat.membres.length > 1 ? 's' : ''} · adresses mail',
-                const EcranMembres()),
+            ecran(Icons.home_outlined, 'Foyer',
+                '${etat.foyerNom} · ${etat.membres.length} membre${etat.membres.length > 1 ? 's' : ''}', const EcranFoyer()),
           ]),
-          GroupeRetractable(cle: 'gerer/magasins', titre: 'Magasins', icone: Icons.storefront_outlined, enfants: [
-            entree(Nav.magasin, Icons.storefront_outlined, 'Magasins et catalogue', '$n magasin${n > 1 ? 's' : ''} · rayons, secteurs, produits'),
-            entree(Nav.parcours, Icons.route_outlined, 'Parcours', 'Appris pendant les courses, pour chacun dans chaque magasin'),
-            ecran(Icons.checklist, 'Listes', 'Types de promotion, types de packaging, préliste', const EcranReglagesListes()),
+          GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
+            ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''} · leurs parcours', const EcranMagasins()),
+            ecran(Icons.menu_book_outlined, 'Catalogue',
+                '${etat.produits.length} produits · le même dans tous les magasins', const EcranCatalogue()),
+            ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types · chacun avec sa couleur',
+                const EcranTypesPromotion()),
+            ecran(Icons.sell_outlined, 'Marques', '${etat.marques.length} marque${etat.marques.length > 1 ? 's' : ''}', const EcranMarques()),
+            ecran(Icons.inventory_2_outlined, 'Packaging', '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…)',
+                const EcranTypesPackaging()),
             ecran(Icons.science_outlined, 'Produits réels', 'Essai Open Food Facts : catalogue de vrais produits', const EcranProduitsReels()),
           ]),
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
             ecran(Icons.palette_outlined, 'Apparence', 'Couleurs de l\'application', const EcranApparence()),
-            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, suppression automatique des archives', const EcranDonnees()),
+            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, préliste, suppression des archives', const EcranDonnees()),
             ecran(Icons.sync, 'MQTT', 'Configuration du partage entre appareils', const EcranPartage()),
           ]),
         ],
@@ -182,53 +177,15 @@ class EcranRubrique extends StatelessWidget {
   final int rubrique;
 
   @override
-  Widget build(BuildContext context) {
-    if (rubrique == Nav.parametres) return const EcranDonnees();
-    if (rubrique == Nav.foyer) return const EcranFoyer();
-    if (rubrique == Nav.archives) return const EcranArchives();
-    if (rubrique == Nav.corbeille) return const EcranCorbeille();
-    return ListenableBuilder(
-      listenable: Listenable.merge([Nav.i, Etat.instance]),
-      builder: (context, _) {
-        final sous = Nav.i.sousOnglet[rubrique] ?? 0;
-        late final String titre;
-        var aide = Aides.magasins;
-        List<SousOnglet>? onglets;
-        late final Widget contenu;
-        Widget? droite;
-        switch (rubrique) {
-          case Nav.parcours:
-            titre = 'Parcours';
-            aide = Aides.parcours;
-            contenu = SousEcranParcours();
-          case Nav.historique:
-            titre = 'Historique';
-            aide = Aides.historique;
-            contenu = const SousEcranHistorique();
-          default:
-            titre = 'Magasins';
-            if (Nav.i.choixMagasin) {
-              contenu = const SousEcranListeMagasins();
-              break;
-            }
-            droite = const SelecteurMagasin();
-            onglets = const [
-              SousOnglet('Rayons', Icons.view_agenda_outlined),
-              SousOnglet('Secteurs', Icons.grid_view),
-              SousOnglet('Produits', Icons.inventory_2_outlined),
-            ];
-            contenu = switch (sous) {
-              Nav.secteurs => SousEcranSecteurs(),
-              Nav.produits => SousEcranProduits(),
-              _ => SousEcranRayons(),
-            };
-        }
-        return PageBase(
-          entete: EnTeteFenetre(retour: true, icone: Icons.tune, sousTitre: 'Gérer', titre: titre, droite: droite, aide: aide),
-          haut: [if (onglets != null) SousOnglets(onglets: onglets, actif: sous, onChoix: Nav.i.allerSous)],
-          corps: contenu,
-        );
-      },
-    );
-  }
+  Widget build(BuildContext context) => switch (rubrique) {
+        Nav.parametres => const EcranDonnees(),
+        Nav.foyer => const EcranFoyer(),
+        Nav.archives => const EcranArchives(),
+        Nav.corbeille => const EcranCorbeille(),
+        Nav.historique => PageBase(
+            entete: const EnTeteFenetre(retour: true, icone: Icons.tune, sousTitre: 'Gérer', titre: 'Historique', aide: Aides.historique),
+            corps: const SousEcranHistorique(),
+          ),
+        _ => const EcranMagasins(),
+      };
 }

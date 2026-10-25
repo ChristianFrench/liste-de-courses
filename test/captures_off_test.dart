@@ -122,7 +122,7 @@ void main() {
     await _afficher(tester, EcranMarque(marque: a.marque), [for (final x in m.take(8)) x.imagePetite]);
     await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 3 marque.png'));
 
-    await _afficher(tester, const EcranCatalogue(), const []);
+    await _afficher(tester, const EcranCatalogueReel(), const []);
     await expectLater(find.byKey(_cle), matchesGoldenFile('captures/OFF 4 catalogue.png'));
   }, skip: !_actif, timeout: const Timeout(Duration(minutes: 4)));
 }

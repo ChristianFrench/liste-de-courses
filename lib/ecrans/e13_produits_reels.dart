@@ -99,9 +99,9 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
     return PageBase(
       entete: EnTeteFenetre(
         retour: true,
-        sousTitre: 'Gérer › Magasins',
+        sousTitre: 'Gérer › Courses',
         titre: 'Produits réels (essai)',
-        actions: [ActionLigne(Icons.cloud_sync_outlined, 'Catalogue et mises à jour', () => Nav.aller(context, const EcranCatalogue()))],
+        actions: [ActionLigne(Icons.cloud_sync_outlined, 'Catalogue et mises à jour', () => Nav.aller(context, const EcranCatalogueReel()))],
       ),
       haut: [
         Padding(
@@ -132,7 +132,7 @@ class _EcranProduitsReelsState extends State<EcranProduitsReels> {
         ),
         ListenableBuilder(
           listenable: CatalogueOff.instance,
-          builder: (context, _) => _EtatCatalogue(onTap: () => Nav.aller(context, const EcranCatalogue())),
+          builder: (context, _) => _EtatCatalogue(onTap: () => Nav.aller(context, const EcranCatalogueReel())),
         ),
       ],
       corps: _corps(),
@@ -435,8 +435,8 @@ class _EtatCatalogue extends StatelessWidget {
 }
 
 /// Catalogue : version, délai de rafraîchissement, mise à jour manuelle.
-class EcranCatalogue extends StatelessWidget {
-  const EcranCatalogue({super.key});
+class EcranCatalogueReel extends StatelessWidget {
+  const EcranCatalogueReel({super.key});
 
   static String _libelleDelai(int j) => switch (j) {
         0 => 'Manuel',

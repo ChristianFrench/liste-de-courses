@@ -119,7 +119,7 @@ class Secteur {
 class Marque {
   Marque(this.id, this.nom);
   final String id;
-  final String nom;
+  String nom;
 }
 
 class Packaging {
@@ -433,6 +433,9 @@ class Etat extends ChangeNotifier {
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
   Set<String> parcoursAppris = {};
 
+  /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
+  Map<String, String> produitsPerso = {};
+
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
   List<String> typesPackaging = [];
 
@@ -526,6 +529,7 @@ class Etat extends ChangeNotifier {
       lire(s.lire());
     }
     await appliquerFormats();
+    harmoniserCatalogue();
   }
 
   /// Repartir d'un foyer neuf : la base actuelle est gardée dans un fichier à part sur l'appareil.
@@ -727,6 +731,7 @@ class Etat extends ChangeNotifier {
     nonRangees = _ids(options?['nonRangees']).toSet();
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
+    produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -830,6 +835,7 @@ class Etat extends ChangeNotifier {
             if (nonRangees.isNotEmpty) 'nonRangees': nonRangees.toList(),
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
+            if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -1079,6 +1085,7 @@ class Etat extends ChangeNotifier {
     if (q == null) {
       q = Produit(nouvelId('p'), nom, [...p.marqueIds], [if (k != null) k.id, ...p.packagingIds.where((id) => id != k?.id)], 0);
       produits.add(q);
+      _marquerAjoute(q);
       for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
         emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
       }
@@ -1142,6 +1149,7 @@ class Etat extends ChangeNotifier {
     if (q == null) {
       q = Produit(nouvelId('p'), nom, [...p.marqueIds], [...p.packagingIds], 0);
       produits.add(q);
+      _marquerAjoute(q);
       for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
         emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
       }
@@ -1536,6 +1544,16 @@ class Etat extends ChangeNotifier {
     return m;
   }
 
+  /// Un nouveau magasin reçoit le catalogue du foyer (le même pour tous les magasins) ;
+  /// le premier magasin du foyer, le catalogue de départ.
+  Future<void> remplirMagasin(Magasin m) async {
+    if (magasins.any((x) => x.id != m.id && rayonsDu(x.id).isNotEmpty)) {
+      harmoniserCatalogue();
+    } else {
+      await appliquerModele(m, tailleComplete);
+    }
+  }
+
   static const String fichierCatalogueType = 'assets/catalogue_type.json';
 
   /// Un nouveau magasin reçoit toujours le catalogue complet, quelle que soit sa taille (décision du 19/10/2026).
@@ -1595,21 +1613,157 @@ class Etat extends ChangeNotifier {
     return s;
   }
 
+  // ------------------------------------------------------------ Catalogue unique (25/10/2026)
+  //
+  // Un seul catalogue pour le foyer : les mêmes rayons, secteurs et produits dans tous les magasins,
+  // chaque produit dans le même secteur partout. La base garde un exemplaire des rayons et secteurs
+  // par magasin ; l'application les tient identiques (mêmes noms).
+
+  /// Magasin dont les rayons et secteurs servent à présenter le catalogue (ils sont les mêmes partout).
+  Magasin? get magasinReference => magasins.isEmpty ? null : magasins.first;
+
+  /// Rayons du catalogue.
+  List<Rayon> get rayonsCatalogue => magasinReference == null ? [] : rayonsDu(magasinReference!.id);
+
+  /// Secteur du catalogue où est rangé le produit, ou null.
+  Secteur? secteurCatalogue(String produitId) => magasinReference == null ? null : secteurDe(magasinReference!.id, produitId);
+
+  /// Produits d'un secteur du catalogue (secteur du magasin de référence).
+  List<Produit> produitsDuSecteur(Secteur s) => produitsDu(rayon(s.rayonId)?.magasinId ?? '', s.id);
+
+  /// Le même secteur (mêmes noms de rayon et de secteur) dans le magasin [magasinId].
+  Secteur? secteurHomologue(String magasinId, Secteur s) {
+    final r = rayon(s.rayonId);
+    if (r == null) return null;
+    if (r.magasinId == magasinId) return s;
+    final r2 = _trouve(rayons, (x) => x.magasinId == magasinId && x.nom == r.nom);
+    return r2 == null ? null : _trouve(secteurs, (x) => x.rayonId == r2.id && x.nom == s.nom);
+  }
+
+  bool estAjoute(Produit p) => produitsPerso[p.id] == 'a';
+  bool estModifie(Produit p) => produitsPerso[p.id] == 'm';
+
+  /// Produits ajoutés ou modifiés par le foyer, par ordre alphabétique.
+  List<Produit> get produitsAjoutesOuModifies =>
+      [for (final p in produits) if (produitsPerso.containsKey(p.id)) p]..sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
+
+  void _marquerAjoute(Produit p) => produitsPerso[p.id] = 'a';
+  void _marquerModifie(Produit p) => produitsPerso.putIfAbsent(p.id, () => 'm');
+
+  /// Range le produit dans le secteur [secteurId] (ou son homologue) de tous les magasins.
+  /// [magasinId] n'est gardé que pour les appels existants : le rangement est le même partout.
   void placer(String magasinId, String produitId, String secteurId) {
-    final e = _trouve(emplacements, (e) => e.magasinId == magasinId && e.produitId == produitId);
-    if (e == null) {
-      emplacements.add(Emplacement(magasinId, produitId, secteurId));
-    } else {
-      e.secteurId = secteurId;
+    final s = secteur(secteurId);
+    final p = produit(produitId);
+    if (s == null || p == null) return;
+    final avant = secteurCatalogue(produitId);
+    for (final m in magasins) {
+      final h = secteurHomologue(m.id, s);
+      if (h == null) continue;
+      final e = _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == produitId);
+      if (e == null) {
+        emplacements.add(Emplacement(m.id, produitId, h.id));
+      } else {
+        e.secteurId = h.id;
+      }
     }
+    if (avant != null && secteurCatalogue(produitId)?.nom != avant.nom) _marquerModifie(p);
     modifie();
   }
 
-  Produit creerProduit(String nom) {
-    final p = Produit(nouvelId('p'), nom, [], [], 0);
+  /// Nouveau produit du catalogue (marqué « ajouté »), rangé dans [secteur] s'il est donné.
+  Produit creerProduit(String nom, {Secteur? secteur}) {
+    final p = Produit(nouvelId('p'), nom.trim(), [], [], 0);
     produits.add(p);
-    modifie();
+    _marquerAjoute(p);
+    if (secteur != null) {
+      placer(rayon(secteur.rayonId)?.magasinId ?? '', p.id, secteur.id);
+    } else {
+      modifie();
+    }
     return p;
+  }
+
+  void renommerProduit(Produit p, String nom) {
+    if (nom.trim().isEmpty || nom.trim() == p.nom) return;
+    p.nom = nom.trim();
+    _marquerModifie(p);
+    modifie();
+  }
+
+  /// Remet les magasins au même catalogue : chaque magasin reçoit les rayons et secteurs qui lui manquent
+  /// (identifiants tirés des noms, les mêmes sur tous les appareils), et chaque produit est rangé partout
+  /// dans le secteur où il l'est dans le plus de magasins. Rend vrai si quelque chose a changé.
+  bool harmoniserCatalogue() {
+    final mags = [...magasins]..sort((a, b) => a.id.compareTo(b.id));
+    if (mags.length < 2) return false;
+    var change = false;
+    String cle(String t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9àâäçéèêëîïôöùûüœ]+'), '-');
+    // Structure : l'union des rayons et secteurs de tous les magasins, dans l'ordre du premier.
+    final structure = <String, List<String>>{};
+    for (final m in mags) {
+      for (final r in rayonsDu(m.id)) {
+        final l = structure.putIfAbsent(r.nom, () => []);
+        for (final s in secteursDu(r.id)) {
+          if (!l.contains(s.nom)) l.add(s.nom);
+        }
+      }
+    }
+    final parNom = <String, Secteur>{}; // « magasin|rayon|secteur » → secteur
+    for (final m in mags) {
+      for (final e in structure.entries) {
+        var r = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == e.key);
+        if (r == null) {
+          r = Rayon('r-${m.id}-${cle(e.key)}', m.id, e.key);
+          rayons.add(r);
+          change = true;
+        }
+        for (final sn in e.value) {
+          var s = _trouve(secteurs, (x) => x.rayonId == r!.id && x.nom == sn);
+          if (s == null) {
+            s = Secteur('s-${r.id}-${cle(sn)}', r.id, sn);
+            secteurs.add(s);
+            change = true;
+          }
+          parNom['${m.id}|${e.key}|$sn'] = s;
+        }
+      }
+    }
+    // Rangement : le plus fréquent ; à égalité, le premier par ordre alphabétique.
+    final rayonDe = {for (final r in rayons) r.id: r};
+    final secteurDeId = {for (final s in secteurs) s.id: s};
+    final parProduit = <String, Map<String, Emplacement>>{};
+    for (final e in emplacements) {
+      (parProduit[e.produitId] ??= {})[e.magasinId] = e;
+    }
+    final ids = {for (final m in mags) m.id};
+    for (final pe in parProduit.entries) {
+      final votes = <String, int>{};
+      for (final e in pe.value.values) {
+        if (!ids.contains(e.magasinId)) continue;
+        final s = secteurDeId[e.secteurId];
+        final r = s == null ? null : rayonDe[s.rayonId];
+        if (s == null || r == null) continue;
+        final k = '${r.nom}|${s.nom}';
+        votes[k] = (votes[k] ?? 0) + 1;
+      }
+      if (votes.isEmpty) continue;
+      final choix = (votes.entries.toList()..sort((a, b) => b.value != a.value ? b.value - a.value : a.key.compareTo(b.key))).first.key;
+      for (final m in mags) {
+        final cible = parNom['${m.id}|$choix'];
+        if (cible == null) continue;
+        final e = pe.value[m.id];
+        if (e == null) {
+          emplacements.add(Emplacement(m.id, pe.key, cible.id));
+          change = true;
+        } else if (e.secteurId != cible.id) {
+          e.secteurId = cible.id;
+          change = true;
+        }
+      }
+    }
+    if (change) modifie();
+    return change;
   }
 
   bool produitUtilise(Produit p) => p.nbUtilisations > 0 || listes.any((l) => l.lignes.any((g) => g.produitId == p.id));
@@ -1620,7 +1774,10 @@ class Etat extends ChangeNotifier {
       m = Marque(nouvelId('b'), nom);
       marques.add(m);
     }
-    if (!p.marqueIds.contains(m.id)) p.marqueIds.add(m.id);
+    if (!p.marqueIds.contains(m.id)) {
+      p.marqueIds.add(m.id);
+      _marquerModifie(p);
+    }
     modifie();
   }
 
@@ -1630,7 +1787,10 @@ class Etat extends ChangeNotifier {
       k = Packaging(nouvelId('k'), libelle);
       packagings.add(k);
     }
-    if (!p.packagingIds.contains(k.id)) p.packagingIds.add(k.id);
+    if (!p.packagingIds.contains(k.id)) {
+      p.packagingIds.add(k.id);
+      _marquerModifie(p);
+    }
     modifie();
   }
 
@@ -1650,13 +1810,11 @@ class Etat extends ChangeNotifier {
   String consequences(Object objet) {
     String n(int x, String mot) => '$x $mot${x > 1 ? 's' : ''}';
     if (objet is Magasin) {
-      final r = rayonsDu(objet.id);
       if (estArchive(objet.id)) {
         return 'Ses ${n(listesArchivees(objet.id).length, 'course')} archivée${listesArchivees(objet.id).length > 1 ? 's' : ''} seront supprimées.';
       }
       final l = listes.where((x) => x.magasinId == objet.id && x.statut != StatutListe.terminee).length;
-      return 'Avec ${n(r.length, 'rayon')}, ${n(secteursDuMagasin(objet.id).length, 'secteur')}, '
-          'l\'emplacement des produits, ${n(parcours.where((p) => p.magasinId == objet.id).length, 'parcours')} '
+      return 'Avec ${n(parcours.where((p) => p.magasinId == objet.id).length, 'parcours')} '
           'et ${l == 0 ? 'aucune liste en cours' : '${n(l, 'liste')} en cours, effacée${l > 1 ? 's' : ''} aussi'}.'
           '${aUnHistorique(objet) ? ' Son historique de courses part dans Courses › Archives.' : ''}';
     }
@@ -2006,6 +2164,46 @@ class Etat extends ChangeNotifier {
 
   /// Corrige le libellé d'un format : tous les produits qui l'utilisent sont corrigés d'un coup.
   /// Si le nouveau libellé existe déjà, les deux formats sont fusionnés.
+  void renommerMagasin(Magasin m, String nom) {
+    if (nom.trim().isEmpty) return;
+    m.nom = nom.trim();
+    modifie();
+  }
+
+  /// Marques, par ordre alphabétique.
+  List<Marque> get marquesTriees => [...marques]..sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
+
+  List<Produit> produitsDeMarque(String marqueId) => [for (final p in produits) if (p.marqueIds.contains(marqueId)) p];
+
+  /// Renomme une marque ; si le nouveau nom est déjà celui d'une autre marque, les deux n'en font plus qu'une.
+  void renommerMarque(Marque m, String nom) {
+    final n = nom.trim();
+    if (n.isEmpty || n == m.nom) return;
+    final autre = _trouve(marques, (x) => x.id != m.id && x.nom.toLowerCase() == n.toLowerCase());
+    if (autre != null) {
+      for (final p in produits) {
+        if (p.marqueIds.remove(m.id) && !p.marqueIds.contains(autre.id)) p.marqueIds.add(autre.id);
+      }
+      for (final l in listes) {
+        for (final g in l.lignes) {
+          if (g.marqueId == m.id) g.marqueId = autre.id;
+        }
+      }
+      marques.remove(m);
+    } else {
+      m.nom = n;
+    }
+    modifie();
+  }
+
+  /// Supprime une marque qu'aucun produit ne porte.
+  bool supprimerMarque(Marque m) {
+    if (produitsDeMarque(m.id).isNotEmpty || listes.any((l) => l.lignes.any((g) => g.marqueId == m.id))) return false;
+    marques.remove(m);
+    modifie();
+    return true;
+  }
+
   void renommerPackaging(String id, String libelle) {
     final k = packaging(id);
     if (k == null || libelle.trim().isEmpty) return;

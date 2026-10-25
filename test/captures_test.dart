@@ -38,8 +38,13 @@ Future<void> _capture(String nom) => expectLater(find.byKey(_cle), matchesGolden
 
 Future<void> _toucher(WidgetTester tester, Finder f) async {
   if (f.evaluate().isEmpty) {
-    await tester.scrollUntilVisible(f, 150,
-        scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+    // Élément pas encore construit : défiler vers le bas, sinon vers le haut (liste restée défilée).
+    final liste = find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first;
+    try {
+      await tester.scrollUntilVisible(f, 150, scrollable: liste);
+    } on StateError {
+      await tester.scrollUntilVisible(f, -150, scrollable: liste);
+    }
   }
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
@@ -92,12 +97,15 @@ void main() {
 
     await _toucher(tester, _onglet('Gérer'));
     await _capture('19 Gerer');
-    await _toucher(tester, find.text('Parcours'));
-    await _capture('05 Gerer-Parcours');
+    await _toucher(tester, find.text('Magasins'));
+    await _capture('22 Magasins');
+    await _toucher(tester, find.text('Magasin 1'));
+    await _capture('05 Magasin-Parcours');
     if (find.text('Parcours habituel').evaluate().isNotEmpty) {
       await _toucher(tester, find.text('Parcours habituel'));
       await _capture('21 Parcours-Detail');
     }
+    await _toucher(tester, _onglet('Courses'));
     await _toucher(tester, _onglet('Courses'));
     await _capture('06 Courses');
 
@@ -118,42 +126,43 @@ void main() {
 
     await _toucher(tester, _onglet('Courses'));
     await _toucher(tester, _onglet('Courses'));
-    await _toucher(tester, find.text('HISTORIQUE'));
+    await _toucher(tester, find.text('Historique'));
     await _capture('11 Historique-Courses');
     await _toucher(tester, find.text('Par magasin'));
     await _capture('12 Historique-Par-magasin');
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, find.text('Magasins et catalogue'));
-    await _capture('22 Magasins');
-    await _toucher(tester, find.text('Magasin 1'));
-    await _capture('13 Magasin-Rayons');
-    await _toucher(tester, find.text('Frais'));
-    await _capture('14 Magasin-Secteurs');
+    await _toucher(tester, find.text('Catalogue'));
+    await _capture('13 Catalogue');
+    await _toucher(tester, find.text('FRAIS'));
+    await _capture('14 Catalogue-Rayon');
     await _toucher(tester, find.text('Crèmerie'));
-    await _capture('15 Magasin-Produits');
+    await _capture('15 Catalogue-Secteur');
     await _toucher(tester, find.text('Lait demi-écrémé'));
     await _capture('16 Fiche-Produit');
     await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.textContaining('Ajoutés, modifiés'));
+    await _capture('20 Ajoutes-ou-modifies');
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
     await _capture('17 Gerer');
-    await _toucher(tester, find.text('Listes'));
-    await _capture('17 Listes');
     await _toucher(tester, find.text('Types de promotion'));
-    await _capture('18 Parametres-Promos');
+    await _capture('18 Types-de-promotion');
     await _toucher(tester, find.byTooltip('Retour'));
-    await _toucher(tester, find.text('Types de packaging'));
-    await _capture('23 Parametres-Packagings');
+    await _toucher(tester, find.text('Marques'));
+    await _capture('17 Marques');
+    await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.text('Packaging'));
+    await _capture('23 Packaging');
 
     for (final (onglet, rubrique, nom) in [
-      ('Courses', 'ARCHIVES', '24 Archives'),
+      ('Courses', 'Archives', '24 Archives'),
       ('Gérer', 'Foyer', '25 Foyer'),
-      ('Gérer', 'Membres', '25 Membres'),
       ('Gérer', 'MQTT', '27 MQTT'),
-      ('Courses', 'CORBEILLE', '26 Corbeille'),
+      ('Courses', 'Corbeille', '26 Corbeille'),
     ]) {
       await _toucher(tester, _onglet(onglet));
       await _toucher(tester, _onglet(onglet));

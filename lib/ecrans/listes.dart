@@ -10,7 +10,7 @@ import 'corbeille.dart';
 import 'historique.dart';
 import 'travail.dart';
 
-// Onglet Préparer (écran 1), Gérer › Parcours (5), onglet Courses (6).
+// Onglet Préparer (écran 1), parcours d'un magasin (5), onglet Courses (6).
 
 /// Écran 1 — onglet Préparer.
 class SousEcranPreparer extends StatelessWidget {
@@ -146,8 +146,10 @@ Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interro
 
 /// Écran 5 — Gérer › Parcours : d'abord les parcours de la personne, puis le parcours choisi,
 /// ordonné par rayon ou par secteur. Enregistrement immédiat.
+/// Parcours d'un magasin (Gérer › Courses › Magasins › un magasin) : ceux de chaque membre.
 class SousEcranParcours extends StatefulWidget {
-  const SousEcranParcours({super.key});
+  const SousEcranParcours({super.key, required this.magasinId});
+  final String magasinId;
 
   @override
   State<SousEcranParcours> createState() => _SousEcranParcoursState();
@@ -156,8 +158,6 @@ class SousEcranParcours extends StatefulWidget {
 class _SousEcranParcoursState extends State<SousEcranParcours> {
   final etat = Etat.instance;
   int membreIndex = 0;
-  String? parcoursId; // null : liste des parcours
-  final Set<String> ouverts = {}; // rayons dont les secteurs sont affichés
 
   @override
   void initState() {
@@ -170,60 +170,114 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
 
   @override
   Widget build(BuildContext context) {
-    final p = etat.unParcours(parcoursId);
-    if (p == null) return _liste(context);
-    return _edition(context, p);
-  }
-
-  Widget _choixMembre() => etat.membres.length < 2
-      ? const SizedBox.shrink()
-      : Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Bascule(
-            hauteur: 48,
-            options: [for (final m in etat.membres) m.nomAffiche],
-            index: membreIndex,
-            onChange: (i) => setState(() {
-              membreIndex = i;
-              parcoursId = null;
-            }),
-          ),
-        );
-
-  Widget _liste(BuildContext context) {
-    final mes = etat.parcoursDuMembre(membre.id);
+    final mes = etat.parcoursDuMembre(membre.id).where((x) => x.magasinId == widget.magasinId).toList();
     return ListView(
-        padding: const EdgeInsets.only(top: 8, bottom: 16),
-        children: [
-          Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _choixMembre()),
-          for (final m in etat.magasins)
-            GroupeRetractable(
-              cle: 'parcours/${m.id}',
-              titre: m.nom,
-              icone: Icons.storefront_outlined,
-              nombre: mes.where((x) => x.magasinId == m.id).length,
-              vide: 'Aucun parcours : il s\'enregistre pendant les courses (« Enregistrer le parcours »).',
-              enfants: [
-                for (final x in mes.where((x) => x.magasinId == m.id))
-                  LigneMenu(
-                    icone: Icons.route_outlined,
-                    titre: x.nom,
-                    sousTitre: '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
-                        '${etat.parcoursAppris.contains(x.id) ? ' · appris pendant les courses' : ''}'
-                        '${x.parDefaut ? ' · par défaut' : ''}',
-                    onTap: () => setState(() => parcoursId = x.id),
-                  ),
-              ],
-            ),
+      padding: const EdgeInsets.only(top: 8, bottom: 16),
+      children: [
+        if (etat.membres.length > 1)
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-            child: Text(
-                'Le parcours s\'apprend pendant les courses : activez « Enregistrer le parcours », l\'ordre dans lequel vous cochez '
-                'les articles donne l\'ordre des secteurs. Les courses enregistrées suivantes complètent le parcours appris.',
-                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: Bascule(
+              hauteur: 48,
+              options: [for (final m in etat.membres) m.nomAffiche],
+              index: membreIndex,
+              onChange: (i) => setState(() => membreIndex = i),
+            ),
           ),
-        ],
+        GroupeRetractable(
+          cle: 'parcours/${widget.magasinId}',
+          titre: 'Parcours',
+          icone: Icons.route_outlined,
+          nombre: mes.length,
+          vide: 'Aucun parcours : il s\'enregistre pendant les courses (« Enregistrer le parcours »).',
+          enfants: [
+            for (final x in mes)
+              LigneMenu(
+                icone: Icons.route_outlined,
+                titre: x.nom,
+                sousTitre: '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
+                    '${etat.parcoursAppris.contains(x.id) ? ' · appris pendant les courses' : ''}'
+                    '${x.parDefaut ? ' · par défaut' : ''}',
+                onTap: () => Nav.aller<void>(context, EcranParcours(parcoursId: x.id)),
+              ),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+          child: Text(
+              'Le parcours s\'apprend pendant les courses : activez « Enregistrer le parcours », l\'ordre dans lequel vous cochez '
+              'les articles donne l\'ordre des secteurs. Les courses enregistrées suivantes complètent le parcours appris.',
+              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        ),
+      ],
     );
+  }
+}
+
+/// Un parcours : rayons et secteurs dans l'ordre de passage, à réordonner par glisser-déposer.
+class EcranParcours extends StatefulWidget {
+  const EcranParcours({super.key, required this.parcoursId});
+  final String parcoursId;
+
+  @override
+  State<EcranParcours> createState() => _EcranParcoursState();
+}
+
+class _EcranParcoursState extends State<EcranParcours> {
+  final etat = Etat.instance;
+  final Set<String> ouverts = {}; // rayons dont les secteurs sont affichés
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: etat,
+        builder: (context, _) {
+          final p = etat.unParcours(widget.parcoursId);
+          if (p == null) {
+            return PageBase(
+              entete: const EnTeteFenetre(retour: true, icone: Icons.route_outlined, titre: 'Parcours'),
+              corps: Center(child: Text('Ce parcours n\'existe plus.', style: Charte.texte(16))),
+            );
+          }
+          return PageBase(
+            entete: EnTeteFenetre(
+              retour: true,
+              icone: Icons.route_outlined,
+              sousTitre: 'Parcours · ${etat.magasin(p.magasinId)?.nom ?? ''}',
+              titre: p.nom,
+              aide: Aides.parcours,
+            ),
+            corps: _edition(context, p),
+            bas: [
+              BarreAction(boutons: [
+                Bouton(texte: 'Renommer', taille: 15, onTap: () async {
+                  final nom = await demanderTexte(context, titre: 'Nom du parcours', initial: p.nom);
+                  if (nom != null && nom.isNotEmpty) etat.renommerParcours(p, nom);
+                }),
+                Bouton(texte: '+ Secteur', taille: 15, onTap: () => _ajouterSecteur(context, p)),
+                Bouton(texte: 'Supprimer', taille: 15, onTap: () async {
+                  if (await demanderSuppression(context, p, 'le parcours ${p.nom}') && context.mounted) Navigator.of(context).pop();
+                }),
+              ]),
+            ],
+          );
+        },
+      );
+
+  Future<void> _ajouterSecteur(BuildContext context, Parcours p) async {
+    final restants = etat.secteursDuMagasin(p.magasinId).where((s) => !p.etapes.contains(s.id)).toList();
+    if (restants.isEmpty) {
+      Nav.message(context, 'Tous les secteurs du magasin sont déjà dans le parcours');
+      return;
+    }
+    final sid = await choisirDansListe<String>(
+      context,
+      titre: 'Ajouter un secteur',
+      choix: {for (final s in restants) s.id: '${s.nom} · ${etat.rayon(s.rayonId)?.nom ?? ''}'},
+    );
+    if (sid != null) {
+      p.etapes.add(sid);
+      etat.modifie();
+    }
   }
 
   Widget _edition(BuildContext context, Parcours p) {
@@ -235,95 +289,25 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
       ],
     ];
     final haut = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () => setState(() => parcoursId = null),
-              icon: Icon(Icons.chevron_left, color: Charte.couleurIcone(Icons.chevron_left)),
-              label: Text('Tous les parcours', style: Charte.texte(15)),
-            ),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Text.rich(TextSpan(children: [
-                  TextSpan(text: p.nom, style: Charte.texte(19, gras: true)),
-                  TextSpan(text: ' · ${etat.magasin(p.magasinId)?.nom ?? ''}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                ])),
-              ),
-              IconButton(
-                tooltip: 'Renommer le parcours',
-                icon: Icon(Icons.edit_outlined, color: Charte.couleurIcone(Icons.edit_outlined)),
-                onPressed: () async {
-                  final nom = await demanderTexte(context, titre: 'Nom du parcours', initial: p.nom);
-                  if (nom != null && nom.isNotEmpty) setState(() => etat.renommerParcours(p, nom));
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text('Glissez un rayon entier, ou ouvrez-le et glissez un de ses secteurs ailleurs dans le parcours.',
-              style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-          const SizedBox(height: 4),
-        ],
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: Text('Glissez un rayon entier, ou ouvrez-le et glissez un de ses secteurs ailleurs dans le parcours.',
+          style: Charte.texte(13, couleur: Charte.texteSecondaire)),
     );
 
     final bas = Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Bouton(
-            texte: '+ Ajouter un secteur',
-            pointille: true,
-            taille: 16,
-            onTap: () async {
-              final restants = etat.secteursDuMagasin(p.magasinId).where((s) => !p.etapes.contains(s.id)).toList();
-              if (restants.isEmpty) {
-                Nav.message(context, 'Tous les secteurs du magasin sont déjà dans le parcours');
-                return;
-              }
-              final sid = await choisirDansListe<String>(
-                context,
-                titre: 'Ajouter un secteur',
-                choix: {for (final s in restants) s.id: '${s.nom} · ${etat.rayon(s.rayonId)?.nom ?? ''}'},
-              );
-              if (sid != null) {
-                p.etapes.add(sid);
-                etat.modifie();
-                setState(() {});
-              }
-            },
+      child: InkWell(
+        onTap: () => etat.definirParDefaut(p, !p.parDefaut),
+        child: SizedBox(
+          height: 48,
+          child: Row(
+            children: [
+              CaseACocher(coche: p.parDefaut, taille: 26),
+              const SizedBox(width: 12),
+              Expanded(child: Text('Parcours par défaut pour ce magasin', style: Charte.texte(16))),
+            ],
           ),
-          const SizedBox(height: 6),
-          InkWell(
-            onTap: () {
-              etat.definirParDefaut(p, !p.parDefaut);
-              setState(() {});
-            },
-            child: SizedBox(
-              height: 48,
-              child: Row(
-                children: [
-                  CaseACocher(coche: p.parDefaut, taille: 26),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text('Parcours par défaut pour ce magasin', style: Charte.texte(16))),
-                ],
-              ),
-            ),
-          ),
-          LienSupprimer(
-            texte: 'Supprimer le parcours ${p.nom}',
-            onTap: () async {
-              if (await demanderSuppression(context, p, 'le parcours ${p.nom}')) setState(() => parcoursId = null);
-            },
-          ),
-        ],
+        ),
       ),
     );
 
@@ -609,7 +593,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           titre: 'Terminées sans ticket',
           icone: Icons.receipt_long_outlined,
           nombre: enInstance.length,
-          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique, plus bas.',
+          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique (bouton en bas).',
           enfants: [
             for (final c in enInstance)
               Glissable(
@@ -634,25 +618,9 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               )),
           ],
         ),
-        // Après la vie des listes : ce qui est passé, dans cet ordre.
-        _vers(context, 'Historique', Icons.history, () => PageBase(
-              entete: const EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Courses', titre: 'Historique', aide: Aides.historique),
-              corps: const SousEcranHistorique(),
-            )),
-        _vers(context, 'Archives', Icons.inventory_2_outlined, () => const EcranArchives()),
-        _vers(context, 'Corbeille', Icons.delete_outline, () => const EcranCorbeille()),
       ],
     );
   }
-
-  /// Bandeau comme ceux des groupes, qui ouvre un écran.
-  Widget _vers(BuildContext context, String titre, IconData icone, Widget Function() ecran) => TitreGroupe(
-        nom: titre,
-        icone: icone,
-        fort: true,
-        droite: '›',
-        onTap: () => Nav.aller<void>(context, ecran()),
-      );
 
   Future<void> _classer(BuildContext context, Course c) async {
     final ok = await modale(
@@ -682,3 +650,19 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     ));
   }
 }
+
+/// En bas de l'onglet Courses : ce qui est passé, dans cet ordre.
+Widget barreCourses(BuildContext context) => BarreAction(boutons: [
+      Bouton(
+        texte: 'Historique',
+        taille: 15,
+        onTap: () => Nav.aller<void>(
+            context,
+            const PageBase(
+              entete: EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Courses', titre: 'Historique', aide: Aides.historique),
+              corps: SousEcranHistorique(),
+            )),
+      ),
+      Bouton(texte: 'Archives', taille: 15, onTap: () => Nav.aller<void>(context, const EcranArchives())),
+      Bouton(texte: 'Corbeille', taille: 15, onTap: () => Nav.aller<void>(context, const EcranCorbeille())),
+    ]);

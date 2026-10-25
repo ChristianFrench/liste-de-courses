@@ -6,19 +6,21 @@ import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
 
-// Écrans de Gérer : Mon foyer (Foyer, Membres), Magasins › Listes, Paramètres (Apparence, Données),
-// Types de promotion (18) et Types de packaging.
+// Écrans de Gérer : Mon foyer (Foyer et ses membres), Courses (Types de promotion, Packaging),
+// Paramètres (Apparence, Données).
 
 /// Page simple de Gérer : en-tête avec retour, contenu en colonne.
-Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu) => ListenableBuilder(
+/// [boutons] : les actions de l'écran, en bas.
+Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<Widget> boutons = const []}) => ListenableBuilder(
       listenable: Etat.instance,
       builder: (context, _) => PageBase(
         entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre),
         corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
+        bas: [if (boutons.isNotEmpty) BarreAction(boutons: boutons)],
       ),
     );
 
-/// Gérer › Mon foyer › Foyer : son nom, et repartir d'un foyer neuf.
+/// Gérer › Mon foyer › Foyer : son nom, ses membres, repartir d'un foyer neuf.
 class EcranFoyer extends StatelessWidget {
   const EcranFoyer({super.key});
 
@@ -26,47 +28,9 @@ class EcranFoyer extends StatelessWidget {
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Mon foyer', 'Foyer', Icons.home_outlined, [
-      Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
-                Text('Créé le ${jjmmaaaa(etat.foyerCreation)}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-              ],
-            ),
-          ),
-          Lien('Renommer', taille: 17, onTap: () async {
-            final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
-            if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
-          }),
-        ],
-      ),
-      const SizedBox(height: 12),
-      Text(
-        'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
-        'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
-        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-      ),
-      LigneMenu(
-        icone: Icons.restart_alt,
-        titre: 'Repartir d\'un foyer neuf',
-        titreTaille: 16,
-        onTap: () => _neuf(context),
-      ),
-    ]);
-  }
-}
-
-/// Gérer › Mon foyer › Membres : membres et leurs adresses mail.
-class EcranMembres extends StatelessWidget {
-  const EcranMembres({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return _page('Gérer › Mon foyer', 'Membres', Icons.group_outlined, [
+      Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
+      Text('Créé le ${jjmmaaaa(etat.foyerCreation)}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      const TitreSection('Membres', cote: 0),
       for (final m in etat.membres)
         LigneMenu(
           titre: m.nomAffiche,
@@ -77,18 +41,29 @@ class EcranMembres extends StatelessWidget {
           },
           gauche: IconeRonde(null, texte: m.initiales),
         ),
-      LigneMenu(
-        icone: Icons.person_add_alt_outlined,
-        titre: 'Ajouter un membre',
-        sousTitre: 'Son nom et, si vous voulez, son adresse mail (sans invitation)',
-        onTap: () => _ajouterMembre(context, etat),
-      ),
       _Option(
         texte: 'Envoyer la liste à tout le foyer',
         aide: 'Le mail est préparé avec les adresses de tous les membres',
         coche: etat.envoiFoyer,
         onChange: (v) => etat.options(envoiFoyer: v),
       ),
+      const SizedBox(height: 12),
+      Text(
+        'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
+        'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
+        style: Charte.texte(14, couleur: Charte.texteSecondaire),
+      ),
+    ], boutons: [
+      Bouton(
+        texte: 'Renommer',
+        taille: 15,
+        onTap: () async {
+          final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
+          if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
+        },
+      ),
+      Bouton(texte: '+ Membre', taille: 15, onTap: () => _ajouterMembre(context, etat)),
+      Bouton(texte: 'Foyer neuf', taille: 15, onTap: () => _neuf(context)),
     ]);
   }
 }
@@ -190,36 +165,6 @@ class EcranApparence extends StatelessWidget {
   }
 }
 
-/// Gérer › Magasins › Listes : types de promotion, types de packaging, préliste.
-class EcranReglagesListes extends StatelessWidget {
-  const EcranReglagesListes({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return _page('Gérer › Magasins', 'Listes', Icons.checklist, [
-      LigneMenu(
-        icone: Icons.local_offer_outlined,
-        titre: 'Types de promotion',
-        sousTitre: '${etat.typesPromotion.length} types · chacun avec sa couleur',
-        onTap: () => Nav.aller(context, const EcranTypesPromotion()),
-      ),
-      LigneMenu(
-        icone: Icons.inventory_2_outlined,
-        titre: 'Types de packaging',
-        sousTitre: '${etat.typesPackaging.length} formats (500 g, 75 cl, lot de 4…) · à corriger ici pour tous les articles',
-        onTap: () => Nav.aller(context, const EcranTypesPackaging()),
-      ),
-      LigneMenu(
-        icone: Icons.playlist_add_check,
-        titre: 'Préliste',
-        sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
-        onTap: () => _reglerPreliste(context, etat),
-      ),
-    ]);
-  }
-}
-
 /// Gérer › Paramètres › Données : listes exemples, puis suppression automatique des archives.
 class EcranDonnees extends StatelessWidget {
   const EcranDonnees({super.key});
@@ -230,9 +175,9 @@ class EcranDonnees extends StatelessWidget {
     return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, [
       LigneMenu(
         icone: Icons.playlist_add_check,
-        titre: 'Remettre les listes exemples',
-        titreTaille: 16,
-        onTap: () => _exemples(context),
+        titre: 'Préliste',
+        sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
+        onTap: () => _reglerPreliste(context, etat),
       ),
       LigneMenu(
         icone: Icons.timer_outlined,
@@ -244,6 +189,8 @@ class EcranDonnees extends StatelessWidget {
           if (v != null) etat.reglerDelaiArchives(v);
         },
       ),
+    ], boutons: [
+      Bouton(texte: 'Remettre les listes exemples', onTap: () => _exemples(context)),
     ]);
   }
 }
@@ -301,7 +248,7 @@ class EcranTypesPromotion extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Magasins › Listes', titre: 'Types de promotion'),
+        entete: const EnTeteFenetre(retour: true, icone: Icons.local_offer_outlined, sousTitre: 'Gérer › Courses', titre: 'Types de promotion'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -506,7 +453,7 @@ class EcranTypesPackaging extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Magasins › Listes', titre: 'Types de packaging'),
+        entete: const EnTeteFenetre(retour: true, icone: Icons.inventory_2_outlined, sousTitre: 'Gérer › Courses', titre: 'Packaging'),
         bas: [
           BarreAction(boutons: [
             Bouton(

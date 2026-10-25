@@ -2,60 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
+import '../composants/signe_perso.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'catalogue.dart';
 import 'corbeille.dart';
 import 'travail.dart';
 
-// Onglet Magasin : Rayons (13), Secteurs (14), Produits (15), fiche produit (16).
+// Création d'un magasin, fiche produit, images des rayons et secteurs.
 
-String magasinCourant() {
-  final etat = Etat.instance;
-  final id = Nav.i.magasinCourant;
-  if (id != null && etat.magasin(id) != null) return id;
-  Nav.i.magasinCourant = etat.magasins.first.id;
-  return Nav.i.magasinCourant!;
-}
-
-/// Sélecteur du magasin courant, en haut à droite (+ Nouveau magasin).
-class SelecteurMagasin extends StatelessWidget {
-  const SelecteurMagasin({super.key});
-  static const nouveau = '__nouveau__';
-  static const tous = '__tous__';
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return SizedBox(
-      width: 130,
-      child: ChoixDeroulant<String>(
-        hauteur: 48,
-        valeur: magasinCourant(),
-        choix: {for (final m in etat.magasins) m.id: m.nom, nouveau: '+ Nouveau magasin', tous: 'Tous les magasins'},
-        onChange: (v) async {
-          if (v == tous) {
-            Nav.i.choixMagasin = true;
-            Nav.i.signaler();
-            return;
-          }
-          if (v == nouveau) {
-            final m = await creerMagasinDemande(context);
-            if (m == null) return;
-            v = m.id;
-          }
-          Nav.i.magasinCourant = v;
-          Nav.i.filtreRayonSecteurs = Nav.i.filtreRayonProduits = Nav.i.filtreSecteurProduits = null;
-          Nav.i.signaler();
-        },
-      ),
-    );
-  }
-}
-
-String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
-
-/// Demande le nom d'un nouveau magasin (refuse un nom déjà pris) et le remplit avec le catalogue complet.
+/// Demande le nom d'un nouveau magasin (refuse un nom déjà pris) ; il reçoit le catalogue du foyer.
 Future<Magasin?> creerMagasinDemande(BuildContext context) async {
   final etat = Etat.instance;
   final nom = await demanderTexte(context, titre: 'Nouveau magasin', aide: 'Ex. : Hyper de la gare');
@@ -65,371 +22,12 @@ Future<Magasin?> creerMagasinDemande(BuildContext context) async {
     return null;
   }
   final m = etat.creerMagasin(nom);
-  final n = await etat.appliquerModele(m, Etat.tailleComplete);
-  if (n > 0 && context.mounted) Nav.message(context, '$nom : $n produits placés dans ses rayons');
+  await etat.remplirMagasin(m);
   return m;
 }
 
-/// Gérer › Magasins : liste des magasins existants, à l'entrée de la rubrique.
-class SousEcranListeMagasins extends StatelessWidget {
-  const SousEcranListeMagasins({super.key});
-
-  void _ouvrir(String id) {
-    Nav.i.magasinCourant = id;
-    Nav.i.choixMagasin = false;
-    Nav.i.filtreRayonSecteurs = Nav.i.filtreRayonProduits = Nav.i.filtreSecteurProduits = null;
-    Nav.i.signaler();
-  }
-
-  @override
-  Widget build(BuildContext context) => ListenableBuilder(listenable: Etat.instance, builder: (context, _) => _liste(context));
-
-  Widget _liste(BuildContext context) {
-    final etat = Etat.instance;
-    return AvecDecision(
-      boutons: [
-        Bouton(
-          texte: '+ Nouveau magasin',
-          plein: true,
-          onTap: () async {
-            final m = await creerMagasinDemande(context);
-            if (m != null) _ouvrir(m.id);
-          },
-        ),
-      ],
-      contenu: ListView(
-      padding: const EdgeInsets.only(bottom: 16),
-      children: [
-        GroupeRetractable(
-          cle: 'magasins',
-          titre: 'Magasins',
-          icone: Icons.storefront_outlined,
-          nombre: etat.magasins.length,
-          vide: 'Aucun magasin.',
-          enfants: [
-        for (final m in etat.magasins)
-          Glissable(
-            key: ValueKey('glisser-${m.id}'),
-            titre: m.nom,
-            versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
-            actions: [
-              ActionLigne(Icons.storefront_outlined, 'Ouvrir le magasin', () => _ouvrir(m.id)),
-              ActionLigne(Icons.delete_outline, 'Supprimer le magasin', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
-            ],
-            child: LigneMenu(
-            titre: m.nom,
-            titreTaille: 19,
-            icone: Icons.storefront_outlined,
-            sousTitre: '${_pluriel(etat.rayonsDu(m.id).length, 'rayon')} · '
-                '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
-            onTap: () => _ouvrir(m.id),
-          )),
-          ],
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-          child: Text(
-              'Glissez un magasin vers la gauche pour le supprimer. Cela efface ses listes en cours (après confirmation) ; son historique de courses part dans Gérer › Archives.',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        ),
-      ],
-    ),
-    );
-  }
-}
-
-/// Écran 13 — Gérer › Magasins › Rayons.
-class SousEcranRayons extends StatelessWidget {
-  const SousEcranRayons({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    final m = magasinCourant();
-    final rayons = etat.rayonsDu(m);
-    return ListView(
-      padding: const EdgeInsets.only(bottom: 16),
-      children: [
-        GroupeRetractable(
-          cle: 'rayons/$m',
-          titre: 'Rayons',
-          icone: Icons.view_agenda_outlined,
-          nombre: rayons.length,
-          vide: "Ce magasin n'a pas encore de rayons.",
-          enfants: [
-        if (rayons.isEmpty)
-          Bouton(
-            texte: 'Remplir avec le catalogue complet',
-            plein: true,
-            onTap: () async {
-              final mg = etat.magasin(m);
-              if (mg == null) return;
-              final n = await etat.appliquerModele(mg, Etat.tailleComplete);
-              if (context.mounted) Nav.message(context, '${mg.nom} : $n produits placés dans ses rayons');
-            },
-          ),
-        for (final r in rayons)
-          LigneMenu(
-            titre: r.nom,
-            titreTaille: 19,
-            gauche: ImageModifiable(cle: cleRayon(r.nom), taille: 44, onTap: () => choisirImageRayon(context, r.nom)),
-            sousTitre: '${_pluriel(etat.secteursDu(r.id).length, 'secteur')} · ${_pluriel(etat.nbProduitsRayon(m, r.id), 'produit')}',
-            onTap: () {
-              Nav.i.filtreRayonSecteurs = r.id;
-              Retractables.i.tous(['secteurs/$m/${r.id}'], true);
-              Nav.i.allerSous(Nav.secteurs);
-            },
-          ),
-        const SizedBox(height: 14),
-        Bouton(
-          texte: '+ Ajouter un rayon',
-          pointille: true,
-          onTap: () async {
-            final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Nom du rayon');
-            if (nom == null || nom.isEmpty) return;
-            etat.ajouterRayon(m, nom);
-            if (context.mounted) await choisirImageRayon(context, nom);
-          },
-        ),
-        LienSupprimer(
-          texte: 'Supprimer le magasin ${etat.magasin(m)?.nom ?? ''}',
-          onTap: () async {
-            final mg = etat.magasin(m);
-            if (mg != null && await demanderSuppression(context, mg, 'le magasin ${mg.nom}')) {
-              Nav.i.magasinCourant = null;
-              Nav.i.choixMagasin = true;
-              Nav.i.signaler();
-            }
-          },
-        ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Écran 14 — Gérer › Magasins › Secteurs. Sert aussi à indiquer le secteur d'un produit non placé.
-class SousEcranSecteurs extends StatelessWidget {
-  const SousEcranSecteurs({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    final nav = Nav.i;
-    final m = magasinCourant();
-    final rayons = etat.rayonsDu(m);
-    if (nav.filtreRayonSecteurs != null && !rayons.any((r) => r.id == nav.filtreRayonSecteurs)) {
-      nav.filtreRayonSecteurs = null;
-    }
-    final filtre = nav.filtreRayonSecteurs;
-    final aPlacer = etat.produit(nav.produitAPlacer);
-    return Column(
-      children: [
-        if (aPlacer != null)
-          Container(
-            color: Charte.fondSelection,
-            padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
-            child: Row(
-              children: [
-                Icon(Icons.place_outlined, size: 20, color: Charte.couleurIcone(Icons.place_outlined)),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text('Où se trouve « ${aPlacer.nom} » dans ${etat.magasin(m)?.nom ?? ''} ? Touchez son secteur.',
-                      style: Charte.texte(14, gras: true)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    nav.produitAPlacer = null;
-                    nav.signaler();
-                  },
-                  child: Text('Annuler', style: Charte.texte(14)),
-                ),
-              ],
-            ),
-          ),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 16),
-            children: [
-              if (rayons.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('Aucun secteur.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                ),
-              // Un groupe rétractable par rayon, ses secteurs dessous (ouvert : le rayon choisi dans Rayons).
-              for (final r in rayons)
-                GroupeRetractable(
-                  cle: 'secteurs/$m/${r.id}',
-                  titre: r.nom,
-                  image: cleRayon(r.nom),
-                  parDefaut: r.id == filtre || aPlacer != null,
-                  nombre: etat.secteursDu(r.id).length,
-                  enfants: [
-                    for (final s in etat.secteursDu(r.id))
-                      LigneMenu(
-                        titre: s.nom,
-                        gauche: _image(context, s),
-                        sousTitre: _pluriel(etat.produitsDu(m, s.id).length, 'produit'),
-                        onTap: () {
-                          if (aPlacer != null) {
-                            etat.placer(m, aPlacer.id, s.id);
-                            nav.produitAPlacer = null;
-                            Nav.message(context, '« ${aPlacer.nom} » est placé dans ${s.nom}');
-                          }
-                          nav.filtreRayonProduits = s.rayonId;
-                          nav.filtreSecteurProduits = s.id;
-                          Retractables.i.tous(['produits/$m/${s.id}'], true);
-                          nav.allerSous(Nav.produits);
-                        },
-                      ),
-                    const SizedBox(height: 8),
-                    Bouton(
-                      texte: '+ Ajouter un secteur au rayon ${r.nom}',
-                      pointille: true,
-                      taille: 16,
-                      onTap: () async {
-                        final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', aide: 'Nom du secteur');
-                        if (nom == null || nom.isEmpty) return;
-                        etat.ajouterSecteur(r.id, nom);
-                        if (context.mounted) await choisirImageSecteur(context, r.nom, nom);
-                      },
-                    ),
-                    LienSupprimer(
-                      texte: 'Supprimer le rayon ${r.nom}',
-                      onTap: () async {
-                        if (await demanderSuppression(context, r, 'le rayon ${r.nom}')) {
-                          nav.filtreRayonSecteurs = null;
-                          nav.signaler();
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                  ],
-                ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Écran 15 — Gérer › Magasins › Produits : filtres rayon et secteur, recherche en direct.
-class SousEcranProduits extends StatefulWidget {
-  const SousEcranProduits({super.key});
-
-  @override
-  State<SousEcranProduits> createState() => _SousEcranProduitsState();
-}
-
-class _SousEcranProduitsState extends State<SousEcranProduits> {
-  String recherche = '';
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    final nav = Nav.i;
-    final m = magasinCourant();
-    final r = recherche.toLowerCase();
-    bool garde(Produit p) {
-      if (r.isEmpty) return true;
-      final marques = p.marqueIds.map((id) => etat.marque(id)?.nom.toLowerCase() ?? '');
-      return p.nom.toLowerCase().contains(r) || marques.any((x) => x.contains(r));
-    }
-
-    Widget ligne(Produit p) => LigneMenu(
-          titre: p.nom,
-          titreTaille: 18,
-          icone: Icons.shopping_basket_outlined,
-          droite: const SizedBox.shrink(),
-          sousTitre: _description(etat, p),
-          onTap: () => Nav.aller(context, EcranFicheProduit(produitId: p.id)),
-        );
-
-    Future<void> nouveau(Secteur? secteur) async {
-      final nom = await demanderTexte(context, titre: 'Nouveau produit', aide: 'Nom générique (ex. : Riz)');
-      if (nom == null || nom.isEmpty || !context.mounted) return;
-      final p = etat.creerProduit(nom);
-      if (secteur != null) etat.placer(m, p.id, secteur.id);
-      Nav.aller(context, EcranFicheProduit(produitId: p.id));
-    }
-
-    final secteurs = etat.secteursDuMagasin(m);
-    final nonPlaces = [for (final p in etat.produits) if (etat.secteurDe(m, p.id) == null && garde(p)) p]
-      ..sort((a, b) => a.nom.compareTo(b.nom));
-
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: TextField(
-            style: Charte.texte(16),
-            decoration: const InputDecoration(hintText: 'Rechercher un produit, une marque…'),
-            onChanged: (v) => setState(() => recherche = v.trim()),
-          ),
-        ),
-        Container(height: 1, color: Charte.separateurZone),
-        Expanded(
-          child: ListView(
-            padding: const EdgeInsets.only(bottom: 16),
-            children: [
-              // Un groupe rétractable par secteur ; pendant une recherche, les secteurs trouvés sont ouverts.
-              for (final s in secteurs)
-                if (etat.produitsDu(m, s.id).where(garde) case final produits when r.isEmpty || produits.isNotEmpty)
-                  GroupeRetractable(
-                    cle: r.isEmpty ? 'produits/$m/${s.id}' : 'produits/recherche/${s.id}',
-                    titre: s.nom,
-                    image: cleSecteur(etat.rayon(s.rayonId)?.nom ?? '', s.nom),
-                    parDefaut: r.isNotEmpty || s.id == nav.filtreSecteurProduits,
-                    nombre: produits.length,
-                    enfants: [
-                      for (final p in produits) ligne(p),
-                      if (r.isEmpty) ...[
-                        const SizedBox(height: 8),
-                        Bouton(texte: '+ Nouveau produit dans ${s.nom}', pointille: true, taille: 16, onTap: () => nouveau(s)),
-                        LienSupprimer(
-                          texte: 'Supprimer le secteur ${s.nom}',
-                          onTap: () => demanderSuppression(context, s, 'le secteur ${s.nom}'),
-                        ),
-                        const SizedBox(height: 8),
-                      ],
-                    ],
-                  ),
-              if (nonPlaces.isNotEmpty)
-                GroupeRetractable(
-                  cle: 'produits/$m/nonPlaces',
-                  titre: 'Non placés dans ce magasin',
-                  icone: Icons.help_outline,
-                  parDefaut: r.isNotEmpty,
-                  nombre: nonPlaces.length,
-                  enfants: [for (final p in nonPlaces) ligne(p)],
-                ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-                child: Bouton(texte: '+ Nouveau produit', pointille: true, taille: 16, onTap: () => nouveau(null)),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  static String _description(Etat etat, Produit p) {
-    final nm = p.marqueIds.length;
-    final nk = p.packagingIds.length;
-    final morceaux = <String>[
-      if (nm > 0) _pluriel(nm, 'marque'),
-      if (nk > 1) _pluriel(nk, 'packaging'),
-      if (nk == 1 && nm == 0) etat.packaging(p.packagingIds.first)?.libelle ?? '',
-    ];
-    return morceaux.isEmpty ? 'à compléter' : morceaux.join(' · ');
-  }
-}
-
-/// Écran 16 — Fiche produit (sous-niveau de Gérer › Magasins › Produits).
-/// Avec [listeId] : ouverte depuis la construction, l'ajout revient à cette liste.
+/// Fiche produit (Gérer › Courses › Catalogue) : nom, rangement (le même dans tous les magasins), marques, packagings.
+/// Avec [listeId] : ouverte depuis la préparation, l'ajout revient à cette liste.
 class EcranFicheProduit extends StatelessWidget {
   const EcranFicheProduit({super.key, required this.produitId, this.listeId});
   final String produitId;
@@ -444,25 +42,13 @@ class EcranFicheProduit extends StatelessWidget {
         final p = etat.produit(produitId);
         if (p == null) {
           return PageBase(
-            entete: const EnTeteFenetre(retour: true, sousTitre: 'Gérer › Produits', titre: 'Produit'),
+            entete: const EnTeteFenetre(retour: true, sousTitre: 'Catalogue', titre: 'Produit'),
             corps: Center(child: Text('Produit introuvable.', style: Charte.texte(16))),
           );
         }
+        final utilise = etat.produitUtilise(p);
         return PageBase(
-          entete: EnTeteFenetre(
-            retour: true,
-            sousTitre: 'Gérer › Produits',
-            titre: p.nom,
-            actions: [
-              ActionLigne(Icons.edit_outlined, 'Renommer', () async {
-                final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
-                if (nom != null && nom.isNotEmpty) {
-                  p.nom = nom;
-                  etat.modifie();
-                }
-              }),
-            ],
-          ),
+          entete: EnTeteFenetre(retour: true, icone: Icons.menu_book_outlined, sousTitre: 'Catalogue', titre: p.nom),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
@@ -471,8 +57,27 @@ class EcranFicheProduit extends StatelessWidget {
                 onTap: () => Nav.plusTard(context),
                 child: const ImageAbsente(texte: 'Image du produit · ajouter une photo', hauteur: 110),
               ),
-              const TitreSection('Où le trouver', cote: 0),
-              for (final m in etat.magasins) _emplacement(context, etat, p, m),
+              if (etat.estAjoute(p) || etat.estModifie(p))
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: Row(children: [
+                    SignePerso(p, taille: 18),
+                    const SizedBox(width: 8),
+                    Text(etat.estAjoute(p) ? 'Ajouté par le foyer' : 'Modifié par le foyer',
+                        style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                  ]),
+                ),
+              const TitreSection('Rangement (le même dans tous les magasins)', cote: 0),
+              Row(
+                children: [
+                  Expanded(child: Text(rangement(p), style: Charte.texte(16))),
+                  const SizedBox(width: 8),
+                  BoutonAction('Changer', onTap: () async {
+                    final choix = await choisirSecteur(context, titre: p.nom);
+                    if (choix?.$1 case final s?) etat.placer('', p.id, s.id);
+                  }),
+                ],
+              ),
               const TitreSection('Marques', cote: 0),
               Wrap(spacing: 8, runSpacing: 8, children: [
                 for (final id in p.marqueIds) _pastille(etat.marque(id)?.nom ?? ''),
@@ -489,39 +94,41 @@ class EcranFicheProduit extends StatelessWidget {
                   if (nom != null && nom.isNotEmpty) etat.ajouterPackaging(p, nom);
                 }),
               ]),
-              if (etat.produitUtilise(p)) ...[
+              if (utilise) ...[
                 const SizedBox(height: 14),
-                CadrePointille(
-                  couleur: const Color(0xFF999999),
-                  epaisseur: 1.2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Row(children: [
-                      Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text('Déjà utilisé dans une liste : ni suppression ni archivage',
-                            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                      ),
-                    ]),
+                Row(children: [
+                  Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Déjà utilisé dans une liste : il peut être modifié, pas supprimé.',
+                        style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                   ),
-                ),
+                ]),
               ],
-              if (!etat.produitUtilise(p))
-                LienSupprimer(
-                  texte: 'Supprimer ce produit',
+              const SizedBox(height: 16),
+            ],
+          ),
+          bas: [
+            BarreAction(boutons: [
+              Bouton(
+                texte: 'Renommer',
+                taille: 15,
+                onTap: () async {
+                  final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
+                  if (nom != null && nom.isNotEmpty) etat.renommerProduit(p, nom);
+                },
+              ),
+              if (!utilise)
+                Bouton(
+                  texte: 'Supprimer',
+                  taille: 15,
                   onTap: () async {
                     if (await demanderSuppression(context, p, 'le produit ${p.nom}') && context.mounted) {
                       Navigator.of(context).pop();
                     }
                   },
                 ),
-              const SizedBox(height: 16),
-            ],
-          ),
-          bas: [
-            BarreAction(boutons: [
-              Bouton(texte: 'Ajouter à la liste en préparation', plein: true, taille: 16, onTap: () => _ajouter(context, etat, p)),
+              Bouton(texte: 'À la liste', plein: true, taille: 15, onTap: () => _ajouter(context, etat, p)),
             ]),
           ],
         );
@@ -529,64 +136,27 @@ class EcranFicheProduit extends StatelessWidget {
     );
   }
 
-  Widget _emplacement(BuildContext context, Etat etat, Produit p, Magasin m) {
-    final s = etat.secteurDe(m.id, p.id);
-    return Container(
-      constraints: const BoxConstraints(minHeight: 50),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-      child: Row(
-        children: [
-          Text(m.nom, style: Charte.texte(16, gras: true)),
-          const Spacer(),
-          if (s != null)
-            Text('${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}', style: Charte.texte(16))
-          else
-            Lien('Non placé · indiquer le secteur', italique: true, taille: 15, onTap: () => _indiquerSecteur(context, etat, p, m)),
-        ],
-      ),
-    );
-  }
-
-  /// « Non placé · indiquer le secteur » → Gérer › Magasins › Secteurs, en mode « placer ce produit ».
-  /// Depuis la construction (écran de travail), un choix direct évite de quitter la liste.
-  Future<void> _indiquerSecteur(BuildContext context, Etat etat, Produit p, Magasin m) async {
-    if (listeId != null || etat.secteursDuMagasin(m.id).isEmpty) {
-      final secteurs = etat.secteursDuMagasin(m.id);
-      if (secteurs.isEmpty) {
-        Nav.message(context, '${m.nom} n\'a pas encore de rayons : décrivez-les dans Gérer › Magasins et catalogue');
-        return;
-      }
-      final sid = await choisirDansListe<String>(context,
-          titre: '${p.nom} · ${m.nom}', choix: {for (final s in secteurs) s.id: '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}'});
-      if (sid != null) etat.placer(m.id, p.id, sid);
-      return;
-    }
-    Nav.i.produitAPlacer = p.id;
-    Nav.i.magasinCourant = m.id;
-    Nav.i.choixMagasin = false;
-    Nav.i.filtreRayonSecteurs = null;
-    Nav.i.ouvrirRubrique(Nav.magasin, sous: Nav.secteurs);
-  }
-
   Future<void> _ajouter(BuildContext context, Etat etat, Produit p) async {
     var l = etat.liste(listeId);
     if (l == null) {
       final enPrep = etat.listesStatut(StatutListe.enConstruction);
       if (enPrep.isEmpty) {
-        l = etat.creerListe(magasinCourant(), []);
+        final m = etat.magasinReference;
+        if (m == null) return;
+        l = etat.creerListe(m.id, []);
       } else if (enPrep.length == 1) {
         l = enPrep.first;
       } else {
         final id = await choisirDansListe<String>(context,
             titre: 'Ajouter à quelle liste ?',
-            choix: {for (final x in enPrep) x.id: '${etat.magasin(x.magasinId)?.nom ?? ''} · ${x.lignes.length} articles'});
+            choix: {for (final x in enPrep) x.id: '${etat.nomListe(x)} · ${x.lignes.length} articles'});
         l = etat.liste(id);
         if (l == null) return;
       }
     }
     etat.ajouterLigne(l, p.id);
     if (!context.mounted) return;
-    Nav.message(context, '« ${p.nom} » ajouté à la liste ${etat.magasin(l.magasinId)?.nom ?? ''}');
+    Nav.message(context, '« ${p.nom} » ajouté à la liste ${etat.nomListe(l)}');
     if (listeId != null) {
       Navigator.of(context).pop();
     } else {
@@ -622,7 +192,8 @@ class EcranFicheProduit extends StatelessWidget {
       );
 }
 
-Widget _image(BuildContext context, Secteur s) {
+/// Image d'un secteur, à changer en la touchant.
+Widget imageSecteur(BuildContext context, Secteur s) {
   final rayon = Etat.instance.rayon(s.rayonId)?.nom ?? '';
   return ImageModifiable(cle: cleSecteur(rayon, s.nom), taille: 44, onTap: () => choisirImageSecteur(context, rayon, s.nom));
 }
