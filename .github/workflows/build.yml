@@ -264,13 +264,17 @@ jobs:
           # sqlite3 compilé en WebAssembly, de la même version que le paquet Dart
           V=$(python3 -c "import re; print(re.search(r'\n  sqlite3:\n(?:    .*\n)*?    version: \"([^\"]+)\"', open('pubspec.lock').read())[1])")
           curl -fsSL -o web/sqlite3.wasm "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-$V/sqlite3.wasm"
+          # Démarrage sans le service worker de Flutter (remplacé par hors_ligne.js)
+          cp outils/web/flutter_bootstrap.js web/
       - name: Compiler la version web
         run: |
           set +e
-          flutter build web --release --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
           exit $code
+      - name: Ouverture sans réseau (service worker hors_ligne.js)
+        run: python3 outils/web/hors_ligne.py build/web
       - name: Assembler le site (page de présentation + application)
         run: |
           mkdir site
