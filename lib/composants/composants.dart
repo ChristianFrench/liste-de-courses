@@ -1802,6 +1802,7 @@ Future<bool> modale(
   required Widget Function(BuildContext context, StateSetter maj) contenu,
   required String? oui,
   String? non = 'Annuler',
+  bool croix = false,
 }) async {
   final r = await showDialog<bool>(
     context: context,
@@ -1826,7 +1827,7 @@ Future<bool> modale(
                   const SizedBox(width: 12),
                   Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
                   // Fenêtre d'information sans bouton : une croix pour la fermer (ou un appui à côté).
-                  if (oui == null && non == null)
+                  if (croix || (oui == null && non == null))
                     BoutonIcone(icone: Icons.close, libelle: 'Fermer', onTap: () => Navigator.of(ctx).pop(false)),
                 ],
               ),

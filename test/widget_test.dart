@@ -374,7 +374,7 @@ void main() {
       expect(find.text('+ Nouveau magasin'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Catalogue');
-      expect(find.text('+ Nouveau produit'), findsOneWidget);
+      expect(find.textContaining('Produits ajoutés'), findsOneWidget);
       expect(find.text('FRAIS'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Marques');
@@ -389,7 +389,12 @@ void main() {
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Types de promotion');
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Packaging');
+      Etat.instance.completerLots(); // fait à l'ouverture du foyer : lots de 2 à 10
+      await _rubrique(tester, 'Types de packaging');
+      expect(find.text('Lot de 7'), findsOneWidget);
+      expect(find.text('Pack de 6'), findsOneWidget, reason: 'les lots existants sont gardés');
+      await _ciblesTactiles(tester);
+      await _rubrique(tester, 'Types de mesure');
       await _ciblesTactiles(tester);
       await _depuisCourses(tester, 'Archives');
       await _ciblesTactiles(tester);
@@ -415,7 +420,7 @@ void main() {
     testWidgets('3. la flèche de retour remonte d\'un niveau', (tester) async {
       await _accueil(tester);
       await _rubrique(tester, 'Catalogue');
-      await _toucher(tester, find.text('FRAIS'));
+      if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
       await _toucher(tester, find.text('Crèmerie').last);
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.text('À la liste'), findsOneWidget, reason: 'fiche produit');
@@ -423,7 +428,7 @@ void main() {
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.text('À la liste'), findsNothing);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('+ Nouveau produit'), findsOneWidget);
+      expect(find.textContaining('Produits ajoutés'), findsOneWidget);
 
       await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
@@ -652,6 +657,7 @@ void main() {
         await tester.pumpAndSettle();
         // Article absent du catalogue : on peut le ranger, ou non.
         if (find.text('Ne pas ranger').evaluate().isNotEmpty) await _toucher(tester, find.text('Ne pas ranger'));
+        if (find.text('Ajouter').evaluate().isNotEmpty) await _toucher(tester, find.text('Ajouter'));
       }
       expect([for (final g in l.lignes) etat.produit(g.produitId)!.nom], ['Jambon', 'Café moulu', 'pq maison'],
           reason: 'ajoutés en fin de liste, dans l\'ordre');
@@ -872,25 +878,46 @@ void main() {
       expect(find.text('Rattacher à une course'), findsNothing);
     });
 
-    testWidgets('catalogue : ranger un produit non rangé, créer un produit, le retrouver dans « Ajoutés ou modifiés »', (tester) async {
+    testWidgets('catalogue : ajouter un produit par sa fenêtre, le modifier ; les produits d\'origine ne se modifient pas', (tester) async {
       final etat = Etat.instance;
       etat.harmoniserCatalogue(); // fait à l'ouverture du foyer
-      final truc = etat.creerProduit('Truc mystère');
       await _accueil(tester);
       await _rubrique(tester, 'Catalogue');
-      await _voir(tester, find.text('Truc mystère'));
-      await _toucher(tester, find.text('Truc mystère'));
-      expect(find.byType(SignePerso), findsWidgets, reason: 'petit signe des produits ajoutés');
-      await _toucher(tester, find.text('Changer'));
-      await _toucher(tester, find.text('FRAIS').last);
-      await _toucher(tester, find.text('CRÈMERIE').last);
+      expect(find.text('+ Nouveau produit'), findsNothing, reason: 'on ajoute depuis un rayon et un secteur');
+      // Le rayon a pu rester ouvert (groupes mémorisés d'un test à l'autre).
+      if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
+      await _toucher(tester, find.text('Crèmerie').last);
+      await _toucher(tester, find.text('+ Nouveau produit'));
+      expect(find.byTooltip('Fermer'), findsOneWidget, reason: 'fenêtre avec une croix');
+      expect(find.textContaining('photo'), findsNothing);
+      await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Camembert');
+      await tester.enterText(find.byKey(const ValueKey('produit-marque')), 'Président');
+      await tester.pumpAndSettle();
+      expect(find.text('Il s\'appellera « Camembert Président ».'), findsOneWidget);
+      await _ciblesTactiles(tester);
+      await _toucher(tester, find.text('Ajouter'));
+      final p = etat.produits.firstWhere((x) => x.nom == 'Camembert Président');
+      expect(etat.estAjoute(p), isTrue);
+      expect(etat.marque(p.marqueIds.single)?.nom, 'Président');
       for (final m in etat.magasins) {
-        expect(etat.secteurDe(m.id, truc.id)?.nom, 'Crèmerie', reason: 'le même rangement dans tous les magasins');
+        expect(etat.secteurDe(m.id, p.id)?.nom, 'Crèmerie', reason: 'le même rangement dans tous les magasins');
       }
+      expect(find.byType(SignePerso), findsWidgets, reason: 'petit signe des produits ajoutés');
+
+      // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
+      await _toucher(tester, find.text('Lait demi-écrémé'));
+      expect(find.text('Modifier'), findsNothing);
+      expect(find.text('Avec une marque'), findsOneWidget);
       await _toucher(tester, find.byTooltip('Retour'));
-      await _rubrique(tester, 'Catalogue');
-      await _toucher(tester, find.textContaining('Ajoutés, modifiés'));
-      expect(find.text('Truc mystère'), findsOneWidget);
+      await _toucher(tester, find.byTooltip('Retour'));
+
+      // Produits ajoutés : la fenêtre du produit pour le modifier.
+      await _toucher(tester, find.text('Produits ajoutés (1)'));
+      await _toucher(tester, find.text('Camembert Président'));
+      expect(find.text('Modifier le produit'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Brie');
+      await _toucher(tester, find.text('Enregistrer'));
+      expect(p.nom, 'Brie Président');
       await _ciblesTactiles(tester);
     });
   });
@@ -932,9 +959,9 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('Gérer › Paramètres › MQTT : serveur HiveMQ prérempli', (tester) async {
+    testWidgets('Gérer › Paramètres › Synchronisation : serveur HiveMQ prérempli', (tester) async {
       await _lancer(tester);
-      await _rubrique(tester, 'MQTT');
+      await _rubrique(tester, 'Synchronisation');
       expect(find.text('Partager ce foyer'), findsOneWidget);
       expect(find.text('Rejoindre un foyer'), findsOneWidget);
       expect(find.text('SERVEUR MQTT'), findsOneWidget, reason: 'configuration seulement, serveur déplié');

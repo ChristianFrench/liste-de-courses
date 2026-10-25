@@ -6,7 +6,7 @@ import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
 
-// Écrans de Gérer : Mon foyer (Foyer et ses membres), Courses (Types de promotion, Packaging),
+// Écrans de Gérer : Mon foyer (Foyer et ses membres), Courses (Types de promotion, de mesure, de packaging),
 // Paramètres (Apparence, Données).
 
 /// Page simple de Gérer : en-tête avec retour, contenu en colonne.
@@ -161,6 +161,18 @@ class EcranApparence extends StatelessWidget {
           Charte.choisirPalette(v);
         },
       ),
+      const TitreSection('Couleur des cadres', cote: 0),
+      for (final (cle, nom, couleur) in [
+        ('promo', 'Promotions', etat.couleurPromotions),
+        ('mesure', 'Mesures', etat.couleurMesures),
+        ('lot', 'Packagings', etat.couleurLots),
+      ])
+        LigneMenu(
+          titre: nom,
+          sousTitre: 'Touchez pour changer la couleur',
+          gauche: SizedBox(width: 80, child: Center(child: Pastille(nom == 'Promotions' ? 'Promo' : (nom == 'Mesures' ? '500 g' : 'Lot de 4'), couleur: Color(couleur)))),
+          onTap: () => _changerCouleur(context, cle, nom),
+        ),
     ]);
   }
 }
@@ -238,9 +250,33 @@ class _Compteur extends StatelessWidget {
       );
 }
 
-/// Écran 18 — Paramètres › Types de promotion.
+/// Gérer › Courses › Types de promotion : chacun dans un petit cadre, tous de la couleur des promotions
+/// (Gérer › Paramètres › Apparence). Touchez un type pour le modifier ou le supprimer.
 class EcranTypesPromotion extends StatelessWidget {
   const EcranTypesPromotion({super.key});
+
+  Future<void> _agir(BuildContext context, TypePromotion t) async {
+    final etat = Etat.instance;
+    final action = await choisirDansListe<String>(context, titre: t.nom, choix: {
+      'modifier': 'Modifier le nom et le code',
+      'supprimer': 'Supprimer ce type',
+    });
+    if (action == null || !context.mounted) return;
+    if (action == 'modifier') {
+      final nom = await demanderTexte(context, titre: 'Nom du type de promotion', initial: t.nom);
+      if (nom == null || nom.isEmpty || !context.mounted) return;
+      final code = await demanderTexte(context, titre: 'Code court (3 caractères)', initial: t.code);
+      if (code == null || code.isEmpty) return;
+      etat.modifierTypePromotion(t, nom: nom, code: code.length > 4 ? code.substring(0, 4) : code);
+    } else {
+      final ok = await confirmer(context,
+          titre: 'Supprimer « ${t.nom} » ?',
+          contenu: Text('Il ne sera plus proposé. Les listes déjà faites gardent leurs promotions.', style: Charte.texte(16)),
+          plein: 'Garder',
+          contour: 'Supprimer');
+      if (ok == true) etat.supprimerTypePromotion(t);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -250,34 +286,23 @@ class EcranTypesPromotion extends StatelessWidget {
       builder: (context, _) => PageBase(
         entete: const EnTeteFenetre(retour: true, icone: Icons.local_offer_outlined, sousTitre: 'Gérer › Courses', titre: 'Types de promotion'),
         corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-              child: Text('Proposés quand on indique une promotion visée sur une ligne de la liste. Touchez un type pour choisir sa couleur.',
-                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            Text('Proposés quand on indique une promotion sur une ligne de la liste. Touchez un type pour le modifier '
+                'ou le supprimer. Leur couleur se choisit dans Gérer › Paramètres › Apparence.',
+                style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 12),
+            GrilleCadres(
+              couleur: Color(etat.couleurPromotions),
+              cadres: [for (final t in etat.typesPromotion) (t.nom, () => _agir(context, t))],
             ),
-            GroupeRetractable(
-              cle: 'types/promotion',
-              titre: 'Types de promotion',
-              icone: Icons.local_offer_outlined,
-              nombre: etat.typesPromotion.length,
-              enfants: [
-            for (final t in etat.typesPromotion)
-              LigneMenu(
-                titre: t.nom,
-                titreTaille: 19,
-                sousTitre: '${t.exemple.isEmpty ? '' : (t.id == 'autre' ? t.exemple : 'Ex. : ${t.exemple.replaceAll(' ; ', ' · ')}')}'
-                    '\nParamètres : ${t.parametresAffiches}',
-                gauche: Pastille(t.code, couleur: _c(etat.couleurPromo(t.id))),
-                onTap: () => _changerCouleur(context, 'promo:${t.id}', t.nom),
-                droite: _RondCouleur(etat.couleurPromo(t.id)),
-              ),
-            const SizedBox(height: 14),
+          ],
+        ),
+        bas: [
+          BarreAction(boutons: [
             Bouton(
-              texte: '+ Ajouter un type de promotion',
-              pointille: true,
-              taille: 16,
+              texte: '+ Nouveau type',
+              plein: true,
               onTap: () async {
                 final nom = await demanderTexte(context, titre: 'Nouveau type de promotion', aide: 'Nom (ex. : Bon de réduction)');
                 if (nom == null || nom.isEmpty || !context.mounted) return;
@@ -287,14 +312,54 @@ class EcranTypesPromotion extends StatelessWidget {
                 etat.ajouterTypePromotion(code.length > 4 ? code.substring(0, 4) : code, nom, '');
               },
             ),
-            const SizedBox(height: 10),
-              ],
-            ),
-          ],
-        ),
+          ]),
+        ],
       ),
     );
   }
+}
+
+/// Petits cadres identiques, texte au centre, tous de la même couleur ; trois par ligne.
+class GrilleCadres extends StatelessWidget {
+  const GrilleCadres({super.key, required this.cadres, required this.couleur});
+  final List<(String, VoidCallback)> cadres;
+  final Color couleur;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, c) {
+          final largeur = (c.maxWidth - 16) / 3;
+          return Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final (texte, onTap) in cadres)
+                SizedBox(
+                  width: largeur,
+                  height: 48,
+                  child: Material(
+                    color: Color.alphaBlend(couleur.withValues(alpha: 0.18), Charte.fond),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6), side: BorderSide(color: couleur, width: 1.5)),
+                    clipBehavior: Clip.antiAlias,
+                    child: InkWell(
+                      onTap: onTap,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Text(texte,
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Charte.texte(14, gras: true)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
+      );
 }
 
 /// Case à cocher d'une option, sur toute la largeur.
@@ -331,7 +396,6 @@ class _Option extends StatelessWidget {
       );
 }
 
-Color? _c(int? v) => v == null ? null : Color(v);
 
 const _palette = <int>[
   0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF00ACC1, 0xFF1E88E5, 0xFF8E24AA, 0xFFEC407A, 0xFF8D6E63, 0xFF757575,
@@ -376,67 +440,50 @@ Future<void> _changerCouleur(BuildContext context, String cle, String nom) async
   etat.choisirCouleur(cle, v == -1 ? null : v);
 }
 
-class _RondCouleur extends StatelessWidget {
-  const _RondCouleur(this.couleur);
-  final int? couleur;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        width: 26,
-        height: 26,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: couleur == null ? Charte.fond : Color(couleur!),
-          border: Border.all(color: couleur == null ? Charte.separateurZone : Charte.encre),
-        ),
-      );
-}
-
-/// Paramètres › Types de packaging : pack de 6, de 5… proposés pour chaque article, chacun avec sa couleur.
-/// Packaging et promotion s'ajoutent : un pack de 6 peut aussi être en promotion.
+/// Gérer › Courses › Types de mesure (poids, volume, à la pièce…) ou Types de packaging (lots de 2 à 10…),
+/// dans de petits cadres de la couleur choisie dans Gérer › Paramètres › Apparence.
 class EcranTypesPackaging extends StatelessWidget {
-  const EcranTypesPackaging({super.key});
+  const EcranTypesPackaging({super.key, this.lots = true});
 
-  /// Actions sur un format : couleur, correction du libellé (pour tous ses articles), fusion, articles, suppression.
+  /// Vrai : les packagings (lots) ; faux : les mesures.
+  final bool lots;
+
+  /// Actions sur un format : correction du libellé (pour tous ses articles), fusion, articles, suppression.
   Future<void> _agir(BuildContext context, Etat etat, String id) async {
     final k = etat.packaging(id);
     if (k == null) return;
     final n = etat.nbProduitsAvecPackaging(id);
     final action = await choisirDansListe<String>(context, titre: k.libelle, choix: {
-      'renommer': 'Corriger le libellé (pour ses $n articles)',
-      'fusionner': 'Fusionner avec un autre format',
+      'renommer': 'Modifier le libellé (pour ses $n articles)',
+      'fusionner': 'Fusionner avec un autre',
       'articles': 'Voir les $n articles',
-      'couleur': 'Changer la couleur',
-      'supprimer': 'Supprimer ce format',
+      'supprimer': 'Supprimer',
     });
     if (action == null || !context.mounted) return;
     switch (action) {
       case 'renommer':
-        final nom = await demanderTexte(context, titre: 'Libellé du format', initial: k.libelle, aide: 'Ex. : 500 g, 75 cl, lot de 4');
+        final nom = await demanderTexte(context, titre: 'Libellé', initial: k.libelle, aide: lots ? 'Ex. : Lot de 4' : 'Ex. : 500 g, 75 cl');
         if (nom != null && nom.isNotEmpty) etat.renommerPackaging(id, nom);
       case 'fusionner':
+        final autres = lots ? etat.typesLot : etat.typesMesure;
         final cible = await choisirDansListe<String>(context,
-            titre: 'Remplacer « ${k.libelle} » par', choix: {for (final x in etat.typesPackaging) if (x != id) x: etat.packaging(x)?.libelle ?? ''});
+            titre: 'Remplacer « ${k.libelle} » par', choix: {for (final x in autres) if (x != id) x: etat.packaging(x)?.libelle ?? ''});
         if (cible != null) etat.fusionnerPackaging(id, cible);
       case 'articles':
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            backgroundColor: Charte.blanc,
-            title: Text('${k.libelle} · $n articles', style: Charte.texte(18, gras: true)),
-            content: SizedBox(
-              width: 360,
-              height: 400,
-              child: ListView(children: [
-                for (final p in etat.produitsAvecPackaging(id))
-                  Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(p.nom, style: Charte.texte(15))),
-              ]),
-            ),
-            actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Fermer', style: Charte.texte(16)))],
+        await modale(
+          context,
+          titre: '${k.libelle} · $n articles',
+          icone: lots ? Icons.inventory_2_outlined : Icons.scale_outlined,
+          oui: null,
+          non: null,
+          contenu: (_, __) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final p in etat.produitsAvecPackaging(id))
+                Padding(padding: const EdgeInsets.symmetric(vertical: 3), child: Text(p.nom, style: Charte.texte(15))),
+            ],
           ),
         );
-      case 'couleur':
-        await _changerCouleur(context, 'pack:$id', k.libelle);
       case 'supprimer':
         final ok = await confirmer(context,
             titre: 'Supprimer « ${k.libelle} » ?',
@@ -452,71 +499,56 @@ class EcranTypesPackaging extends StatelessWidget {
     final etat = Etat.instance;
     return ListenableBuilder(
       listenable: etat,
-      builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, icone: Icons.inventory_2_outlined, sousTitre: 'Gérer › Courses', titre: 'Packaging'),
-        bas: [
-          BarreAction(boutons: [
-            Bouton(
-              texte: '+ Nouveau format',
-              plein: true,
-              onTap: () async {
-                final nom = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
-                if (nom != null && nom.isNotEmpty) {
-                  etat.ajouterTypePackaging(nom);
+      builder: (context, _) {
+        final ids = lots ? etat.typesLot : etat.typesMesure;
+        return PageBase(
+          entete: EnTeteFenetre(
+              retour: true,
+              icone: lots ? Icons.inventory_2_outlined : Icons.scale_outlined,
+              sousTitre: 'Gérer › Courses',
+              titre: lots ? 'Types de packaging' : 'Types de mesure'),
+          bas: [
+            BarreAction(boutons: [
+              Bouton(
+                texte: lots ? '+ Nouveau packaging' : '+ Nouvelle mesure',
+                plein: true,
+                onTap: () async {
+                  final nom = await demanderTexte(context,
+                      titre: lots ? 'Nouveau packaging' : 'Nouvelle mesure', aide: lots ? 'Ex. : Lot de 12' : 'Ex. : 500 g, 75 cl');
+                  if (nom == null || nom.isEmpty) return;
+                  // Un packaging est un lot : « 12 » devient « Lot de 12 ».
+                  final libelle = lots && !Etat.estLot(nom) ? 'Lot de ${nom.replaceFirst(RegExp(r'^de\s+', caseSensitive: false), '')}' : nom;
+                  etat.ajouterTypePackaging(libelle);
                   etat.trierTypesPackaging();
-                }
-              },
-            ),
-          ]),
-        ],
-        corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 10),
-              child: Text('Les formats de vente proposés pour les articles. Touchez un format pour corriger son libellé '
-                  '(tous ses articles sont corrigés), le fusionner avec un autre, voir ses articles ou changer sa couleur.',
-                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            ),
-            // Un groupe par famille de formats : unité, poids, volume, lots et packs.
-            for (final (famille, icone) in const [
-              ('À l\'unité', Icons.category_outlined),
-              ('Au poids', Icons.scale_outlined),
-              ('En volume', Icons.water_drop_outlined),
-              ('Lots et packs', Icons.inventory_2_outlined),
-            ])
-              if ([for (final id in etat.typesPackaging) if (_famille(etat.packaging(id)?.libelle ?? '') == famille) id] case final ids
-                  when ids.isNotEmpty)
-                GroupeRetractable(
-                  cle: 'types/packaging/$famille',
-                  titre: famille,
-                  icone: icone,
-                  nombre: ids.length,
-                  enfants: [
-                    for (final id in ids)
-                      if (etat.packaging(id) case final k?)
-                        LigneMenu(
-                          titre: k.libelle,
-                          sousTitre: '${etat.nbProduitsAvecPackaging(id)} articles',
-                          gauche: _RondCouleur(etat.couleurPack(id)),
-                          onTap: () => _agir(context, etat, id),
-                        ),
-                  ],
-                ),
+                },
+              ),
+            ]),
           ],
-        ),
-      ),
+          corps: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            children: [
+              Text(
+                  lots
+                      ? 'Ce sont essentiellement des lots, de 2 à 10. Touchez-en un pour le modifier, voir ses articles ou le supprimer.'
+                      : 'C\'est le poids (g, kg), le volume (cl, l) ou la vente à la pièce. Touchez-en une pour la modifier, '
+                          'voir ses articles ou la supprimer.',
+                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+              const SizedBox(height: 12),
+              GrilleCadres(
+                couleur: Color(lots ? etat.couleurLots : etat.couleurMesures),
+                cadres: [
+                  for (final id in ids)
+                    if (etat.packaging(id) case final k?) (k.libelle, () => _agir(context, etat, id)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text('La couleur se choisit dans Gérer › Paramètres › Apparence.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            ],
+          ),
+        );
+      },
     );
   }
-}
-
-/// Famille d'un format de vente, pour le ranger dans son groupe.
-String _famille(String libelle) {
-  final l = libelle.toLowerCase();
-  if (RegExp(r'^(lot|pack|paquet|boîte) ').hasMatch(l)) return 'Lots et packs';
-  if (RegExp(r'\d\s*(g|kg)$').hasMatch(l) || l == 'au poids') return 'Au poids';
-  if (RegExp(r'\d\s*(cl|ml|l)$').hasMatch(l)) return 'En volume';
-  return 'À l\'unité';
 }
 
 /// Pastille d'une palette : ses teintes, du plus foncé au plus pâle, et son nom.

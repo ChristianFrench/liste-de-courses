@@ -47,54 +47,37 @@ class EcranFicheProduit extends StatelessWidget {
           );
         }
         final utilise = etat.produitUtilise(p);
+        final ajoute = etat.estAjoute(p);
         return PageBase(
           entete: EnTeteFenetre(retour: true, icone: Icons.menu_book_outlined, sousTitre: 'Catalogue', titre: p.nom),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
-              const SizedBox(height: 14),
-              InkWell(
-                onTap: () => Nav.plusTard(context),
-                child: const ImageAbsente(texte: 'Image du produit · ajouter une photo', hauteur: 110),
-              ),
-              if (etat.estAjoute(p) || etat.estModifie(p))
-                Padding(
-                  padding: const EdgeInsets.only(top: 10),
-                  child: Row(children: [
-                    SignePerso(p, taille: 18),
-                    const SizedBox(width: 8),
-                    Text(etat.estAjoute(p) ? 'Ajouté par le foyer' : 'Modifié par le foyer',
-                        style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-                  ]),
+              const SizedBox(height: 10),
+              Row(children: [
+                if (ajoute) ...[SignePerso(p, taille: 18), const SizedBox(width: 8)],
+                Expanded(
+                  child: Text(
+                      ajoute
+                          ? 'Ajouté par le foyer : il peut être modifié.'
+                          : 'Produit du catalogue d\'origine : il ne se modifie pas. Avec une marque, il devient un nouveau produit.',
+                      style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                 ),
+              ]),
               const TitreSection('Rangement (le même dans tous les magasins)', cote: 0),
-              Row(
-                children: [
-                  Expanded(child: Text(rangement(p), style: Charte.texte(16))),
-                  const SizedBox(width: 8),
-                  BoutonAction('Changer', onTap: () async {
-                    final choix = await choisirSecteur(context, titre: p.nom);
-                    if (choix?.$1 case final s?) etat.placer('', p.id, s.id);
-                  }),
-                ],
-              ),
-              const TitreSection('Marques', cote: 0),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final id in p.marqueIds) _pastille(etat.marque(id)?.nom ?? ''),
-                _ajout('+ Marque', () async {
-                  final nom = await demanderTexte(context, titre: 'Ajouter une marque', aide: 'Nom de la marque');
-                  if (nom != null && nom.isNotEmpty) etat.ajouterMarque(p, nom);
-                }),
-              ]),
-              const TitreSection('Packagings', cote: 0),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                for (final id in p.packagingIds) _pastille(etat.packaging(id)?.libelle ?? ''),
-                _ajout('+ Packaging', () async {
-                  final nom = await demanderTexte(context, titre: 'Ajouter un packaging', aide: 'Ex. : Pack de 6, 500 g');
-                  if (nom != null && nom.isNotEmpty) etat.ajouterPackaging(p, nom);
-                }),
-              ]),
-              if (utilise) ...[
+              Text(rangement(p), style: Charte.texte(16)),
+              if (p.marqueIds.isNotEmpty) ...[
+                const TitreSection('Marque', cote: 0),
+                Wrap(spacing: 8, runSpacing: 8, children: [for (final id in p.marqueIds) Pastille(etat.marque(id)?.nom ?? '')]),
+              ],
+              if (p.packagingIds.isNotEmpty) ...[
+                const TitreSection('Formats', cote: 0),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  for (final id in p.packagingIds)
+                    Pastille(etat.packaging(id)?.libelle ?? '', couleur: Color(etat.couleurPack(id) ?? Etat.couleurMesureDefaut)),
+                ]),
+              ],
+              if (ajoute && utilise) ...[
                 const SizedBox(height: 14),
                 Row(children: [
                   Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
@@ -110,15 +93,23 @@ class EcranFicheProduit extends StatelessWidget {
           ),
           bas: [
             BarreAction(boutons: [
-              Bouton(
-                texte: 'Renommer',
-                taille: 15,
-                onTap: () async {
-                  final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
-                  if (nom != null && nom.isNotEmpty) etat.renommerProduit(p, nom);
-                },
-              ),
-              if (!utilise)
+              if (ajoute)
+                Bouton(
+                  texte: 'Modifier',
+                  taille: 15,
+                  onTap: () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id)),
+                )
+              else
+                Bouton(
+                  texte: 'Avec une marque',
+                  taille: 15,
+                  onTap: () async {
+                    final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
+                    if (q != null && context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+                        builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
+                  },
+                ),
+              if (ajoute && !utilise)
                 Bouton(
                   texte: 'Supprimer',
                   taille: 15,
@@ -163,33 +154,6 @@ class EcranFicheProduit extends StatelessWidget {
       Nav.travail(EcranConstruction(listeId: l.id));
     }
   }
-
-  Widget _pastille(String texte) => Container(
-        height: 44,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
-        ),
-        child: Center(widthFactor: 1, child: Text(texte, style: Charte.texte(16))),
-      );
-
-  Widget _ajout(String texte, VoidCallback onTap) => CadrePointille(
-        rayon: 22,
-        child: Material(
-          color: Charte.fond,
-          borderRadius: BorderRadius.circular(22),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Center(widthFactor: 1, child: Text(texte, style: Charte.texte(16))),
-            ),
-          ),
-        ),
-      );
 }
 
 /// Image d'un secteur, à changer en la touchant.

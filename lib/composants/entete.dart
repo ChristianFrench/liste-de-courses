@@ -360,8 +360,8 @@ class Aides {
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
       'Mon foyer : le foyer (son nom, ses membres avec leur adresse mail, repartir d\'un foyer neuf).\n'
       'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins), '
-      'les types de promotion, les marques, les types de packaging et les produits réels (essai).\n'
-      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), MQTT (configuration du partage entre appareils).\n'
+      'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'
+      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), synchronisation (partage entre appareils).\n'
       'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
@@ -414,12 +414,14 @@ class Aides {
       'le renommer ou le supprimer.\n$_gestes';
 
   static const catalogue = 'Le catalogue du foyer, le même dans tous les magasins : ses rayons, ses secteurs et ses produits. '
-      'Les rayons et les secteurs ne changent pas ; vous pouvez ajouter des produits (ici, ou depuis la recherche d\'une liste) '
-      'et les modifier.\n'
-      'Un petit + signale un produit ajouté par le foyer, un petit crayon un produit modifié ; '
-      '« Ajoutés ou modifiés » les rassemble pour les corriger ou les supprimer.\n$_gestes';
+      'Les rayons, les secteurs et les produits d\'origine ne changent pas.\n'
+      'Pour ajouter un produit, ouvrez son rayon puis son secteur et touchez « + Nouveau produit » : une fenêtre demande son nom, '
+      'sa marque éventuelle, sa mesure et son packaging. Le produit s\'appelle « nom marque » (ex. « Camembert Président »). '
+      'Sur un produit d\'origine, « Avec une marque » crée de même un nouveau produit.\n'
+      'Un petit + signale un produit ajouté par le foyer ; « Produits ajoutés » les rassemble pour les modifier ou les supprimer.\n$_gestes';
 
-  static const marques = 'Les marques portées par vos produits. Touchez une marque pour la renommer, voir ses produits, '
+  static const marques = 'Les marques portées par vos produits. « + Nouvelle marque » en ajoute une (on peut aussi la saisir avec un nouveau produit). '
+      'Touchez une marque pour la renommer, voir ses produits, '
       'ou la supprimer si plus aucun produit ne la porte.\n$_gestes';
 
   static const parcours = 'L\'ordre des secteurs appris pendant vos courses, pour chaque membre et chaque magasin. '

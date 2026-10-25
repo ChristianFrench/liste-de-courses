@@ -75,8 +75,8 @@ class Membre {
 class TypePromotion {
   TypePromotion(this.id, this.code, this.nom, this.exemple, this.parametres);
   final String id;
-  final String code;
-  final String nom;
+  String code;
+  String nom;
   final String exemple;
   final List<String> parametres;
 
@@ -444,6 +444,7 @@ class Etat extends ChangeNotifier {
 
   /// Formats de vente du catalogue déjà appliqués aux produits (une seule fois, à la mise à jour).
   bool formatsAppliques = false;
+  bool lotsCompletes = false;
 
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
@@ -529,6 +530,7 @@ class Etat extends ChangeNotifier {
       lire(s.lire());
     }
     await appliquerFormats();
+    completerLots();
     harmoniserCatalogue();
   }
 
@@ -736,6 +738,7 @@ class Etat extends ChangeNotifier {
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
     formatsAppliques = options?['formats'] == 1;
+    lotsCompletes = options?['lots'] == 1;
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
@@ -841,6 +844,7 @@ class Etat extends ChangeNotifier {
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
             if (formatsAppliques) 'formats': 1,
+            if (lotsCompletes) 'lots': 1,
           },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
@@ -1640,15 +1644,60 @@ class Etat extends ChangeNotifier {
     return r2 == null ? null : _trouve(secteurs, (x) => x.rayonId == r2.id && x.nom == s.nom);
   }
 
+  /// Produit ajouté par le foyer : lui seul peut être modifié ; le catalogue d'origine ne change pas.
   bool estAjoute(Produit p) => produitsPerso[p.id] == 'a';
-  bool estModifie(Produit p) => produitsPerso[p.id] == 'm';
 
-  /// Produits ajoutés ou modifiés par le foyer, par ordre alphabétique.
-  List<Produit> get produitsAjoutesOuModifies =>
-      [for (final p in produits) if (produitsPerso.containsKey(p.id)) p]..sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
+  /// Produits ajoutés par le foyer, par ordre alphabétique.
+  List<Produit> get produitsAjoutes =>
+      [for (final p in produits) if (estAjoute(p)) p]..sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
 
   void _marquerAjoute(Produit p) => produitsPerso[p.id] = 'a';
-  void _marquerModifie(Produit p) => produitsPerso.putIfAbsent(p.id, () => 'm');
+
+  /// Marque de ce nom (créée au besoin).
+  Marque marqueNommee(String nom) {
+    var m = _trouve(marques, (m) => m.nom.toLowerCase() == nom.trim().toLowerCase());
+    if (m == null) {
+      m = Marque(nouvelId('b'), nom.trim());
+      marques.add(m);
+      modifie();
+    }
+    return m;
+  }
+
+  /// Libellé d'un produit ajouté, sans sa marque (« Camembert Président » → « Camembert »).
+  String libelleSansMarque(Produit p) {
+    final m = p.marqueIds.isEmpty ? null : marque(p.marqueIds.first);
+    if (m != null && p.nom.toLowerCase().endsWith(' ${m.nom.toLowerCase()}')) {
+      return p.nom.substring(0, p.nom.length - m.nom.length - 1);
+    }
+    return p.nom;
+  }
+
+  /// Crée (ou corrige, avec [produit]) un produit ajouté : son nom est le libellé suivi de la marque,
+  /// sa mesure et son packaging forment son format de vente.
+  Produit enregistrerProduitAjoute({
+    Produit? produit,
+    required String libelle,
+    String? marqueNom,
+    String? mesure,
+    String? lot,
+    Secteur? secteur,
+  }) {
+    final mq = (marqueNom ?? '').trim();
+    final nom = mq.isEmpty ? libelle.trim() : '${libelle.trim()} $mq';
+    final p = produit ?? creerProduit(nom, secteur: secteur);
+    p.nom = nom;
+    p.marqueIds
+      ..clear()
+      ..addAll([if (mq.isNotEmpty) marqueNommee(mq).id]);
+    final k = packagingCompose(mesure, lot);
+    p.packagingIds
+      ..clear()
+      ..addAll([if (k != null) k.id]);
+    if (produit != null && secteur != null) placer('', p.id, secteur.id);
+    modifie();
+    return p;
+  }
 
   /// Range le produit dans le secteur [secteurId] (ou son homologue) de tous les magasins.
   /// [magasinId] n'est gardé que pour les appels existants : le rangement est le même partout.
@@ -1656,7 +1705,6 @@ class Etat extends ChangeNotifier {
     final s = secteur(secteurId);
     final p = produit(produitId);
     if (s == null || p == null) return;
-    final avant = secteurCatalogue(produitId);
     for (final m in magasins) {
       final h = secteurHomologue(m.id, s);
       if (h == null) continue;
@@ -1667,7 +1715,6 @@ class Etat extends ChangeNotifier {
         e.secteurId = h.id;
       }
     }
-    if (avant != null && secteurCatalogue(produitId)?.nom != avant.nom) _marquerModifie(p);
     modifie();
   }
 
@@ -1687,7 +1734,6 @@ class Etat extends ChangeNotifier {
   void renommerProduit(Produit p, String nom) {
     if (nom.trim().isEmpty || nom.trim() == p.nom) return;
     p.nom = nom.trim();
-    _marquerModifie(p);
     modifie();
   }
 
@@ -1776,7 +1822,6 @@ class Etat extends ChangeNotifier {
     }
     if (!p.marqueIds.contains(m.id)) {
       p.marqueIds.add(m.id);
-      _marquerModifie(p);
     }
     modifie();
   }
@@ -1789,7 +1834,6 @@ class Etat extends ChangeNotifier {
     }
     if (!p.packagingIds.contains(k.id)) {
       p.packagingIds.add(k.id);
-      _marquerModifie(p);
     }
     modifie();
   }
@@ -1950,6 +1994,25 @@ class Etat extends ChangeNotifier {
       unique = '$code$i';
     }
     typesPromotion.add(TypePromotion(nouvelId('tp'), unique, nom, exemple, ['libelle']));
+    modifie();
+  }
+
+  /// Corrige le nom et le code court d'un type de promotion (le code reste unique).
+  void modifierTypePromotion(TypePromotion t, {required String nom, required String code}) {
+    if (nom.trim().isEmpty || code.trim().isEmpty) return;
+    var unique = code.trim().toUpperCase();
+    for (var i = 2; typesPromotion.any((x) => x.id != t.id && x.code == unique); i++) {
+      unique = '${code.trim().toUpperCase()}$i';
+    }
+    t
+      ..nom = nom.trim()
+      ..code = unique;
+    modifie();
+  }
+
+  /// Retire un type de promotion ; les listes déjà faites gardent leurs promotions.
+  void supprimerTypePromotion(TypePromotion t) {
+    typesPromotion.remove(t);
     modifie();
   }
 
@@ -2281,17 +2344,36 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  /// Couleur d'un type de promotion ou de packaging, ou null.
-  // Sans couleur choisie : couleurs chaudes pour les promotions selon le rang du type ; une seule couleur pour tous les packagings.
-  static const _chaudes = [0xFFE53935, 0xFFFB8C00, 0xFFEC407A, 0xFFFDD835, 0xFF8E24AA, 0xFF8D6E63];
-  static const _froides = [0xFF1E88E5, 0xFF00ACC1, 0xFF43A047, 0xFF3949AB, 0xFF00897B, 0xFF7CB342];
-  int _rang(String id, List<String> ids) => (ids.indexOf(id) < 0 ? id.hashCode : ids.indexOf(id)).abs();
-  int? couleurPromo(String? typeId) => typeId == null
-      ? null
-      : couleurs['promo:$typeId'] ?? _chaudes[_rang(typeId, [for (final t in typesPromotion) t.id]) % _chaudes.length];
-  int? couleurPack(String? packagingId) => packagingId == null
-      ? null
-      : couleurs['pack:$packagingId'] ?? _froides.first;
+  /// Couleurs des pastilles (Gérer › Paramètres › Apparence) : une pour les promotions, une pour les mesures,
+  /// une pour les packagings (lots). Par défaut : promotion en rouge, mesure et packaging en vert.
+  static const couleurPromoDefaut = 0xFFE53935;
+  static const couleurMesureDefaut = 0xFF43A047;
+  static const couleurLotDefaut = 0xFF2E7D32;
+  int get couleurPromotions => couleurs['promo'] ?? couleurPromoDefaut;
+  int get couleurMesures => couleurs['mesure'] ?? couleurMesureDefaut;
+  int get couleurLots => couleurs['lot'] ?? couleurLotDefaut;
+  int? couleurPromo(String? typeId) => typeId == null ? null : couleurPromotions;
+  int? couleurPack(String? packagingId) {
+    final k = packaging(packagingId);
+    if (k == null) return null;
+    return mesureEtLot(k.libelle).$2 != null ? couleurLots : couleurMesures;
+  }
+
+  /// Types de mesure (poids, volume, à la pièce…) et types de packaging (lots), parmi les formats proposés.
+  List<String> get typesMesure => [for (final id in typesPackaging) if (!estLot(packaging(id)?.libelle ?? '')) id];
+  List<String> get typesLot => [for (final id in typesPackaging) if (estLot(packaging(id)?.libelle ?? '')) id];
+
+  /// Les packagings sont surtout des lots de 2 à 10 : ceux qui manquent sont ajoutés une fois.
+  void completerLots() {
+    if (lotsCompletes) return;
+    for (var n = 2; n <= 10; n++) {
+      final existe = typesLot.any((id) => RegExp('\\b$n\\b').hasMatch(packaging(id)?.libelle ?? ''));
+      if (!existe) ajouterTypePackaging('Lot de $n');
+    }
+    lotsCompletes = true;
+    trierTypesPackaging();
+    modifie();
+  }
 
   void choisirCouleur(String cle, int? couleur) {
     if (couleur == null) {

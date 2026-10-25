@@ -139,12 +139,15 @@ void main() {
     await _capture('14 Catalogue-Rayon');
     await _toucher(tester, find.text('Crèmerie'));
     await _capture('15 Catalogue-Secteur');
+    await _toucher(tester, find.text('+ Nouveau produit'));
+    await _capture('15 Nouveau-produit');
+    await _toucher(tester, find.byTooltip('Fermer'));
     await _toucher(tester, find.text('Lait demi-écrémé'));
     await _capture('16 Fiche-Produit');
     await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.byTooltip('Retour'));
-    await _toucher(tester, find.textContaining('Ajoutés, modifiés'));
-    await _capture('20 Ajoutes-ou-modifies');
+    await _toucher(tester, find.textContaining('Produits ajoutés'));
+    await _capture('20 Produits-ajoutes');
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
@@ -155,13 +158,17 @@ void main() {
     await _toucher(tester, find.text('Marques'));
     await _capture('17 Marques');
     await _toucher(tester, find.byTooltip('Retour'));
-    await _toucher(tester, find.text('Packaging'));
-    await _capture('23 Packaging');
+    await _toucher(tester, find.text('Types de packaging'));
+    await _capture('23 Types-de-packaging');
+    await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.text('Types de mesure'));
+    await _capture('23 Types-de-mesure');
 
     for (final (onglet, rubrique, nom) in [
       ('Courses', 'Archives', '24 Archives'),
       ('Gérer', 'Foyer', '25 Foyer'),
-      ('Gérer', 'MQTT', '27 MQTT'),
+      ('Gérer', 'Apparence', '27 Apparence'),
+      ('Gérer', 'Synchronisation', '27 Synchronisation'),
       ('Courses', 'Corbeille', '26 Corbeille'),
     ]) {
       await _toucher(tester, _onglet(onglet));

@@ -7,7 +7,7 @@ import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Gérer › MQTT : partage entre appareils (code, état du réseau, serveur MQTT, journal des échanges).
+// Gérer › Synchronisation : partage entre appareils (code, état du réseau, serveur MQTT, journal des échanges).
 // L'appui sur le nuage de la barre de titre ouvre seulement l'état : [montrerEtatSynchro].
 
 /// Titre de l'état du partage, selon le voyant.
@@ -106,7 +106,7 @@ class EcranPartage extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([s, Etat.instance]),
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, icone: Icons.sync, sousTitre: 'Gérer › Paramètres', titre: 'MQTT'),
+        entete: const EnTeteFenetre(retour: true, icone: Icons.sync, sousTitre: 'Gérer › Paramètres', titre: 'Synchronisation'),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
