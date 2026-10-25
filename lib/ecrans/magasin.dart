@@ -8,7 +8,6 @@ import '../navigation.dart';
 import '../theme.dart';
 import 'catalogue.dart';
 import 'corbeille.dart';
-import 'travail.dart';
 
 // Création d'un magasin, fiche produit, images des rayons et secteurs.
 
@@ -83,7 +82,7 @@ class EcranFicheProduit extends StatelessWidget {
                   Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Text('Déjà utilisé dans une liste : il peut être modifié, pas supprimé.',
+                    child: Text('Il est dans une liste : il peut être modifié ; pour le supprimer, retirez-le d\'abord de la liste.',
                         style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                   ),
                 ]),
@@ -109,7 +108,7 @@ class EcranFicheProduit extends StatelessWidget {
                         builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
                   },
                 ),
-              if (ajoute && !utilise)
+              if (ajoute)
                 Bouton(
                   texte: 'Supprimer',
                   taille: 15,
@@ -119,40 +118,11 @@ class EcranFicheProduit extends StatelessWidget {
                     }
                   },
                 ),
-              Bouton(texte: 'À la liste', plein: true, taille: 15, onTap: () => _ajouter(context, etat, p)),
             ]),
           ],
         );
       },
     );
-  }
-
-  Future<void> _ajouter(BuildContext context, Etat etat, Produit p) async {
-    var l = etat.liste(listeId);
-    if (l == null) {
-      final enPrep = etat.listesStatut(StatutListe.enConstruction);
-      if (enPrep.isEmpty) {
-        final m = etat.magasinReference;
-        if (m == null) return;
-        l = etat.creerListe(m.id, []);
-      } else if (enPrep.length == 1) {
-        l = enPrep.first;
-      } else {
-        final id = await choisirDansListe<String>(context,
-            titre: 'Ajouter à quelle liste ?',
-            choix: {for (final x in enPrep) x.id: '${etat.nomListe(x)} · ${x.lignes.length} articles'});
-        l = etat.liste(id);
-        if (l == null) return;
-      }
-    }
-    etat.ajouterLigne(l, p.id);
-    if (!context.mounted) return;
-    Nav.message(context, '« ${p.nom} » ajouté à la liste ${etat.nomListe(l)}');
-    if (listeId != null) {
-      Navigator.of(context).pop();
-    } else {
-      Nav.travail(EcranConstruction(listeId: l.id));
-    }
   }
 }
 

@@ -109,6 +109,17 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Le nom retenu, en haut, sans saisie : il suit le nom et la marque tapés dessous.
+          Container(
+            key: const ValueKey('produit-nom-retenu'),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(color: Charte.fondBandeau, borderRadius: BorderRadius.circular(8)),
+            child: Text(
+              nom.text.trim().isEmpty ? 'Nom du produit' : [nom.text.trim(), mq.text.trim()].where((x) => x.isNotEmpty).join(' '),
+              style: Charte.texte(18, gras: true, couleur: nom.text.trim().isEmpty ? Charte.texteSecondaire : Charte.encre),
+            ),
+          ),
+          const SizedBox(height: 12),
           TextField(
             key: const ValueKey('produit-nom'),
             controller: nom,
@@ -133,12 +144,6 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
               decoration: const InputDecoration(labelText: 'Marque (facultative)'),
             ),
           ),
-          if (mq.text.trim().isNotEmpty || nom.text.trim().isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: Text('Il s\'appellera « ${[nom.text.trim(), mq.text.trim()].where((x) => x.isNotEmpty).join(' ')} ».',
-                  style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            ),
           // Les mesures sont nombreuses : une liste déroulante.
           const SizedBox(height: 14),
           Text('Mesure', style: Charte.texte(15, gras: true)),
@@ -483,13 +488,10 @@ class EcranProduitsPerso extends StatelessWidget {
                 Glissable(
                   key: ValueKey('perso-${p.id}'),
                   titre: p.nom,
-                  versGauche: etat.produitUtilise(p)
-                      ? null
-                      : ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
+                  versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
                   actions: [
                     ActionLigne(Icons.edit_outlined, 'Modifier', () => modifier(p)),
-                    if (!etat.produitUtilise(p))
-                      ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
+                    ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
                   ],
                   child: LigneMenu(
                     titre: p.nom,
@@ -497,13 +499,18 @@ class EcranProduitsPerso extends StatelessWidget {
                     sousTitre: [rangement(p), if (p.packagingIds.isNotEmpty) etat.packaging(p.packagingIds.first)?.libelle ?? '']
                         .join(' · '),
                     onTap: () => modifier(p),
+                    droite: BoutonIcone(
+                      icone: Icons.delete_outline,
+                      libelle: 'Supprimer ${p.nom}',
+                      onTap: () => demanderSuppression(context, p, 'le produit ${p.nom}'),
+                    ),
                   ),
                 ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Text(
-                    'Les produits d\'origine du catalogue ne se modifient pas. Touchez un produit ajouté pour le modifier ; '
-                    'glissez-le vers la gauche pour le supprimer, s\'il n\'a encore servi dans aucune liste.',
+                    'Les produits d\'origine du catalogue ne se modifient pas. Touchez un produit ajouté pour le modifier, '
+                    'ou sa corbeille pour le supprimer (s\'il n\'est dans aucune liste).',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),
             ],

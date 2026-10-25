@@ -11,21 +11,27 @@ import '../donnees/synchro.dart';
 
 /// Page simple de Gérer : en-tête avec retour, contenu en colonne.
 /// [boutons] : les actions de l'écran, en bas.
-Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<Widget> boutons = const []}) => ListenableBuilder(
-      listenable: Etat.instance,
-      builder: (context, _) => PageBase(
-        entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre),
-        corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
-        bas: [if (boutons.isNotEmpty) BarreAction(boutons: boutons)],
-      ),
+Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<Widget> boutons = const []}) => PageBase(
+      entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre),
+      corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
+      bas: [if (boutons.isNotEmpty) BarreAction(boutons: boutons)],
     );
 
+/// Écran de Gérer redessiné à chaque changement (couleur choisie, membre ajouté…).
+abstract class _EcranVivant extends StatelessWidget {
+  const _EcranVivant({super.key});
+  Widget construire(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(listenable: Etat.instance, builder: (context, _) => construire(context));
+}
+
 /// Gérer › Mon foyer › Foyer : son nom, ses membres, repartir d'un foyer neuf.
-class EcranFoyer extends StatelessWidget {
+class EcranFoyer extends _EcranVivant {
   const EcranFoyer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Mon foyer', 'Foyer', Icons.home_outlined, [
       Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
@@ -123,11 +129,11 @@ Future<void> _neuf(BuildContext context) async {
 }
 
 /// Gérer › Paramètres › Apparence : palettes de couleurs.
-class EcranApparence extends StatelessWidget {
+class EcranApparence extends _EcranVivant {
   const EcranApparence({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
       Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
@@ -178,11 +184,11 @@ class EcranApparence extends StatelessWidget {
 }
 
 /// Gérer › Paramètres › Données : listes exemples, puis suppression automatique des archives.
-class EcranDonnees extends StatelessWidget {
+class EcranDonnees extends _EcranVivant {
   const EcranDonnees({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, [
       LigneMenu(

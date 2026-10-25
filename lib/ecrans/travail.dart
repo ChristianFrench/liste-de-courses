@@ -111,7 +111,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
         ),
       );
 
-  /// Liste depuis un mail : on colle le texte, on vérifie ce qui a été reconnu, puis la liste est créée.
+  /// Liste depuis un texte : on colle le texte, on vérifie ce qui a été reconnu, puis la liste est créée.
   Future<void> _depuisMail() async {
     await chargerCorrespondances();
     if (!mounted) return;
@@ -119,25 +119,25 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     final textes = <String>[];
     final lire = await modale(
       context,
-      titre: 'Liste depuis un mail',
-      icone: Icons.mail_outline,
+      titre: 'Liste depuis un texte',
+      icone: Icons.notes,
       oui: 'Lire la liste',
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Copiez la liste dans le mail, puis collez-la ici : un article par ligne. '
-              'Plusieurs mails ? Ajoutez-les un par un : ils seront fusionnés en une seule liste.',
+          Text('Copiez la liste (mail, message, note…), puis touchez « Coller » : un article par ligne. '
+              'Chaque « Coller » ajoute le texte copié à la suite ; plusieurs textes forment une seule liste.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           if (textes.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 6),
-              child: Text('${textes.length} mail${textes.length > 1 ? 's' : ''} déjà ajouté${textes.length > 1 ? 's' : ''}',
+              child: Text('${textes.length} texte${textes.length > 1 ? 's' : ''} déjà ajouté${textes.length > 1 ? 's' : ''}',
                   style: Charte.texte(15, gras: true)),
             ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Lien('Ajouter un autre mail', onTap: () {
+              Lien('Ajouter un autre texte', onTap: () {
                 if (texte.text.trim().isEmpty) return;
                 maj(() {
                   textes.add(texte.text);
@@ -146,7 +146,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
               }),
               Lien('Coller', onTap: () async {
                 final d = await Clipboard.getData(Clipboard.kTextPlain);
-                if (d?.text != null) maj(() => texte.text = d!.text!);
+                // Le texte copié s'ajoute à la suite de ce qui est déjà là.
+                final t = d?.text?.trim() ?? '';
+                if (t.isNotEmpty) maj(() => texte.text = texte.text.trim().isEmpty ? t : '${texte.text.trimRight()}\n$t');
               }),
             ],
           ),
@@ -333,9 +335,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 droite: Icon(personnalisee ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
               ),
               LigneMenu(
-                icone: Icons.mail_outline,
-                titre: 'Liste depuis un mail',
-                sousTitre: 'Collez le texte d\'un mail : les articles sont reconnus dans le catalogue',
+                icone: Icons.notes,
+                titre: 'Liste depuis un texte',
+                sousTitre: 'Collez un texte (mail, message, note) : les articles sont reconnus dans le catalogue',
                 onTap: _depuisMail,
               ),
               LigneMenu(

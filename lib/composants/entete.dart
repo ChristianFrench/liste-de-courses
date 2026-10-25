@@ -343,7 +343,7 @@ class Aides {
   static const preparer = 'L\'onglet Préparer sert à construire les listes avant les courses.\n'
       '« + Nouvelle liste » : choisissez le magasin, le nom de la liste (proposé d\'office), puis son type : '
       'liste simple (on tape les articles, sans rayons), liste type ou liste complète (tout le catalogue, rayon par rayon), '
-      'liste personnalisée (reprise d\'une course passée), liste depuis un mail (texte collé), ou liste calculée (plus tard).\n'
+      'liste personnalisée (reprise d\'une course passée), liste depuis un texte (collé), ou liste calculée (plus tard).\n'
       '« En préparation » : touchez une liste pour la reprendre. Glisser à gauche la supprime (avec « Annuler »).\n'
       '« Prêtes pour les courses » : les listes validées ; un appui long permet de les remettre en préparation.\n$_gestes';
 
@@ -370,7 +370,7 @@ class Aides {
       'À la fin, la liste peut être rangée par rayons et secteurs.\n'
       'Liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou la liste complète, vide, avec tout le catalogue du magasin.\n'
       'Liste personnalisée : une de vos dernières courses ; cochez les articles à reprendre.\n'
-      'Liste depuis un mail : collez le texte d\'une liste reçue par mail ; les articles sont reconnus dans le catalogue, '
+      'Liste depuis un texte : collez le texte d\'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, '
       'vous décochez ceux à ne pas garder.\n'
       'Liste calculée : à partir de vos tickets de caisse, prévue plus tard.';
 

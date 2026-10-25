@@ -423,10 +423,10 @@ void main() {
       if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
       await _toucher(tester, find.text('Crèmerie').last);
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('À la liste'), findsOneWidget, reason: 'fiche produit');
+      expect(find.text('Avec une marque'), findsOneWidget, reason: 'fiche produit');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('À la liste'), findsNothing);
+      expect(find.text('Avec une marque'), findsNothing);
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.textContaining('Produits ajoutés'), findsOneWidget);
 
@@ -738,7 +738,7 @@ void main() {
       await tester.runAsync(chargerCorrespondances); // lecture réelle de l'asset, hors horloge simulée
       await _accueil(tester);
       await _toucher(tester, find.text('+ Nouvelle liste'));
-      await _toucher(tester, find.text('Liste depuis un mail'));
+      await _toucher(tester, find.text('Liste depuis un texte'));
       await tester.enterText(find.byKey(const ValueKey('texte-mail')),
           'Bonjour,\n\nCRÈMERIE\n- Lait demi écrémé x2\n- beurre doux, bidule introuvable\n\nEnvoyé de mon iPhone');
       await _toucher(tester, find.text('Lire la liste'));
@@ -756,10 +756,10 @@ void main() {
       await tester.runAsync(chargerCorrespondances);
       await _accueil(tester);
       await _toucher(tester, find.text('+ Nouvelle liste'));
-      await _toucher(tester, find.text('Liste depuis un mail'));
+      await _toucher(tester, find.text('Liste depuis un texte'));
       await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'Lait demi écrémé x2\nBeurre doux');
-      await _toucher(tester, find.text('Ajouter un autre mail'));
-      expect(find.text('1 mail déjà ajouté'), findsOneWidget);
+      await _toucher(tester, find.text('Ajouter un autre texte'));
+      expect(find.text('1 texte déjà ajouté'), findsOneWidget);
       await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'lait demi-écrémé\nbeurre doux\nbeurre doux');
       await _toucher(tester, find.text('Lire la liste'));
       // Le lait : 2 dans un mail, 1 dans l'autre → 2 ; le beurre : 1, puis 2 dans le même mail → 2
@@ -893,7 +893,8 @@ void main() {
       await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Camembert');
       await tester.enterText(find.byKey(const ValueKey('produit-marque')), 'Président');
       await tester.pumpAndSettle();
-      expect(find.text('Il s\'appellera « Camembert Président ».'), findsOneWidget);
+      expect(find.descendant(of: find.byKey(const ValueKey('produit-nom-retenu')), matching: find.text('Camembert Président')), findsOneWidget,
+          reason: 'le nom retenu, en haut, sans saisie');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Ajouter'));
       final p = etat.produits.firstWhere((x) => x.nom == 'Camembert Président');
@@ -918,6 +919,9 @@ void main() {
       await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Brie');
       await _toucher(tester, find.text('Enregistrer'));
       expect(p.nom, 'Brie Président');
+      await _toucher(tester, find.byTooltip('Supprimer Brie Président'));
+      await _toucher(tester, find.text('Supprimer').last);
+      expect(etat.produit(p.id), isNull, reason: 'un produit ajouté se supprime depuis la liste des produits ajoutés');
       await _ciblesTactiles(tester);
     });
   });

@@ -1812,7 +1812,8 @@ class Etat extends ChangeNotifier {
     return change;
   }
 
-  bool produitUtilise(Produit p) => p.nbUtilisations > 0 || listes.any((l) => l.lignes.any((g) => g.produitId == p.id));
+  /// Produit présent dans une liste (en préparation, prête, en cours ou dans l'historique).
+  bool produitUtilise(Produit p) => listes.any((l) => l.lignes.any((g) => g.produitId == p.id));
 
   void ajouterMarque(Produit p, String nom) {
     var m = _trouve(marques, (m) => m.nom.toLowerCase() == nom.toLowerCase());
@@ -1846,7 +1847,7 @@ class Etat extends ChangeNotifier {
       if (magasins.contains(objet) && magasins.length <= 1) return 'C\'est le seul magasin : créez-en un autre avant de le supprimer.';
 
     }
-    if (objet is Produit && produitUtilise(objet)) return 'Ce produit a déjà servi dans une liste : il ne peut pas être supprimé.';
+    if (objet is Produit && produitUtilise(objet)) return 'Ce produit est dans une liste : retirez-le d\'abord de la liste pour pouvoir le supprimer.';
     return null;
   }
 
