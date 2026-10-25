@@ -328,7 +328,7 @@ class _ServeurState extends State<_Serveur> {
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: 6),
-        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (HiveMQ Cloud, gratuit, '
+        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (EMQX Cloud Serverless, gratuit, '
             'ou Mosquitto sur votre PC), indiquez son adresse, son port et son identifiant. '
             'Tous les appareils du foyer doivent utiliser le même serveur.',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
