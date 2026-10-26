@@ -126,10 +126,10 @@ void main() {
 
     await _toucher(tester, _onglet('Courses'));
     await _toucher(tester, _onglet('Courses'));
-    await _toucher(tester, find.text('Historique'));
+    // Historique, Archives, Corbeille : titres repliés de l'onglet Courses, déployés sur place
+    await _toucher(tester, find.text('HISTORIQUE'));
     await _capture('11 Historique-Courses');
-    await _toucher(tester, find.text('Par magasin'));
-    await _capture('12 Historique-Par-magasin');
+    await _toucher(tester, find.text('HISTORIQUE'));
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
@@ -165,11 +165,11 @@ void main() {
     await _capture('23 Types-de-mesure');
 
     for (final (onglet, rubrique, nom) in [
-      ('Courses', 'Archives', '24 Archives'),
+      ('Courses', 'ARCHIVES', '24 Archives'),
       ('Gérer', 'Foyer', '25 Foyer'),
       ('Gérer', 'Apparence', '27 Apparence'),
       ('Gérer', 'Synchronisation', '27 Synchronisation'),
-      ('Courses', 'Corbeille', '26 Corbeille'),
+      ('Courses', 'CORBEILLE', '26 Corbeille'),
     ]) {
       await _toucher(tester, _onglet(onglet));
       await _toucher(tester, _onglet(onglet));
