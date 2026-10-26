@@ -1,7 +1,0 @@
-analyzer:
-  exclude:
-    - build/**
-    - android/**
-    - windows/**
-  language:
-    strict-casts: false

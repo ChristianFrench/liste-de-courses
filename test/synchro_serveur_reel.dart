@@ -189,36 +189,4 @@ void main() {
     await ta.fermer();
     await s.arreterPartage();
   }, timeout: const Timeout(Duration(minutes: 4)));
-
-  test('certificat fait sur le PC : accepté la première fois, refusé s\'il change', () async {
-    final env = Platform.environment;
-    if (env['MQTT_TLS'] != '1' || env['MQTT_HOTE'] == null) return; // seulement avec un Mosquitto local chiffré
-    ServeurMqtt serveur(String empreinte) => ServeurMqtt(
-        hote: env['MQTT_HOTE']!,
-        port: int.parse(env['MQTT_PORT']!),
-        utilisateur: env['MQTT_UTILISATEUR'] ?? '',
-        motDePasse: env['MQTT_MDP'] ?? '',
-        empreinte: empreinte);
-    Future<List<String>> essai(String empreinte) async {
-      final t = TransportMqtt(serveur(empreinte));
-      final etats = <String>[];
-      final sub = t.etats.listen(etats.add);
-      unawaited(t.connecter(identifiant: 'ldc-essai-cert-${DateTime.now().millisecondsSinceEpoch}', sujetTestament: 'ldc/ESSAICERT/presence/x', testament: '{}', abonnement: 'ldc/ESSAICERT/#'));
-      final fin = DateTime.now().add(const Duration(seconds: 10));
-      while (!etats.any((e) => e == 'connecte' || e.startsWith('Connexion impossible')) && DateTime.now().isBefore(fin)) {
-        await Future<void>.delayed(const Duration(milliseconds: 100));
-      }
-      await t.fermer();
-      await sub.cancel();
-      return etats;
-    }
-
-    final premier = await essai('');
-    expect(premier, contains('connecte'));
-    final empreinte = premier.firstWhere((e) => e.startsWith('certificat:')).substring(11);
-    expect(await essai(empreinte), contains('connecte'));
-    final autre = await essai('0' * 64);
-    expect(autre, isNot(contains('connecte')));
-    expect(autre.any((e) => e.startsWith('certificat-refuse:$empreinte')), isTrue);
-  });
 }

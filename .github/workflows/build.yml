@@ -2,8 +2,6 @@ name: Compilation Android, Windows, web
 
 on:
   push:
-    # L'application d'essai de synchronisation a sa propre compilation
-    paths-ignore: ['essai_synchro/**', '.github/workflows/essai-synchro.yml']
   workflow_dispatch:
 
 env:
@@ -154,57 +152,6 @@ jobs:
           name: Liste de courses Windows
           path: build/Liste de courses Windows/
 
-  serveur_mqtt:
-    name: serveur MQTT Windows (Mosquitto installé et vérifié)
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with: { channel: stable, cache: true }
-      - name: Compiler Verifier-serveur-MQTT.exe
-        shell: bash
-        run: |
-          flutter pub get > /dev/null
-          mkdir -p "build/Serveur MQTT"
-          dart compile exe outils/verifier_serveur_mqtt.dart -o "build/Serveur MQTT/Verifier-serveur-MQTT.exe"
-          cp "outils/mosquitto/Installer le serveur MQTT.bat" outils/mosquitto/LISEZMOI.txt "build/Serveur MQTT/"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: Serveur MQTT Windows
-          path: build/Serveur MQTT/
-      - name: Essai du .bat sur ce Windows (installation, service, vérification)
-        shell: cmd
-        run: |
-          xcopy /e /i /q "build\Serveur MQTT" "%RUNNER_TEMP%\essai" > nul
-          call "%RUNNER_TEMP%\essai\Installer le serveur MQTT.bat" courses Essai123 1883 > "%RUNNER_TEMP%\essai.log" 2>&1
-          set code=%errorlevel%
-          type "%RUNNER_TEMP%\essai.log"
-          python outils\annoter_mqtt.py "%RUNNER_TEMP%\essai.log"
-          if not "%code%"=="0" exit /b %code%
-          rem Le port chiffre (8883) doit aussi etre verifie
-          findstr /c:"certificat fait sur le PC" "%RUNNER_TEMP%\essai.log" > nul || exit /b 1
-      - name: Essai du .bat avec les questions (comme un double-clic, mot de passe laissé vide)
-        shell: cmd
-        run: |
-          rem Les réponses sont lues dans un fichier, ligne par ligne, comme au clavier
-          rem D'abord un mot de passe refusé (avec &), qui doit être redemandé, puis vide (tiré au hasard)
-          > "%RUNNER_TEMP%\reponses.txt" echo courses
-          >> "%RUNNER_TEMP%\reponses.txt" echo courses06^&
-          >> "%RUNNER_TEMP%\reponses.txt" echo.
-          >> "%RUNNER_TEMP%\reponses.txt" echo 1883
-          >> "%RUNNER_TEMP%\reponses.txt" echo 8883
-          >> "%RUNNER_TEMP%\reponses.txt" echo n
-          >> "%RUNNER_TEMP%\reponses.txt" echo.
-          >> "%RUNNER_TEMP%\reponses.txt" echo.
-          call "%RUNNER_TEMP%\essai\Installer le serveur MQTT.bat" < "%RUNNER_TEMP%\reponses.txt" > "%RUNNER_TEMP%\essai2.log" 2>&1
-          set code=%errorlevel%
-          type "%RUNNER_TEMP%\essai2.log"
-          python outils\annoter_mqtt.py "%RUNNER_TEMP%\essai2.log"
-          findstr /c:"Serveur MQTT pret" "%RUNNER_TEMP%\essai2.log" > nul || exit /b 1
-          findstr /c:"Mot de passe refuse" "%RUNNER_TEMP%\essai2.log" > nul || exit /b 1
-          findstr /c:"certificat fait sur le PC" "%RUNNER_TEMP%\essai2.log" > nul || exit /b 1
-          exit /b %code%
-
   web:
     # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
     if: "!contains(github.event.head_commit.message, '[rapide]')"
@@ -265,7 +212,7 @@ jobs:
 
   publication:
     name: publication (page « derniere-version »)
-    needs: [verification, android, windows, serveur_mqtt]
+    needs: [verification, android, windows]
     concurrency: publication
     if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && needs.windows.result == 'success' && needs.android.result != 'failure'
     runs-on: ubuntu-latest
@@ -286,7 +233,6 @@ jobs:
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
           (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
-          if [ -d "livrables/Serveur MQTT Windows" ]; then (cd "livrables/Serveur MQTT Windows" && zip -qr ../../publication/Serveur-MQTT-Windows.zip .); fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
           {

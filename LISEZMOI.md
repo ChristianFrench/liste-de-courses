@@ -1,57 +1,47 @@
-# Liste de courses — maquette Flutter (Android, iPhone, Windows)
+# Liste de courses (Android, Windows, web)
 
-Version 0.3 — maquette cliquable des 12 écrans de la « Spécification de l'IHM » (v0.1),
-avec les données factices de `assets/donnees_maquette.json`. Pas encore de Firebase :
-les modifications faites pendant l'essai restent en mémoire et sont perdues à la fermeture.
+Application Flutter pour préparer à plusieurs la liste de courses du foyer, puis faire les courses
+dans l'ordre des allées du magasin. Une seule base de code pour trois versions :
+
+- **Android** : `Liste-de-courses.apk` ;
+- **Windows** : `Liste-de-courses-Windows.zip` (décompresser, lancer `liste_de_courses.exe`) ;
+- **web** (iPhone, iPad, PC) : https://christianfrench.github.io/liste-de-courses/web/
+
+Tous les fichiers de la dernière compilation sont sur la page
+[derniere-version](https://github.com/ChristianFrench/liste-de-courses/releases/tag/derniere-version).
+
+## Données et partage
+
+Chaque appareil a sa base locale (SQLite ; IndexedDB dans le navigateur) et fonctionne sans réseau.
+Au premier lancement, on choisit de l'utiliser **seul** ou **en foyer**. En foyer, les appareils
+échangent leurs modifications par un serveur MQTT (EMQX Cloud), la plus récente l'emportant.
+L'identifiant du serveur est fourni à la compilation par les secrets GitHub `MQTT_UTILISATEUR`
+et `MQTT_MOT_DE_PASSE` ; il n'est jamais écrit dans le dépôt.
 
 ## Compilation
 
-À chaque dépôt de fichiers, l'onglet **Actions** lance quatre travaux en parallèle :
+À chaque dépôt, le workflow « Compilation Android, Windows, web » (`.github/workflows/build.yml`) :
+analyse le code, passe les tests de recette, fait les captures d'écran (branche `captures`),
+compile les trois versions, publie la version web sur GitHub Pages et les fichiers sur la page
+« derniere-version ». Un message de commit contenant `[rapide]` ne compile que Windows.
+En cas d'échec, les erreurs apparaissent en tête de la page du travail (« Annotations »).
 
-| Travail       | Rôle | Fichier téléchargeable (section « Artifacts ») |
-|---------------|------|------------------------------------------------|
-| verification  | Analyse du code et tests de recette de la maquette | aucun : la coche verte indique que les tests passent |
-| android       | APK | Liste de courses Android → `Liste de courses.apk` |
-| windows       | Exécutable | Liste de courses Windows → dossier contenant `liste_de_courses.exe` |
-| iphone        | Vérification | aucun fichier : la coche verte indique seulement que le code compile pour iPhone |
+Autres workflows : « Catalogue Open Food Facts » (`catalogue.yml`, page « catalogue-off »,
+base le 1er du mois, mise à jour chaque nuit) et « Essai Android » (`essai-android.yml`,
+l'APK sur un émulateur, lancé à la main).
 
-En cas d'échec, les messages d'erreur apparaissent en tête de la page du travail (« Annotations »).
-
-Sous Windows : décompresser le zip dans un dossier (par exemple `Documents\Liste de courses`)
-et lancer `liste_de_courses.exe`. Garder tous les fichiers du dossier ensemble.
-La fenêtre s'ouvre au format téléphone (rapport 390 × 844), sans redimensionnement.
-
-## Organisation du code
+## Organisation
 
 | Dossier / fichier | Contenu |
 |---|---|
-| `lib/main.dart` | Démarrage, chargement des données, format téléphone sous Windows |
-| `lib/theme.dart` | Charte de la maquette (couleurs, police, tailles, hauteurs) |
-| `lib/donnees/modele.dart` | Entités du modèle de données, état en mémoire, règles (préliste, alerte de quantité, étapes du parcours) |
-| `lib/composants/composants.dart` | Composants réutilisables (chapitre 5) |
-| `lib/ecrans/` | Un fichier par écran (chapitre 8), numérotés de `e01` à `e12` |
-| `lib/navigation.dart` | Enchaînement des écrans et barre de navigation |
-| `assets/` | Données factices, icône, police Atkinson Hyperlegible (licence OFL) |
-| `test/widget_test.dart` | Tests de recette (chapitre 12) |
-| `outils/` | Scripts lancés par la compilation GitHub |
-
-## Particularités de la maquette
-
-- **Date du jour figée au 9 octobre 2026**, pour que les promotions factices restent visibles.
-- **Hors réseau simulé** : toucher « Synchronisé » en haut de l'accueil bascule en « Hors réseau » ;
-  le bandeau d'information apparaît alors pendant les courses.
-- Photo, envoi du code d'invitation, comptes magasin : boutons présents, fonction affichée « non disponible ».
-- Taille des caractères du téléphone prise en compte jusqu'à 115 %, pour éviter les textes coupés.
-
-## Catalogue Open Food Facts (depuis la version 0.5)
-
-Workflow « Catalogue Open Food Facts » (`.github/workflows/catalogue.yml`), page « catalogue-off » :
-
-| Fichier | Contenu | Fréquence |
-|---|---|---|
-| `catalogue.json.gz` | Base : les 60 000 produits les plus populaires en France | 1er du mois (export JSONL d'Open Food Facts) |
-| `catalogue-maj.json.gz` | Mise à jour cumulative depuis la base | chaque nuit (fichiers de changements quotidiens) |
-| `catalogue-version.txt` | Versions lues par l'application | à chaque publication |
-
-La base est jointe à l'application à la compilation ; l'application télécharge ensuite
-elle-même les mises à jour selon le délai réglé (7 jours par défaut).
+| `lib/main.dart` | Démarrage, format téléphone sous Windows |
+| `lib/theme.dart` | Charte (couleurs, police, tailles) |
+| `lib/donnees/` | Modèle (`modele.dart`), base locale (`stockage.dart`), synchronisation (`synchro.dart`), catalogue |
+| `lib/composants/` | Composants réutilisables, en-tête des fenêtres |
+| `lib/ecrans/` | Les écrans : accueil, préparation, courses, Gérer (foyer, catalogue, magasins, paramètres…) |
+| `assets/` | Catalogue type, correspondances des listes par mail, images, police Atkinson Hyperlegible (OFL) |
+| `test/` | Tests de recette et captures d'écran |
+| `outils/` | Scripts lancés par la compilation ou par le fil de génération |
+| `docs/` | Page de présentation publiée avec la version web |
+| `documents/` | Fiches d'évolution, cahier de tests, spécification (dans `Documents.zip`) |
+| `ihm/` | Ordres de travail du fil IHM (voir `CLAUDE.md`) |
