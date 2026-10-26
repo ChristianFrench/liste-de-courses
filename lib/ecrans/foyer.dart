@@ -258,12 +258,99 @@ Future<void> _fiche(BuildContext context, Membre m, {required bool admin, requir
                     maj(() {});
                   }),
                 if (admin && !m.moi) BoutonAction('Supprimer', onTap: () => fermerPuis(() => _supprimer(context, m))),
+                if (enFoyer && !m.moi && !radie) BoutonAction('C\'est moi', onTap: () => fermerPuis(() => _cEstMoi(context, m))),
               ]),
             ]),
           ),
         );
       },
     );
+
+/// « C'est moi » : cet appareil appartient à [m] (la même personne sur un autre appareil).
+Future<void> _cEstMoi(BuildContext context, Membre m) async {
+  final etat = Etat.instance;
+  final ok = await confirmer(
+    context,
+    titre: 'Vous êtes ${m.nomAffiche} ?',
+    icone: Icons.person_outline,
+    contenu: Text(
+        'Cet appareil sera rattaché à ${m.nomAffiche}, avec ses autres appareils. « ${etat.moi.nomAffiche} », le nom utilisé '
+        'jusqu\'ici sur cet appareil, disparaît de la liste des membres ; ses listes et ses courses passent à ${m.nomAffiche}.',
+        style: Charte.texte(16)),
+    plein: 'Annuler',
+    contour: 'C\'est moi',
+  );
+  if (ok != true || !context.mounted) return;
+  etat.devenir(m);
+  Nav.message(context, 'Cet appareil est maintenant celui de ${m.nomAffiche}');
+}
+
+/// Après avoir rejoint un foyer : « Qui êtes-vous ? » parmi les membres, ou nouveau membre.
+Future<void> demanderQuiSuisJe(BuildContext context) async {
+  final etat = Etat.instance;
+  final autres = [for (final m in etat.membresVisibles) if (!m.moi && !etat.estRadie(m)) m];
+  Membre? choisi;
+  final ok = await modale(
+    context,
+    titre: 'Qui êtes-vous ?',
+    icone: Icons.person_outline,
+    oui: 'Valider',
+    non: null,
+    contenu: (context, maj) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Text('Une même personne peut utiliser plusieurs appareils (téléphone, PC, navigateur) : choisissez votre nom '
+          's\'il est déjà dans le foyer.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      const SizedBox(height: 8),
+      for (final m in autres)
+        CaseModale(texte: m.nomAffiche, coche: identical(choisi, m), onChange: (_) => maj(() => choisi = m)),
+      CaseModale(
+        texte: 'Je suis un nouveau membre : ${etat.moi.nomAffiche}',
+        coche: choisi == null,
+        onChange: (_) => maj(() => choisi = null),
+      ),
+    ]),
+  );
+  if (!ok) return;
+  if (choisi == null) {
+    etat.resterNouveau();
+  } else {
+    etat.devenir(choisi!);
+  }
+}
+
+/// Pose la question « Qui êtes-vous ? » dès que le foyer rejoint a été reçu.
+class GuetteurQuiSuisJe extends StatefulWidget {
+  const GuetteurQuiSuisJe({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<GuetteurQuiSuisJe> createState() => _GuetteurQuiSuisJeState();
+}
+
+class _GuetteurQuiSuisJeState extends State<GuetteurQuiSuisJe> {
+  bool _ouverte = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Etat.instance.addListener(_verifier);
+  }
+
+  @override
+  void dispose() {
+    Etat.instance.removeListener(_verifier);
+    super.dispose();
+  }
+
+  Future<void> _verifier() async {
+    if (_ouverte || !mounted || !Etat.instance.quiSuisJe) return;
+    _ouverte = true;
+    await demanderQuiSuisJe(context);
+    _ouverte = false;
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 String _statut(StatutListe s) => switch (s) {
       StatutListe.enConstruction => 'en préparation',

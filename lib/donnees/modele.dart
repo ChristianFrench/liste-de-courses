@@ -315,7 +315,7 @@ class Course {
   final String? nom;
   final String magasinId;
   final DateTime dateCourses;
-  final String membreId;
+  String membreId;
   final int nbArticles;
 }
 
@@ -715,9 +715,42 @@ class Etat extends ChangeNotifier {
         ..[membres.indexOf(meme)] = Membre(meme.id, meme.nomAffiche, meme.role, true, email: meme.email.isEmpty ? ici.email : meme.email);
       s.effacerReglage('synchro_membre_provisoire');
       modifie();
-    } else if (membres.length > 1) {
-      s.effacerReglage('synchro_membre_provisoire');
+    } else if (membres.length > 1 && !quiSuisJe) {
+      // Pas de membre de ce nom : la personne dit elle-même qui elle est (ou confirme qu'elle est nouvelle).
+      quiSuisJe = true;
+      notifyListeners();
     }
+  }
+
+  /// Après avoir rejoint un foyer : demander à la personne qui elle est parmi les membres (26/10/2026).
+  bool quiSuisJe = false;
+
+  /// Cet appareil est à [m] : la personne et ses appareils (exe, apk, web) ne font plus qu'un membre.
+  /// L'ancien membre de cet appareil disparaît de la liste ; ses listes et ses courses passent à [m].
+  void devenir(Membre m) {
+    final ancien = moi;
+    _foyer?.effacerReglage('synchro_membre_provisoire');
+    quiSuisJe = false;
+    if (ancien.id == m.id) {
+      notifyListeners();
+      return;
+    }
+    membres = [for (final x in membres) Membre(x.id, x.nomAffiche, x.role, x.id == m.id, email: x.email)];
+    for (final l in listes) {
+      if (l.membreId == ancien.id) l.membreId = m.id;
+    }
+    for (final c in historique) {
+      if (c.membreId == ancien.id) c.membreId = m.id;
+    }
+    statutsMembres[ancien.id] = 's';
+    modifie();
+  }
+
+  /// Après avoir rejoint un foyer : « Je suis un nouveau membre ».
+  void resterNouveau() {
+    _foyer?.effacerReglage('synchro_membre_provisoire');
+    quiSuisJe = false;
+    notifyListeners();
   }
 
   /// À appeler après chaque action : prévient les écrans et enregistre.
@@ -1027,6 +1060,14 @@ class Etat extends ChangeNotifier {
     } else {
       g.quantite = q;
     }
+    _toucheConstruction(l);
+    modifie();
+  }
+
+  /// Remet une ligne retirée (« Annuler » du message), à sa place.
+  void remettreLigne(Liste l, LigneListe g, int i) {
+    if (ligne(l, g.produitId) != null) return;
+    l.lignes.insert(i.clamp(0, l.lignes.length), g);
     _toucheConstruction(l);
     modifie();
   }

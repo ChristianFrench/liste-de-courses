@@ -29,9 +29,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     final aRattacher = etat.tickets.where((t) => t.id == nav.ticketARattacher).firstOrNull;
     // Une course terminée sans ticket reste dans l'onglet Courses tant qu'elle n'est pas classée
     // (sauf pendant un rattachement de ticket : elle peut alors recevoir le sien).
-    final courses = etat.historique
-        .where((c) => !etat.estArchivee(c) && (aRattacher != null || !etat.enInstance(c)))
-        .toList();
+    final courses = etat.historique.where((c) => !etat.estArchivee(c) && (aRattacher != null || !etat.enInstance(c))).toList();
     final groupes = <String, List<Course>>{};
     for (final c in courses) {
       final cle = vue == 0 ? moisAnnee(c.dateCourses).toUpperCase() : (etat.magasin(c.magasinId)?.nom ?? '').toUpperCase();
@@ -83,21 +81,21 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             icone: Icons.receipt_long_outlined,
             nombre: libres.length,
             enfants: [
-          for (final t in libres)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                BlocTicket(ticket: t, libre: true, onChange: () => setState(() {})),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Lien('Rattacher à une course', onTap: () {
-                    nav.ticketARattacher = t.id;
-                    nav.signaler();
-                    setState(() {});
-                  }),
+              for (final t in libres)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    BlocTicket(ticket: t, libre: true, onChange: () => setState(() {})),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Lien('Rattacher à une course', onTap: () {
+                        nav.ticketARattacher = t.id;
+                        nav.signaler();
+                        setState(() {});
+                      }),
+                    ),
+                  ]),
                 ),
-              ]),
-            ),
             ],
           ),
         if (courses.isEmpty)
@@ -152,13 +150,15 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             else
               Row(children: [
                 Expanded(child: Text('Pas de ticket de caisse', style: Charte.texte(15, couleur: Charte.texteSecondaire))),
-                BoutonIcone(icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
+                BoutonIcone(
+                    icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
               ]),
             if (aRattacher == null)
               Padding(
                 padding: const EdgeInsets.only(top: 6),
                 child: Wrap(spacing: 8, runSpacing: 8, children: [
-                  if (liste != null && liste.lignes.isNotEmpty) Lien('Créer une liste type', onTap: () => _creerListeType(context, etat, liste)),
+                  if (liste != null && liste.lignes.isNotEmpty)
+                    Lien('Créer une liste type', onTap: () => creerListeType(context, etat, liste)),
                   if (t == null)
                     Lien('Remettre en terminées sans ticket', onTap: () {
                       etat.remettreSansTicket(c);
@@ -175,13 +175,14 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
       ),
     );
   }
+}
 
-  Future<void> _creerListeType(BuildContext context, Etat etat, Liste l) async {
-    final nom = await demanderTexte(context, titre: 'Nom de la liste type', initial: etat.nomListe(l));
-    if (nom == null || nom.trim().isEmpty || !context.mounted) return;
-    etat.enregistrerListeType(l, nom);
-    Nav.message(context, 'Liste type « ${nom.trim()} » créée (Préparer › Nouvelle liste)');
-  }
+/// Enregistre les articles d'une course comme liste type.
+Future<void> creerListeType(BuildContext context, Etat etat, Liste l) async {
+  final nom = await demanderTexte(context, titre: 'Nom de la liste type', initial: etat.nomListe(l));
+  if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+  etat.enregistrerListeType(l, nom);
+  Nav.message(context, 'Liste type « ${nom.trim()} » créée (Préparer › Nouvelle liste)');
 }
 
 /// Le ticket de caisse en gros : libellé, date et montant ; le trombone l'affiche.
@@ -198,7 +199,9 @@ class BlocTicket extends StatelessWidget {
     final libelle = etat.libelleTicket(t);
     final image = etat.ticketImage(t) && t.montant <= 0;
     final ligne2 = [
-      if (image) 'Ticket en image : date et prix inconnus' else ...[
+      if (image)
+        'Ticket en image : date et prix inconnus'
+      else ...[
         'Ticket du ${jjmmaaaa(t.date)}',
         if (t.montant > 0) euros(t.montant) else 'montant non saisi',
       ],
@@ -389,8 +392,10 @@ class _EcranTicketPdfState extends State<EcranTicketPdf> {
 Future<void> recevoirTicketPdf(BuildContext context, String chemin) async {
   final etat = Etat.instance;
   const libre = '\u0000libre';
-  final candidates = [for (final c in etat.historique) if (etat.ticketDe(c.id) == null && !etat.estArchive(c.magasinId)) c]
-    ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
+  final candidates = [
+    for (final c in etat.historique)
+      if (etat.ticketDe(c.id) == null && !etat.estArchive(c.magasinId)) c
+  ]..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
   final choix = await choisirDansListe<String>(context, titre: 'Ticket de caisse reçu · à quelle course le joindre ?', choix: {
     for (final c in candidates.take(10))
       c.id: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''} · ${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',

@@ -93,7 +93,7 @@ class Coquille extends StatelessWidget {
         final s = Synchro.instance;
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: GuetteurNouveautes(child: ListenableBuilder(
+      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -115,7 +115,7 @@ class Coquille extends StatelessWidget {
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
       ),
-      )),
+      ))),
     );
   }
 }

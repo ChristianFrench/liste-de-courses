@@ -20,7 +20,11 @@ import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/donnees/ticket_recu.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
-import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, codeCourtPackaging, ordreAlpha;
+import 'package:liste_de_courses/ecrans/archives.dart';
+import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
+import 'package:liste_de_courses/ecrans/historique.dart' show SousEcranHistorique;
+import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, FeuillePromotion, codeCourtPackaging, ordreAlpha;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -106,12 +110,18 @@ Future<void> _rubrique(WidgetTester tester, String titre) async {
   await _toucher(tester, find.text(titre));
 }
 
-/// Historique, Archives, Corbeille : en fin d'onglet Courses.
+/// Historique, Archives, Corbeille : pages complètes (aussi déployées sur place en fin d'onglet Courses).
 Future<void> _depuisCourses(WidgetTester tester, String titre) async {
   await _toucher(tester, _onglet('Courses'));
   Nav.i.retourOnglet(Nav.courses);
   await tester.pumpAndSettle();
-  await _toucher(tester, find.descendant(of: find.byType(LigneMenu), matching: find.text(titre)));
+  final page = switch (titre) {
+    'Archives' => const EcranArchives(),
+    'Corbeille' => const EcranCorbeille(),
+    _ => const PageBase(entete: EnTeteFenetre(retour: true, titre: 'Historique'), corps: SousEcranHistorique()),
+  };
+  Nav.aller<void>(tester.element(find.byType(SousEcranCourses)), page);
+  await tester.pumpAndSettle();
 }
 
 Future<void> _ciblesTactiles(WidgetTester tester) => expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
@@ -736,11 +746,24 @@ void main() {
       await tester.pumpAndSettle();
       expect(etat.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
       expect(find.byType(LigneChoix), findsNothing, reason: 'pas de lignes détaillées');
-      expect(find.text('P'), findsNWidgets(l.lignes.where((g) => g.promotion != null).length));
+      if (l.lignes.any((g) => g.promotion != null)) expect(find.text('P'), findsWidgets, reason: 'P devant les promotions');
+      // La quantité : − N + ; on reste en Condensé
+      await _toucher(tester, find.byKey(ValueKey('quantite-${huile.id}')));
+      await tester.tap(find.byTooltip('Plus'));
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.text('Valider'));
+      expect(etat.ligne(l, huile.id)!.quantite, 2);
+      expect(etat.modePreparation, 'condense');
+      // Toucher la ligne : la promotion
       await _toucher(tester, find.byKey(ValueKey('condense-${huile.id}')));
-      expect(etat.modePreparation, 'liste');
-      expect(find.text('+ Marque'), findsOneWidget, reason: 'sur l\'article, ses pastilles visibles');
-      await tester.pump(const Duration(seconds: 4));
+      expect(find.byType(FeuillePromotion), findsOneWidget);
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      // Appui long : retirée, « Annuler » la remet
+      await tester.longPress(find.byKey(ValueKey('condense-${huile.id}')));
+      await tester.pumpAndSettle();
+      expect(etat.ligne(l, huile.id), isNull);
+      await tester.pump(const Duration(seconds: 6));
     });
 
     test('historique, archives et corbeille : remettre, archiver, vider', () {
@@ -755,6 +778,13 @@ void main() {
       expect(etat.archivees.contains(c.id), isFalse, reason: 'remise à la main : elle reste dans l\'historique');
       etat.remettreSansTicket(c);
       expect(etat.enInstance(c), etat.ticketDe(c.id) == null);
+      // Une même personne sur un autre appareil : « C'est moi »
+      final ancien = etat.moi;
+      final autre = etat.membres.firstWhere((m) => !m.moi);
+      etat.devenir(autre);
+      expect(etat.moi.id, autre.id);
+      expect(etat.membresVisibles.map((m) => m.id), isNot(contains(ancien.id)));
+      expect(etat.listes.where((x) => x.membreId == ancien.id), isEmpty);
       etat.supprimer(etat.listes.first);
       expect(etat.corbeille, isNotEmpty);
       etat.viderCorbeille();

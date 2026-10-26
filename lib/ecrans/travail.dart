@@ -999,18 +999,56 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   /// Mode « Rechercher » : l'article choisi entre dans la liste (s'il n'y est pas) ; on ne voit plus que la liste,
   /// avec seuls son rayon et son secteur ouverts, et l'on est sur l'article, prêt pour la marque, la mesure…
-  /// Mode « Condensé » : l'article trouvé s'ajoute (s'il n'y est pas) ; la liste reste serrée.
+  /// Mode « Condensé » : l'article trouvé s'ajoute (s'il n'y est pas) ; la liste reste serrée et l'écran va sur lui.
   void _ajouterCondense(Liste l, Produit p) {
-    if (etat.ligne(l, p.id) != null) {
-      Nav.message(context, '« ${p.nom} » est déjà dans la liste');
-      return;
+    if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
+    setState(() => _surligne = p.id);
+    _amener(p.id, essais: 4);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _surligne == p.id) setState(() => _surligne = null);
+    });
+  }
+
+  /// Condensé : la quantité dans une petite fenêtre − N + ; à 0, l'article quitte la liste.
+  Future<void> _quantiteCondense(Liste l, Produit p) async {
+    final g = etat.ligne(l, p.id);
+    if (g == null) return;
+    var q = g.quantite;
+    final ok = await modale(
+      context,
+      titre: p.nom,
+      icone: Icons.exposure_outlined,
+      oui: 'Valider',
+      contenu: (context, maj) => Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        BoutonIcone(icone: Icons.remove, libelle: 'Moins', onTap: q > 0 ? () => maj(() => q--) : null),
+        SizedBox(
+          width: 72,
+          child: Text('$q', key: const ValueKey('quantite-condense'), textAlign: TextAlign.center, style: Charte.texte(28, gras: true)),
+        ),
+        BoutonIcone(icone: Icons.add, libelle: 'Plus', onTap: () => maj(() => q++)),
+      ]),
+    );
+    if (!ok || !mounted || q == g.quantite) return;
+    if (q <= 0) {
+      _retirerCondense(l, p);
+    } else {
+      etat.quantite(l, p.id, q);
     }
-    etat.ajouterLigne(l, p.id);
-    Nav.message(context, '« ${p.nom} » ajouté à la liste');
+  }
+
+  /// Condensé : appui long (ou quantité 0) : l'article quitte la liste, « Annuler » le remet.
+  void _retirerCondense(Liste l, Produit p) {
+    final g = etat.ligne(l, p.id);
+    if (g == null) return;
+    final i = l.lignes.indexOf(g);
+    HapticFeedback.mediumImpact();
+    etat.quantite(l, p.id, 0);
+    Nav.message(context, '« ${p.nom} » retiré de la liste', annuler: () => etat.remettreLigne(l, g, i));
   }
 
   /// Mode « Condensé » : la liste comme en magasin, serrée sous de minces bandeaux de secteur ; un P devant
-  /// les articles en promotion. Toucher un article passe en « Sans détails », sur cet article.
+  /// les articles en promotion. On y reste : toucher la ligne ouvre la promotion, toucher la quantité la règle,
+  /// un appui long retire l'article.
   Widget _condense(Liste l) {
     final etapes = etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id);
     if (l.lignes.isEmpty) {
@@ -1038,22 +1076,34 @@ class _EcranConstructionState extends State<EcranConstruction> {
           ),
           for (final g in x.lignes)
             if (etat.produit(g.produitId) case final p?)
-              InkWell(
-                key: ValueKey('condense-${p.id}'),
-                onTap: () {
-                  etat.options(modePreparation: 'liste');
-                  _ajouterTrouve(l, p);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 3, 14, 3),
-                  child: Row(children: [
-                    SizedBox(
-                      width: 22,
-                      child: g.promotion == null ? null : Text('P', style: Charte.texte(16, gras: true, couleur: Color(etat.couleurPromotions))),
-                    ),
-                    Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
-                    if (g.quantite > 1) Text('×${g.quantite}', style: Charte.texte(15, gras: true)),
-                  ]),
+              Material(
+                key: _lignes.putIfAbsent(p.id, GlobalKey.new),
+                color: _surligne == p.id ? Charte.fondSelection : Colors.transparent,
+                child: InkWell(
+                  key: ValueKey('condense-${p.id}'),
+                  onTap: () => ouvrirFeuillePromotion(context, l, g),
+                  onLongPress: () => _retirerCondense(l, p),
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 16, right: 6),
+                    child: Row(children: [
+                      SizedBox(
+                        width: 22,
+                        child: g.promotion == null ? null : Text('P', style: Charte.texte(16, gras: true, couleur: Color(etat.couleurPromotions))),
+                      ),
+                      Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
+                      InkWell(
+                        key: ValueKey('quantite-${p.id}'),
+                        onTap: () => _quantiteCondense(l, p),
+                        child: Container(
+                          width: 48,
+                          height: 44,
+                          alignment: Alignment.center,
+                          child: Text('×${g.quantite}',
+                              style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
+                        ),
+                      ),
+                    ]),
+                  ),
                 ),
               ),
         ],

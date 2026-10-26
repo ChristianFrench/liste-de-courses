@@ -52,11 +52,41 @@ Future<void> supprimerVite(BuildContext context, Object objet, String quoi) asyn
   Nav.message(context, 'Supprimé : $quoi', annuler: () => etat.restaurer(c));
 }
 
+void restaurerElement(BuildContext context, ElementCorbeille c) {
+  final etat = Etat.instance;
+  final refus = etat.restaurationImpossible(c);
+  if (refus != null) {
+    Nav.message(context, refus);
+    return;
+  }
+  etat.restaurer(c);
+  Nav.message(context, 'Restauré : ${c.libelle}');
+}
+
+Future<void> viderCorbeille(BuildContext context) async {
+  final etat = Etat.instance;
+  final n = etat.corbeille.length;
+  final ok = await confirmer(
+    context,
+    titre: 'Vider la corbeille ?',
+    icone: Icons.delete_forever_outlined,
+    contenu: Text(
+        '${n > 1 ? 'Les $n éléments' : 'L\'élément'} de la corbeille ${n > 1 ? 'seront effacés' : 'sera effacé'} pour de bon : '
+        'on ne pourra plus ${n > 1 ? 'les' : 'le'} remettre.',
+        style: Charte.texte(16)),
+    plein: 'Annuler',
+    contour: 'Vider',
+  );
+  if (ok != true || !context.mounted) return;
+  etat.viderCorbeille();
+  Nav.message(context, 'Corbeille vidée');
+}
+
 /// Courses › Corbeille.
 class EcranCorbeille extends StatelessWidget {
   const EcranCorbeille({super.key});
 
-  static const _icones = {
+  static const icones = {
     'magasin': Icons.storefront_outlined,
     'rayon': Icons.view_week_outlined,
     'secteur': Icons.grid_view_outlined,
@@ -74,34 +104,6 @@ class EcranCorbeille extends StatelessWidget {
     'parcours': 'Parcours',
   };
 
-  void _restaurer(BuildContext context, ElementCorbeille c) {
-    final etat = Etat.instance;
-    final refus = etat.restaurationImpossible(c);
-    if (refus != null) {
-      Nav.message(context, refus);
-      return;
-    }
-    etat.restaurer(c);
-    Nav.message(context, 'Restauré : ${c.libelle}');
-  }
-
-  Future<void> _vider(BuildContext context) async {
-    final etat = Etat.instance;
-    final n = etat.corbeille.length;
-    final ok = await confirmer(
-      context,
-      titre: 'Vider la corbeille ?',
-      icone: Icons.delete_forever_outlined,
-      contenu: Text('${n > 1 ? 'Les $n éléments' : 'L\'élément'} de la corbeille ${n > 1 ? 'seront effacés' : 'sera effacé'} pour de bon : '
-          'on ne pourra plus ${n > 1 ? 'les' : 'le'} remettre.', style: Charte.texte(16)),
-      plein: 'Annuler',
-      contour: 'Vider',
-    );
-    if (ok != true || !context.mounted) return;
-    etat.viderCorbeille();
-    Nav.message(context, 'Corbeille vidée');
-  }
-
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -115,22 +117,22 @@ class EcranCorbeille extends StatelessWidget {
               GroupeRetractable(
                 cle: 'corbeille/$type',
                 titre: _titres[type] ?? type,
-                icone: _icones[type] ?? Icons.delete_outline,
+                icone: icones[type] ?? Icons.delete_outline,
                 nombre: etat.corbeille.where((c) => c.type == type).length,
                 enfants: [
-            for (final c in etat.corbeille.where((c) => c.type == type))
-              Glissable(
-                key: ValueKey('glisser-${c.id}'),
-                titre: c.libelle,
-                versDroite: ActionLigne(Icons.restore, 'Restaurer', () => _restaurer(context, c)),
-                actions: [ActionLigne(Icons.restore, 'Restaurer', () => _restaurer(context, c))],
-                child: LigneMenu(
-                titre: c.libelle,
-                titreTaille: 16,
-                sousTitre: 'Supprimé ${quand(c.le)}',
-                icone: _icones[c.type] ?? Icons.delete_outline,
-                droite: Lien('Restaurer', taille: 16, onTap: () => _restaurer(context, c)),
-              )),
+                  for (final c in etat.corbeille.where((c) => c.type == type))
+                    Glissable(
+                        key: ValueKey('glisser-${c.id}'),
+                        titre: c.libelle,
+                        versDroite: ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c)),
+                        actions: [ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c))],
+                        child: LigneMenu(
+                          titre: c.libelle,
+                          titreTaille: 16,
+                          sousTitre: 'Supprimé ${quand(c.le)}',
+                          icone: icones[c.type] ?? Icons.delete_outline,
+                          droite: Lien('Restaurer', taille: 16, onTap: () => restaurerElement(context, c)),
+                        )),
                 ],
               ),
             if (etat.corbeille.isEmpty)
@@ -144,7 +146,7 @@ class EcranCorbeille extends StatelessWidget {
         bas: [
           if (etat.corbeille.isNotEmpty)
             BarreAction(boutons: [
-              Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => _vider(context)),
+              Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => viderCorbeille(context)),
             ]),
         ],
       ),

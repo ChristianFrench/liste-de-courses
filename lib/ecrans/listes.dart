@@ -618,7 +618,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               )),
           ],
         ),
-        groupePasse(context, etat),
+        ...groupesPasses(context, etat),
       ],
     );
   }
@@ -652,38 +652,144 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
   }
 }
 
-/// En fin d'onglet Courses : ce qui est passé, dans cet ordre (26/10/2026 : une liste, plus des boutons).
-Widget groupePasse(BuildContext context, Etat etat) {
-  final historique = etat.historique.where((c) => !etat.estArchivee(c) && !etat.enInstance(c)).length;
-  return GroupeRetractable(
-    cle: 'courses/passe',
-    titre: 'Historique, archives, corbeille',
-    icone: Icons.history,
-    parDefaut: true,
-    enfants: [
-      LigneMenu(
-        icone: Icons.history,
-        titre: 'Historique',
-        sousTitre: historique == 0 ? 'Aucune course classée' : '$historique course${historique > 1 ? 's' : ''} classée${historique > 1 ? 's' : ''}',
-        onTap: () => Nav.aller<void>(
-            context,
-            const PageBase(
-              entete: EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Courses', titre: 'Historique', aide: Aides.historique),
-              corps: SousEcranHistorique(),
-            )),
-      ),
-      LigneMenu(
-        icone: Icons.inventory_2_outlined,
-        titre: 'Archives',
-        sousTitre: etat.delaiHistorique == 0 ? 'Courses archivées à la main' : 'Courses de plus de ${etat.delaiHistorique} mois',
-        onTap: () => Nav.aller<void>(context, const EcranArchives()),
-      ),
-      LigneMenu(
-        icone: Icons.delete_outline,
-        titre: 'Corbeille',
-        sousTitre: etat.corbeille.isEmpty ? 'Vide' : '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''}',
-        onTap: () => Nav.aller<void>(context, const EcranCorbeille()),
-      ),
+/// En fin d'onglet Courses, comme les autres titres et repliés au départ : Historique, Archives, Corbeille.
+/// Ils se déploient sur place ; un appui long sur une ligne (ou un glissement) propose ses actions.
+List<Widget> groupesPasses(BuildContext context, Etat etat) {
+  final historique = etat.historique.where((c) => !etat.estArchivee(c) && !etat.enInstance(c)).toList()
+    ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
+  final libres = etat.tickets.where((t) => etat.course(t.listeId) == null).length;
+  final nbArchives = etat.coursesArchivees.length + etat.magasinsArchives.length;
+  return [
+    GroupeRetractable(
+      cle: 'courses/historique',
+      titre: 'Historique',
+      icone: Icons.history,
+      parDefaut: false,
+      nombre: historique.length,
+      vide: 'Aucune course classée : une course terminée y arrive avec son ticket, ou classée sans ticket.',
+      enfants: [
+        for (final c in historique) _ligneHistorique(context, etat, c),
+        if (libres > 0)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Lien('$libres ticket${libres > 1 ? 's' : ''} à rattacher', onTap: () => _pageHistorique(context)),
+            ),
+          ),
+      ],
+    ),
+    GroupeRetractable(
+      cle: 'courses/archives',
+      titre: 'Archives',
+      icone: Icons.inventory_2_outlined,
+      parDefaut: false,
+      nombre: nbArchives,
+      vide: etat.delaiHistorique == 0
+          ? 'Aucune archive.'
+          : 'Aucune archive : les courses de l\'historique y passent après ${etat.delaiHistorique} mois.',
+      enfants: [
+        for (final c in etat.coursesArchivees)
+          Glissable(
+            key: ValueKey('archive-${c.id}'),
+            titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+            versDroite: ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c)),
+            actions: [ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c))],
+            child: LigneMenu(
+              icone: Icons.receipt_long_outlined,
+              titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+              sousTitre: '${etat.nomCourse(c)} · ${c.nbArticles} articles',
+              droite: etat.ticketDe(c.id) == null ? null : Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)),
+            ),
+          ),
+        for (final m in etat.magasinsArchives)
+          Glissable(
+            key: ValueKey('archive-magasin-${m.id}'),
+            titre: m.nom,
+            actions: [
+              ActionLigne(Icons.storefront_outlined, 'Rétablir le magasin', () => etat.restaurerMagasin(m)),
+              ActionLigne(Icons.delete_outline, 'Tout supprimer', () => demanderSuppression(context, m, 'les archives de ${m.nom}'),
+                  danger: true),
+            ],
+            child: LigneMenu(
+              icone: Icons.storefront_outlined,
+              titre: '${m.nom} (magasin supprimé)',
+              sousTitre: '${etat.historique.where((c) => c.magasinId == m.id).length} courses',
+              onTap: () => Nav.aller<void>(context, const EcranArchives()),
+            ),
+          ),
+      ],
+    ),
+    GroupeRetractable(
+      cle: 'courses/corbeille',
+      titre: 'Corbeille',
+      icone: Icons.delete_outline,
+      parDefaut: false,
+      nombre: etat.corbeille.length,
+      vide: 'La corbeille est vide.',
+      enfants: [
+        for (final c in etat.corbeille)
+          Glissable(
+            key: ValueKey('corbeille-${c.id}'),
+            titre: c.libelle,
+            versDroite: ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c)),
+            actions: [ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c))],
+            child: LigneMenu(
+              titre: c.libelle,
+              titreTaille: 16,
+              sousTitre: 'Supprimé ${quand(c.le)}',
+              icone: EcranCorbeille.icones[c.type] ?? Icons.delete_outline,
+            ),
+          ),
+        if (etat.corbeille.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            child: Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => viderCorbeille(context)),
+          ),
+      ],
+    ),
+  ];
+}
+
+void _pageHistorique(BuildContext context) => Nav.aller<void>(
+    context,
+    const PageBase(
+      entete: EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Courses', titre: 'Historique', aide: Aides.historique),
+      corps: SousEcranHistorique(),
+    ));
+
+/// Une course de l'historique : toucher montre son ticket ; appui long : les actions.
+Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
+  final t = etat.ticketDe(c.id);
+  final liste = etat.liste(c.id);
+  final qui = etat.membre(c.membreId)?.nomAffiche ?? '';
+  final titre = '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}';
+  return Glissable(
+    key: ValueKey('historique-${c.id}'),
+    titre: titre,
+    actions: [
+      if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
+      if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+      if (liste != null && liste.lignes.isNotEmpty)
+        ActionLigne(Icons.playlist_add, 'Créer une liste type', () => creerListeType(context, etat, liste)),
+      if (t == null)
+        ActionLigne(Icons.undo, 'Remettre en terminées sans ticket', () {
+          etat.remettreSansTicket(c);
+          Nav.message(context, 'La course est de nouveau dans « Terminées sans ticket »');
+        }),
+      ActionLigne(Icons.inventory_2_outlined, 'Archiver', () => etat.archiver(c)),
     ],
+    child: LigneMenu(
+      icone: Icons.receipt_long_outlined,
+      titre: titre,
+      sousTitre: [
+        etat.nomCourse(c),
+        '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+        if (t != null) euros(t.montant),
+        if (qui.isNotEmpty) 'par $qui',
+      ].join(' · '),
+      droite: t == null ? null : Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)),
+      onTap: t == null ? null : () => ouvrirTicketPdf(context, t),
+    ),
   );
 }
