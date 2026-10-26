@@ -354,7 +354,10 @@ class Aides {
       '« Courses interrompues » : des courses mises en pause ; « Reprendre » les continue.\n'
       '« Terminées sans ticket » : joignez le ticket de caisse (fichier PDF), ou classez la course sans ticket ; '
       'elle rejoint alors l\'historique.\n'
-      'En bas : Historique (courses terminées et tickets), Archives (magasins supprimés), Corbeille (à remettre ou effacer).\n'
+      'Plus bas : Historique (courses classées et tickets ; à remettre en « Terminées sans ticket » ou à archiver), '
+      'Archives (courses de plus de trois mois, réglable dans Données, et magasins supprimés ; à remettre dans l\'historique), '
+      'Corbeille (à remettre ou à vider).\n'
+      'En terminant les courses, vous pouvez envoyer un résumé au foyer : oubliés, absents des rayons, achetés.\n'
       'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Liste de courses ; '
       'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Courses › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
 
@@ -365,7 +368,7 @@ class Aides {
       'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
       'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
       'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'
-      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
+      'Paramètres : apparence (couleurs), données (listes exemples, préliste, passage aux archives et suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
       'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
@@ -380,17 +383,16 @@ class Aides {
 
   static const preparation = 'Le champ de recherche, sous le titre : tapez au moins trois lettres, la liste des articles '
       'dont un mot commence ainsi s\'affiche.\n'
-      'Touchez l\'article proposé : il s\'ajoute aussitôt à la liste (s\'il y est déjà, l\'écran va dessus). L\'écran ne montre que '
-      'votre liste, avec seuls son rayon et son secteur ouverts, et vous êtes sur l\'article pour sa marque, sa mesure, son packaging '
-      'ou sa promo.\n'
-      'Bouton « Parcourir », à droite du champ : enfoncé, tout le catalogue est là ; la recherche ouvre le rayon et le secteur '
-      'de l\'article et le signale, touchez-le pour le cocher.\n'
-      'Sinon, les rayons sont repliés : touchez-en un pour voir ses secteurs, puis un secteur pour voir ses articles. '
-      'Un seul rayon et un seul secteur sont ouverts à la fois ; leurs bandeaux restent en haut pendant que les articles défilent.\n'
-      'Toucher un article le coche ; − et + règlent la quantité. L\'article touché affiche quatre pastilles : marque, mesure, '
-      'packaging et promo ; touchez-en une pour la renseigner. Un appui long ajoute une consigne (« bien mûres »).\n'
-      '« + Produit absent de ce secteur », « + Ajouter un secteur » et « + Ajouter un rayon » complètent le magasin.\n'
-      '« Ma liste » ne montre que les articles choisis. « Aperçu » montre la liste comme pendant les courses. '
+      'À droite du champ, trois façons de voir la liste :\n'
+      '• Condensé : votre liste serrée sous les secteurs, un P devant les articles en promotion. L\'article trouvé s\'y ajoute. '
+      'Touchez un article pour le détailler (passage en « Sans détails »).\n'
+      '• Sans détails : votre liste par rayons et secteurs. L\'article trouvé s\'ajoute, son rayon et son secteur s\'ouvrent '
+      'et vous êtes dessus pour sa marque, sa mesure, son packaging ou sa promo.\n'
+      '• Avec détails : tout le catalogue, rayons repliés ; touchez un rayon, puis un secteur, puis un article pour le cocher. '
+      'La recherche ouvre le rayon et le secteur de l\'article et le signale.\n'
+      'Toucher un article affiche quatre pastilles : marque, mesure, packaging et promo ; − et + règlent la quantité. '
+      'Un appui long ajoute une consigne (« bien mûres »).\n'
+      '« Aperçu » montre la liste comme pendant les courses, sans les coches. '
       '« Liste prête » la valide : commentaire, enregistrement comme liste type, envoi par mail.\n$_gestes';
 
   static const listeSimple = 'Une liste simple se construit sans rayons ni secteurs.\n'
@@ -403,8 +405,7 @@ class Aides {
       'sinon elle garde l\'ordre de saisie.\n$_gestes';
 
   static const apercu = 'La liste telle qu\'elle sera pendant les courses, dans l\'ordre des rayons et de votre parcours, '
-      'tout déployé. Par défaut elle est condensée : les articles serrés sous leur secteur, avec leur quantité. '
-      '« Détail » enfoncé montre aussi mesures, packagings et promotions. '
+      'tout déployé, avec mesures, packagings et promotions. '
       'Rien ne se coche ici. « Continuer la préparation » revient à la liste.';
 
   static const enMagasin = 'La liste suit l\'ordre des allées, secteur par secteur ; chaque bandeau montre l\'avancement du secteur.\n'

@@ -30,7 +30,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
     // Une course terminée sans ticket reste dans l'onglet Courses tant qu'elle n'est pas classée
     // (sauf pendant un rattachement de ticket : elle peut alors recevoir le sien).
     final courses = etat.historique
-        .where((c) => !etat.estArchive(c.magasinId) && (aRattacher != null || !etat.enInstance(c)))
+        .where((c) => !etat.estArchivee(c) && (aRattacher != null || !etat.enInstance(c)))
         .toList();
     final groupes = <String, List<Course>>{};
     for (final c in courses) {
@@ -154,13 +154,21 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
                 Expanded(child: Text('Pas de ticket de caisse', style: Charte.texte(15, couleur: Charte.texteSecondaire))),
                 BoutonIcone(icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
               ]),
-            if (liste != null && liste.lignes.isNotEmpty && aRattacher == null)
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: Lien('Créer une liste type', onTap: () => _creerListeType(context, etat, liste)),
-                ),
+            if (aRattacher == null)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Wrap(spacing: 8, runSpacing: 8, children: [
+                  if (liste != null && liste.lignes.isNotEmpty) Lien('Créer une liste type', onTap: () => _creerListeType(context, etat, liste)),
+                  if (t == null)
+                    Lien('Remettre en terminées sans ticket', onTap: () {
+                      etat.remettreSansTicket(c);
+                      Nav.message(context, 'La course est de nouveau dans Courses › Terminées sans ticket');
+                    }),
+                  Lien('Archiver', onTap: () {
+                    etat.archiver(c);
+                    Nav.message(context, 'Course archivée (Courses › Archives)');
+                  }),
+                ]),
               ),
           ]),
         ),

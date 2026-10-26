@@ -51,7 +51,7 @@ jobs:
           grep -o '::\(notice\|warning\) title=.*' reel.log || true
           grep -q 'All tests passed' reel.log || { echo "::warning title=Synchronisation, serveur réel::échec"; tail -n 30 reel.log; exit 1; }
       - name: Captures des écrans (branche « captures »)
-        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]')
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')
         env:
           CAPTURES: '1'
         run: |
@@ -72,7 +72,7 @@ jobs:
           git push -qf origin HEAD:refs/heads/captures
           exit $code
       - name: Conserver les captures pour la publication
-        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]')
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')
         uses: actions/upload-artifact@v4
         with:
           name: Captures
@@ -80,8 +80,9 @@ jobs:
           if-no-files-found: ignore
 
   android:
-    # Mode rapide (« [rapide] » dans le message de commit) : Windows seulement
-    if: "!contains(github.event.head_commit.message, '[rapide]')"
+    # Mode rapide (« [rapide] » dans le message de commit) : Windows seulement ;
+    # mode web (« [web] ») : la version web seulement, la page « derniere-version » garde l'APK et l'exe précédents
+    if: "!contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -116,6 +117,7 @@ jobs:
           path: build/Liste de courses*.apk
 
   windows:
+    if: "!contains(github.event.head_commit.message, '[web]')"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4

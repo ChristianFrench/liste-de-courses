@@ -62,6 +62,18 @@ Future<void> _accueil(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Mode de la préparation : « Condensé », « Sans détails » ou « Avec détails ».
+Future<void> _mode(WidgetTester tester, String libelle) async {
+  await tester.tap(find.byKey(const ValueKey('mode-preparation')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(libelle).last);
+  await tester.pumpAndSettle();
+}
+
+/// Nombre d'articles de la liste en préparation à l'écran.
+int _nbEnPreparation(WidgetTester tester) =>
+    Etat.instance.liste(tester.widget<EcranConstruction>(find.byType(EcranConstruction)).listeId)!.lignes.length;
+
 Future<void> _toucher(WidgetTester tester, Finder f) async {
   if (f.evaluate().isEmpty) {
     // Élément pas encore construit : faire défiler la liste verticale jusqu'à lui
@@ -94,12 +106,12 @@ Future<void> _rubrique(WidgetTester tester, String titre) async {
   await _toucher(tester, find.text(titre));
 }
 
-/// Historique, Archives, Corbeille : en bas de l'onglet Courses.
+/// Historique, Archives, Corbeille : en fin d'onglet Courses.
 Future<void> _depuisCourses(WidgetTester tester, String titre) async {
   await _toucher(tester, _onglet('Courses'));
   Nav.i.retourOnglet(Nav.courses);
   await tester.pumpAndSettle();
-  await _toucher(tester, find.descendant(of: find.byType(BarreAction), matching: find.text(titre)));
+  await _toucher(tester, find.descendant(of: find.byType(LigneMenu), matching: find.text(titre)));
 }
 
 Future<void> _ciblesTactiles(WidgetTester tester) => expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
@@ -513,12 +525,11 @@ void main() {
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
       expect(find.text('CHARCUTERIE'), findsOneWidget);
 
-      // Ma liste : seulement les articles choisis ; Tout : tout le catalogue
-      final n = Etat.instance.liste('l1')!.lignes.length;
-      await _toucher(tester, find.text('Ma liste · $n'));
+      // Sans détails : seulement les articles choisis ; Avec détails : tout le catalogue
+      await _mode(tester, 'Sans détails');
       expect(find.text('+ Produit absent de ce secteur'), findsNothing);
       expect(find.textContaining('Œufs', findRichText: true), findsNothing);
-      await _toucher(tester, find.text('Ma liste · $n'));
+      await _mode(tester, 'Avec détails');
       await _ciblesTactiles(tester);
 
       // Un seul rayon ouvert : ouvrir Épicerie replie Frais
@@ -537,7 +548,7 @@ void main() {
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Liste complète'));
-      expect(find.textContaining('Ma liste · 0'), findsOneWidget);
+      expect(_nbEnPreparation(tester), 0);
       expect(find.byType(LigneChoix), findsNothing, reason: 'à la première ouverture, tous les rayons sont repliés');
       expect(find.text('CRÈMERIE'), findsNothing, reason: 'on voit les rayons, pas les secteurs');
       await _toucher(tester, find.text('FRAIS').first);
@@ -547,25 +558,23 @@ void main() {
       expect(noms, [...noms]..sort((a, b) => ordreAlpha(a).compareTo(ordreAlpha(b))));
       // Article non coché : toucher le nom le coche et montre ses pastilles ; toucher encore les replie
       await _toucher(tester, find.textContaining('Œufs', findRichText: true));
-      expect(find.textContaining('Ma liste · 1'), findsOneWidget);
+      expect(_nbEnPreparation(tester), 1);
       expect(find.text('+ Marque'), findsOneWidget);
       await _toucher(tester, find.textContaining('Œufs', findRichText: true));
       expect(find.text('+ Marque'), findsNothing);
-      expect(find.textContaining('Ma liste · 1'), findsOneWidget, reason: 'l\'article reste coché');
+      expect(_nbEnPreparation(tester), 1);
       // Produit absent : son nom suffit
       await _toucher(tester, find.text('+ Produit absent de ce secteur'));
       await tester.enterText(find.byType(TextField).last, 'Kéfir');
       await _toucher(tester, find.text('Ajouter').last);
       expect(Etat.instance.produits.any((p) => p.nom == 'Kéfir'), isTrue);
-      expect(find.textContaining('Ma liste · 2'), findsOneWidget);
+      expect(_nbEnPreparation(tester), 2);
       await tester.pump(const Duration(seconds: 6));
       // Aperçu : la liste comme en courses, sans case à cocher
       await _toucher(tester, find.text('Aperçu'));
-      expect(find.byType(LigneCourse), findsNothing, reason: 'condensé par défaut');
+      expect(find.byType(LigneCourse), findsWidgets);
       expect(find.text('Kéfir'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Détail'));
-      expect(find.byType(LigneCourse), findsWidgets);
       expect(find.descendant(of: find.byType(LigneCourse), matching: find.byType(CaseACocher)), findsNothing);
       await _toucher(tester, find.text('Continuer la préparation'));
       await _toucher(tester, find.text('Liste prête'));
@@ -586,7 +595,7 @@ void main() {
       await _toucher(tester, find.text('+ Nouvelle liste'));
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
-      expect(find.textContaining('Ma liste · 2'), findsOneWidget);
+      expect(_nbEnPreparation(tester), 2);
     });
 
     testWidgets('préparation : la recherche ouvre le rayon et le secteur de l\'article', (tester) async {
@@ -684,8 +693,8 @@ void main() {
     testWidgets('préparation, mode Rechercher : l\'article trouvé s\'ajoute, seul son secteur est ouvert', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
-      await _toucher(tester, find.text('Parcourir'));
-      expect(Etat.instance.ajoutParRecherche, isTrue, reason: '« Parcourir » relâché : mode recherche');
+      await _mode(tester, 'Sans détails');
+      expect(Etat.instance.ajoutParRecherche, isTrue, reason: 'Sans détails : l\'article trouvé s\'ajoute');
       final l = Etat.instance.liste('l1')!;
       final huile = Etat.instance.produits.firstWhere((p) => p.nom == 'Huile d\'olive');
       expect(Etat.instance.ligne(l, huile.id), isNull);
@@ -711,6 +720,45 @@ void main() {
       expect(l.lignes.length, n);
       await tester.pump(const Duration(seconds: 4));
       await _ciblesTactiles(tester);
+    });
+
+    testWidgets('préparation, mode Condensé : liste serrée, P des promotions, toucher détaille l\'article', (tester) async {
+      await _accueil(tester);
+      await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
+      await _mode(tester, 'Condensé');
+      expect(Etat.instance.modePreparation, 'condense');
+      final etat = Etat.instance;
+      final l = etat.liste('l1')!;
+      final huile = etat.produits.firstWhere((p) => p.nom == 'Huile d\'olive');
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'huile oli');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      expect(etat.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
+      expect(find.byType(LigneChoix), findsNothing, reason: 'pas de lignes détaillées');
+      expect(find.text('P'), findsNWidgets(l.lignes.where((g) => g.promotion != null).length));
+      await _toucher(tester, find.byKey(ValueKey('condense-${huile.id}')));
+      expect(etat.modePreparation, 'liste');
+      expect(find.text('+ Marque'), findsOneWidget, reason: 'sur l\'article, ses pastilles visibles');
+      await tester.pump(const Duration(seconds: 4));
+    });
+
+    test('historique, archives et corbeille : remettre, archiver, vider', () {
+      final etat = Etat.instance;
+      final c = etat.historique.first;
+      etat.archiver(c);
+      expect(etat.coursesArchivees, contains(c));
+      etat.remettreEnHistorique(c);
+      expect(etat.coursesArchivees, isNot(contains(c)));
+      etat.delaiHistorique = 1;
+      etat.archiverAnciennes();
+      expect(etat.archivees.contains(c.id), isFalse, reason: 'remise à la main : elle reste dans l\'historique');
+      etat.remettreSansTicket(c);
+      expect(etat.enInstance(c), etat.ticketDe(c.id) == null);
+      etat.supprimer(etat.listes.first);
+      expect(etat.corbeille, isNotEmpty);
+      etat.viderCorbeille();
+      expect(etat.corbeille, isEmpty);
     });
 
     testWidgets('non placés : visibles en fin de liste, toucher propose un secteur', (tester) async {

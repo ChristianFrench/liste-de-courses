@@ -85,6 +85,23 @@ class EcranCorbeille extends StatelessWidget {
     Nav.message(context, 'Restauré : ${c.libelle}');
   }
 
+  Future<void> _vider(BuildContext context) async {
+    final etat = Etat.instance;
+    final n = etat.corbeille.length;
+    final ok = await confirmer(
+      context,
+      titre: 'Vider la corbeille ?',
+      icone: Icons.delete_forever_outlined,
+      contenu: Text('${n > 1 ? 'Les $n éléments' : 'L\'élément'} de la corbeille ${n > 1 ? 'seront effacés' : 'sera effacé'} pour de bon : '
+          'on ne pourra plus ${n > 1 ? 'les' : 'le'} remettre.', style: Charte.texte(16)),
+      plein: 'Annuler',
+      contour: 'Vider',
+    );
+    if (ok != true || !context.mounted) return;
+    etat.viderCorbeille();
+    Nav.message(context, 'Corbeille vidée');
+  }
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -124,6 +141,12 @@ class EcranCorbeille extends StatelessWidget {
             const SizedBox(height: 16),
           ],
         ),
+        bas: [
+          if (etat.corbeille.isNotEmpty)
+            BarreAction(boutons: [
+              Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => _vider(context)),
+            ]),
+        ],
       ),
     );
   }

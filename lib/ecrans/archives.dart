@@ -6,8 +6,9 @@ import '../navigation.dart';
 import '../theme.dart';
 import 'corbeille.dart';
 
-// Gérer › Archives : les courses des magasins supprimés, par magasin. Chaque course ou tout
-// un magasin peut être supprimé ; un magasin peut aussi revenir parmi les magasins actifs.
+// Courses › Archives : les courses passées de l'historique (d'elles-mêmes après quelques mois, ou à la main),
+// qui peuvent y revenir, et celles des magasins supprimés, par magasin. Chaque course ou tout un magasin peut
+// être supprimé ; un magasin peut aussi revenir parmi les magasins actifs.
 
 class EcranArchives extends StatelessWidget {
   const EcranArchives({super.key});
@@ -22,12 +23,32 @@ class EcranArchives extends StatelessWidget {
         corps: ListView(
           padding: const EdgeInsets.only(top: 8, bottom: 16),
           children: [
-            if (etat.magasinsArchives.isEmpty)
+            if (etat.magasinsArchives.isEmpty && etat.coursesArchivees.isEmpty)
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Text(
-                    'Aucune archive. Quand vous supprimez un magasin qui a un historique de courses, ses courses arrivent ici.',
+                    'Aucune archive. Les courses de l\'historique arrivent ici après quelques mois, ainsi que celles '
+                    'd\'un magasin supprimé.',
                     style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+              ),
+            if (etat.coursesArchivees.isNotEmpty)
+              GroupeRetractable(
+                cle: 'archives/historique',
+                titre: 'Courses de l\'historique',
+                icone: Icons.history,
+                nombre: etat.coursesArchivees.length,
+                enfants: [
+                  for (final c in etat.coursesArchivees)
+                    LigneMenu(
+                      icone: Icons.receipt_long_outlined,
+                      titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                      sousTitre: '${etat.nomCourse(c)} · ${c.nbArticles} articles${etat.ticketDe(c.id) != null ? ' · ticket joint' : ''}',
+                      droite: Lien('Remettre en historique', onTap: () {
+                        etat.remettreEnHistorique(c);
+                        Nav.message(context, 'La course est de nouveau dans l\'historique');
+                      }),
+                    ),
+                ],
               ),
             for (final m in etat.magasinsArchives)
               GroupeRetractable(
@@ -67,9 +88,9 @@ class EcranArchives extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-              etat.delaiArchives == 0
-                  ? 'Les archives sont gardées sans limite (réglage dans Paramètres).'
-                  : 'Les archives de plus de ${etat.delaiArchives} mois sont supprimées automatiquement (réglage dans Paramètres).',
+              '${etat.delaiHistorique == 0 ? 'Les courses restent dans l\'historique' : 'Les courses de plus de ${etat.delaiHistorique} mois passent de l\'historique aux archives'}'
+              ' ; ${etat.delaiArchives == 0 ? 'les archives sont gardées sans limite' : 'les archives de plus de ${etat.delaiArchives} mois sont supprimées'}'
+              ' (réglages dans Gérer › Paramètres › Données).',
               style: Charte.texte(13, couleur: Charte.texteSecondaire),
             ),
             ),

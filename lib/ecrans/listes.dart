@@ -593,7 +593,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           titre: 'Terminées sans ticket',
           icone: Icons.receipt_long_outlined,
           nombre: enInstance.length,
-          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique (bouton en bas).',
+          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique (plus bas).',
           enfants: [
             for (final c in enInstance)
               Glissable(
@@ -618,6 +618,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               )),
           ],
         ),
+        groupePasse(context, etat),
       ],
     );
   }
@@ -651,11 +652,19 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
   }
 }
 
-/// En bas de l'onglet Courses : ce qui est passé, dans cet ordre.
-Widget barreCourses(BuildContext context) => BarreAction(boutons: [
-      Bouton(
-        texte: 'Historique',
-        taille: 15,
+/// En fin d'onglet Courses : ce qui est passé, dans cet ordre (26/10/2026 : une liste, plus des boutons).
+Widget groupePasse(BuildContext context, Etat etat) {
+  final historique = etat.historique.where((c) => !etat.estArchivee(c) && !etat.enInstance(c)).length;
+  return GroupeRetractable(
+    cle: 'courses/passe',
+    titre: 'Historique, archives, corbeille',
+    icone: Icons.history,
+    parDefaut: true,
+    enfants: [
+      LigneMenu(
+        icone: Icons.history,
+        titre: 'Historique',
+        sousTitre: historique == 0 ? 'Aucune course classée' : '$historique course${historique > 1 ? 's' : ''} classée${historique > 1 ? 's' : ''}',
         onTap: () => Nav.aller<void>(
             context,
             const PageBase(
@@ -663,6 +672,18 @@ Widget barreCourses(BuildContext context) => BarreAction(boutons: [
               corps: SousEcranHistorique(),
             )),
       ),
-      Bouton(texte: 'Archives', taille: 15, onTap: () => Nav.aller<void>(context, const EcranArchives())),
-      Bouton(texte: 'Corbeille', taille: 15, onTap: () => Nav.aller<void>(context, const EcranCorbeille())),
-    ]);
+      LigneMenu(
+        icone: Icons.inventory_2_outlined,
+        titre: 'Archives',
+        sousTitre: etat.delaiHistorique == 0 ? 'Courses archivées à la main' : 'Courses de plus de ${etat.delaiHistorique} mois',
+        onTap: () => Nav.aller<void>(context, const EcranArchives()),
+      ),
+      LigneMenu(
+        icone: Icons.delete_outline,
+        titre: 'Corbeille',
+        sousTitre: etat.corbeille.isEmpty ? 'Vide' : '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''}',
+        onTap: () => Nav.aller<void>(context, const EcranCorbeille()),
+      ),
+    ],
+  );
+}

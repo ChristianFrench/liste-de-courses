@@ -23,7 +23,7 @@ et `MQTT_MOT_DE_PASSE` ; il n'est jamais écrit dans le dépôt.
 À chaque dépôt, le workflow « Compilation Android, Windows, web » (`.github/workflows/build.yml`) :
 analyse le code, passe les tests de recette, fait les captures d'écran (branche `captures`),
 compile les trois versions, publie la version web sur GitHub Pages et les fichiers sur la page
-« derniere-version ». Un message de commit contenant `[rapide]` ne compile que Windows.
+« derniere-version ». Un message de commit contenant `[rapide]` ne compile que Windows ; `[web]`, que la version web.
 En cas d'échec, les erreurs apparaissent en tête de la page du travail (« Annotations »).
 
 Autres workflows : « Catalogue Open Food Facts » (`catalogue.yml`, page « catalogue-off »,

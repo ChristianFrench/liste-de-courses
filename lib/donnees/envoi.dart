@@ -54,6 +54,46 @@ Uri lienMail(Etat etat, Liste l) => Uri(
       query: _requete({'subject': 'Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''}', 'body': texteListe(etat, l)}),
     );
 
+/// Résumé de fin de courses pour le foyer : les oubliés (non cochés), les absents des rayons (manquants)
+/// et les achetés. Un mail n'a pas de couleurs : des pastilles de couleur les remplacent.
+String texteResume(Etat etat, Liste l) {
+  String nom(LigneListe g) {
+    final p = etat.produit(g.produitId);
+    return p == null ? '' : '${g.quantite > 1 ? '${g.quantite} × ' : ''}${p.nom}';
+  }
+
+  final manquants = [for (final g in l.lignes) if (etat.manquant(l, g.produitId)) nom(g)];
+  final oublies = [for (final g in l.lignes) if (!g.coche && !etat.manquant(l, g.produitId)) nom(g)];
+  final achetes = [for (final g in l.lignes) if (g.coche && !etat.manquant(l, g.produitId)) nom(g)];
+  final b = StringBuffer('Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''} · ${etat.nomListe(l)}\n'
+      '${achetes.length} acheté${achetes.length > 1 ? 's' : ''} sur ${l.lignes.length}\n');
+  void bloc(String titre, List<String> noms) {
+    if (noms.isEmpty) return;
+    b
+      ..write('\n$titre (${noms.length})\n')
+      ..writeAll(noms.where((x) => x.isNotEmpty).map((x) => '- $x\n'));
+  }
+
+  bloc('🔴 OUBLIÉS (non cochés)', oublies);
+  bloc('🔵 ABSENTS DES RAYONS', manquants);
+  bloc('✅ ACHETÉS', achetes);
+  return b.toString();
+}
+
+/// Ouvre la messagerie avec le résumé des courses, adressé à tous les membres du foyer qui ont une adresse.
+/// Rien ne part sans que l'on appuie sur « Envoyer ». Rend false si aucune messagerie n'a répondu.
+Future<bool> envoyerResume(Etat etat, Liste l) async {
+  try {
+    return await launchUrl(Uri(
+      scheme: 'mailto',
+      path: [for (final m in etat.membres) if (m.email.isNotEmpty) m.email].join(','),
+      query: _requete({'subject': 'Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''}', 'body': texteResume(etat, l)}),
+    ));
+  } catch (_) {
+    return false;
+  }
+}
+
 // Uri(queryParameters:) code les espaces en « + », que les messageries affichent tels quels.
 String _requete(Map<String, String> p) =>
     p.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');

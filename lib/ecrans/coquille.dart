@@ -137,7 +137,7 @@ class RacineOnglet extends StatelessWidget {
             entete: const EnTeteFenetre(icone: Icons.checklist, titre: 'Préparer', aide: Aides.preparer),
             corps: SousEcranPreparer(),
           ),
-        Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses(), bas: [barreCourses(context)]),
+        Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
         _ => const MenuGerer(),
       },
     );

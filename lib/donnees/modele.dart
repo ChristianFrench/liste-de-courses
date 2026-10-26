@@ -388,9 +388,12 @@ class Etat extends ChangeNotifier {
   /// Envoi de la liste par mail : adresses de tous les membres déjà remplies.
   bool envoiFoyer = false;
 
-  /// Préparation, mode « Rechercher » : l'article trouvé est aussitôt ajouté à la liste, rangé dans son rayon
-  /// et son secteur, seuls ouverts ; sinon (« Parcourir »), la recherche ne fait qu'amener à l'article.
-  bool ajoutParRecherche = true;
+  /// Préparation (26/10/2026), trois modes : 'condense' (la liste serrée, P devant les promotions),
+  /// 'liste' (la liste par rayons et secteurs, avec ses détails) et 'detail' (tout le catalogue à parcourir).
+  /// Dans les deux premiers, l'article trouvé est aussitôt ajouté ; dans le dernier, la recherche amène à lui.
+  String modePreparation = 'liste';
+  bool get ajoutParRecherche => modePreparation != 'detail';
+  set ajoutParRecherche(bool oui) => modePreparation = oui ? 'liste' : 'detail';
   List<TypePromotion> typesPromotion = [];
   List<Magasin> magasins = []; // magasins actifs
 
@@ -404,6 +407,15 @@ class Etat extends ChangeNotifier {
 
   /// Courses terminées classées dans l'historique sans ticket de caisse.
   Set<String> sansTicket = {};
+
+  /// Courses passées de l'historique aux archives (à la main, ou d'elles-mêmes après [delaiHistorique] mois).
+  Set<String> archivees = {};
+
+  /// Courses remises dans l'historique depuis les archives : elles n'y repartent plus d'elles-mêmes.
+  Set<String> gardeesEnHistorique = {};
+
+  /// Délai, en mois, après lequel une course de l'historique passe dans les archives (0 : jamais).
+  int delaiHistorique = 3;
 
   /// Commentaire saisi à la validation d'une liste (identifiant de liste → texte), repris en courses et dans le mail.
   Map<String, String> commentaires = {};
@@ -543,6 +555,8 @@ class Etat extends ChangeNotifier {
     await appliquerFormats();
     completerLots();
     harmoniserCatalogue();
+    // Historique de plus de trois mois (réglable) vers les archives, et archives trop anciennes supprimées.
+    if (archiverAnciennes() | purgerArchives()) enregistrer();
   }
 
   /// Repartir d'un foyer neuf : la base actuelle est gardée dans un fichier à part sur l'appareil.
@@ -732,7 +746,10 @@ class Etat extends ChangeNotifier {
     final options = (j['parametres'] as Map?)?['options'] as Map?;
     parSecteurs = options?['parSecteurs'] as bool? ?? true;
     envoiFoyer = options?['envoiFoyer'] as bool? ?? false;
-    ajoutParRecherche = options?['ajoutParRecherche'] as bool? ?? true;
+    modePreparation = options?['modePreparation'] as String? ?? ((options?['ajoutParRecherche'] as bool? ?? true) ? 'liste' : 'detail');
+    delaiHistorique = (options?['delaiHistorique'] as num? ?? 3).toInt();
+    archivees = _ids(options?['archivees']).toSet();
+    gardeesEnHistorique = _ids(options?['gardeesEnHistorique']).toSet();
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
@@ -841,6 +858,10 @@ class Etat extends ChangeNotifier {
             'parSecteurs': parSecteurs,
             'envoiFoyer': envoiFoyer,
             'ajoutParRecherche': ajoutParRecherche,
+            'modePreparation': modePreparation,
+            'delaiHistorique': delaiHistorique,
+            if (archivees.isNotEmpty) 'archivees': archivees.toList(),
+            if (gardeesEnHistorique.isNotEmpty) 'gardeesEnHistorique': gardeesEnHistorique.toList(),
             if (imagesChoisies.isNotEmpty) 'images': imagesChoisies,
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
@@ -1995,6 +2016,12 @@ class Etat extends ChangeNotifier {
     enregistrer();
   }
 
+  /// Vide la corbeille : ce qu'elle contient ne pourra plus être remis.
+  void viderCorbeille() {
+    corbeille.clear();
+    modifie();
+  }
+
   // ------------------------------------------------------------ Paramètres et historique
 
   void renommerFoyer(String nom) {
@@ -2103,6 +2130,50 @@ class Etat extends ChangeNotifier {
   void classerSansTicket(Course c) {
     sansTicket.add(c.id);
     modifie();
+  }
+
+  /// Historique › « Remettre en terminées sans ticket » : la course revient dans l'onglet Courses.
+  void remettreSansTicket(Course c) {
+    sansTicket.remove(c.id);
+    archivees.remove(c.id);
+    modifie();
+  }
+
+  /// Course rangée dans les archives (magasin supprimé, ou passée de l'historique aux archives).
+  bool estArchivee(Course c) => estArchive(c.magasinId) || archivees.contains(c.id);
+
+  void archiver(Course c) {
+    archivees.add(c.id);
+    gardeesEnHistorique.remove(c.id);
+    modifie();
+  }
+
+  void remettreEnHistorique(Course c) {
+    archivees.remove(c.id);
+    gardeesEnHistorique.add(c.id);
+    modifie();
+  }
+
+  /// Courses archivées des magasins actifs, les plus récentes d'abord.
+  List<Course> get coursesArchivees => historique.where((c) => !estArchive(c.magasinId) && archivees.contains(c.id)).toList()
+    ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
+
+  void reglerDelaiHistorique(int mois) {
+    delaiHistorique = mois;
+    archiverAnciennes();
+    modifie();
+  }
+
+  /// Les courses classées de plus de [delaiHistorique] mois passent dans les archives (sauf celles remises
+  /// à la main dans l'historique). Rend vrai si quelque chose a changé.
+  bool archiverAnciennes() {
+    if (delaiHistorique <= 0) return false;
+    final limite = DateTime.now().subtract(Duration(days: 30 * delaiHistorique));
+    var change = false;
+    for (final c in historique) {
+      if (c.dateCourses.isBefore(limite) && !enInstance(c) && !gardeesEnHistorique.contains(c.id) && archivees.add(c.id)) change = true;
+    }
+    return change;
   }
 
   Membre ajouterMembre(String nom, String email) {
@@ -2520,10 +2591,11 @@ class Etat extends ChangeNotifier {
     return true;
   }
 
-  void options({bool? parSecteurs, bool? envoiFoyer, bool? ajoutParRecherche}) {
+  void options({bool? parSecteurs, bool? envoiFoyer, bool? ajoutParRecherche, String? modePreparation}) {
     if (parSecteurs != null) this.parSecteurs = parSecteurs;
     if (envoiFoyer != null) this.envoiFoyer = envoiFoyer;
     if (ajoutParRecherche != null) this.ajoutParRecherche = ajoutParRecherche;
+    if (modePreparation != null) this.modePreparation = modePreparation;
     modifie();
   }
 
@@ -2774,20 +2846,23 @@ class Etat extends ChangeNotifier {
   List<Liste> listesArchivees(String magasinId) => listes.where((l) => l.magasinId == magasinId).toList()
     ..sort((a, b) => dateCourses(b).compareTo(dateCourses(a)));
 
-  /// Supprime les archives plus anciennes que le délai réglé (rien si « jamais »).
-  void purgerArchives() {
-    if (delaiArchives <= 0) return;
+  /// Supprime les archives plus anciennes que le délai réglé (rien si « jamais ») ; rend vrai si quelque chose est parti.
+  bool purgerArchives() {
+    if (delaiArchives <= 0) return false;
     final limite = DateTime.now().subtract(Duration(days: 30 * delaiArchives));
     final ids = {
       for (final m in magasinsArchives)
-        for (final c in historique.where((c) => c.magasinId == m.id && c.dateCourses.isBefore(limite))) c.id
+        for (final c in historique.where((c) => c.magasinId == m.id && c.dateCourses.isBefore(limite))) c.id,
+      for (final c in historique.where((c) => archivees.contains(c.id) && c.dateCourses.isBefore(limite))) c.id,
     };
-    if (ids.isEmpty) return;
+    if (ids.isEmpty) return false;
+    archivees.removeAll(ids);
     listes.removeWhere((l) => ids.contains(l.id));
     historique.removeWhere((c) => ids.contains(c.id));
     for (final m in [...magasinsArchives]) {
       if (!historique.any((c) => c.magasinId == m.id) && !listes.any((l) => l.magasinId == m.id)) magasinsArchives.remove(m);
     }
+    return true;
   }
 
   /// Un magasin supprimé qui a un historique part dans les archives ; ses listes non terminées sont effacées.

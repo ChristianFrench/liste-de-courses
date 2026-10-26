@@ -446,8 +446,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
     if (l == null) return;
     // À l'ouverture, rayons et secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
     Retractables.i.fixer(_toutesLesCles(l), false);
-    // Mode « Rechercher » : on ne voit que les articles déjà choisis.
-    maListe = etat.ajoutParRecherche && l.lignes.isNotEmpty;
+    // Modes « Condensé » et « Sans détails » : on ne voit que les articles choisis ; « Avec détails » : tout le catalogue.
+    maListe = etat.ajoutParRecherche;
     final s = etat.secteur(l.repriseSecteurId ?? '');
     if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
   }
@@ -741,13 +741,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
           );
         }
         final simple = etat.estSimple(l);
+        final mode = simple ? 'liste' : etat.modePreparation;
         final barre = BarreAction(boutons: [
-          if (!simple)
-            BoutonEtat(
-              texte: 'Ma liste · ${l.lignes.length}',
-              actif: maListe,
-              onTap: () => setState(() => maListe = !maListe),
-            ),
           Bouton(
             texte: 'Aperçu',
             taille: 15,
@@ -783,27 +778,28 @@ class _EcranConstructionState extends State<EcranConstruction> {
           produits: () => etat.produits,
           detail: ou,
           aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher',
-          // Par défaut, l'article trouvé s'ajoute ; « Parcourir » enfoncé : tout le catalogue, la recherche y amène.
+          // Condensé et Sans détails : l'article trouvé s'ajoute ; Avec détails : tout le catalogue, la recherche y amène.
           droite: simple
               ? null
               : SizedBox(
-                  width: 112,
-                  child: BoutonEtat(
-                    texte: 'Parcourir',
-                    hauteur: 44,
-                    actif: !etat.ajoutParRecherche,
-                    onTap: () {
-                      final rechercher = !etat.ajoutParRecherche;
-                      etat.options(ajoutParRecherche: rechercher);
-                      setState(() => maListe = rechercher && l.lignes.isNotEmpty);
+                  width: 150,
+                  child: ChoixDeroulant<String>(
+                    key: const ValueKey('mode-preparation'),
+                    valeur: mode,
+                    choix: const {'condense': 'Condensé', 'liste': 'Sans détails', 'detail': 'Avec détails'},
+                    onChange: (v) {
+                      etat.options(modePreparation: v);
+                      setState(() => maListe = v != 'detail');
                     },
                   ),
                 ),
           onChoix: (p) => simple
               ? _ajouterSimple(l, p)
-              : etat.ajoutParRecherche
-                  ? _ajouterTrouve(l, p)
-                  : _trouver(l, p),
+              : mode == 'condense'
+                  ? _ajouterCondense(l, p)
+                  : mode == 'liste'
+                      ? _ajouterTrouve(l, p)
+                      : _trouver(l, p),
           onNouveau: simple || etat.ajoutParRecherche
               ? (n) async {
                   final p = await nouveauProduit(context, nom: n);
@@ -827,6 +823,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
                     padding: const EdgeInsets.only(bottom: 16),
                     children: [for (final g in l.lignes) if (etat.produit(g.produitId) case final p?) _ligne(l, p, simple: true)],
                   ),
+            bas: [barre],
+          );
+        }
+        if (mode == 'condense') {
+          return PageBase(
+            entete: entete,
+            haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
+            corps: _condense(l),
             bas: [barre],
           );
         }
@@ -995,6 +999,68 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   /// Mode « Rechercher » : l'article choisi entre dans la liste (s'il n'y est pas) ; on ne voit plus que la liste,
   /// avec seuls son rayon et son secteur ouverts, et l'on est sur l'article, prêt pour la marque, la mesure…
+  /// Mode « Condensé » : l'article trouvé s'ajoute (s'il n'y est pas) ; la liste reste serrée.
+  void _ajouterCondense(Liste l, Produit p) {
+    if (etat.ligne(l, p.id) != null) {
+      Nav.message(context, '« ${p.nom} » est déjà dans la liste');
+      return;
+    }
+    etat.ajouterLigne(l, p.id);
+    Nav.message(context, '« ${p.nom} » ajouté à la liste');
+  }
+
+  /// Mode « Condensé » : la liste comme en magasin, serrée sous de minces bandeaux de secteur ; un P devant
+  /// les articles en promotion. Toucher un article passe en « Sans détails », sur cet article.
+  Widget _condense(Liste l) {
+    final etapes = etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id);
+    if (l.lignes.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
+            style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+      );
+    }
+    return ListView(
+      controller: _defilement,
+      padding: const EdgeInsets.only(bottom: 16),
+      children: [
+        for (final x in etapes) ...[
+          Container(
+            color: Charte.accent,
+            margin: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
+            child: Row(children: [
+              Expanded(
+                  child: Text(x.nom.toUpperCase(),
+                      maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
+              Text('${x.lignes.length}', style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+            ]),
+          ),
+          for (final g in x.lignes)
+            if (etat.produit(g.produitId) case final p?)
+              InkWell(
+                key: ValueKey('condense-${p.id}'),
+                onTap: () {
+                  etat.options(modePreparation: 'liste');
+                  _ajouterTrouve(l, p);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 3, 14, 3),
+                  child: Row(children: [
+                    SizedBox(
+                      width: 22,
+                      child: g.promotion == null ? null : Text('P', style: Charte.texte(16, gras: true, couleur: Color(etat.couleurPromotions))),
+                    ),
+                    Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
+                    if (g.quantite > 1) Text('×${g.quantite}', style: Charte.texte(15, gras: true)),
+                  ]),
+                ),
+              ),
+        ],
+      ],
+    );
+  }
+
   void _ajouterTrouve(Liste l, Produit p) {
     final deja = etat.ligne(l, p.id) != null;
     if (!deja) etat.ajouterLigne(l, p.id);
@@ -1706,10 +1772,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   /// Aperçu d'une liste simple : sans rayons ni secteurs (ordre de saisie) ou rangée comme en magasin.
   bool? _aplat;
 
-  /// Aperçu : tout est déployé ; « Détail » enfoncé montre mesures, packagings, promotions et filets,
-  /// sinon (par défaut) la liste est condensée, les articles serrés sous leur secteur.
-  bool _detail = false;
-
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -1763,22 +1825,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
               icone: apercu ? Icons.checklist : Icons.shopping_cart_outlined,
               titre: titre,
               aide: apercu ? Aides.apercu : Aides.enMagasin,
-              droite: !apercu && commentaire == null ? null : Row(mainAxisSize: MainAxisSize.min, children: [
-                if (apercu)
-                  SizedBox(
-                    width: 100,
-                    child: BoutonEtat(
-                      texte: 'Détail',
-                      taille: 15,
-                      surPhoto: true,
-                      hauteur: EnTeteFenetre.hauteurBouton,
-                      actif: _detail,
-                      onTap: () => setState(() => _detail = !_detail),
-                    ),
-                  ),
-                if (commentaire != null)
-                  boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
-              ]),
+              droite: commentaire == null ? null : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
               deplier: aplat || apercu ? const [] : [for (final x in etapes) _cle(x.id)],
             ),
             corps: etapes.isEmpty
@@ -1795,23 +1842,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                     padding: const EdgeInsets.only(bottom: 16),
                     children: [
                       for (final x in visibles) ...[
-                          if (apercu && !_detail)
-                            // Condensé : bandeau mince du secteur, sans image
-                            Container(
-                              key: _titres.putIfAbsent(x.id, GlobalKey.new),
-                              color: Charte.accent,
-                              margin: const EdgeInsets.only(top: 2),
-                              padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
-                              child: Row(children: [
-                                Expanded(
-                                    child: Text(x.nom.toUpperCase(),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
-                                Text('${x.lignes.length}', style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
-                              ]),
-                            )
-                          else
                           TitreGroupe(
                             key: _titres.putIfAbsent(x.id, GlobalKey.new),
                             nom: x.nom,
@@ -1895,17 +1925,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   Widget _ligne(Etat etat, Liste l, LigneListe g, bool apercu) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
-    if (apercu && !_detail) {
-      // Condensé : le nom et la quantité, lignes serrées, sans mesure, packaging, promotion ni filet.
-      return Padding(
-        key: ValueKey(p.id),
-        padding: const EdgeInsets.fromLTRB(16, 2, 14, 2),
-        child: Row(children: [
-          Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
-          if (g.quantite > 1) Text('×${g.quantite}', style: Charte.texte(15, gras: true)),
-        ]),
-      );
-    }
     final morceaux = [
       etat.complement(g, p, avecPackaging: false),
       if (g.consigne != null) '« ${g.consigne} »',
@@ -1995,6 +2014,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           ),
         );
     final secteurs = etat.secteursDansLOrdre(l).length;
+    // Résumé au foyer : proposé (et coché d'avance) quand d'autres membres ont une adresse.
+    final autres = etat.membres.where((m) => m.id != etat.moi.id && m.email.isNotEmpty).isNotEmpty;
+    var resume = autres;
     final ok = await modale(
       context,
       titre: 'Terminer les courses ?',
@@ -2015,10 +2037,22 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           ],
           const SizedBox(height: 8),
           Text('La course attend son ticket de caisse dans l\'onglet Courses (« Terminées sans ticket »).', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 4),
+          CaseModale(
+            texte: 'Envoyer un résumé au foyer',
+            aide: 'Votre messagerie s\'ouvre avec le mail prêt pour tous les membres : oubliés, absents des rayons, achetés.',
+            coche: resume,
+            onChange: (v) => maj(() => resume = v),
+          ),
         ],
       ),
     );
     if (!ok || !context.mounted) return;
+    // Le résumé se lit avant la fin des courses (la liste garde ses coches et ses manquants).
+    if (resume && !await envoyerResume(etat, l) && context.mounted) {
+      Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
+    }
+    if (!context.mounted) return;
     Etat.instance.terminerCourses(l);
     Nav.i.retourOnglet(Nav.courses);
     Nav.message(context, 'Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');

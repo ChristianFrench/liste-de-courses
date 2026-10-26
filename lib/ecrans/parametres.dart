@@ -157,6 +157,16 @@ class EcranDonnees extends _EcranVivant {
         onTap: () => _reglerPreliste(context, etat),
       ),
       LigneMenu(
+        icone: Icons.inventory_2_outlined,
+        titre: 'Passage de l\'historique aux archives',
+        sousTitre: etat.delaiHistorique == 0 ? 'Jamais : les courses restent dans l\'historique' : 'Après ${etat.delaiHistorique} mois',
+        onTap: () async {
+          final v = await choisirDansListe<int>(context,
+              titre: 'Archiver les courses après', choix: const {1: '1 mois', 2: '2 mois', 3: '3 mois', 6: '6 mois', 12: '1 an', 0: 'Jamais'});
+          if (v != null) etat.reglerDelaiHistorique(v);
+        },
+      ),
+      LigneMenu(
         icone: Icons.timer_outlined,
         titre: 'Suppression automatique des archives',
         sousTitre: etat.delaiArchives == 0 ? 'Jamais : les archives sont gardées' : 'Après ${etat.delaiArchives} mois',
