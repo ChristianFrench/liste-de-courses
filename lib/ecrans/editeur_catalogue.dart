@@ -182,7 +182,12 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     );
     if (ok != true || !mounted) return;
     setState(() => _publication = true);
-    final fait = await CatalogueCommun.instance.publierBrouillon(b);
+    var fait = false;
+    try {
+      fait = await CatalogueCommun.instance.publierBrouillon(b);
+    } catch (e) {
+      CatalogueCommun.instance.erreur = '$e';
+    }
     if (!mounted) return;
     if (fait) {
       final nouveau = await CatalogueCommun.instance.brouillon();
@@ -194,7 +199,8 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
       Nav.message(context, 'Catalogue commun publié');
     } else {
       setState(() => _publication = false);
-      Nav.message(context, 'Le serveur ne répond pas : rien n\'est publié, le brouillon est gardé');
+      Nav.message(context,
+          'Rien n\'est publié (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : le brouillon est gardé, réessayez');
     }
   }
 }

@@ -235,6 +235,11 @@ void main() {
     expect(lireTexteCatalogue(b, 'Animalerie / Chiens :\nLitière\nOs\n').groupes.single.nouveaux, ['Os']);
     b.retirerSecteur(b.rayon('Animalerie')!, chiens);
   
+    // Envoi compressé : le même catalogue une fois relu, bien plus court
+    final paquet = CatalogueCommun.emballer(b.versJson());
+    expect(paquet, startsWith('gz:'));
+    expect(jsonEncode(CatalogueCommun.deballer(paquet)), jsonEncode(b.versJson()));
+    expect(CatalogueCommun.deballer(jsonEncode({'version': 1}))['version'], 1, reason: 'ancien format lu aussi');
     // Titre simple inconnu : pas de rayon créé d'office, le rayon est à choisir.
     final l2 = lireTexteCatalogue(b, 'Oiseaux :\nGraines\n');
     expect(l2.groupes.single.rayonAChoisir, isTrue);

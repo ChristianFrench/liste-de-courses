@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:archive/archive.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
@@ -56,6 +57,7 @@ class CatalogueCommun extends ChangeNotifier {
     final messages = t.messages.asBroadcastStream();
     final sub = t.etats.listen((e) {
       if (e == 'connecte' && !connecte.isCompleted) connecte.complete(true);
+      if (e.startsWith('Connexion impossible')) erreur = e.replaceFirst(RegExp(r', nouvel essai.*'), '');
     });
     try {
       unawaited(t.connecter(
@@ -77,28 +79,54 @@ class CatalogueCommun extends ChangeNotifier {
   /// Le catalogue commun publié, ou null (rien de publié, ou pas de réseau).
   Future<Map<String, dynamic>?> recuperer() => _avecServeur((t, messages) async {
         try {
-          final m = await messages.firstWhere((m) => m.$1 == sujet && m.$2.isNotEmpty).timeout(const Duration(seconds: 6));
-          return jsonDecode(m.$2) as Map<String, dynamic>;
+          final m = await messages.firstWhere((m) => m.$1 == sujet && m.$2.isNotEmpty).timeout(const Duration(seconds: 8));
+          return deballer(m.$2);
         } on TimeoutException {
           return null;
         }
       });
 
+  /// Le catalogue part compressé (« gz: » + gzip en base 64) : environ 30 ko au lieu de 160.
+  static String emballer(Map<String, dynamic> j) => 'gz:${base64Encode(GZipEncoder().encode(utf8.encode(jsonEncode(j)))!)}';
+
+  static Map<String, dynamic> deballer(String t) =>
+      jsonDecode(t.startsWith('gz:') ? utf8.decode(GZipDecoder().decodeBytes(base64Decode(t.substring(3)))) : t) as Map<String, dynamic>;
+
+  /// Pourquoi la dernière publication a échoué (montré à l'éditeur).
+  String? erreur;
+
   /// Publie le catalogue commun (message retenu) ; rend vrai si le serveur l'a renvoyé.
+  /// Ne lève jamais d'erreur : en cas d'échec, [erreur] dit pourquoi.
   Future<bool> publier(Map<String, dynamic> j) async {
-    final texte = jsonEncode(j);
-    final ok = await _avecServeur((t, messages) async {
-      final retour = messages.firstWhere((m) => m.$1 == sujet && m.$2 == texte).timeout(const Duration(seconds: 15));
-      t.publier(sujet, texte, retenu: true);
-      try {
-        await retour;
-        return true;
-      } on TimeoutException {
-        return false;
-      }
-    });
+    erreur = null;
+    bool? ok;
+    try {
+      final texte = emballer(j);
+      ok = await _avecServeur((t, messages) async {
+        final retour = Completer<bool>();
+        final sub = messages.listen((m) {
+          if (m.$1 == sujet && m.$2 == texte && !retour.isCompleted) retour.complete(true);
+        }, onDone: () {
+          erreur ??= 'le serveur a coupé la liaison';
+          if (!retour.isCompleted) retour.complete(false);
+        });
+        t.publier(sujet, texte, retenu: true);
+        try {
+          return await retour.future.timeout(const Duration(seconds: 20));
+        } on TimeoutException {
+          erreur ??= 'le serveur n\'a pas renvoyé le catalogue';
+          return false;
+        } finally {
+          await sub.cancel();
+        }
+      });
+      if (ok == null) erreur ??= 'pas de liaison avec le serveur';
+    } catch (e) {
+      erreur = '$e';
+      ok = false;
+    }
     if (ok == true) {
-      _definir('catalogue_commun', texte);
+      _definir('catalogue_commun', jsonEncode(j));
       _appliquer(j);
     }
     return ok == true;
