@@ -1009,32 +1009,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
   }
 
-  /// Condensé : la quantité dans une petite fenêtre − N + ; à 0, l'article quitte la liste.
-  Future<void> _quantiteCondense(Liste l, Produit p) async {
-    final g = etat.ligne(l, p.id);
-    if (g == null) return;
-    var q = g.quantite;
-    final ok = await modale(
-      context,
-      titre: p.nom,
-      icone: Icons.exposure_outlined,
-      oui: 'Valider',
-      contenu: (context, maj) => Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        BoutonIcone(icone: Icons.remove, libelle: 'Moins', onTap: q > 0 ? () => maj(() => q--) : null),
-        SizedBox(
-          width: 72,
-          child: Text('$q', key: const ValueKey('quantite-condense'), textAlign: TextAlign.center, style: Charte.texte(28, gras: true)),
+  /// Condensé : petit bouton − ou + de la ligne (lignes serrées, à la demande du maître d'ouvrage).
+  Widget _petitBouton(IconData icone, String libelle, Key cle, VoidCallback onTap) => Semantics(
+        button: true,
+        label: libelle,
+        child: InkWell(
+          key: cle,
+          onTap: onTap,
+          child: SizedBox(width: 32, height: 24, child: Icon(icone, size: 18, color: Charte.couleurIcone(icone))),
         ),
-        BoutonIcone(icone: Icons.add, libelle: 'Plus', onTap: () => maj(() => q++)),
-      ]),
-    );
-    if (!ok || !mounted || q == g.quantite) return;
-    if (q <= 0) {
-      _retirerCondense(l, p);
-    } else {
-      etat.quantite(l, p.id, q);
-    }
-  }
+      );
 
   /// Condensé : appui long (ou quantité 0) : l'article quitte la liste, « Annuler » le remet.
   void _retirerCondense(Liste l, Produit p) {
@@ -1087,21 +1071,22 @@ class _EcranConstructionState extends State<EcranConstruction> {
                     padding: const EdgeInsets.only(left: 16, right: 6),
                     child: Row(children: [
                       SizedBox(
+                        height: 24,
                         width: 22,
                         child: g.promotion == null ? null : Text('P', style: Charte.texte(16, gras: true, couleur: Color(etat.couleurPromotions))),
                       ),
                       Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
-                      InkWell(
-                        key: ValueKey('quantite-${p.id}'),
-                        onTap: () => _quantiteCondense(l, p),
-                        child: Container(
-                          width: 48,
-                          height: 44,
-                          alignment: Alignment.center,
-                          child: Text('×${g.quantite}',
-                              style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
-                        ),
+                      // − N + : à 0, l'article quitte la liste (« Annuler » le remet).
+                      _petitBouton(Icons.remove, 'Moins', ValueKey('moins-${p.id}'),
+                          () => g.quantite <= 1 ? _retirerCondense(l, p) : etat.quantite(l, p.id, g.quantite - 1)),
+                      SizedBox(
+                        width: 28,
+                        child: Text('${g.quantite}',
+                            key: ValueKey('quantite-${p.id}'),
+                            textAlign: TextAlign.center,
+                            style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
                       ),
+                      _petitBouton(Icons.add, 'Plus', ValueKey('plus-${p.id}'), () => etat.quantite(l, p.id, g.quantite + 1)),
                     ]),
                   ),
                 ),

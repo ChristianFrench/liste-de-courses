@@ -747,12 +747,10 @@ void main() {
       expect(etat.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
       expect(find.byType(LigneChoix), findsNothing, reason: 'pas de lignes détaillées');
       if (l.lignes.any((g) => g.promotion != null)) expect(find.text('P'), findsWidgets, reason: 'P devant les promotions');
-      // La quantité : − N + ; on reste en Condensé
-      await _toucher(tester, find.byKey(ValueKey('quantite-${huile.id}')));
-      await tester.tap(find.byTooltip('Plus'));
-      await tester.pumpAndSettle();
-      await _toucher(tester, find.text('Valider'));
+      // La quantité : − N + sur la ligne ; on reste en Condensé
+      await _toucher(tester, find.byKey(ValueKey('plus-${huile.id}')));
       expect(etat.ligne(l, huile.id)!.quantite, 2);
+      expect(find.text('×2'), findsNothing, reason: 'le nombre seul, sans x');
       expect(etat.modePreparation, 'condense');
       // Toucher la ligne : la promotion
       await _toucher(tester, find.byKey(ValueKey('condense-${huile.id}')));
