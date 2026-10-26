@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
+import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -166,7 +167,21 @@ class EcranDonnees extends _EcranVivant {
       ),
     ], boutons: [
       Bouton(texte: 'Remettre les listes exemples', onTap: () => _exemples(context)),
+      if (CatalogueCommun.editeurPossible && !CatalogueCommun.instance.editeur)
+        Bouton(texte: 'Éditeur du catalogue', onTap: () => _deverrouillerEditeur(context)),
     ]);
+  }
+}
+
+/// Le code d'éditeur (secret GitHub CODE_EDITEUR) ouvre Gérer › Courses › Catalogue commun sur cet appareil.
+Future<void> _deverrouillerEditeur(BuildContext context) async {
+  final code = await demanderTexte(context, titre: 'Éditeur du catalogue commun', aide: 'Code d\'éditeur', valider: 'Ouvrir');
+  if (code == null || !context.mounted) return;
+  if (CatalogueCommun.instance.deverrouiller(code)) {
+    Etat.instance.modifie();
+    Nav.message(context, 'Catalogue commun : dans Gérer › Courses');
+  } else {
+    Nav.message(context, 'Code incorrect');
   }
 }
 

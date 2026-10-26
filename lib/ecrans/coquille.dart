@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
+import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
@@ -13,6 +14,7 @@ import 'bienvenue.dart';
 import 'catalogue.dart';
 import 'corbeille.dart';
 import 'e13_produits_reels.dart';
+import 'editeur_catalogue.dart';
 import 'foyer.dart';
 import 'historique.dart';
 import 'listes.dart';
@@ -91,7 +93,7 @@ class Coquille extends StatelessWidget {
         final s = Synchro.instance;
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: ListenableBuilder(
+      child: GuetteurNouveautes(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -113,7 +115,7 @@ class Coquille extends StatelessWidget {
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
       ),
-      ),
+      )),
     );
   }
 }
@@ -163,6 +165,8 @@ class MenuGerer extends StatelessWidget {
           ]),
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''} · leurs parcours', const EcranMagasins()),
+            if (CatalogueCommun.instance.editeur)
+              ecran(Icons.public, 'Catalogue commun', 'Éditeur : modifier et publier pour tous les foyers', const EcranEditeurCatalogue()),
             ecran(Icons.menu_book_outlined, 'Catalogue',
                 '${etat.produits.length} produits · le même dans tous les magasins', const EcranCatalogue()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types · chacun avec sa couleur',

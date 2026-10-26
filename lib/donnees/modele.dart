@@ -442,6 +442,11 @@ class Etat extends ChangeNotifier {
   /// Rayons (« Animalerie ») et secteurs (« Animalerie/Chats ») ajoutés par le foyer.
   Set<String> structurePerso = {};
 
+  /// Version du catalogue commun déjà ajoutée au foyer (0 : catalogue livré avec l'application),
+  /// et ses nouveautés, montrées une fois sur chaque appareil.
+  int versionCatalogueCommun = 0;
+  Map<String, dynamic>? nouveautesCatalogue;
+
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
   List<String> typesPackaging = [];
 
@@ -748,6 +753,8 @@ class Etat extends ChangeNotifier {
     apparence = options?['apparence'] as String?;
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
+    versionCatalogueCommun = (options?['catalogueCommun'] as num? ?? 0).toInt();
+    nouveautesCatalogue = (options?['nouveautesCatalogue'] as Map?)?.cast<String, dynamic>();
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
@@ -856,6 +863,8 @@ class Etat extends ChangeNotifier {
             if (apparence != null) 'apparence': apparence,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
+            if (versionCatalogueCommun > 0) 'catalogueCommun': versionCatalogueCommun,
+            if (nouveautesCatalogue != null) 'nouveautesCatalogue': nouveautesCatalogue,
           },
         },
         'typesPromotion': [for (final t in typesPromotion) t.toJson()],
@@ -2269,6 +2278,131 @@ class Etat extends ChangeNotifier {
     }
     modifie();
     return true;
+  }
+
+  // ------------------------------------------------------------ Catalogue commun (26/10/2026)
+  //
+  // Tenu par l'éditeur (une seule personne), publié sur le serveur, ajouté à chaque foyer à la connexion.
+  // Mêmes règles partout : identifiants calculés depuis les noms (deux appareils du foyer qui
+  // l'ajoutent en même temps créent les mêmes objets) ; rien de ce que le foyer utilise n'est retiré.
+
+  static String _cleNom(String t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9àâäçéèêëîïôöùûüœ]+'), '-');
+
+  /// Ajoute au foyer une version plus récente du catalogue commun. Rend les nouveautés (vide si rien).
+  List<String> appliquerCatalogueCommun(Map<String, dynamic> j) {
+    final version = (j['version'] as num? ?? 0).toInt();
+    if (version <= versionCatalogueCommun || magasins.isEmpty) return const [];
+    final lignes = <String>[];
+    String bas(String t) => t.trim().toLowerCase();
+    Produit? produitNomme(String nom) => _trouve(produits, (p) => bas(p.nom) == bas(nom));
+
+    // 1. Noms changés par l'éditeur.
+    var renommes = 0;
+    for (final o in (j['renommes'] as List? ?? const []).cast<Map>()) {
+      final ancien = o['ancien'] as String, nouveau = o['nouveau'] as String;
+      switch (o['type']) {
+        case 'rayon':
+          if (_trouve(rayons, (r) => r.nom == nouveau) != null) continue;
+          for (final r in rayons.where((r) => r.nom == ancien)) {
+            r.nom = nouveau;
+            renommes++;
+          }
+        case 'secteur':
+          for (final x in secteurs.where((x) => x.nom == ancien && rayon(x.rayonId)?.nom == o['rayon'])) {
+            if (_trouve(secteurs, (y) => y.rayonId == x.rayonId && y.nom == nouveau) != null) continue;
+            x.nom = nouveau;
+            renommes++;
+          }
+        case 'produit':
+          final p = produitNomme(ancien);
+          if (p != null && !estAjoute(p) && produitNomme(nouveau) == null) {
+            p.nom = nouveau;
+            renommes++;
+          }
+      }
+    }
+
+    // 2. Rayons, secteurs et produits.
+    for (final rj in (j['rayons'] as List).cast<Map>()) {
+      final rn = rj['nom'] as String;
+      final rayonNeuf = _trouve(rayonsCatalogue, (r) => r.nom == rn) == null;
+      if (rayonNeuf) lignes.add('Nouveau rayon : $rn');
+      structurePerso.remove(rn);
+      for (final m in magasins) {
+        if (_trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn) == null) rayons.add(Rayon('r-${m.id}-${_cleNom(rn)}', m.id, rn));
+      }
+      for (final sj in (rj['secteurs'] as List).cast<Map>()) {
+        final sn = sj['nom'] as String;
+        final ref = _trouve(rayonsCatalogue, (r) => r.nom == rn)!;
+        if (!rayonNeuf && _trouve(secteursDu(ref.id), (x) => x.nom == sn) == null) lignes.add('Nouveau secteur : $rn › $sn');
+        structurePerso.remove('$rn/$sn');
+        for (final m in magasins) {
+          final r = _trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn)!;
+          if (_trouve(secteurs, (x) => x.rayonId == r.id && x.nom == sn) == null) secteurs.add(Secteur('s-${r.id}-${_cleNom(sn)}', r.id, sn));
+        }
+        final secteurRef = _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
+        for (final pj in (sj['produits'] as List).cast<Map>()) {
+          final nom = pj['nom'] as String;
+          var p = produitNomme(nom);
+          if (p != null) {
+            // Ajouté par le foyer, maintenant au catalogue commun : il en fait partie.
+            produitsPerso.remove(p.id);
+          } else {
+            p = Produit('pc-${_cleNom(nom)}', nom, [], [], 0);
+            produits.add(p);
+            for (final f in (pj['formats'] as List? ?? const []).cast<String>()) {
+              p.packagingIds.add(_packagingNomme(f).id);
+            }
+            for (final mq in (pj['marques'] as List? ?? const []).cast<String>()) {
+              p.marqueIds.add(marqueNommee(mq).id);
+            }
+            lignes.add('$sn : $nom');
+          }
+          if (secteurCatalogue(p.id) == null) placer(ref.magasinId, p.id, secteurRef.id);
+        }
+      }
+    }
+    for (final e in (j['images'] as Map? ?? const {}).entries) {
+      imagesChoisies.putIfAbsent(e.key as String, () => e.value as String);
+    }
+
+    // 3. Retirés par l'éditeur, s'ils ne servent pas au foyer.
+    var retires = 0;
+    for (final o in (j['retires'] as List? ?? const []).cast<Map>()) {
+      final nom = o['nom'] as String;
+      switch (o['type']) {
+        case 'produit':
+          final p = produitNomme(nom);
+          if (p == null || estAjoute(p) || produitUtilise(p)) continue;
+          produits.remove(p);
+          emplacements.removeWhere((e) => e.produitId == p.id);
+          retires++;
+        case 'secteur':
+          final ids = {
+            for (final x in secteurs)
+              if (x.nom == nom && rayon(x.rayonId)?.nom == o['rayon']) x.id
+          };
+          if (ids.isEmpty || emplacements.any((e) => ids.contains(e.secteurId))) continue;
+          secteurs.removeWhere((x) => ids.contains(x.id));
+          for (final pc in parcours) {
+            pc.etapes.removeWhere(ids.contains);
+          }
+          retires++;
+        case 'rayon':
+          final ids = {for (final r in rayons) if (r.nom == nom) r.id};
+          if (ids.isEmpty || secteurs.any((x) => ids.contains(x.rayonId))) continue;
+          rayons.removeWhere((r) => ids.contains(r.id));
+          retires++;
+      }
+    }
+    if (renommes > 0) lignes.add('$renommes nom${renommes > 1 ? 's' : ''} corrigé${renommes > 1 ? 's' : ''}');
+    if (retires > 0) lignes.add('$retires élément${retires > 1 ? 's' : ''} retiré${retires > 1 ? 's' : ''} du catalogue');
+    versionCatalogueCommun = version;
+    if (lignes.isNotEmpty) {
+      nouveautesCatalogue = {'version': version, 'date': j['date'], 'lignes': lignes.take(200).toList(), 'total': lignes.length};
+    }
+    modifie();
+    return lignes;
   }
 
   // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)

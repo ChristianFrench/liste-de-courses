@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/stockage.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
@@ -135,6 +136,84 @@ void main() {
     // Un foyer encore vide (rien reçu) : on attend.
     e.lire(parLeModele(vide(d)));
     expect(e.reprendre(garde), isFalse);
+  });
+
+  test('catalogue commun : nouveautés ajoutées, ajouts du foyer intégrés, rien d\'utilisé retiré', () {
+    final d = demo();
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(d));
+    final perso = e.creerProduit('Croquettes Félix');
+    final utilise = e.listes.first.lignes.first.produitId;
+    final nomUtilise = e.produit(utilise)!.nom;
+    final rayonExistant = e.rayonsCatalogue.first, secteurExistant = e.secteursDu(rayonExistant.id).first;
+    final nb = e.produits.length;
+    Map<String, dynamic> version(int v) => {
+          'version': v,
+          'rayons': [
+            {
+              'nom': 'Animalerie',
+              'secteurs': [
+                {
+                  'nom': 'Chats',
+                  'taille': 1,
+                  'produits': [
+                    {'nom': 'Croquettes Félix', 'taille': 1},
+                    {'nom': 'Litière', 'taille': 1, 'formats': ['10 l']},
+                  ]
+                }
+              ]
+            },
+            {
+              'nom': rayonExistant.nom,
+              'secteurs': [
+                {'nom': secteurExistant.nom, 'taille': 1, 'produits': [{'nom': 'Nouveauté du rayon', 'taille': 1}]}
+              ]
+            },
+          ],
+          'retires': [
+            {'type': 'produit', 'nom': nomUtilise}
+          ],
+        };
+    final lignes = e.appliquerCatalogueCommun(version(10));
+    expect(lignes, containsAll(['Nouveau rayon : Animalerie', 'Chats : Litière', '${secteurExistant.nom} : Nouveauté du rayon']));
+    expect(e.produits.length, nb + 2);
+    expect(e.estAjoute(perso), isFalse, reason: 'au catalogue commun maintenant');
+    expect(e.secteurCatalogue(perso.id)?.nom, 'Chats');
+    for (final m in e.magasins) {
+      expect(e.rayons.where((r) => r.magasinId == m.id && r.nom == 'Animalerie'), hasLength(1));
+    }
+    expect(e.produit(utilise), isNotNull, reason: 'dans une liste : pas retiré');
+    expect(e.nouveautesCatalogue?['version'], 10);
+    expect(e.appliquerCatalogueCommun(version(10)), isEmpty, reason: 'déjà ajoutée');
+    // Un deuxième appareil du foyer qui l'ajoute aussi crée les mêmes identifiants.
+    final ids = {for (final p in e.produits) p.id};
+    expect(ids, contains('pc-litière'));
+  });
+
+  test('ajout au catalogue commun depuis un texte : titres de secteur, puis produits', () {
+    final b = Brouillon.lire(demo()..['rayons'] = [
+          {
+            'nom': 'Fruits et légumes',
+            'secteurs': [
+              {'nom': 'Fruits', 'taille': 1, 'produits': [{'nom': 'Pommes', 'taille': 1}]}
+            ]
+          }
+        ]);
+    final lu = lireTexteCatalogue(b, 'Fruits :\n- Pommes\n- Kakis\n\nAnimalerie / Chats :\nCroquettes\nlitière\nLitière\n');
+    expect(lu.groupes.map((g) => '${g.rayon}/${g.secteur}'), ['Fruits et légumes/Fruits', 'Animalerie/Chats']);
+    expect(lu.groupes.first.nouveaux, ['Kakis']);
+    expect(lu.groupes.first.connus, ['Pommes']);
+    expect(lu.groupes.last.rayonNeuf, isTrue);
+    expect(lu.groupes.last.nouveaux, ['Croquettes', 'Litière']);
+    expect(ajouterLecture(b, lu), 3);
+    expect(b.produit('kakis')?.$2.nom, 'Fruits');
+    b.renommerProduit(b.produit('Kakis')!.$3, 'Kaki');
+    b.retirerProduit(b.produit('Croquettes')!.$2, b.produit('Croquettes')!.$3);
+    final j = b.versJson();
+    expect(j['renommes'], [
+      {'type': 'produit', 'ancien': 'Kakis', 'nouveau': 'Kaki'}
+    ]);
+    expect((j['retires'] as List).single['nom'], 'Croquettes');
   });
 
   test('modification simultanée du même objet : la plus récente l\'emporte partout', () {

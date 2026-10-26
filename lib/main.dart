@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'donnees/catalogue_commun.dart';
 import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
 import 'donnees/synchro.dart';
@@ -21,6 +22,8 @@ Future<void> main() async {
   if (!kIsWeb) TicketRecu.demarrer();
   // Partage du foyer entre appareils (si cet appareil partage)
   Synchro.instance.demarrer();
+  // Catalogue commun : les nouveautés publiées par l'éditeur s'ajoutent au foyer
+  CatalogueCommun.instance.verifier();
 }
 
 class ListeDeCoursesApp extends StatelessWidget {
