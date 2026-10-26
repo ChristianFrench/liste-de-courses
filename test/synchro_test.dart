@@ -214,6 +214,22 @@ void main() {
       {'type': 'produit', 'ancien': 'Kakis', 'nouveau': 'Kaki'}
     ]);
     expect((j['retires'] as List).single['nom'], 'Croquettes');
+  
+    // Titre simple inconnu : pas de rayon créé d'office, le rayon est à choisir.
+    final l2 = lireTexteCatalogue(b, 'Oiseaux :\nGraines\n');
+    expect(l2.groupes.single.rayonAChoisir, isTrue);
+    expect(ajouterLecture(b, l2), 0);
+    expect(b.rayon('Oiseaux'), isNull);
+    l2.groupes.single.rayon = 'Animalerie';
+    expect(ajouterLecture(b, l2), 1);
+    expect(b.produit('Graines')?.$2.nom, 'Oiseaux');
+    // Depuis un rayon : le secteur inconnu y est créé.
+    expect(lireTexteCatalogue(b, 'Poissons :\nAquarium\n', rayonDefaut: 'Animalerie').groupes.single.rayon, 'Animalerie');
+    // Déplacer un secteur, supprimer un rayon non vide.
+    b.deplacerSecteur(b.rayon('Animalerie')!, b.secteur(b.rayon('Animalerie')!, 'Oiseaux')!, b.rayon('Fruits et légumes')!);
+    expect(b.produit('Graines')?.$1.nom, 'Fruits et légumes');
+    b.retirerRayon(b.rayon('Animalerie')!);
+    expect(b.rayon('Animalerie'), isNull);
   });
 
   test('modification simultanée du même objet : la plus récente l\'emporte partout', () {

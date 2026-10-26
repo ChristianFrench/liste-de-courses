@@ -85,17 +85,24 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                           b.choisirImage(cleChoixRayon(r.nom), c == imageAutomatique ? null : c);
                           _modifie();
                         }),
+                        Lien('Depuis un texte', onTap: () async {
+                          if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
+                        }),
                         Lien('Renommer', onTap: () async {
                           final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
                           if (nom == null) return;
                           b.renommerRayon(r, nom);
                           _modifie();
                         }),
-                        if (r.secteurs.isEmpty)
-                          Lien('Supprimer', onTap: () {
-                            b.retirerRayon(r);
-                            _modifie();
-                          }),
+                        Lien('Supprimer', onTap: () async {
+                          if (r.secteurs.isNotEmpty &&
+                              !await _confirmerSuppression(context, 'le rayon ${r.nom}',
+                                  '${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(r.secteurs.fold(0, (n, s) => n + s.produits.length), 'produit')}')) {
+                            return;
+                          }
+                          b.retirerRayon(r);
+                          _modifie();
+                        }),
                       ]),
                     ),
                   ],
@@ -256,24 +263,66 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
               _modifie();
             },
           ),
-          if (s.produits.isEmpty)
-            Bouton(
-              texte: 'Supprimer',
-              taille: 15,
-              onTap: () {
-                b.retirerSecteur(r, s);
-                CatalogueCommun.instance.enregistrerBrouillon(b);
-                Navigator.of(context).pop();
-              },
-            ),
+          Bouton(
+            texte: 'Déplacer',
+            taille: 15,
+            onTap: () async {
+              final vers = await _choisirRayon(context, b, titre: 'Déplacer ${s.nom} vers', sauf: r);
+              if (vers == null || !context.mounted) return;
+              b.deplacerSecteur(r, s, vers);
+              CatalogueCommun.instance.enregistrerBrouillon(b);
+              Navigator.of(context).pop();
+              Nav.message(context, '${s.nom} déplacé dans ${vers.nom}');
+            },
+          ),
+          Bouton(
+            texte: 'Supprimer',
+            taille: 15,
+            onTap: () async {
+              if (s.produits.isNotEmpty && !await _confirmerSuppression(context, 'le secteur ${s.nom}', _pluriel(s.produits.length, 'produit'))) {
+                return;
+              }
+              b.retirerSecteur(r, s);
+              CatalogueCommun.instance.enregistrerBrouillon(b);
+              if (context.mounted) Navigator.of(context).pop();
+            },
+          ),
         ]),
       ],
     );
   }
 }
 
+Future<bool> _confirmerSuppression(BuildContext context, String quoi, String contenu) async {
+  final ok = await confirmer(context,
+      titre: 'Supprimer $quoi ?',
+      icone: Icons.delete_outline,
+      contenu: Text('Avec son contenu : $contenu. Les foyers ne retirent que ce qu\'ils n\'utilisent pas.', style: Charte.texte(16)),
+      plein: 'Annuler',
+      contour: 'Supprimer');
+  return ok == true;
+}
+
+/// Liste des rayons du brouillon, pour y déplacer un secteur.
+Future<CatRayon?> _choisirRayon(BuildContext context, Brouillon b, {required String titre, CatRayon? sauf}) async {
+  CatRayon? choisi;
+  final ok = await modale(
+    context,
+    titre: titre,
+    icone: Icons.drive_file_move_outline,
+    oui: 'Déplacer',
+    contenu: (context, maj) => ChoixDeroulant<String>(
+      valeur: choisi?.nom ?? '',
+      choix: {'': 'Choisir un rayon', for (final x in b.catalogue.rayons) if (!identical(x, sauf)) x.nom: x.nom},
+      onChange: (v) => maj(() => choisi = b.rayon(v)),
+    ),
+  );
+  return ok ? choisi : null;
+}
+
 /// Coller un texte : titres de secteur (« Animalerie / Chats : ») puis produits, un par ligne.
-/// Dans un secteur ([secteur] donné), les lignes sans titre vont dans ce secteur.
+/// Dans un secteur ([secteur] donné), les lignes sans titre vont dans ce secteur ; depuis un rayon
+/// ([rayon] seul), un titre de secteur inconnu y crée le secteur. Sinon son rayon est demandé.
 Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? rayon, CatSecteur? secteur}) async {
   final texte = TextEditingController();
   final lire = await modale(
@@ -285,6 +334,8 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
       Text(
           secteur != null
               ? 'Un produit par ligne : ils vont dans ${secteur.nom}. Une ligne finie par « : » ouvre un autre secteur.'
+              : rayon != null
+              ? 'Une ligne finie par « : » donne le secteur du rayon ${rayon.nom} (« Chats : »), puis un produit par ligne.'
               : 'Une ligne finie par « : » donne le secteur : « Animalerie / Chats : » (rayon / secteur), '
                   'ou « Fruits : » pour un secteur existant. Puis un produit par ligne.',
           style: Charte.texte(14, couleur: Charte.texteSecondaire)),
@@ -309,7 +360,7 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
   );
   if (!lire || !context.mounted) return false;
   final source = secteur != null && rayon != null ? '${rayon.nom} / ${secteur.nom} :\n${texte.text}' : texte.text;
-  final lu = lireTexteCatalogue(b, source);
+  final lu = lireTexteCatalogue(b, source, rayonDefaut: rayon?.nom);
   if (lu.nouveaux == 0 && lu.groupes.every((g) => !g.secteurNeuf)) {
     Nav.message(context, lu.connus > 0 ? 'Tous ces produits sont déjà au catalogue' : 'Aucun produit trouvé dans ce texte');
     return false;
@@ -319,15 +370,31 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
     titre: 'À ajouter',
     icone: Icons.playlist_add,
     oui: 'Ajouter au brouillon',
-    contenu: (context, _) => ConstrainedBox(
+    contenu: (context, maj) => ConstrainedBox(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.55),
       child: ListView(shrinkWrap: true, children: [
         Text('${_pluriel(lu.nouveaux, 'produit nouveau')}${lu.connus > 0 ? ', ${lu.connus} déjà au catalogue (ignorés)' : ''}.',
             style: Charte.texte(15, couleur: Charte.texteSecondaire)),
         for (final g in lu.groupes) ...[
           const SizedBox(height: 10),
-          Text('${g.rayon} › ${g.secteur}${g.rayonNeuf ? ' (nouveau rayon)' : g.secteurNeuf ? ' (nouveau secteur)' : ''}',
-              style: Charte.texte(15, gras: true)),
+          if (g.rayonAChoisir) ...[
+            Text('${g.secteur} (nouveau secteur) : dans quel rayon ?', style: Charte.texte(15, gras: true)),
+            const SizedBox(height: 4),
+            ChoixDeroulant<String>(
+              valeur: g.rayonNeuf ? '+' : g.rayon,
+              choix: {
+                '': 'Choisir un rayon',
+                for (final r in b.catalogue.rayons) r.nom: r.nom,
+                '+': 'Nouveau rayon « ${g.secteur} »',
+              },
+              onChange: (v) => maj(() {
+                g.rayonNeuf = v == '+';
+                g.rayon = v == '+' ? g.secteur : v;
+              }),
+            ),
+          ] else
+            Text('${g.rayon} › ${g.secteur}${g.rayonNeuf ? ' (nouveau rayon)' : g.secteurNeuf ? ' (nouveau secteur)' : ''}',
+                style: Charte.texte(15, gras: true)),
           for (final p in g.nouveaux) Text(p, style: Charte.texte(15)),
           for (final p in g.connus) Text('$p · déjà au catalogue', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         ],
@@ -335,7 +402,12 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
     ),
   );
   if (!ok || !context.mounted) return false;
+  final sansRayon = lu.groupes.where((g) => g.rayon.isEmpty).map((g) => g.secteur).toList();
   final n = ajouterLecture(b, lu);
+  if (sansRayon.isNotEmpty) {
+    Nav.message(context, 'Sans rayon choisi, non ajouté : ${sansRayon.join(', ')}');
+    return n > 0;
+  }
   Nav.message(context, '${_pluriel(n, 'produit')} ajouté${n > 1 ? 's' : ''} au brouillon');
   return true;
 }

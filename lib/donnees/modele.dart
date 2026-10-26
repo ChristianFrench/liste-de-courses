@@ -2358,7 +2358,9 @@ class Etat extends ChangeNotifier {
             }
             lignes.add('$sn : $nom');
           }
-          if (secteurCatalogue(p.id) == null) placer(ref.magasinId, p.id, secteurRef.id);
+          // Rangé là où le catalogue commun le met (un produit d'origine ne se déplace que par l'éditeur).
+          final ici = secteurCatalogue(p.id);
+          if (ici == null || (!estAjoute(p) && ici.id != secteurRef.id)) placer(ref.magasinId, p.id, secteurRef.id);
         }
       }
     }

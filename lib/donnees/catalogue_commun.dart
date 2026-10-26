@@ -284,22 +284,45 @@ class Brouillon {
     modifications++;
   }
 
-  /// Seulement vide.
+  /// Le secteur et ses produits (les foyers ne retirent que ce qu'ils n'utilisent pas).
   bool retirerSecteur(CatRayon r, CatSecteur s) {
-    if (s.produits.isNotEmpty) return false;
+    for (final p in s.produits) {
+      retires.add({'type': 'produit', 'nom': p.nom});
+    }
     r.secteurs.remove(s);
     retires.add({'type': 'secteur', 'rayon': r.nom, 'nom': s.nom});
     modifications++;
     return true;
   }
 
-  /// Seulement vide.
+  /// Le rayon, ses secteurs et leurs produits.
   bool retirerRayon(CatRayon r) {
-    if (r.secteurs.isNotEmpty) return false;
+    for (final s in [...r.secteurs]) {
+      retirerSecteur(r, s);
+    }
     catalogue.rayons.remove(r);
     retires.add({'type': 'rayon', 'nom': r.nom});
     modifications++;
     return true;
+  }
+
+  /// Déplace un secteur dans un autre rayon (fusionné avec un secteur du même nom s'il y en a un).
+  /// Les foyers rangent ses produits dans le nouveau secteur ; l'ancien, vide, est retiré.
+  void deplacerSecteur(CatRayon de, CatSecteur s, CatRayon vers) {
+    if (identical(de, vers)) return;
+    de.secteurs.remove(s);
+    final meme = secteur(vers, s.nom);
+    if (meme == null) {
+      vers.secteurs.add(s);
+    } else {
+      meme.produits.addAll(s.produits);
+    }
+    retires.add({'type': 'secteur', 'rayon': de.nom, 'nom': s.nom});
+    if (de.secteurs.isEmpty) {
+      catalogue.rayons.remove(de);
+      retires.add({'type': 'rayon', 'nom': de.nom});
+    }
+    modifications++;
   }
 
   void choisirImage(String cle, String? picto) {
@@ -329,17 +352,23 @@ class LectureCatalogue {
 }
 
 class GroupeLu {
-  GroupeLu(this.rayon, this.secteur, {this.rayonNeuf = false, this.secteurNeuf = false});
-  final String rayon, secteur;
-  final bool rayonNeuf, secteurNeuf;
+  GroupeLu(this.rayon, this.secteur, {this.rayonNeuf = false, this.secteurNeuf = false, this.rayonAChoisir = false});
+  String rayon;
+  final String secteur;
+  bool rayonNeuf;
+  final bool secteurNeuf;
+
+  /// Titre sans rayon (« Chats : ») et secteur inconnu : le rayon est à choisir (vide tant qu'il ne l'est pas).
+  final bool rayonAChoisir;
   final nouveaux = <String>[];
   final connus = <String>[];
 }
 
-/// Titre : ligne qui finit par « : » (« Animalerie / Chats : », ou « Fruits : » si ce secteur existe).
+/// Titre : ligne qui finit par « : » (« Animalerie / Chats : », ou « Fruits : » si ce secteur existe ;
+/// un secteur inconnu sans rayon va dans [rayonDefaut], sinon son rayon est à choisir).
 /// Les autres lignes sont des produits ; puces et numéros sont enlevés. Sans titre au-dessus, les
 /// produits vont dans « Divers ».
-LectureCatalogue lireTexteCatalogue(Brouillon b, String texte) {
+LectureCatalogue lireTexteCatalogue(Brouillon b, String texte, {String? rayonDefaut}) {
   final lu = LectureCatalogue();
   GroupeLu? courant;
   final vus = <String>{};
@@ -355,7 +384,13 @@ LectureCatalogue lireTexteCatalogue(Brouillon b, String texte) {
         sn = parties.sublist(1).join(' ');
       } else {
         final x = b.secteurPartout(titre);
-        rn = x?.$1.nom ?? b.rayon(titre)?.nom ?? titre;
+        if (x == null && rayonDefaut == null) {
+          // Secteur inconnu, rayon non dit : on le demandera (pas de nouveau rayon d'office).
+          courant = GroupeLu('', titre, secteurNeuf: true, rayonAChoisir: true);
+          lu.groupes.add(courant);
+          continue;
+        }
+        rn = x?.$1.nom ?? rayonDefaut!;
         sn = x?.$2.nom ?? titre;
       }
       final r = b.rayon(rn);
@@ -367,8 +402,11 @@ LectureCatalogue lireTexteCatalogue(Brouillon b, String texte) {
     final nom = ligne.replaceFirst(RegExp(r'^([-•*·–]|\d+[.)])\s*'), '').trim();
     if (nom.isEmpty) continue;
     if (courant == null) {
-      final r = b.rayon('Divers');
-      courant = GroupeLu('Divers', 'Divers', rayonNeuf: r == null, secteurNeuf: r == null || b.secteur(r, 'Divers') == null);
+      // Produits sans titre : secteur « Divers » du rayon donné, ou d'un rayon Divers existant, sinon à choisir.
+      final r = rayonDefaut != null ? b.rayon(rayonDefaut) : b.rayon('Divers');
+      courant = r == null
+          ? GroupeLu('', 'Divers', secteurNeuf: true, rayonAChoisir: true)
+          : GroupeLu(r.nom, 'Divers', secteurNeuf: b.secteur(r, 'Divers') == null);
       lu.groupes.add(courant);
     }
     final cle = nom.toLowerCase();
@@ -383,6 +421,7 @@ LectureCatalogue lireTexteCatalogue(Brouillon b, String texte) {
 int ajouterLecture(Brouillon b, LectureCatalogue lu) {
   var n = 0;
   for (final g in lu.groupes) {
+    if (g.rayon.isEmpty) continue;
     final r = b.ajouterRayon(g.rayon);
     final s = b.ajouterSecteur(r, g.secteur);
     for (final p in g.nouveaux) {
