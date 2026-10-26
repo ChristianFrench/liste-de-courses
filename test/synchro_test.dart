@@ -185,6 +185,20 @@ void main() {
     expect(e.produit(utilise), isNotNull, reason: 'dans une liste : pas retiré');
     expect(e.nouveautesCatalogue?['version'], 10);
     expect(e.appliquerCatalogueCommun(version(10)), isEmpty, reason: 'déjà ajoutée');
+    // Le même nom dans deux secteurs : deux produits, chacun dans son secteur.
+    final v11 = version(11);
+    ((v11['rayons'] as List).first['secteurs'] as List).add({
+      'nom': 'Chiens',
+      'taille': 1,
+      'produits': [
+        {'nom': 'Litière', 'taille': 1}
+      ]
+    });
+    e.appliquerCatalogueCommun(v11);
+    final litieres = e.produits.where((p) => p.nom == 'Litière').toList();
+    expect(litieres.map((p) => e.secteurCatalogue(p.id)?.nom).toSet(), {'Chats', 'Chiens'});
+    e.appliquerCatalogueCommun(version(12)..['rayons'] = v11['rayons']);
+    expect(e.produits.where((p) => p.nom == 'Litière'), hasLength(2), reason: 'rien de doublé à la version suivante');
     // Un deuxième appareil du foyer qui l'ajoute aussi crée les mêmes identifiants.
     final ids = {for (final p in e.produits) p.id};
     expect(ids, contains('pc-litière'));
@@ -211,9 +225,15 @@ void main() {
     b.retirerProduit(b.produit('Croquettes')!.$2, b.produit('Croquettes')!.$3);
     final j = b.versJson();
     expect(j['renommes'], [
-      {'type': 'produit', 'ancien': 'Kakis', 'nouveau': 'Kaki'}
+      {'type': 'produit', 'secteur': 'Fruits', 'ancien': 'Kakis', 'nouveau': 'Kaki'}
     ]);
     expect((j['retires'] as List).single['nom'], 'Croquettes');
+    final chats = b.secteur(b.rayon('Animalerie')!, 'Chats')!;
+    final chiens = b.ajouterSecteur(b.rayon('Animalerie')!, 'Chiens');
+    expect(b.ajouterProduit(chiens, 'Litière'), isTrue, reason: 'même nom, autre secteur');
+    expect(b.ajouterProduit(chats, 'litière'), isFalse, reason: 'déjà dans ce secteur');
+    expect(lireTexteCatalogue(b, 'Animalerie / Chiens :\nLitière\nOs\n').groupes.single.nouveaux, ['Os']);
+    b.retirerSecteur(b.rayon('Animalerie')!, chiens);
   
     // Titre simple inconnu : pas de rayon créé d'office, le rayon est à choisir.
     final l2 = lireTexteCatalogue(b, 'Oiseaux :\nGraines\n');

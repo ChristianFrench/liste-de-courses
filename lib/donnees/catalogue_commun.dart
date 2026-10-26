@@ -232,6 +232,21 @@ class Brouillon {
     return null;
   }
 
+  /// Le produit de ce nom dans ce secteur (un même nom peut être dans plusieurs secteurs).
+  CatProduit? produitDans(CatSecteur s, String nom) {
+    for (final p in s.produits) {
+      if (_bas(p.nom) == _bas(nom)) return p;
+    }
+    return null;
+  }
+
+  CatSecteur? _secteurDe(CatProduit p) {
+    for (final x in catalogue.tousLesProduits) {
+      if (identical(x.$3, p)) return x.$2;
+    }
+    return null;
+  }
+
   int get nbProduits => catalogue.tousLesProduits.length;
 
   CatRayon ajouterRayon(String nom) {
@@ -248,11 +263,11 @@ class Brouillon {
     return s;
   }
 
-  /// Rend faux si le produit existe déjà quelque part.
+  /// Rend faux si le produit est déjà dans ce secteur (le même nom peut être dans un autre secteur).
   bool ajouterProduit(CatSecteur s, String nom) {
-    if (nom.trim().isEmpty || produit(nom) != null) return false;
+    if (nom.trim().isEmpty || produitDans(s, nom) != null) return false;
     s.produits.add(CatProduit(nom.trim(), 1));
-    _retirerRetire('produit', nom);
+    _retirerRetire('produit', nom, secteur: s.nom);
     modifications++;
     return true;
   }
@@ -272,22 +287,23 @@ class Brouillon {
   }
 
   void renommerProduit(CatProduit p, String nom) {
-    if (nom.trim().isEmpty || nom.trim() == p.nom || produit(nom) != null) return;
-    renommes.add({'type': 'produit', 'ancien': p.nom, 'nouveau': nom.trim()});
+    final s = _secteurDe(p);
+    if (s == null || nom.trim().isEmpty || nom.trim() == p.nom || produitDans(s, nom) != null) return;
+    renommes.add({'type': 'produit', 'secteur': s.nom, 'ancien': p.nom, 'nouveau': nom.trim()});
     p.nom = nom.trim();
     modifications++;
   }
 
   void retirerProduit(CatSecteur s, CatProduit p) {
     s.produits.remove(p);
-    retires.add({'type': 'produit', 'nom': p.nom});
+    retires.add({'type': 'produit', 'secteur': s.nom, 'nom': p.nom});
     modifications++;
   }
 
   /// Le secteur et ses produits (les foyers ne retirent que ce qu'ils n'utilisent pas).
   bool retirerSecteur(CatRayon r, CatSecteur s) {
     for (final p in s.produits) {
-      retires.add({'type': 'produit', 'nom': p.nom});
+      retires.add({'type': 'produit', 'secteur': s.nom, 'nom': p.nom});
     }
     r.secteurs.remove(s);
     retires.add({'type': 'secteur', 'rayon': r.nom, 'nom': s.nom});
@@ -315,7 +331,7 @@ class Brouillon {
     if (meme == null) {
       vers.secteurs.add(s);
     } else {
-      meme.produits.addAll(s.produits);
+      meme.produits.addAll(s.produits.where((p) => produitDans(meme, p.nom) == null));
     }
     retires.add({'type': 'secteur', 'rayon': de.nom, 'nom': s.nom});
     if (de.secteurs.isEmpty) {
@@ -335,7 +351,8 @@ class Brouillon {
   }
 
   /// Un nom remis au catalogue après avoir été retiré : il n'est plus à retirer des foyers.
-  void _retirerRetire(String type, String nom) => retires.removeWhere((o) => o['type'] == type && _bas(o['nom'] as String) == _bas(nom));
+  void _retirerRetire(String type, String nom, {String? secteur}) => retires.removeWhere((o) =>
+      o['type'] == type && _bas(o['nom'] as String) == _bas(nom) && (secteur == null || o['secteur'] == null || o['secteur'] == secteur));
 }
 
 extension _Let<T> on T {
@@ -372,6 +389,11 @@ LectureCatalogue lireTexteCatalogue(Brouillon b, String texte, {String? rayonDef
   final lu = LectureCatalogue();
   GroupeLu? courant;
   final vus = <String>{};
+  CatSecteur? cible(GroupeLu g) {
+    final r = g.rayon.isEmpty ? null : b.rayon(g.rayon);
+    return r == null ? null : b.secteur(r, g.secteur);
+  }
+
   for (final brut in const LineSplitter().convert(texte)) {
     final ligne = brut.trim();
     if (ligne.isEmpty) continue;
@@ -409,9 +431,9 @@ LectureCatalogue lireTexteCatalogue(Brouillon b, String texte, {String? rayonDef
           : GroupeLu(r.nom, 'Divers', secteurNeuf: b.secteur(r, 'Divers') == null);
       lu.groupes.add(courant);
     }
-    final cle = nom.toLowerCase();
-    if (!vus.add(cle)) continue;
-    (b.produit(nom) != null ? courant.connus : courant.nouveaux).add(nom[0].toUpperCase() + nom.substring(1));
+    if (!vus.add('${courant.rayon}/${courant.secteur}/${nom.toLowerCase()}')) continue;
+    final s = cible(courant);
+    (s != null && b.produitDans(s, nom) != null ? courant.connus : courant.nouveaux).add(nom[0].toUpperCase() + nom.substring(1));
   }
   lu.groupes.removeWhere((g) => g.nouveaux.isEmpty && g.connus.isEmpty && !g.secteurNeuf);
   return lu;

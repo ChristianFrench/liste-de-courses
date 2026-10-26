@@ -2295,6 +2295,19 @@ class Etat extends ChangeNotifier {
     final lignes = <String>[];
     String bas(String t) => t.trim().toLowerCase();
     Produit? produitNomme(String nom) => _trouve(produits, (p) => bas(p.nom) == bas(nom));
+    // Un même nom peut être dans plusieurs secteurs : le produit est alors repéré par son secteur.
+    String? secteurDuProduit(Produit p) => secteurCatalogue(p.id)?.nom;
+    Produit? produitDuSecteur(String nom, Object? secteur) =>
+        secteur == null ? produitNomme(nom) : _trouve(produits, (p) => bas(p.nom) == bas(nom) && secteurDuProduit(p) == secteur);
+    final places = <String, Set<String>>{};
+    for (final rj in (j['rayons'] as List).cast<Map>()) {
+      for (final sj in (rj['secteurs'] as List).cast<Map>()) {
+        for (final pj in (sj['produits'] as List).cast<Map>()) {
+          places.putIfAbsent(bas(pj['nom'] as String), () => {}).add('${rj['nom']}/${sj['nom']}');
+        }
+      }
+    }
+    final pris = <String>{};
 
     // 1. Noms changés par l'éditeur.
     var renommes = 0;
@@ -2314,8 +2327,8 @@ class Etat extends ChangeNotifier {
             renommes++;
           }
         case 'produit':
-          final p = produitNomme(ancien);
-          if (p != null && !estAjoute(p) && produitNomme(nouveau) == null) {
+          final p = produitDuSecteur(ancien, o['secteur']);
+          if (p != null && !estAjoute(p) && produitDuSecteur(nouveau, o['secteur']) == null) {
             p.nom = nouveau;
             renommes++;
           }
@@ -2343,12 +2356,23 @@ class Etat extends ChangeNotifier {
         final secteurRef = _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
         for (final pj in (sj['produits'] as List).cast<Map>()) {
           final nom = pj['nom'] as String;
-          var p = produitNomme(nom);
+          final plusieurs = (places[bas(nom)]?.length ?? 0) > 1;
+          String? place(Produit x) {
+            final c = secteurCatalogue(x.id);
+            return c == null ? null : '${rayon(c.rayonId)?.nom}/${c.nom}';
+          }
+
+          // Même nom dans plusieurs secteurs : celui de ce secteur, sinon un homonyme rangé ailleurs, sinon un nouveau.
+          var p = !plusieurs
+              ? produitNomme(nom)
+              : _trouve(produits, (x) => bas(x.nom) == bas(nom) && secteurCatalogue(x.id)?.id == secteurRef.id) ??
+                  _trouve(produits, (x) => bas(x.nom) == bas(nom) && !pris.contains(x.id) && !places[bas(nom)]!.contains(place(x)));
           if (p != null) {
             // Ajouté par le foyer, maintenant au catalogue commun : il en fait partie.
             produitsPerso.remove(p.id);
           } else {
-            p = Produit('pc-${_cleNom(nom)}', nom, [], [], 0);
+            final id = 'pc-${_cleNom(nom)}';
+            p = Produit(plusieurs && _trouve(produits, (x) => x.id == id) != null ? 'pc-${_cleNom(sn)}-${_cleNom(nom)}' : id, nom, [], [], 0);
             produits.add(p);
             for (final f in (pj['formats'] as List? ?? const []).cast<String>()) {
               p.packagingIds.add(_packagingNomme(f).id);
@@ -2358,6 +2382,7 @@ class Etat extends ChangeNotifier {
             }
             lignes.add('$sn : $nom');
           }
+          pris.add(p.id);
           // Rangé là où le catalogue commun le met (un produit d'origine ne se déplace que par l'éditeur).
           final ici = secteurCatalogue(p.id);
           if (ici == null || (!estAjoute(p) && ici.id != secteurRef.id)) placer(ref.magasinId, p.id, secteurRef.id);
@@ -2374,7 +2399,7 @@ class Etat extends ChangeNotifier {
       final nom = o['nom'] as String;
       switch (o['type']) {
         case 'produit':
-          final p = produitNomme(nom);
+          final p = produitDuSecteur(nom, o['secteur']);
           if (p == null || estAjoute(p) || produitUtilise(p)) continue;
           produits.remove(p);
           emplacements.removeWhere((e) => e.produitId == p.id);

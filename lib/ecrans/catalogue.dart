@@ -165,9 +165,17 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
     return null;
   }
   final complet = [n, mq.text.trim()].where((x) => x.isNotEmpty).join(' ').toLowerCase();
-  final existant = etat.produits.where((p) => p.id != produit?.id && p.nom.toLowerCase() == complet).firstOrNull;
+  // Le même nom peut exister dans un autre secteur, pas deux fois dans le même.
+  final ici = secteur ?? (produit == null ? null : etat.secteurCatalogue(produit.id));
+  bool memePlace(Produit p) {
+    if (ici == null) return true;
+    final c = etat.secteurCatalogue(p.id);
+    return c != null && c.nom == ici.nom && etat.rayon(c.rayonId)?.nom == etat.rayon(ici.rayonId)?.nom;
+  }
+
+  final existant = etat.produits.where((p) => p.id != produit?.id && p.nom.toLowerCase() == complet && memePlace(p)).firstOrNull;
   if (existant != null) {
-    Nav.message(context, '« ${existant.nom} » est déjà dans le catalogue');
+    Nav.message(context, '« ${existant.nom} » est déjà dans ${ici == null ? 'le catalogue' : 'ce secteur'}');
     return produit == null ? existant : null;
   }
   return etat.enregistrerProduitAjoute(produit: produit, libelle: n, marqueNom: mq.text, mesure: mesure, lot: lot, secteur: secteur);
