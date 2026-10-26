@@ -61,8 +61,8 @@ String quandJour(DateTime d) {
 class Membre {
   Membre(this.id, this.nomAffiche, this.role, this.moi, {this.email = ''});
   final String id;
-  final String nomAffiche;
-  final String role;
+  String nomAffiche;
+  String role;
   final bool moi;
   String email; // pour l'envoi de la liste par mail
   String get roleAffiche => role == 'administrateur' ? 'Administrateur' : 'Membre';
@@ -436,6 +436,12 @@ class Etat extends ChangeNotifier {
   /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
   Map<String, String> produitsPerso = {};
 
+  /// Membres radiés ('r') ou supprimés ('s') par l'administrateur.
+  Map<String, String> statutsMembres = {};
+
+  /// Rayons (« Animalerie ») et secteurs (« Animalerie/Chats ») ajoutés par le foyer.
+  Set<String> structurePerso = {};
+
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
   List<String> typesPackaging = [];
 
@@ -649,7 +655,7 @@ class Etat extends ChangeNotifier {
 
   /// Rejoindre un foyer : les données de cet appareil sont mises de côté (fichier gardé)
   /// et remplacées par un foyer vide, avec [nom] comme membre, qui se remplit de ce que les autres envoient.
-  Future<void> rejoindreFoyer(String nom) async {
+  Future<void> rejoindreFoyer(String nom, {String email = ''}) async {
     final demo = await _donneesDemo();
     if (_dossier == null) {
       lire(_depart(demo));
@@ -663,6 +669,7 @@ class Etat extends ChangeNotifier {
     final moiJson = (depart['membres'] as List).first as Map;
     moiJson['nomAffiche'] = nom.trim().isEmpty ? 'Moi' : nom.trim();
     moiJson['role'] = 'membre';
+    moiJson['email'] = email.trim();
     depart['magasins'] = <dynamic>[];
     depart['parametres'] = {
       ...(demo['parametres'] as Map? ?? {}),
@@ -686,7 +693,7 @@ class Etat extends ChangeNotifier {
     if (meme != null) {
       membres
         ..remove(ici)
-        ..[membres.indexOf(meme)] = Membre(meme.id, meme.nomAffiche, meme.role, true, email: meme.email);
+        ..[membres.indexOf(meme)] = Membre(meme.id, meme.nomAffiche, meme.role, true, email: meme.email.isEmpty ? ici.email : meme.email);
       s.effacerReglage('synchro_membre_provisoire');
       modifie();
     } else if (membres.length > 1) {
@@ -734,6 +741,8 @@ class Etat extends ChangeNotifier {
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    statutsMembres = {for (final e in (options?['statutsMembres'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    structurePerso = {for (final x in (options?['structurePerso'] as List? ?? const [])) x as String};
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -839,6 +848,8 @@ class Etat extends ChangeNotifier {
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
+            if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
+            if (structurePerso.isNotEmpty) 'structurePerso': structurePerso.toList()..sort(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -2144,6 +2155,208 @@ class Etat extends ChangeNotifier {
   void modifierEmail(Membre m, String email) {
     m.email = email.trim();
     modifie();
+  }
+
+  // ------------------------------------------------------------ Membres du foyer (26/10/2026)
+
+  bool get suisAdministrateur => moi.role == 'administrateur';
+
+  /// Membres visibles : tous sauf ceux que l'administrateur a supprimés.
+  List<Membre> get membresVisibles => [for (final m in membres) if (statutsMembres[m.id] != 's') m];
+
+  bool estRadie(Membre m) => statutsMembres[m.id] == 'r';
+
+  /// Cet appareil a été radié ou supprimé du foyer par l'administrateur.
+  bool get moiExclu => statutsMembres.containsKey(moi.id);
+
+  void renommerMembre(Membre m, String nom) {
+    if (nom.trim().isEmpty) return;
+    m.nomAffiche = nom.trim();
+    modifie();
+  }
+
+  /// Radier : le membre ne reçoit plus rien ; il revient en saisissant le code de partage.
+  void radierMembre(Membre m) {
+    statutsMembres[m.id] = 'r';
+    modifie();
+  }
+
+  /// Supprimer : le membre disparaît de la liste ; ses listes et ses courses restent.
+  void supprimerMembre(Membre m) {
+    statutsMembres[m.id] = 's';
+    modifie();
+  }
+
+  void reactiverMembre(Membre m) {
+    if (statutsMembres.remove(m.id) != null) modifie();
+  }
+
+  /// Listes préparées par un membre, et ses courses.
+  List<Liste> listesDuMembre(Membre m) => [for (final l in listes) if (l.membreId == m.id) l]
+    ..sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+  List<Course> coursesDuMembre(Membre m) => [for (final c in historique) if (c.membreId == m.id) c]
+    ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
+
+  /// Avant de rejoindre un foyer : les produits ajoutés et les listes non terminées de cet appareil,
+  /// décrits par leurs noms (les identifiants changent d'un foyer à l'autre).
+  Map<String, Object?> aReprendre() {
+    String? rangementDe(Produit p) {
+      final s = secteurCatalogue(p.id);
+      return s == null ? null : '${rayon(s.rayonId)?.nom}/${s.nom}';
+    }
+
+    return {
+      'produits': [
+        for (final p in produitsAjoutes)
+          {
+            'nom': p.nom,
+            'rangement': rangementDe(p),
+            'marques': [for (final id in p.marqueIds) marque(id)?.nom],
+            'formats': [for (final id in p.packagingIds) packaging(id)?.libelle],
+          }
+      ],
+      'listes': [
+        for (final l in listes)
+          if (l.statut == StatutListe.enConstruction || l.statut == StatutListe.prete)
+            {
+              'nom': nomListe(l),
+              'magasin': magasin(l.magasinId)?.nom,
+              'prete': l.statut == StatutListe.prete,
+              'lignes': [
+                for (final g in l.lignes)
+                  if (produit(g.produitId) case final p?)
+                    {'produit': p.nom, 'quantite': g.quantite, 'consigne': g.consigne}
+              ],
+            }
+      ],
+    };
+  }
+
+  /// Une fois les données du foyer reçues : les produits et les listes gardés sont ajoutés au foyer.
+  /// Rend vrai si c'est fait (le foyer a des magasins), faux s'il faut attendre encore.
+  bool reprendre(Map<String, dynamic> a) {
+    if (magasins.isEmpty) return false;
+    for (final x in (a['produits'] as List? ?? const []).cast<Map>()) {
+      final nom = x['nom'] as String;
+      if (_trouve(produits, (p) => p.nom.toLowerCase() == nom.toLowerCase()) != null) continue;
+      Secteur? s;
+      final r = (x['rangement'] as String?)?.split('/');
+      if (r != null && r.length == 2) {
+        final ry = _trouve(rayonsCatalogue, (y) => y.nom == r[0]);
+        if (ry != null) s = _trouve(secteursDu(ry.id), (y) => y.nom == r[1]);
+      }
+      final p = creerProduit(nom, secteur: s);
+      for (final m in (x['marques'] as List? ?? const []).whereType<String>()) {
+        p.marqueIds.add(marqueNommee(m).id);
+      }
+      for (final f in (x['formats'] as List? ?? const []).whereType<String>()) {
+        p.packagingIds.add(_packagingNomme(f).id);
+      }
+    }
+    for (final x in (a['listes'] as List? ?? const []).cast<Map>()) {
+      final m = magasinNomme(x['magasin'] as String? ?? '') ?? magasins.first;
+      final l = creerListe(m.id, []);
+      l.nom = x['nom'] as String?;
+      for (final g in (x['lignes'] as List? ?? const []).cast<Map>()) {
+        final p = _trouve(produits, (p) => p.nom.toLowerCase() == (g['produit'] as String).toLowerCase());
+        if (p == null) continue;
+        ajouterLigne(l, p.id);
+        final ligne = l.lignes.last;
+        ligne.quantite = (g['quantite'] as num?)?.toInt() ?? 1;
+        ligne.consigne = g['consigne'] as String?;
+      }
+      if (x['prete'] == true) l.statut = StatutListe.prete;
+    }
+    modifie();
+    return true;
+  }
+
+  // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
+
+  bool rayonAjoute(Rayon r) => structurePerso.contains(r.nom);
+  bool secteurAjoute(Secteur s) => structurePerso.contains('${rayon(s.rayonId)?.nom}/${s.nom}');
+
+  /// Nouveau rayon, dans tous les magasins, avec un premier secteur du même nom.
+  Rayon? ajouterRayonCatalogue(String nom) {
+    final n = nom.trim();
+    if (n.isEmpty || magasins.isEmpty) return null;
+    if (_trouve(rayonsCatalogue, (r) => r.nom.toLowerCase() == n.toLowerCase()) != null) return null;
+    for (final m in magasins) {
+      final r = ajouterRayon(m.id, n);
+      ajouterSecteur(r.id, n);
+    }
+    structurePerso
+      ..add(n)
+      ..add('$n/$n');
+    modifie();
+    return _trouve(rayonsCatalogue, (r) => r.nom == n);
+  }
+
+  /// Nouveau secteur dans le rayon [r], dans tous les magasins.
+  Secteur? ajouterSecteurCatalogue(Rayon r, String nom) {
+    final n = nom.trim();
+    if (n.isEmpty) return null;
+    if (_trouve(secteursDu(r.id), (s) => s.nom.toLowerCase() == n.toLowerCase()) != null) return null;
+    for (final m in magasins) {
+      final ry = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == r.nom);
+      if (ry != null) ajouterSecteur(ry.id, n);
+    }
+    structurePerso.add('${r.nom}/$n');
+    modifie();
+    return _trouve(secteursDu(r.id), (s) => s.nom == n);
+  }
+
+  /// Renomme un rayon ajouté, dans tous les magasins.
+  void renommerRayonCatalogue(Rayon r, String nom) {
+    final n = nom.trim(), ancien = r.nom;
+    if (n.isEmpty || n == ancien || !rayonAjoute(r)) return;
+    for (final x in rayons.where((x) => x.nom == ancien)) {
+      x.nom = n;
+    }
+    structurePerso = {for (final c in structurePerso) c == ancien ? n : (c.startsWith('$ancien/') ? '$n/${c.substring(ancien.length + 1)}' : c)};
+    modifie();
+  }
+
+  /// Renomme un secteur ajouté, dans tous les magasins.
+  void renommerSecteurCatalogue(Secteur s, String nom) {
+    final n = nom.trim(), ancien = s.nom, rn = rayon(s.rayonId)?.nom ?? '';
+    if (n.isEmpty || n == ancien || !secteurAjoute(s)) return;
+    for (final x in secteurs.where((x) => x.nom == ancien && rayon(x.rayonId)?.nom == rn)) {
+      x.nom = n;
+    }
+    structurePerso
+      ..remove('$rn/$ancien')
+      ..add('$rn/$n');
+    modifie();
+  }
+
+  /// Un secteur ajouté et vide se supprime (dans tous les magasins) ; rend faux s'il a des produits.
+  bool supprimerSecteurCatalogue(Secteur s) {
+    if (!secteurAjoute(s) || produitsDuSecteur(s).isNotEmpty) return false;
+    final rn = rayon(s.rayonId)?.nom ?? '';
+    final ids = {for (final x in secteurs) if (x.nom == s.nom && rayon(x.rayonId)?.nom == rn) x.id};
+    secteurs.removeWhere((x) => ids.contains(x.id));
+    for (final p in parcours) {
+      p.etapes.removeWhere(ids.contains);
+    }
+    structurePerso.remove('$rn/${s.nom}');
+    modifie();
+    return true;
+  }
+
+  /// Un rayon ajouté se supprime quand ses secteurs sont vides.
+  bool supprimerRayonCatalogue(Rayon r) {
+    if (!rayonAjoute(r) || secteursDu(r.id).any((s) => produitsDuSecteur(s).isNotEmpty)) return false;
+    final ids = {for (final x in rayons) if (x.nom == r.nom) x.id};
+    final sids = {for (final x in secteurs) if (ids.contains(x.rayonId)) x.id};
+    secteurs.removeWhere((x) => sids.contains(x.id));
+    rayons.removeWhere((x) => ids.contains(x.id));
+    for (final p in parcours) {
+      p.etapes.removeWhere(sids.contains);
+    }
+    structurePerso.removeWhere((c) => c == r.nom || c.startsWith('${r.nom}/'));
+    modifie();
+    return true;
   }
 
   void options({bool? parSecteurs, bool? envoiFoyer, bool? ajoutParRecherche}) {

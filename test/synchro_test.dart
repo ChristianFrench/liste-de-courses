@@ -107,6 +107,36 @@ void main() {
     expect(b.appliquer(modifB), 0);
   });
 
+  test('rejoindre un foyer : produits ajoutés et listes en préparation gardés, ajoutés au foyer', () {
+    final d = demo();
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(d));
+    final s = e.secteursDu(e.rayonsCatalogue.first.id).first;
+    final p = e.creerProduit('Croquettes Félix', secteur: s);
+    p.marqueIds.add(e.marqueNommee('Purina').id);
+    final l = e.creerListe(e.magasins.first.id, [], nom: 'Ma liste à garder');
+    e.ajouterLigne(l, p.id);
+    e.ajouterLigne(l, e.produits.first.id);
+    l.lignes.first.quantite = 3;
+    final garde = jsonDecode(jsonEncode(e.aReprendre())) as Map<String, dynamic>;
+
+    // Le foyer rejoint : données du foyer (ici la démonstration), sans les ajouts de cet appareil.
+    e.lire(parLeModele(d));
+    expect(e.produits.any((x) => x.nom == 'Croquettes Félix'), isFalse);
+    expect(e.reprendre(garde), isTrue);
+    final repris = e.produits.firstWhere((x) => x.nom == 'Croquettes Félix');
+    expect(e.estAjoute(repris), isTrue);
+    expect(e.secteurCatalogue(repris.id)?.nom, s.nom);
+    expect(repris.marqueIds.map((id) => e.marque(id)?.nom), contains('Purina'));
+    final lr = e.listes.firstWhere((x) => x.nom == 'Ma liste à garder');
+    expect(lr.lignes.length, 2);
+    expect(lr.lignes.first.quantite, 3);
+
+    // Un foyer encore vide (rien reçu) : on attend.
+    e.lire(parLeModele(vide(d)));
+    expect(e.reprendre(garde), isFalse);
+  });
+
   test('modification simultanée du même objet : la plus récente l\'emporte partout', () {
     final d = demo();
     final a = Stockage.ouvrir(':memory:')..ecrire(parLeModele(d));

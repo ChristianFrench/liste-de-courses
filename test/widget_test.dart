@@ -15,6 +15,7 @@ import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/synchro.dart' show ServeurMqtt;
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/donnees/ticket_recu.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
@@ -385,7 +386,7 @@ void main() {
       expect(find.text('Rattacher à une course'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Foyer');
-      expect(find.text('+ Membre'), findsOneWidget, reason: 'les membres sont dans le foyer');
+      expect(find.text('+ Nouveau membre'), findsOneWidget, reason: 'les membres sont dans le foyer');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Types de promotion');
       await _ciblesTactiles(tester);
@@ -963,21 +964,73 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('Gérer › Paramètres › Synchronisation : serveur HiveMQ prérempli', (tester) async {
+    testWidgets('Gérer › Paramètres › Synchronisation : état, serveur imposé caché sous « Avancé »', (tester) async {
       await _lancer(tester);
       await _rubrique(tester, 'Synchronisation');
-      expect(find.text('Partager ce foyer'), findsOneWidget);
-      expect(find.text('Rejoindre un foyer'), findsOneWidget);
-      expect(find.text('SERVEUR MQTT'), findsOneWidget, reason: 'configuration seulement, serveur déplié');
+      expect(find.text('Le code de partage et les membres sont dans Gérer › Foyer.'), findsOneWidget);
+      expect(find.text('Partager ce foyer'), findsNothing);
+      expect(find.byKey(const ValueKey('mqtt-hote')), findsNothing, reason: 'serveur replié');
+      await _toucher(tester, find.text('AVANCÉ : SERVEUR'));
       final hote = tester.widget<TextField>(find.byKey(const ValueKey('mqtt-hote')));
-      expect(hote.controller!.text, 'broker.hivemq.com');
+      expect(hote.controller!.text, ServeurMqtt.hoteDefaut);
       expect(tester.widget<TextField>(find.byKey(const ValueKey('mqtt-port'))).controller!.text, '8883');
       await _ciblesTactiles(tester);
-      // « Annuler » ne crée pas de partage
-      await _toucher(tester, find.text('Partager ce foyer'));
-      expect(find.text('Créer le code du foyer'), findsOneWidget);
-      await _toucher(tester, find.text('Annuler'));
-      expect(find.text('Partager ce foyer'), findsOneWidget);
+    });
+
+    testWidgets('Gérer › Foyer : passer en foyer ouvre le choix seul, créer, rejoindre', (tester) async {
+      await _lancer(tester);
+      await _rubrique(tester, 'Foyer');
+      expect(find.text('MEMBRES'), findsOneWidget);
+      await _toucher(tester, find.text('Passer en foyer'));
+      expect(find.text('Comment utilisez-vous l\'application ?'), findsOneWidget);
+      expect(find.text('Seul, sur cet appareil'), findsOneWidget);
+      expect(find.byKey(const ValueKey('bienvenue-nom-foyer')), findsNothing);
+      await _toucher(tester, find.text('Créer un foyer'));
+      expect(find.byKey(const ValueKey('bienvenue-nom-foyer')), findsOneWidget);
+      expect(find.text('Créer le foyer'), findsOneWidget);
+      await _toucher(tester, find.text('Rejoindre un foyer'));
+      expect(find.byKey(const ValueKey('bienvenue-code')), findsOneWidget);
+      expect(find.byKey(const ValueKey('bienvenue-nom-foyer')), findsNothing);
+      await _ciblesTactiles(tester);
+    });
+
+    testWidgets('membres : renommer, radier, réactiver, supprimer (marques, pas d\'effacement)', (tester) async {
+      await _lancer(tester);
+      final etat = Etat.instance;
+      final autre = etat.ajouterMembre('Zoé', '');
+      final n = etat.membres.length;
+      etat.renommerMembre(autre, 'Zoé B');
+      expect(autre.nomAffiche, 'Zoé B');
+      etat.radierMembre(autre);
+      expect(etat.estRadie(autre), isTrue);
+      expect(etat.membresVisibles, contains(autre));
+      etat.reactiverMembre(autre);
+      expect(etat.estRadie(autre), isFalse);
+      etat.supprimerMembre(autre);
+      expect(etat.membresVisibles, isNot(contains(autre)));
+      expect(etat.membres.length, n, reason: 'le membre reste pour ses listes et ses courses');
+      expect(etat.moiExclu, isFalse);
+    });
+
+    testWidgets('catalogue : rayon et secteur ajoutés dans tous les magasins, marqués, supprimables vides', (tester) async {
+      await _lancer(tester);
+      final etat = Etat.instance;
+      final r = etat.ajouterRayonCatalogue('Animalerie')!;
+      for (final m in etat.magasins) {
+        expect(etat.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
+      }
+      expect(etat.rayonAjoute(r), isTrue);
+      expect(etat.ajouterRayonCatalogue('animalerie'), isNull, reason: 'déjà là');
+      final s = etat.ajouterSecteurCatalogue(r, 'Chats')!;
+      expect(etat.secteurAjoute(s), isTrue);
+      expect(etat.secteursDu(r.id).map((x) => x.nom), containsAll(['Animalerie', 'Chats']));
+      etat.renommerSecteurCatalogue(s, 'Chats et chiens');
+      expect(etat.secteursDu(r.id).map((x) => x.nom), contains('Chats et chiens'));
+      final origine = etat.rayonsCatalogue.firstWhere((x) => !etat.rayonAjoute(x));
+      expect(etat.supprimerRayonCatalogue(origine), isFalse, reason: 'rayon d\'origine');
+      expect(etat.supprimerRayonCatalogue(etat.rayonsCatalogue.firstWhere((x) => x.nom == 'Animalerie')), isTrue);
+      expect(etat.rayons.where((x) => x.nom == 'Animalerie'), isEmpty);
+      expect(etat.structurePerso, isEmpty);
     });
 
     testWidgets('le nuage montre seulement l\'état : voyant, sa signification, appareils', (tester) async {
@@ -987,8 +1040,7 @@ void main() {
       expect(find.text('Foyer non partagé'), findsOneWidget);
       expect(find.text('Signification du voyant'), findsOneWidget);
       expect(find.text('Rouge : pas de connexion au serveur MQTT ou pas de réseau'), findsOneWidget);
-      expect(find.text('Partager ce foyer'), findsNothing);
-      expect(find.text('SERVEUR MQTT'), findsNothing);
+      expect(find.text('AVANCÉ : SERVEUR'), findsNothing);
     });
   });
 }

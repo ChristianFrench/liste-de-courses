@@ -26,53 +26,10 @@ abstract class _EcranVivant extends StatelessWidget {
   Widget build(BuildContext context) => ListenableBuilder(listenable: Etat.instance, builder: (context, _) => construire(context));
 }
 
-/// Gérer › Mon foyer › Foyer : son nom, ses membres, repartir d'un foyer neuf.
-class EcranFoyer extends _EcranVivant {
-  const EcranFoyer({super.key});
-
-  @override
-  Widget construire(BuildContext context) {
-    final etat = Etat.instance;
-    return _page('Gérer › Mon foyer', 'Foyer', Icons.home_outlined, [
-      Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
-      Text('Créé le ${jjmmaaaa(etat.foyerCreation)}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      const TitreSection('Membres', cote: 0),
-      for (final m in etat.membres)
-        LigneMenu(
-          titre: m.nomAffiche,
-          sousTitre: '${m.roleAffiche} · ${m.email.isEmpty ? 'adresse mail : touchez pour l\'indiquer' : m.email}',
-          onTap: () async {
-            final email = await demanderTexte(context, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
-            if (email != null) etat.modifierEmail(m, email);
-          },
-          gauche: IconeRonde(null, texte: m.initiales),
-        ),
-      _Option(
-        texte: 'Envoyer la liste à tout le foyer',
-        aide: 'Le mail est préparé avec les adresses de tous les membres',
-        coche: etat.envoiFoyer,
-        onChange: (v) => etat.options(envoiFoyer: v),
-      ),
-      const SizedBox(height: 12),
-      Text(
-        'Un foyer neuf démarre avec le catalogue complet, six enseignes (${Etat.enseignesDeDepart.join(', ')}) '
-        'et trois listes exemples. Vos listes s\'ajoutent à ce contenu de départ.',
-        style: Charte.texte(14, couleur: Charte.texteSecondaire),
-      ),
-    ], boutons: [
-      Bouton(
-        texte: 'Renommer',
-        taille: 15,
-        onTap: () async {
-          final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
-          if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
-        },
-      ),
-      Bouton(texte: '+ Membre', taille: 15, onTap: () => _ajouterMembre(context, etat)),
-      Bouton(texte: 'Foyer neuf', taille: 15, onTap: () => _neuf(context)),
-    ]);
-  }
-}
+/// Pour l'écran Foyer (foyer.dart).
+typedef OptionFoyer = _Option;
+Future<void> repartirANeuf(BuildContext context) => _neuf(context);
+Future<void> ajouterMembreParNom(BuildContext context) => _ajouterMembre(context, Etat.instance);
 
 /// Ajout d'un membre directement par son nom, sans passer par l'invitation.
 Future<void> _ajouterMembre(BuildContext context, Etat etat) async {

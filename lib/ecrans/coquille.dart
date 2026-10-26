@@ -4,13 +4,16 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
+import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'accueil.dart';
 import 'archives.dart';
+import 'bienvenue.dart';
 import 'catalogue.dart';
 import 'corbeille.dart';
 import 'e13_produits_reels.dart';
+import 'foyer.dart';
 import 'historique.dart';
 import 'listes.dart';
 import 'parametres.dart';
@@ -81,7 +84,14 @@ class Coquille extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nav = Nav.i;
+    // Premier lancement (ou partage interrompu) : seul ou en foyer ?
     return ListenableBuilder(
+      listenable: Synchro.instance,
+      builder: (context, coquille) {
+        final s = Synchro.instance;
+        return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
+      },
+      child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -102,6 +112,7 @@ class Coquille extends StatelessWidget {
           ),
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
+      ),
       ),
     );
   }
@@ -148,7 +159,7 @@ class MenuGerer extends StatelessWidget {
         children: [
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Mon foyer', icone: Icons.home_outlined, enfants: [
             ecran(Icons.home_outlined, 'Foyer',
-                '${etat.foyerNom} · ${etat.membres.length} membre${etat.membres.length > 1 ? 's' : ''}', const EcranFoyer()),
+                '${etat.foyerNom} · ${etat.membresVisibles.length} membre${etat.membresVisibles.length > 1 ? 's' : ''}', const EcranFoyer()),
           ]),
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''} · leurs parcours', const EcranMagasins()),
@@ -169,7 +180,8 @@ class MenuGerer extends StatelessWidget {
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
             ecran(Icons.palette_outlined, 'Apparence', 'Couleurs de l\'application', const EcranApparence()),
             ecran(Icons.storage_outlined, 'Données', 'Listes exemples, préliste, suppression des archives', const EcranDonnees()),
-            ecran(Icons.sync, 'Synchronisation', 'Partage entre les appareils du foyer', const EcranPartage()),
+            if (Synchro.instance.mode != 'seul')
+              ecran(Icons.sync, 'Synchronisation', 'État des échanges entre les appareils du foyer', const EcranPartage()),
           ]),
         ],
       ),

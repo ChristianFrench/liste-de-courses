@@ -371,14 +371,27 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                         titre: x.nom,
                         image: cleRayon(x.nom),
                         nombre: etat.secteursDu(x.id).length,
+                        ajoute: etat.rayonAjoute(x),
                         enfants: [
                           for (final s in etat.secteursDu(x.id))
                             LigneMenu(
                               titre: s.nom,
+                              apresTitre: etat.secteurAjoute(s) ? const SigneAjoute() : null,
                               gauche: imageSecteur(context, s),
                               sousTitre: _pluriel(etat.produitsDuSecteur(s).length, 'produit'),
                               onTap: () => Nav.aller<void>(context, EcranSecteurCatalogue(secteurId: s.id)),
                             ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            child: Wrap(spacing: 8, runSpacing: 8, children: [
+                              Lien('+ Nouveau secteur', onTap: () => _nouveauSecteur(context, x)),
+                              Lien('Image du rayon', onTap: () => choisirImageRayon(context, x.nom)),
+                              if (etat.rayonAjoute(x)) ...[
+                                Lien('Renommer le rayon', onTap: () => _renommerRayon(context, x)),
+                                Lien('Supprimer le rayon', onTap: () => _supprimerRayon(context, x)),
+                              ],
+                            ]),
+                          ),
                         ],
                       ),
                     if (nonRanges.isNotEmpty)
@@ -393,6 +406,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           ),
           bas: [
             BarreAction(boutons: [
+              Bouton(texte: '+ Rayon', onTap: () => _nouveauRayon(context)),
               Bouton(
                 texte: 'Produits ajoutés ($perso)',
                 onTap: () => Nav.aller<void>(context, const EcranProduitsPerso()),
@@ -445,6 +459,10 @@ class EcranSecteurCatalogue extends StatelessWidget {
           ),
           bas: [
             BarreAction(boutons: [
+              if (etat.secteurAjoute(s)) ...[
+                Bouton(texte: 'Renommer', taille: 15, onTap: () => _renommerSecteur(context, s)),
+                Bouton(texte: 'Supprimer', taille: 15, onTap: () => _supprimerSecteur(context, s)),
+              ],
               Bouton(
                 texte: '+ Nouveau produit',
                 plein: true,
@@ -587,4 +605,83 @@ class EcranMarques extends StatelessWidget {
         }, danger: true),
     ]);
   }
+}
+
+/// Petite icône d'un rayon ou d'un secteur ajouté par le foyer.
+class SigneAjoute extends StatelessWidget {
+  const SigneAjoute({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      Tooltip(message: 'Ajouté par le foyer', child: Icon(Icons.add_circle, size: 16, color: Charte.accent));
+}
+
+// ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
+
+Future<void> _nouveauRayon(BuildContext context) async {
+  final etat = Etat.instance;
+  final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Animalerie, Bricolage…', valider: 'Suivant');
+  if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+  final r = etat.ajouterRayonCatalogue(nom);
+  if (r == null) {
+    Nav.message(context, 'Le rayon « ${nom.trim()} » existe déjà');
+    return;
+  }
+  if (!Retractables.i.ouvert('catalogue/${r.nom}', parDefaut: false)) Retractables.i.basculer('catalogue/${r.nom}', parDefaut: false);
+  await choisirImageRayon(context, r.nom);
+  if (context.mounted) Nav.message(context, 'Rayon « ${r.nom} » ajouté, avec un secteur du même nom');
+}
+
+Future<void> _nouveauSecteur(BuildContext context, Rayon r) async {
+  final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', aide: 'Nom du secteur', valider: 'Suivant');
+  if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+  final s = Etat.instance.ajouterSecteurCatalogue(r, nom);
+  if (s == null) {
+    Nav.message(context, 'Le secteur « ${nom.trim()} » existe déjà dans ce rayon');
+    return;
+  }
+  await choisirImageSecteur(context, r.nom, s.nom);
+  if (context.mounted) Nav.message(context, 'Secteur « ${s.nom} » ajouté');
+}
+
+Future<void> _renommerRayon(BuildContext context, Rayon r) async {
+  final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
+  if (nom == null || nom.trim().isEmpty) return;
+  Etat.instance.renommerRayonCatalogue(r, nom);
+}
+
+Future<void> _supprimerRayon(BuildContext context, Rayon r) async {
+  final etat = Etat.instance;
+  if (etat.secteursDu(r.id).any((s) => etat.produitsDuSecteur(s).isNotEmpty)) {
+    Nav.message(context, 'Ce rayon contient des produits : déplacez-les ou supprimez-les d\'abord');
+    return;
+  }
+  final ok = await confirmer(context,
+      titre: 'Supprimer le rayon ${r.nom} ?',
+      contenu: Text('Le rayon et ses secteurs disparaissent de tous les magasins.', style: Charte.texte(16)),
+      plein: 'Annuler',
+      contour: 'Supprimer');
+  if (ok == true) etat.supprimerRayonCatalogue(r);
+}
+
+Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
+  final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
+  if (nom == null || nom.trim().isEmpty) return;
+  Etat.instance.renommerSecteurCatalogue(s, nom);
+}
+
+Future<void> _supprimerSecteur(BuildContext context, Secteur s) async {
+  final etat = Etat.instance;
+  if (etat.produitsDuSecteur(s).isNotEmpty) {
+    Nav.message(context, 'Ce secteur contient des produits : déplacez-les ou supprimez-les d\'abord');
+    return;
+  }
+  final ok = await confirmer(context,
+      titre: 'Supprimer le secteur ${s.nom} ?',
+      contenu: Text('Il disparaît de tous les magasins.', style: Charte.texte(16)),
+      plein: 'Annuler',
+      contour: 'Supprimer');
+  if (ok != true) return;
+  etat.supprimerSecteurCatalogue(s);
+  if (context.mounted) Navigator.of(context).pop();
 }

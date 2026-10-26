@@ -19,6 +19,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'client_mqtt.dart';
 import 'modele.dart';
 import 'stockage.dart';
+import 'version.dart';
 
 /// Horloge hybride : « heure en ms (15 chiffres) - compteur (5 chiffres) - appareil ».
 /// Les chaînes se comparent dans l'ordre des événements, même si les montres des appareils diffèrent.
@@ -50,11 +51,26 @@ class Horloge {
   }
 }
 
-/// Serveur MQTT ; par défaut le serveur public de HiveMQ.
+/// Serveur MQTT ; par défaut celui du projet, dont l'identifiant est fourni à la compilation
+/// (secrets GitHub MQTT_UTILISATEUR et MQTT_MOT_DE_PASSE, jamais écrits dans le dépôt).
 class ServeurMqtt {
   const ServeurMqtt(
-      {this.hote = hoteHiveMq, this.port = 8883, this.tls = true, this.utilisateur = '', this.motDePasse = '', this.empreinte = ''});
-  static const hoteHiveMq = 'broker.hivemq.com';
+      {this.hote = hoteDefaut,
+      this.port = portDefaut,
+      this.tls = true,
+      this.utilisateur = utilisateurDefaut,
+      this.motDePasse = motDePasseDefaut,
+      this.empreinte = ''});
+  static const hoteDefaut = String.fromEnvironment('MQTT_HOTE', defaultValue: 'w041270a.ala.us-east-1.emqxsl.com');
+  static const portDefaut = int.fromEnvironment('MQTT_PORT', defaultValue: 8883);
+  static const utilisateurDefaut = String.fromEnvironment('MQTT_UTILISATEUR');
+  static const motDePasseDefaut = String.fromEnvironment('MQTT_MOT_DE_PASSE');
+
+  /// Vrai si l'application a reçu l'identifiant du serveur à la compilation.
+  static bool get identifiantIntegre => utilisateurDefaut.isNotEmpty;
+
+  /// Réglages saisis à la main (dépannage) : sinon le serveur imposé.
+  bool get parDefaut => hote == hoteDefaut && port == portDefaut && utilisateur == utilisateurDefaut;
   final String hote;
   final int port;
   final bool tls;
@@ -96,6 +112,12 @@ class Appareil {
   final String id;
   String nom = '?';
   bool enLigne = false;
+
+  /// Membre du foyer qui utilise cet appareil, son système (Windows, Android, Web) et la version.
+  String? membreId, plateforme, version;
+
+  /// Dernière connexion connue.
+  DateTime? vu;
 
   /// Avance de son horloge sur la nôtre, en secondes (annoncée avec sa présence).
   int? decalage;
@@ -149,7 +171,22 @@ class Synchro extends ChangeNotifier {
     });
   }
 
-  /// Autres appareils du foyer connectés en ce moment.
+  /// Appareils vus d'un membre du foyer (sa présence l'indique ; avant le 26/10/2026, d'après son nom).
+  List<Appareil> appareilsDe(Membre m) => [
+        for (final a in appareils.values)
+          if (a.membreId == m.id || (a.membreId == null && a.nom.split(' · ').first == m.nomAffiche)) a
+      ];
+
+  /// « exe », « apk » ou « web » selon le système, suivi de la version.
+  static String libelleVersion(String? plateforme, String? version) {
+    final p = switch (plateforme) { 'Windows' => 'exe', 'Android' => 'apk', 'Web' => 'web', null => '?', _ => plateforme };
+    return version == null ? p : '$p $version';
+  }
+
+  /// Cet appareil : « apk 0.6.0 ».
+  String get maVersion => libelleVersion(nomSysteme, versionApplication);
+
+    /// Autres appareils du foyer connectés en ce moment.
   int get autresEnLigne => appareils.values.where((a) => a.enLigne).length;
 
   /// Couleur du point de l'icône : blanc (pas de partage), rouge (pas de serveur ou de réseau),
@@ -187,16 +224,47 @@ class Synchro extends ChangeNotifier {
   }
   bool get actif => code != null;
 
+  /// 'seul' : pas de synchronisation ; 'foyer' : données partagées ; '' : pas encore choisi
+  /// (écran d'accueil du premier lancement). Sans base (essais), 'foyer'.
+  String get mode {
+    if (_base == null) return 'foyer';
+    return _reglage('mode') ?? (actif ? 'foyer' : '');
+  }
+
+  /// Le partage s'est arrêté sans que cet appareil le demande : 'code' (code régénéré par
+  /// l'administrateur) ou 'radie' (membre radié). Il faut saisir le code de partage pour revenir.
+  String? get suspendu => _reglage('suspendu');
+
   String get noeud => _reglage('noeud') ?? '';
 
-  ServeurMqtt get serveur => ServeurMqtt(
-        hote: _reglage('hote') ?? ServeurMqtt.hoteHiveMq,
-        port: int.tryParse(_reglage('port') ?? '') ?? 8883,
-        tls: _reglage('tls') != '0',
-        utilisateur: _reglage('utilisateur') ?? '',
-        motDePasse: _reglage('mdp') ?? '',
-        empreinte: _reglage('empreinte') ?? '',
-      );
+  ServeurMqtt get serveur {
+    final hote = _reglage('hote') ?? '';
+    // Serveur imposé, sauf réglage de dépannage (« Avancé ») ou ancien serveur saisi à la main.
+    if (hote.isEmpty) return ServeurMqtt(empreinte: _reglage('empreinte') ?? '');
+    final u = _reglage('utilisateur') ?? '';
+    final memeServeur = hote == ServeurMqtt.hoteDefaut;
+    return ServeurMqtt(
+      hote: hote,
+      port: int.tryParse(_reglage('port') ?? '') ?? 8883,
+      tls: _reglage('tls') != '0',
+      utilisateur: u.isEmpty && memeServeur ? ServeurMqtt.utilisateurDefaut : u,
+      motDePasse: u.isEmpty && memeServeur ? ServeurMqtt.motDePasseDefaut : (_reglage('mdp') ?? ''),
+      empreinte: _reglage('empreinte') ?? '',
+    );
+  }
+
+  /// Revient au serveur imposé (efface les réglages de dépannage).
+  Future<void> serveurParDefaut() async {
+    for (final c in ['hote', 'port', 'tls', 'utilisateur', 'mdp', 'empreinte']) {
+      _base?.effacerReglage('synchro_$c');
+    }
+    certificatRefuse = null;
+    if (actif) {
+      await _deconnecter();
+      await _connecter();
+    }
+    notifyListeners();
+  }
 
   String get _sujet => 'ldc/$code';
   String get nomAppareil {
@@ -229,19 +297,163 @@ class Synchro extends ChangeNotifier {
   }
 
   /// Autre appareil : remplace les données de cet appareil par celles du foyer qui partage [codePartage].
-  Future<void> rejoindre(String codePartage, String nom) async {
-    final ancien = serveur;
+  /// Les produits ajoutés et les listes non terminées de cet appareil sont gardés et ajoutés au foyer.
+  Future<void> rejoindre(String codePartage, String nom, {String email = ''}) async {
+    final ancien = _base?.reglage('synchro_hote') == null ? null : serveur;
+    final garder = _etat.magasins.isEmpty ? null : _etat.aReprendre();
     await _deconnecter();
-    await _etat.rejoindreFoyer(nom);
+    await _etat.rejoindreFoyer(nom, email: email);
     final base = _base!;
     _definir('code', codePartage.trim().toUpperCase());
     _definir('role', 'esclave');
+    _definir('mode', 'foyer');
     _definir('noeud', _tirer(12));
-    _definirServeur(ancien);
+    if (garder != null) _definir('a_reprendre', jsonEncode(garder));
+    if (ancien != null) _definirServeur(ancien);
     base.horloge = Horloge(noeud);
     base.toutJournaliser(_etat.versJson(), tables: {'membre'});
     _noter('Foyer rejoint avec le code $code : réception des données…');
     await _connecter();
+  }
+
+  // ------------------------------------------------------------ Seul ou en foyer (26/10/2026)
+
+  /// Premier lancement ou changement : cet appareil fonctionne seul, sans synchronisation.
+  Future<void> choisirSeul() async {
+    if (actif) await arreterPartage();
+    _definir('mode', 'seul');
+    _base?.effacerReglage('synchro_suspendu');
+    notifyListeners();
+  }
+
+  static String _cleNom(String nom) => nom
+      .trim()
+      .toLowerCase()
+      .replaceAll(RegExp('[àâä]'), 'a')
+      .replaceAll(RegExp('[éèêë]'), 'e')
+      .replaceAll(RegExp('[îï]'), 'i')
+      .replaceAll(RegExp('[ôö]'), 'o')
+      .replaceAll(RegExp('[ùûü]'), 'u')
+      .replaceAll('ç', 'c')
+      .replaceAll(RegExp('[^a-z0-9]+'), '-');
+
+  /// Vérifie sur le serveur qu'aucun foyer ne porte déjà ce nom (annuaire des noms, sans données).
+  /// Rend null si le nom est libre, sinon la raison du refus.
+  Future<String?> verifierNomFoyer(String nom) async {
+    final cle = _cleNom(nom);
+    if (cle.replaceAll('-', '').isEmpty) return 'Saisissez le nom du foyer.';
+    final t = fabrique(serveur);
+    final pris = Completer<bool>();
+    final abonnements = [
+      t.messages.listen((m) {
+        if (m.$1 == 'ldc/annuaire/$cle' && m.$2.isNotEmpty && !pris.isCompleted) pris.complete(true);
+      }),
+      t.etats.listen((e) {
+        // Connecté : un nom déjà pris arrive aussitôt (message retenu) ; sinon, libre après 3 s.
+        if (e == 'connecte') Timer(const Duration(seconds: 3), () => pris.isCompleted ? null : pris.complete(false));
+      }),
+    ];
+    try {
+      await t.connecter(
+        identifiant: 'ldc-verif-${_tirer(8)}',
+        sujetTestament: 'ldc/verif',
+        testament: '',
+        abonnement: 'ldc/annuaire/$cle',
+      );
+      final r = await pris.future.timeout(const Duration(seconds: 15));
+      return r ? 'Un foyer porte déjà ce nom. Choisissez-en un autre.' : null;
+    } on TimeoutException {
+      return 'Le serveur ne répond pas. Vérifiez la connexion à internet et réessayez.';
+    } finally {
+      for (final a in abonnements) {
+        await a.cancel();
+      }
+      await t.fermer();
+    }
+  }
+
+  /// Créer un foyer : cet appareil en est l'administrateur ; toutes ses données deviennent celles du foyer.
+  /// Rend null si c'est fait, sinon la raison du refus.
+  Future<String?> creerFoyer(String nom, String email) async {
+    final refus = await verifierNomFoyer(nom);
+    if (refus != null) return refus;
+    _etat.renommerFoyer(nom.trim());
+    _etat.modifierEmail(_etat.moi, email);
+    _etat.moi.role = 'administrateur';
+    _etat.statutsMembres.clear();
+    _etat.modifie();
+    _definir('mode', 'foyer');
+    _base?.effacerReglage('synchro_suspendu');
+    _annuaire = _cleNom(nom);
+    await creerPartage();
+    return null;
+  }
+
+  /// Nom du foyer à inscrire dans l'annuaire dès la connexion.
+  String? _annuaire;
+
+  /// Administrateur : un nouveau code remplace l'ancien. Les autres appareils s'arrêtent et
+  /// demandent le nouveau code ; leurs données restent.
+  Future<void> regenererCode() async {
+    if (!actif) return;
+    _transport?.publier('$_sujet/ferme', jsonEncode({'de': noeud, 'heure': DateTime.now().millisecondsSinceEpoch}),
+        retenu: true);
+    _transport?.publier('$_sujet/presence/$noeud', '', retenu: true);
+    await _deconnecter(presence: false);
+    appareils.clear();
+    _definir('code', _tirer(10));
+    _noter('Nouveau code de partage : ${code!}');
+    await _connecter();
+  }
+
+  /// Revenir dans le foyer avec le code de partage (après un code régénéré ou une radiation) :
+  /// les données de cet appareil sont gardées.
+  Future<void> reprendreAvecCode(String codePartage) async {
+    final raison = suspendu;
+    _definir('code', codePartage.trim().toUpperCase());
+    _definir('mode', 'foyer');
+    _base?.effacerReglage('synchro_suspendu');
+    if (raison == 'radie') _definir('rejoint', '1');
+    _noter('Retour dans le foyer avec le code $code');
+    await _connecter();
+    notifyListeners();
+  }
+
+  /// Le partage s'arrête sans que cet appareil l'ait demandé ; ses données restent.
+  Future<void> _suspendre(String raison) async {
+    if (!actif) return;
+    _transport?.publier('$_sujet/presence/$noeud', '', retenu: true);
+    await _deconnecter(presence: false);
+    _base?.effacerReglage('synchro_code');
+    _definir('suspendu', raison);
+    etatReseau = 'arrete';
+    appareils.clear();
+    _noter(raison == 'code'
+        ? 'Le code de partage a changé : saisissez le nouveau code'
+        : 'Cet appareil a été radié du foyer par l\'administrateur');
+  }
+
+  /// Après une réception : retour d'un membre radié, reprise des données gardées, radiation.
+  Timer? _apresReception;
+  void _verifierApresReception() {
+    _apresReception?.cancel();
+    _apresReception = Timer(const Duration(seconds: 4), () {
+      if (!actif) return;
+      if (_reglage('rejoint') != null && _etat.moiExclu) {
+        _etat.reactiverMembre(_etat.moi);
+      }
+      _base?.effacerReglage('synchro_rejoint');
+      final a = _reglage('a_reprendre');
+      if (a != null) {
+        try {
+          if (_etat.reprendre(jsonDecode(a) as Map<String, dynamic>)) _base?.effacerReglage('synchro_a_reprendre');
+        } catch (e) {
+          _base?.effacerReglage('synchro_a_reprendre');
+          _noter('Reprise des données de cet appareil impossible : $e', erreur: true);
+        }
+      }
+      if (_etat.moiExclu) _suspendre('radie');
+    });
   }
 
   /// Cet appareil ne partage plus : ses données restent, elles ne circulent plus.
@@ -332,6 +544,10 @@ class Synchro extends ChangeNotifier {
           certificatRefuse = null;
           derniereErreur = null;
           _noter('Connecté à ${serveur.hote}');
+          if (_annuaire case final cle?) {
+            t.publier('ldc/annuaire/$cle', jsonEncode({'cree': DateTime.now().millisecondsSinceEpoch}), retenu: true);
+            _annuaire = null;
+          }
           _annoncer();
           _controler();
           _controle?.cancel();
@@ -392,8 +608,15 @@ class Synchro extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, Object?> _presence(bool enLigne) =>
-      {'de': noeud, 'nom': nomAppareil, 'enLigne': enLigne, 'heure': DateTime.now().millisecondsSinceEpoch};
+  Map<String, Object?> _presence(bool enLigne) => {
+        'de': noeud,
+        'nom': nomAppareil,
+        'membre': _etat.moi.id,
+        'plateforme': nomSysteme,
+        'version': versionApplication,
+        'enLigne': enLigne,
+        'heure': DateTime.now().millisecondsSinceEpoch,
+      };
 
   void _annoncer() {
     final t = _transport, base = _base;
@@ -469,6 +692,11 @@ class Synchro extends ChangeNotifier {
       return;
     }
     final de = m['de'] as String?;
+    if (type == 'ferme') {
+      // L'administrateur a régénéré le code : ce canal est fermé.
+      if (de != noeud) _suspendre('code');
+      return;
+    }
     if (type == 'controle') {
       if (de == noeud && m['t'] == _envoiControle) {
         _delaiControle?.cancel();
@@ -486,6 +714,10 @@ class Synchro extends ChangeNotifier {
         final avant = a.enLigne;
         a.enLigne = m['enLigne'] == true;
         final heure = m['heure'] as int?;
+        a.membreId = m['membre'] as String? ?? a.membreId;
+        a.plateforme = m['plateforme'] as String? ?? a.plateforme;
+        a.version = m['version'] as String? ?? a.version;
+        if (heure != null) a.vu = DateTime.fromMillisecondsSinceEpoch(heure);
         if (a.enLigne && heure != null) a.decalage = ((heure - DateTime.now().millisecondsSinceEpoch) / 1000).round();
         if (!avant && a.enLigne) {
           _noter('${a.nom} est en ligne');
@@ -496,6 +728,7 @@ class Synchro extends ChangeNotifier {
         notifyListeners();
       case 'bonjour':
         a.enLigne = true;
+        a.vu = DateTime.now();
         _repondre(m, a);
       case 'modifs':
         final pour = m['pour'] as String?;
@@ -537,6 +770,7 @@ class Synchro extends ChangeNotifier {
       for (final e in _base?.erreurs ?? const <String>[]) {
         debugPrint('Synchronisation, en attente : $e');
       }
+      _verifierApresReception();
     } catch (e) {
       _noter('Réception impossible : $e', erreur: true);
     }

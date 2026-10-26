@@ -806,8 +806,12 @@ class TitreGroupe extends StatelessWidget {
       this.icone,
       this.ouvert,
       this.focus = false,
+      this.ajoute = false,
       this.onTap});
   final String nom;
+
+  /// Rayon ou secteur ajouté par le foyer : petite icône après le nom.
+  final bool ajoute;
 
   /// Groupe où l'on travaille (rayon ou secteur ouvert en préparation, secteur en cours pendant les courses) :
   /// son image est légèrement agrandie.
@@ -880,6 +884,13 @@ class TitreGroupe extends StatelessWidget {
                     style: Charte.texte(image != null || icone != null ? (fort ? 15 : 14) : (onTap != null ? 14 : 12),
                         gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
               ),
+              if (ajoute)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: Tooltip(
+                      message: 'Ajouté par le foyer',
+                      child: Icon(Icons.add_circle, size: 18, color: fort ? Charte.blanc : Charte.accent)),
+                ),
               if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
               if (nombre != null && nombre! > 0)
                 Container(
@@ -949,8 +960,10 @@ class GroupeRetractable extends StatelessWidget {
     this.vide,
     this.parDefaut = true,
     this.marge = 16,
+    this.ajoute = false,
   });
   final String cle;
+  final bool ajoute;
   final String titre;
   final List<Widget> enfants;
   final String? image;
@@ -978,6 +991,7 @@ class GroupeRetractable extends StatelessWidget {
               fort: true,
               nombre: nombre,
               ouvert: o,
+              ajoute: ajoute,
               onTap: () => Retractables.i.basculer(cle, parDefaut: parDefaut),
             ),
             if (o)

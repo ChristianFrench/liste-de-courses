@@ -176,5 +176,12 @@ void main() {
       await _toucher(tester, find.text(rubrique));
       await _capture(nom);
     }
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, _onglet('Gérer'));
+    await _toucher(tester, find.text('Foyer'));
+    await _toucher(tester, find.text('Passer en foyer'));
+    await _capture('25 Bienvenue');
+    await _toucher(tester, find.text('Créer un foyer'));
+    await _capture('25 Creer-un-foyer');
   }, skip: !_actif);
 }

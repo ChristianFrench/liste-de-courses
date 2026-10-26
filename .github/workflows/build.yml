@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 
 env:
+  # Identifiant du serveur MQTT : secrets saisis par le maître d'ouvrage sur GitHub, jamais dans le dépôt.
+  MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR }}
+  MQTT_MOT_DE_PASSE: ${{ secrets.MQTT_MOT_DE_PASSE }}
   CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,windows .
 
 jobs:
@@ -98,14 +101,14 @@ jobs:
       - name: Compiler l'APK
         run: |
           set +e
-          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
       - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
         run: |
-          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --target-platform android-x64
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --target-platform android-x64
           mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
       - uses: actions/upload-artifact@v4
         with:
@@ -132,7 +135,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          flutter build windows --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
+          flutter build windows --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Windows"; else tail -n 20 compilation.log; fi
           exit $code
@@ -224,7 +227,7 @@ jobs:
       - name: Compiler la version web
         run: |
           set +e
-          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" > compilation.log 2>&1
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
           exit $code

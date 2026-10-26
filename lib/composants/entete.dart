@@ -8,7 +8,7 @@ import '../theme.dart';
 import 'composants.dart';
 
 /// Version affichée en haut de l'accueil, fournie à la compilation (« 0.6.0 · 3d4d87c »).
-const versionApplication = String.fromEnvironment('VERSION', defaultValue: 'essai');
+export '../donnees/version.dart';
 
 /// En-tête unique de toutes les fenêtres (22 octobre 2026) : fond de la couleur de la palette,
 /// à gauche l'icône de l'onglet (la même que dans la barre du bas), le titre, puis les actions
@@ -214,7 +214,8 @@ class BoutonSynchro extends StatelessWidget {
     const ombre = [Shadow(color: Color(0x99000000), blurRadius: 4)];
     return ListenableBuilder(
       listenable: s,
-      builder: (context, _) => Tooltip(
+      // Seul sur cet appareil : pas de nuage.
+      builder: (context, _) => s.mode == 'seul' ? const SizedBox.shrink() : Tooltip(
         message: resume(s),
         child: Semantics(
           button: true,
@@ -358,10 +359,13 @@ class Aides {
       'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Courses › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
-      'Mon foyer : le foyer (son nom, ses membres avec leur adresse mail, repartir d\'un foyer neuf).\n'
-      'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins), '
+      'Mon foyer : seul sur cet appareil ou en foyer partagé ; le code de partage (à copier ou envoyer par mail, '
+      'régénéré par l\'administrateur) ; les membres (version de l\'application ; pour l\'administrateur, dernière connexion, '
+      'listes préparées et courses faites ; renommer, radier, supprimer).\n'
+      'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
+      'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
       'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'
-      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), synchronisation (partage entre appareils).\n'
+      'Paramètres : apparence (couleurs), données (listes exemples, préliste, suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
       'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '

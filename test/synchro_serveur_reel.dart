@@ -39,7 +39,7 @@ void main() {
     // MQTT_HOTE=localhost MQTT_PORT=1883 : essai sur un serveur local (MQTT_TLS=1 : chiffré, certificat fait sur le PC).
     final env = Platform.environment;
     final serveur = env['MQTT_HOTE'] == null
-        ? const ServeurMqtt()
+        ? const ServeurMqtt(hote: 'broker.hivemq.com', utilisateur: '', motDePasse: '')
         : ServeurMqtt(
             hote: env['MQTT_HOTE']!,
             port: int.parse(env['MQTT_PORT'] ?? '1883'),
@@ -132,7 +132,7 @@ void main() {
     final s = Synchro.instance;
     final env = Platform.environment;
     final serveur = env['MQTT_HOTE'] == null
-        ? const ServeurMqtt()
+        ? const ServeurMqtt(hote: 'broker.hivemq.com', utilisateur: '', motDePasse: '')
         : ServeurMqtt(
             hote: env['MQTT_HOTE']!,
             port: int.parse(env['MQTT_PORT'] ?? '1883'),

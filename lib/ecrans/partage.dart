@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
@@ -111,17 +110,26 @@ class EcranPartage extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 16),
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: s.actif ? _actif(context, s) : _inactif(context, s),
-              ),
+              padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+              child: Row(children: [
+                PointSynchro(taille: 20, couleur: BoutonSynchro.couleur(s.pastille), clignote: s.pastille == 'vert' && s.enEchange),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                      s.actif ? titreEtatSynchro(s) : 'Cet appareil ne partage pas : choisissez « Passer en foyer » dans Gérer › Foyer.',
+                      style: Charte.texte(16, gras: s.actif)),
+                ),
+              ]),
             ),
-            GroupeRetractable(
-              cle: 'partage/serveur',
-              titre: 'Serveur MQTT',
-              icone: Icons.dns_outlined,
-              enfants: [_Serveur(serveur: s.serveur)],
+            if (s.actif && !s.liaisonOk && s.derniereErreur != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: Text(s.derniereErreur!, style: Charte.texte(13, couleur: _rouge)),
+              ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text('Le code de partage et les membres sont dans Gérer › Foyer.',
+                  style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ),
             if (s.actif)
               GroupeRetractable(
@@ -138,6 +146,13 @@ class EcranPartage extends StatelessWidget {
                     ),
                 ],
               ),
+            GroupeRetractable(
+              cle: 'partage/serveur',
+              titre: 'Avancé : serveur',
+              icone: Icons.dns_outlined,
+              parDefaut: false,
+              enfants: [_Serveur(serveur: s.serveur)],
+            ),
           ],
         ),
       ),
@@ -177,110 +192,13 @@ class EcranPartage extends StatelessWidget {
     ];
   }
 
-  List<Widget> _inactif(BuildContext context, Synchro s) => [
-        const SizedBox(height: 10),
-        Text('Sur l\'appareil qui a les bonnes données : « Partager ce foyer ». Sur chacun des autres : « Rejoindre un foyer » '
-            'avec le code obtenu. Tous doivent joindre le même serveur MQTT (plus bas).',
-            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        const SizedBox(height: 10),
-        Text('Premier appareil (celui qui a les bonnes données)', style: Charte.texte(15, gras: true)),
-        const SizedBox(height: 6),
-        Bouton(
-          texte: 'Partager ce foyer',
-          icone: Icons.share_outlined,
-          plein: true,
-          onTap: () async {
-            // Le bouton à contour confirme (convention de [confirmer] : le bouton plein annule).
-            final ok = await confirmer(context,
-                titre: 'Partager ce foyer ?',
-                contenu: Text(
-                    'À faire sur un seul appareil, celui qui a les bonnes données : il crée le code du foyer.\n\n'
-                    'Sur les autres appareils, choisissez « Rejoindre un foyer » et saisissez ce code.',
-                    style: Charte.texte(16)),
-                plein: 'Annuler',
-                contour: 'Créer le code du foyer');
-            if (ok != true) return;
-            await s.creerPartage();
-            if (context.mounted) Nav.message(context, 'Partage créé : donnez le code aux autres appareils');
-          },
-        ),
-        const SizedBox(height: 16),
-        Text('Autres appareils (j\'ai reçu un code)', style: Charte.texte(15, gras: true)),
-        const SizedBox(height: 6),
-        Bouton(texte: 'Rejoindre un foyer', icone: Icons.login, onTap: () => _rejoindre(context, s)),
-        const SizedBox(height: 16),
-      ];
-
-  List<Widget> _actif(BuildContext context, Synchro s) {
-    return [
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-        child: Row(children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Code de partage', style: Charte.texte(15)),
-              Text(s.code!.split('').join(' '), maxLines: 1, style: Charte.texte(24, gras: true, espacement: 1)),
-              Text('À saisir sur les autres appareils (Rejoindre un foyer)', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            ]),
-          ),
-          Lien('Copier', taille: 17, onTap: () {
-            Clipboard.setData(ClipboardData(text: s.code!));
-            Nav.message(context, 'Code copié');
-          }),
-        ]),
-      ),
-      const SizedBox(height: 14),
-      Text('Ne plus partager (les données restent sur cet appareil)', style: Charte.texte(15, gras: true)),
-      const SizedBox(height: 6),
-      Bouton(
-        texte: 'Arrêter le partage sur cet appareil',
-        icone: Icons.link_off,
-        onTap: () async {
-          final ok = await confirmer(context,
-              titre: 'Arrêter le partage ?',
-              contenu: Text('Cet appareil garde ses données mais ne reçoit plus les modifications des autres.',
-                  style: Charte.texte(16)),
-              plein: 'Annuler',
-              contour: 'Arrêter le partage');
-          if (ok == true) await s.arreterPartage();
-        },
-      ),
-      const SizedBox(height: 16),
-    ];
-  }
-
-  Future<void> _rejoindre(BuildContext context, Synchro s) async {
-    final code = await demanderTexte(context, titre: 'Rejoindre un foyer', aide: 'Code de partage (10 caractères)', valider: 'Suivant');
-    final net = (code ?? '').replaceAll(RegExp(r'\s'), '').toUpperCase();
-    if (net.isEmpty || !context.mounted) return;
-    if (net.length != 10) {
-      Nav.message(context, 'Le code de partage a 10 caractères');
-      return;
-    }
-    final nom = await demanderTexte(context,
-        titre: 'Votre nom', initial: Etat.instance.moi.nomAffiche, aide: 'Le nom sous lequel les autres vous voient', valider: 'Suivant');
-    if (nom == null || nom.trim().isEmpty || !context.mounted) return;
-    final ok = await confirmer(context,
-        titre: 'Remplacer les données de cet appareil ?',
-        contenu: Text(
-            'Les listes, magasins et produits de cet appareil sont remplacés par ceux du foyer. '
-            'Une copie de l\'ancienne base est gardée sur l\'appareil.\n\n'
-            'Ouvrez l\'application sur un appareil du foyer pour qu\'il envoie les données.',
-            style: Charte.texte(16)),
-        plein: 'Annuler',
-        contour: 'Rejoindre et remplacer');
-    if (ok != true) return;
-    await s.rejoindre(net, nom);
-    if (context.mounted) Nav.message(context, 'Foyer rejoint : les données arrivent dès qu\'un autre appareil est en ligne');
-  }
 }
 
 const _rouge = Color(0xFFB00020);
 
 String heure(DateTime t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:${t.second.toString().padLeft(2, '0')}';
 
-/// Réglages du serveur MQTT, préremplis pour le serveur public HiveMQ.
+/// Réglages du serveur MQTT (dépannage) ; par défaut le serveur fourni avec l'application.
 class _Serveur extends StatefulWidget {
   const _Serveur({required this.serveur});
   final ServeurMqtt serveur;
@@ -292,8 +210,9 @@ class _Serveur extends StatefulWidget {
 class _ServeurState extends State<_Serveur> {
   late final hote = TextEditingController(text: widget.serveur.hote);
   late final port = TextEditingController(text: '${widget.serveur.port}');
-  late final utilisateur = TextEditingController(text: widget.serveur.utilisateur);
-  late final mdp = TextEditingController(text: widget.serveur.motDePasse);
+  // Le serveur imposé garde son identifiant caché : les champs restent vides.
+  late final utilisateur = TextEditingController(text: widget.serveur.parDefaut ? '' : widget.serveur.utilisateur);
+  late final mdp = TextEditingController(text: widget.serveur.parDefaut ? '' : widget.serveur.motDePasse);
   late bool tls = widget.serveur.tls;
 
   @override
@@ -317,23 +236,27 @@ class _ServeurState extends State<_Serveur> {
         ),
       );
 
-  void _hivemq() => setState(() {
-        hote.text = ServeurMqtt.hoteHiveMq;
-        port.text = '8883';
-        tls = true;
-        utilisateur.text = '';
-        mdp.text = '';
-      });
+  Future<void> _parDefaut() async {
+    await Synchro.instance.serveurParDefaut();
+    setState(() {
+      hote.text = ServeurMqtt.hoteDefaut;
+      port.text = '${ServeurMqtt.portDefaut}';
+      tls = true;
+      utilisateur.text = '';
+      mdp.text = '';
+    });
+    if (mounted) Nav.message(context, 'Serveur par défaut');
+  }
 
   @override
   Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         const SizedBox(height: 6),
-        Text('Par défaut : serveur public HiveMQ, sans compte. Pour un serveur privé (EMQX Cloud Serverless, gratuit, '
-            'ou Mosquitto sur votre PC), indiquez son adresse, son port et son identifiant. '
-            'Tous les appareils du foyer doivent utiliser le même serveur.',
+        Text('Le serveur est fourni avec l\'application. À ne modifier que pour un dépannage : '
+            'tous les appareils du foyer doivent utiliser le même serveur. '
+            'Identifiant et mot de passe vides : ceux du serveur fourni.',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
         const SizedBox(height: 6),
-        _champ('Adresse du serveur', hote, aide: 'broker.hivemq.com', key: const ValueKey('mqtt-hote')),
+        _champ('Adresse du serveur', hote, aide: ServeurMqtt.hoteDefaut, key: const ValueKey('mqtt-hote')),
         _champ('Port', port, aide: '8883', nombre: true, key: const ValueKey('mqtt-port')),
         InkWell(
           onTap: () => setState(() => tls = !tls),
@@ -363,11 +286,11 @@ class _ServeurState extends State<_Serveur> {
               style: Charte.texte(13, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 8),
         ],
-        _champ('Identifiant', utilisateur, aide: 'vide pour le serveur public'),
+        _champ('Identifiant', utilisateur, aide: 'vide : celui du serveur fourni'),
         _champ('Mot de passe', mdp, secret: true),
         const SizedBox(height: 6),
         Row(children: [
-          Lien('Serveur public', taille: 16, onTap: _hivemq),
+          Lien('Serveur par défaut', taille: 16, onTap: _parDefaut),
           const Spacer(),
           BoutonAction('Enregistrer', plein: true, onTap: () async {
             final p = int.tryParse(port.text.trim());
