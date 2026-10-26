@@ -4,6 +4,7 @@ import '../composants/composants.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
+import 'editeur_catalogue.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
 
@@ -165,10 +166,19 @@ class EcranDonnees extends _EcranVivant {
           if (v != null) etat.reglerDelaiArchives(v);
         },
       ),
+      if (CatalogueCommun.editeurPossible)
+        LigneMenu(
+          icone: Icons.public,
+          titre: 'Éditeur du catalogue commun',
+          sousTitre: CatalogueCommun.instance.editeur
+              ? 'Ouvert sur cet appareil (aussi dans Gérer › Courses)'
+              : 'Fermé : touchez pour saisir le code d\'éditeur',
+          onTap: () => CatalogueCommun.instance.editeur
+              ? Nav.aller<void>(context, const EcranEditeurCatalogue())
+              : _deverrouillerEditeur(context),
+        ),
     ], boutons: [
       Bouton(texte: 'Remettre les listes exemples', onTap: () => _exemples(context)),
-      if (CatalogueCommun.editeurPossible && !CatalogueCommun.instance.editeur)
-        Bouton(texte: 'Éditeur du catalogue', onTap: () => _deverrouillerEditeur(context)),
     ]);
   }
 }
@@ -179,7 +189,7 @@ Future<void> _deverrouillerEditeur(BuildContext context) async {
   if (code == null || !context.mounted) return;
   if (CatalogueCommun.instance.deverrouiller(code)) {
     Etat.instance.modifie();
-    Nav.message(context, 'Catalogue commun : dans Gérer › Courses');
+    await Nav.aller<void>(context, const EcranEditeurCatalogue());
   } else {
     Nav.message(context, 'Code incorrect');
   }
