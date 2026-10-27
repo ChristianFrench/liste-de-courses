@@ -81,6 +81,7 @@ Future<void> _neuf(BuildContext context) async {
   if (ok != true) return;
   if (partage) await Synchro.instance.libererNomEtArreter();
   await Etat.instance.repartirANeuf();
+  Synchro.instance.rafraichir();
   Nav.i.reinitialiser();
   Nav.i.retourOnglet(Nav.gerer);
   if (context.mounted) Nav.message(context, 'Foyer neuf');

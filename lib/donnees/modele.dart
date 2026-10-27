@@ -570,6 +570,7 @@ class Etat extends ChangeNotifier {
       return;
     }
     _foyer?.fermer();
+    _foyer = null; // pendant le renommage (asynchrone sur le web), rien ne doit lire la base fermée
     final f = _chemin(baseFoyer);
     if (baseExiste(f)) await renommerBase(f, '$f.avant-neuf-${_horodatage()}');
     _foyer = Stockage.ouvrir(_chemin(baseFoyer));
@@ -685,6 +686,7 @@ class Etat extends ChangeNotifier {
       return;
     }
     _foyer?.fermer();
+    _foyer = null;
     final f = _chemin(baseFoyer);
     if (baseExiste(f)) await renommerBase(f, '$f.avant-partage-${_horodatage()}');
     final s = _foyer = Stockage.ouvrir(_chemin(baseFoyer));

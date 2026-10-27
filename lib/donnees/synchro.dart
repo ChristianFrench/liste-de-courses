@@ -468,6 +468,9 @@ class Synchro extends ChangeNotifier {
   }
 
   /// Cet appareil ne partage plus : ses données restent, elles ne circulent plus.
+  /// Après un changement de base (foyer neuf) : l'écran d'accueil (seul, créer, rejoindre) se réaffiche.
+  void rafraichir() => notifyListeners();
+
   /// Repartir d'un foyer neuf : le nom du foyer est libéré dans l'annuaire (il pourra être repris), puis le partage s'arrête.
   Future<void> libererNomEtArreter() async {
     final cle = _cleNom(_etat.foyerNom);
