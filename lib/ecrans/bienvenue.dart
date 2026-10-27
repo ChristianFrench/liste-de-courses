@@ -184,7 +184,18 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
               if (_nomFoyer.text.trim().isEmpty) return 'Saisissez le nom du foyer.';
               final etat = Etat.instance;
               if (_nom.text.trim().isNotEmpty) etat.renommerMembre(etat.moi, _nom.text);
-              final r = await Synchro.instance.creerFoyer(_nomFoyer.text, _email.text);
+              var r = await Synchro.instance.creerFoyer(_nomFoyer.text, _email.text);
+              if (r != null && r.startsWith('Un foyer porte déjà ce nom') && mounted) {
+                final ok = await confirmer(context,
+                    titre: 'Reprendre le nom « ${_nomFoyer.text.trim()} » ?',
+                    contenu: Text(
+                        'Ce nom a déjà servi, par exemple pour votre ancien foyer avant de repartir à neuf. Vous pouvez le reprendre : '
+                        'le nouveau foyer a son propre code de partage, rien ne se mélange avec l\'ancien.',
+                        style: Charte.texte(16)),
+                    plein: 'Choisir un autre nom',
+                    contour: 'Reprendre ce nom');
+                if (ok == true) r = await Synchro.instance.creerFoyer(_nomFoyer.text, _email.text, reprendreNom: true);
+              }
               if (r == null) _fini('Foyer créé : ajoutez les membres dans Gérer › Foyer (touchez le titre « Foyer »)');
               return r;
             })),

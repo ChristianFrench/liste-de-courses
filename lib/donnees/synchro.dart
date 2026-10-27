@@ -381,9 +381,13 @@ class Synchro extends ChangeNotifier {
 
   /// Créer un foyer : toutes ses données deviennent celles du foyer.
   /// Rend null si c'est fait, sinon la raison du refus.
-  Future<String?> creerFoyer(String nom, String email) async {
-    final refus = await verifierNomFoyer(nom);
-    if (refus != null) return refus;
+  /// [reprendreNom] : le nom a déjà servi (ancien foyer de la famille) et on le reprend ; les données ne se
+  /// mélangent pas, chaque foyer ayant son propre code.
+  Future<String?> creerFoyer(String nom, String email, {bool reprendreNom = false}) async {
+    if (!reprendreNom) {
+      final refus = await verifierNomFoyer(nom);
+      if (refus != null) return refus;
+    }
     _etat.renommerFoyer(nom.trim());
     _etat.modifierEmail(_etat.moi, email);
     _etat.moi.role = 'administrateur';
@@ -464,6 +468,13 @@ class Synchro extends ChangeNotifier {
   }
 
   /// Cet appareil ne partage plus : ses données restent, elles ne circulent plus.
+  /// Repartir d'un foyer neuf : le nom du foyer est libéré dans l'annuaire (il pourra être repris), puis le partage s'arrête.
+  Future<void> libererNomEtArreter() async {
+    final cle = _cleNom(_etat.foyerNom);
+    if (cle.replaceAll('-', '').isNotEmpty) _transport?.publier('ldc/annuaire/$cle', '', retenu: true);
+    await arreterPartage();
+  }
+
   Future<void> arreterPartage() async {
     // La présence gardée par le serveur est effacée : les autres ne voient plus cet appareil.
     _transport?.publier('$_sujet/presence/$noeud', '', retenu: true);

@@ -72,14 +72,14 @@ Future<void> _neuf(BuildContext context) async {
       'Le foyer repart du contenu de départ : le catalogue, les enseignes et les trois listes exemples. '
       'Vos listes, parcours, tickets et modifications du catalogue disparaissent de l\'application '
       '(une copie reste dans un fichier sur cet appareil).'
-      '${partage ? '\n\nLe partage entre appareils est arrêté sur cet appareil.' : ''}',
+      '${partage ? '\n\nLe partage entre appareils est arrêté sur cet appareil, et le nom du foyer est libéré : vous pourrez le reprendre en créant un foyer.' : ''}',
       style: Charte.texte(16),
     ),
     plein: 'Annuler',
     contour: 'Repartir à neuf',
   );
   if (ok != true) return;
-  if (partage) await Synchro.instance.arreterPartage();
+  if (partage) await Synchro.instance.libererNomEtArreter();
   await Etat.instance.repartirANeuf();
   Nav.i.reinitialiser();
   Nav.i.retourOnglet(Nav.gerer);
