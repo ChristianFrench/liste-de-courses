@@ -348,6 +348,7 @@ class Aides {
       'l\'invitation par mail (code de partage et liens d\'installation), le renommer ou le retirer du foyer, et régénérer le code. '
       'En rejoignant le foyer, on choisit son nom dans la liste des membres ; « Changer de personne » corrige une erreur. '
       'Appareil partagé (tablette, PC de la famille) : on choisit son nom à chaque lancement.\n'
+      'Messages (essai) : écrire à tout le foyer ; avec l\'appli ntfy (Android) ou la page ntfy du navigateur, on est prévenu même application fermée.\n'
       'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
       'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
       'les types de promotion, de mesure et de packaging, et les marques avec leurs produits.\n'
