@@ -17,6 +17,7 @@ import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/synchro.dart' show ServeurMqtt;
+import 'package:liste_de_courses/ecrans/foyer.dart' show choisirPersonne;
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/donnees/ticket_recu.dart';
@@ -431,7 +432,7 @@ void main() {
       expect(find.text('TICKETS NON RATTACHÉS'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Foyer');
-      await _menuTitre(tester, '+ Nouveau membre');
+      expect(find.text('Seul sur cet appareil'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Types de promotion');
       await _ciblesTactiles(tester);
@@ -681,13 +682,14 @@ void main() {
       expect(etat.archivees.contains(c.id), isFalse, reason: 'remise à la main : elle reste dans l\'historique');
       etat.remettreSansTicket(c);
       expect(etat.enInstance(c), etat.ticketDe(c.id) == null);
-      // Une même personne sur un autre appareil : « C'est moi »
+      // Changer de personne (appareil partagé, ou mauvais choix) : l'ancien moi reste membre
       final ancien = etat.moi;
       final autre = etat.membres.firstWhere((m) => !m.moi);
       etat.devenir(autre);
       expect(etat.moi.id, autre.id);
-      expect(etat.membresVisibles.map((m) => m.id), isNot(contains(ancien.id)));
-      expect(etat.listes.where((x) => x.membreId == ancien.id), isEmpty);
+      expect(etat.membresVisibles.map((m) => m.id), contains(ancien.id));
+      etat.devenir(ancien);
+      expect(etat.moi.id, ancien.id);
       etat.supprimer(etat.listes.first);
       expect(etat.corbeille, isNotEmpty);
       etat.viderCorbeille();
@@ -967,7 +969,19 @@ void main() {
     testWidgets('Gérer › Foyer : passer en foyer ouvre le choix seul, créer, rejoindre', (tester) async {
       await _lancer(tester);
       await _rubrique(tester, 'Foyer');
-      expect(find.text('MEMBRES'), findsOneWidget);
+      expect(find.text('Seul sur cet appareil'), findsOneWidget, reason: 'seul : ni membres ni code');
+      expect(find.text('MEMBRES'), findsNothing);
+      // Choisir son nom dans la liste des membres (après avoir rejoint, ou appareil partagé)
+      final etat = Etat.instance;
+      final autre = etat.membresVisibles.firstWhere((m) => !m.moi);
+      final avant = etat.moi;
+      choisirPersonne(tester.element(find.text('Seul sur cet appareil')));
+      await tester.pumpAndSettle();
+      expect(find.text('Qui utilise cet appareil ?'), findsOneWidget);
+      await _toucher(tester, find.byKey(ValueKey('personne-${autre.nomAffiche}')));
+      expect(etat.moi.id, autre.id);
+      etat.devenir(avant);
+      await tester.pumpAndSettle();
       await _actionTitre(tester, 'Passer en foyer');
       expect(find.text('Comment utilisez-vous l\'application ?'), findsOneWidget);
       expect(find.text('Seul, sur cet appareil'), findsOneWidget);
@@ -984,7 +998,7 @@ void main() {
     testWidgets('éditeur du catalogue commun : rayons, secteurs, ajout depuis un texte', (tester) async {
       await _lancer(tester);
       await _rubrique(tester, 'Foyer');
-      Nav.aller<void>(tester.element(find.text('MEMBRES')), const EcranEditeurCatalogue());
+      Nav.aller<void>(tester.element(find.text('Seul sur cet appareil')), const EcranEditeurCatalogue());
       await tester.pump();
       // Le catalogue livré se lit vraiment (fichier de l'application) : on lui laisse le temps.
       for (var i = 0; i < 20 && find.textContaining('Jamais publié').evaluate().isEmpty; i++) {
@@ -1006,18 +1020,14 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
-    testWidgets('membres : renommer, radier, réactiver, supprimer (marques, pas d\'effacement)', (tester) async {
+    testWidgets('membres : renommer, retirer du foyer (marque, pas d\'effacement)', (tester) async {
       await _lancer(tester);
       final etat = Etat.instance;
       final autre = etat.ajouterMembre('Zoé', '');
       final n = etat.membres.length;
       etat.renommerMembre(autre, 'Zoé B');
       expect(autre.nomAffiche, 'Zoé B');
-      etat.radierMembre(autre);
-      expect(etat.estRadie(autre), isTrue);
       expect(etat.membresVisibles, contains(autre));
-      etat.reactiverMembre(autre);
-      expect(etat.estRadie(autre), isFalse);
       etat.supprimerMembre(autre);
       expect(etat.membresVisibles, isNot(contains(autre)));
       expect(etat.membres.length, n, reason: 'le membre reste pour ses listes et ses courses');

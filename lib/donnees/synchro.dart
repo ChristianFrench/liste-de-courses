@@ -372,7 +372,7 @@ class Synchro extends ChangeNotifier {
     }
   }
 
-  /// Créer un foyer : cet appareil en est l'administrateur ; toutes ses données deviennent celles du foyer.
+  /// Créer un foyer : toutes ses données deviennent celles du foyer.
   /// Rend null si c'est fait, sinon la raison du refus.
   Future<String?> creerFoyer(String nom, String email) async {
     final refus = await verifierNomFoyer(nom);
@@ -406,7 +406,7 @@ class Synchro extends ChangeNotifier {
     await _connecter();
   }
 
-  /// Revenir dans le foyer avec le code de partage (après un code régénéré ou une radiation) :
+  /// Revenir dans le foyer avec le code de partage (après un code régénéré ou un retrait du foyer) :
   /// les données de cet appareil sont gardées.
   Future<void> reprendreAvecCode(String codePartage) async {
     final raison = suspendu;
@@ -430,7 +430,7 @@ class Synchro extends ChangeNotifier {
     appareils.clear();
     _noter(raison == 'code'
         ? 'Le code de partage a changé : saisissez le nouveau code'
-        : 'Cet appareil a été radié du foyer par l\'administrateur');
+        : 'Cette personne a été retirée du foyer par un autre membre');
   }
 
   /// Après une réception : retour d'un membre radié, reprise des données gardées, radiation.
@@ -693,7 +693,7 @@ class Synchro extends ChangeNotifier {
     }
     final de = m['de'] as String?;
     if (type == 'ferme') {
-      // L'administrateur a régénéré le code : ce canal est fermé.
+      // Un membre a régénéré le code : ce canal est fermé.
       if (de != noeud) _suspendre('code');
       return;
     }

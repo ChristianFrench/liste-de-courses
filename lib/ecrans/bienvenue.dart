@@ -7,7 +7,7 @@ import '../navigation.dart';
 import '../theme.dart';
 
 // Premier lancement (26/10/2026) : seul sur cet appareil, créer un foyer ou rejoindre un foyer.
-// Revient quand le partage s'est arrêté sans que l'appareil le demande (code régénéré, membre radié),
+// Revient quand le partage s'est arrêté sans que l'appareil le demande (code régénéré, membre retiré),
 // et s'ouvre depuis Gérer › Foyer (« Passer en foyer »).
 
 class EcranBienvenue extends StatefulWidget {
@@ -75,7 +75,7 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
           'creer',
           Icons.add_home_outlined,
           'Créer un foyer',
-          'Vous en êtes l\'administrateur. Vos données deviennent celles du foyer ; un code de partage est créé pour les autres.',
+          'Vos données deviennent celles du foyer. Vous ajoutez ensuite les membres et leur envoyez l\'invitation avec le code de partage.',
         ),
         if (_choix == 'creer') ..._formCreer(),
         _carte(
@@ -101,11 +101,11 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Text(
                 raison == 'radie'
-                    ? 'L\'administrateur du foyer « ${Etat.instance.foyerNom} » a arrêté le partage avec cet appareil.'
+                    ? 'Un membre du foyer « ${Etat.instance.foyerNom} » a retiré cette personne du foyer.'
                     : 'Le code de partage du foyer « ${Etat.instance.foyerNom} » a changé.',
                 style: Charte.texte(16, gras: true)),
             const SizedBox(height: 4),
-            Text('Vos données sont gardées. Pour revenir dans le foyer, saisissez le code de partage que l\'administrateur vous donne.',
+            Text('Vos données sont gardées. Pour revenir dans le foyer, saisissez le code de partage qu\'un membre du foyer vous donne.',
                 style: Charte.texte(14, couleur: Charte.texteSecondaire)),
             _champ('Code de partage', _code, cle: 'bienvenue-code-retour', majuscules: true),
             Align(
@@ -185,27 +185,24 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
               final etat = Etat.instance;
               if (_nom.text.trim().isNotEmpty) etat.renommerMembre(etat.moi, _nom.text);
               final r = await Synchro.instance.creerFoyer(_nomFoyer.text, _email.text);
-              if (r == null) _fini('Foyer créé : donnez le code de partage (Gérer › Foyer) aux autres membres');
+              if (r == null) _fini('Foyer créé : ajoutez les membres dans Gérer › Foyer (touchez le titre « Foyer »)');
               return r;
             })),
       ];
 
   List<Widget> _formRejoindre() => [
         _champ('Code de partage', _code, aide: '10 caractères', cle: 'bienvenue-code', majuscules: true),
-        _champ('Votre nom', _nom, cle: 'bienvenue-nom'),
-        _champ('Votre adresse mail', _email, aide: 'prenom.nom@exemple.fr', cle: 'bienvenue-mail'),
         Padding(
           padding: const EdgeInsets.only(top: 6),
           child: Text(
-              'Les données du foyer remplacent celles de cet appareil. Vos produits ajoutés et vos listes en préparation '
+              'Quand le foyer est reçu, vous choisissez votre nom dans la liste des membres. Les données du foyer remplacent celles de cet appareil. Vos produits ajoutés et vos listes en préparation '
               'ou prêtes sont gardés et ajoutés au foyer ; une copie de l\'ancienne base reste sur l\'appareil.',
               style: Charte.texte(13, couleur: Charte.texteSecondaire)),
         ),
         ..._pied('Rejoindre le foyer', () => _faire(() async {
               final c = _code.text.replaceAll(RegExp(r'\s'), '').toUpperCase();
               if (c.length != 10) return 'Le code de partage a 10 caractères.';
-              if (_nom.text.trim().isEmpty) return 'Saisissez votre nom.';
-              await Synchro.instance.rejoindre(c, _nom.text, email: _email.text);
+              await Synchro.instance.rejoindre(c, '');
               _fini('Foyer rejoint : les données arrivent dès qu\'un autre appareil est en ligne');
               return null;
             })),

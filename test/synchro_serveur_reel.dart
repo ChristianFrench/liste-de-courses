@@ -164,16 +164,17 @@ void main() {
     await ta.connecter(identifiant: 'ldc-essai-A-$code', sujetTestament: '$base/presence/NOEUDA', testament: '{}', abonnement: '$base/#');
     await pret.future.timeout(const Duration(seconds: 30));
 
-    // L'application rejoint sous le nom d'un membre qui existe déjà dans le foyer.
+    // L'application rejoint avec le code seul, puis la personne choisit son nom dans la liste des membres.
     final nom = ((demo['membres'] as List)[1] as Map)['nomAffiche'] as String;
     final t0 = DateTime.now();
-    await s.rejoindre(code, nom);
-    await attendre(() => etat.produits.length == (demo['produits'] as List).length && etat.listes.isNotEmpty);
+    await s.rejoindre(code, '');
+    await attendre(() => etat.produits.length == (demo['produits'] as List).length && etat.listes.isNotEmpty && etat.quiSuisJe);
+    etat.devenir(etat.membres.firstWhere((m) => m.nomAffiche == nom));
     notice('Foyer rejoint', '${DateTime.now().difference(t0).inMilliseconds} ms : ${etat.produits.length} produits, '
         '${etat.listes.length} listes, ${etat.membres.length} membres, moi = ${etat.moi.nomAffiche}');
     expect(etat.moi.nomAffiche, nom);
     expect(etat.moi.id, ((demo['membres'] as List)[1] as Map)['id'], reason: 'le membre existant est repris');
-    expect(etat.membres.length, (demo['membres'] as List).length);
+    expect(etat.membresVisibles.length, (demo['membres'] as List).length, reason: 'l\'appareil provisoire est retiré');
     expect(dossier.listSync().isNotEmpty, isTrue);
 
     // A supprime une liste après coup : elle disparaît de l'application.

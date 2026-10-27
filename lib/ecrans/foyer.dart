@@ -11,8 +11,8 @@ import 'bienvenue.dart';
 import 'parametres.dart' show OptionFoyer, ajouterMembreParNom, repartirANeuf;
 
 // Gérer › Mon foyer › Foyer : seul ou en foyer, code de partage, membres (26/10/2026).
-// L'administrateur voit la dernière connexion et l'activité de chacun, régénère le code,
-// renomme, radie ou supprime un membre. Un membre voit le nom et la version de chacun.
+// Pas d'administrateur (27/10/2026) : chaque membre peut ajouter, inviter, renommer ou retirer un membre
+// et régénérer le code. Chacun choisit son nom dans la liste des membres en rejoignant le foyer.
 
 const lienApk = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk';
 const lienWeb = 'https://christianfrench.github.io/liste-de-courses/web/';
@@ -35,7 +35,6 @@ class EcranFoyer extends StatelessWidget {
   Widget _construire(BuildContext context) {
     final etat = Etat.instance, s = Synchro.instance;
     final enFoyer = s.mode == 'foyer' && s.actif;
-    final admin = !enFoyer || etat.suisAdministrateur;
     return PageBase(
       entete: EnTeteFenetre(
         retour: true,
@@ -43,73 +42,75 @@ class EcranFoyer extends StatelessWidget {
         sousTitre: 'Gérer › Mon foyer',
         titre: 'Foyer',
         actions: [
-          if (!enFoyer) ActionLigne(Icons.person_add_outlined, '+ Nouveau membre', () => ajouterMembreParNom(context)),
           if (enFoyer) ...[
+            ActionLigne(Icons.person_add_outlined, '+ Nouveau membre', () => nouveauMembre(context)),
+            ActionLigne(Icons.switch_account_outlined, 'Changer de personne', () => choisirPersonne(context)),
             ActionLigne(Icons.copy, 'Copier le code', () {
               Clipboard.setData(ClipboardData(text: s.code!));
               Nav.message(context, 'Code copié');
             }),
-            ActionLigne(Icons.mail_outline, 'Envoyer le code par mail', () => _envoyerCode(context, s.code!)),
-            if (etat.suisAdministrateur) ActionLigne(Icons.key_outlined, 'Régénérer le code', () => _regenerer(context, s)),
-          ],
-          if (admin)
+            ActionLigne(Icons.key_outlined, 'Régénérer le code', () => _regenerer(context, s)),
             ActionLigne(Icons.edit_outlined, 'Renommer le foyer', () async {
               final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
               if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
             }),
+          ],
           ActionLigne(Icons.swap_horiz, enFoyer ? 'Utiliser seul' : 'Passer en foyer', () => _changerMode(context, enFoyer)),
-          if (admin) ActionLigne(Icons.restart_alt, 'Foyer neuf', () => repartirANeuf(context), danger: true),
+          ActionLigne(Icons.restart_alt, 'Foyer neuf', () => repartirANeuf(context), danger: true),
         ],
       ),
       corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: [
-        Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
-        Text(
-            enFoyer
-                ? 'Foyer partagé · vous en êtes ${etat.suisAdministrateur ? 'l\'administrateur' : 'membre'}'
-                : 'Seul sur cet appareil · pas de synchronisation',
-            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        if (enFoyer) ..._code(context, s, etat.suisAdministrateur),
-        const TitreSection('Membres', cote: 0),
-        for (final m in etat.membresVisibles) _LigneMembre(m, admin: admin, enFoyer: enFoyer),
-        OptionFoyer(
-          texte: 'Envoyer la liste à tout le foyer',
-          aide: 'Le mail est préparé avec les adresses de tous les membres',
-          coche: etat.envoiFoyer,
-          onChange: (v) => etat.options(envoiFoyer: v),
-        ),
+        if (!enFoyer) ...[
+          Text('Seul sur cet appareil', style: Charte.texte(20, gras: true)),
+          Text('Pas de membres ni de synchronisation. Pour partager les listes avec d\'autres personnes, '
+              'touchez le titre « Foyer » puis « Passer en foyer ».', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        ] else ...[
+          Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
+          Text(
+              'Foyer partagé · cet appareil est celui de ${etat.moi.nomAffiche}'
+              '${etat.appareilPartage ? ' (appareil partagé : on choisit son nom à chaque lancement)' : ''}',
+              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ..._code(s),
+          const TitreSection('Membres', cote: 0),
+          for (final m in etat.membresVisibles) _LigneMembre(m),
+          Padding(
+            padding: const EdgeInsets.only(top: 6, bottom: 4),
+            child: Text('Touchez un membre pour lui envoyer l\'invitation, le renommer ou le retirer du foyer.',
+                style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+          ),
+          OptionFoyer(
+            texte: 'Envoyer la liste à tout le foyer',
+            aide: 'Le mail est préparé avec les adresses de tous les membres',
+            coche: etat.envoiFoyer,
+            onChange: (v) => etat.options(envoiFoyer: v),
+          ),
+          OptionFoyer(
+            texte: 'Appareil partagé',
+            aide: 'Tablette ou PC de la famille : à chaque lancement, on choisit son nom',
+            coche: etat.appareilPartage,
+            onChange: (v) => etat.appareilPartage = v,
+          ),
+        ],
       ]),
     );
   }
 
-  List<Widget> _code(BuildContext context, Synchro s, bool admin) => [
+  List<Widget> _code(Synchro s) => [
         const TitreSection('Code de partage', cote: 0),
         Text(s.code!.split('').join(' '), maxLines: 1, style: Charte.texte(24, gras: true, espacement: 1)),
-        Text('À saisir sur un autre appareil : « Rejoindre un foyer ». Tous ceux qui ont ce code font partie du foyer. '
-            'Pour le copier ou l\'envoyer, touchez le titre « Foyer ».',
+        Text('À saisir sur un autre appareil : « Rejoindre un foyer », puis chacun choisit son nom dans la liste des membres. '
+            'L\'invitation envoyée à un membre contient ce code.',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
       ];
-
-  Future<void> _envoyerCode(BuildContext context, String code) async {
-    final etat = Etat.instance;
-    final corps = 'Bonjour,\n\nPour partager nos listes de courses dans le foyer « ${etat.foyerNom} » :\n\n'
-        '1. Installez l\'application : sur Android $lienApk ; sur iPhone, iPad ou PC, ouvrez $lienWeb\n'
-        '2. Au premier lancement, choisissez « Rejoindre un foyer ».\n'
-        '3. Saisissez le code de partage : $code\n\n${etat.moi.nomAffiche}';
-    final q = {'subject': 'Rejoindre le foyer ${etat.foyerNom}', 'body': corps}
-        .entries
-        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-    final ok = await launchUrl(Uri.parse('mailto:?$q'));
-    if (!ok && context.mounted) Nav.message(context, 'Aucune messagerie trouvée : utilisez « Copier »');
-  }
 
   Future<void> _regenerer(BuildContext context, Synchro s) async {
     final ok = await confirmer(context,
         titre: 'Régénérer le code ?',
         icone: Icons.key_outlined,
         contenu: Text(
-            'Un nouveau code remplace l\'ancien. Les autres appareils s\'arrêtent de partager et demandent le nouveau code '
-            '(leurs données restent). Donnez-le à ceux qui doivent rester dans le foyer.',
+            'À faire seulement si quelqu\'un a quitté le foyer et ne doit plus voir les listes. Un nouveau code remplace '
+            'l\'ancien : TOUS les autres appareils s\'arrêtent de partager jusqu\'à ce qu\'on y saisisse le nouveau code '
+            '(leurs données restent).',
             style: Charte.texte(16)),
         plein: 'Annuler',
         contour: 'Régénérer le code');
@@ -135,31 +136,67 @@ class EcranFoyer extends StatelessWidget {
   }
 }
 
+/// Mail d'invitation à [m], prérempli dans la messagerie de l'appareil (rien ne part tout seul).
+Future<void> envoyerInvitation(BuildContext context, Membre m) async {
+  final etat = Etat.instance;
+  final code = Synchro.instance.code ?? '';
+  final corps = 'Bonjour ${m.nomAffiche},\n\nPour partager nos listes de courses dans le foyer « ${etat.foyerNom} » :\n\n'
+      '1. Installez l\'application : sur Android $lienApk ; sur iPhone, iPad ou PC, ouvrez $lienWeb\n'
+      '2. Au premier lancement, choisissez « Rejoindre un foyer ».\n'
+      '3. Saisissez le code de partage : $code\n'
+      '4. Dans la liste des membres, choisissez « ${m.nomAffiche} ».\n\n${etat.moi.nomAffiche}';
+  final q = {'subject': 'Rejoindre le foyer ${etat.foyerNom}', 'body': corps}
+      .entries
+      .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
+      .join('&');
+  final ok = await launchUrl(Uri.parse('mailto:${Uri.encodeComponent(m.email)}?$q'));
+  if (!ok && context.mounted) Nav.message(context, 'Aucune messagerie trouvée : copiez le code (titre « Foyer »)');
+}
+
+/// Nouveau membre du foyer (prénom, mail), puis son invitation.
+Future<void> nouveauMembre(BuildContext context) async {
+  final etat = Etat.instance;
+  final avant = {for (final m in etat.membres) m.id};
+  await ajouterMembreParNom(context);
+  final m = _trouveNouveau(etat, avant);
+  if (m == null || !context.mounted) return;
+  final ok = await confirmer(context,
+      titre: 'Inviter ${m.nomAffiche} ?',
+      contenu: Text('Votre messagerie s\'ouvre avec le mail d\'invitation : le code de partage, les liens pour installer '
+          'l\'application, et le nom à choisir. Vous l\'envoyez vous-même.', style: Charte.texte(16)),
+      plein: 'Plus tard',
+      contour: 'Préparer le mail');
+  if (ok == true && context.mounted) await envoyerInvitation(context, m);
+}
+
+Membre? _trouveNouveau(Etat etat, Set<String> avant) {
+  for (final m in etat.membres) {
+    if (!avant.contains(m.id)) return m;
+  }
+  return null;
+}
+
 class _LigneMembre extends StatelessWidget {
-  const _LigneMembre(this.m, {required this.admin, required this.enFoyer});
+  const _LigneMembre(this.m);
   final Membre m;
-  final bool admin, enFoyer;
 
   @override
   Widget build(BuildContext context) {
-    final etat = Etat.instance, s = Synchro.instance;
-    final radie = etat.estRadie(m);
+    final s = Synchro.instance;
     final versions = [
       if (m.moi) s.maVersion,
       for (final a in s.appareilsDe(m)) Synchro.libelleVersion(a.plateforme, a.version),
     ].toSet().join(', ');
     final details = [
-      m.roleAffiche + (m.moi ? ' (vous)' : ''),
-      if (radie) 'radié',
-      if (enFoyer && versions.isNotEmpty) versions,
-      if (enFoyer && admin && !m.moi) _connexion(m),
-      if (!enFoyer) m.email.isEmpty ? 'adresse mail : touchez pour l\'indiquer' : m.email,
+      if (m.moi) 'vous',
+      if (versions.isNotEmpty) versions else if (!m.moi) 'pas encore connecté',
+      if (!m.moi && s.appareilsDe(m).isNotEmpty) _connexion(m),
     ];
     return LigneMenu(
       titre: m.nomAffiche,
       sousTitre: details.join(' · '),
-      gauche: Opacity(opacity: radie ? 0.4 : 1, child: IconeRonde(null, texte: m.initiales)),
-      onTap: () => _fiche(context, m, admin: admin, enFoyer: enFoyer),
+      gauche: IconeRonde(null, texte: m.initiales),
+      onTap: () => _fiche(context, m),
     );
   }
 }
@@ -171,17 +208,14 @@ String _connexion(Membre m) {
   return vus.isEmpty ? 'jamais vu' : 'vu ${_vu(vus.last)}';
 }
 
-/// Fiche d'un membre : appareils, activité (administrateur), mail, et les actions de l'administrateur.
-Future<void> _fiche(BuildContext context, Membre m, {required bool admin, required bool enFoyer}) => modale(
+/// Fiche d'un membre : appareils, listes et courses, puis ses actions (tous les membres peuvent les faire).
+Future<void> _fiche(BuildContext context, Membre m) => modale(
       context,
       titre: m.nomAffiche,
-      icone: Icons.person_outline,
       oui: null,
       non: null,
-      croix: true,
       contenu: (ctx, maj) {
         final etat = Etat.instance, s = Synchro.instance;
-        final radie = etat.estRadie(m);
         final listes = etat.listesDuMembre(m), courses = etat.coursesDuMembre(m);
         final gris = Charte.texte(14, couleur: Charte.texteSecondaire);
         void fermerPuis(void Function() f) {
@@ -189,129 +223,124 @@ Future<void> _fiche(BuildContext context, Membre m, {required bool admin, requir
           f();
         }
 
-        return ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.7),
-          child: SingleChildScrollView(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text('${m.roleAffiche}${radie ? ' · radié' : ''}', style: Charte.texte(15)),
-              Text(m.email.isEmpty ? 'Pas d\'adresse mail' : m.email, style: gris),
-              if (enFoyer) ...[
-                const SizedBox(height: 10),
-                Text('Appareils', style: Charte.texte(15, gras: true)),
-                if (m.moi) Text('${s.maVersion} · cet appareil', style: Charte.texte(14)),
-                for (final a in s.appareilsDe(m))
-                  Text(
-                      '${Synchro.libelleVersion(a.plateforme, a.version)}'
-                      '${admin ? ' · ${a.enLigne ? 'en ligne' : a.vu == null ? 'jamais vu' : 'vu ${_vu(a.vu!)}'}' : ''}',
-                      style: Charte.texte(14)),
-                if (!m.moi && s.appareilsDe(m).isEmpty) Text('Aucun appareil vu depuis le lancement', style: gris),
-              ],
-              if (admin) ...[
-                const SizedBox(height: 10),
-                Text('Listes préparées (${listes.length})', style: Charte.texte(15, gras: true)),
-                for (final l in listes.take(15))
-                  InkWell(
-                    onTap: () => _voirListe(ctx, l),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Row(children: [
-                        Expanded(child: Text(etat.nomListe(l), style: Charte.texte(14))),
-                        Text('${l.lignes.length} art. · ${_statut(l.statut)}', style: gris),
-                      ]),
-                    ),
-                  ),
-                if (listes.isEmpty) Text('Aucune', style: gris),
-                const SizedBox(height: 10),
-                Text('Courses faites (${courses.length})', style: Charte.texte(15, gras: true)),
-                for (final c in courses.take(15))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4),
-                    child: Text('${etat.nomCourse(c)} · ${c.nbArticles} articles', style: Charte.texte(14)),
-                  ),
-                if (courses.isEmpty) Text('Aucune', style: gris),
-              ],
-              const SizedBox(height: 14),
-              Wrap(spacing: 8, runSpacing: 8, children: [
-                if (admin || m.moi)
-                  BoutonAction('Mail', onTap: () async {
-                    final email = await demanderTexte(ctx, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
-                    if (email != null) etat.modifierEmail(m, email);
-                    maj(() {});
-                  }),
-                if (admin || m.moi)
-                  BoutonAction('Renommer', onTap: () async {
-                    final nom = await demanderTexte(ctx, titre: 'Nom du membre', initial: m.nomAffiche);
-                    if (nom != null && nom.trim().isNotEmpty) etat.renommerMembre(m, nom);
-                    maj(() {});
-                  }),
-                if (admin && enFoyer && !m.moi && !radie)
-                  BoutonAction('Radier', onTap: () => fermerPuis(() => _radier(context, m))),
-                if (admin && enFoyer && radie)
-                  BoutonAction('Réactiver', onTap: () {
-                    etat.reactiverMembre(m);
-                    maj(() {});
-                  }),
-                if (admin && !m.moi) BoutonAction('Supprimer', onTap: () => fermerPuis(() => _supprimer(context, m))),
-                if (enFoyer && !m.moi && !radie) BoutonAction('C\'est moi', onTap: () => fermerPuis(() => _cEstMoi(context, m))),
-              ]),
-            ]),
+        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+          Text(m.email.isEmpty ? 'Pas d\'adresse mail' : m.email, style: gris),
+          const SizedBox(height: 10),
+          Text('Appareils', style: Charte.texte(15, gras: true)),
+          if (m.moi) Text('${s.maVersion} · cet appareil', style: Charte.texte(14)),
+          for (final a in s.appareilsDe(m))
+            Text(
+                '${Synchro.libelleVersion(a.plateforme, a.version)}'
+                ' · ${a.enLigne ? 'en ligne' : a.vu == null ? 'jamais vu' : 'vu ${_vu(a.vu!)}'}',
+                style: Charte.texte(14)),
+          if (!m.moi && s.appareilsDe(m).isEmpty) Text('Aucun appareil vu depuis le lancement', style: gris),
+          const SizedBox(height: 10),
+          Text('Listes préparées (${listes.length})', style: Charte.texte(15, gras: true)),
+          for (final l in listes.take(15))
+            InkWell(
+              onTap: () => _voirListe(ctx, l),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(children: [
+                  Expanded(child: Text(etat.nomListe(l), style: Charte.texte(14))),
+                  Text('${l.lignes.length} art. · ${_statut(l.statut)}', style: gris),
+                ]),
+              ),
+            ),
+          if (listes.isEmpty) Text('Aucune', style: gris),
+          const SizedBox(height: 10),
+          Text('Courses faites (${courses.length})', style: Charte.texte(15, gras: true)),
+          for (final c in courses.take(15))
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text('${etat.nomCourse(c)} · ${c.nbArticles} articles', style: Charte.texte(14)),
+            ),
+          if (courses.isEmpty) Text('Aucune', style: gris),
+          const SizedBox(height: 10),
+          if (!m.moi)
+            LigneMenu(titre: 'Envoyer l\'invitation', onTap: () => fermerPuis(() => envoyerInvitation(context, m))),
+          LigneMenu(
+            titre: 'Adresse mail',
+            onTap: () async {
+              final email = await demanderTexte(ctx, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
+              if (email != null) etat.modifierEmail(m, email);
+              maj(() {});
+            },
           ),
-        );
+          LigneMenu(
+            titre: 'Renommer',
+            onTap: () async {
+              final nom = await demanderTexte(ctx, titre: 'Nom du membre', initial: m.nomAffiche);
+              if (nom != null && nom.trim().isNotEmpty) etat.renommerMembre(m, nom);
+              maj(() {});
+            },
+          ),
+          if (!m.moi) LigneMenu(titre: 'Retirer du foyer', onTap: () => fermerPuis(() => _retirer(context, m))),
+        ]);
       },
     );
 
-/// « C'est moi » : cet appareil appartient à [m] (la même personne sur un autre appareil).
-Future<void> _cEstMoi(BuildContext context, Membre m) async {
+/// La liste des membres : la personne touche son nom. Après avoir rejoint un foyer, on peut aussi
+/// ne pas y être (nouveau membre) ou dire que l'appareil est partagé.
+Future<void> choisirPersonne(BuildContext context, {bool premiereFois = false}) async {
   final etat = Etat.instance;
-  final ok = await confirmer(
+  final membres = [for (final m in etat.membresVisibles) if (!(m.moi && (premiereFois || etat.moiProvisoire))) m];
+  final r = await volet<String>(
     context,
-    titre: 'Vous êtes ${m.nomAffiche} ?',
-    icone: Icons.person_outline,
-    contenu: Text(
-        'Cet appareil sera rattaché à ${m.nomAffiche}, avec ses autres appareils. « ${etat.moi.nomAffiche} », le nom utilisé '
-        'jusqu\'ici sur cet appareil, disparaît de la liste des membres ; ses listes et ses courses passent à ${m.nomAffiche}.',
-        style: Charte.texte(16)),
-    plein: 'Annuler',
-    contour: 'C\'est moi',
+    fermable: !premiereFois && !etat.choixPersonne,
+    builder: (ctx) => corpsVolet(
+      titre: premiereFois ? 'Qui êtes-vous ?' : 'Qui utilise cet appareil ?',
+      contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Text(
+            premiereFois
+                ? 'Touchez votre nom. Une même personne peut utiliser plusieurs appareils (téléphone, PC, navigateur).'
+                : 'Touchez votre nom.',
+            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        const SizedBox(height: 6),
+        for (final m in membres)
+          LigneMenu(
+            key: ValueKey('personne-${m.nomAffiche}'),
+            titre: m.nomAffiche,
+            gauche: IconeRonde(null, texte: m.initiales),
+            sousTitre: m.moi ? 'actuellement' : null,
+            onTap: () => Navigator.of(ctx).pop(m.id),
+          ),
+        if (premiereFois) ...[
+          LigneMenu(titre: 'Je ne suis pas dans la liste', onTap: () => Navigator.of(ctx).pop('nouveau')),
+          LigneMenu(
+            titre: 'Appareil partagé (tablette, PC de la famille)',
+            sousTitre: 'on choisira son nom à chaque lancement',
+            onTap: () => Navigator.of(ctx).pop('partage'),
+          ),
+        ],
+      ]),
+    ),
   );
-  if (ok != true || !context.mounted) return;
-  etat.devenir(m);
-  Nav.message(context, 'Cet appareil est maintenant celui de ${m.nomAffiche}');
-}
-
-/// Après avoir rejoint un foyer : « Qui êtes-vous ? » parmi les membres, ou nouveau membre.
-Future<void> demanderQuiSuisJe(BuildContext context) async {
-  final etat = Etat.instance;
-  final autres = [for (final m in etat.membresVisibles) if (!m.moi && !etat.estRadie(m)) m];
-  Membre? choisi;
-  final ok = await modale(
-    context,
-    titre: 'Qui êtes-vous ?',
-    icone: Icons.person_outline,
-    oui: 'Valider',
-    non: null,
-    contenu: (context, maj) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Text('Une même personne peut utiliser plusieurs appareils (téléphone, PC, navigateur) : choisissez votre nom '
-          's\'il est déjà dans le foyer.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      const SizedBox(height: 8),
-      for (final m in autres)
-        CaseModale(texte: m.nomAffiche, coche: identical(choisi, m), onChange: (_) => maj(() => choisi = m)),
-      CaseModale(
-        texte: 'Je suis un nouveau membre : ${etat.moi.nomAffiche}',
-        coche: choisi == null,
-        onChange: (_) => maj(() => choisi = null),
-      ),
-    ]),
-  );
-  if (!ok) return;
-  if (choisi == null) {
-    etat.resterNouveau();
-  } else {
-    etat.devenir(choisi!);
+  if (!context.mounted) return;
+  switch (r) {
+    case null:
+      return;
+    case 'nouveau':
+      final nom = await demanderTexte(context, titre: 'Votre prénom', aide: 'Il apparaîtra sur vos listes', valider: 'Valider');
+      if (nom == null || nom.trim().isEmpty) {
+        if (context.mounted) await choisirPersonne(context, premiereFois: true);
+        return;
+      }
+      etat.resterNouveau(nom);
+    case 'partage':
+      etat.appareilPartage = true;
+      await choisirPersonne(context);
+      if (etat.moiProvisoire && context.mounted) await choisirPersonne(context, premiereFois: true);
+    default:
+      final m = etat.membre(r);
+      if (m == null) return;
+      etat.devenir(m);
+      Nav.message(context, 'Bonjour ${m.nomAffiche}');
   }
 }
 
-/// Pose la question « Qui êtes-vous ? » dès que le foyer rejoint a été reçu.
+/// Pose la question « Qui êtes-vous ? » dès que le foyer rejoint a été reçu, et « Qui utilise cet appareil ? »
+/// au lancement d'un appareil partagé.
 class GuetteurQuiSuisJe extends StatefulWidget {
   const GuetteurQuiSuisJe({super.key, required this.child});
   final Widget child;
@@ -327,6 +356,7 @@ class _GuetteurQuiSuisJeState extends State<GuetteurQuiSuisJe> {
   void initState() {
     super.initState();
     Etat.instance.addListener(_verifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _verifier());
   }
 
   @override
@@ -336,9 +366,10 @@ class _GuetteurQuiSuisJeState extends State<GuetteurQuiSuisJe> {
   }
 
   Future<void> _verifier() async {
-    if (_ouverte || !mounted || !Etat.instance.quiSuisJe) return;
+    final etat = Etat.instance;
+    if (_ouverte || !mounted || !(etat.quiSuisJe || etat.choixPersonne)) return;
     _ouverte = true;
-    await demanderQuiSuisJe(context);
+    await choisirPersonne(context, premiereFois: etat.quiSuisJe);
     _ouverte = false;
   }
 
@@ -377,25 +408,14 @@ Future<void> _voirListe(BuildContext context, Liste l) {
   );
 }
 
-Future<void> _radier(BuildContext context, Membre m) async {
+Future<void> _retirer(BuildContext context, Membre m) async {
   final ok = await confirmer(context,
-      titre: 'Radier ${m.nomAffiche} ?',
+      titre: 'Retirer ${m.nomAffiche} du foyer ?',
       contenu: Text(
-          'Son appareil cesse de partager et garde ses données. Pour revenir, il lui faudra le code de partage, '
-          'que vous lui redonnerez. Pour l\'exclure sûrement, régénérez aussi le code.',
+          'Il disparaît de la liste des membres et ses appareils cessent de partager. Son nom reste sur ses listes '
+          'et ses courses passées. Il pourra revenir avec le code de partage.',
           style: Charte.texte(16)),
       plein: 'Annuler',
-      contour: 'Radier');
-  if (ok == true) Etat.instance.radierMembre(m);
-}
-
-Future<void> _supprimer(BuildContext context, Membre m) async {
-  final ok = await confirmer(context,
-      titre: 'Supprimer ${m.nomAffiche} ?',
-      contenu: Text(
-          'Il disparaît de la liste des membres et son appareil cesse de partager. Ses listes et ses courses passées restent.',
-          style: Charte.texte(16)),
-      plein: 'Annuler',
-      contour: 'Supprimer');
+      contour: 'Retirer du foyer');
   if (ok == true) Etat.instance.supprimerMembre(m);
 }

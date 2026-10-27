@@ -344,9 +344,10 @@ class Aides {
       'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
-      'Mon foyer : seul sur cet appareil ou en foyer partagé ; le code de partage (à copier ou envoyer par mail, '
-      'régénéré par l\'administrateur) ; les membres (version de l\'application ; pour l\'administrateur, dernière connexion, '
-      'listes préparées et courses faites ; renommer, radier, supprimer).\n'
+      'Mon foyer : seul sur cet appareil ou en foyer partagé. En foyer, chacun peut ajouter un membre et lui envoyer '
+      'l\'invitation par mail (code de partage et liens d\'installation), le renommer ou le retirer du foyer, et régénérer le code. '
+      'En rejoignant le foyer, on choisit son nom dans la liste des membres ; « Changer de personne » corrige une erreur. '
+      'Appareil partagé (tablette, PC de la famille) : on choisit son nom à chaque lancement.\n'
       'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
       'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
       'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'

@@ -557,6 +557,8 @@ class Etat extends ChangeNotifier {
     harmoniserCatalogue();
     // Historique de plus de trois mois (réglable) vers les archives, et archives trop anciennes supprimées.
     if (archiverAnciennes() | purgerArchives()) enregistrer();
+    // Appareil partagé (tablette, PC de la famille) : on dit qui l'utilise à chaque lancement.
+    choixPersonne = appareilPartage && membresVisibles.length > 1;
   }
 
   /// Repartir d'un foyer neuf : la base actuelle est gardée dans un fichier à part sur l'appareil.
@@ -686,7 +688,7 @@ class Etat extends ChangeNotifier {
     final s = _foyer = Stockage.ouvrir(_chemin(baseFoyer));
     final depart = _depart(demo);
     final moiJson = (depart['membres'] as List).first as Map;
-    moiJson['nomAffiche'] = nom.trim().isEmpty ? 'Moi' : nom.trim();
+    moiJson['nomAffiche'] = nom.trim().isEmpty ? 'Nouvel appareil' : nom.trim();
     moiJson['role'] = 'membre';
     moiJson['email'] = email.trim();
     depart['magasins'] = <dynamic>[];
@@ -699,58 +701,76 @@ class Etat extends ChangeNotifier {
     lire(s.lire());
   }
 
-  /// Après avoir rejoint un foyer : si le foyer a déjà un membre de ce nom, c'est moi.
+  /// Après avoir rejoint un foyer : dès que les membres du foyer sont reçus, la personne choisit
+  /// son nom dans la liste (27/10/2026).
   void _retrouverMoi(Stockage s) {
     final provisoire = s.reglage('synchro_membre_provisoire');
     if (provisoire == null) return;
-    final ici = _trouve(membres, (m) => m.id == provisoire);
-    if (ici == null) {
+    if (_trouve(membres, (m) => m.id == provisoire) == null) {
       s.effacerReglage('synchro_membre_provisoire');
       return;
     }
-    final meme = _trouve(membres, (m) => m.id != provisoire && m.nomAffiche.toLowerCase() == ici.nomAffiche.toLowerCase());
-    if (meme != null) {
-      membres
-        ..remove(ici)
-        ..[membres.indexOf(meme)] = Membre(meme.id, meme.nomAffiche, meme.role, true, email: meme.email.isEmpty ? ici.email : meme.email);
-      s.effacerReglage('synchro_membre_provisoire');
-      modifie();
-    } else if (membres.length > 1 && !quiSuisJe) {
-      // Pas de membre de ce nom : la personne dit elle-même qui elle est (ou confirme qu'elle est nouvelle).
+    if (!quiSuisJe && membresVisibles.any((m) => m.id != provisoire)) {
       quiSuisJe = true;
       notifyListeners();
     }
   }
 
-  /// Après avoir rejoint un foyer : demander à la personne qui elle est parmi les membres (26/10/2026).
+  /// Après avoir rejoint un foyer : la personne choisit qui elle est parmi les membres.
   bool quiSuisJe = false;
 
-  /// Cet appareil est à [m] : la personne et ses appareils (exe, apk, web) ne font plus qu'un membre.
-  /// L'ancien membre de cet appareil disparaît de la liste ; ses listes et ses courses passent à [m].
+  /// Appareil partagé : au lancement, la personne qui l'utilise choisit son nom.
+  bool choixPersonne = false;
+
+  /// Appareil partagé par plusieurs membres (réglage de cet appareil seulement).
+  bool get appareilPartage => _foyer?.reglage('appareil_partage') == '1';
+  set appareilPartage(bool v) {
+    if (v) {
+      _foyer?.definirReglage('appareil_partage', '1');
+    } else {
+      _foyer?.effacerReglage('appareil_partage');
+    }
+    notifyListeners();
+  }
+
+  /// Membre provisoire de cet appareil, en attendant que la personne choisisse son nom.
+  bool get moiProvisoire => _foyer?.reglage('synchro_membre_provisoire') == moi.id;
+
+  /// Cet appareil est à [m]. Le membre provisoire créé en rejoignant le foyer disparaît ;
+  /// ses listes et ses courses (reprises de l'appareil) passent à [m]. Sinon, simple changement de personne.
   void devenir(Membre m) {
     final ancien = moi;
+    final provisoire = moiProvisoire;
     _foyer?.effacerReglage('synchro_membre_provisoire');
     quiSuisJe = false;
+    choixPersonne = false;
     if (ancien.id == m.id) {
       notifyListeners();
       return;
     }
     membres = [for (final x in membres) Membre(x.id, x.nomAffiche, x.role, x.id == m.id, email: x.email)];
-    for (final l in listes) {
-      if (l.membreId == ancien.id) l.membreId = m.id;
+    if (provisoire) {
+      for (final l in listes) {
+        if (l.membreId == ancien.id) l.membreId = m.id;
+      }
+      for (final c in historique) {
+        if (c.membreId == ancien.id) c.membreId = m.id;
+      }
+      statutsMembres[ancien.id] = 's';
     }
-    for (final c in historique) {
-      if (c.membreId == ancien.id) c.membreId = m.id;
-    }
-    statutsMembres[ancien.id] = 's';
     modifie();
   }
 
-  /// Après avoir rejoint un foyer : « Je suis un nouveau membre ».
-  void resterNouveau() {
+  /// Après avoir rejoint un foyer : « Je ne suis pas dans la liste » ; le membre de cet appareil prend [nom].
+  void resterNouveau([String? nom]) {
     _foyer?.effacerReglage('synchro_membre_provisoire');
     quiSuisJe = false;
-    notifyListeners();
+    choixPersonne = false;
+    if (nom != null && nom.trim().isNotEmpty) {
+      renommerMembre(moi, nom);
+    } else {
+      notifyListeners();
+    }
   }
 
   /// À appeler après chaque action : prévient les écrans et enregistre.
@@ -2280,14 +2300,11 @@ class Etat extends ChangeNotifier {
 
   // ------------------------------------------------------------ Membres du foyer (26/10/2026)
 
-  bool get suisAdministrateur => moi.role == 'administrateur';
+  /// Membres visibles : tous sauf ceux qui ont été retirés du foyer (ou radiés, avant le 27/10/2026).
+  /// Leurs noms restent sur leurs listes et leurs courses.
+  List<Membre> get membresVisibles => [for (final m in membres) if (!statutsMembres.containsKey(m.id)) m];
 
-  /// Membres visibles : tous sauf ceux que l'administrateur a supprimés.
-  List<Membre> get membresVisibles => [for (final m in membres) if (statutsMembres[m.id] != 's') m];
-
-  bool estRadie(Membre m) => statutsMembres[m.id] == 'r';
-
-  /// Cet appareil a été radié ou supprimé du foyer par l'administrateur.
+  /// Cet appareil a été retiré du foyer par un autre membre.
   bool get moiExclu => statutsMembres.containsKey(moi.id);
 
   void renommerMembre(Membre m, String nom) {
@@ -2296,13 +2313,8 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  /// Radier : le membre ne reçoit plus rien ; il revient en saisissant le code de partage.
-  void radierMembre(Membre m) {
-    statutsMembres[m.id] = 'r';
-    modifie();
-  }
-
-  /// Supprimer : le membre disparaît de la liste ; ses listes et ses courses restent.
+  /// Retirer du foyer : le membre disparaît de la liste ; ses listes et ses courses restent.
+  /// Son appareil cesse de partager ; il revient en saisissant le code de partage.
   void supprimerMembre(Membre m) {
     statutsMembres[m.id] = 's';
     modifie();
