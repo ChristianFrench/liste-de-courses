@@ -495,7 +495,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                           ],
                         ],
                 ),
-          bas: [BarreAction(boutons: [Bouton(texte: 'Liste prête', plein: true, onTap: () => _valider(l))])],
+          bas: [BarreAction(boutons: [Bouton(texte: 'Liste prête', icone: Icons.check, plein: true, onTap: () => _valider(l))])],
         );
       },
     );
@@ -1272,11 +1272,11 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                   ),
             bas: [
               BarreAction(boutons: [
-                Bouton(texte: 'Pause', taille: 16, onTap: () => _pause(context, l, e)),
+                Bouton(texte: 'Pause', icone: Icons.pause, onTap: () => _pause(context, l, e)),
                 Bouton(
-                  texte: 'Terminer les courses',
-                  taille: 15,
-                  plein: l.nbCoches == total,
+                  texte: 'Terminer',
+                  icone: Icons.flag_outlined,
+                  plein: true,
                   onTap: () => _terminer(context, l),
                 ),
               ]),

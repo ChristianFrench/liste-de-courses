@@ -220,7 +220,19 @@ class EcranMagasins extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, icone: Icons.storefront_outlined, sousTitre: 'Gérer › Courses', titre: 'Magasins', aide: Aides.magasins),
+        entete: EnTeteFenetre(
+          retour: true,
+          icone: Icons.storefront_outlined,
+          sousTitre: 'Gérer › Courses',
+          titre: 'Magasins',
+          aide: Aides.magasins,
+          actions: [
+            ActionLigne(Icons.add, '+ Nouveau magasin', () async {
+              final m = await creerMagasinDemande(context);
+              if (m != null && context.mounted) Nav.aller<void>(context, EcranMagasin(magasinId: m.id));
+            }),
+          ],
+        ),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -249,18 +261,6 @@ class EcranMagasins extends StatelessWidget {
             ),
           ],
         ),
-        bas: [
-          BarreAction(boutons: [
-            Bouton(
-              texte: '+ Nouveau magasin',
-              plein: true,
-              onTap: () async {
-                final m = await creerMagasinDemande(context);
-                if (m != null && context.mounted) Nav.aller<void>(context, EcranMagasin(magasinId: m.id));
-              },
-            ),
-          ]),
-        ],
       ),
     );
   }
@@ -285,30 +285,28 @@ class EcranMagasin extends StatelessWidget {
           );
         }
         return PageBase(
-          entete: EnTeteFenetre(retour: true, icone: Icons.storefront_outlined, sousTitre: 'Gérer › Courses › Magasins', titre: m.nom, aide: Aides.parcours),
+          entete: EnTeteFenetre(
+            retour: true,
+            icone: Icons.storefront_outlined,
+            sousTitre: 'Gérer › Courses › Magasins',
+            titre: m.nom,
+            aide: Aides.parcours,
+            actions: [
+              ActionLigne(Icons.edit_outlined, 'Renommer le magasin', () async {
+                final nom = await demanderTexte(context, titre: 'Nom du magasin', initial: m.nom);
+                if (nom == null || nom.isEmpty || !context.mounted) return;
+                if (etat.magasinNomme(nom) case final autre? when autre.id != m.id) {
+                  Nav.message(context, 'Un magasin s\'appelle déjà « $nom »');
+                  return;
+                }
+                etat.renommerMagasin(m, nom);
+              }),
+              ActionLigne(Icons.delete_outline, 'Supprimer le magasin', () async {
+                if (await demanderSuppression(context, m, 'le magasin ${m.nom}') && context.mounted) Navigator.of(context).pop();
+              }, danger: true),
+            ],
+          ),
           corps: SousEcranParcours(magasinId: m.id),
-          bas: [
-            BarreAction(boutons: [
-              Bouton(
-                texte: 'Renommer',
-                onTap: () async {
-                  final nom = await demanderTexte(context, titre: 'Nom du magasin', initial: m.nom);
-                  if (nom == null || nom.isEmpty || !context.mounted) return;
-                  if (etat.magasinNomme(nom) case final autre? when autre.id != m.id) {
-                    Nav.message(context, 'Un magasin s\'appelle déjà « $nom »');
-                    return;
-                  }
-                  etat.renommerMagasin(m, nom);
-                },
-              ),
-              Bouton(
-                texte: 'Supprimer',
-                onTap: () async {
-                  if (await demanderSuppression(context, m, 'le magasin ${m.nom}') && context.mounted) Navigator.of(context).pop();
-                },
-              ),
-            ]),
-          ],
         );
       },
     );
@@ -347,6 +345,10 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
             sousTitre: 'Gérer › Courses',
             titre: 'Catalogue',
             aide: Aides.catalogue,
+            actions: [
+              ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
+              ActionLigne(Icons.edit_outlined, 'Produits ajoutés ($perso)', () => Nav.aller<void>(context, const EcranProduitsPerso())),
+            ],
           ),
           haut: [
             Padding(
@@ -400,7 +402,10 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                               apresTitre: etat.secteurAjoute(s) ? const SigneAjoute() : null,
                               gauche: imageSecteur(context, s),
                               sousTitre: _pluriel(etat.produitsDuSecteur(s).length, 'produit'),
-                              onTap: () => Nav.aller<void>(context, EcranSecteurCatalogue(secteurId: s.id)),
+                              onTap: () => menuActions(context, titre: s.nom, actions: [
+                                ActionLigne(Icons.list, 'Voir et modifier les produits', () => Nav.aller<void>(context, EcranSecteurCatalogue(secteurId: s.id))),
+                                ...actionsSecteur(context, s),
+                              ]),
                             ),
                         ],
                       ),
@@ -414,15 +419,6 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                       ),
                   ],
           ),
-          bas: [
-            BarreAction(boutons: [
-              Bouton(texte: '+ Rayon', onTap: () => _nouveauRayon(context)),
-              Bouton(
-                texte: 'Produits ajoutés ($perso)',
-                onTap: () => Nav.aller<void>(context, const EcranProduitsPerso()),
-              ),
-            ]),
-          ],
         );
       },
     );
@@ -455,6 +451,7 @@ class EcranSecteurCatalogue extends StatelessWidget {
             sousTitre: 'Catalogue › ${etat.rayon(s.rayonId)?.nom ?? ''}',
             titre: s.nom,
             aide: Aides.catalogue,
+            actions: actionsSecteur(context, s),
           ),
           corps: ListView(
             padding: const EdgeInsets.only(bottom: 16),
@@ -467,27 +464,23 @@ class EcranSecteurCatalogue extends StatelessWidget {
               for (final p in produits) ligneProduit(context, p),
             ],
           ),
-          bas: [
-            BarreAction(boutons: [
-              if (etat.secteurAjoute(s)) ...[
-                Bouton(texte: 'Renommer', taille: 15, onTap: () => _renommerSecteur(context, s)),
-                Bouton(texte: 'Supprimer', taille: 15, onTap: () => _supprimerSecteur(context, s)),
-              ],
-              Bouton(
-                texte: '+ Nouveau produit',
-                plein: true,
-                onTap: () async {
-                  final p = await fenetreProduit(context, secteur: s);
-                  if (p != null && context.mounted) Nav.message(context, '« ${p.nom} » ajouté au catalogue');
-                },
-              ),
-            ]),
-          ],
         );
       },
     );
   }
 }
+
+/// Actions d'un secteur du catalogue : nouveau produit ; renommer et supprimer s'il a été ajouté par le foyer.
+List<ActionLigne> actionsSecteur(BuildContext context, Secteur s) => [
+      ActionLigne(Icons.add, '+ Nouveau produit', () async {
+        final p = await fenetreProduit(context, secteur: s);
+        if (p != null && context.mounted) Nav.message(context, '« ${p.nom} » ajouté au catalogue');
+      }),
+      if (Etat.instance.secteurAjoute(s)) ...[
+        ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () => _renommerSecteur(context, s)),
+        ActionLigne(Icons.delete_outline, 'Supprimer le secteur', () => _supprimerSecteur(context, s), danger: true),
+      ],
+    ];
 
 /// Catalogue › Produits ajoutés : les produits que le foyer a ajoutés, à corriger (fenêtre du produit) ou supprimer.
 class EcranProduitsPerso extends StatelessWidget {
@@ -516,6 +509,7 @@ class EcranProduitsPerso extends StatelessWidget {
                 Glissable(
                   key: ValueKey('perso-${p.id}'),
                   titre: p.nom,
+                  auToucher: true,
                   versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
                   actions: [
                     ActionLigne(Icons.edit_outlined, 'Modifier', () => modifier(p)),
@@ -526,19 +520,13 @@ class EcranProduitsPerso extends StatelessWidget {
                     icone: Icons.shopping_basket_outlined,
                     sousTitre: [rangement(p), if (p.packagingIds.isNotEmpty) etat.packaging(p.packagingIds.first)?.libelle ?? '']
                         .join(' · '),
-                    onTap: () => modifier(p),
-                    droite: BoutonIcone(
-                      icone: Icons.delete_outline,
-                      libelle: 'Supprimer ${p.nom}',
-                      onTap: () => demanderSuppression(context, p, 'le produit ${p.nom}'),
-                    ),
                   ),
                 ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Text(
-                    'Les produits d\'origine du catalogue ne se modifient pas. Touchez un produit ajouté pour le modifier, '
-                    'ou sa corbeille pour le supprimer (s\'il n\'est dans aucune liste).',
+                    'Les produits d\'origine du catalogue ne se modifient pas. Touchez un produit ajouté pour le modifier '
+                    'ou le supprimer (s\'il n\'est dans aucune liste).',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),
             ],
@@ -563,7 +551,19 @@ class EcranMarques extends StatelessWidget {
       builder: (context, _) {
         final marques = etat.marquesTriees;
         return PageBase(
-          entete: const EnTeteFenetre(retour: true, icone: Icons.sell_outlined, sousTitre: 'Gérer › Courses', titre: 'Marques', aide: Aides.marques),
+          entete: EnTeteFenetre(
+            retour: true,
+            icone: Icons.sell_outlined,
+            sousTitre: 'Gérer › Courses',
+            titre: 'Marques',
+            aide: Aides.marques,
+            actions: [
+              ActionLigne(Icons.add, '+ Nouvelle marque', () async {
+                final nom = await demanderTexte(context, titre: 'Nouvelle marque', aide: 'Ex. : Président');
+                if (nom != null && nom.isNotEmpty) etat.marqueNommee(nom);
+              }),
+            ],
+          ),
           corps: ListView(
             padding: const EdgeInsets.only(bottom: 16),
             children: [
@@ -582,18 +582,6 @@ class EcranMarques extends StatelessWidget {
                 ),
             ],
           ),
-          bas: [
-            BarreAction(boutons: [
-              Bouton(
-                texte: '+ Nouvelle marque',
-                plein: true,
-                onTap: () async {
-                  final nom = await demanderTexte(context, titre: 'Nouvelle marque', aide: 'Ex. : Président');
-                  if (nom != null && nom.isNotEmpty) etat.marqueNommee(nom);
-                },
-              ),
-            ]),
-          ],
         );
       },
     );

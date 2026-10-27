@@ -101,7 +101,7 @@ class Charte {
   /// Lignes des autres listes (listes de courses, catalogue, réglages) : un peu plus hautes.
   static const double ligneListe = 40;
   static const double ligneCompacte = 32;
-  static const double barreAction = 64;
+  static const double barreAction = 52;
   static const double barreNavigation = 64;
   static const double enTeteNiveau = 52;
   static const double sousOnglets = 44;

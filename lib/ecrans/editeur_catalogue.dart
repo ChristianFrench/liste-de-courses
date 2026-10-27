@@ -40,7 +40,25 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
   Widget build(BuildContext context) {
     final b = this.b;
     return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.public, sousTitre: 'Gérer › Courses', titre: 'Catalogue commun'),
+      entete: EnTeteFenetre(
+        retour: true,
+        icone: Icons.public,
+        sousTitre: 'Gérer › Courses',
+        titre: 'Catalogue commun',
+        actions: [
+          if (b != null) ...[
+            ActionLigne(Icons.add, '+ Nouveau rayon', () async {
+              final nom = await demanderTexte(context, titre: 'Nouveau rayon', valider: 'Ajouter');
+              if (nom == null || nom.trim().isEmpty) return;
+              b.ajouterRayon(nom);
+              _modifie();
+            }),
+            ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
+              if (await ajouterDepuisTexte(context, b)) _modifie();
+            }),
+          ],
+        ],
+      ),
       corps: b == null
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -104,10 +122,13 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                           titre: s.nom,
                           gauche: Pictogramme(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), taille: 32),
                           sousTitre: _pluriel(s.produits.length, 'produit'),
-                          onTap: () async {
-                            await Nav.aller<void>(context, EcranEditeurSecteur(b: b, r: r, s: s));
-                            if (mounted) setState(() {});
-                          },
+                          onTap: () => menuActions(context, titre: s.nom, actions: [
+                            ActionLigne(Icons.list, 'Voir et modifier les produits', () async {
+                              await Nav.aller<void>(context, EcranEditeurSecteur(b: b, r: r, s: s));
+                              if (mounted) setState(() {});
+                            }),
+                            ...actionsSecteurEditeur(context, b, r, s, _modifie),
+                          ]),
                         ),
                     ],
                   ),
@@ -118,25 +139,8 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
           BarreAction(
             boutons: [
               Bouton(
-                texte: '+ Rayon',
-                taille: 15,
-                onTap: () async {
-                  final nom = await demanderTexte(context, titre: 'Nouveau rayon', valider: 'Ajouter');
-                  if (nom == null || nom.trim().isEmpty) return;
-                  b.ajouterRayon(nom);
-                  _modifie();
-                },
-              ),
-              Bouton(
-                texte: 'Depuis un texte',
-                taille: 15,
-                onTap: () async {
-                  if (await ajouterDepuisTexte(context, b)) _modifie();
-                },
-              ),
-              Bouton(
                 texte: _publication ? 'Envoi…' : 'Publier',
-                taille: 15,
+                icone: Icons.public,
                 plein: true,
                 onTap: _publication || b.modifications == 0 ? null : () => _publier(b),
               ),
@@ -211,51 +215,16 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
     final b = widget.b, r = widget.r, s = widget.s;
     final produits = [...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase()));
     return PageBase(
-      entete: EnTeteFenetre(retour: true, icone: Icons.public, sousTitre: 'Catalogue commun › ${r.nom}', titre: s.nom),
+      entete: EnTeteFenetre(
+        retour: true,
+        icone: Icons.public,
+        sousTitre: 'Catalogue commun › ${r.nom}',
+        titre: s.nom,
+        actions: actionsSecteurEditeur(context, b, r, s, _modifie, quitter: () => Navigator.of(context).pop()),
+      ),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 6),
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                Lien(
-                  'Renommer',
-                  onTap: () async {
-                    final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
-                    if (nom == null) return;
-                    b.renommerSecteur(r, s, nom);
-                    _modifie();
-                  },
-                ),
-                Lien(
-                  'Déplacer',
-                  onTap: () async {
-                    final vers = await _choisirRayon(context, b, titre: 'Déplacer ${s.nom} vers', sauf: r);
-                    if (vers == null || !context.mounted) return;
-                    b.deplacerSecteur(r, s, vers);
-                    CatalogueCommun.instance.enregistrerBrouillon(b);
-                    Navigator.of(context).pop();
-                    Nav.message(context, '${s.nom} déplacé dans ${vers.nom}');
-                  },
-                ),
-                Lien(
-                  'Supprimer',
-                  onTap: () async {
-                    if (s.produits.isNotEmpty &&
-                        !await _confirmerSuppression(context, 'le secteur ${s.nom}', _pluriel(s.produits.length, 'produit'))) {
-                      return;
-                    }
-                    b.retirerSecteur(r, s);
-                    CatalogueCommun.instance.enregistrerBrouillon(b);
-                    if (context.mounted) Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            ),
-          ),
           if (produits.isEmpty)
             Padding(
               padding: const EdgeInsets.all(16),
@@ -264,62 +233,64 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
           for (final p in produits)
             LigneMenu(
               titre: p.nom,
-              droite: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  BoutonIcone(
-                    icone: Icons.edit_outlined,
-                    libelle: 'Renommer ${p.nom}',
-                    onTap: () async {
-                      final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
-                      if (nom == null) return;
-                      b.renommerProduit(p, nom);
-                      _modifie();
-                    },
-                  ),
-                  BoutonIcone(
-                    icone: Icons.delete_outline,
-                    libelle: 'Retirer ${p.nom}',
-                    onTap: () {
-                      b.retirerProduit(s, p);
-                      _modifie();
-                    },
-                  ),
-                ],
-              ),
+              onTap: () => menuActions(context, titre: p.nom, actions: [
+                ActionLigne(Icons.edit_outlined, 'Renommer', () async {
+                  final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
+                  if (nom == null) return;
+                  b.renommerProduit(p, nom);
+                  _modifie();
+                }),
+                ActionLigne(Icons.delete_outline, 'Retirer', () {
+                  b.retirerProduit(s, p);
+                  _modifie();
+                }, danger: true),
+              ]),
             ),
         ],
       ),
-      bas: [
-        BarreAction(
-          boutons: [
-            Bouton(
-              texte: '+ Produit',
-              taille: 15,
-              plein: true,
-              onTap: () async {
-                final nom = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', valider: 'Ajouter');
-                if (nom == null || nom.trim().isEmpty || !context.mounted) return;
-                if (!b.ajouterProduit(s, nom)) {
-                  Nav.message(context, '« ${nom.trim()} » est déjà dans ce secteur');
-                  return;
-                }
-                _modifie();
-              },
-            ),
-            Bouton(
-              texte: 'Depuis un texte',
-              taille: 15,
-              onTap: () async {
-                if (await ajouterDepuisTexte(context, b, rayon: r, secteur: s)) _modifie();
-              },
-            ),
-          ],
-        ),
-      ],
     );
   }
 }
+
+/// Actions d'un secteur du catalogue commun ; [quitter] ferme l'écran du secteur quand il est déplacé ou retiré.
+List<ActionLigne> actionsSecteurEditeur(BuildContext context, Brouillon b, CatRayon r, CatSecteur s, VoidCallback modifie,
+        {VoidCallback? quitter}) =>
+    [
+      ActionLigne(Icons.add, '+ Nouveau produit', () async {
+        final nom = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', valider: 'Ajouter');
+        if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+        if (!b.ajouterProduit(s, nom)) {
+          Nav.message(context, '« ${nom.trim()} » est déjà dans ce secteur');
+          return;
+        }
+        modifie();
+      }),
+      ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
+        if (await ajouterDepuisTexte(context, b, rayon: r, secteur: s)) modifie();
+      }),
+      ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () async {
+        final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
+        if (nom == null) return;
+        b.renommerSecteur(r, s, nom);
+        modifie();
+      }),
+      ActionLigne(Icons.drive_file_move_outline, 'Déplacer dans un autre rayon', () async {
+        final vers = await _choisirRayon(context, b, titre: 'Déplacer ${s.nom} vers', sauf: r);
+        if (vers == null || !context.mounted) return;
+        b.deplacerSecteur(r, s, vers);
+        modifie();
+        quitter?.call();
+        Nav.message(context, '${s.nom} déplacé dans ${vers.nom}');
+      }),
+      ActionLigne(Icons.delete_outline, 'Supprimer le secteur', () async {
+        if (s.produits.isNotEmpty && !await _confirmerSuppression(context, 'le secteur ${s.nom}', _pluriel(s.produits.length, 'produit'))) {
+          return;
+        }
+        b.retirerSecteur(r, s);
+        modifie();
+        quitter?.call();
+      }, danger: true),
+    ];
 
 Future<bool> _confirmerSuppression(BuildContext context, String quoi, String contenu) async {
   final ok = await confirmer(

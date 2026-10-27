@@ -662,10 +662,10 @@ class Bouton extends StatelessWidget {
     required this.onTap,
     this.plein = false,
     this.pointille = false,
-    this.hauteur = 48,
+    this.hauteur = 40,
     this.icone,
     this.iconeApres,
-    this.taille = 17,
+    this.taille = 16,
   });
   final String texte;
   final VoidCallback? onTap;
@@ -686,8 +686,9 @@ class Bouton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Pas d'icône à côté d'un libellé : seulement sur un bouton sans texte.
-          if (icone != null && texte.isEmpty) Icon(icone, size: 28, color: texteCouleur),
+          // Icône à gauche du libellé (boutons qui font avancer les listes et les courses).
+          if (icone != null) Icon(icone, size: texte.isEmpty ? 28 : 20, color: texteCouleur),
+          if (icone != null && texte.isNotEmpty) const SizedBox(width: 6),
           if (texte.isNotEmpty)
             Flexible(
               child: Text(texte,
@@ -798,7 +799,7 @@ class BarreAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: Charte.barreAction,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(top: _bordZone)),
       child: Row(
         children: [

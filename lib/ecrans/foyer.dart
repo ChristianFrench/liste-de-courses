@@ -37,7 +37,30 @@ class EcranFoyer extends StatelessWidget {
     final enFoyer = s.mode == 'foyer' && s.actif;
     final admin = !enFoyer || etat.suisAdministrateur;
     return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.home_outlined, sousTitre: 'Gérer › Mon foyer', titre: 'Foyer'),
+      entete: EnTeteFenetre(
+        retour: true,
+        icone: Icons.home_outlined,
+        sousTitre: 'Gérer › Mon foyer',
+        titre: 'Foyer',
+        actions: [
+          if (!enFoyer) ActionLigne(Icons.person_add_outlined, '+ Nouveau membre', () => ajouterMembreParNom(context)),
+          if (enFoyer) ...[
+            ActionLigne(Icons.copy, 'Copier le code', () {
+              Clipboard.setData(ClipboardData(text: s.code!));
+              Nav.message(context, 'Code copié');
+            }),
+            ActionLigne(Icons.mail_outline, 'Envoyer le code par mail', () => _envoyerCode(context, s.code!)),
+            if (etat.suisAdministrateur) ActionLigne(Icons.key_outlined, 'Régénérer le code', () => _regenerer(context, s)),
+          ],
+          if (admin)
+            ActionLigne(Icons.edit_outlined, 'Renommer le foyer', () async {
+              final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
+              if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
+            }),
+          ActionLigne(Icons.swap_horiz, enFoyer ? 'Utiliser seul' : 'Passer en foyer', () => _changerMode(context, enFoyer)),
+          if (admin) ActionLigne(Icons.restart_alt, 'Foyer neuf', () => repartirANeuf(context), danger: true),
+        ],
+      ),
       corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: [
         Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
         Text(
@@ -48,11 +71,6 @@ class EcranFoyer extends StatelessWidget {
         if (enFoyer) ..._code(context, s, etat.suisAdministrateur),
         const TitreSection('Membres', cote: 0),
         for (final m in etat.membresVisibles) _LigneMembre(m, admin: admin, enFoyer: enFoyer),
-        if (!enFoyer)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Lien('+ Nouveau membre', onTap: () => ajouterMembreParNom(context)),
-          ),
         OptionFoyer(
           texte: 'Envoyer la liste à tout le foyer',
           aide: 'Le mail est préparé avec les adresses de tous les membres',
@@ -60,38 +78,15 @@ class EcranFoyer extends StatelessWidget {
           onChange: (v) => etat.options(envoiFoyer: v),
         ),
       ]),
-      bas: [
-        BarreAction(boutons: [
-          if (admin)
-            Bouton(
-              texte: 'Renommer',
-              taille: 15,
-              onTap: () async {
-                final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
-                if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
-              },
-            ),
-          Bouton(texte: enFoyer ? 'Utiliser seul' : 'Passer en foyer', taille: 15, onTap: () => _changerMode(context, enFoyer)),
-          if (admin) Bouton(texte: 'Foyer neuf', taille: 15, onTap: () => repartirANeuf(context)),
-        ]),
-      ],
     );
   }
 
   List<Widget> _code(BuildContext context, Synchro s, bool admin) => [
         const TitreSection('Code de partage', cote: 0),
         Text(s.code!.split('').join(' '), maxLines: 1, style: Charte.texte(24, gras: true, espacement: 1)),
-        Text('À saisir sur un autre appareil : « Rejoindre un foyer ». Tous ceux qui ont ce code font partie du foyer.',
+        Text('À saisir sur un autre appareil : « Rejoindre un foyer ». Tous ceux qui ont ce code font partie du foyer. '
+            'Pour le copier ou l\'envoyer, touchez le titre « Foyer ».',
             style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-        const SizedBox(height: 8),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          BoutonAction('Copier', onTap: () {
-            Clipboard.setData(ClipboardData(text: s.code!));
-            Nav.message(context, 'Code copié');
-          }),
-          BoutonAction('Envoyer par mail', onTap: () => _envoyerCode(context, s.code!)),
-          if (admin) BoutonAction('Régénérer', onTap: () => _regenerer(context, s)),
-        ]),
       ];
 
   Future<void> _envoyerCode(BuildContext context, String code) async {

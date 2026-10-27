@@ -43,10 +43,12 @@ class EcranArchives extends StatelessWidget {
                       icone: Icons.receipt_long_outlined,
                       titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
                       sousTitre: '${etat.nomCourse(c)} · ${c.nbArticles} articles${etat.ticketDe(c.id) != null ? ' · ticket joint' : ''}',
-                      droite: Lien('Remettre en historique', onTap: () {
-                        etat.remettreEnHistorique(c);
-                        Nav.message(context, 'La course est de nouveau dans l\'historique');
-                      }),
+                      onTap: () => menuActions(context, titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}', actions: [
+                        ActionLigne(Icons.history, 'Remettre en historique', () {
+                          etat.remettreEnHistorique(c);
+                          Nav.message(context, 'La course est de nouveau dans l\'historique');
+                        }),
+                      ]),
                     ),
                 ],
               ),
@@ -55,33 +57,17 @@ class EcranArchives extends StatelessWidget {
                 cle: 'archives/${m.id}',
                 titre: m.nom,
                 icone: Icons.inventory_2_outlined,
+                actions: [
+                  ActionLigne(Icons.restore, 'Rétablir le magasin', () {
+                    etat.restaurerMagasin(m);
+                    Nav.message(context, '${m.nom} est de nouveau dans vos magasins');
+                  }),
+                  ActionLigne(Icons.delete_outline, 'Tout supprimer', () => demanderSuppression(context, m, 'les archives de ${m.nom}'), danger: true),
+                ],
                 enfants: [
               for (final l in etat.listesArchivees(m.id)) _course(context, etat, l),
               for (final c in etat.historique.where((c) => c.magasinId == m.id && etat.liste(c.id) == null))
                 _ligne(context, '${jjmmaaaa(c.dateCourses)} · ${c.nbArticles} articles', etat.ticketDe(c.id) != null, null),
-              Row(
-                children: [
-                  Expanded(
-                    child: Bouton(
-                      texte: 'Rétablir le magasin',
-                      taille: 15,
-                      onTap: () {
-                        etat.restaurerMagasin(m);
-                        Nav.message(context, '${m.nom} est de nouveau dans vos magasins');
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Bouton(
-                      texte: 'Tout supprimer',
-                      taille: 15,
-                      onTap: () => demanderSuppression(context, m, 'les archives de ${m.nom}'),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
                 ],
               ),
             const SizedBox(height: 14),

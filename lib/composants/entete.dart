@@ -34,7 +34,7 @@ class EnTeteFenetre extends StatelessWidget {
   /// Flèche de retour avant l'icône (sous-niveaux et fenêtres de travail).
   final bool retour;
 
-  /// Actions propres à la fenêtre : dans le menu « ⋮ », avec l'aide.
+  /// Actions propres à la fenêtre : proposées en touchant le titre, avec l'aide.
   final List<ActionLigne> actions;
 
   /// Élément de droite particulier (ex. : choix du magasin).
@@ -78,9 +78,36 @@ class EnTeteFenetre extends StatelessWidget {
               children: [
                 if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
                 if (!retour) const SizedBox(width: 4),
+                // Toucher le titre propose les actions de la fenêtre, puis l'aide, dans un volet.
                 Expanded(
-                  child: Text(titre,
-                      maxLines: 2, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(20, gras: true, couleur: Charte.blanc))),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Semantics(
+                      button: true,
+                      label: 'Actions de la fenêtre',
+                      child: InkWell(
+                        key: const ValueKey('titre-actions'),
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: () => menuActions(context, titre: titre, actions: [
+                          ...actions,
+                          ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
+                        ]),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            Flexible(
+                              child: Text(titre,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: surPhoto(Charte.texte(20, gras: true, couleur: Charte.blanc))),
+                            ),
+                            Icon(Icons.expand_more,
+                                size: 26, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)]),
+                          ]),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
               ],
@@ -98,11 +125,6 @@ class EnTeteFenetre extends StatelessWidget {
                 ),
                 if (droite != null) ...[droite!, const SizedBox(width: 4)],
                 const BoutonSynchro(),
-                // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
-                bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
-                      ...actions,
-                      ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
-                    ])),
               ],
             ),
           ],
@@ -278,7 +300,7 @@ Future<void> montrerAide(BuildContext context, String titre, String texte) => mo
       ),
     );
 
-/// Textes d'aide des fenêtres (menu « ⋮ » › Aide). Un paragraphe par ligne.
+/// Textes d'aide des fenêtres (toucher le titre › Aide). Un paragraphe par ligne.
 class Aides {
   Aides._();
 
@@ -287,7 +309,9 @@ class Aides {
       'Toucher une ligne en ouvre le volet du bas : son détail, puis ses actions. Sur une ligne, glisser à gauche supprime '
       'ou retire (« Annuler » apparaît quelques secondes en bas), glisser à droite fait l\'action principale.\n'
       'Les fenêtres s\'ouvrent en volet du bas : tirez la poignée vers le bas (ou touchez à côté) pour le fermer.\n'
-      'Le menu des trois points, en haut à droite, regroupe les actions de la fenêtre et cette aide. '
+      'Toucher le titre de la fenêtre (en haut, avec la petite flèche) propose ses actions et cette aide ; '
+      'toucher un bandeau propose les actions de son groupe. Seuls les boutons qui font avancer une liste '
+      '(Nouvelle liste, Liste prête, Pause, Terminer) restent en bas de l\'écran. '
       'Le nuage barré indique que la synchronisation entre les membres du foyer n\'est pas encore active.';
 
   static const generale = 'L\'application compte quatre onglets, en bas de l\'écran : Accueil, Préparer, Courses et Gérer.\n$_gestes';
@@ -300,7 +324,7 @@ class Aides {
       'Une nouvelle liste se crée dans l\'onglet Préparer.\n$_gestes';
 
   static const preparer = 'L\'onglet Préparer sert à construire les listes avant les courses.\n'
-      '« + Nouvelle liste » : choisissez le magasin, le nom de la liste (proposé d\'office), puis son type : '
+      '« Nouvelle liste » : choisissez le magasin, le nom de la liste (proposé d\'office), puis son type : '
       'liste simple (sans secteurs), liste type ou liste vide, liste personnalisée (reprise d\'une course passée), '
       'liste depuis un texte (collé), ou liste calculée (plus tard).\n'
       '« En préparation » et « Prêtes pour les courses » : touchez une liste pour la reprendre, la remettre en préparation, '
@@ -360,7 +384,7 @@ class Aides {
       'Touchez deux fois de suite un article absent du rayon (ou faites un appui long) : il est marqué « manquant », en rouge.\n'
       'Touchez le P d\'une promotion ou le code du packaging pour en voir le détail.\n'
       '« Pause » interrompt les courses sans rien perdre. '
-      '« Terminer les courses » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
+      '« Terminer » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
       'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n$_gestes';
 
   static const magasins = 'Vos magasins. Ils ont tous le même catalogue ; touchez un magasin pour ses parcours, '
@@ -368,12 +392,13 @@ class Aides {
 
   static const catalogue = 'Le catalogue du foyer, le même dans tous les magasins : ses rayons, ses secteurs et ses produits. '
       'Les rayons, les secteurs et les produits d\'origine ne changent pas.\n'
-      'Pour ajouter un produit, ouvrez son rayon puis son secteur et touchez « + Nouveau produit » : une fenêtre demande son nom, '
+      'Touchez un secteur : « Voir et modifier les produits » affiche ses produits, « + Nouveau produit » demande le nom, '
       'sa marque éventuelle, sa mesure et son packaging. Le produit s\'appelle « nom marque » (ex. « Camembert Président »). '
       'Sur un produit d\'origine, « Avec une marque » crée de même un nouveau produit.\n'
-      'Un petit + signale un produit ajouté par le foyer ; « Produits ajoutés » les rassemble pour les modifier ou les supprimer.\n$_gestes';
+      'Un petit + signale un produit ajouté par le foyer ; « Produits ajoutés » (en touchant le titre) les rassemble pour les modifier ou les supprimer. '
+      'Toucher le bandeau d\'un rayon propose un nouveau secteur ou de changer l\'ordre des secteurs.\n$_gestes';
 
-  static const marques = 'Les marques portées par vos produits. « + Nouvelle marque » en ajoute une (on peut aussi la saisir avec un nouveau produit). '
+  static const marques = 'Les marques portées par vos produits. « + Nouvelle marque » (en touchant le titre) en ajoute une (on peut aussi la saisir avec un nouveau produit). '
       'Touchez une marque pour la renommer, voir ses produits, '
       'ou la supprimer si plus aucun produit ne la porte.\n$_gestes';
 

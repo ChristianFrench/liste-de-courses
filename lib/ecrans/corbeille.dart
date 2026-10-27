@@ -82,7 +82,7 @@ Future<void> viderCorbeille(BuildContext context) async {
   Nav.message(context, 'Corbeille vidée');
 }
 
-/// Gérer › Corbeille : toucher un élément propose de le restaurer ; « Vider la corbeille » est dans le menu ⋮.
+/// Gérer › Corbeille : toucher un élément propose de le restaurer ; « Vider la corbeille » se propose en touchant le titre.
 class EcranCorbeille extends StatelessWidget {
   const EcranCorbeille({super.key});
 

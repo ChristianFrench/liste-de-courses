@@ -21,7 +21,7 @@ class SousEcranPreparer extends StatelessWidget {
     final enPreparation = etat.listesStatut(StatutListe.enConstruction);
     final pretes = etat.listesStatut(StatutListe.prete);
     return AvecDecision(
-      boutons: [Bouton(texte: '+ Nouvelle liste', plein: true, taille: 18, onTap: () => Nav.travail(const EcranPreliste()))],
+      boutons: [Bouton(texte: 'Nouvelle liste', icone: Icons.add, plein: true, onTap: () => Nav.travail(const EcranPreliste()))],
       contenu: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
@@ -247,20 +247,18 @@ class _EcranParcoursState extends State<EcranParcours> {
               sousTitre: 'Parcours · ${etat.magasin(p.magasinId)?.nom ?? ''}',
               titre: p.nom,
               aide: Aides.parcours,
-            ),
-            corps: _edition(context, p),
-            bas: [
-              BarreAction(boutons: [
-                Bouton(texte: 'Renommer', taille: 15, onTap: () async {
+              actions: [
+                ActionLigne(Icons.add, '+ Secteur', () => _ajouterSecteur(context, p)),
+                ActionLigne(Icons.edit_outlined, 'Renommer le parcours', () async {
                   final nom = await demanderTexte(context, titre: 'Nom du parcours', initial: p.nom);
                   if (nom != null && nom.isNotEmpty) etat.renommerParcours(p, nom);
                 }),
-                Bouton(texte: '+ Secteur', taille: 15, onTap: () => _ajouterSecteur(context, p)),
-                Bouton(texte: 'Supprimer', taille: 15, onTap: () async {
+                ActionLigne(Icons.delete_outline, 'Supprimer le parcours', () async {
                   if (await demanderSuppression(context, p, 'le parcours ${p.nom}') && context.mounted) Navigator.of(context).pop();
-                }),
-              ]),
-            ],
+                }, danger: true),
+              ],
+            ),
+            corps: _edition(context, p),
           );
         },
       );
@@ -658,9 +656,10 @@ List<Widget> groupesPasses(BuildContext context, Etat etat) {
         enfants: [
           for (final c in historique) _ligneHistorique(context, etat, c),
           if (libres > 0)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Bouton(texte: '$libres ticket${libres > 1 ? 's' : ''} à rattacher', hauteur: 40, taille: 15, onTap: () => _pageHistorique(context)),
+            LigneMenu(
+              titre: '$libres ticket${libres > 1 ? 's' : ''} à rattacher',
+              icone: Icons.receipt_long_outlined,
+              onTap: () => _pageHistorique(context),
             ),
         ],
       ),

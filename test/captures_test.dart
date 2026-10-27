@@ -82,7 +82,7 @@ void main() {
     await _toucher(tester, _onglet('Préparer'));
     await _capture('01 Main');
 
-    await _toucher(tester, find.text('+ Nouvelle liste'));
+    await _toucher(tester, find.text('Nouvelle liste'));
     await _capture('02 Preliste');
     await _toucher(tester, find.byTooltip('Retour'));
 
@@ -115,7 +115,7 @@ void main() {
     await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l4')!)).first);
     await _toucher(tester, find.text('Reprendre les courses'));
     await _capture('08 Courses-Secteur');
-    await _toucher(tester, find.text('Terminer les courses'));
+    await _toucher(tester, find.text('Terminer'));
     await _capture('29 Modale-Terminer');
     await _toucher(tester, find.text('Continuer les courses'));
     await _toucher(tester, find.text('Pause'));
@@ -136,16 +136,24 @@ void main() {
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Catalogue'));
     await _capture('13 Catalogue');
+    await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
+    await _capture('13 Catalogue-Actions');
+    await tester.tapAt(const Offset(195, 20));
+    await tester.pumpAndSettle();
     await _toucher(tester, find.text('Crèmerie'));
-    await _capture('15 Catalogue-Secteur');
+    await _capture('15 Secteur-Actions');
     await _toucher(tester, find.text('+ Nouveau produit'));
     await _capture('15 Nouveau-produit');
-    await tester.tapAt(const Offset(195, 80));
+    await tester.tapAt(const Offset(195, 20));
     await tester.pumpAndSettle();
+    await _toucher(tester, find.text('Crèmerie'));
+    await _toucher(tester, find.text('Voir et modifier les produits'));
+    await _capture('15 Catalogue-Secteur');
     await _toucher(tester, find.text('Lait demi-écrémé'));
     await _capture('16 Fiche-Produit');
     await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.byTooltip('Retour'));
+    await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
     await _toucher(tester, find.textContaining('Produits ajoutés'));
     await _capture('20 Produits-ajoutes');
 
@@ -183,6 +191,8 @@ void main() {
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Foyer'));
+    await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
+    await _capture('25 Foyer-Actions');
     await _toucher(tester, find.text('Passer en foyer'));
     await _capture('25 Bienvenue');
     await _toucher(tester, find.text('Créer un foyer'));

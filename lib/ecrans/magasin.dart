@@ -48,7 +48,27 @@ class EcranFicheProduit extends StatelessWidget {
         final utilise = etat.produitUtilise(p);
         final ajoute = etat.estAjoute(p);
         return PageBase(
-          entete: EnTeteFenetre(retour: true, icone: Icons.menu_book_outlined, sousTitre: 'Catalogue', titre: p.nom),
+          entete: EnTeteFenetre(
+            retour: true,
+            icone: Icons.menu_book_outlined,
+            sousTitre: 'Catalogue',
+            titre: p.nom,
+            actions: [
+              if (ajoute) ...[
+                ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
+                ActionLigne(Icons.delete_outline, 'Supprimer', () async {
+                  if (await demanderSuppression(context, p, 'le produit ${p.nom}') && context.mounted) Navigator.of(context).pop();
+                }, danger: true),
+              ] else
+                ActionLigne(Icons.sell_outlined, 'Avec une marque', () async {
+                  final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
+                  if (q != null && context.mounted) {
+                    Navigator.of(context).pushReplacement(
+                        MaterialPageRoute<void>(builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
+                  }
+                }),
+            ],
+          ),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             children: [
@@ -88,36 +108,6 @@ class EcranFicheProduit extends StatelessWidget {
               const SizedBox(height: 16),
             ],
           ),
-          bas: [
-            BarreAction(boutons: [
-              if (ajoute)
-                Bouton(
-                  texte: 'Modifier',
-                  taille: 15,
-                  onTap: () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id)),
-                )
-              else
-                Bouton(
-                  texte: 'Avec une marque',
-                  taille: 15,
-                  onTap: () async {
-                    final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
-                    if (q != null && context.mounted) Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
-                        builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
-                  },
-                ),
-              if (ajoute)
-                Bouton(
-                  texte: 'Supprimer',
-                  taille: 15,
-                  onTap: () async {
-                    if (await demanderSuppression(context, p, 'le produit ${p.nom}') && context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                  },
-                ),
-            ]),
-          ],
         );
       },
     );

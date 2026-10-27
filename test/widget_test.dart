@@ -23,7 +23,7 @@ import 'package:liste_de_courses/donnees/ticket_recu.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/ecrans/archives.dart';
 import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
-import 'package:liste_de_courses/ecrans/historique.dart' show SousEcranHistorique;
+import 'package:liste_de_courses/ecrans/historique.dart' show BlocTicket, SousEcranHistorique;
 import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
 import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, FeuillePromotion, LigneArticle, codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
@@ -66,9 +66,22 @@ Future<void> _accueil(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+/// Touche le titre de la fenêtre (ses actions s'ouvrent dans un volet), puis l'action donnée.
+Future<void> _actionTitre(WidgetTester tester, String action) async {
+  await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
+  await _toucher(tester, find.text(action).last);
+}
+
+/// Vérifie que le titre de la fenêtre propose l'action donnée, puis referme le volet.
+Future<void> _menuTitre(WidgetTester tester, String action) async {
+  await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
+  expect(find.text(action), findsOneWidget);
+  await _fermerVolet(tester);
+}
+
 /// Ferme le volet du bas ouvert (appui au-dessus de lui).
 Future<void> _fermerVolet(WidgetTester tester) async {
-  await tester.tapAt(const Offset(195, 80));
+  await tester.tapAt(const Offset(195, 20));
   await tester.pumpAndSettle();
 }
 
@@ -361,7 +374,7 @@ void main() {
       expect(find.text('EN PRÉPARATION'), findsOneWidget);
       expect(find.text('À FAIRE'), findsOneWidget, reason: 'les listes prêtes');
       await _ciblesTactiles(tester);
-      expect(find.text('+ Nouvelle liste'), findsNothing);
+      expect(find.text('Nouvelle liste'), findsNothing);
       // Toucher une liste ouvre son volet : détail et actions
       await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)).first);
       expect(find.text('Faire les courses'), findsOneWidget);
@@ -375,24 +388,23 @@ void main() {
       expect(find.byType(EnTeteFenetre), findsNothing, reason: 'pas de bandeau de titre sur l\'accueil');
       await tester.fling(find.text('Bonjour !'), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
-      expect(find.text('+ Nouvelle liste'), findsOneWidget, reason: 'glisser à gauche : onglet Préparer');
+      expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'glisser à gauche : onglet Préparer');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
       expect(find.text('Courses').first, findsOneWidget);
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
-      expect(find.text('+ Nouvelle liste'), findsOneWidget, reason: 'glisser à droite : retour à Préparer');
+      expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'glisser à droite : retour à Préparer');
       // Sur une zone libre de la fenêtre, le même geste change aussi d'onglet
       await tester.fling(find.textContaining('Touchez une liste pour voir'), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
-      expect(find.text('+ Nouvelle liste'), findsNothing, reason: 'glisser sur le texte : onglet Courses');
+      expect(find.text('Nouvelle liste'), findsNothing, reason: 'glisser sur le texte : onglet Courses');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
       await _toucher(tester, find.byTooltip('Synchronisation : foyer non partagé'));
       expect(find.text('Foyer non partagé'), findsOneWidget, reason: 'l\'icône ouvre l\'état du partage');
       await _fermerVolet(tester);
-      await _toucher(tester, find.byTooltip('Plus d\'actions'));
-      await _toucher(tester, find.text('Aide'));
+      await _actionTitre(tester, 'Aide');
       expect(find.text('Aide · Préparer'), findsOneWidget);
       await _fermerVolet(tester);
       expect(find.text('Aide · Préparer'), findsNothing);
@@ -405,21 +417,21 @@ void main() {
       expect(find.text('À FAIRE'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Magasins');
-      expect(find.text('+ Nouveau magasin'), findsOneWidget);
+      await _menuTitre(tester, '+ Nouveau magasin');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Catalogue');
-      expect(find.textContaining('Produits ajoutés'), findsOneWidget);
+      await _menuTitre(tester, 'Produits ajoutés (0)');
       expect(find.text('FRAIS'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Marques');
       await _ciblesTactiles(tester);
       await _depuisCourses(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
-      await _voir(tester, find.text('Rattacher à une course'));
-      expect(find.text('Rattacher à une course'), findsOneWidget);
+      await _voir(tester, find.text('TICKETS NON RATTACHÉS'));
+      expect(find.text('TICKETS NON RATTACHÉS'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Foyer');
-      expect(find.text('+ Nouveau membre'), findsOneWidget, reason: 'les membres sont dans le foyer');
+      await _menuTitre(tester, '+ Nouveau membre');
       await _ciblesTactiles(tester);
       await _rubrique(tester, 'Types de promotion');
       await _ciblesTactiles(tester);
@@ -456,13 +468,14 @@ void main() {
       await _rubrique(tester, 'Catalogue');
       if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
       await _toucher(tester, find.text('Crèmerie').last);
+      await _toucher(tester, find.text('Voir et modifier les produits'));
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('Avec une marque'), findsOneWidget, reason: 'fiche produit');
+      expect(find.textContaining('RANGEMENT'), findsOneWidget, reason: 'fiche produit');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('Avec une marque'), findsNothing);
+      expect(find.textContaining('RANGEMENT'), findsNothing);
       await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.textContaining('Produits ajoutés'), findsOneWidget);
+      expect(find.text('FRAIS'), findsOneWidget);
 
       await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
@@ -518,7 +531,7 @@ void main() {
 
     testWidgets('2. nouvelle liste : types, recherche, liste prête, liste type', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       expect(find.text('Liste calculée'), findsOneWidget);
       await _ciblesTactiles(tester);
       await _toucher(tester, find.text('Liste personnalisée'));
@@ -555,7 +568,7 @@ void main() {
       await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
       await _toucher(tester, _onglet('Préparer'));
-      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
       expect(_nbEnPreparation(tester), 1);
@@ -602,7 +615,7 @@ void main() {
 
     testWidgets('liste simple : saisie sans secteurs, rangement à « Liste prête »', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste simple'));
       final etat = Etat.instance;
       final l = etat.listes.firstWhere((x) => etat.estSimple(x));
@@ -704,7 +717,7 @@ void main() {
     testWidgets('nouvelle liste depuis le texte d\'un mail', (tester) async {
       await tester.runAsync(chargerCorrespondances); // lecture réelle de l'asset, hors horloge simulée
       await _accueil(tester);
-      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste depuis un texte'));
       await tester.enterText(find.byKey(const ValueKey('texte-mail')),
           'Bonjour,\n\nCRÈMERIE\n- Lait demi écrémé x2\n- beurre doux, bidule introuvable\n\nEnvoyé de mon iPhone');
@@ -722,7 +735,7 @@ void main() {
     testWidgets('liste depuis plusieurs mails, fusionnés', (tester) async {
       await tester.runAsync(chargerCorrespondances);
       await _accueil(tester);
-      await _toucher(tester, find.text('+ Nouvelle liste'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste depuis un texte'));
       await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'Lait demi écrémé x2\nBeurre doux');
       await _toucher(tester, find.text('Ajouter un autre texte'));
@@ -777,7 +790,7 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
 
       // Terminer depuis la zone de décision : la liste des manquants et des non cochés
-      await _toucher(tester, find.text('Terminer les courses'));
+      await _toucher(tester, find.text('Terminer'));
       expect(find.text('Terminer les courses ?'), findsOneWidget);
       expect(find.text('Manquants en rayon (1)'), findsOneWidget);
       expect(find.text('• Fromage râpé'), findsOneWidget);
@@ -838,10 +851,14 @@ void main() {
     testWidgets('historique : rattacher un ticket', (tester) async {
       await _accueil(tester);
       await _depuisCourses(tester, 'Historique');
-      await _voir(tester, find.text('Rattacher à une course'));
+      final etat = Etat.instance;
+      int libres() => etat.tickets.where((t) => etat.course(t.listeId) == null).length;
+      final avant = libres();
+      await _voir(tester, find.byType(BlocTicket).first);
+      await _toucher(tester, find.byType(BlocTicket).first);
       await _toucher(tester, find.text('Rattacher à une course'));
       await _toucher(tester, find.textContaining('Magasin 2').first);
-      expect(find.text('Rattacher à une course'), findsNothing);
+      expect(libres(), avant - 1);
     });
 
     testWidgets('catalogue : ajouter un produit par sa fenêtre, le modifier ; les produits d\'origine ne se modifient pas', (tester) async {
@@ -868,23 +885,29 @@ void main() {
       for (final m in etat.magasins) {
         expect(etat.secteurDe(m.id, p.id)?.nom, 'Crèmerie', reason: 'le même rangement dans tous les magasins');
       }
+      await _toucher(tester, find.text('Crèmerie').last);
+      await _toucher(tester, find.text('Voir et modifier les produits'));
       expect(find.byType(SignePerso), findsWidgets, reason: 'petit signe des produits ajoutés');
 
       // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
       await _toucher(tester, find.text('Lait demi-écrémé'));
+      await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
       expect(find.text('Modifier'), findsNothing);
       expect(find.text('Avec une marque'), findsOneWidget);
+      await _fermerVolet(tester);
       await _toucher(tester, find.byTooltip('Retour'));
       await _toucher(tester, find.byTooltip('Retour'));
 
       // Produits ajoutés : la fenêtre du produit pour le modifier.
-      await _toucher(tester, find.text('Produits ajoutés (1)'));
+      await _actionTitre(tester, 'Produits ajoutés (1)');
       await _toucher(tester, find.text('Camembert Président'));
+      await _toucher(tester, find.text('Modifier'));
       expect(find.text('Modifier le produit'), findsOneWidget);
       await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Brie');
       await _toucher(tester, find.text('Enregistrer'));
       expect(p.nom, 'Brie Président');
-      await _toucher(tester, find.byTooltip('Supprimer Brie Président'));
+      await _toucher(tester, find.text('Brie Président'));
+      await _toucher(tester, find.text('Supprimer'));
       await _toucher(tester, find.text('Supprimer').last);
       expect(etat.produit(p.id), isNull, reason: 'un produit ajouté se supprime depuis la liste des produits ajoutés');
       await _ciblesTactiles(tester);
@@ -934,7 +957,7 @@ void main() {
       expect(find.text('Le code de partage et les membres sont dans Gérer › Foyer.'), findsOneWidget);
       expect(find.text('Partager ce foyer'), findsNothing);
       expect(find.byKey(const ValueKey('mqtt-hote')), findsNothing, reason: 'serveur dans un volet');
-      await _toucher(tester, find.text('Avancé : serveur'));
+      await _actionTitre(tester, 'Avancé : serveur');
       final hote = tester.widget<TextField>(find.byKey(const ValueKey('mqtt-hote')));
       expect(hote.controller!.text, ServeurMqtt.hoteDefaut);
       expect(tester.widget<TextField>(find.byKey(const ValueKey('mqtt-port'))).controller!.text, '8883');
@@ -945,7 +968,7 @@ void main() {
       await _lancer(tester);
       await _rubrique(tester, 'Foyer');
       expect(find.text('MEMBRES'), findsOneWidget);
-      await _toucher(tester, find.text('Passer en foyer'));
+      await _actionTitre(tester, 'Passer en foyer');
       expect(find.text('Comment utilisez-vous l\'application ?'), findsOneWidget);
       expect(find.text('Seul, sur cet appareil'), findsOneWidget);
       expect(find.byKey(const ValueKey('bienvenue-nom-foyer')), findsNothing);
@@ -971,7 +994,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.textContaining('Jamais publié'), findsOneWidget);
       expect(find.text('FRUITS ET LÉGUMES'), findsOneWidget);
-      await _toucher(tester, find.text('Depuis un texte'));
+      await _actionTitre(tester, 'Ajouter depuis un texte');
       await tester.enterText(find.byKey(const ValueKey('editeur-texte')), 'Animalerie / Chats :\nCroquettes\nLitière');
       await _toucher(tester, find.text('Lire le texte'));
       expect(find.text('Animalerie › Chats (nouveau rayon)'), findsOneWidget);

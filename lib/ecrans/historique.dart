@@ -82,17 +82,18 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
               for (final t in libres)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    BlocTicket(ticket: t, libre: true, onChange: () => setState(() {})),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: Lien('Rattacher à une course', onTap: () {
+                  child: BlocTicket(
+                    ticket: t,
+                    libre: true,
+                    onChange: () => setState(() {}),
+                    actions: [
+                      ActionLigne(Icons.link, 'Rattacher à une course', () {
                         nav.ticketARattacher = t.id;
                         nav.signaler();
                         setState(() {});
                       }),
-                    ),
-                  ]),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -127,7 +128,20 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
       color: Charte.fond,
       child: InkWell(
         onTap: aRattacher == null
-            ? null
+            ? () => menuActions(context, titre: etat.nomCourse(c), detail: details, actions: [
+                  if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+                  if (liste != null && liste.lignes.isNotEmpty)
+                    ActionLigne(Icons.note_add_outlined, 'Créer une liste type', () => creerListeType(context, etat, liste)),
+                  if (t == null)
+                    ActionLigne(Icons.undo, 'Remettre en terminées sans ticket', () {
+                      etat.remettreSansTicket(c);
+                      Nav.message(context, 'La course est de nouveau dans Courses › Terminées sans ticket');
+                    }),
+                  ActionLigne(Icons.inventory_2_outlined, 'Archiver', () {
+                    etat.archiver(c);
+                    Nav.message(context, 'Course archivée (Courses › Archives)');
+                  }),
+                ])
             : () {
                 etat.rattacherTicket(aRattacher, c);
                 Nav.i.ticketARattacher = null;
@@ -146,28 +160,7 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             if (t != null)
               BlocTicket(ticket: t, onChange: () => setState(() {}))
             else
-              Row(children: [
-                Expanded(child: Text('Pas de ticket de caisse', style: Charte.texte(15, couleur: Charte.texteSecondaire))),
-                BoutonIcone(
-                    icone: Icons.upload_file_outlined, libelle: 'Joindre le ticket PDF', onTap: () => joindreTicket(context, etat, c)),
-              ]),
-            if (aRattacher == null)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Wrap(spacing: 8, runSpacing: 8, children: [
-                  if (liste != null && liste.lignes.isNotEmpty)
-                    Lien('Créer une liste type', onTap: () => creerListeType(context, etat, liste)),
-                  if (t == null)
-                    Lien('Remettre en terminées sans ticket', onTap: () {
-                      etat.remettreSansTicket(c);
-                      Nav.message(context, 'La course est de nouveau dans Courses › Terminées sans ticket');
-                    }),
-                  Lien('Archiver', onTap: () {
-                    etat.archiver(c);
-                    Nav.message(context, 'Course archivée (Courses › Archives)');
-                  }),
-                ]),
-              ),
+              Text('Pas de ticket de caisse', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           ]),
         ),
       ),
@@ -185,10 +178,13 @@ Future<void> creerListeType(BuildContext context, Etat etat, Liste l) async {
 
 /// Le ticket de caisse en gros : libellé, date et montant ; le trombone l'affiche.
 class BlocTicket extends StatelessWidget {
-  const BlocTicket({super.key, required this.ticket, this.onChange, this.libre = false});
+  const BlocTicket({super.key, required this.ticket, this.onChange, this.libre = false, this.actions = const []});
   final Ticket ticket;
   final VoidCallback? onChange;
   final bool libre;
+
+  /// Actions en plus de « Décrire le ticket » : le toucher les propose alors dans un volet.
+  final List<ActionLigne> actions;
 
   @override
   Widget build(BuildContext context) {
@@ -212,8 +208,18 @@ class BlocTicket extends StatelessWidget {
         Expanded(
           child: InkWell(
             onTap: () async {
-              await decrireTicket(context, t);
-              onChange?.call();
+              if (actions.isEmpty) {
+                await decrireTicket(context, t);
+                onChange?.call();
+                return;
+              }
+              await menuActions(context, titre: libelle.isEmpty ? 'Ticket sans libellé' : libelle, actions: [
+                ...actions,
+                ActionLigne(Icons.edit_outlined, 'Décrire le ticket', () async {
+                  await decrireTicket(context, t);
+                  onChange?.call();
+                }),
+              ]);
             },
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(libelle.isEmpty ? 'Ticket sans libellé' : libelle,

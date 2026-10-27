@@ -12,11 +12,10 @@ import '../donnees/synchro.dart';
 // Paramètres (Apparence, Données).
 
 /// Page simple de Gérer : en-tête avec retour, contenu en colonne.
-/// [boutons] : les actions de l'écran, en bas.
-Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<Widget> boutons = const []}) => PageBase(
-      entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre),
+/// [actions] : les actions de l'écran, proposées en touchant son titre.
+Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<ActionLigne> actions = const []}) => PageBase(
+      entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre, actions: actions),
       corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
-      bas: [if (boutons.isNotEmpty) BarreAction(boutons: boutons)],
     );
 
 /// Écran de Gérer redessiné à chaque changement (couleur choisie, membre ajouté…).
@@ -187,8 +186,8 @@ class EcranDonnees extends _EcranVivant {
               ? Nav.aller<void>(context, const EcranEditeurCatalogue())
               : _deverrouillerEditeur(context),
         ),
-    ], boutons: [
-      Bouton(texte: 'Remettre les listes exemples', onTap: () => _exemples(context)),
+    ], actions: [
+      ActionLigne(Icons.restore, 'Remettre les listes exemples', () => _exemples(context)),
     ]);
   }
 }
@@ -281,7 +280,22 @@ class EcranTypesPromotion extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, icone: Icons.local_offer_outlined, sousTitre: 'Gérer › Courses', titre: 'Types de promotion'),
+        entete: EnTeteFenetre(
+          retour: true,
+          icone: Icons.local_offer_outlined,
+          sousTitre: 'Gérer › Courses',
+          titre: 'Types de promotion',
+          actions: [
+            ActionLigne(Icons.add, '+ Nouveau type', () async {
+              final nom = await demanderTexte(context, titre: 'Nouveau type de promotion', aide: 'Nom (ex. : Bon de réduction)');
+              if (nom == null || nom.isEmpty || !context.mounted) return;
+              final code = await demanderTexte(context,
+                  titre: 'Code court (3 caractères)', initial: nom.substring(0, nom.length < 3 ? nom.length : 3).toUpperCase());
+              if (code == null || code.isEmpty) return;
+              etat.ajouterTypePromotion(code.length > 4 ? code.substring(0, 4) : code, nom, '');
+            }),
+          ],
+        ),
         corps: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
           children: [
@@ -295,22 +309,6 @@ class EcranTypesPromotion extends StatelessWidget {
             ),
           ],
         ),
-        bas: [
-          BarreAction(boutons: [
-            Bouton(
-              texte: '+ Nouveau type',
-              plein: true,
-              onTap: () async {
-                final nom = await demanderTexte(context, titre: 'Nouveau type de promotion', aide: 'Nom (ex. : Bon de réduction)');
-                if (nom == null || nom.isEmpty || !context.mounted) return;
-                final code = await demanderTexte(context,
-                    titre: 'Code court (3 caractères)', initial: nom.substring(0, nom.length < 3 ? nom.length : 3).toUpperCase());
-                if (code == null || code.isEmpty) return;
-                etat.ajouterTypePromotion(code.length > 4 ? code.substring(0, 4) : code, nom, '');
-              },
-            ),
-          ]),
-        ],
       ),
     );
   }
@@ -501,13 +499,9 @@ class EcranTypesPackaging extends StatelessWidget {
               retour: true,
               icone: lots ? Icons.inventory_2_outlined : Icons.scale_outlined,
               sousTitre: 'Gérer › Courses',
-              titre: lots ? 'Types de packaging' : 'Types de mesure'),
-          bas: [
-            BarreAction(boutons: [
-              Bouton(
-                texte: lots ? '+ Nouveau packaging' : '+ Nouvelle mesure',
-                plein: true,
-                onTap: () async {
+              titre: lots ? 'Types de packaging' : 'Types de mesure',
+              actions: [
+                ActionLigne(Icons.add, lots ? '+ Nouveau packaging' : '+ Nouvelle mesure', () async {
                   final nom = await demanderTexte(context,
                       titre: lots ? 'Nouveau packaging' : 'Nouvelle mesure', aide: lots ? 'Ex. : Lot de 12' : 'Ex. : 500 g, 75 cl');
                   if (nom == null || nom.isEmpty) return;
@@ -515,10 +509,8 @@ class EcranTypesPackaging extends StatelessWidget {
                   final libelle = lots && !Etat.estLot(nom) ? 'Lot de ${nom.replaceFirst(RegExp(r'^de\s+', caseSensitive: false), '')}' : nom;
                   etat.ajouterTypePackaging(libelle);
                   etat.trierTypesPackaging();
-                },
-              ),
-            ]),
-          ],
+                }),
+              ]),
           corps: ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
             children: [

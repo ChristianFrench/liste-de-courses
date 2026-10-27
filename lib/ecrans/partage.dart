@@ -105,7 +105,36 @@ class EcranPartage extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([s, Etat.instance]),
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, icone: Icons.sync, sousTitre: 'Gérer › Paramètres', titre: 'Synchronisation'),
+        entete: EnTeteFenetre(
+          retour: true,
+          icone: Icons.sync,
+          sousTitre: 'Gérer › Paramètres',
+          titre: 'Synchronisation',
+          actions: [
+            if (s.actif)
+              ActionLigne(Icons.build_outlined, 'Dépannage', () => volet<void>(
+                    context,
+                    builder: (ctx) => ListenableBuilder(
+                      listenable: s,
+                      builder: (ctx, _) => corpsVolet(
+                        titre: 'Dépannage',
+                        contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                          ..._depannage(ctx, s),
+                          for (final e in s.journal.take(40))
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              child: Text('${heure(e.t)}  ${e.texte}', style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
+                            ),
+                        ]),
+                      ),
+                    ),
+                  )),
+            ActionLigne(Icons.dns_outlined, 'Avancé : serveur', () => volet<void>(
+                  context,
+                  builder: (ctx) => corpsVolet(titre: 'Avancé : serveur', contenu: _Serveur(serveur: s.serveur)),
+                )),
+          ],
+        ),
         corps: ListView(
           padding: const EdgeInsets.only(bottom: 16),
           children: [
@@ -130,44 +159,6 @@ class EcranPartage extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               child: Text('Le code de partage et les membres sont dans Gérer › Foyer.',
                   style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            ),
-            if (s.actif)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Bouton(
-                  texte: 'Dépannage',
-                  hauteur: 40,
-                  taille: 15,
-                  onTap: () => volet<void>(
-                    context,
-                    builder: (ctx) => ListenableBuilder(
-                      listenable: s,
-                      builder: (ctx, _) => corpsVolet(
-                        titre: 'Dépannage',
-                        contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                          ..._depannage(ctx, s),
-                          for (final e in s.journal.take(40))
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 3),
-                              child: Text('${heure(e.t)}  ${e.texte}', style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
-                            ),
-                        ]),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Bouton(
-                texte: 'Avancé : serveur',
-                hauteur: 40,
-                taille: 15,
-                onTap: () => volet<void>(
-                  context,
-                  builder: (ctx) => corpsVolet(titre: 'Avancé : serveur', contenu: _Serveur(serveur: s.serveur)),
-                ),
-              ),
             ),
           ],
         ),
