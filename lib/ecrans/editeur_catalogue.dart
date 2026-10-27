@@ -62,74 +62,45 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                     titre: r.nom,
                     image: b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom),
                     nombre: r.secteurs.length,
+                    actions: [
+                      ActionLigne(Icons.chevron_right, '+ Nouveau secteur', () async {
+                          final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
+                          if (nom == null || nom.trim().isEmpty) return;
+                          b.ajouterSecteur(r, nom);
+                          _modifie();
+                        }),
+                      ActionLigne(Icons.chevron_right, 'Depuis un texte', () async {
+                          if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
+                        }),
+                      ActionLigne(Icons.chevron_right, 'Renommer', () async {
+                          final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
+                          if (nom == null) return;
+                          b.renommerRayon(r, nom);
+                          _modifie();
+                        }),
+                      ActionLigne(Icons.chevron_right, 'Supprimer', () async {
+                          if (r.secteurs.isNotEmpty &&
+                              !await _confirmerSuppression(
+                                context,
+                                'le rayon ${r.nom}',
+                                '${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(r.secteurs.fold(0, (n, s) => n + s.produits.length), 'produit')}',
+                              )) {
+                            return;
+                          }
+                          b.retirerRayon(r);
+                          _modifie();
+                        }),
+                    ],
                     enfants: [
                       for (final s in r.secteurs)
                         LigneMenu(
                           titre: s.nom,
-                          gauche: Pictogramme(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), taille: 44),
                           sousTitre: _pluriel(s.produits.length, 'produit'),
                           onTap: () async {
                             await Nav.aller<void>(context, EcranEditeurSecteur(b: b, r: r, s: s));
                             if (mounted) setState(() {});
                           },
                         ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Wrap(
-                          spacing: 8,
-                          runSpacing: 8,
-                          children: [
-                            Lien(
-                              '+ Nouveau secteur',
-                              onTap: () async {
-                                final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
-                                if (nom == null || nom.trim().isEmpty) return;
-                                b.ajouterSecteur(r, nom);
-                                _modifie();
-                              },
-                            ),
-                            Lien(
-                              'Image',
-                              onTap: () async {
-                                final c = await choisirPictogramme(context, titre: 'Image du rayon ${r.nom}');
-                                if (c == null) return;
-                                b.choisirImage(cleChoixRayon(r.nom), c == imageAutomatique ? null : c);
-                                _modifie();
-                              },
-                            ),
-                            Lien(
-                              'Depuis un texte',
-                              onTap: () async {
-                                if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
-                              },
-                            ),
-                            Lien(
-                              'Renommer',
-                              onTap: () async {
-                                final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
-                                if (nom == null) return;
-                                b.renommerRayon(r, nom);
-                                _modifie();
-                              },
-                            ),
-                            Lien(
-                              'Supprimer',
-                              onTap: () async {
-                                if (r.secteurs.isNotEmpty &&
-                                    !await _confirmerSuppression(
-                                      context,
-                                      'le rayon ${r.nom}',
-                                      '${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(r.secteurs.fold(0, (n, s) => n + s.produits.length), 'produit')}',
-                                    )) {
-                                  return;
-                                }
-                                b.retirerRayon(r);
-                                _modifie();
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
               ],
@@ -242,15 +213,6 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
               spacing: 8,
               runSpacing: 8,
               children: [
-                Lien(
-                  'Image',
-                  onTap: () async {
-                    final c = await choisirPictogramme(context, titre: 'Image du secteur ${s.nom}');
-                    if (c == null) return;
-                    b.choisirImage(cleChoixSecteur(r.nom, s.nom), c == imageAutomatique ? null : c);
-                    _modifie();
-                  },
-                ),
                 Lien(
                   'Renommer',
                   onTap: () async {

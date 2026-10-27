@@ -94,6 +94,9 @@ class Charte {
   static const double bandeauPuces = 44;
   static const double ligneConstruction = 44;
   static const double ligneCourses = 56;
+
+  /// Hauteur unique des lignes de toutes les listes (articles, listes, menus).
+  static const double ligne = 30;
   static const double ligneCompacte = 32;
   static const double barreAction = 64;
   static const double barreNavigation = 64;

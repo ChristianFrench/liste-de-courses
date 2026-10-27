@@ -79,8 +79,6 @@ class EcranFicheProduit extends StatelessWidget {
               if (ajoute && utilise) ...[
                 const SizedBox(height: 14),
                 Row(children: [
-                  Icon(Icons.lock_outline, size: 18, color: Charte.couleurIcone(Icons.lock_outline)),
-                  const SizedBox(width: 8),
                   Expanded(
                     child: Text('Il est dans une liste : il peut être modifié ; pour le supprimer, retirez-le d\'abord de la liste.',
                         style: Charte.texte(14, couleur: Charte.texteSecondaire)),

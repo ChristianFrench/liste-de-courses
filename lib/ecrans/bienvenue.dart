@@ -137,8 +137,6 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
                   _fini('Vous utilisez l\'application seul sur cet appareil');
                 },
           child: Row(children: [
-            IconeRonde(icone),
-            const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(titre, style: Charte.texte(17, gras: true)),

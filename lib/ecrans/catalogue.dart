@@ -354,7 +354,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               child: TextField(
                 key: const ValueKey('catalogue-recherche'),
                 style: Charte.texte(16),
-                decoration: const InputDecoration(hintText: 'Rechercher un produit, une marque…', prefixIcon: Icon(Icons.search)),
+                decoration: const InputDecoration(hintText: 'Rechercher un produit, une marque…'),
                 onChanged: (v) => setState(() => recherche = v.trim()),
               ),
             ),
@@ -380,6 +380,13 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                         image: cleRayon(x.nom),
                         nombre: etat.secteursDu(x.id).length,
                         ajoute: etat.rayonAjoute(x),
+                        actions: [
+                          ActionLigne(Icons.add, '+ Nouveau secteur', () => _nouveauSecteur(context, x)),
+                          if (etat.rayonAjoute(x)) ...[
+                            ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
+                            ActionLigne(Icons.delete_outline, 'Supprimer le rayon', () => _supprimerRayon(context, x), danger: true),
+                          ],
+                        ],
                         enfants: [
                           for (final s in etat.secteursDu(x.id))
                             LigneMenu(
@@ -389,17 +396,6 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                               sousTitre: _pluriel(etat.produitsDuSecteur(s).length, 'produit'),
                               onTap: () => Nav.aller<void>(context, EcranSecteurCatalogue(secteurId: s.id)),
                             ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                            child: Wrap(spacing: 8, runSpacing: 8, children: [
-                              Lien('+ Nouveau secteur', onTap: () => _nouveauSecteur(context, x)),
-                              Lien('Image du rayon', onTap: () => choisirImageRayon(context, x.nom)),
-                              if (etat.rayonAjoute(x)) ...[
-                                Lien('Renommer le rayon', onTap: () => _renommerRayon(context, x)),
-                                Lien('Supprimer le rayon', onTap: () => _supprimerRayon(context, x)),
-                              ],
-                            ]),
-                          ),
                         ],
                       ),
                     if (nonRanges.isNotEmpty)
@@ -621,7 +617,7 @@ class SigneAjoute extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) =>
-      Tooltip(message: 'Ajouté par le foyer', child: Icon(Icons.add_circle, size: 16, color: Charte.accent));
+      Tooltip(message: 'Ajouté par le foyer', child: Text('+', style: Charte.texte(16, gras: true, couleur: Charte.accent)));
 }
 
 // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
@@ -635,8 +631,6 @@ Future<void> _nouveauRayon(BuildContext context) async {
     Nav.message(context, 'Le rayon « ${nom.trim()} » existe déjà');
     return;
   }
-  if (!Retractables.i.ouvert('catalogue/${r.nom}', parDefaut: false)) Retractables.i.basculer('catalogue/${r.nom}', parDefaut: false);
-  await choisirImageRayon(context, r.nom);
   if (context.mounted) Nav.message(context, 'Rayon « ${r.nom} » ajouté, avec un secteur du même nom');
 }
 

@@ -5,7 +5,7 @@ import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Suppression avec confirmation, et corbeille (Courses › Corbeille) pour tout remettre.
+// Suppression avec confirmation, et corbeille (Gérer › Corbeille) pour tout remettre.
 
 /// Demande confirmation puis supprime [objet] (magasin, rayon, secteur, produit, liste, parcours).
 /// Rend true si la suppression a eu lieu.
@@ -22,7 +22,7 @@ Future<bool> demanderSuppression(BuildContext context, Object objet, String quoi
     titre: 'Supprimer $quoi ?',
     icone: Icons.delete_outline,
     contenu: Text(
-      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Courses › Corbeille.',
+      '${suite.isEmpty ? '' : '$suite\n\n'}Vous pourrez le remettre depuis Gérer › Corbeille.',
       style: Charte.texte(16),
     ),
     plein: 'Annuler',
@@ -82,7 +82,7 @@ Future<void> viderCorbeille(BuildContext context) async {
   Nav.message(context, 'Corbeille vidée');
 }
 
-/// Courses › Corbeille.
+/// Gérer › Corbeille : toucher un élément propose de le restaurer ; « Vider la corbeille » est dans le menu ⋮.
 class EcranCorbeille extends StatelessWidget {
   const EcranCorbeille({super.key});
 
@@ -110,7 +110,9 @@ class EcranCorbeille extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(retour: true, sousTitre: 'Courses', titre: 'Corbeille'),
+        entete: EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Corbeille', actions: [
+          if (etat.corbeille.isNotEmpty) ActionLigne(Icons.delete_forever_outlined, 'Vider la corbeille', () => viderCorbeille(context)),
+        ]),
         corps: ListView(
           children: [
             for (final type in [for (final c in etat.corbeille) c.type].toSet())
@@ -124,15 +126,11 @@ class EcranCorbeille extends StatelessWidget {
                     Glissable(
                         key: ValueKey('glisser-${c.id}'),
                         titre: c.libelle,
+                        detail: 'Supprimé ${quand(c.le)}',
+                        auToucher: true,
                         versDroite: ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c)),
                         actions: [ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c))],
-                        child: LigneMenu(
-                          titre: c.libelle,
-                          titreTaille: 16,
-                          sousTitre: 'Supprimé ${quand(c.le)}',
-                          icone: icones[c.type] ?? Icons.delete_outline,
-                          droite: Lien('Restaurer', taille: 16, onTap: () => restaurerElement(context, c)),
-                        )),
+                        child: LigneMenu(titre: c.libelle, sousTitre: 'Supprimé ${quand(c.le)}')),
                 ],
               ),
             if (etat.corbeille.isEmpty)
@@ -143,12 +141,6 @@ class EcranCorbeille extends StatelessWidget {
             const SizedBox(height: 16),
           ],
         ),
-        bas: [
-          if (etat.corbeille.isNotEmpty)
-            BarreAction(boutons: [
-              Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => viderCorbeille(context)),
-            ]),
-        ],
       ),
     );
   }

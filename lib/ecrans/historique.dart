@@ -46,8 +46,6 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
             color: Charte.fondSelection,
             child: Row(
               children: [
-                Icon(Icons.link, size: 20, color: Charte.couleurIcone(Icons.link)),
-                const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Rattacher le ticket du ${jjmm(aRattacher.date)} (${euros(aRattacher.montant)}) : touchez la course.',
@@ -211,8 +209,6 @@ class BlocTicket extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(12, 8, 4, 8),
       decoration: BoxDecoration(color: Charte.fondSelection, borderRadius: BorderRadius.circular(10)),
       child: Row(children: [
-        Icon(Icons.receipt_long_outlined, size: 30, color: Charte.couleurIcone(Icons.receipt_long_outlined)),
-        const SizedBox(width: 10),
         Expanded(
           child: InkWell(
             onTap: () async {
@@ -261,12 +257,11 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
   final image = lu.image || (etat.ticketImage(t) && t.montant <= 0);
   final date = TextEditingController(text: image ? '' : jjmmaaaa(lu.date ?? t.date));
   final luSurLeTicket = lu.date != null || lu.montant != null;
-  final ok = await showDialog<bool>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: Charte.fond,
-      title: Text('Ticket de caisse', style: Charte.texte(18, gras: true)),
-      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+  final ok = await volet<bool>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: 'Ticket de caisse',
+      contenu: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (image)
           Text('Ticket en image : date et prix inconnus. Saisissez-les si vous les connaissez.',
               style: Charte.texte(14, couleur: Charte.texteSecondaire)),
@@ -296,9 +291,9 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
           onSubmitted: (_) => Navigator.of(ctx).pop(true),
         ),
       ]),
-      actions: [
-        TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Passer', style: Charte.texte(16))),
-        TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Valider', style: Charte.texte(16, gras: true))),
+      boutons: [
+        Bouton(texte: 'Passer', onTap: () => Navigator.of(ctx).pop(false)),
+        Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(true)),
       ],
     ),
   );

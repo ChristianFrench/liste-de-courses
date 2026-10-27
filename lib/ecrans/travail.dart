@@ -2,13 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart';
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show choisirSecteur, nouveauProduit;
+import 'catalogue.dart' show nouveauProduit;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -32,8 +31,6 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   /// Jour prévu des courses : aujourd'hui par défaut.
   late DateTime prevue = DateTime(debut.year, debut.month, debut.day);
   bool nomModifie = false;
-  bool personnalisee = false;
-  bool types = false;
 
   @override
   void initState() {
@@ -97,18 +94,15 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
 
-  void _calculee() => showDialog<void>(
-        context: context,
-        barrierColor: Charte.voile,
-        builder: (ctx) => AlertDialog(
-          backgroundColor: Charte.fond,
-          title: Text('Liste calculée', style: Charte.texte(18, gras: true)),
-          content: Text(
-              'La liste calculée à partir de vos tickets de caisse (lecture des tickets, puis choix des produits '
-              'achetés régulièrement) est prévue dans une version future.',
-              style: Charte.texte(16)),
-          actions: [TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Compris', style: Charte.texte(16, gras: true)))],
-        ),
+  void _calculee() => modale(
+        context,
+        titre: 'Liste calculée',
+        oui: null,
+        non: 'Compris',
+        contenu: (context, maj) => Text(
+            'La liste calculée à partir de vos tickets de caisse (lecture des tickets, puis choix des produits '
+            'achetés régulièrement) est prévue dans une version future.',
+            style: Charte.texte(16)),
       );
 
   /// Liste depuis un texte : on colle le texte, on vérifie ce qui a été reconnu, puis la liste est créée.
@@ -321,18 +315,14 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 onTap: () => _creer([], simple: true),
               ),
               LigneMenu(
-                icone: Icons.note_add_outlined,
                 titre: 'Liste type',
-                sousTitre: 'Une de vos listes types, ou la liste complète pour en construire une',
-                onTap: () => setState(() => types = !types),
-                droite: Icon(types ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
+                sousTitre: 'Une de vos listes types, ou une liste vide',
+                onTap: () => _choisirListeType(),
               ),
               LigneMenu(
-                icone: Icons.history,
                 titre: 'Liste personnalisée',
-                sousTitre: 'Choisir dans une de vos dernières courses (rien n\'est coché d\'avance)',
-                onTap: () => setState(() => personnalisee = !personnalisee),
-                droite: Icon(personnalisee ? Icons.expand_less : Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
+                sousTitre: 'Choisir dans une de vos dernières courses',
+                onTap: () => _choisirCourse(passees),
               ),
               LigneMenu(
                 icone: Icons.notes,
@@ -348,60 +338,65 @@ class _EcranPrelisteState extends State<EcranPreliste> {
               ),
             ],
           ),
-          if (types)
-            GroupeRetractable(
-              cle: 'preliste/types',
-              titre: 'Listes types',
-              icone: Icons.note_add_outlined,
-              nombre: etat.listesTypes.length,
-              enfants: [
-                LigneMenu(
-                  icone: Icons.format_list_bulleted,
-                  titre: 'Liste complète',
-                  sousTitre: 'Tous les articles du magasin, rayon par rayon : vous choisissez. '
-                      'À la fin, vous pourrez l\'enregistrer comme liste type.',
-                  onTap: () => _creer([]),
-                ),
-                for (final t in etat.listesTypes)
-                  Glissable(
-                    key: ValueKey('glisser-${t.id}'),
-                    titre: t.nom,
-                    versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => _supprimerListeType(t), danger: true),
-                    actions: [
-                      ActionLigne(Icons.playlist_add, 'Partir de cette liste type', () => _creer(etat.lignesDeListeType(t))),
-                      ActionLigne(Icons.delete_outline, 'Supprimer la liste type', () => _supprimerListeType(t), danger: true),
-                    ],
-                    child: LigneMenu(
-                    icone: Icons.note_alt_outlined,
-                    titre: t.nom,
-                    sousTitre: '${t.lignes.length} article${t.lignes.length > 1 ? 's' : ''}'
-                        '${t.magasinId == magasinId ? '' : ' · faite pour ${etat.magasin(t.magasinId)?.nom ?? 'un autre magasin'}'}',
-                    onTap: () => _creer(etat.lignesDeListeType(t)),
-                  )),
-              ],
-            ),
-          if (personnalisee)
-            GroupeRetractable(
-              cle: 'preliste/dernieres',
-              titre: 'Dernières courses dans ce magasin',
-              icone: Icons.history,
-              nombre: passees.length,
-              vide: 'Aucune course terminée avec ses articles dans ce magasin.',
-              enfants: [
-                for (final c in passees)
-                  LigneMenu(
-                    icone: Icons.receipt_long_outlined,
-                    titre: etat.nomListe(c),
-                    sousTitre: '${c.lignes.length} articles · ${quandJour(etat.dateCourses(c))} · touchez pour choisir',
-                    onTap: () => _voirCourse(c),
-                  ),
-              ],
-            ),
         ],
       ),
     );
   }
 
+  /// « Liste type » : une liste vide, ou une liste type (glisser vers la gauche la supprime).
+  Future<void> _choisirListeType() => volet<void>(
+        context,
+        builder: (ctx) => StatefulBuilder(
+          builder: (ctx, maj) => corpsVolet(
+            titre: 'Liste type',
+            contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              LigneMenu(
+                titre: 'Liste vide',
+                sousTitre: 'les articles par la recherche',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _creer([]);
+                },
+              ),
+              for (final t in etat.listesTypes)
+                Glissable(
+                  key: ValueKey('glisser-${t.id}'),
+                  titre: t.nom,
+                  versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => maj(() => _supprimerListeType(t)), danger: true),
+                  child: LigneMenu(
+                    titre: t.nom,
+                    sousTitre: '${t.lignes.length} art.${t.magasinId == magasinId ? '' : ' · ${etat.magasin(t.magasinId)?.nom ?? 'autre magasin'}'}',
+                    onTap: () {
+                      Navigator.of(ctx).pop();
+                      _creer(etat.lignesDeListeType(t));
+                    },
+                  ),
+                ),
+            ]),
+          ),
+        ),
+      );
+
+  /// « Liste personnalisée » : les dernières courses dans ce magasin ; en toucher une montre ses articles.
+  Future<void> _choisirCourse(List<Liste> passees) => volet<void>(
+        context,
+        builder: (ctx) => corpsVolet(
+          titre: 'Dernières courses dans ce magasin',
+          contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            if (passees.isEmpty)
+              Text('Aucune course terminée avec ses articles dans ce magasin.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            for (final c in passees)
+              LigneMenu(
+                titre: etat.nomListe(c),
+                sousTitre: '${c.lignes.length} art. · ${quandJour(etat.dateCourses(c))}',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  _voirCourse(c);
+                },
+              ),
+          ]),
+        ),
+      );
 }
 
 /// Écran 3 — Construction par secteur. Chaque action est enregistrée ; quitter ne perd rien.
@@ -413,44 +408,19 @@ class EcranConstruction extends StatefulWidget {
   State<EcranConstruction> createState() => _EcranConstructionState();
 }
 
-/// Un élément de la liste de préparation : titre de rayon, titre de secteur, produit, ou « + Produit absent ».
-class _Element {
-  _Element.rayon(Rayon this.rayon) : secteur = null, produit = null, absent = false;
-  _Element.titre(this.secteur) : rayon = null, produit = null, absent = false;
-  _Element.produit(this.secteur, Produit this.produit) : rayon = null, absent = false;
-  _Element.absent(Secteur this.secteur) : rayon = null, produit = null, absent = true;
-
-  final Rayon? rayon;
-  final Secteur? secteur; // null : « Non placé »
-  final Produit? produit;
-  final bool absent;
-  bool get titreSecteur => rayon == null && produit == null && !absent;
-}
-
-/// Préparation : la même liste que pendant les courses. Tous les secteurs du magasin, dans l'ordre du parcours
-/// (sans parcours : ordre des rayons), chacun sous son bandeau ; on fait défiler du doigt.
-/// « Ma liste » ne garde que les articles choisis ; un nouvel appui (« Tout ») remet tout le catalogue.
+/// Préparation : la recherche, puis la liste condensée, la même que pendant les courses : de minces bandeaux
+/// de secteur dans l'ordre du parcours (liste simple : sans bandeaux, dans l'ordre de saisie), des lignes de 30.
+/// Toucher une ligne ouvre son volet (packaging, promotion, consigne) ; − et + règlent la quantité ;
+/// un appui long (ou la quantité 0) retire l'article.
 class _EcranConstructionState extends State<EcranConstruction> {
   final etat = Etat.instance;
-  static const int seuilHabituel = 5;
-  bool maListe = false;
   final _defilement = ScrollController();
-  final _titres = <String, GlobalKey>{};
+  final _lignes = <String, GlobalKey>{};
+
+  /// Article signalé après une recherche (fond coloré quelques secondes).
+  String? _surligne;
 
   Liste? get liste => etat.liste(widget.listeId);
-
-  @override
-  void initState() {
-    super.initState();
-    final l = liste;
-    if (l == null) return;
-    // À l'ouverture, rayons et secteurs sont repliés ; à la reprise, seul celui où l'on s'était arrêté s'ouvre.
-    Retractables.i.fixer(_toutesLesCles(l), false);
-    // Modes « Condensé » et « Sans détails » : on ne voit que les articles choisis ; « Avec détails » : tout le catalogue.
-    maListe = etat.ajoutParRecherche;
-    final s = etat.secteur(l.repriseSecteurId ?? '');
-    if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _allerA(l, s, noter: false));
-  }
 
   @override
   void dispose() {
@@ -458,171 +428,157 @@ class _EcranConstructionState extends State<EcranConstruction> {
     super.dispose();
   }
 
-  /// Secteurs du magasin dans l'ordre du parcours par défaut, puis ceux qu'il ne cite pas.
-  List<Secteur> _secteurs(Liste l) {
-    final ordre = <String>[...(etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.etapes ?? const <String>[])];
-    for (final s in etat.secteursDuMagasin(l.magasinId)) {
-      if (ordre.contains(s.id)) continue;
-      // Un secteur que le parcours ne cite pas (ajouté depuis) se range après les autres secteurs de son rayon.
-      final i = ordre.lastIndexWhere((id) => etat.secteur(id)?.rayonId == s.rayonId);
-      if (i < 0) {
-        ordre.add(s.id);
-      } else {
-        ordre.insert(i + 1, s.id);
-      }
-    }
-    return [for (final id in ordre) etat.secteur(id)].whereType<Secteur>().toList();
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: etat,
+      builder: (context, _) {
+        final l = liste;
+        if (l == null) {
+          return PageBase(
+            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
+            corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
+          );
+        }
+        final simple = etat.estSimple(l);
+        final n = l.lignes.length;
+        String ou(Produit p) {
+          final s = etat.secteurDe(l.magasinId, p.id);
+          if (s == null) return 'Non placé dans ce magasin';
+          return '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
+        }
+
+        return PageBase(
+          entete: EnTeteFenetre(
+            retour: true,
+            titre: etat.nomListe(l),
+            sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · ${etat.creeeLe(l)}',
+            aide: simple ? Aides.listeSimple : Aides.preparation,
+            actions: [
+              ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
+                if (!await envoyerListe(etat, l) && context.mounted) {
+                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
+                }
+              }),
+            ],
+          ),
+          haut: [
+            ChampRecherche(
+              key: ValueKey('recherche-${l.id}'),
+              produits: () => etat.produits,
+              detail: ou,
+              aide: 'Ajouter un article (3 lettres ou plus)',
+              onChoix: (p) => _ajouter(l, p),
+              onNouveau: (nom) async {
+                final p = await nouveauProduit(context, nom: nom);
+                if (p == null || !mounted) return;
+                _ajouter(l, p);
+              },
+            ),
+            Container(height: 1, color: Charte.separateurZone),
+          ],
+          corps: l.lignes.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
+                      style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                )
+              : ListView(
+                  controller: _defilement,
+                  padding: const EdgeInsets.only(bottom: 16),
+                  children: simple
+                      ? [for (final g in l.lignes) _ligne(l, g)]
+                      : [
+                          for (final x in etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id)) ...[
+                            TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length),
+                            for (final g in x.lignes) _ligne(l, g),
+                          ],
+                        ],
+                ),
+          bas: [BarreAction(boutons: [Bouton(texte: 'Liste prête', plein: true, onTap: () => _valider(l))])],
+        );
+      },
+    );
   }
 
-  /// Rayons, puis leurs secteurs, puis leurs produits : chaque niveau se déplie au doigt.
-  List<_Element> _elements(Liste l) {
-    final res = <_Element>[];
-    String? rayonCourant;
-
-    for (final s in _secteurs(l)) {
-      final produits = [
-        for (final p in etat.produitsDu(l.magasinId, s.id))
-          if (!maListe || etat.ligne(l, p.id) != null) p,
-      ]..sort((a, b) => ordreAlpha(a.nom).compareTo(ordreAlpha(b.nom)));
-      if (maListe && produits.isEmpty) continue;
-      if (s.rayonId != rayonCourant) {
-        rayonCourant = s.rayonId;
-        final r = etat.rayon(s.rayonId);
-        if (r != null) res.add(_Element.rayon(r));
-      }
-      if (!Retractables.i.ouvert(_cleRayon(s.rayonId))) continue;
-      res.add(_Element.titre(s));
-      if (!Retractables.i.ouvert(_cle(s.id))) continue;
-      for (final p in produits) {
-        res.add(_Element.produit(s, p));
-      }
-      if (!maListe) res.add(_Element.absent(s));
-    }
-    final nonPlaces = [
-      for (final g in l.lignes)
-        if (etat.secteurDe(l.magasinId, g.produitId) == null) etat.produit(g.produitId),
-    ].whereType<Produit>().toList();
-    if (nonPlaces.isNotEmpty) {
-      res.add(_Element.titre(null));
-      if (Retractables.i.ouvert(_cle('nonPlace'))) for (final p in nonPlaces) {
-        res.add(_Element.produit(null, p));
-      }
-    }
-    return res;
+  /// L'article trouvé s'ajoute (s'il n'y est pas) ; l'écran va sur lui et le signale quelques secondes.
+  void _ajouter(Liste l, Produit p) {
+    if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
+    setState(() => _surligne = p.id);
+    _amener(p.id, essais: 4);
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted && _surligne == p.id) setState(() => _surligne = null);
+    });
   }
 
-  String _cle(String secteurId) => 'preparation/${widget.listeId}/$secteurId';
-  String _cleRayon(String rayonId) => 'preparation/${widget.listeId}/rayon/$rayonId';
-
-  List<String> _toutesLesCles(Liste l) => [
-        for (final s in _secteurs(l)) ...[_cle(s.id), _cleRayon(s.rayonId)],
-        _cle('nonPlace'),
-      ];
-
-  /// Un seul rayon ouvert : ouvrir un rayon replie les autres rayons et tous les secteurs.
-  void _ouvrirRayon(Liste l, String rayonId) {
-    Retractables.i.tous([
-      for (final s in _secteurs(l)) ...[_cle(s.id), if (s.rayonId != rayonId) _cleRayon(s.rayonId)],
-      _cle('nonPlace'),
-    ], false);
-    if (!Retractables.i.ouvert(_cleRayon(rayonId))) Retractables.i.basculer(_cleRayon(rayonId));
-  }
-
-  /// Un seul secteur ouvert : ouvrir un secteur replie les autres (et ouvre son rayon, seul).
-  void _ouvrirSeul(Liste l, String secteurId) {
-    final rayonId = etat.secteur(secteurId)?.rayonId;
-    Retractables.i.tous([
-      for (final s in _secteurs(l)) ...[
-        if (s.id != secteurId) _cle(s.id),
-        if (s.rayonId != rayonId) _cleRayon(s.rayonId),
-      ],
-      if (secteurId != 'nonPlace') _cle('nonPlace'),
-    ], false);
-    if (rayonId != null && !Retractables.i.ouvert(_cleRayon(rayonId))) Retractables.i.basculer(_cleRayon(rayonId));
-    if (!Retractables.i.ouvert(_cle(secteurId))) Retractables.i.basculer(_cle(secteurId));
-  }
-
-  final _lignes = <String, GlobalKey>{};
-
-  /// Article touché en dernier : il montre ses quatre pastilles (marque, mesure, packaging, promo).
-  String? _focus;
-
-  void _montrerLigne(String produitId) {
+  /// Fait venir la ligne d'un article à l'écran ; si elle n'est pas encore construite (loin dans la liste),
+  /// on descend d'abord par estimation, puis on ajuste.
+  void _amener(String produitId, {int essais = 1}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       final c = _lignes[produitId]?.currentContext;
-      if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3, alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd);
+      if (c != null && c.mounted) {
+        Scrollable.ensureVisible(c, alignment: 0.4, duration: const Duration(milliseconds: 200));
+        return;
+      }
+      if (essais <= 0 || !_defilement.hasClients) return;
+      final p = _defilement.position;
+      _defilement.jumpTo((p.pixels + p.viewportDimension * 0.8).clamp(0, p.maxScrollExtent));
+      _amener(produitId, essais: essais - 1);
     });
   }
 
-  static const _autre = '\u0000autre';
-  static const _sans = '\u0000sans';
-
-  /// Pastille « Marque » : « Camembert » devient l'article « Camembert Président » (créé au besoin).
-  Future<void> _choisirMarque(Liste l, Produit p) async {
+  /// Appui long (ou quantité 0) : l'article quitte la liste, « Annuler » le remet.
+  void _retirer(Liste l, Produit p) {
     final g = etat.ligne(l, p.id);
     if (g == null) return;
-    final actuelle = etat.marque(g.marqueId)?.nom;
-    final v = await choisirDansListe<String>(context, titre: 'Marque · ${etat.nomSansMarque(g, p)}', choix: {
-      if (actuelle != null) _sans: 'Sans marque',
-      for (final m in etat.marquesProposees(g, p)) m: m,
-      _autre: 'Autre marque…',
-    });
-    if (v == null || !mounted) return;
-    var nom = v == _sans ? '' : v;
-    if (v == _autre) {
-      nom = await demanderTexte(context, titre: 'Marque', aide: 'Ex. : Président') ?? '';
-      if (nom.isEmpty || !mounted) return;
-    }
-    final q = etat.changerMarque(l, p, nom);
-    setState(() => _focus = q.id);
-    _montrerLigne(q.id);
+    final i = l.lignes.indexOf(g);
+    HapticFeedback.mediumImpact();
+    etat.quantite(l, p.id, 0);
+    Nav.message(context, '« ${p.nom} » retiré de la liste', annuler: () => etat.remettreLigne(l, g, i));
   }
 
-  /// Pastilles « Mesure » (poids, contenance) et « Packaging » (lot de x).
-  Future<void> _choisirPackaging(Liste l, Produit p, {required bool lot}) async {
-    final g = etat.ligne(l, p.id);
-    if (g == null) return;
-    final (mesure, lotActuel) = Etat.mesureEtLot(etat.packaging(g.packagingId)?.libelle);
-    final v = await choisirDansListe<String>(context, titre: '${lot ? 'Packaging' : 'Mesure'} · ${p.nom}', choix: {
-      '': lot ? 'À l\'unité' : 'Indifférente',
-      for (final x in lot ? etat.lotsProposes(p) : etat.mesuresProposees(p)) x: x,
-      _autre: lot ? 'Autre packaging…' : 'Autre mesure…',
-    });
-    if (v == null || !mounted) return;
-    var x = v;
-    if (v == _autre) {
-      x = await demanderTexte(context, titre: lot ? 'Packaging' : 'Mesure', aide: lot ? 'Ex. : lot de 6' : 'Ex. : 500 g') ?? '';
-      if (x.isEmpty || !mounted) return;
-      if (lot && RegExp(r'^\d+$').hasMatch(x)) x = 'lot de $x';
-    }
-    final choix = x.isEmpty ? null : x;
-    final k = lot ? etat.packagingCompose(mesure, choix) : etat.packagingCompose(choix, lotActuel);
-    etat.definirPackaging(l, p.id, k?.id);
-  }
+  /// Petit bouton − ou + de la ligne.
+  Widget _petitBouton(String signe, String libelle, Key cle, VoidCallback onTap) => Semantics(
+        button: true,
+        label: libelle,
+        child: InkWell(
+          key: cle,
+          onTap: onTap,
+          child: SizedBox(
+            width: 34,
+            height: Charte.ligne,
+            child: Center(child: Text(signe, style: Charte.texte(20, gras: true, couleur: Charte.cadre))),
+          ),
+        ),
+      );
 
-  Future<void> _consigne(Liste l, Produit p) async {
-    final g = etat.ligne(l, p.id);
-    if (g == null) return;
-    final t = await demanderTexte(context, titre: 'Consigne · ${p.nom}', initial: g.consigne ?? '', aide: 'Ex. : bien mûres, la moins chère');
-    if (t != null) etat.definirConsigne(l, p.id, t);
-  }
-
-  /// Fait venir le bandeau d'un secteur en haut de l'écran (hauteurs estimées, puis ajustement).
-  void _allerA(Liste l, Secteur s, {bool noter = true}) {
-    if (noter) etat.positionConstruction(l, s.rayonId, s.id);
-    _ouvrirSeul(l, s.id);
-    if (!_defilement.hasClients) return;
-    final elements = _elements(l);
-    var y = 0.0;
-    for (final e in elements) {
-      if (e.titreSecteur && e.secteur?.id == s.id) break;
-      y += e.produit == null ? 52 : (etat.ligne(l, e.produit!.id) != null ? 110 : Charte.ligneCourses);
-    }
-    _defilement.jumpTo(y.clamp(0, _defilement.position.maxScrollExtent));
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final c = _titres[s.id]?.currentContext;
-      if (c != null && c.mounted) Scrollable.ensureVisible(c);
-    });
+  Widget _ligne(Liste l, LigneListe g) {
+    final p = etat.produit(g.produitId);
+    if (p == null) return const SizedBox.shrink();
+    return LigneArticle(
+      key: _lignes.putIfAbsent(p.id, GlobalKey.new),
+      cle: ValueKey('condense-${p.id}'),
+      ligne: g,
+      produit: p,
+      surligne: _surligne == p.id,
+      onTap: () => ouvrirFeuillePromotion(context, l, g),
+      onDetail: () => ouvrirFeuillePromotion(context, l, g),
+      onLongPress: () => _retirer(l, p),
+      reglage: Row(mainAxisSize: MainAxisSize.min, children: [
+        // − N + : à 0, l'article quitte la liste (« Annuler » le remet).
+        _petitBouton('−', 'Moins', ValueKey('moins-${p.id}'),
+            () => g.quantite <= 1 ? _retirer(l, p) : etat.quantite(l, p.id, g.quantite - 1)),
+        SizedBox(
+          width: 26,
+          child: Text('${g.quantite}',
+              key: ValueKey('quantite-${p.id}'),
+              textAlign: TextAlign.center,
+              style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
+        ),
+        _petitBouton('+', 'Plus', ValueKey('plus-${p.id}'), () => etat.quantite(l, p.id, g.quantite + 1)),
+      ]),
+    );
   }
 
   /// Fenêtre modale « Liste prête » : récapitulatif, envoi par mail éventuel, puis la liste passe dans Courses.
@@ -638,9 +594,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final ok = await modale(
       context,
       titre: 'Fin de la liste',
-      icone: Icons.checklist,
       oui: 'Valider',
       non: 'Continuer la préparation',
+      fermable: false,
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -716,548 +672,142 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
-  /// « + Produit absent de ce secteur » : son nom suffit ; il est créé, placé ici, coché et touché
-  /// (ses pastilles permettent ensuite d'ajouter marque, mesure, packaging, promo).
-  Future<void> _produitAbsent(Liste l, Secteur s) async {
-    final n = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', aide: 'Nom générique (ex. : Riz)', valider: 'Ajouter');
-    if (n == null || n.isEmpty || !mounted) return;
-    final q = etat.creerProduit(n, secteur: s);
-    etat.ajouterLigne(l, q.id);
-    setState(() => _focus = q.id);
-    Nav.message(context, '« ${q.nom} » ajouté au catalogue et à la liste');
-    _montrerLigne(q.id);
-  }
+}
+
+/// Une ligne d'article, la même en préparation et en courses (30 points) : le P des promotions, le nom
+/// (et la consigne en petit), le packaging en code court, puis la quantité (ou [reglage]).
+/// Toucher le P ou le packaging appelle [onDetail] ; toucher le reste de la ligne, [onTap].
+class LigneArticle extends StatelessWidget {
+  const LigneArticle({
+    super.key,
+    required this.ligne,
+    required this.produit,
+    this.cle,
+    this.onTap,
+    this.onLongPress,
+    this.onDetail,
+    this.reglage,
+    this.coche = false,
+    this.manquant = false,
+    this.surligne = false,
+  });
+  final LigneListe ligne;
+  final Produit produit;
+
+  /// Clé de la zone sensible de la ligne.
+  final Key? cle;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDetail;
+  final Widget? reglage;
+  final bool coche;
+
+  /// Manquant en rayon : nom en rouge, barré.
+  final bool manquant;
+  final bool surligne;
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Listenable.merge([etat, Retractables.i]),
-      builder: (context, _) {
-        final l = liste;
-        if (l == null) {
-          return PageBase(
-            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
-            corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
-          );
-        }
-        final simple = etat.estSimple(l);
-        final mode = simple ? 'liste' : etat.modePreparation;
-        final barre = BarreAction(boutons: [
-          Bouton(
-            texte: 'Aperçu',
-            taille: 15,
-            onTap: () => Nav.travail(EcranCoursesSecteur(listeId: l.id, apercu: true)),
-          ),
-          Bouton(texte: 'Liste prête', plein: true, onTap: () => _valider(l)),
-        ]);
-        final entete = EnTeteFenetre(
-          retour: true,
-          icone: Icons.checklist,
-          titre: etat.nomListe(l),
-          sousTitre: simple
-              ? 'Liste simple · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · ${etat.creeeLe(l)}'
-              : etat.creeeLe(l),
-          aide: simple ? Aides.listeSimple : Aides.preparation,
-          deplier: simple ? const [] : _toutesLesCles(l),
-          actions: [
-            ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
-              if (!await envoyerListe(etat, l) && context.mounted) {
-                Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
-              }
-            }),
-          ],
-        );
-        String ou(Produit p) {
-          final s = etat.secteurDe(l.magasinId, p.id);
-          if (s == null) return 'Non placé dans ce magasin';
-          return '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
-        }
-
-        final recherche = ChampRecherche(
-          key: ValueKey('recherche-${l.id}'),
-          produits: () => etat.produits,
-          detail: ou,
-          aide: simple ? 'Ajouter un article (3 lettres ou plus)' : 'Rechercher',
-          // Condensé et Sans détails : l'article trouvé s'ajoute ; Avec détails : tout le catalogue, la recherche y amène.
-          droite: simple
-              ? null
-              : SizedBox(
-                  width: 150,
-                  child: ChoixDeroulant<String>(
-                    key: const ValueKey('mode-preparation'),
-                    valeur: mode,
-                    choix: const {'condense': 'Condensé', 'liste': 'Sans détails', 'detail': 'Avec détails'},
-                    onChange: (v) {
-                      etat.options(modePreparation: v);
-                      setState(() => maListe = v != 'detail');
-                    },
-                  ),
-                ),
-          onChoix: (p) => simple
-              ? _ajouterSimple(l, p)
-              : mode == 'condense'
-                  ? _ajouterCondense(l, p)
-                  : mode == 'liste'
-                      ? _ajouterTrouve(l, p)
-                      : _trouver(l, p),
-          onNouveau: simple || etat.ajoutParRecherche
-              ? (n) async {
-                  final p = await nouveauProduit(context, nom: n);
-                  if (p == null || !mounted) return;
-                  simple ? _ajouterSimple(l, p) : _ajouterTrouve(l, p);
-                }
-              : null,
-        );
-        if (simple) {
-          return PageBase(
-            entete: entete,
-            haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
-            corps: l.lignes.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus : il s\'ajoute en fin de liste.',
-                        style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-                  )
-                : ListView(
-                    controller: _defilement,
-                    padding: const EdgeInsets.only(bottom: 16),
-                    children: [for (final g in l.lignes) if (etat.produit(g.produitId) case final p?) _ligne(l, p, simple: true)],
-                  ),
-            bas: [barre],
-          );
-        }
-        if (mode == 'condense') {
-          return PageBase(
-            entete: entete,
-            haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
-            corps: _condense(l),
-            bas: [barre],
-          );
-        }
-        if (etat.secteursDuMagasin(l.magasinId).isEmpty) {
-          return PageBase(
-            entete: entete,
-            corps: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text("Ce magasin n'a pas encore de rayons : le catalogue du foyer est vide (Gérer › Courses › Catalogue).",
-                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            ),
-            bas: [barre],
-          );
-        }
-        final elements = _elements(l);
-        final numeros = <String, int>{};
-        final premiers = <String, int>{};
-        for (var i = 0; i < elements.length; i++) {
-          if (elements[i].rayon case final r?) premiers.putIfAbsent(r.id, () => i);
-        }
-        for (final e in elements) {
-          if (e.titreSecteur && e.secteur != null) numeros[e.secteur!.id] = numeros.length + 1;
-        }
-        Widget element(int i) => _element(l, elements[i], i, numeros, premiers);
-
-        // Le rayon ouvert et son secteur ouvert restent en haut de l'écran pendant que leurs articles défilent.
-        final morceaux = <Widget>[];
-        var i = 0;
-        while (i < elements.length) {
-          final e = elements[i];
-          if (e.rayon != null && Retractables.i.ouvert(_cleRayon(e.rayon!.id))) {
-            final interieur = <Widget>[];
-            var j = i + 1;
-            while (j < elements.length && elements[j].rayon == null && !(elements[j].titreSecteur && elements[j].secteur == null)) {
-              final f = elements[j];
-              if (f.titreSecteur && Retractables.i.ouvert(_cle(f.secteur!.id))) {
-                var k = j + 1;
-                while (k < elements.length && (elements[k].produit != null || elements[k].absent) && elements[k].secteur?.id == f.secteur!.id) {
-                  k++;
-                }
-                interieur.add(SliverMainAxisGroup(slivers: [
-                  PinnedHeaderSliver(child: element(j)),
-                  SliverList.list(children: [for (var x = j + 1; x < k; x++) element(x)]),
-                ]));
-                j = k;
-              } else {
-                interieur.add(SliverToBoxAdapter(child: element(j)));
-                j++;
-              }
-            }
-            morceaux.add(SliverMainAxisGroup(slivers: [PinnedHeaderSliver(child: element(i)), ...interieur]));
-            i = j;
-          } else {
-            morceaux.add(SliverToBoxAdapter(child: element(i)));
-            i++;
-          }
-        }
-
-        return PageBase(
-          entete: entete,
-          haut: [recherche, Container(height: 1, color: Charte.separateurZone)],
-          corps: elements.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                      etat.ajoutParRecherche
-                          ? 'Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste, '
-                              'rangé dans son rayon et son secteur.'
-                          : 'La liste est vide.',
-                      style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-                )
-              : CustomScrollView(
-                  controller: _defilement,
-                  slivers: [...morceaux, const SliverPadding(padding: EdgeInsets.only(bottom: 16))],
-                ),
-          bas: [barre],
-        );
-      },
+    final etat = Etat.instance;
+    final g = ligne;
+    final k = etat.packagingDe(g, produit);
+    final couleurPack = k == null ? null : etat.couleurPack(k.id);
+    final couleurPromo = g.promotion == null ? null : etat.couleurPromo(g.promotion!.type);
+    final grise = coche || manquant;
+    final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
+      decoration: grise ? TextDecoration.lineThrough : null,
     );
-  }
-
-  Widget _element(Liste l, _Element e, int i, Map<String, int> numeros, Map<String, int> premiers) {
-    final s = e.secteur;
-    if (e.rayon != null) {
-      final r = e.rayon!;
-      final cle = _cleRayon(r.id);
-      return TitreGroupe(
-        // Un rayon peut revenir plus loin dans le parcours : seule sa première apparition porte la clé.
-        key: premiers[r.id] == i ? _titres.putIfAbsent('rayon:${r.id}', GlobalKey.new) : null,
-        nom: r.nom,
-        image: cleRayon(r.nom),
-        icone: Icons.view_week_outlined,
-        fort: true,
-        nombre: l.lignes.where((g) => etat.secteurDe(l.magasinId, g.produitId)?.rayonId == r.id).length,
-        ouvert: Retractables.i.ouvert(cle),
-        focus: Retractables.i.ouvert(cle),
-        onTap: () {
-          if (Retractables.i.ouvert(cle)) {
-            Retractables.i.basculer(cle);
-          } else {
-            _ouvrirRayon(l, r.id);
-            _montrer('rayon:${r.id}');
-          }
-        },
-      );
-    }
-    if (e.produit != null) return _ligne(l, e.produit!);
-    if (e.absent) {
-      return InkWell(
-        onTap: () => _produitAbsent(l, s!),
+    // Les petits signes ont une zone de toucher plus large que leur dessin.
+    Widget signe(Widget w, String libelle) => Semantics(
+          button: true,
+          label: libelle,
+          child: InkWell(
+            onTap: onDetail,
+            child: Container(
+              height: Charte.ligne,
+              constraints: const BoxConstraints(minWidth: 32),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              child: w,
+            ),
+          ),
+        );
+    return Material(
+      color: surligne ? Charte.fondSelection : Colors.transparent,
+      child: InkWell(
+        key: cle,
+        onTap: onTap,
+        onLongPress: onLongPress,
         child: Container(
-          height: 44,
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-          child: Text('+ Produit absent de ce secteur', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        ),
-      );
-    }
-    final r = s == null ? null : etat.rayon(s.rayonId);
-    return TitreGroupe(
-      key: _titres.putIfAbsent(s?.id ?? 'nonPlace', GlobalKey.new),
-      nom: s?.nom ?? 'Non placé',
-      numero: s == null ? null : numeros[s.id]?.toString(),
-      nonPlace: s == null,
-      image: r == null ? null : cleSecteur(r.nom, s!.nom),
-      nombre: s == null ? null : etat.nbDansSecteur(l, s.id),
-      ouvert: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-      focus: Retractables.i.ouvert(_cle(s?.id ?? 'nonPlace')),
-      onTap: () {
-        final id = s?.id ?? 'nonPlace';
-        if (Retractables.i.ouvert(_cle(id))) {
-          Retractables.i.basculer(_cle(id));
-        } else {
-          _ouvrirSeul(l, id);
-          _montrer(id);
-        }
-      },
-    );
-  }
-
-  /// Article choisi dans la recherche : son rayon et son secteur s'ouvrent, la ligne vient à l'écran et se signale.
-  void _trouver(Liste l, Produit p) {
-    final s = etat.secteurDe(l.magasinId, p.id);
-    setState(() {
-      maListe = maListe && etat.ligne(l, p.id) != null;
-      _surligne = p.id;
-      if (etat.ligne(l, p.id) != null) _focus = p.id;
-    });
-    if (s == null) {
-      // Absent des rayons de ce magasin : il rejoint la liste, dans « Non placé ».
-      if (etat.ligne(l, p.id) == null) {
-        etat.ajouterLigne(l, p.id);
-        Nav.message(context, '« ${p.nom} » ajouté à la liste (non placé dans ce magasin)');
-      }
-      _ouvrirSeul(l, 'nonPlace');
-      _montrer('nonPlace');
-    } else {
-      _allerA(l, s);
-    }
-    _amener(p.id, essais: 3);
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _surligne == p.id) setState(() => _surligne = null);
-    });
-  }
-
-  /// Mode « Rechercher » : l'article choisi entre dans la liste (s'il n'y est pas) ; on ne voit plus que la liste,
-  /// avec seuls son rayon et son secteur ouverts, et l'on est sur l'article, prêt pour la marque, la mesure…
-  /// Mode « Condensé » : l'article trouvé s'ajoute (s'il n'y est pas) ; la liste reste serrée et l'écran va sur lui.
-  void _ajouterCondense(Liste l, Produit p) {
-    if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
-    setState(() => _surligne = p.id);
-    _amener(p.id, essais: 4);
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _surligne == p.id) setState(() => _surligne = null);
-    });
-  }
-
-  /// Condensé : petit bouton − ou + de la ligne (lignes serrées, à la demande du maître d'ouvrage).
-  Widget _petitBouton(IconData icone, String libelle, Key cle, VoidCallback onTap) => Semantics(
-        button: true,
-        label: libelle,
-        child: InkWell(
-          key: cle,
-          onTap: onTap,
-          child: SizedBox(width: 32, height: 24, child: Icon(icone, size: 18, color: Charte.couleurIcone(icone))),
-        ),
-      );
-
-  /// Condensé : appui long (ou quantité 0) : l'article quitte la liste, « Annuler » le remet.
-  void _retirerCondense(Liste l, Produit p) {
-    final g = etat.ligne(l, p.id);
-    if (g == null) return;
-    final i = l.lignes.indexOf(g);
-    HapticFeedback.mediumImpact();
-    etat.quantite(l, p.id, 0);
-    Nav.message(context, '« ${p.nom} » retiré de la liste', annuler: () => etat.remettreLigne(l, g, i));
-  }
-
-  /// Mode « Condensé » : la liste comme en magasin, serrée sous de minces bandeaux de secteur ; un P devant
-  /// les articles en promotion. On y reste : toucher la ligne ouvre la promotion, toucher la quantité la règle,
-  /// un appui long retire l'article.
-  Widget _condense(Liste l) {
-    final etapes = etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id);
-    if (l.lignes.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
-            style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-      );
-    }
-    return ListView(
-      controller: _defilement,
-      padding: const EdgeInsets.only(bottom: 16),
-      children: [
-        for (final x in etapes) ...[
-          Container(
-            color: Charte.accent,
-            margin: const EdgeInsets.only(top: 2),
-            padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
-            child: Row(children: [
-              Expanded(
-                  child: Text(x.nom.toUpperCase(),
-                      maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
-              Text('${x.lignes.length}', style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
-            ]),
-          ),
-          for (final g in x.lignes)
-            if (etat.produit(g.produitId) case final p?)
-              Material(
-                key: _lignes.putIfAbsent(p.id, GlobalKey.new),
-                color: _surligne == p.id ? Charte.fondSelection : Colors.transparent,
-                child: InkWell(
-                  key: ValueKey('condense-${p.id}'),
-                  onTap: () => ouvrirFeuillePromotion(context, l, g),
-                  onLongPress: () => _retirerCondense(l, p),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 16, right: 6),
-                    child: Row(children: [
-                      SizedBox(
-                        height: 24,
-                        width: 22,
-                        child: g.promotion == null ? null : Text('P', style: Charte.texte(16, gras: true, couleur: Color(etat.couleurPromotions))),
-                      ),
-                      Expanded(child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
-                      // − N + : à 0, l'article quitte la liste (« Annuler » le remet).
-                      _petitBouton(Icons.remove, 'Moins', ValueKey('moins-${p.id}'),
-                          () => g.quantite <= 1 ? _retirerCondense(l, p) : etat.quantite(l, p.id, g.quantite - 1)),
-                      SizedBox(
-                        width: 28,
-                        child: Text('${g.quantite}',
-                            key: ValueKey('quantite-${p.id}'),
-                            textAlign: TextAlign.center,
-                            style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
-                      ),
-                      _petitBouton(Icons.add, 'Plus', ValueKey('plus-${p.id}'), () => etat.quantite(l, p.id, g.quantite + 1)),
-                    ]),
-                  ),
-                ),
-              ),
-        ],
-      ],
-    );
-  }
-
-  void _ajouterTrouve(Liste l, Produit p) {
-    final deja = etat.ligne(l, p.id) != null;
-    if (!deja) etat.ajouterLigne(l, p.id);
-    setState(() {
-      maListe = true;
-      _focus = p.id;
-      _surligne = p.id;
-    });
-    final s = etat.secteurDe(l.magasinId, p.id);
-    if (s == null) {
-      _ouvrirSeul(l, 'nonPlace');
-      _montrer('nonPlace');
-    } else {
-      _allerA(l, s);
-    }
-    _amener(p.id, essais: 3);
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _surligne == p.id) setState(() => _surligne = null);
-    });
-  }
-
-  /// Fait venir la ligne d'un article à l'écran ; si elle n'est pas encore construite (loin dans le secteur),
-  /// on descend d'abord par estimation, puis on ajuste.
-  void _amener(String produitId, {int essais = 1}) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      final c = _lignes[produitId]?.currentContext;
-      if (c != null && c.mounted) {
-        Scrollable.ensureVisible(c, alignment: 0.4, duration: const Duration(milliseconds: 200));
-        return;
-      }
-      if (essais <= 0 || !_defilement.hasClients) return;
-      final p = _defilement.position;
-      _defilement.jumpTo((p.pixels + p.viewportDimension * 0.8).clamp(0, p.maxScrollExtent));
-      _amener(produitId, essais: essais - 1);
-    });
-  }
-
-  /// Liste simple : l'article choisi s'ajoute en fin de liste (ou, s'il y est déjà, se signale).
-  void _ajouterSimple(Liste l, Produit p) {
-    final deja = etat.ligne(l, p.id) != null;
-    etat.ajouterLigne(l, p.id);
-    setState(() {
-      _focus = p.id;
-      _surligne = p.id;
-    });
-    if (deja) Nav.message(context, '« ${p.nom} » est déjà dans la liste');
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_defilement.hasClients) return;
-      if (deja) {
-        _amener(p.id);
-      } else {
-        _defilement.animateTo(_defilement.position.maxScrollExtent, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
-      }
-    });
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted && _surligne == p.id) setState(() => _surligne = null);
-    });
-  }
-
-  /// Article signalé après une recherche (fond coloré quelques secondes).
-  String? _surligne;
-
-  /// Après dépliage, le bandeau monte en haut de l'écran : ce qu'il contient est visible dessous,
-  /// même pour le dernier groupe (« Non placé », en fin de liste).
-  void _montrer(String cleTitre) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final c = _titres[cleTitre]?.currentContext;
-      if (c != null && c.mounted) {
-        Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250), curve: Curves.easeOut);
-      }
-    });
-  }
-
-  /// Article non placé dans ce magasin : on choisit son rayon puis son secteur ; il y rejoint la liste.
-  Future<void> _placer(Liste l, Produit p) async {
-    final s = (await choisirSecteur(context, titre: p.nom))?.$1;
-    if (s == null || !mounted) return;
-    etat.placer(l.magasinId, p.id, s.id);
-    Nav.message(context, '« ${p.nom} » est placé dans ${s.nom}');
-    _allerA(l, s);
-  }
-
-  Widget _ligne(Liste l, Produit p, {bool simple = false}) {
-    final g = etat.ligne(l, p.id);
-    // Non placé : toucher son nom propose un secteur ; il pourra ensuite être coché (pas dans une liste simple).
-    final place = simple || etat.secteurDe(l.magasinId, p.id) != null;
-    final focus = g != null && _focus == p.id;
-    void basculer() {
-      etat.basculer(l, p.id);
-      final coche = etat.ligne(l, p.id) != null;
-      setState(() => _focus = coche ? p.id : (_focus == p.id ? null : _focus));
-      final s = etat.secteurDe(l.magasinId, p.id);
-      if (s != null) etat.positionConstruction(l, s.rayonId, s.id);
-    }
-
-    final (mesure, lot) = Etat.mesureEtLot(etat.packaging(g?.packagingId)?.libelle);
-    final promo = g?.promotion;
-    final textePromo = promo == null ? null : (promo.libelle.isNotEmpty ? promo.libelle : (etat.typePromotion(promo.type)?.nom ?? 'Promo'));
-    final couleurPromo = promo == null ? null : etat.couleurPromo(promo.type);
-    final pastilles = <Widget>[
-      if (focus) ...[
-        Pastille(etat.marque(g.marqueId)?.nom ?? '+ Marque', vide: g.marqueId == null, onTap: () => _choisirMarque(l, p)),
-        Pastille(mesure ?? '+ Mesure', vide: mesure == null, onTap: () => _choisirPackaging(l, p, lot: false)),
-        Pastille(lot ?? '+ Packaging', vide: lot == null, onTap: () => _choisirPackaging(l, p, lot: true)),
-        Pastille(textePromo ?? '+ Promo',
-            couleur: couleurPromo == null ? Charte.rouge : Color(couleurPromo),
-            vide: promo == null,
-            onTap: () => ouvrirFeuillePromotion(context, l, g)),
-      ] else if (g != null) ...[
-        // Article coché, pas touché en dernier : seulement la mesure et le packaging, s'il y en a.
-        if (mesure != null) Pastille(mesure, petite: true),
-        if (lot != null) Pastille(lot, petite: true),
-      ],
-    ];
-
-    // Glisser vers la droite ajoute l'article, vers la gauche le retire ; appui long : menu.
-    final ajouter = ActionLigne(Icons.add_shopping_cart, 'Ajouter', basculer);
-    final retirer = ActionLigne(Icons.remove_shopping_cart_outlined, 'Retirer', basculer, danger: true);
-    return Glissable(
-      key: ValueKey('glisser-${p.id}'),
-      titre: p.nom,
-      versDroite: g == null ? ajouter : null,
-      versGauche: g == null ? null : retirer,
-      actions: [
-        if (g == null) ajouter else retirer,
-        if (g != null) ActionLigne(Icons.sticky_note_2_outlined, 'Consigne', () => _consigne(l, p)),
-        if (!place) ActionLigne(Icons.place_outlined, 'Choisir son secteur', () => _placer(l, p)),
-      ],
-      child: Container(
-      foregroundDecoration: _surligne == p.id ? BoxDecoration(border: Border.all(color: Charte.accent, width: 3)) : null,
-      child: LigneChoix(
-      key: _lignes.putIfAbsent(p.id, GlobalKey.new),
-      nom: g == null ? p.nom : etat.libelleArticle(g, p),
-      complement: [
-        if (!place) 'Touchez pour choisir son secteur',
-        if (g == null) etat.complement(g, p),
-        if (g?.consigne != null) '« ${g!.consigne} »',
-      ].where((x) => x.isNotEmpty).join(' · '),
-      coche: g != null,
-      quantite: g?.quantite ?? 1,
-      pastilles: pastilles,
-      // La promotion, bien visible à gauche de la quantité (quand ses pastilles sont repliées).
-      avantQuantite: g == null || focus || textePromo == null
-          ? null
-          : Container(
-              constraints: const BoxConstraints(maxWidth: 76),
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              decoration: BoxDecoration(color: couleurPromo == null ? Charte.rouge : Color(couleurPromo), borderRadius: BorderRadius.circular(5)),
-              child: Text(textePromo, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center,
-                  style: Charte.texte(11, gras: true, couleur: Charte.blanc)),
+          height: Charte.ligne,
+          padding: const EdgeInsets.only(left: 6, right: 6),
+          // Le trait sous la ligne ne prend pas de place : les signes gardent leurs 30 points.
+          foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Row(children: [
+            SizedBox(
+              width: 30,
+              child: g.promotion == null
+                  ? null
+                  : signe(
+                      Text('P',
+                          key: ValueKey('promo-${produit.id}'),
+                          style: Charte.texte(16, gras: true, couleur: couleurPromo == null ? Charte.rouge : Color(couleurPromo))),
+                      'Promotion'),
             ),
-      // Article non choisi : toucher la ligne le coche ; article choisi : il montre (ou replie) ses pastilles.
-      onNom: !place
-          ? () => _placer(l, p)
-          : (g == null ? basculer : () => setState(() => _focus = focus ? null : p.id)),
-      habituel: p.nbUtilisations >= seuilHabituel,
-      alerte: g == null ? null : etat.quantiteInsuffisante(g),
-      onTap: basculer,
-      onQuantite: (q) => etat.quantite(l, p.id, q),
-    )));
+            Expanded(
+              child: Text.rich(
+                TextSpan(text: produit.nom, style: styleNom, children: [
+                  if (g.consigne != null) TextSpan(text: '  « ${g.consigne} »', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                ]),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (k != null)
+              signe(
+                Text(codeCourtPackaging(k.libelle),
+                    key: ValueKey('packaging-${produit.id}'),
+                    style: Charte.texte(13, gras: true, couleur: couleurPack == null ? Charte.cadre : Color(couleurPack))),
+                'Packaging',
+              ),
+            reglage ??
+                SizedBox(
+                  width: 30,
+                  child: Text('${g.quantite}',
+                      textAlign: TextAlign.right,
+                      style: Charte.texte(15, gras: g.quantite > 1, couleur: g.quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
+                ),
+          ]),
+        ),
+      ),
+    );
   }
+}
+
+/// Détail d'un article pendant les courses (toucher son P ou son packaging) : en clair, dans un volet.
+Future<void> detailArticle(BuildContext context, LigneListe g) {
+  final etat = Etat.instance;
+  final p = etat.produit(g.produitId);
+  final k = p == null ? null : etat.packagingDe(g, p);
+  final promo = g.promotion;
+  final lignes = [
+    'Quantité : ${g.quantite}',
+    if (etat.marque(g.marqueId) case final m?) 'Marque : ${m.nom}',
+    if (k != null) 'Packaging : ${k.libelle}',
+    if (promo != null)
+      'Promotion : ${promo.libelle.isNotEmpty ? promo.libelle : (etat.typePromotion(promo.type)?.nom ?? 'promo')}',
+    if (g.consigne != null) 'Consigne : ${g.consigne}',
+  ];
+  return volet<void>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: p?.nom ?? 'Article',
+      contenu: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [for (final x in lignes) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(x, style: Charte.texte(17)))],
+      ),
+    ),
+  );
 }
 
 // ---------------------------------------------------------------- Écran 4 : volet « Promotion visée »
@@ -1273,30 +823,15 @@ String codeCourtPackaging(String libelle) {
   return t.length <= 5 ? t : t.substring(0, 5);
 }
 
-/// Volet du packaging (et de la consigne) ou volet de la promotion d'un article.
-Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g, {bool packaging = false}) {
-  return showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    barrierColor: Charte.voile,
-    backgroundColor: Charte.fond,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
-    ),
-    builder: (_) => Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: FeuillePromotion(liste: l, ligne: g, packaging: packaging),
-    ),
-  );
-}
+/// Volet d'un article de la liste : packaging, consigne et promotion visée.
+Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g) =>
+    volet<void>(context, builder: (_) => FeuillePromotion(liste: l, ligne: g));
 
-/// Volet de l'article : soit le packaging (pack de x) et la consigne, soit la promotion visée.
+/// Volet de l'article : le packaging (pack de x), la consigne, puis la promotion visée.
 class FeuillePromotion extends StatefulWidget {
-  const FeuillePromotion({super.key, required this.liste, required this.ligne, this.packaging = false});
+  const FeuillePromotion({super.key, required this.liste, required this.ligne});
   final Liste liste;
   final LigneListe ligne;
-  final bool packaging;
 
   /// Promotions proposées : lot « 3 dont 1 gratuit », lot pour bénéficier d'une promo, remise simple, autre.
   static const typesProposes = ['lot', 'prixGlobal', 'remise', 'autre'];
@@ -1390,10 +925,9 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   void _valider() {
     final id = widget.ligne.produitId;
-    if (widget.packaging) {
-      etat.definirPackaging(widget.liste, id, packagingId);
-      etat.definirConsigne(widget.liste, id, consigne.text);
-    } else if (type == FeuillePromotion.aucune) {
+    etat.definirPackaging(widget.liste, id, packagingId);
+    etat.definirConsigne(widget.liste, id, consigne.text);
+    if (type == FeuillePromotion.aucune) {
       etat.definirPromotion(widget.liste, id, null);
     } else {
       final lib = libelle.text.trim().isEmpty ? _auto() : libelle.text.trim();
@@ -1414,24 +948,14 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     final proposes = p == null
         ? <String>[]
         : (p.packagingIds.isNotEmpty ? p.packagingIds : etat.formatsDuSecteur(widget.liste.magasinId, p.id));
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+    return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Center(
-              child: Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(color: Charte.texteSecondaire, borderRadius: BorderRadius.circular(2)),
-              ),
-            ),
-            const SizedBox(height: 12),
             Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
             Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            if (widget.packaging) ...[
             const TitreSection('Packaging', cote: 0, haut: 12),
             Wrap(spacing: 8, runSpacing: 8, children: [
               _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
@@ -1473,7 +997,6 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               minLines: 1,
               decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
             ),
-            ] else ...[
             const TitreSection('Promotion visée', cote: 0, haut: 14),
             GridView.count(
               crossAxisCount: 3,
@@ -1496,7 +1019,6 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 onChanged: (_) => libelleModifie = true,
               ),
             ],
-            ],
             const SizedBox(height: 14),
             Row(
               children: [
@@ -1507,7 +1029,6 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -1646,139 +1167,11 @@ String ordreAlpha(String nom) {
   return nom.toLowerCase().split('').map((c) => accents[c] ?? c).join();
 }
 
-/// Fenêtre de l'article choisi : mesure et lot (packaging), promotion, marque, consigne.
-/// Une marque ajoutée ou un packaging changé crée l'article correspondant (« Camembert Président · 250 g »).
-/// Packaging et promotion d'une ligne, en clair et dans leur couleur.
-List<Pastille> pastillesLigne(Etat etat, LigneListe g, {bool petite = false}) {
-  final p = etat.produit(g.produitId);
-  final k = p == null ? null : etat.packagingDe(g, p);
-  Color? c(int? v) => v == null ? null : Color(v);
-  return [
-    if (k != null) Pastille(k.libelle, couleur: c(etat.couleurPack(k.id)), petite: petite),
-    if (g.promotion != null)
-      Pastille(g.promotion!.libelle.isEmpty ? (etat.typePromotion(g.promotion!.type)?.nom ?? 'Promo') : g.promotion!.libelle,
-          couleur: c(etat.couleurPromo(g.promotion!.type)), petite: petite),
-  ];
-}
-
-// ---------------------------------------------------------------- Écran 7 : liste complète
-
-class EcranListeComplete extends StatelessWidget {
-  const EcranListeComplete({super.key, required this.listeId, this.depuisCourses = false});
-  final String listeId;
-  final bool depuisCourses;
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return ListenableBuilder(
-      listenable: etat,
-      builder: (context, _) {
-        final l = etat.liste(listeId);
-        if (l == null) {
-          return PageBase(
-            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
-            corps: Center(child: Text("Cette liste n'existe plus.", style: Charte.texte(16))),
-          );
-        }
-        final enCours = l.statut == StatutListe.enCours;
-        final membreId = enCours ? (l.membreId ?? etat.moi.id) : etat.moi.id;
-        final parcoursId = enCours ? l.parcoursId : etat.parcoursParDefaut(l.magasinId, membreId)?.id;
-        final p = etat.unParcours(parcoursId);
-        final etapes = etat.etapes(l, parcoursId);
-        final nbSecteurs = etapes.where((e) => !e.nonPlace).length;
-        final n = l.lignes.length;
-        final commence = l.nbCoches > 0 || l.repriseSecteurId != null;
-        var numero = 0;
-        return PageBase(
-          entete: EnTeteFenetre(
-            retour: true,
-            titre: '${etat.nomListe(l)} · $n article${n > 1 ? 's' : ''}',
-            actions: [
-              ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
-                if (!await envoyerListe(etat, l) && context.mounted) {
-                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
-                }
-              }),
-            ],
-          ),
-          haut: [
-            Container(
-              width: double.infinity,
-              color: Charte.fondBandeau,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              child: Text(
-                '${p?.nom ?? 'Ordre des rayons'} · ${etat.membre(membreId)?.nomAffiche ?? ''} · '
-                '$nbSecteurs secteur${nbSecteurs > 1 ? 's' : ''}',
-                style: Charte.texte(13, couleur: Charte.texteSecondaire),
-              ),
-            ),
-          ],
-          corps: n == 0
-              ? Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('La liste est vide.', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-                )
-              : ListView(
-                  children: [
-                    for (final e in etapes) ...[
-                      TitreGroupe(
-                        nom: e.nom,
-                        numero: e.nonPlace ? null : '${++numero}',
-                        nonPlace: e.nonPlace,
-                        image: e.secteur == null ? null : cleSecteur(etat.rayon(e.secteur!.rayonId)?.nom ?? '', e.nom),
-                      ),
-                      for (final g in e.lignes)
-                        LigneCompacte(
-                          nom: etat.produit(g.produitId)?.nom ?? '',
-                          complement: [
-                            etat.complement(g, etat.produit(g.produitId)!, marque: false, avecPackaging: false),
-                            if (g.consigne != null) '« ${g.consigne} »',
-                          ].where((x) => x.isNotEmpty).join(' · '),
-                          pastilles: pastillesLigne(etat, g, petite: true),
-                          quantite: g.quantite,
-                          promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
-                          coche: g.coche,
-                        ),
-                    ],
-                  ],
-                ),
-          bas: [
-            if (enCours)
-              BarreAction(boutons: [
-                Bouton(
-                  texte: commence ? 'Reprendre les courses' : 'Commencer · secteur 1',
-                  plein: true,
-                  onTap: n == 0
-                      ? null
-                      : () {
-                          if (depuisCourses) {
-                            Navigator.of(context).pop();
-                          } else {
-                            Nav.remplacerTravail(EcranCoursesSecteur(listeId: l.id));
-                          }
-                        },
-                ),
-              ])
-            else
-              BarreAction(boutons: [
-                Bouton(texte: 'Continuer la préparation', plein: true, onTap: () => Navigator.of(context).pop()),
-              ]),
-          ],
-        );
-      },
-    );
-  }
-}
-
-// ---------------------------------------------------------------- Écrans 8 et 9 : courses par secteur
+// ---------------------------------------------------------------- Écrans 8 et 9 : courses
 
 class EcranCoursesSecteur extends StatefulWidget {
-  const EcranCoursesSecteur({super.key, required this.listeId, this.apercu = false});
+  const EcranCoursesSecteur({super.key, required this.listeId});
   final String listeId;
-
-  /// Aperçu depuis la préparation : la liste telle qu'elle se présentera en courses, sans coche ni pause.
-  final bool apercu;
 
   static String court(String nom) => nom.split(' ').first;
 
@@ -1786,17 +1179,16 @@ class EcranCoursesSecteur extends StatefulWidget {
   State<EcranCoursesSecteur> createState() => _EcranCoursesSecteurState();
 }
 
-/// Courses : une seule liste, dans l'ordre du parcours, secteur par secteur ; on la fait défiler du doigt.
-/// « Reste à faire » cache les articles déjà cochés (et les secteurs terminés) ; un nouvel appui remet la liste complète.
+/// Courses : la liste condensée, comme en préparation, dans l'ordre du parcours, sous de minces bandeaux de secteur.
+/// Toucher une ligne la coche (elle reste à sa place, grisée et barrée) ; toucher son P ou son packaging en montre
+/// le détail ; un appui long propose ses actions.
 class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
-  bool resteAFaire = false;
   bool _commentaireVu = false;
 
-  /// Fenêtre simple : se ferme par la croix ou un appui à côté.
+  /// Fenêtre simple : se ferme par la poignée ou un appui à côté.
   Future<void> _commentaire(BuildContext context, String texte) => modale(
         context,
         titre: 'Commentaire',
-        icone: Icons.sticky_note_2_outlined,
         oui: null,
         non: null,
         contenu: (context, maj) => Text(texte, style: Charte.texte(17)),
@@ -1804,33 +1196,25 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   final _titres = <String, GlobalKey>{};
   bool _place = false;
 
-  /// Aperçu d'une liste simple : sans rayons ni secteurs (ordre de saisie) ou rangée comme en magasin.
-  bool? _aplat;
-
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     return ListenableBuilder(
-      listenable: Listenable.merge([etat, Retractables.i]),
+      listenable: etat,
       builder: (context, _) {
         final l = etat.liste(widget.listeId);
-        final apercu = widget.apercu;
-        if (l == null || (!apercu && l.statut != StatutListe.enCours)) {
+        if (l == null || l.statut != StatutListe.enCours) {
           return PageBase(
-            entete: const EnTeteFenetre(retour: true, icone: Icons.shopping_cart_outlined, titre: 'Courses'),
+            entete: const EnTeteFenetre(retour: true, titre: 'Courses'),
             corps: Center(child: Text('Pas de courses en cours.', style: Charte.texte(16))),
           );
         }
-        final etapes = etat.etapes(l, apercu ? etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id : l.parcoursId);
+        final etapes = etat.etapes(l, l.parcoursId);
         // Liste simple non rangée : les articles dans l'ordre de saisie, sans bandeaux.
-        final simple = etat.estSimple(l);
-        final aplat = apercu ? (_aplat ?? simple) : etat.aPlat(l);
+        final aplat = etat.aPlat(l);
         final total = l.lignes.length;
-        final titre = apercu
-            ? 'Aperçu · $total article${total > 1 ? 's' : ''}'
-            : '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total';
         final commentaire = etat.commentaire(l);
-        // Le commentaire de la liste s'affiche une fois à l'ouverture ; l'icône du titre le remontre.
+        // Le commentaire de la liste s'affiche une fois à l'ouverture ; le bouton du titre le remontre.
         if (commentaire != null && !_commentaireVu) {
           _commentaireVu = true;
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1839,96 +1223,36 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
         }
         // Secteur où l'on en est : le premier qui a encore un article à cocher.
         final e = etapes.firstWhere((x) => x.lignes.any((g) => !g.coche), orElse: () => etapes.isEmpty ? Etape(null, []) : etapes.last);
-        if (!apercu) _allerALaReprise(l);
-        final numeros = <String, int>{};
-        for (final x in etapes) {
-          if (!x.nonPlace) numeros[x.id] = numeros.length + 1;
-        }
-        final visibles = [
-          for (final x in etapes)
-            if (!resteAFaire || x.lignes.any((g) => !g.coche)) x,
-        ];
+        _allerALaReprise(l);
 
         return PopScope(
-          canPop: apercu,
+          canPop: false,
           onPopInvokedWithResult: (aFerme, _) {
             if (!aFerme) _pause(context, l, e);
           },
           child: PageBase(
             entete: EnTeteFenetre(
               retour: true,
-              icone: apercu ? Icons.checklist : Icons.shopping_cart_outlined,
-              titre: titre,
-              aide: apercu ? Aides.apercu : Aides.enMagasin,
+              titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total',
+              aide: Aides.enMagasin,
               droite: commentaire == null ? null : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
-              deplier: aplat || apercu ? const [] : [for (final x in etapes) _cle(x.id)],
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
-                : aplat
-                ? ListView(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    children: [
-                      for (final g in l.lignes)
-                        if (!resteAFaire || !(g.coche || etat.manquant(l, g.produitId))) _ligne(etat, l, g, apercu),
-                    ],
-                  )
                 : ListView(
                     padding: const EdgeInsets.only(bottom: 16),
-                    children: [
-                      for (final x in visibles) ...[
-                          TitreGroupe(
-                            key: _titres.putIfAbsent(x.id, GlobalKey.new),
-                            nom: x.nom,
-                            numero: numeros[x.id]?.toString(),
-                            nonPlace: x.nonPlace,
-                            image: imageEtape(etat, x),
-                            fort: true,
-                            avancement: apercu ? null : (x.lignes.where((g) => g.coche).length, x.lignes.length),
-                            nombre: apercu ? x.lignes.length : null,
-                            // Aperçu : toujours tout déployé, sans chevron
-                            ouvert: apercu ? null : Retractables.i.ouvert(_cle(x.id)),
-                            focus: !apercu && x.id == e.id && l.nbCoches > 0,
-                            onTap: apercu ? null : () => Retractables.i.basculer(_cle(x.id)),
-                          ),
-                          if (apercu || Retractables.i.ouvert(_cle(x.id)))
-                            for (final g in x.lignes)
-                              if (!resteAFaire || !(g.coche || etat.manquant(l, g.produitId))) _ligne(etat, l, g, apercu),
-                      ],
-                      if (resteAFaire && visibles.isEmpty)
-                        Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(Icons.check_circle_outline, size: 22, color: Charte.couleurIcone(Icons.check_circle_outline)),
-                              const SizedBox(width: 8),
-                              Text('Tout est coché', style: Charte.texte(16, gras: true)),
+                    children: aplat
+                        ? [for (final g in l.lignes) _ligne(etat, l, g)]
+                        : [
+                            for (final x in etapes) ...[
+                              TitreGroupe(key: _titres.putIfAbsent(x.id, GlobalKey.new), nom: x.nom, nonPlace: x.nonPlace),
+                              for (final g in x.lignes) _ligne(etat, l, g),
                             ],
-                          ),
-                        ),
-                    ],
+                          ],
                   ),
-            // Zone de décision : reste à faire / liste complète, pause, fin des courses.
             bas: [
-              if (apercu)
-                BarreAction(boutons: [
-                  if (simple)
-                    BoutonEtat(
-                      texte: 'Rayons et secteurs',
-                      actif: !aplat,
-                      onTap: () => setState(() => _aplat = !aplat),
-                    ),
-                  Bouton(texte: 'Continuer la préparation', plein: true, onTap: () => Navigator.of(context).maybePop()),
-                ])
-              else
               BarreAction(boutons: [
-                BoutonEtat(
-                  texte: 'Reste à faire',
-                  actif: resteAFaire,
-                  onTap: () => setState(() => resteAFaire = !resteAFaire),
-                ),
-                Bouton(texte: 'Pause', icone: Icons.pause, taille: 16, onTap: () => _pause(context, l, e)),
+                Bouton(texte: 'Pause', taille: 16, onTap: () => _pause(context, l, e)),
                 Bouton(
                   texte: 'Terminer les courses',
                   taille: 15,
@@ -1943,8 +1267,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
   }
 
-  String _cle(String etapeId) => '${widget.apercu ? 'apercu' : 'courses'}/${widget.listeId}/$etapeId';
-
   /// À la reprise de courses interrompues, la liste s'ouvre sur le secteur où l'on s'était arrêté.
   void _allerALaReprise(Liste l) {
     if (_place) return;
@@ -1957,24 +1279,31 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     });
   }
 
-  Widget _ligne(Etat etat, Liste l, LigneListe g, bool apercu) {
+  Widget _ligne(Etat etat, Liste l, LigneListe g) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
-    final morceaux = [
-      etat.complement(g, p, avecPackaging: false),
-      if (g.consigne != null) '« ${g.consigne} »',
-    ].where((x) => x.isNotEmpty);
-    return LigneCourse(
+    final manquant = etat.manquant(l, p.id);
+    return LigneArticle(
       key: ValueKey(p.id),
-      nom: p.nom,
-      complement: morceaux.join(' · '),
-      coche: !apercu && g.coche,
-      quantite: g.quantite,
-      promo: g.promotion == null ? null : (etat.typePromotion(g.promotion!.type)?.code ?? '?'),
-      pastilles: pastillesLigne(etat, g),
-      alerte: etat.quantiteInsuffisante(g),
-      manquant: !apercu && etat.manquant(l, p.id),
-      onTap: apercu ? null : () => _appui(etat, l, p),
+      ligne: g,
+      produit: p,
+      coche: g.coche,
+      manquant: manquant,
+      onTap: () => _appui(etat, l, p),
+      onDetail: () => detailArticle(context, g),
+      onLongPress: () {
+        HapticFeedback.mediumImpact();
+        menuActions(context, titre: p.nom, actions: [
+          if (manquant)
+            ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p))
+          else
+            ActionLigne(Icons.remove_circle_outline, 'Manquant en rayon', () {
+              etat.marquerManquant(l, p.id, true);
+              Nav.message(context, '« ${p.nom} » : manquant en rayon');
+            }),
+          ActionLigne(Icons.info_outline, 'Détail', () => detailArticle(context, g)),
+        ]);
+      },
     );
   }
 
@@ -2007,7 +1336,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     // Même sans article coché, la course est interrompue (elle reste dans « Courses interrompues »).
     final interrompre = await confirmer(
       context,
-      icone: Icons.pause_circle_outline,
       titre: 'Interrompre les courses ?',
       contenu: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2055,7 +1383,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     final ok = await modale(
       context,
       titre: 'Terminer les courses ?',
-      icone: Icons.flag_outlined,
+      fermable: false,
       oui: 'Terminer les courses',
       non: 'Continuer les courses',
       contenu: (context, maj) => Column(
@@ -2092,10 +1420,4 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     Nav.i.retourOnglet(Nav.courses);
     Nav.message(context, 'Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
   }
-}
-
-/// Image du secteur d'une étape des courses (aucune pour « Non placé »).
-String? imageEtape(Etat etat, Etape e) {
-  final r = e.secteur == null ? null : etat.rayon(e.secteur!.rayonId);
-  return r == null ? null : cleSecteur(r.nom, e.secteur!.nom);
 }

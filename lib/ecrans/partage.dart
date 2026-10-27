@@ -132,26 +132,42 @@ class EcranPartage extends StatelessWidget {
                   style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ),
             if (s.actif)
-              GroupeRetractable(
-                cle: 'partage/depannage',
-                titre: 'Dépannage',
-                icone: Icons.build_outlined,
-                parDefaut: false,
-                enfants: [..._depannage(context, s),
-                  for (final e in s.journal.take(40))
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 3),
-                      child: Text('${heure(e.t)}  ${e.texte}',
-                          style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                child: Bouton(
+                  texte: 'Dépannage',
+                  hauteur: 40,
+                  taille: 15,
+                  onTap: () => volet<void>(
+                    context,
+                    builder: (ctx) => ListenableBuilder(
+                      listenable: s,
+                      builder: (ctx, _) => corpsVolet(
+                        titre: 'Dépannage',
+                        contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                          ..._depannage(ctx, s),
+                          for (final e in s.journal.take(40))
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 3),
+                              child: Text('${heure(e.t)}  ${e.texte}', style: Charte.texte(13, couleur: e.erreur ? _rouge : Charte.encre)),
+                            ),
+                        ]),
+                      ),
                     ),
-                ],
+                  ),
+                ),
               ),
-            GroupeRetractable(
-              cle: 'partage/serveur',
-              titre: 'Avancé : serveur',
-              icone: Icons.dns_outlined,
-              parDefaut: false,
-              enfants: [_Serveur(serveur: s.serveur)],
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+              child: Bouton(
+                texte: 'Avancé : serveur',
+                hauteur: 40,
+                taille: 15,
+                onTap: () => volet<void>(
+                  context,
+                  builder: (ctx) => corpsVolet(titre: 'Avancé : serveur', contenu: _Serveur(serveur: s.serveur)),
+                ),
+              ),
             ),
           ],
         ),
@@ -159,7 +175,7 @@ class EcranPartage extends StatelessWidget {
     );
   }
 
-  /// Appareils (retirer un ancien), compteurs, tout renvoyer, journal : replié par défaut.
+  /// Appareils (retirer un ancien), compteurs, tout renvoyer, journal : dans le volet « Dépannage ».
   List<Widget> _depannage(BuildContext context, Synchro s) {
     final autres = s.appareils.values.toList()..sort((a, b) => a.nom.compareTo(b.nom));
     return [

@@ -112,7 +112,7 @@ class EcranArchives extends StatelessWidget {
     final ligne = LigneMenu(
       icone: Icons.receipt_long_outlined,
       titre: texte,
-      droite: pj ? Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)) : null,
+      sousTitre: pj ? 'ticket' : null,
     );
     if (supprimer == null) return ligne;
     final a = ActionLigne(Icons.delete_outline, 'Supprimer', supprimer, danger: true);

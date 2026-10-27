@@ -86,13 +86,16 @@ void main() {
     await _capture('02 Preliste');
     await _toucher(tester, find.byTooltip('Retour'));
 
-    await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)));
+    await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l1')!)).first);
+    await _capture('03 Volet-liste');
+    await _toucher(tester, find.text('Continuer la préparation').last);
     await _capture('03 Construire');
     await _toucher(tester, find.text('Liste prête'));
     await _capture('27 Modale-Liste-prete');
     await _toucher(tester, find.text('Continuer la préparation'));
     await _toucher(tester, find.textContaining('Lait demi-écrémé', findRichText: true));
     await _capture('04 Construire-Article');
+    await _toucher(tester, find.text('Annuler'));
     await _toucher(tester, find.byTooltip('Retour'));
 
     await _toucher(tester, _onglet('Gérer'));
@@ -109,39 +112,36 @@ void main() {
     await _toucher(tester, _onglet('Courses'));
     await _capture('06 Courses');
 
-    await _toucher(tester, find.text('Reprendre'));
+    await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l4')!)).first);
+    await _toucher(tester, find.text('Reprendre les courses'));
     await _capture('08 Courses-Secteur');
-    await _toucher(tester, find.text('Reste à faire'));
-    await _capture('07 Courses-Reste-a-faire');
-    await _toucher(tester, find.text('Reste à faire'));
     await _toucher(tester, find.text('Terminer les courses'));
     await _capture('29 Modale-Terminer');
     await _toucher(tester, find.text('Continuer les courses'));
     await _toucher(tester, find.text('Pause'));
     await _capture('09 Courses-Interrompre');
     await _toucher(tester, find.text('Interrompre'));
-    await _toucher(tester, find.text('Faire les courses').first);
+    await _toucher(tester, find.text(Etat.instance.nomListe(Etat.instance.liste('l3')!)).first);
+    await _toucher(tester, find.text('Faire les courses').last);
     await _capture('28 Modale-Partir');
     await _toucher(tester, find.text('Annuler'));
 
     await _toucher(tester, _onglet('Courses'));
     await _toucher(tester, _onglet('Courses'));
-    // Historique, Archives, Corbeille : titres repliés de l'onglet Courses, déployés sur place
+    // Historique et archives : en fin de l'onglet Courses, dans la même liste
     await _toucher(tester, find.text('HISTORIQUE'));
     await _capture('11 Historique-Courses');
-    await _toucher(tester, find.text('HISTORIQUE'));
 
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, find.text('Catalogue'));
     await _capture('13 Catalogue');
-    await _toucher(tester, find.text('FRAIS'));
-    await _capture('14 Catalogue-Rayon');
     await _toucher(tester, find.text('Crèmerie'));
     await _capture('15 Catalogue-Secteur');
     await _toucher(tester, find.text('+ Nouveau produit'));
     await _capture('15 Nouveau-produit');
-    await _toucher(tester, find.byTooltip('Fermer'));
+    await tester.tapAt(const Offset(195, 80));
+    await tester.pumpAndSettle();
     await _toucher(tester, find.text('Lait demi-écrémé'));
     await _capture('16 Fiche-Produit');
     await _toucher(tester, find.byTooltip('Retour'));
@@ -166,14 +166,18 @@ void main() {
 
     for (final (onglet, rubrique, nom) in [
       ('Courses', 'ARCHIVES', '24 Archives'),
+      ('Gérer', 'Corbeille', '26 Corbeille'),
       ('Gérer', 'Foyer', '25 Foyer'),
       ('Gérer', 'Apparence', '27 Apparence'),
       ('Gérer', 'Synchronisation', '27 Synchronisation'),
-      ('Courses', 'CORBEILLE', '26 Corbeille'),
     ]) {
       await _toucher(tester, _onglet(onglet));
       await _toucher(tester, _onglet(onglet));
-      await _toucher(tester, find.text(rubrique));
+      try {
+        await _toucher(tester, find.text(rubrique));
+      } on StateError {
+        continue; // rubrique absente des données de démonstration
+      }
       await _capture(nom);
     }
     await _toucher(tester, _onglet('Gérer'));

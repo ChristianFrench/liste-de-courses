@@ -222,7 +222,6 @@ Future<void> _fiche(BuildContext context, Membre m, {required bool admin, requir
                       child: Row(children: [
                         Expanded(child: Text(etat.nomListe(l), style: Charte.texte(14))),
                         Text('${l.lignes.length} art. · ${_statut(l.statut)}', style: gris),
-                        const Icon(Icons.chevron_right, size: 20),
                       ]),
                     ),
                   ),

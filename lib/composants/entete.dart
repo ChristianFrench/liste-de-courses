@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../donnees/synchro.dart';
-import '../ecrans/coquille.dart' show BarreOnglets;
 import '../ecrans/partage.dart' show montrerEtatSynchro;
 import '../navigation.dart';
 import '../theme.dart';
@@ -25,11 +24,10 @@ class EnTeteFenetre extends StatelessWidget {
     this.droite,
     this.aide,
     this.onAppuiLong,
-    this.deplier,
   });
   final String titre;
 
-  /// Icône de gauche ; par défaut celle de l'onglet affiché.
+  /// N'est plus affichée (pas d'icônes dans l'application).
   final IconData? icone;
   final String? sousTitre;
 
@@ -46,15 +44,11 @@ class EnTeteFenetre extends StatelessWidget {
   final String? aide;
   final VoidCallback? onAppuiLong;
 
-  /// Groupes visés par l'icône « tout déplier / tout replier » ; par défaut, les groupes rétractables de la fenêtre.
-  final List<String>? deplier;
-
   /// Hauteur d'un bouton de l'en-tête (deuxième ligne).
   static const hauteurBouton = 44.0;
 
   @override
   Widget build(BuildContext context) {
-    final ico = icone ?? BarreOnglets.entrees[Nav.i.onglet].$1;
     const bouton = boutonEnTete;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -83,13 +77,7 @@ class EnTeteFenetre extends StatelessWidget {
             Row(
               children: [
                 if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
-                Container(
-                  width: 38,
-                  height: 38,
-                  decoration: const BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-                  child: Icon(ico, size: 23, color: Charte.accent),
-                ),
-                const SizedBox(width: 10),
+                if (!retour) const SizedBox(width: 4),
                 Expanded(
                   child: Text(titre,
                       maxLines: 2, overflow: TextOverflow.ellipsis, style: surPhoto(Charte.texte(20, gras: true, couleur: Charte.blanc))),
@@ -109,7 +97,6 @@ class EnTeteFenetre extends StatelessWidget {
                           style: surPhoto(Charte.texte(13, couleur: const Color(0xEEFFFFFF)))),
                 ),
                 if (droite != null) ...[droite!, const SizedBox(width: 4)],
-                _BoutonDeplier(deplier),
                 const BoutonSynchro(),
                 // Le menu « ⋮ », toujours à droite : les actions de la fenêtre, puis l'aide.
                 bouton(Icons.more_vert, 'Plus d\'actions', () => menuActions(context, titre: titre, actions: [
@@ -125,33 +112,6 @@ class EnTeteFenetre extends StatelessWidget {
   }
 }
 
-/// Icône « tout déplier / tout replier » de l'en-tête : sur les groupes donnés ([cles]),
-/// sinon sur les groupes rétractables de la fenêtre (elle n'apparaît que s'il y en a).
-class _BoutonDeplier extends StatelessWidget {
-  const _BoutonDeplier(this.cles);
-  final List<String>? cles;
-
-  @override
-  Widget build(BuildContext context) {
-    final page = PorteeGroupes.de(context);
-    return ListenableBuilder(
-      listenable: Listenable.merge([Retractables.i, if (page != null) page]),
-      builder: (context, _) {
-        if (cles case final c?) {
-          if (c.isEmpty) return const SizedBox.shrink(); // rien à déplier ni replier
-          final a = reduireTout(c);
-          return boutonEnTete(a.icone, a.texte, a.faire);
-        }
-        if (page == null || page.cles.isEmpty) return const SizedBox.shrink();
-        final fermes = page.tousFermes;
-        return boutonEnTete(fermes ? Icons.unfold_more : Icons.unfold_less, fermes ? 'Tout déplier' : 'Tout replier',
-            () => Retractables.i.tous(page.cles.keys, page.tousFermes));
-      },
-    );
-  }
-}
-
-/// Texte blanc posé sur la photo : une ombre douce le détache des légumes clairs.
 TextStyle surPhoto(TextStyle s) =>
     s.copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6), Shadow(color: Color(0x99000000), blurRadius: 2)]);
 
@@ -323,11 +283,10 @@ class Aides {
   Aides._();
 
   static const _gestes = 'Gestes communs : glisser le doigt à gauche ou à droite sur le bandeau du haut, ou sur une zone libre '
-      'de la fenêtre, passe à l\'onglet voisin. Sur une ligne de liste : glisser à gauche supprime ou retire '
-      '(« Annuler » apparaît quelques secondes en bas), glisser à droite fait l\'action principale, '
-      'un appui long ouvre le menu de toutes les actions de la ligne.\n'
-      'Les groupes (rayons, secteurs, magasins…) s\'ouvrent et se ferment d\'un appui sur leur bandeau ; '
-      'l\'icône à double flèche du bandeau du haut les déplie ou les replie tous.\n'
+      'de la fenêtre, passe à l\'onglet voisin. Toutes les listes ont des lignes serrées sous de minces bandeaux. '
+      'Toucher une ligne en ouvre le volet du bas : son détail, puis ses actions. Sur une ligne, glisser à gauche supprime '
+      'ou retire (« Annuler » apparaît quelques secondes en bas), glisser à droite fait l\'action principale.\n'
+      'Les fenêtres s\'ouvrent en volet du bas : tirez la poignée vers le bas (ou touchez à côté) pour le fermer.\n'
       'Le menu des trois points, en haut à droite, regroupe les actions de la fenêtre et cette aide. '
       'Le nuage barré indique que la synchronisation entre les membres du foyer n\'est pas encore active.';
 
@@ -335,31 +294,30 @@ class Aides {
 
   static const accueil = 'L\'accueil rassemble ce qui est en cours.\n'
       '« Comment ça marche » rappelle les cinq étapes : je paramètre, je prépare ma liste, je la valide, je fais mes courses, '
-      'je garde le ticket. Touchez une étape pour son explication. Ce bloc se replie quand vous faites défiler l\'écran.\n'
-      '« En préparation » : les listes que vous êtes en train de construire ; « Reprendre » les rouvre là où vous en étiez.\n'
-      '« En instance de courses » : les listes prêtes ; « Faire les courses » lance les courses.\n'
-      '« Courses en cours » : des courses interrompues par « Pause » ; « Reprendre » les continue au secteur où vous vous étiez arrêté.\n'
+      'je garde le ticket. Touchez une étape pour son explication.\n'
+      '« En préparation » : les listes que vous êtes en train de construire. « À faire » : les listes prêtes pour les courses. '
+      '« Courses en cours » : des courses interrompues par « Pause ». Touchez une liste pour ce que vous pouvez en faire.\n'
       'Une nouvelle liste se crée dans l\'onglet Préparer.\n$_gestes';
 
   static const preparer = 'L\'onglet Préparer sert à construire les listes avant les courses.\n'
       '« + Nouvelle liste » : choisissez le magasin, le nom de la liste (proposé d\'office), puis son type : '
-      'liste simple (on tape les articles, sans rayons), liste type ou liste complète (tout le catalogue, rayon par rayon), '
-      'liste personnalisée (reprise d\'une course passée), liste depuis un texte (collé), ou liste calculée (plus tard).\n'
-      '« En préparation » : touchez une liste pour la reprendre. Glisser à gauche la supprime (avec « Annuler »).\n'
-      '« Prêtes pour les courses » : les listes validées ; un appui long permet de les remettre en préparation.\n$_gestes';
+      'liste simple (sans secteurs), liste type ou liste vide, liste personnalisée (reprise d\'une course passée), '
+      'liste depuis un texte (collé), ou liste calculée (plus tard).\n'
+      '« En préparation » et « Prêtes pour les courses » : touchez une liste pour la reprendre, la remettre en préparation, '
+      'la renommer ou la supprimer.\n$_gestes';
 
-  static const courses = 'L\'onglet Courses sert pendant les courses.\n'
-      '« Prêtes pour les courses » : touchez « Faire les courses » ; une fenêtre demande qui fait les courses et avec quel parcours, '
-      'puis la liste s\'affiche dans l\'ordre des allées.\n'
-      '« Courses interrompues » : des courses mises en pause ; « Reprendre » les continue.\n'
+  static const courses = 'L\'onglet Courses suit la vie des listes, en une seule liste :\n'
+      '« À faire » : les listes prêtes ; touchez-en une puis « Faire les courses » : une fenêtre demande qui fait les courses '
+      'et avec quel parcours.\n'
+      '« En cours » : des courses mises en pause, à reprendre.\n'
       '« Terminées sans ticket » : joignez le ticket de caisse (fichier PDF), ou classez la course sans ticket ; '
       'elle rejoint alors l\'historique.\n'
-      'Historique, Archives et Corbeille : repliés, ils se déploient sur place. Un appui long sur une ligne montre ses actions '
-      '(voir ou joindre le ticket, créer une liste type, remettre en « Terminées sans ticket », archiver, remettre en historique, '
-      'restaurer). Les courses de plus de trois mois passent aux archives (réglable dans Données).\n'
+      '« Historique » et « Archives » : touchez une course pour voir ou joindre son ticket, en faire une liste type, '
+      'la remettre en « Terminées sans ticket », l\'archiver ou la remettre en historique. Les courses de plus de trois mois '
+      'passent aux archives (réglable dans Données).\n'
       'En terminant les courses, vous pouvez envoyer un résumé au foyer : oubliés, absents des rayons, achetés.\n'
       'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Liste de courses ; '
-      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre, ou le garde en haut de Courses › Historique (« Tickets non rattachés »). Le trombone affiche le ticket dans l\'application.\n$_gestes';
+      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
       'Mon foyer : seul sur cet appareil ou en foyer partagé ; le code de partage (à copier ou envoyer par mail, '
@@ -369,50 +327,39 @@ class Aides {
       'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
       'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'
       'Paramètres : apparence (couleurs), données (listes exemples, préliste, passage aux archives et suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
-      'Historique, Archives et Corbeille sont dans l\'onglet Courses.\n$_gestes';
+      'La corbeille est dans Paramètres ; l\'historique et les archives sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
       'deux listes ne peuvent pas porter le même nom).\n'
       'Liste simple : vous tapez le début du nom des articles, ils s\'ajoutent les uns sous les autres, sans rayons ni secteurs. '
       'À la fin, la liste peut être rangée par rayons et secteurs.\n'
-      'Liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou la liste complète, vide, avec tout le catalogue du magasin.\n'
+      'Liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou une liste vide.\n'
       'Liste personnalisée : une de vos dernières courses ; cochez les articles à reprendre.\n'
       'Liste depuis un texte : collez le texte d\'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, '
       'vous décochez ceux à ne pas garder.\n'
       'Liste calculée : à partir de vos tickets de caisse, prévue plus tard.';
 
   static const preparation = 'Le champ de recherche, sous le titre : tapez au moins trois lettres, la liste des articles '
-      'dont un mot commence ainsi s\'affiche.\n'
-      'À droite du champ, trois façons de voir la liste :\n'
-      '• Condensé : votre liste serrée sous les secteurs, un P devant les articles en promotion. L\'article trouvé s\'y ajoute '
-      'et l\'écran va sur lui. Touchez la ligne pour la promotion, la quantité (×1) pour − et +. Un appui long, ou la quantité '
-      'à 0, retire l\'article.\n'
-      '• Sans détails : votre liste par rayons et secteurs. L\'article trouvé s\'ajoute, son rayon et son secteur s\'ouvrent '
-      'et vous êtes dessus pour sa marque, sa mesure, son packaging ou sa promo.\n'
-      '• Avec détails : tout le catalogue, rayons repliés ; touchez un rayon, puis un secteur, puis un article pour le cocher. '
-      'La recherche ouvre le rayon et le secteur de l\'article et le signale.\n'
-      'Toucher un article affiche quatre pastilles : marque, mesure, packaging et promo ; − et + règlent la quantité. '
-      'Un appui long ajoute une consigne (« bien mûres »).\n'
-      '« Aperçu » montre la liste comme pendant les courses, sans les coches. '
+      'dont un mot commence ainsi s\'affiche. Touchez-en un : il s\'ajoute à la liste et l\'écran va sur lui. '
+      'Absent du catalogue ? Touchez « Créer « … » ».\n'
+      'La liste a la même présentation que pendant les courses : de minces bandeaux de secteur dans l\'ordre de votre parcours, '
+      'une ligne par article. Un P signale une promotion, un petit code le packaging (ex. ×6), une consigne suit le nom.\n'
+      '− et + règlent la quantité ; à 0, l\'article est retiré (« Annuler » le remet). Touchez la ligne pour le packaging, '
+      'la consigne et la promotion. Un appui long retire l\'article.\n'
       '« Liste prête » la valide : commentaire, enregistrement comme liste type, envoi par mail.\n$_gestes';
 
-  static const listeSimple = 'Une liste simple se construit sans rayons ni secteurs.\n'
+  static const listeSimple = 'Une liste simple se construit sans secteurs : les articles restent dans l\'ordre de saisie.\n'
       'Dans le champ sous le titre, tapez au moins trois lettres : les articles dont un mot commence ainsi s\'affichent. '
       'Touchez-en un : il s\'ajoute en fin de liste. Absent du catalogue ? Touchez « Créer « … » ».\n'
-      'Toucher un article affiche ses pastilles (marque, mesure, packaging, promo) ; − et + règlent la quantité ; '
-      'glisser à gauche le retire.\n'
-      '« Aperçu » montre la liste telle qu\'elle sera en magasin, avec ou sans rayons et secteurs.\n'
+      '− et + règlent la quantité ; touchez la ligne pour le packaging, la consigne et la promotion ; un appui long retire l\'article.\n'
       '« Liste prête » : cochez « Ranger par rayons et secteurs » pour que la liste suive l\'ordre du magasin pendant les courses ; '
       'sinon elle garde l\'ordre de saisie.\n$_gestes';
 
-  static const apercu = 'La liste telle qu\'elle sera pendant les courses, dans l\'ordre des rayons et de votre parcours, '
-      'tout déployé, avec mesures, packagings et promotions. '
-      'Rien ne se coche ici. « Continuer la préparation » revient à la liste.';
-
-  static const enMagasin = 'La liste suit l\'ordre des allées, secteur par secteur ; chaque bandeau montre l\'avancement du secteur.\n'
-      'Touchez un article quand il est dans le chariot : il est barré. Touchez-le de nouveau pour le décocher.\n'
-      'Touchez deux fois de suite un article absent du rayon : il est marqué « manquant ».\n'
-      '« Reste à faire » cache ce qui est déjà pris. « Pause » interrompt les courses sans rien perdre. '
+  static const enMagasin = 'La liste suit l\'ordre des allées, sous de minces bandeaux de secteur.\n'
+      'Touchez un article quand il est dans le chariot : il est barré et grisé, à sa place. Touchez-le de nouveau pour le décocher.\n'
+      'Touchez deux fois de suite un article absent du rayon (ou faites un appui long) : il est marqué « manquant », en rouge.\n'
+      'Touchez le P d\'une promotion ou le code du packaging pour en voir le détail.\n'
+      '« Pause » interrompt les courses sans rien perdre. '
       '« Terminer les courses » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
       'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n$_gestes';
 

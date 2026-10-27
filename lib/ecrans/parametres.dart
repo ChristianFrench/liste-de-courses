@@ -208,13 +208,12 @@ Future<void> _deverrouillerEditeur(BuildContext context) async {
 Future<void> _reglerPreliste(BuildContext context, Etat etat) async {
   var presences = etat.prelistePresencesMin;
   var sur = etat.prelisteSur;
-  final ok = await showDialog<bool>(
-    context: context,
+  final ok = await volet<bool>(
+    context,
     builder: (ctx) => StatefulBuilder(
-      builder: (ctx, maj) => AlertDialog(
-        backgroundColor: Charte.fond,
-        title: Text('Règle de la préliste', style: Charte.texte(18, gras: true)),
-        content: Column(
+      builder: (ctx, maj) => corpsVolet(
+        titre: 'Règle de la préliste',
+        contenu: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -224,9 +223,9 @@ Future<void> _reglerPreliste(BuildContext context, Etat etat) async {
             _Compteur(valeur: sur, min: presences, max: 20, onChange: (v) => maj(() => sur = v)),
           ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(false), child: Text('Annuler', style: Charte.texte(16))),
-          TextButton(onPressed: () => Navigator.of(ctx).pop(true), child: Text('Valider', style: Charte.texte(16, gras: true))),
+        boutons: [
+          Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop(false)),
+          Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(true)),
         ],
       ),
     ),
@@ -402,13 +401,11 @@ const _palette = <int>[
 /// Choix d'une couleur (ou aucune) pour un type de promotion ou de packaging.
 Future<void> _changerCouleur(BuildContext context, String cle, String nom) async {
   final etat = Etat.instance;
-  final v = await showDialog<int>(
-    context: context,
-    barrierColor: Charte.voile,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: Charte.fond,
-      title: Text('Couleur · $nom', style: Charte.texte(18, gras: true)),
-      content: Wrap(
+  final v = await volet<int>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: 'Couleur · $nom',
+      contenu: Wrap(
         spacing: 10,
         runSpacing: 10,
         children: [
@@ -428,9 +425,9 @@ Future<void> _changerCouleur(BuildContext context, String cle, String nom) async
             ),
         ],
       ),
-      actions: [
-        TextButton(onPressed: () => Navigator.of(ctx).pop(-1), child: Text('Couleur par défaut', style: Charte.texte(16))),
-        TextButton(onPressed: () => Navigator.of(ctx).pop(), child: Text('Annuler', style: Charte.texte(16))),
+      boutons: [
+        Bouton(texte: 'Couleur par défaut', onTap: () => Navigator.of(ctx).pop(-1)),
+        Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
       ],
     ),
   );

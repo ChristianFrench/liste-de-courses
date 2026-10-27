@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
-import '../navigation.dart';
 import '../theme.dart';
 import 'listes.dart';
-import 'travail.dart';
 
 // Onglet Accueil : un bandeau ludique, « Comment ça marche », puis ce qui est en cours
 // (préparations et courses) avec son action directe.
@@ -26,97 +24,77 @@ class EcranAccueil extends StatelessWidget {
       backgroundColor: Charte.fond,
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       const _EnTetePhoto(),
-      Expanded(child: NotificationListener<ScrollUpdateNotification>(
-        onNotification: (n) {
-          if (n.metrics.axis == Axis.vertical && n.metrics.pixels > 24 && Retractables.i.ouvert(_EnTetePhoto._cle)) {
-            Retractables.i.basculer(_EnTetePhoto._cle);
-          }
-          return false;
-        },
+      Expanded(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             GroupeRetractable(
               cle: 'accueil/preparation',
               titre: 'En préparation',
-              icone: Icons.checklist,
               nombre: enPreparation.length,
               vide: 'Aucune liste en préparation.',
               enfants: [
                 for (final l in enPreparation)
-                  listeGlissable(context, l, LigneMenu(
-                    icone: Icons.checklist,
-                    titre: etat.nomListe(l),
-                    sousTitre: '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · '
+                  listeGlissable(
+                    context,
+                    l,
+                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                    detail: '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · '
                         '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
-                    onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
-                    droite: BoutonAction('Reprendre', onTap: () => Nav.travail(EcranConstruction(listeId: l.id))),
-                  )),
+                  ),
               ],
             ),
-            // Listes prêtes : en instance de courses, avec de quoi partir les faire.
+            // Listes prêtes : en instance de courses.
             GroupeRetractable(
               cle: 'accueil/instance',
-              titre: 'En instance de courses',
-              icone: Icons.shopping_cart_outlined,
+              titre: 'À faire',
               nombre: pretes.length,
               vide: 'Aucune liste prête pour les courses.',
               enfants: [
                 for (final l in pretes)
-                  listeGlissable(context, l, LigneMenu(
-                    icone: Icons.shopping_cart_outlined,
-                    titre: etat.nomListe(l),
-                    sousTitre: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
-                    onTap: () => partirFaireLesCourses(context, l),
-                    droite: BoutonAction('Faire les courses', onTap: () => partirFaireLesCourses(context, l)),
-                  )),
+                  listeGlissable(
+                    context,
+                    l,
+                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                    detail: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
+                  ),
               ],
             ),
-            GroupeRetractable(
-              cle: 'accueil/courses',
-              titre: 'Courses en cours',
-              icone: Icons.pause_circle_outline,
-              nombre: enCours == null ? 0 : 1,
-              vide: 'Aucune course en cours.',
-              enfants: [
-                if (enCours != null)
-                  listeGlissable(context, enCours, interrompue: true, LigneMenu(
-                    gauche: SizedBox(
-                      width: 44,
-                      height: 44,
-                      child: Center(child: Avancement(fait: enCours.nbCoches, total: enCours.lignes.length, couleur: Charte.accent)),
-                    ),
-                    titre: '${etat.nomListe(enCours)} · ${enCours.nbCoches} / ${enCours.lignes.length}',
-                    sousTitre: 'Courses interrompues${enCours.interrompueLe != null ? ' ${quand(enCours.interrompueLe!)}' : ''}',
-                    onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id)),
-                    droite: BoutonAction('Reprendre', plein: true, onTap: () => Nav.travail(EcranCoursesSecteur(listeId: enCours.id))),
-                  )),
-              ],
-            ),
+            if (enCours != null)
+              GroupeRetractable(
+                cle: 'accueil/courses',
+                titre: 'Courses en cours',
+                nombre: 1,
+                enfants: [
+                  listeGlissable(
+                    context,
+                    enCours,
+                    interrompue: true,
+                    LigneMenu(titre: etat.nomListe(enCours), sousTitre: '${enCours.nbCoches} / ${enCours.lignes.length}'),
+                    detail: 'Courses interrompues${enCours.interrompueLe != null ? ' ${quand(enCours.interrompueLe!)}' : ''} · '
+                        '${enCours.nbCoches} article${enCours.nbCoches > 1 ? 's' : ''} coché${enCours.nbCoches > 1 ? 's' : ''} '
+                        'sur ${enCours.lignes.length}',
+                  ),
+                ],
+              ),
             const SizedBox(height: 12),
           ],
         ),
-      )),
+      ),
       ]),
     );
   }
 }
 
 /// En-tête : la photo de légumes, le bonjour, puis « Comment ça marche » posé sur la même photo,
-/// qui déborde jusque sous les cinq étapes. Un appui sur le titre replie les étapes.
+/// qui déborde jusque sous les cinq étapes (toujours visibles).
 class _EnTetePhoto extends StatelessWidget {
   const _EnTetePhoto();
-
-  static const _cle = 'accueil/comment';
 
   @override
   Widget build(BuildContext context) {
     final haut = MediaQuery.of(context).padding.top;
-    return ListenableBuilder(
-      listenable: Retractables.i,
-      builder: (context, _) {
-        final ouvert = Retractables.i.ouvert(_cle);
-        return GestureDetector(
+    return GestureDetector(
           // Comme sur les bandeaux des autres fenêtres : glisser passe à l'onglet voisin.
           onHorizontalDragEnd: (d) {
             final v = d.primaryVelocity ?? 0;
@@ -166,38 +144,19 @@ class _EnTetePhoto extends StatelessWidget {
                       ],
                     ),
                   ),
-                  InkWell(
-                    onTap: () => Retractables.i.basculer(_cle),
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: 48),
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0x55FFFFFF)))),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-                            child: Icon(Icons.lightbulb_outline, size: 19, color: Charte.cadre),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text('COMMENT ÇA MARCHE',
-                                style: _surPhoto(Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8))),
-                          ),
-                          Icon(ouvert ? Icons.expand_less : Icons.expand_more, size: 30, color: Charte.blanc),
-                        ],
-                      ),
-                    ),
+                  Container(
+                    constraints: const BoxConstraints(minHeight: 36),
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0x55FFFFFF)))),
+                    child: Text('COMMENT ÇA MARCHE', style: _surPhoto(Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8))),
                   ),
-                  if (ouvert) const _Etapes(),
+                  const _Etapes(),
                 ],
               ),
             ),
           ],
         ));
-      },
-    );
   }
 }
 
@@ -210,11 +169,11 @@ class _Etapes extends StatelessWidget {
   const _Etapes();
 
   static const _etapes = [
-    (Icons.tune, 'Je\nparamètre'),
-    (Icons.checklist, 'Je prépare\nma liste'),
-    (Icons.check_circle_outline, 'Je la\nvalide'),
-    (Icons.shopping_cart_outlined, 'Je fais\nmes courses'),
-    (Icons.receipt_long_outlined, 'Je garde\nle ticket'),
+    'Je\nparamètre',
+    'Je prépare\nma liste',
+    'Je la\nvalide',
+    'Je fais\nmes courses',
+    'Je garde\nle ticket',
   ];
 
   // Explication de chaque étape, affichée quand on la touche.
@@ -237,9 +196,10 @@ class _Etapes extends StatelessWidget {
         '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
         '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
         '• Liste depuis un texte : vous collez le texte d\'un mail ou d\'un message, les articles sont reconnus dans le catalogue.',
-        'Ouvrez un rayon, puis un secteur, et touchez les articles voulus pour les cocher. Touchez de nouveau un '
-            'article coché pour préciser le packaging, la promotion, la marque ou une consigne.',
-        '« Aperçu » montre la liste telle qu\'elle se présentera pendant les courses.',
+        'Tapez le début du nom d\'un article dans le champ de recherche et touchez-le : il s\'ajoute à la liste, '
+            'rangée par secteur dans l\'ordre de votre parcours. − et + règlent la quantité ; touchez la ligne pour '
+            'préciser le packaging, la promotion ou une consigne ; un appui long retire l\'article.',
+        'La liste a la même présentation que pendant les courses.',
         'Vous pouvez vous arrêter à tout moment : rien n\'est perdu, la liste reste « En préparation ».',
       ],
     ),
@@ -256,7 +216,8 @@ class _Etapes extends StatelessWidget {
       'Je fais mes courses',
       [
         'Au magasin, touchez « Faire les courses » : indiquez qui fait les courses et le parcours.',
-        'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez un article pour le cocher.',
+        'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez un article pour le cocher ; '
+            'touchez son P ou son packaging pour en voir le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
         'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
       ],
@@ -276,7 +237,6 @@ class _Etapes extends StatelessWidget {
   static Future<void> _expliquer(BuildContext context, int i) => modale(
         context,
         titre: '${i + 1}. ${_explications[i].$1}',
-        icone: _etapes[i].$1,
         oui: null,
         non: null,
         contenu: (context, maj) => Column(
@@ -309,25 +269,15 @@ class _Etapes extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
               children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    IconeRonde(_etapes[i].$1),
-                    Positioned(
-                      left: -4,
-                      top: -4,
-                      child: Container(
-                        width: 20,
-                        height: 20,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(color: Charte.accent, shape: BoxShape.circle),
-                        child: Text('${i + 1}', style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
-                      ),
-                    ),
-                  ],
+                Container(
+                  width: 30,
+                  height: 30,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: Charte.accent, shape: BoxShape.circle),
+                  child: Text('${i + 1}', style: Charte.texte(15, gras: true, couleur: Charte.blanc)),
                 ),
                 const SizedBox(height: 6),
-                Text(_etapes[i].$2, textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
+                Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],
             ),
           ),

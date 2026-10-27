@@ -27,24 +27,15 @@ class PageBase extends StatefulWidget {
 }
 
 class _PageBaseState extends State<PageBase> {
-  final _groupes = GroupesDeLaPage();
-
-  @override
-  void dispose() {
-    _groupes.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Charte.fond,
       body: SafeArea(
-        child: PorteeGroupes(
-          groupes: _groupes,
+        child: Builder(
           // Glisser le doigt sur une zone libre de la fenêtre passe à l'onglet voisin, comme sur le bandeau
           // (les lignes qui se glissent gardent leur geste : elles l'emportent).
-          child: GestureDetector(
+          builder: (context) => GestureDetector(
             behavior: HitTestBehavior.translucent,
             onHorizontalDragEnd: (d) {
               final v = d.primaryVelocity ?? 0;
@@ -59,36 +50,6 @@ class _PageBaseState extends State<PageBase> {
       ),
     );
   }
-}
-
-/// Les groupes rétractables affichés dans une fenêtre (clé → ouvert par défaut) :
-/// l'icône « tout déplier / tout replier » de l'en-tête agit sur eux.
-class GroupesDeLaPage extends ChangeNotifier {
-  final Map<String, bool> cles = {};
-  bool _prevenir = false;
-
-  void inscrire(String cle, bool parDefaut) {
-    if (cles.containsKey(cle)) return;
-    cles[cle] = parDefaut;
-    if (_prevenir) return;
-    _prevenir = true;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _prevenir = false;
-      notifyListeners();
-    });
-  }
-
-  bool get tousFermes => cles.isNotEmpty && cles.entries.every((e) => !Retractables.i.ouvert(e.key, parDefaut: e.value));
-}
-
-class PorteeGroupes extends InheritedWidget {
-  const PorteeGroupes({super.key, required this.groupes, required super.child});
-  final GroupesDeLaPage groupes;
-
-  static GroupesDeLaPage? de(BuildContext context) => context.getInheritedWidgetOfExactType<PorteeGroupes>()?.groupes;
-
-  @override
-  bool updateShouldNotify(PorteeGroupes old) => old.groupes != groupes;
 }
 
 class BoutonIcone extends StatelessWidget {
@@ -460,243 +421,6 @@ class SelecteurQuantite extends StatelessWidget {
   }
 }
 
-/// Ligne produit pendant la construction (44 points).
-class LigneChoix extends StatelessWidget {
-  const LigneChoix({
-    super.key,
-    required this.nom,
-    required this.complement,
-    required this.coche,
-    required this.quantite,
-    required this.onTap,
-    required this.onQuantite,
-    this.codePromo,
-    this.couleurPromo,
-    this.onPromo,
-    this.codePackaging,
-    this.couleurPackaging,
-    this.onPackaging,
-    this.habituel = false,
-    this.alerte,
-    this.afficherQuantite = true,
-    this.droite,
-    this.onNom,
-    this.pastilles = const [],
-    this.avantQuantite,
-  });
-  final String nom;
-  final String complement;
-  final bool coche;
-  final int quantite;
-
-  /// Pastilles sous le nom (préparation : marque, mesure, packaging, promo de l'article touché).
-  final List<Widget> pastilles;
-
-  /// Avant la quantité (préparation : la promotion, bien visible).
-  final Widget? avantQuantite;
-
-  /// Appui sur le nom (hors de la case) : comme l'icône de modification. La case seule coche alors.
-  final VoidCallback? onNom;
-  final String? codePromo;
-  final Color? couleurPromo;
-  final VoidCallback? onPromo;
-  final String? codePackaging;
-  final Color? couleurPackaging;
-  final VoidCallback? onPackaging;
-  final bool habituel;
-  final int? alerte;
-  final VoidCallback onTap;
-  final ValueChanged<int> onQuantite;
-  final bool afficherQuantite;
-  final Widget? droite;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Charte.fond,
-      child: InkWell(
-        onTap: onNom ?? onTap,
-        child: Container(
-          constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
-          decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-          padding: EdgeInsets.symmetric(horizontal: onNom == null ? 12 : 2),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-          Row(
-            children: [
-              if (onNom == null)
-                CaseACocher(coche: coche, taille: 28)
-              else
-                Semantics(
-                  checked: coche,
-                  child: InkWell(
-                    onTap: () {
-                      HapticFeedback.selectionClick();
-                      onTap();
-                    },
-                    child: SizedBox(width: 48, height: 52, child: Center(child: CaseACocher(coche: coche, taille: 28))),
-                  ),
-                ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Même présentation que la ligne des courses : nom, pastilles, complément.
-                      Text(nom, maxLines: 2, overflow: TextOverflow.ellipsis, style: Charte.texte(17, gras: coche)),
-                      // Comme pendant les courses : packaging et promotion en clair sous le nom ; un appui les choisit.
-                      if (coche && (onPackaging != null || onPromo != null))
-                        Wrap(
-                          spacing: 6,
-                          children: [
-                            if (onPackaging != null)
-                              Pastille(codePackaging ?? '+ Packaging',
-                                  couleur: couleurPackaging, vide: codePackaging == null, onTap: onPackaging),
-                            if (onPromo != null)
-                              Pastille(codePromo ?? '+ Promo', couleur: couleurPromo ?? Charte.rouge, vide: codePromo == null, onTap: onPromo),
-                          ],
-                        ),
-                      if (complement.isNotEmpty)
-                        Text(complement,
-                            maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(12, couleur: Charte.texteSecondaire)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              if (avantQuantite != null) ...[avantQuantite!, const SizedBox(width: 4)],
-              if (droite != null)
-                droite!
-              else if (coche && afficherQuantite)
-                SelecteurQuantite(quantite: quantite, onChange: onQuantite)
-              else if (!coche && habituel)
-                Tooltip(
-                  message: 'Acheté habituellement',
-                  child: Icon(Icons.history, size: 19, color: Charte.couleurIcone(Icons.history)),
-                ),
-            ],
-          ),
-          // Pastilles sur toute la largeur, sous le nom (elles tiennent sur une ligne).
-          if (pastilles.isNotEmpty)
-            Padding(padding: const EdgeInsets.only(left: 52, right: 8), child: Wrap(spacing: 6, children: pastilles)),
-          if (alerte != null)
-            Padding(padding: const EdgeInsets.only(left: 40, bottom: 4), child: AlerteQuantite(requise: alerte!)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Ligne produit pendant les courses (56 points) : cochée = barrée et grisée.
-class LigneCourse extends StatelessWidget {
-  const LigneCourse({
-    super.key,
-    required this.nom,
-    required this.complement,
-    required this.coche,
-    required this.quantite,
-    required this.onTap,
-    this.promo,
-    this.alerte,
-    this.pastilles = const [],
-    this.manquant = false,
-  });
-  final String nom;
-  final String complement;
-  final bool coche;
-
-  /// Absent des rayons (double appui) : case barrée en rouge.
-  final bool manquant;
-  final int quantite;
-  final String? promo;
-  final int? alerte;
-
-  /// null : aperçu de la liste depuis la préparation, sans case à cocher.
-  final VoidCallback? onTap;
-
-  /// Packaging et promotion en clair, dans leur couleur (Paramètres).
-  final List<Pastille> pastilles;
-
-  @override
-  Widget build(BuildContext context) {
-    final couleur = coche ? Charte.texteBarre : Charte.encre;
-    return Material(
-      color: Charte.fond,
-      child: InkWell(
-        // Un léger retour au doigt à chaque coche.
-        onTap: onTap == null
-            ? null
-            : () {
-                HapticFeedback.selectionClick();
-                onTap!();
-              },
-        child: Container(
-          constraints: const BoxConstraints(minHeight: Charte.ligneCourses),
-          decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          child: Row(
-            children: [
-              if (onTap != null) ...[
-                if (manquant)
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: Charte.blanc,
-                      borderRadius: BorderRadius.circular(3),
-                      border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
-                    ),
-                    child: Icon(Icons.close, size: 24, color: Charte.rouge),
-                  )
-                else
-                  CaseACocher(coche: coche, taille: 28),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(nom,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: Charte.texte(17, gras: !coche && !manquant, couleur: manquant ? Charte.texteBarre : couleur, barre: coche)),
-                      if (manquant) Text('Manquant en rayon', style: Charte.texte(13, gras: true, couleur: Charte.rouge)),
-                      if (pastilles.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 3, bottom: 2),
-                          child: Wrap(spacing: 6, runSpacing: 4, children: pastilles),
-                        ),
-                      if (complement.isNotEmpty)
-                        Text(complement,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: Charte.texte(12,
-                                couleur: coche ? Charte.texteBarre : Charte.texteSecondaire, barre: coche)),
-                      if (alerte != null && !coche) AlerteQuantite(requise: alerte!),
-                    ],
-                  ),
-                ),
-              ),
-              if (promo != null) ...[IconePromo(code: promo!), const SizedBox(width: 8)],
-              Text('×$quantite', style: Charte.texte(17, gras: true, couleur: couleur)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// Packaging ou promotion en clair (« Pack de 6 », « 3 dont 1 gratuit »), sur la couleur choisie dans Paramètres.
 /// Avec [onTap], c'est un bouton (préparation) ; [vide] : rien n'est encore choisi (« + Packaging », fond pâle).
 class Pastille extends StatelessWidget {
@@ -739,58 +463,6 @@ class Pastille extends StatelessWidget {
   }
 }
 
-/// Ligne en lecture seule de la liste complète (32 points).
-class LigneCompacte extends StatelessWidget {
-  const LigneCompacte(
-      {super.key, required this.nom, required this.complement, required this.quantite, this.promo, this.coche = false, this.pastilles = const []});
-  final String nom;
-  final String complement;
-  final int quantite;
-  final String? promo;
-  final bool coche;
-  final List<Pastille> pastilles;
-
-  @override
-  Widget build(BuildContext context) {
-    final couleur = coche ? Charte.texteBarre : Charte.encre;
-    return Container(
-      height: Charte.ligneCompacte,
-      decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-      padding: const EdgeInsets.only(left: 40, right: 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Row(
-              children: [
-                Flexible(
-                  child: Text.rich(
-                    TextSpan(children: [
-                      TextSpan(text: nom, style: Charte.texte(15, couleur: couleur, barre: coche)),
-                      if (complement.isNotEmpty)
-                        TextSpan(
-                            text: '  $complement',
-                            style: Charte.texte(12, couleur: Charte.texteSecondaire, barre: coche)),
-                    ]),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                for (final p in pastilles) ...[const SizedBox(width: 6), p],
-                if (promo != null && pastilles.isEmpty) ...[const SizedBox(width: 6), IconePromo(code: promo!)],
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 28,
-            child: Text('$quantite', textAlign: TextAlign.right, style: Charte.texte(15, gras: true, couleur: couleur)),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 /// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
 class TitreGroupe extends StatelessWidget {
   const TitreGroupe(
@@ -810,108 +482,41 @@ class TitreGroupe extends StatelessWidget {
       this.onTap});
   final String nom;
 
-  /// Rayon ou secteur ajouté par le foyer : petite icône après le nom.
+  /// Rayon ou secteur ajouté par le foyer : petit signe après le nom.
   final bool ajoute;
-
-  /// Groupe où l'on travaille (rayon ou secteur ouvert en préparation, secteur en cours pendant les courses) :
-  /// son image est légèrement agrandie.
-  final bool focus;
-  /// Icône dans un rond blanc, quand le groupe n'a pas d'image.
-  final IconData? icone;
-  /// Groupe rétractable : chevron ouvert ou fermé, et un appui sur le titre l'ouvre ou le ferme.
-  final bool? ouvert;
   final VoidCallback? onTap;
-  /// Titre contrasté (couleur d'accent, texte blanc) : sépare nettement les secteurs pendant les courses.
-  final bool fort;
   final String? droite;
-  /// Avancement du secteur (cochés, total) : anneau qui se remplit, coche quand tout est fait.
-  final (int, int)? avancement;
-  /// Nombre d'articles choisis dans le secteur (préparation), dans une pastille blanche.
+  /// Nombre d'articles ou d'éléments du groupe, à droite.
   final int? nombre;
-  final String? image;
+
+  /// Ne sont plus affichés (ni images, ni icônes, ni numéros, ni anneau, ni chevron) : [numero], [image],
+  /// [icone], [avancement], [ouvert], [focus], [fort].
   final String? numero;
+  final String? image;
+  final IconData? icone;
+  final (int, int)? avancement;
+  final bool? ouvert;
+  final bool focus;
+  final bool fort;
   final bool nonPlace;
 
   @override
   Widget build(BuildContext context) {
-    final rond = Container(
-      width: 20,
-      height: 20,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: fort ? Charte.blanc : Charte.encre, width: 1.2)),
-      child: Text(numero ?? '?', style: Charte.texte(11, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (nonPlace) const TraitPointille(),
-        Material(
-          color: fort ? Charte.accent : Charte.fondSelection,
-          child: InkWell(
-          onTap: onTap,
-          child: Container(
-          height: image != null || icone != null ? (focus ? 58 : 50) : (onTap != null ? 44 : 30),
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Row(
-            children: [
-              if (numero != null || nonPlace) ...[rond, const SizedBox(width: 10)],
-              if (icone != null && image == null) ...[
-                Container(
-                  width: focus ? 44 : 36,
-                  height: focus ? 44 : 36,
-                  decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, shape: BoxShape.circle),
-                  alignment: Alignment.center,
-                  child: Icon(icone, size: focus ? 25 : 21, color: fort ? Charte.accent : Charte.blanc),
-                ),
-                const SizedBox(width: 10),
-              ],
-              if (image != null) ...[
-                fort
-                    ? Container(
-                        width: focus ? 44 : 36,
-                        height: focus ? 44 : 36,
-                        decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-                        alignment: Alignment.center,
-                        child: Pictogramme(image, taille: focus ? 38 : 30),
-                      )
-                    : Pictogramme(image, taille: focus ? 44 : 36),
-                const SizedBox(width: 10),
-              ],
-              Expanded(
-                child: Text(nom.toUpperCase(),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: Charte.texte(image != null || icone != null ? (fort ? 15 : 14) : (onTap != null ? 14 : 12),
-                        gras: true, espacement: 0.8, couleur: fort ? Charte.blanc : Charte.encre)),
-              ),
-              if (ajoute)
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: Tooltip(
-                      message: 'Ajouté par le foyer',
-                      child: Icon(Icons.add_circle, size: 18, color: fort ? Charte.blanc : Charte.accent)),
-                ),
-              if (droite != null) Text(droite!, style: Charte.texte(14, gras: true, couleur: fort ? Charte.blanc : Charte.encre)),
-              if (nombre != null && nombre! > 0)
-                Container(
-                  constraints: const BoxConstraints(minWidth: 30),
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: fort ? Charte.blanc : Charte.accent, borderRadius: BorderRadius.circular(15)),
-                  child: Text('$nombre', style: Charte.texte(15, gras: true, couleur: fort ? Charte.accent : Charte.blanc)),
-                ),
-              if (avancement != null) Avancement(fait: avancement!.$1, total: avancement!.$2, couleur: fort ? Charte.blanc : Charte.accent),
-              if (ouvert != null) ...[
-                const SizedBox(width: 4),
-                Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 30, color: fort ? Charte.blanc : Charte.encre),
-              ],
-            ],
-          ),
+    final blanc = Charte.texte(14, gras: true, couleur: Charte.blanc);
+    return Material(
+      color: nonPlace ? Charte.texteSecondaire : Charte.accent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
+          child: Row(children: [
+            Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
+            if (ajoute) Text(' +', style: blanc),
+            if (droite != null) Text(droite!, style: blanc),
+            if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
+          ]),
         ),
-        ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -946,8 +551,9 @@ class Retractables extends ChangeNotifier {
   bool tousFermes(Iterable<String> cles, {bool parDefaut = true}) => cles.isNotEmpty && cles.every((c) => !ouvert(c, parDefaut: parDefaut));
 }
 
-/// Le modèle de toutes les listes de l'application : un bandeau (titre du groupe, image ou icône, nombre)
-/// qu'un appui ouvre ou ferme, puis les éléments du groupe.
+/// Le modèle de toutes les listes de l'application : un mince bandeau (titre du groupe, nombre), puis les
+/// éléments du groupe, toujours visibles (plus rien ne se replie). [cle], [image], [icone] et [parDefaut]
+/// ne servent plus.
 class GroupeRetractable extends StatelessWidget {
   const GroupeRetractable({
     super.key,
@@ -961,9 +567,13 @@ class GroupeRetractable extends StatelessWidget {
     this.parDefaut = true,
     this.marge = 16,
     this.ajoute = false,
+    this.actions = const [],
   });
   final String cle;
   final bool ajoute;
+
+  /// Actions du groupe : toucher son bandeau les propose dans un volet.
+  final List<ActionLigne> actions;
   final String titre;
   final List<Widget> enfants;
   final String? image;
@@ -976,69 +586,30 @@ class GroupeRetractable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: Retractables.i,
-      builder: (context, _) {
-        PorteeGroupes.de(context)?.inscrire(cle, parDefaut);
-        final o = Retractables.i.ouvert(cle, parDefaut: parDefaut);
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TitreGroupe(
-              nom: titre,
-              image: image,
-              icone: icone,
-              fort: true,
-              nombre: nombre,
-              ouvert: o,
-              ajoute: ajoute,
-              onTap: () => Retractables.i.basculer(cle, parDefaut: parDefaut),
-            ),
-            if (o)
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: marge),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (enfants.isEmpty && vide != null)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Text(vide!, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                      ),
-                    ...enfants,
-                  ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TitreGroupe(
+          nom: titre,
+          nombre: nombre,
+          ajoute: ajoute,
+          onTap: actions.isEmpty ? null : () => menuActions(context, titre: titre, actions: actions),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: marge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (enfants.isEmpty && vide != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(vide!, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                 ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class Avancement extends StatelessWidget {
-  const Avancement({required this.fait, required this.total, required this.couleur});
-  final int fait;
-  final int total;
-  final Color couleur;
-
-  @override
-  Widget build(BuildContext context) {
-    final fini = total > 0 && fait >= total;
-    return Semantics(
-      label: '$fait sur $total',
-      child: SizedBox(
-        width: 30,
-        height: 30,
-        child: fini
-            ? Icon(Icons.check_circle, size: 30, color: couleur)
-            : CircularProgressIndicator(
-                value: total == 0 ? 0 : fait / total,
-                strokeWidth: 4,
-                color: couleur,
-                backgroundColor: couleur.withValues(alpha: 0.3),
-              ),
-      ),
+              ...enfants,
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1061,11 +632,6 @@ class TitreSection extends StatelessWidget {
 // ----------------------------------------------------------------- Boutons
 
 /// Action « Tout replier » / « Tout déplier » des groupes [cles] (menu de l'en-tête).
-ActionLigne reduireTout(List<String> cles, {bool parDefaut = true}) {
-  final fermes = Retractables.i.tousFermes(cles, parDefaut: parDefaut);
-  return ActionLigne(fermes ? Icons.unfold_more : Icons.unfold_less, fermes ? 'Tout déplier' : 'Tout replier',
-      () => Retractables.i.tous(cles, Retractables.i.tousFermes(cles, parDefaut: parDefaut)));
-}
 
 class Bouton extends StatelessWidget {
   const Bouton({
@@ -1098,10 +664,8 @@ class Bouton extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (icone != null) ...[
-            Icon(icone, size: icone == Icons.arrow_left || texte.isEmpty ? 28 : 20, color: texteCouleur),
-            if (texte.isNotEmpty) const SizedBox(width: 6),
-          ],
+          // Pas d'icône à côté d'un libellé : seulement sur un bouton sans texte.
+          if (icone != null && texte.isEmpty) Icon(icone, size: 28, color: texteCouleur),
           if (texte.isNotEmpty)
             Flexible(
               child: Text(texte,
@@ -1110,7 +674,7 @@ class Bouton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
             ),
-          if (iconeApres != null) ...[const SizedBox(width: 4), Icon(iconeApres, size: 28, color: texteCouleur)],
+          if (iconeApres != null && texte.isEmpty) Icon(iconeApres, size: 28, color: texteCouleur),
         ],
       ),
     );
@@ -1507,31 +1071,63 @@ class Lien extends StatelessWidget {
   }
 }
 
-/// Boîte de saisie d'un texte court ; renvoie null si annulée.
+/// Volet du bas : toutes les fenêtres de l'application s'ouvrent ainsi, avec la poignée en haut.
+/// Il remonte avec le clavier, ne dépasse pas la largeur d'un téléphone sur grand écran ;
+/// [fermable] faux : seuls ses boutons le ferment (saisies longues qu'un geste maladroit ferait perdre).
+Future<T?> volet<T>(BuildContext context, {required WidgetBuilder builder, bool fermable = true}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: fermable,
+    enableDrag: fermable,
+    showDragHandle: true,
+    useSafeArea: true,
+    backgroundColor: Charte.blanc,
+    barrierColor: Charte.voile,
+    constraints: const BoxConstraints(maxWidth: 560),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+      child: SafeArea(top: false, child: builder(ctx)),
+    ),
+  );
+}
+
+/// Corps d'un volet : titre, contenu qui défile, puis les boutons (toujours visibles).
+Widget corpsVolet({required String titre, required Widget contenu, List<Widget> boutons = const []}) => Padding(
+      padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(titre, style: Charte.texte(20, gras: true)),
+          const SizedBox(height: 12),
+          Flexible(child: SingleChildScrollView(child: contenu)),
+          for (final b in boutons) ...[const SizedBox(height: 10), b],
+        ],
+      ),
+    );
+
+/// Saisie d'un texte court ; renvoie null si annulée.
 Future<String?> demanderTexte(BuildContext context,
     {required String titre, String initial = '', String? aide, String valider = 'Valider'}) {
   final controleur = TextEditingController(text: initial);
-  return showDialog<String>(
-    context: context,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: Charte.fond,
-      title: Text(titre, style: Charte.texte(18, gras: true)),
-      content: TextField(
+  return volet<String>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: TextField(
         controller: controleur,
         autofocus: true,
         style: Charte.texte(16),
         decoration: InputDecoration(hintText: aide),
         onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(),
-          child: Text('Annuler', style: Charte.texte(16)),
-        ),
-        TextButton(
-          onPressed: () => Navigator.of(ctx).pop(controleur.text.trim()),
-          child: Text(valider, style: Charte.texte(16, gras: true)),
-        ),
+      boutons: [
+        Row(children: [
+          Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop())),
+          const SizedBox(width: 10),
+          Expanded(child: Bouton(texte: valider, plein: true, onTap: () => Navigator.of(ctx).pop(controleur.text.trim()))),
+        ]),
       ],
     ),
   );
@@ -1539,41 +1135,25 @@ Future<String?> demanderTexte(BuildContext context,
 
 /// Choix dans une liste simple ; renvoie la clé choisie ou null.
 Future<T?> choisirDansListe<T>(BuildContext context, {required String titre, required Map<T, String> choix}) {
-  return showModalBottomSheet<T>(
-    context: context,
-    backgroundColor: Charte.fond,
-    isScrollControlled: true,
-    builder: (ctx) => SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(ctx).size.height * 0.75),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: Text(titre, style: Charte.texte(18, gras: true)),
-            ),
-            Flexible(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  for (final e in choix.entries)
-                    InkWell(
-                      onTap: () => Navigator.of(ctx).pop(e.key),
-                      child: Container(
-                        constraints: const BoxConstraints(minHeight: 48),
-                        alignment: Alignment.centerLeft,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
-                        child: Text(e.value, style: Charte.texte(16)),
-                      ),
-                    ),
-                ],
+  return volet<T>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final e in choix.entries)
+            InkWell(
+              onTap: () => Navigator.of(ctx).pop(e.key),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 36),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
+                child: Text(e.value, style: Charte.texte(16)),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     ),
   );
@@ -1709,10 +1289,12 @@ class BoutonAction extends StatelessWidget {
       );
 }
 
-/// L'élément de liste standard : icône ronde en tête, titre, sous-titre, actions ou chevron à droite.
+/// L'élément de liste standard, le même partout : une ligne de 30 points, le titre, son complément en petit
+/// à droite (coupé s'il est long : le détail s'ouvre au toucher), sans icône ni chevron.
+/// [icone] et [gauche] ne sont plus affichés.
 class LigneMenu extends StatelessWidget {
   const LigneMenu(
-      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 17, this.gauche, this.droite, this.icone, this.apresTitre});
+      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre});
   final String titre;
 
   /// Petit signe après le titre (ex. : produit ajouté ou modifié par le foyer).
@@ -1731,32 +1313,29 @@ class LigneMenu extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(minHeight: 64),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          constraints: const BoxConstraints(minHeight: Charte.ligne),
+          padding: const EdgeInsets.symmetric(vertical: 3),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
-              if (gauche != null || icone != null) ...[gauche ?? IconeRonde(icone), const SizedBox(width: 12)],
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (apresTitre == null)
-                      Text(titre, style: Charte.texte(17, gras: true))
-                    else
-                      Row(children: [
-                        Flexible(child: Text(titre, style: Charte.texte(17, gras: true))),
-                        const SizedBox(width: 6),
-                        apresTitre!,
-                      ]),
-                    if (sousTitre != null)
-                      Text(sousTitre!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ],
-                ),
+                child: Row(children: [
+                  Flexible(child: Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
+                  if (apresTitre != null) ...[const SizedBox(width: 6), apresTitre!],
+                ]),
               ),
-              if (droite != null) droite!,
-              if (onTap != null && droite == null) Icon(Icons.chevron_right, size: 26, color: Charte.couleurIcone(Icons.chevron_right)),
+              if (sousTitre != null && sousTitre!.isNotEmpty)
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8),
+                    child: Text(sousTitre!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.right,
+                        style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ),
+                ),
+              if (droite != null) ...[const SizedBox(width: 8), droite!],
             ],
           ),
         ),
@@ -1804,60 +1383,30 @@ class BoutonPause extends StatelessWidget {
   }
 }
 
-/// Dialogue de confirmation : fond assombri, carte centrée, bouton plein + bouton contour.
-/// Renvoie true pour le bouton contour (action secondaire), false pour le bouton plein, null si fermé.
-/// Fenêtre modale des étapes décisives (valider la liste, partir faire les courses, terminer) :
-/// icône ronde et titre, ce qu'il faut savoir ou choisir, puis l'action (bouton plein) et l'annulation.
-/// Rend true si l'action est choisie.
+/// Fenêtre des étapes décisives (valider la liste, partir faire les courses, terminer…), en volet du bas :
+/// titre, ce qu'il faut savoir ou choisir, puis l'action (bouton plein) et l'annulation.
+/// Rend true si l'action est choisie. [icone] et [croix] ne sont plus affichés (ni icônes, ni croix : la poignée ferme).
 Future<bool> modale(
   BuildContext context, {
   required String titre,
-  required IconData icone,
+  IconData? icone,
   required Widget Function(BuildContext context, StateSetter maj) contenu,
   required String? oui,
   String? non = 'Annuler',
   bool croix = false,
+  bool fermable = true,
 }) async {
-  final r = await showDialog<bool>(
-    context: context,
-    barrierColor: Charte.voile,
+  final r = await volet<bool>(
+    context,
+    fermable: fermable,
     builder: (ctx) => StatefulBuilder(
-      builder: (ctx, maj) => Dialog(
-        backgroundColor: Charte.blanc,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(18),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                children: [
-                  IconeRonde(icone),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
-                  // Fenêtre d'information sans bouton : une croix pour la fermer (ou un appui à côté).
-                  if (croix || (oui == null && non == null))
-                    BoutonIcone(icone: Icons.close, libelle: 'Fermer', onTap: () => Navigator.of(ctx).pop(false)),
-                ],
-              ),
-              const SizedBox(height: 14),
-              Flexible(child: SingleChildScrollView(child: contenu(ctx, maj))),
-              if (oui != null) ...[
-                const SizedBox(height: 18),
-                Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
-              ],
-              if (non != null) ...[
-                const SizedBox(height: 10),
-                Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
-              ],
-            ],
-          ),
-        ),
+      builder: (ctx, maj) => corpsVolet(
+        titre: titre,
+        contenu: contenu(ctx, maj),
+        boutons: [
+          if (oui != null) Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
+          if (non != null) Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
+        ],
       ),
     ),
   );
@@ -1896,6 +1445,7 @@ class CaseModale extends StatelessWidget {
       );
 }
 
+/// Confirmation en volet du bas : bouton plein (rend false) et bouton contour (rend true) ; null si fermé.
 Future<bool?> confirmer(
   BuildContext context, {
   required String titre,
@@ -1904,37 +1454,15 @@ Future<bool?> confirmer(
   required String contour,
   IconData? icone,
 }) {
-  return showDialog<bool>(
-    context: context,
-    barrierColor: Charte.voile,
-    builder: (ctx) => Dialog(
-      backgroundColor: Charte.blanc,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                if (icone != null) ...[IconeRonde(icone), const SizedBox(width: 12)],
-                Expanded(child: Text(titre, style: Charte.texte(21, gras: true))),
-              ],
-            ),
-            const SizedBox(height: 12),
-            contenu,
-            const SizedBox(height: 18),
-            Bouton(texte: plein, plein: true, onTap: () => Navigator.of(ctx).pop(false)),
-            const SizedBox(height: 10),
-            Bouton(texte: contour, onTap: () => Navigator.of(ctx).pop(true)),
-          ],
-        ),
-      ),
+  return volet<bool>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: contenu,
+      boutons: [
+        Bouton(texte: plein, plein: true, onTap: () => Navigator.of(ctx).pop(false)),
+        Bouton(texte: contour, onTap: () => Navigator.of(ctx).pop(true)),
+      ],
     ),
   );
 }
@@ -1955,9 +1483,16 @@ class ActionLigne {
 /// Ligne qu'on fait glisser du doigt : vers la gauche [versGauche] (en général supprimer),
 /// vers la droite [versDroite] (l'action principale) ; un appui long ouvre le menu de toutes les [actions].
 class Glissable extends StatelessWidget {
-  const Glissable({required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.actions = const []})
+  const Glissable(
+      {required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.detail, this.auToucher = false, this.actions = const []})
       : super(key: key);
   final Widget child;
+
+  /// Détail montré en tête du volet des actions.
+  final String? detail;
+
+  /// Toucher la ligne ouvre aussi le volet (détail et actions), comme l'appui long.
+  final bool auToucher;
   final ActionLigne? versGauche;
   final ActionLigne? versDroite;
   final String? titre;
@@ -1967,11 +1502,7 @@ class Glissable extends StatelessWidget {
         color: a.danger ? Charte.rouge : Charte.accent,
         alignment: aDroite ? Alignment.centerRight : Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          Icon(a.icone, color: Charte.blanc, size: 26),
-          const SizedBox(width: 8),
-          Text(a.texte, style: Charte.texte(16, gras: true, couleur: Charte.blanc)),
-        ]),
+        child: Text(a.texte, style: Charte.texte(16, gras: true, couleur: Charte.blanc)),
       );
 
   @override
@@ -1979,9 +1510,10 @@ class Glissable extends StatelessWidget {
     Widget w = child;
     if (actions.isNotEmpty) {
       w = GestureDetector(
+        onTap: auToucher ? () => menuActions(context, titre: titre, detail: detail, actions: actions) : null,
         onLongPress: () {
           HapticFeedback.mediumImpact();
-          menuActions(context, titre: titre, actions: actions);
+          menuActions(context, titre: titre, detail: detail, actions: actions);
         },
         child: w,
       );
@@ -2008,30 +1540,30 @@ class Glissable extends StatelessWidget {
   }
 }
 
-/// Menu de l'appui long : les actions d'une ligne, en bas de l'écran.
-Future<void> menuActions(BuildContext context, {String? titre, required List<ActionLigne> actions}) async {
-  final choix = await showModalBottomSheet<ActionLigne>(
-    context: context,
-    backgroundColor: Charte.blanc,
-    showDragHandle: true,
-    builder: (ctx) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+/// Volet d'une ligne (toucher ou appui long) : son détail éventuel, puis ses actions, sans icônes.
+Future<void> menuActions(BuildContext context, {String? titre, String? detail, required List<ActionLigne> actions}) async {
+  final choix = await volet<ActionLigne>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre ?? '',
+      contenu: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (titre != null)
+          if (detail != null && detail.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Text(titre, maxLines: 2, overflow: TextOverflow.ellipsis, style: Charte.texte(18, gras: true)),
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(detail, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
             ),
           for (final a in actions)
-            ListTile(
-              minTileHeight: 56,
-              leading: Icon(a.icone, color: a.danger ? Charte.rouge : Charte.couleurIcone(a.icone)),
-              title: Text(a.texte, style: Charte.texte(17, couleur: a.danger ? Charte.rouge : Charte.encre)),
+            InkWell(
               onTap: () => Navigator.of(ctx).pop(a),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 40),
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
+                child: Text(a.texte, style: Charte.texte(17, couleur: a.danger ? Charte.rouge : Charte.encre)),
+              ),
             ),
-          const SizedBox(height: 8),
         ],
       ),
     ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -29,42 +28,40 @@ class SousEcranPreparer extends StatelessWidget {
           GroupeRetractable(
             cle: 'preparer/enPreparation',
             titre: 'En préparation',
-            icone: Icons.checklist,
             nombre: enPreparation.length,
             vide: 'Aucune liste en préparation.',
             enfants: [
               for (final l in enPreparation)
-                listeGlissable(context, l, LigneMenu(
-                  icone: Icons.checklist,
-                  titre: etat.nomListe(l),
-                  sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
+                listeGlissable(
+                  context,
+                  l,
+                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                  detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
                       '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
                       '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
-                  onTap: () => Nav.travail(EcranConstruction(listeId: l.id)),
-                )),
+                ),
             ],
           ),
           GroupeRetractable(
             cle: 'preparer/pretes',
             titre: 'Prêtes pour les courses',
-            icone: Icons.shopping_cart_outlined,
             nombre: pretes.length,
             vide: 'Aucune liste prête.',
             enfants: [
               for (final l in pretes)
-                listeGlissable(context, l, LigneMenu(
-                  icone: Icons.shopping_cart_outlined,
-                  titre: etat.nomListe(l),
-                  sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
+                listeGlissable(
+                  context,
+                  l,
+                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                  detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
                       '${quandJour(l.modifieeLe ?? l.dateCreation)}',
-                  onTap: () => Nav.i.allerOnglet(Nav.courses),
-                )),
+                ),
             ],
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Text('Touchez une liste pour la reprendre. Glissez-la vers la gauche pour la supprimer, '
-                'vers la droite pour la remettre en préparation ; un appui long montre toutes les actions.',
+            child: Text('Touchez une liste pour voir ce que vous pouvez en faire. Glissez-la vers la gauche pour la supprimer, '
+                'vers la droite pour la remettre en préparation.',
                 style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ),
         ],
@@ -115,8 +112,9 @@ Future<void> coursesEnPreparation(BuildContext context, Liste l) async {
 }
 
 /// Gestes d'une liste, partout où elle apparaît : glisser vers la gauche la supprime,
-/// vers la droite la remet en préparation (liste prête ou courses interrompues) ; l'appui long ouvre le menu.
-Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interrompue = false}) {
+/// vers la droite la remet en préparation (liste prête ou courses interrompues) ; le toucher (ou l'appui long)
+/// ouvre son volet : le détail, puis les actions.
+Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interrompue = false, String? detail}) {
   final etat = Etat.instance;
   final supprimer =
       ActionLigne(Icons.delete_outline, 'Supprimer', () => supprimerVite(context, l, 'la liste ${etat.nomListe(l)}'), danger: true);
@@ -137,6 +135,8 @@ Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interro
   return Glissable(
     key: ValueKey('glisser-${l.id}'),
     titre: etat.nomListe(l),
+    detail: detail,
+    auToucher: true,
     versGauche: supprimer,
     versDroite: droite,
     actions: actions,
@@ -397,7 +397,6 @@ class _EcranParcoursState extends State<EcranParcours> {
     final rayon = etat.rayon(run.rayonId);
     final ouvert = ouverts.contains(run.rayonId);
     final retour = runs.take(r).any((x) => x.rayonId == run.rayonId);
-    final img = rayon == null ? null : cleRayon(rayon.nom);
     final n = run.etapes.length;
     return _ligneOrdre(
       key: ValueKey('passage-$r-${run.rayonId}'),
@@ -413,7 +412,6 @@ class _EcranParcoursState extends State<EcranParcours> {
             child: Text('${r + 1}', style: Charte.texte(14)),
           ),
           const SizedBox(width: 8),
-          if (img != null) ...[Pictogramme(img, taille: 44), const SizedBox(width: 10)],
           Expanded(
             child: Text.rich(TextSpan(children: [
               TextSpan(text: rayon?.nom ?? '?', style: Charte.texte(18, gras: true)),
@@ -431,8 +429,6 @@ class _EcranParcoursState extends State<EcranParcours> {
 
   Widget _secteur(BuildContext context, Parcours p, String sid, int i) {
     final s = etat.secteur(sid);
-    final r = etat.rayon(s?.rayonId);
-    final img = s == null || r == null ? null : cleSecteur(r.nom, s.nom);
     return _ligneOrdre(
       key: ValueKey('etape-$sid'),
       index: i,
@@ -453,7 +449,6 @@ class _EcranParcoursState extends State<EcranParcours> {
       },
       contenu: Row(
         children: [
-          if (img != null) ...[Pictogramme(img, taille: 38), const SizedBox(width: 10)],
           Expanded(child: Text(s?.nom ?? '?', style: Charte.texte(16))),
         ],
       ),
@@ -550,74 +545,65 @@ class SousEcranCourses extends StatefulWidget {
 class _SousEcranCoursesState extends State<SousEcranCourses> {
   final etat = Etat.instance;
 
-  Future<void> _partir(BuildContext context, Liste l) => partirFaireLesCourses(context, l);
-
   @override
   Widget build(BuildContext context) {
     final enCours = etat.coursesEnCours;
     final pretes = etat.listesStatut(StatutListe.prete);
     final enInstance = etat.coursesEnInstance;
 
-    // Dans l'ordre de la vie d'une liste : prête, courses interrompues, terminée en attente du ticket.
+    // Une seule liste, dans l'ordre de la vie d'une liste : à faire, en cours, terminée en attente du ticket,
+    // historique, archives. Toucher une ligne ouvre son volet : le détail, puis les actions.
     return ListView(
       padding: const EdgeInsets.only(bottom: 16),
       children: [
         GroupeRetractable(
           cle: 'courses/pretes',
-          titre: 'Listes prêtes',
-          icone: Icons.shopping_cart_outlined,
+          titre: 'À faire',
           nombre: pretes.length,
           vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
           enfants: [
             for (final l in pretes)
-              listeGlissable(context, l, LigneMenu(
-                icone: Icons.shopping_cart_outlined,
-                titre: etat.nomListe(l),
-                sousTitre: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
+              listeGlissable(
+                context,
+                l,
+                LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
                     '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
-                onTap: () => _partir(context, l),
-                droite: BoutonAction('Faire les courses', onTap: () => _partir(context, l)),
-              )),
+              ),
           ],
         ),
-        GroupeRetractable(
-          cle: 'courses/interrompues',
-          titre: 'Courses interrompues',
-          icone: Icons.pause_circle_outline,
-          nombre: enCours == null ? 0 : 1,
-          vide: 'Aucune course interrompue.',
-          enfants: [if (enCours != null) _carteInterrompues(context, enCours)],
-        ),
-        GroupeRetractable(
-          cle: 'courses/sansTicket',
-          titre: 'Terminées sans ticket',
-          icone: Icons.receipt_long_outlined,
-          nombre: enInstance.length,
-          vide: 'Toutes les courses terminées ont leur ticket : elles sont dans l\'Historique (plus bas).',
-          enfants: [
-            for (final c in enInstance)
-              Glissable(
-                key: ValueKey('glisser-${c.id}'),
-                titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-                versDroite: ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket', () => joindreTicket(context, etat, c)),
-                actions: [
-                  ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
-                  ActionLigne(Icons.receipt_long_outlined, 'Classer sans ticket', () => _classer(context, c)),
-                ],
-                child: LigneMenu(
-                icone: Icons.receipt_long_outlined,
-                titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-                sousTitre: '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''} · '
-                    '${etat.membre(c.membreId)?.nomAffiche ?? ''} · joignez le ticket pour la classer dans l\'historique',
-                onTap: () => _classer(context, c),
-                droite: BoutonIcone(
-                  icone: Icons.upload_file_outlined,
-                  libelle: 'Joindre le ticket PDF',
-                  onTap: () => joindreTicket(context, etat, c),
+        if (enCours != null)
+          GroupeRetractable(
+            cle: 'courses/interrompues',
+            titre: 'En cours',
+            nombre: 1,
+            enfants: [_ligneInterrompue(context, enCours)],
+          ),
+        if (enInstance.isNotEmpty)
+          GroupeRetractable(
+            cle: 'courses/sansTicket',
+            titre: 'Terminées sans ticket',
+            nombre: enInstance.length,
+            enfants: [
+              for (final c in enInstance)
+                Glissable(
+                  key: ValueKey('glisser-${c.id}'),
+                  titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                  detail: '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''} · ${etat.membre(c.membreId)?.nomAffiche ?? ''} · '
+                      'joignez le ticket pour la classer dans l\'historique',
+                  auToucher: true,
+                  versDroite: ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket', () => joindreTicket(context, etat, c)),
+                  actions: [
+                    ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+                    ActionLigne(Icons.receipt_long_outlined, 'Classer sans ticket', () => _classer(context, c)),
+                  ],
+                  child: LigneMenu(
+                    titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                    sousTitre: '${c.nbArticles} art.',
+                  ),
                 ),
-              )),
-          ],
-        ),
+            ],
+          ),
         ...groupesPasses(context, etat),
       ],
     );
@@ -627,7 +613,6 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     final ok = await modale(
       context,
       titre: 'Classer sans ticket',
-      icone: Icons.receipt_long_outlined,
       oui: 'Classer sans ticket',
       contenu: (context, maj) => Text(
           'La course du ${jjmm(c.dateCourses)} passera dans Courses › Historique sans ticket de caisse. '
@@ -637,117 +622,80 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
     if (ok) etat.classerSansTicket(c);
   }
 
-  Widget _carteInterrompues(BuildContext context, Liste l) {
+  Widget _ligneInterrompue(BuildContext context, Liste l) {
     final etape = etat.etapes(l, l.parcoursId).where((e) => e.id == l.repriseSecteurId).toList();
     final arret = etape.isEmpty ? '' : ' · arrêt au secteur ${etape.first.nom}';
-    void reprendre() => Nav.travail(EcranCoursesSecteur(listeId: l.id));
-    return listeGlissable(context, l, interrompue: true, LigneMenu(
-      gauche: SizedBox(width: 44, height: 44, child: Center(child: Avancement(fait: l.nbCoches, total: l.lignes.length, couleur: Charte.accent))),
-      titre: '${etat.nomListe(l)} · ${l.nbCoches} / ${l.lignes.length}',
-      sousTitre: '${etat.membre(l.membreId)?.nomAffiche ?? ''}$arret'
+    return listeGlissable(
+      context,
+      l,
+      interrompue: true,
+      LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.nbCoches} / ${l.lignes.length}'),
+      detail: '${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} coché${l.nbCoches > 1 ? 's' : ''} sur ${l.lignes.length} · '
+          '${etat.membre(l.membreId)?.nomAffiche ?? ''}$arret'
           '${l.interrompueLe != null ? ' · ${quand(l.interrompueLe!)}' : ''}',
-      onTap: reprendre,
-      droite: BoutonAction('Reprendre', plein: true, onTap: reprendre),
-    ));
+    );
   }
 }
 
-/// En fin d'onglet Courses, comme les autres titres et repliés au départ : Historique, Archives, Corbeille.
-/// Ils se déploient sur place ; un appui long sur une ligne (ou un glissement) propose ses actions.
+/// En fin d'onglet Courses : l'historique, puis les archives (les groupes vides ne s'affichent pas).
 List<Widget> groupesPasses(BuildContext context, Etat etat) {
   final historique = etat.historique.where((c) => !etat.estArchivee(c) && !etat.enInstance(c)).toList()
     ..sort((a, b) => b.dateCourses.compareTo(a.dateCourses));
   final libres = etat.tickets.where((t) => etat.course(t.listeId) == null).length;
   final nbArchives = etat.coursesArchivees.length + etat.magasinsArchives.length;
   return [
-    GroupeRetractable(
-      cle: 'courses/historique',
-      titre: 'Historique',
-      icone: Icons.history,
-      parDefaut: false,
-      nombre: historique.length,
-      vide: 'Aucune course classée : une course terminée y arrive avec son ticket, ou classée sans ticket.',
-      enfants: [
-        for (final c in historique) _ligneHistorique(context, etat, c),
-        if (libres > 0)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Lien('$libres ticket${libres > 1 ? 's' : ''} à rattacher', onTap: () => _pageHistorique(context)),
+    if (historique.isNotEmpty || libres > 0)
+      GroupeRetractable(
+        cle: 'courses/historique',
+        titre: 'Historique',
+        nombre: historique.length,
+        enfants: [
+          for (final c in historique) _ligneHistorique(context, etat, c),
+          if (libres > 0)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Bouton(texte: '$libres ticket${libres > 1 ? 's' : ''} à rattacher', hauteur: 40, taille: 15, onTap: () => _pageHistorique(context)),
             ),
-          ),
-      ],
-    ),
-    GroupeRetractable(
-      cle: 'courses/archives',
-      titre: 'Archives',
-      icone: Icons.inventory_2_outlined,
-      parDefaut: false,
-      nombre: nbArchives,
-      vide: etat.delaiHistorique == 0
-          ? 'Aucune archive.'
-          : 'Aucune archive : les courses de l\'historique y passent après ${etat.delaiHistorique} mois.',
-      enfants: [
-        for (final c in etat.coursesArchivees)
-          Glissable(
-            key: ValueKey('archive-${c.id}'),
-            titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-            versDroite: ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c)),
-            actions: [ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c))],
-            child: LigneMenu(
-              icone: Icons.receipt_long_outlined,
+        ],
+      ),
+    if (nbArchives > 0)
+      GroupeRetractable(
+        cle: 'courses/archives',
+        titre: 'Archives',
+        nombre: nbArchives,
+        enfants: [
+          for (final c in etat.coursesArchivees)
+            Glissable(
+              key: ValueKey('archive-${c.id}'),
               titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-              sousTitre: '${etat.nomCourse(c)} · ${c.nbArticles} articles',
-              droite: etat.ticketDe(c.id) == null ? null : Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)),
+              detail: '${etat.nomCourse(c)} · ${c.nbArticles} articles${etat.ticketDe(c.id) == null ? '' : ' · avec ticket'}',
+              auToucher: true,
+              versDroite: ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c)),
+              actions: [
+                if (etat.ticketDe(c.id) case final t?) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
+                ActionLigne(Icons.history, 'Remettre en historique', () => etat.remettreEnHistorique(c)),
+              ],
+              child: LigneMenu(
+                titre: '${jjmmaaaa(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
+                sousTitre: '${c.nbArticles} art.',
+              ),
             ),
-          ),
-        for (final m in etat.magasinsArchives)
-          Glissable(
-            key: ValueKey('archive-magasin-${m.id}'),
-            titre: m.nom,
-            actions: [
-              ActionLigne(Icons.storefront_outlined, 'Rétablir le magasin', () => etat.restaurerMagasin(m)),
-              ActionLigne(Icons.delete_outline, 'Tout supprimer', () => demanderSuppression(context, m, 'les archives de ${m.nom}'),
-                  danger: true),
-            ],
-            child: LigneMenu(
-              icone: Icons.storefront_outlined,
-              titre: '${m.nom} (magasin supprimé)',
-              sousTitre: '${etat.historique.where((c) => c.magasinId == m.id).length} courses',
-              onTap: () => Nav.aller<void>(context, const EcranArchives()),
+          for (final m in etat.magasinsArchives)
+            Glissable(
+              key: ValueKey('archive-magasin-${m.id}'),
+              titre: m.nom,
+              detail: 'Magasin supprimé · ${etat.historique.where((c) => c.magasinId == m.id).length} courses',
+              auToucher: true,
+              actions: [
+                ActionLigne(Icons.history, 'Voir ses courses', () => Nav.aller<void>(context, const EcranArchives())),
+                ActionLigne(Icons.storefront_outlined, 'Rétablir le magasin', () => etat.restaurerMagasin(m)),
+                ActionLigne(Icons.delete_outline, 'Tout supprimer', () => demanderSuppression(context, m, 'les archives de ${m.nom}'),
+                    danger: true),
+              ],
+              child: LigneMenu(titre: '${m.nom} (magasin supprimé)'),
             ),
-          ),
-      ],
-    ),
-    GroupeRetractable(
-      cle: 'courses/corbeille',
-      titre: 'Corbeille',
-      icone: Icons.delete_outline,
-      parDefaut: false,
-      nombre: etat.corbeille.length,
-      vide: 'La corbeille est vide.',
-      enfants: [
-        for (final c in etat.corbeille)
-          Glissable(
-            key: ValueKey('corbeille-${c.id}'),
-            titre: c.libelle,
-            versDroite: ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c)),
-            actions: [ActionLigne(Icons.restore, 'Restaurer', () => restaurerElement(context, c))],
-            child: LigneMenu(
-              titre: c.libelle,
-              titreTaille: 16,
-              sousTitre: 'Supprimé ${quand(c.le)}',
-              icone: EcranCorbeille.icones[c.type] ?? Icons.delete_outline,
-            ),
-          ),
-        if (etat.corbeille.isNotEmpty)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: Bouton(texte: 'Vider la corbeille', icone: Icons.delete_forever_outlined, taille: 16, onTap: () => viderCorbeille(context)),
-          ),
-      ],
-    ),
+        ],
+      ),
   ];
 }
 
@@ -758,7 +706,7 @@ void _pageHistorique(BuildContext context) => Nav.aller<void>(
       corps: SousEcranHistorique(),
     ));
 
-/// Une course de l'historique : toucher montre son ticket ; appui long : les actions.
+/// Une course de l'historique : toucher ouvre son volet (détail, ticket, actions).
 Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
   final t = etat.ticketDe(c.id);
   final liste = etat.liste(c.id);
@@ -767,6 +715,13 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
   return Glissable(
     key: ValueKey('historique-${c.id}'),
     titre: titre,
+    detail: [
+      etat.nomCourse(c),
+      '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+      if (t != null) euros(t.montant),
+      if (qui.isNotEmpty) 'par $qui',
+    ].join(' · '),
+    auToucher: true,
     actions: [
       if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
       if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
@@ -779,17 +734,6 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
         }),
       ActionLigne(Icons.inventory_2_outlined, 'Archiver', () => etat.archiver(c)),
     ],
-    child: LigneMenu(
-      icone: Icons.receipt_long_outlined,
-      titre: titre,
-      sousTitre: [
-        etat.nomCourse(c),
-        '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
-        if (t != null) euros(t.montant),
-        if (qui.isNotEmpty) 'par $qui',
-      ].join(' · '),
-      droite: t == null ? null : Icon(Icons.attach_file, color: Charte.couleurIcone(Icons.attach_file)),
-      onTap: t == null ? null : () => ouvrirTicketPdf(context, t),
-    ),
+    child: LigneMenu(titre: titre, sousTitre: t == null ? '${c.nbArticles} art.' : euros(t.montant)),
   );
 }
