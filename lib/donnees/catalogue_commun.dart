@@ -127,7 +127,11 @@ class CatalogueCommun extends ChangeNotifier {
     }
     if (ok == true) {
       _definir('catalogue_commun', jsonEncode(j));
-      _appliquer(j);
+      // L'éditeur connaît déjà ce qu'il vient de publier : pas de fenêtre « Nouveautés » chez lui.
+      Etat.instance.appliquerCatalogueCommun(j);
+      final n = Etat.instance.nouveautesCatalogue;
+      if (n != null) _definir('nouveautes_vues', '${n['version']}');
+      notifyListeners();
     }
     return ok == true;
   }

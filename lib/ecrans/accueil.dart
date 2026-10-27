@@ -31,6 +31,7 @@ class EcranAccueil extends StatelessWidget {
             GroupeRetractable(
               cle: 'accueil/preparation',
               titre: 'En préparation',
+              icone: Icons.checklist,
               nombre: enPreparation.length,
               vide: 'Aucune liste en préparation.',
               enfants: [
@@ -48,6 +49,7 @@ class EcranAccueil extends StatelessWidget {
             GroupeRetractable(
               cle: 'accueil/instance',
               titre: 'À faire',
+              icone: Icons.shopping_cart_outlined,
               nombre: pretes.length,
               vide: 'Aucune liste prête pour les courses.',
               enfants: [
@@ -64,6 +66,7 @@ class EcranAccueil extends StatelessWidget {
               GroupeRetractable(
                 cle: 'accueil/courses',
                 titre: 'Courses en cours',
+                icone: Icons.pause_circle_outline,
                 nombre: 1,
                 enfants: [
                   listeGlissable(

@@ -479,8 +479,12 @@ class TitreGroupe extends StatelessWidget {
       this.ouvert,
       this.focus = false,
       this.ajoute = false,
+      this.grand = false,
       this.onTap});
   final String nom;
+
+  /// Bandeau des listes autres que les articles : plus haut, police plus grosse, avec icône ou image.
+  final bool grand;
 
   /// Rayon ou secteur ajouté par le foyer : petit signe après le nom.
   final bool ajoute;
@@ -489,8 +493,8 @@ class TitreGroupe extends StatelessWidget {
   /// Nombre d'articles ou d'éléments du groupe, à droite.
   final int? nombre;
 
-  /// Ne sont plus affichés (ni images, ni icônes, ni numéros, ni anneau, ni chevron) : [numero], [image],
-  /// [icone], [avancement], [ouvert], [focus], [fort].
+  /// [image] et [icone] ne s'affichent que sur un bandeau [grand] ; ne sont plus affichés : [numero],
+  /// [avancement], [ouvert], [focus], [fort].
   final String? numero;
   final String? image;
   final IconData? icone;
@@ -502,14 +506,29 @@ class TitreGroupe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blanc = Charte.texte(14, gras: true, couleur: Charte.blanc);
+    final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: Charte.blanc);
+    final signe = !grand
+        ? null
+        : image != null
+            ? Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
+                alignment: Alignment.center,
+                child: Pictogramme(image!, taille: 26),
+              )
+            : icone != null
+                ? Icon(icone, size: 24, color: Charte.blanc)
+                : null;
     return Material(
       color: nonPlace ? Charte.texteSecondaire : Charte.accent,
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 4, 14, 4),
+        child: Container(
+          constraints: BoxConstraints(minHeight: grand ? Charte.ligneListe : 0),
+          padding: EdgeInsets.fromLTRB(grand ? 12 : 16, 4, 14, 4),
           child: Row(children: [
+            if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
             if (ajoute) Text(' +', style: blanc),
             if (droite != null) Text(droite!, style: blanc),
@@ -593,6 +612,9 @@ class GroupeRetractable extends StatelessWidget {
           nom: titre,
           nombre: nombre,
           ajoute: ajoute,
+          grand: true,
+          image: image,
+          icone: icone,
           onTap: actions.isEmpty ? null : () => menuActions(context, titre: titre, actions: actions),
         ),
         Padding(
@@ -1308,33 +1330,32 @@ class LigneMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final signe = gauche ?? (icone == null ? null : Icon(icone, size: 24, color: Charte.cadre));
     return Material(
       color: Charte.fond,
       child: InkWell(
         onTap: onTap,
         child: Container(
-          constraints: const BoxConstraints(minHeight: Charte.ligne),
-          padding: const EdgeInsets.symmetric(vertical: 3),
+          constraints: const BoxConstraints(minHeight: Charte.ligneListe),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
+              if (signe != null) ...[SizedBox(width: 32, height: 32, child: FittedBox(child: signe)), const SizedBox(width: 10)],
               Expanded(
-                child: Row(children: [
-                  Flexible(child: Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
-                  if (apresTitre != null) ...[const SizedBox(width: 6), apresTitre!],
-                ]),
-              ),
-              if (sousTitre != null && sousTitre!.isNotEmpty)
-                Flexible(
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
-                    child: Text(sousTitre!,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.right,
-                        style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(children: [
+                      Flexible(child: Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                      if (apresTitre != null) ...[const SizedBox(width: 6), apresTitre!],
+                    ]),
+                    if (sousTitre != null && sousTitre!.isNotEmpty)
+                      Text(sousTitre!, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ],
                 ),
+              ),
               if (droite != null) ...[const SizedBox(width: 8), droite!],
             ],
           ),

@@ -28,6 +28,7 @@ class SousEcranPreparer extends StatelessWidget {
           GroupeRetractable(
             cle: 'preparer/enPreparation',
             titre: 'En préparation',
+            icone: Icons.checklist,
             nombre: enPreparation.length,
             vide: 'Aucune liste en préparation.',
             enfants: [
@@ -45,6 +46,7 @@ class SousEcranPreparer extends StatelessWidget {
           GroupeRetractable(
             cle: 'preparer/pretes',
             titre: 'Prêtes pour les courses',
+            icone: Icons.shopping_cart_outlined,
             nombre: pretes.length,
             vide: 'Aucune liste prête.',
             enfants: [
@@ -559,6 +561,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
         GroupeRetractable(
           cle: 'courses/pretes',
           titre: 'À faire',
+          icone: Icons.shopping_cart_outlined,
           nombre: pretes.length,
           vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
           enfants: [
@@ -576,6 +579,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           GroupeRetractable(
             cle: 'courses/interrompues',
             titre: 'En cours',
+            icone: Icons.pause_circle_outline,
             nombre: 1,
             enfants: [_ligneInterrompue(context, enCours)],
           ),
@@ -583,6 +587,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           GroupeRetractable(
             cle: 'courses/sansTicket',
             titre: 'Terminées sans ticket',
+            icone: Icons.receipt_long_outlined,
             nombre: enInstance.length,
             enfants: [
               for (final c in enInstance)
@@ -648,6 +653,7 @@ List<Widget> groupesPasses(BuildContext context, Etat etat) {
       GroupeRetractable(
         cle: 'courses/historique',
         titre: 'Historique',
+        icone: Icons.history,
         nombre: historique.length,
         enfants: [
           for (final c in historique) _ligneHistorique(context, etat, c),
@@ -662,6 +668,7 @@ List<Widget> groupesPasses(BuildContext context, Etat etat) {
       GroupeRetractable(
         cle: 'courses/archives',
         titre: 'Archives',
+        icone: Icons.inventory_2_outlined,
         nombre: nbArchives,
         enfants: [
           for (final c in etat.coursesArchivees)

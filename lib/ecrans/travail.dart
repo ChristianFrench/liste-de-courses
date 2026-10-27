@@ -690,6 +690,7 @@ class LigneArticle extends StatelessWidget {
     this.coche = false,
     this.manquant = false,
     this.surligne = false,
+    this.caseCourse = false,
   });
   final LigneListe ligne;
   final Produit produit;
@@ -705,6 +706,9 @@ class LigneArticle extends StatelessWidget {
   /// Manquant en rayon : nom en rouge, barré.
   final bool manquant;
   final bool surligne;
+
+  /// Pendant les courses : case cochée (un appui) ou croix rouge (manquant, double appui).
+  final bool caseCourse;
 
   @override
   Widget build(BuildContext context) {
@@ -744,6 +748,22 @@ class LigneArticle extends StatelessWidget {
           // Le trait sous la ligne ne prend pas de place : les signes gardent leurs 30 points.
           foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(children: [
+            if (caseCourse) ...[
+              if (manquant)
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Charte.blanc,
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
+                  ),
+                  child: Icon(Icons.close, size: 16, color: Charte.rouge),
+                )
+              else
+                CaseACocher(coche: coche, taille: 20),
+              const SizedBox(width: 2),
+            ],
             SizedBox(
               width: 30,
               child: g.promotion == null
@@ -1289,6 +1309,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       produit: p,
       coche: g.coche,
       manquant: manquant,
+      caseCourse: true,
       onTap: () => _appui(etat, l, p),
       onDetail: () => detailArticle(context, g),
       onLongPress: () {

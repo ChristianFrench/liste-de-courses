@@ -97,6 +97,9 @@ class Charte {
 
   /// Hauteur unique des lignes de toutes les listes (articles, listes, menus).
   static const double ligne = 30;
+
+  /// Lignes des autres listes (listes de courses, catalogue, réglages) : un peu plus hautes.
+  static const double ligneListe = 40;
   static const double ligneCompacte = 32;
   static const double barreAction = 64;
   static const double barreNavigation = 64;

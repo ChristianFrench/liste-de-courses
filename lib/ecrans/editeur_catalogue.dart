@@ -95,6 +95,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                       for (final s in r.secteurs)
                         LigneMenu(
                           titre: s.nom,
+                          gauche: Pictogramme(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), taille: 32),
                           sousTitre: _pluriel(s.produits.length, 'produit'),
                           onTap: () async {
                             await Nav.aller<void>(context, EcranEditeurSecteur(b: b, r: r, s: s));
@@ -461,10 +462,9 @@ Future<void> montrerNouveautes(BuildContext context) async {
   await modale(
     context,
     titre: 'Nouveautés du catalogue',
-    icone: Icons.new_releases_outlined,
-    oui: null,
+    oui: 'Fermer',
     non: null,
-    croix: true,
+    fermable: false,
     contenu: (context, _) => ConstrainedBox(
       constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
       child: ListView(
