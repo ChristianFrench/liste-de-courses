@@ -1129,6 +1129,62 @@ Widget corpsVolet({required String titre, required Widget contenu, List<Widget> 
       ),
     );
 
+/// Change l'ordre d'une liste de noms (on fait glisser la poignée ≡) ; renvoie null si annulé.
+Future<List<String>?> ordonner(BuildContext context, {required String titre, required List<String> noms}) {
+  final ordre = [...noms];
+  return volet<List<String>>(
+    context,
+    fermable: false,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(titre, style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 4),
+            Text('Faites glisser la poignée ≡ pour déplacer un secteur.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ReorderableListView.builder(
+                shrinkWrap: true,
+                buildDefaultDragHandles: false,
+                itemCount: ordre.length,
+                onReorderItem: (de, vers) => maj(() => ordre.insert(vers, ordre.removeAt(de))),
+                itemBuilder: (ctx, i) => Material(
+                  key: ValueKey('ordre-${ordre[i]}'),
+                  color: Charte.blanc,
+                  child: Container(
+                    height: Charte.ligneListe,
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                    child: Row(children: [
+                      Expanded(child: Text(ordre[i], maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                      ReorderableDragStartListener(
+                        index: i,
+                        child: Container(
+                          width: 44,
+                          height: Charte.ligneListe,
+                          alignment: Alignment.center,
+                          child: Icon(Icons.drag_handle, key: ValueKey('poignee-${ordre[i]}'), size: 26, color: Charte.cadre),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(ordre)),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 /// Saisie d'un texte court ; renvoie null si annulée.
 Future<String?> demanderTexte(BuildContext context,
     {required String titre, String initial = '', String? aide, String valider = 'Valider'}) {

@@ -382,6 +382,12 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                         ajoute: etat.rayonAjoute(x),
                         actions: [
                           ActionLigne(Icons.add, '+ Nouveau secteur', () => _nouveauSecteur(context, x)),
+                          if (etat.secteursDu(x.id).length > 1)
+                            ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
+                              final noms = await ordonner(context,
+                                  titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursDu(x.id)) s.nom]);
+                              if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
+                            }),
                           if (etat.rayonAjoute(x)) ...[
                             ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
                             ActionLigne(Icons.delete_outline, 'Supprimer le rayon', () => _supprimerRayon(context, x), danger: true),

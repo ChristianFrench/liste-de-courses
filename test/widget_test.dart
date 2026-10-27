@@ -11,6 +11,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/composants/signe_perso.dart';
+import 'package:liste_de_courses/donnees/catalogue_commun.dart' show Brouillon;
 import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
@@ -1029,6 +1030,54 @@ void main() {
       expect(find.text('Signification du voyant'), findsOneWidget);
       expect(find.text('Rouge : pas de connexion au serveur MQTT ou pas de réseau'), findsOneWidget);
       expect(find.text('Avancé : serveur'), findsNothing);
+    });
+  });
+
+  group('Ordre des secteurs', () {
+    setUp(_donnees);
+
+    testWidgets('catalogue du foyer : le bandeau du rayon propose de changer l\'ordre, dans tous les magasins', (tester) async {
+      await _accueil(tester);
+      await _rubrique(tester, 'Catalogue');
+      final etat = Etat.instance;
+      final frais = etat.rayonsCatalogue.firstWhere((r) => r.nom == 'Frais');
+      final avant = [for (final s in etat.secteursDu(frais.id)) s.nom];
+      await _toucher(tester, find.text('FRAIS'));
+      await _toucher(tester, find.text('Changer l\'ordre des secteurs'));
+      // Le dernier secteur glisse tout en haut
+      final dernier = avant.last;
+      final poignee = find.byKey(ValueKey('poignee-$dernier'));
+      final haut = tester.getCenter(find.byKey(ValueKey('poignee-${avant.first}')));
+      final g = await tester.startGesture(tester.getCenter(poignee));
+      await tester.pump(const Duration(milliseconds: 100));
+      for (var y = tester.getCenter(poignee).dy; y > haut.dy - 40; y -= 20) {
+        await g.moveTo(Offset(haut.dx, y));
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      await tester.pump(const Duration(milliseconds: 500));
+      await g.up();
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.text('Valider'));
+      expect([for (final s in etat.secteursDu(frais.id)) s.nom], [dernier, ...avant.take(avant.length - 1)]);
+      for (final r in etat.rayons.where((r) => r.nom == 'Frais')) {
+        expect(etat.secteursDu(r.id).first.nom, dernier);
+      }
+    });
+
+    test('catalogue commun : le brouillon garde le nouvel ordre et compte une modification', () {
+      final b = Brouillon.lire({'rayons': [
+        {'nom': 'Frais', 'secteurs': [
+          {'nom': 'A', 'taille': 1, 'produits': []},
+          {'nom': 'B', 'taille': 1, 'produits': []},
+          {'nom': 'C', 'taille': 1, 'produits': []},
+        ]},
+      ]});
+      final r = b.catalogue.rayons.first;
+      b.ordonnerSecteurs(r, ['C', 'A', 'B']);
+      expect([for (final s in r.secteurs) s.nom], ['C', 'A', 'B']);
+      expect(b.modifications, 1);
+      b.ordonnerSecteurs(r, ['C', 'A', 'B']);
+      expect(b.modifications, 1);
     });
   });
 }

@@ -304,6 +304,13 @@ class Brouillon {
     return true;
   }
 
+  /// Nouvel ordre des secteurs du rayon [r] (par leurs noms).
+  void ordonnerSecteurs(CatRayon r, List<String> noms) {
+    final avant = [for (final s in r.secteurs) s.nom];
+    r.secteurs = [for (final n in noms) ...r.secteurs.where((s) => s.nom == n), ...r.secteurs.where((s) => !noms.contains(s.nom))];
+    if ([for (final s in r.secteurs) s.nom].join('\n') != avant.join('\n')) modifications++;
+  }
+
   void renommerRayon(CatRayon r, String nom) {
     if (nom.trim().isEmpty || nom.trim() == r.nom || rayon(nom) != null) return;
     renommes.add({'type': 'rayon', 'ancien': r.nom, 'nouveau': nom.trim()});

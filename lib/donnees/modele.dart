@@ -2579,6 +2579,21 @@ class Etat extends ChangeNotifier {
     return _trouve(secteursDu(r.id), (s) => s.nom == n);
   }
 
+  /// Nouvel ordre des secteurs du rayon [r] (par leurs noms), dans tous les magasins.
+  void ordonnerSecteursCatalogue(Rayon r, List<String> noms) {
+    final rang = {for (var i = 0; i < noms.length; i++) noms[i]: i};
+    for (final rid in {for (final x in rayons) if (x.nom == r.nom) x.id}) {
+      // Les secteurs de ce rayon reprennent leurs places dans la liste, dans le nouvel ordre.
+      final places = [for (var i = 0; i < secteurs.length; i++) if (secteurs[i].rayonId == rid) i];
+      final cle = {for (var k = 0; k < places.length; k++) secteurs[places[k]]: rang[secteurs[places[k]].nom] ?? noms.length + k};
+      final tries = [for (final i in places) secteurs[i]]..sort((a, b) => cle[a]!.compareTo(cle[b]!));
+      for (var k = 0; k < places.length; k++) {
+        secteurs[places[k]] = tries[k];
+      }
+    }
+    modifie();
+  }
+
   /// Renomme un rayon ajouté, dans tous les magasins.
   void renommerRayonCatalogue(Rayon r, String nom) {
     final n = nom.trim(), ancien = r.nom;

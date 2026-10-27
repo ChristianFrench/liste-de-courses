@@ -69,6 +69,13 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                           b.ajouterSecteur(r, nom);
                           _modifie();
                         }),
+                      if (r.secteurs.length > 1)
+                        ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
+                          final noms = await ordonner(context, titre: 'Ordre des secteurs · ${r.nom}', noms: [for (final s in r.secteurs) s.nom]);
+                          if (noms == null) return;
+                          b.ordonnerSecteurs(r, noms);
+                          _modifie();
+                        }),
                       ActionLigne(Icons.chevron_right, 'Depuis un texte', () async {
                           if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
                         }),
