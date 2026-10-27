@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_commun.dart';
-import 'donnees/catalogue_off.dart';
 import 'donnees/modele.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
@@ -17,7 +16,6 @@ Future<void> main() async {
   await Etat.instance.charger();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
-  if (!kIsWeb) CatalogueOff.instance.demarrer();
   runApp(const ListeDeCoursesApp());
   if (!kIsWeb) TicketRecu.demarrer();
   // Partage du foyer entre appareils (si cet appareil partage)

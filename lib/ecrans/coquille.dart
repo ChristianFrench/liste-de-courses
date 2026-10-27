@@ -1,5 +1,4 @@
 // ignore_for_file: prefer_const_constructors
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
@@ -13,7 +12,6 @@ import 'archives.dart';
 import 'bienvenue.dart';
 import 'catalogue.dart';
 import 'corbeille.dart';
-import 'e13_produits_reels.dart';
 import 'editeur_catalogue.dart';
 import 'foyer.dart';
 import 'historique.dart';
@@ -171,15 +169,12 @@ class MenuGerer extends StatelessWidget {
                 '${etat.produits.length} produits · le même dans tous les magasins', const EcranCatalogue()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types · chacun avec sa couleur',
                 const EcranTypesPromotion()),
-            ecran(Icons.sell_outlined, 'Marques', '${etat.marques.length} marque${etat.marques.length > 1 ? 's' : ''}', const EcranMarques()),
             ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures : poids, volume, à la pièce',
                 const EcranTypesPackaging(lots: false)),
             ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings : lots de 2 à 10…',
                 const EcranTypesPackaging()),
-            if (kIsWeb)
-              LigneMenu(icone: Icons.science_outlined, titre: 'Produits réels', sousTitre: 'Indisponible dans la version web')
-            else
-              ecran(Icons.science_outlined, 'Produits réels', 'Essai Open Food Facts : catalogue de vrais produits', const EcranProduitsReels()),
+            ecran(Icons.sell_outlined, 'Marques', '${etat.marques.length} marque${etat.marques.length > 1 ? 's' : ''} · leurs produits',
+                const EcranMarques()),
           ]),
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
             ecran(Icons.palette_outlined, 'Apparence', 'Couleurs de l\'application', const EcranApparence()),

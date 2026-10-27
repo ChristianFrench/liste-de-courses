@@ -12,14 +12,12 @@ import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/composants/signe_perso.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart' show Brouillon;
-import 'package:liste_de_courses/donnees/catalogue_off.dart';
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/synchro.dart' show ServeurMqtt;
 import 'package:liste_de_courses/ecrans/foyer.dart' show choisirPersonne;
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
-import 'package:liste_de_courses/donnees/open_food_facts.dart';
 import 'package:liste_de_courses/donnees/ticket_recu.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/ecrans/archives.dart';
@@ -916,40 +914,37 @@ void main() {
     });
   });
 
-  group('Open Food Facts', () {
-    test('code-barres EAN-13', () {
-      expect(ean13Valide('3017620422003'), isTrue);
-      expect(ean13Valide('3017620422004'), isFalse);
-      expect(modulesEan13('3017620422003').length, 95);
-    });
-
-    test('catalogue : « pâtes » ≠ « pâtes à tartiner » ≠ « pâtés »', () {
-      final c = CatalogueOff.instance;
-      c.lireBase({
-        'version': '20261009',
-        'jusqua': 1760000000,
-        'date': '09/10/2026',
-        'categories': [
-          ['en:pastas', 'pâtes alimentaires', 'pâtes'],
-          ['fr:pates-a-tartiner', 'Pâtes à tartiner', 'Pâte à tartiner'],
-          ['en:pates', 'Pâtés'],
-        ],
-        'produits': [
-          ['3017620422003', 'Nutella', 'Ferrero', '400 g', 'e', 5000, [1], ''],
-          ['3038350208606', 'Spaghetti n°5', 'Panzani', '500 g', 'a', 800, [0], ''],
-          ['3250390000000', 'Pâté de campagne', 'Hénaff', '78 g', 'd', 600, [2], ''],
-        ],
-      });
-      expect(c.rechercher('Pâtes').articles.single.nom, 'Spaghetti n°5');
-      expect(c.rechercher('pâte à tartiner').articles.single.nom, 'Nutella');
-      expect(c.rechercher('Pâtés').articles.single.nom, 'Pâté de campagne');
-      expect(c.rechercher('panzani').articles.single.nom, 'Spaghetti n°5');
-    });
-
-    testWidgets('écran d\'essai accessible depuis Gérer › Courses', (tester) async {
-      await _accueil(tester);
-      await _rubrique(tester, 'Produits réels');
-      expect(find.text('Produits réels (essai)'), findsOneWidget);
+  group('Gérer', () {
+    testWidgets('marques : une liste, renommer la marque renomme ses produits ; types en liste', (tester) async {
+      await _lancer(tester);
+      final etat = Etat.instance;
+      expect(etat.typesMesure, isEmpty, reason: 'données d\'essai : comme sur l\'appareil de M. Bezard');
+      etat.formatsAppliques = true;
+      await etat.reparerTypesMesure(
+          catalogue: jsonDecode(File('assets/catalogue_type.json').readAsStringSync()) as Map<String, dynamic>);
+      expect(etat.typesMesure.length, greaterThan(5), reason: 'les types de mesure reviennent du catalogue');
+      final avecFormat = etat.produits.where((p) => p.packagingIds.isNotEmpty).length;
+      final s = etat.secteurs.first;
+      final p = etat.enregistrerProduitAjoute(libelle: 'Camembert', marqueNom: 'Président', secteur: s);
+      expect(p.nom, 'Camembert Président');
+      expect(etat.produits.where((p) => p.packagingIds.isNotEmpty).length, avecFormat, reason: 'articles inchangés');
+      await _rubrique(tester, 'Marques');
+      expect(find.text('Produits réels'), findsNothing);
+      await _voir(tester, find.text('Camembert Président'));
+      expect(find.text('Camembert Président'), findsOneWidget, reason: 'les produits sous leur marque');
+      await _toucher(tester, find.byKey(const ValueKey('marque-Président')));
+      await _toucher(tester, find.text('Renommer (et ses 1 produits)'));
+      await tester.enterText(find.byType(TextField).last, 'Président Fin');
+      await _toucher(tester, find.text('Valider'));
+      expect(p.nom, 'Camembert Président Fin');
+      await _toucher(tester, find.text('Camembert Président Fin'));
+      expect(find.text('Modifier'), findsOneWidget);
+      expect(find.text('Supprimer'), findsOneWidget);
+      await _fermerVolet(tester);
+      await _rubrique(tester, 'Types de mesure');
+      await _toucher(tester, find.text(etat.packaging(etat.typesMesure.first)!.libelle));
+      expect(find.text('Fusionner avec un autre'), findsOneWidget);
+      await _fermerVolet(tester);
       await _ciblesTactiles(tester);
     });
 

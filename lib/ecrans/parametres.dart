@@ -251,28 +251,24 @@ class _Compteur extends StatelessWidget {
 class EcranTypesPromotion extends StatelessWidget {
   const EcranTypesPromotion({super.key});
 
-  Future<void> _agir(BuildContext context, TypePromotion t) async {
-    final etat = Etat.instance;
-    final action = await choisirDansListe<String>(context, titre: t.nom, choix: {
-      'modifier': 'Modifier le nom et le code',
-      'supprimer': 'Supprimer ce type',
-    });
-    if (action == null || !context.mounted) return;
-    if (action == 'modifier') {
-      final nom = await demanderTexte(context, titre: 'Nom du type de promotion', initial: t.nom);
-      if (nom == null || nom.isEmpty || !context.mounted) return;
-      final code = await demanderTexte(context, titre: 'Code court (3 caractères)', initial: t.code);
-      if (code == null || code.isEmpty) return;
-      etat.modifierTypePromotion(t, nom: nom, code: code.length > 4 ? code.substring(0, 4) : code);
-    } else {
-      final ok = await confirmer(context,
-          titre: 'Supprimer « ${t.nom} » ?',
-          contenu: Text('Il ne sera plus proposé. Les listes déjà faites gardent leurs promotions.', style: Charte.texte(16)),
-          plein: 'Garder',
-          contour: 'Supprimer');
-      if (ok == true) etat.supprimerTypePromotion(t);
-    }
-  }
+  Future<void> _agir(BuildContext context, TypePromotion t) => menuActions(context, titre: t.nom, actions: [
+        ActionLigne(Icons.edit_outlined, 'Modifier le nom et le code', () async {
+          final etat = Etat.instance;
+          final nom = await demanderTexte(context, titre: 'Nom du type de promotion', initial: t.nom);
+          if (nom == null || nom.isEmpty || !context.mounted) return;
+          final code = await demanderTexte(context, titre: 'Code court (3 caractères)', initial: t.code);
+          if (code == null || code.isEmpty) return;
+          etat.modifierTypePromotion(t, nom: nom, code: code.length > 4 ? code.substring(0, 4) : code);
+        }),
+        ActionLigne(Icons.delete_outline, 'Supprimer ce type', () async {
+          final ok = await confirmer(context,
+              titre: 'Supprimer « ${t.nom} » ?',
+              contenu: Text('Il ne sera plus proposé. Les listes déjà faites gardent leurs promotions.', style: Charte.texte(16)),
+              plein: 'Garder',
+              contour: 'Supprimer');
+          if (ok == true) Etat.instance.supprimerTypePromotion(t);
+        }, danger: true),
+      ]);
 
   @override
   Widget build(BuildContext context) {
@@ -297,16 +293,17 @@ class EcranTypesPromotion extends StatelessWidget {
           ],
         ),
         corps: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          padding: const EdgeInsets.only(bottom: 16),
           children: [
-            Text('Proposés quand on indique une promotion sur une ligne de la liste. Touchez un type pour le modifier '
-                'ou le supprimer. Leur couleur se choisit dans Gérer › Paramètres › Apparence.',
-                style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 12),
-            GrilleCadres(
-              couleur: Color(etat.couleurPromotions),
-              cadres: [for (final t in etat.typesPromotion) (t.nom, () => _agir(context, t))],
-            ),
+            for (final t in etat.typesPromotion)
+              LigneMenu(
+                titre: t.nom,
+                sousTitre: 'code ${t.code}',
+                gauche: PastilleType(Color(etat.couleurPromotions)),
+                onTap: () => _agir(context, t),
+              ),
+            _NoteTypes('Proposés quand on indique une promotion sur une ligne de la liste. Touchez un type pour le modifier '
+                'ou le supprimer. Leur couleur se choisit dans Gérer › Paramètres › Apparence.'),
           ],
         ),
       ),
@@ -356,6 +353,36 @@ class GrilleCadres extends StatelessWidget {
         },
       );
 }
+
+/// Petit carré de la couleur d'une famille de types (promotions, mesures, packagings).
+class PastilleType extends StatelessWidget {
+  const PastilleType(this.couleur, {super.key});
+  final Color couleur;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          color: Color.alphaBlend(couleur.withValues(alpha: 0.25), Charte.fond),
+          borderRadius: BorderRadius.circular(5),
+          border: Border.all(color: couleur, width: 1.5),
+        ),
+      );
+}
+
+class _NoteTypes extends StatelessWidget {
+  const _NoteTypes(this.texte);
+  final String texte;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+        child: Text(texte, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      );
+}
+
+String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 /// Case à cocher d'une option, sur toute la largeur.
 class _Option extends StatelessWidget {
@@ -446,12 +473,13 @@ class EcranTypesPackaging extends StatelessWidget {
     final k = etat.packaging(id);
     if (k == null) return;
     final n = etat.nbProduitsAvecPackaging(id);
-    final action = await choisirDansListe<String>(context, titre: k.libelle, choix: {
-      'renommer': 'Modifier le libellé (pour ses $n articles)',
-      'fusionner': 'Fusionner avec un autre',
-      'articles': 'Voir les $n articles',
-      'supprimer': 'Supprimer',
-    });
+    String? action;
+    await menuActions(context, titre: k.libelle, actions: [
+      ActionLigne(Icons.edit_outlined, 'Modifier le libellé (pour ses $n articles)', () => action = 'renommer'),
+      ActionLigne(Icons.merge, 'Fusionner avec un autre', () => action = 'fusionner'),
+      ActionLigne(Icons.list, 'Voir les $n articles', () => action = 'articles'),
+      ActionLigne(Icons.delete_outline, 'Supprimer', () => action = 'supprimer', danger: true),
+    ]);
     if (action == null || !context.mounted) return;
     switch (action) {
       case 'renommer':
@@ -512,24 +540,21 @@ class EcranTypesPackaging extends StatelessWidget {
                 }),
               ]),
           corps: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            padding: const EdgeInsets.only(bottom: 16),
             children: [
-              Text(
+              for (final id in ids)
+                if (etat.packaging(id) case final k?)
+                  LigneMenu(
+                    titre: k.libelle,
+                    sousTitre: _pluriel(etat.nbProduitsAvecPackaging(id), 'article'),
+                    gauche: PastilleType(Color(lots ? etat.couleurLots : etat.couleurMesures)),
+                    onTap: () => _agir(context, etat, id),
+                  ),
+              _NoteTypes(
                   lots
                       ? 'Ce sont essentiellement des lots, de 2 à 10. Touchez-en un pour le modifier, voir ses articles ou le supprimer.'
                       : 'C\'est le poids (g, kg), le volume (cl, l) ou la vente à la pièce. Touchez-en une pour la modifier, '
-                          'voir ses articles ou la supprimer.',
-                  style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-              const SizedBox(height: 12),
-              GrilleCadres(
-                couleur: Color(lots ? etat.couleurLots : etat.couleurMesures),
-                cadres: [
-                  for (final id in ids)
-                    if (etat.packaging(id) case final k?) (k.libelle, () => _agir(context, etat, id)),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Text('La couleur se choisit dans Gérer › Paramètres › Apparence.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                          'voir ses articles ou la supprimer. La couleur se choisit dans Gérer › Paramètres › Apparence.'),
             ],
           ),
         );

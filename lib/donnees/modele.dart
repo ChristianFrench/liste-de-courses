@@ -552,6 +552,8 @@ class Etat extends ChangeNotifier {
     } else {
       lire(s.lire());
     }
+    // Types de mesure vides (types reçus avant leurs libellés, ou foyer rejoint) : on les reprend du catalogue.
+    await reparerTypesMesure();
     await appliquerFormats();
     completerLots();
     harmoniserCatalogue();
@@ -2678,7 +2680,7 @@ class Etat extends ChangeNotifier {
 
   /// Mise à jour : donne aux produits sans packaging les formats de vente du catalogue,
   /// et fait de tous ces formats les types de packaging (Paramètres), rangés par nature.
-  Future<void> appliquerFormats({Map<String, dynamic>? catalogue}) async {
+  Future<void> appliquerFormats({Map<String, dynamic>? catalogue, bool typesSeulement = false}) async {
     if (formatsAppliques) return;
     try {
       catalogue ??= await CatalogueType.lireJson();
@@ -2697,7 +2699,7 @@ class Etat extends ChangeNotifier {
       }
     }
     if (tous.isEmpty) return;
-    for (final p in produits) {
+    for (final p in typesSeulement ? const <Produit>[] : produits) {
       if (p.packagingIds.isNotEmpty) continue;
       for (final f in parNom[p.nom.toLowerCase()] ?? const <String>[]) {
         p.packagingIds.add(_packagingNomme(f).id);
@@ -2713,6 +2715,14 @@ class Etat extends ChangeNotifier {
     trierTypesPackaging();
     formatsAppliques = true;
     modifie();
+  }
+
+  /// Types de mesure vides alors que les formats ont été appliqués : on les reprend du catalogue, sans toucher aux articles.
+  Future<void> reparerTypesMesure({Map<String, dynamic>? catalogue}) async {
+    if (typesMesure.isNotEmpty || !formatsAppliques) return;
+    formatsAppliques = false;
+    await appliquerFormats(catalogue: catalogue, typesSeulement: true);
+    formatsAppliques = true;
   }
 
   /// Range les types : vente à l'unité, poids, volumes, lots, packs ; puis par quantité.
@@ -2757,6 +2767,11 @@ class Etat extends ChangeNotifier {
   void renommerMarque(Marque m, String nom) {
     final n = nom.trim();
     if (n.isEmpty || n == m.nom) return;
+    // Les produits de la marque portent son nom (« Camembert Président ») : ils sont renommés aussi.
+    final ancien = RegExp('(?<![\\p{L}\\p{N}])${RegExp.escape(m.nom)}(?![\\p{L}\\p{N}])', caseSensitive: false, unicode: true);
+    for (final p in produitsDeMarque(m.id)) {
+      p.nom = p.nom.replaceAll(ancien, n);
+    }
     final autre = _trouve(marques, (x) => x.id != m.id && x.nom.toLowerCase() == n.toLowerCase());
     if (autre != null) {
       for (final p in produits) {

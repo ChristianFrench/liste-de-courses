@@ -22,9 +22,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: { channel: stable, cache: true }
-      - name: Joindre le catalogue Open Food Facts
-        shell: bash
-        run: curl -fsSL -o assets/catalogue/catalogue.json.gz https://github.com/ChristianFrench/liste-de-courses/releases/download/catalogue-off/catalogue.json.gz || echo "::warning::catalogue absent, application livrée sans catalogue"
       - name: Analyser le code
         run: |
           sudo apt-get install -y -qq libsqlite3-dev > /dev/null   # SQLite pour les tests de la base locale
@@ -59,9 +56,6 @@ jobs:
           flutter test --update-goldens test/captures_test.dart > captures.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py captures.log "Captures des écrans"; fi
-          # Écran d'essai Open Food Facts avec de vraies données : un échec ne bloque pas
-          flutter test --update-goldens test/captures_off_test.dart > captures_off.log 2>&1 \
-            || { echo "::warning title=Captures Open Food Facts::échec, détail ci-dessous"; python3 outils/annoter.py captures_off.log "Captures Open Food Facts" | grep '^::' | sed 's/^::error/::warning/'; }
           ls test/captures || exit 1
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
@@ -90,9 +84,6 @@ jobs:
         with: { distribution: temurin, java-version: '17' }
       - uses: subosito/flutter-action@v2
         with: { channel: stable, cache: true }
-      - name: Joindre le catalogue Open Food Facts
-        shell: bash
-        run: curl -fsSL -o assets/catalogue/catalogue.json.gz https://github.com/ChristianFrench/liste-de-courses/releases/download/catalogue-off/catalogue.json.gz || echo "::warning::catalogue absent, application livrée sans catalogue"
       - name: Préparer le projet
         run: |
           $CREER
@@ -123,9 +114,6 @@ jobs:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with: { channel: stable, cache: true }
-      - name: Joindre le catalogue Open Food Facts
-        shell: bash
-        run: curl -fsSL -o assets/catalogue/catalogue.json.gz https://github.com/ChristianFrench/liste-de-courses/releases/download/catalogue-off/catalogue.json.gz || echo "::warning::catalogue absent, application livrée sans catalogue"
       - name: Préparer le projet
         shell: bash
         run: |

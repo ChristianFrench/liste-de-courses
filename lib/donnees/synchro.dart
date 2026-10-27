@@ -177,6 +177,13 @@ class Synchro extends ChangeNotifier {
           if (a.membreId == m.id || (a.membreId == null && a.nom.split(' · ').first == m.nomAffiche)) a
       ];
 
+  /// Nom affiché d'un appareil : le nom actuel de son membre (il a pu être renommé), puis son système.
+  String nomDe(Appareil a) {
+    final m = _etat.membre(a.membreId);
+    if (m == null) return a.nom;
+    return '${m.nomAffiche} · ${a.plateforme ?? a.nom.split(' · ').last}';
+  }
+
   /// « exe », « apk » ou « web » selon le système, suivi de la version.
   static String libelleVersion(String? plateforme, String? version) {
     final p = switch (plateforme) { 'Windows' => 'exe', 'Android' => 'apk', 'Web' => 'web', null => '?', _ => plateforme };
@@ -608,6 +615,8 @@ class Synchro extends ChangeNotifier {
     notifyListeners();
   }
 
+  String? _presenceAnnoncee;
+
   Map<String, Object?> _presence(bool enLigne) => {
         'de': noeud,
         'nom': nomAppareil,
@@ -621,6 +630,7 @@ class Synchro extends ChangeNotifier {
   void _annoncer() {
     final t = _transport, base = _base;
     if (t == null || base == null) return;
+    _presenceAnnoncee = '${_etat.moi.id}|$nomAppareil';
     t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(true)), retenu: true);
     _bonjour();
     envoyerModifs();
@@ -644,6 +654,12 @@ class Synchro extends ChangeNotifier {
   void envoyerModifs() {
     final t = _transport, base = _base;
     if (t == null || base == null || !t.connecte) return;
+    // Changement de personne ou de nom sur cet appareil : les autres le voient tout de suite.
+    final qui = '${_etat.moi.id}|$nomAppareil';
+    if (qui != _presenceAnnoncee) {
+      _presenceAnnoncee = qui;
+      t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(true)), retenu: true);
+    }
     if (_envoiEnCours) {
       _envoiARefaire = true;
       return;

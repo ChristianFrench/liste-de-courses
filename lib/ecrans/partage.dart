@@ -28,7 +28,7 @@ Future<void> montrerEtatSynchro(BuildContext context) => modale(
       oui: null,
       non: null,
       contenu: (context, _) => ListenableBuilder(
-        listenable: Synchro.instance,
+        listenable: Listenable.merge([Synchro.instance, Etat.instance]),
         builder: (context, _) {
           final s = Synchro.instance;
           final actuel = s.pastille == 'vert' && s.enEchange ? 'clignotant' : s.pastille;
@@ -42,7 +42,7 @@ Future<void> montrerEtatSynchro(BuildContext context) => modale(
                           style: Charte.texte(15, gras: cle == actuel, couleur: cle == actuel ? Charte.encre : Charte.texteSecondaire))),
                 ]),
               );
-          final autres = s.appareils.values.toList()..sort((a, b) => a.nom.compareTo(b.nom));
+          final autres = s.appareils.values.toList()..sort((a, b) => s.nomDe(a).compareTo(s.nomDe(b)));
           return Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
             Row(children: [
               PointSynchro(taille: 20, couleur: BoutonSynchro.couleur(s.pastille), clignote: actuel == 'clignotant'),
@@ -65,7 +65,7 @@ Future<void> montrerEtatSynchro(BuildContext context) => modale(
               const SizedBox(height: 14),
               Text('Appareils', style: Charte.texte(15, gras: true)),
               _Appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
-              for (final a in autres) _Appareil('${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})', a.enLigne),
+              for (final a in autres) _Appareil('${s.nomDe(a)} (${a.enLigne ? 'en ligne' : 'hors ligne'})', a.enLigne),
               if (autres.isEmpty) Text('Aucun autre appareil vu pour l\'instant', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
             ],
           ]);
@@ -168,14 +168,14 @@ class EcranPartage extends StatelessWidget {
 
   /// Appareils (retirer un ancien), compteurs, tout renvoyer, journal : dans le volet « Dépannage ».
   List<Widget> _depannage(BuildContext context, Synchro s) {
-    final autres = s.appareils.values.toList()..sort((a, b) => a.nom.compareTo(b.nom));
+    final autres = s.appareils.values.toList()..sort((a, b) => s.nomDe(a).compareTo(s.nomDe(b)));
     return [
       const SizedBox(height: 8),
       Text('Appareils', style: Charte.texte(15, gras: true)),
       _Appareil('${s.nomAppareil} (cet appareil)', s.liaisonOk),
       for (final a in autres)
         _Appareil(
-            '${a.nom} (${a.enLigne ? 'en ligne' : 'hors ligne'})'
+            '${s.nomDe(a)} (${a.enLigne ? 'en ligne' : 'hors ligne'})'
             '${a.enLigne && (a.decalage ?? 0).abs() >= 5 ? ' · horloge décalée de ${a.decalage} s' : ''}',
             a.enLigne,
             retirer: a.enLigne ? null : () => s.oublier(a.id)),

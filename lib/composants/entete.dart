@@ -350,7 +350,7 @@ class Aides {
       'Appareil partagé (tablette, PC de la famille) : on choisit son nom à chaque lancement.\n'
       'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
       'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
-      'les types de promotion, les marques, les types de mesure et de packaging, et les produits réels (essai).\n'
+      'les types de promotion, de mesure et de packaging, et les marques avec leurs produits.\n'
       'Paramètres : apparence (couleurs), données (listes exemples, préliste, passage aux archives et suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
       'La corbeille est dans Paramètres ; l\'historique et les archives sont dans l\'onglet Courses.\n$_gestes';
 
@@ -400,8 +400,9 @@ class Aides {
       'Toucher le bandeau d\'un rayon propose un nouveau secteur ou de changer l\'ordre des secteurs.\n$_gestes';
 
   static const marques = 'Les marques portées par vos produits. « + Nouvelle marque » (en touchant le titre) en ajoute une (on peut aussi la saisir avec un nouveau produit). '
-      'Touchez une marque pour la renommer, voir ses produits, '
-      'ou la supprimer si plus aucun produit ne la porte.\n$_gestes';
+      'Chaque marque est un bandeau, avec en dessous les produits qui la portent. Touchez la marque pour la renommer '
+      '(ses produits sont renommés aussi) ou la supprimer si plus aucun produit ne la porte ; touchez un produit pour le modifier '
+      'ou le supprimer.\n$_gestes';
 
   static const parcours = 'L\'ordre des secteurs appris pendant vos courses, pour chaque membre et chaque magasin. '
       'Il se complète tout seul quand vous passez par de nouveaux secteurs.\n$_gestes';

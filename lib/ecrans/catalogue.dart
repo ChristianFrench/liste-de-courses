@@ -539,7 +539,9 @@ class EcranProduitsPerso extends StatelessWidget {
 
 // ------------------------------------------------------------ Marques
 
-/// Gérer › Courses › Marques : les marques des produits ; les renommer, supprimer celles qui ne servent plus.
+/// Gérer › Courses › Marques (27/10/2026) : une seule liste ; chaque marque en bandeau, avec en dessous
+/// les produits du catalogue qui la portent. Toucher la marque : la renommer (ses produits aussi) ;
+/// toucher un produit : le modifier ou le supprimer.
 class EcranMarques extends StatelessWidget {
   const EcranMarques({super.key});
 
@@ -573,13 +575,23 @@ class EcranMarques extends StatelessWidget {
                   child: Text('Aucune marque : ajoutez-en ici, ou en saisissant un nouveau produit.',
                       style: Charte.texte(15, couleur: Charte.texteSecondaire)),
                 ),
-              for (final m in marques)
-                LigneMenu(
-                  titre: m.nom,
+              for (final m in marques) ...[
+                TitreGroupe(
+                  key: ValueKey('marque-${m.nom}'),
+                  nom: m.nom,
+                  grand: true,
                   icone: Icons.sell_outlined,
-                  sousTitre: _pluriel(etat.produitsDeMarque(m.id).length, 'produit'),
+                  nombre: etat.produitsDeMarque(m.id).length,
                   onTap: () => _marque(context, m),
                 ),
+                for (final p in etat.produitsDeMarque(m.id)..sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase())))
+                  LigneMenu(
+                    titre: p.nom,
+                    icone: Icons.shopping_basket_outlined,
+                    sousTitre: etat.estAjoute(p) ? null : 'produit d\'origine du catalogue',
+                    onTap: () => _produit(context, p),
+                  ),
+              ],
             ],
           ),
         );
@@ -589,18 +601,30 @@ class EcranMarques extends StatelessWidget {
 
   Future<void> _marque(BuildContext context, Marque m) async {
     final etat = Etat.instance;
-    final produits = etat.produitsDeMarque(m.id);
+    final n = etat.produitsDeMarque(m.id).length;
     await menuActions(context, titre: m.nom, actions: [
-      ActionLigne(Icons.edit_outlined, 'Renommer', () async {
+      ActionLigne(Icons.edit_outlined, n == 0 ? 'Renommer' : 'Renommer (et ses $n produits)', () async {
         final nom = await demanderTexte(context, titre: 'Nom de la marque', initial: m.nom);
         if (nom != null && nom.isNotEmpty) etat.renommerMarque(m, nom);
       }),
-      for (final p in produits.take(8))
-        ActionLigne(Icons.shopping_basket_outlined, p.nom, () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id))),
-      if (produits.isEmpty)
-        ActionLigne(Icons.delete_outline, 'Supprimer', () {
+      if (n == 0)
+        ActionLigne(Icons.delete_outline, 'Supprimer la marque', () {
           if (!etat.supprimerMarque(m)) Nav.message(context, 'Cette marque sert encore dans une liste');
         }, danger: true),
+    ]);
+  }
+
+  Future<void> _produit(BuildContext context, Produit p) async {
+    final etat = Etat.instance;
+    if (!etat.estAjoute(p)) {
+      await menuActions(context, titre: p.nom, detail: 'Produit d\'origine du catalogue : il ne se modifie pas.', actions: [
+        ActionLigne(Icons.info_outline, 'Voir la fiche', () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id))),
+      ]);
+      return;
+    }
+    await menuActions(context, titre: p.nom, actions: [
+      ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
+      ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
     ]);
   }
 }
