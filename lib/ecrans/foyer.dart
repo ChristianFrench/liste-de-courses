@@ -326,6 +326,29 @@ Future<void> choisirPersonne(BuildContext context, {bool premiereFois = false}) 
         if (context.mounted) await choisirPersonne(context, premiereFois: true);
         return;
       }
+      // Prénom déjà dans le foyer : c'est sans doute la même personne sur un autre appareil.
+      final meme = [
+        for (final m in etat.membresVisibles)
+          if (!m.moi && m.nomAffiche.trim().toLowerCase() == nom.trim().toLowerCase()) m
+      ];
+      if (meme.isNotEmpty && context.mounted) {
+        final ok = await confirmer(context,
+            titre: 'C\'est vous, ${meme.first.nomAffiche} ?',
+            contenu: Text(
+                '« ${meme.first.nomAffiche} » fait déjà partie du foyer. Si c\'est vous sur un autre appareil, '
+                'cet appareil vous est rattaché. Sinon, choisissez un autre prénom.',
+                style: Charte.texte(16)),
+            plein: 'C\'est moi',
+            contour: 'Autre prénom');
+        if (!context.mounted) return;
+        if (ok == false) {
+          etat.devenir(meme.first); // « C'est moi » (bouton plein)
+          Nav.message(context, 'Bonjour ${meme.first.nomAffiche}');
+        } else {
+          await choisirPersonne(context, premiereFois: true);
+        }
+        return;
+      }
       etat.resterNouveau(nom);
     case 'partage':
       etat.appareilPartage = true;
