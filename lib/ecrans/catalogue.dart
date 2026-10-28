@@ -301,6 +301,11 @@ class EcranMagasin extends StatelessWidget {
                 }
                 etat.renommerMagasin(m, nom);
               }),
+              ActionLigne(Icons.local_mall_outlined, 'Enseigne : ${etat.enseigneDe(m) ?? 'aucune'}', () async {
+                final e = await choisirDansListe<String>(context,
+                    titre: 'Enseigne (marques distributeur)', choix: {'': 'Aucune', for (final x in etat.enseignesMdd) x: x});
+                if (e != null) etat.definirEnseigne(m, e.isEmpty ? '-' : e);
+              }),
               ActionLigne(Icons.delete_outline, 'Supprimer le magasin', () async {
                 if (await demanderSuppression(context, m, 'le magasin ${m.nom}') && context.mounted) Navigator.of(context).pop();
               }, danger: true),
@@ -606,6 +611,24 @@ class EcranMarques extends StatelessWidget {
               ajout: true,
               onTap: () => fenetreMarque(context, secteur: s),
             ));
+          }
+        }
+        // Marques distributeur, par enseigne (proposées selon l'enseigne du magasin de la liste)
+        for (final e in etat.marquesDistributeur.entries) {
+          final cleE = 'marques/r/mdd/${e.key}';
+          final eOuvert = plis.ouvert(cleE, parDefaut: false);
+          cles.add(cleE);
+          enfants.add(TitreGroupe(
+              key: ValueKey('mdd-${e.key}'),
+              nom: 'Marques distributeur · ${e.key}',
+              grand: true,
+              icone: Icons.local_mall_outlined,
+              nombre: e.value.length,
+              ouvert: eOuvert,
+              onTap: () => plis.basculer(cleE, parDefaut: false)));
+          if (!eOuvert) continue;
+          for (final x in e.value) {
+            enfants.add(_LigneMarque(nom: x.marque, detail: x.categorie, onTap: () {}));
           }
         }
         // Rayons repliés par défaut, secteurs déployés : « tout déplier » les ouvre tous.

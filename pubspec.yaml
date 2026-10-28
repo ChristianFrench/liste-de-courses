@@ -39,6 +39,7 @@ flutter:
     - assets/catalogue_type.json
     - assets/correspondances_mails.json
     - assets/marques_catalogue.json
+    - assets/marques_distributeur.json
     - assets/pictos/png/
   fonts:
     - family: Atkinson

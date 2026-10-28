@@ -1059,6 +1059,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     final proposes = p == null
         ? <String>[]
         : (p.packagingIds.isNotEmpty ? p.packagingIds : etat.formatsDuSecteur(widget.liste.magasinId, p.id));
+    // Marques distributeur de l'enseigne du magasin, signalées par l'enseigne
+    final mdd = p == null ? const <String>{} : etat.marquesDistributeurPour(m, etat.secteurCatalogue(p.id)).toSet();
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       child: Column(
@@ -1083,7 +1085,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               valeur: marque,
               choix: {
                 '': 'Indifférente',
-                for (final n in {...etat.marquesProposees(widget.ligne, p), if (marque.isNotEmpty) marque}) n: n,
+                for (final n in {...etat.marquesProposees(widget.ligne, p, magasinId: widget.liste.magasinId), if (marque.isNotEmpty) marque})
+                  n: mdd.contains(n) ? '$n · ${etat.enseigneDe(m)}' : n,
                 _autre: 'Autre marque…',
               },
               onChange: (v) async {

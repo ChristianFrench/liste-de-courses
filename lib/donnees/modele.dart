@@ -98,8 +98,17 @@ class Magasin {
   Magasin(this.id, this.nom, this.enseigne, this.ville);
   final String id;
   String nom;
-  final String enseigne;
+  String enseigne;
   final String ville;
+}
+
+/// Marque distributeur (MDD) d'une enseigne : proposée pour les articles des rayons ou secteurs [cibles]
+/// (« Crèmerie », « Cave/Vins ») ; « * » : tous.
+class MarqueDistributeur {
+  MarqueDistributeur(this.marque, this.categorie, this.cibles);
+  final String marque;
+  final String categorie;
+  final List<String> cibles;
 }
 
 class Rayon {
@@ -491,6 +500,9 @@ class Etat extends ChangeNotifier {
 
   /// Catalogue des marques livré (assets/marques_catalogue.json) : « Rayon/Secteur » → marques.
   Map<String, List<String>> marquesType = {};
+
+  /// Marques distributeur livrées (assets/marques_distributeur.json), par enseigne.
+  Map<String, List<MarqueDistributeur>> marquesDistributeur = {};
 
   /// Changements du foyer au catalogue des marques : « Rayon/Secteur » → {'+': ajoutées, '-': retirées}.
   Map<String, Map<String, List<String>>> marquesSecteurs = {};
@@ -1296,10 +1308,13 @@ class Etat extends ChangeNotifier {
 
   /// Marques proposées pour un article : celles de son secteur dans le catalogue des marques, celles du
   /// produit et de ses variantes (« Camembert Président »…).
-  List<String> marquesProposees(LigneListe? g, Produit p) {
+  List<String> marquesProposees(LigneListe? g, Produit p, {String? magasinId}) {
     final racine = nomSansMarque(g, p).toLowerCase();
     final s = secteurCatalogue(p.id);
-    final duSecteur = s == null ? const <String>[] : marquesDuSecteur(s);
+    final duSecteur = [
+      if (s != null) ...marquesDuSecteur(s),
+      if (magasinId != null) ...marquesDistributeurPour(magasin(magasinId), s),
+    ];
     final ids = <String>{
       ...p.marqueIds,
       for (final q in produits)
@@ -2941,12 +2956,66 @@ class Etat extends ChangeNotifier {
 
   static const fichierMarques = 'assets/marques_catalogue.json';
 
+  static const fichierMarquesDistributeur = 'assets/marques_distributeur.json';
+
   Future<void> chargerMarquesType() async {
     try {
       lireMarquesType(jsonDecode(await rootBundle.loadString(fichierMarques)) as Map<String, dynamic>);
+      lireMarquesDistributeur(jsonDecode(await rootBundle.loadString(fichierMarquesDistributeur)) as Map<String, dynamic>);
     } catch (e) {
       debugPrint('Catalogue des marques illisible : $e');
     }
+  }
+
+  void lireMarquesDistributeur(Map<String, dynamic> j) {
+    marquesDistributeur = {
+      for (final e in (j['enseignes'] as Map).entries)
+        e.key as String: [
+          for (final m in (e.value as List).cast<Map>())
+            MarqueDistributeur(m['marque'] as String, m['categorie'] as String? ?? '', _ids(m['cibles']))
+        ]
+    };
+  }
+
+  /// Mots qui reconnaissent une enseigne dans l'enseigne ou le nom d'un magasin.
+  static const _motsEnseignes = {
+    'Intermarché': ['intermarch'],
+    'Carrefour': ['carrefour'],
+    'Leclerc': ['leclerc'],
+    'Système U': ['système u', 'systeme u', 'super u', 'hyper u', 'u express', 'marché u', 'magasins u'],
+    'Auchan': ['auchan'],
+    'Casino': ['casino', 'géant'],
+    'Monoprix': ['monoprix', 'monop\''],
+  };
+
+  /// Enseignes qui ont des marques distributeur.
+  List<String> get enseignesMdd => marquesDistributeur.keys.toList();
+
+  /// Enseigne d'un magasin pour ses marques distributeur : celle choisie, sinon reconnue dans son nom.
+  String? enseigneDe(Magasin? m) {
+    if (m == null || m.enseigne == '-') return null; // « Aucune » choisie
+    if (marquesDistributeur.containsKey(m.enseigne)) return m.enseigne;
+    final t = ' ${m.enseigne} ${m.nom} '.toLowerCase();
+    for (final e in _motsEnseignes.entries) {
+      if (e.value.any(t.contains)) return e.key;
+    }
+    return null;
+  }
+
+  void definirEnseigne(Magasin m, String enseigne) {
+    m.enseigne = enseigne;
+    modifie();
+  }
+
+  /// Marques distributeur de l'enseigne du magasin pour un article du secteur [s].
+  List<String> marquesDistributeurPour(Magasin? m, Secteur? s) {
+    final liste = marquesDistributeur[enseigneDe(m)] ?? const <MarqueDistributeur>[];
+    final rayonNom = s == null ? null : rayon(s.rayonId)?.nom;
+    final cle = s == null ? null : cleSecteur(s);
+    return [
+      for (final x in liste)
+        if (x.cibles.any((c) => c == '*' || c == rayonNom || c == cle)) x.marque
+    ];
   }
 
   void lireMarquesType(Map<String, dynamic> j) {

@@ -406,6 +406,22 @@ void main() {
       expect(e.rectificativeDe(r4)?.enRedaction, isTrue);
     });
 
+    test('marques distributeur : enseigne reconnue dans le nom du magasin, marques selon le secteur', () {
+      final e = Etat.instance;
+      e.lireMarquesDistributeur(jsonDecode(File('assets/marques_distributeur.json').readAsStringSync()) as Map<String, dynamic>);
+      final m = e.magasins.first;
+      final s = e.secteurCatalogue(e.produits.first.id)!;
+      e.renommerMagasin(m, 'Super U Nantes');
+      expect(e.enseigneDe(m), 'Système U');
+      expect(e.marquesDistributeurPour(m, s), containsAll(['U Bio', 'U Saveurs']), reason: 'marques valables partout');
+      expect(e.marquesDistributeurPour(m, s), isNot(contains('U Tout Petits')), reason: 'rayon Bébé seulement');
+      e.definirEnseigne(m, 'Leclerc');
+      expect(e.marquesDistributeurPour(m, s), contains('Eco+'));
+      e.definirEnseigne(m, '-');
+      expect(e.enseigneDe(m), isNull, reason: '« Aucune » choisie');
+      expect(e.marquesProposees(null, e.produits.first, magasinId: m.id), isNot(contains('Eco+')));
+    });
+
     test('enregistrement : les données relues sont identiques', () {
       final e = Etat.instance;
       final avant = jsonEncode(e.versJson());
