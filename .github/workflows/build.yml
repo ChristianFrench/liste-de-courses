@@ -97,14 +97,18 @@ jobs:
       - name: Compiler l'APK
         run: |
           set +e
-          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" --dart-define=EMAILJS_SERVICE="$EMAILJS_SERVICE" --dart-define=EMAILJS_MODELE="$EMAILJS_MODELE" --dart-define=EMAILJS_CLE="$EMAILJS_CLE" > compilation.log 2>&1
+          # Secrets EmailJS passés seulement s'ils existent (une valeur vide fait échouer la compilation Windows).
+          MAIL=(); for n in EMAILJS_SERVICE EMAILJS_MODELE EMAILJS_CLE; do if [ -n "${!n}" ]; then MAIL+=("--dart-define=$n=${!n}"); fi; done
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" "${MAIL[@]}" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
       - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
         run: |
-          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" --dart-define=EMAILJS_SERVICE="$EMAILJS_SERVICE" --dart-define=EMAILJS_MODELE="$EMAILJS_MODELE" --dart-define=EMAILJS_CLE="$EMAILJS_CLE" --target-platform android-x64
+          # Secrets EmailJS passés seulement s'ils existent (une valeur vide fait échouer la compilation Windows).
+          MAIL=(); for n in EMAILJS_SERVICE EMAILJS_MODELE EMAILJS_CLE; do if [ -n "${!n}" ]; then MAIL+=("--dart-define=$n=${!n}"); fi; done
+          flutter build apk --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" "${MAIL[@]}" --target-platform android-x64
           mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
       - uses: actions/upload-artifact@v4
         with:
@@ -129,7 +133,9 @@ jobs:
         shell: bash
         run: |
           set +e
-          flutter build windows --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" --dart-define=EMAILJS_SERVICE="$EMAILJS_SERVICE" --dart-define=EMAILJS_MODELE="$EMAILJS_MODELE" --dart-define=EMAILJS_CLE="$EMAILJS_CLE" > compilation.log 2>&1
+          # Secrets EmailJS passés seulement s'ils existent (une valeur vide fait échouer la compilation Windows).
+          MAIL=(); for n in EMAILJS_SERVICE EMAILJS_MODELE EMAILJS_CLE; do if [ -n "${!n}" ]; then MAIL+=("--dart-define=$n=${!n}"); fi; done
+          flutter build windows --release --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" "${MAIL[@]}" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Windows"; else tail -n 20 compilation.log; fi
           exit $code
@@ -170,7 +176,9 @@ jobs:
       - name: Compiler la version web
         run: |
           set +e
-          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" --dart-define=EMAILJS_SERVICE="$EMAILJS_SERVICE" --dart-define=EMAILJS_MODELE="$EMAILJS_MODELE" --dart-define=EMAILJS_CLE="$EMAILJS_CLE" > compilation.log 2>&1
+          # Secrets EmailJS passés seulement s'ils existent (une valeur vide fait échouer la compilation Windows).
+          MAIL=(); for n in EMAILJS_SERVICE EMAILJS_MODELE EMAILJS_CLE; do if [ -n "${!n}" ]; then MAIL+=("--dart-define=$n=${!n}"); fi; done
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define=VERSION="$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//') (${GITHUB_SHA::7})" --dart-define=MQTT_UTILISATEUR="$MQTT_UTILISATEUR" --dart-define=MQTT_MOT_DE_PASSE="$MQTT_MOT_DE_PASSE" --dart-define=CODE_EDITEUR="$CODE_EDITEUR" "${MAIL[@]}" > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
           exit $code
