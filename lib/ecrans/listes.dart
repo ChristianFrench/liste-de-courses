@@ -36,7 +36,7 @@ class SousEcranPreparer extends StatelessWidget {
                 listeGlissable(
                   context,
                   l,
-                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.rectificativeDe(l) != null ? ' · rectificative envoyée' : ''}'),
+                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
                   detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
                       '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
                       '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
@@ -54,7 +54,7 @@ class SousEcranPreparer extends StatelessWidget {
                 listeGlissable(
                   context,
                   l,
-                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
                   detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · prête depuis '
                       '${quandJour(l.modifieeLe ?? l.dateCreation)}',
                 ),
@@ -567,7 +567,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
               listeGlissable(
                 context,
                 l,
-                LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
                 detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}'
                     '${l.lignes.any((g) => g.consigne != null) ? ' · avec consignes' : ''}',
               ),

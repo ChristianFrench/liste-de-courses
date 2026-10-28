@@ -341,9 +341,11 @@ class ElementCorbeille {
   Map<String, dynamic> toJson() => {'id': id, 'type': type, 'libelle': libelle, 'le': _iso(le), 'contenu': contenu};
 }
 
-/// Liste rectificative (cahier des charges du 28/10/2026) : quelques articles préparés par un membre pour
-/// une course en cours d'un autre. Celui qui fait les courses l'accepte ou la refuse en entier ; acceptée,
-/// ses articles rejoignent la course, fondus dans leur secteur ([fusion]) ou gardés à part en tête de liste.
+/// Liste rectificative (28/10/2026) : une liste simple préparée pour compléter une liste « À faire » ou en
+/// cours de courses (une seule par liste). Liste « À faire » : ses articles y sont ajoutés aussitôt. Courses en
+/// cours : celui qui les fait l'accepte ou la refuse en entier ; acceptée, ses articles rejoignent la course,
+/// fondus dans leur secteur ([fusion]) ou gardés à part en tête. Refusée, ou sans réponse à la fin des courses,
+/// elle passe en « À faire », marquée « rectificative » jusqu'au départ de ses propres courses.
 class Rectificative {
   Rectificative(this.listeId, this.cibleId, this.auteurId, this.le, {this.mode, List<String>? produits}) : produits = produits ?? [];
   /// Liste qui porte les articles (retirée une fois acceptée).
@@ -353,13 +355,17 @@ class Rectificative {
   final String auteurId;
   final DateTime le;
 
-  /// null : en attente de décision ; 'fusion' ou 'apart' : acceptée.
+  /// 'redaction' : en préparation ; null : en attente de décision ; 'fusion' ou 'apart' : acceptée ;
+  /// 'signalee' : devenue une liste « À faire » marquée rectificative.
   String? mode;
 
   /// Articles ajoutés à la course à l'acceptation.
   final List<String> produits;
 
   bool get enAttente => mode == null;
+  bool get enRedaction => mode == 'redaction';
+  bool get signalee => mode == 'signalee';
+  bool get acceptee => mode == 'fusion' || mode == 'apart';
   bool get fusion => mode == 'fusion';
 
   Map<String, dynamic> toJson() => {
@@ -1383,6 +1389,8 @@ class Etat extends ChangeNotifier {
   }
 
   void remettreEnPreparation(Liste l) {
+    // Une rectificative remise en préparation devient une liste ordinaire.
+    if (rectificatives[l.id]?.signalee ?? false) rectificatives.remove(l.id);
     l.statut = StatutListe.enConstruction;
     l.membreId = null;
     l.parcoursId = null;
@@ -1462,11 +1470,12 @@ class Etat extends ChangeNotifier {
 
   Rectificative? rectificativeDe(Liste l) => rectificatives[l.id];
 
-  /// Courses en cours auxquelles une rectificative peut être envoyée : une seule par course ([sauf] : la liste
-  /// déjà rattachée).
-  List<Liste> ciblesRectificative({String? sauf}) => [
+  /// Listes « À faire » ou en cours de courses qui peuvent recevoir une rectificative : une seule par liste.
+  List<Liste> ciblesRectificative() => [
         for (final l in listes)
-          if (l.statut == StatutListe.enCours && !rectificatives.values.any((r) => r.cibleId == l.id && r.listeId != sauf)) l
+          if ((l.statut == StatutListe.prete || l.statut == StatutListe.enCours) &&
+              !rectificatives.values.any((r) => r.cibleId == l.id && !r.signalee && (r.acceptee || liste(r.listeId) != null)))
+            l
       ];
 
   /// Rectificative qui attend la décision de celui qui fait la course [cible].
@@ -1475,26 +1484,58 @@ class Etat extends ChangeNotifier {
 
   /// Rectificatives acceptées pour la course [cible].
   List<Rectificative> rectificativesAcceptees(Liste cible) =>
-      [for (final r in rectificatives.values) if (r.cibleId == cible.id && !r.enAttente) r];
+      [for (final r in rectificatives.values) if (r.cibleId == cible.id && r.acceptee) r];
 
-  void envoyerRectificative(Liste l, Liste cible) {
+  /// Mention après le nombre d'articles d'une liste : « rectificative », « rectificative envoyée ».
+  String mentionRectificative(Liste l) {
     final r = rectificatives[l.id];
-    if (r != null && r.cibleId == cible.id) return;
-    rectificatives[l.id] = Rectificative(l.id, cible.id, moi.id, DateTime.now());
-    l.modifieePar = moi.id;
-    l.modifieeLe = DateTime.now();
-    modifie();
+    if (r == null || r.acceptee) return '';
+    return r.enAttente ? ' · rectificative envoyée' : ' · rectificative';
   }
 
-  /// La liste n'est plus une rectificative : une liste ordinaire en préparation.
-  void retirerRectificative(Liste l) {
-    if (rectificatives.remove(l.id) != null) modifie();
+  /// Nouvelle liste rectificative de [cible] : une liste simple du même magasin.
+  Liste creerRectificative(Liste cible) {
+    final l = creerListe(cible.magasinId, [], nom: nomLibre('Rectificative ${nomListe(cible)}'));
+    marquerSimple(l, true);
+    rectificatives[l.id] = Rectificative(l.id, cible.id, moi.id, DateTime.now(), mode: 'redaction');
+    modifie();
+    return l;
   }
 
-  void refuserRectificative(Rectificative r) {
-    rectificatives.remove(r.listeId);
-    modifie();
+  /// « Liste prête » d'une rectificative : fusionnée dans une liste pas encore commencée ('fusionnee'),
+  /// envoyée à celui qui fait les courses ('envoyee'), ou, les courses finies, mise en « À faire » ('afaire').
+  String validerRectificative(Liste l) {
+    final r = rectificatives[l.id];
+    if (r == null) return '';
+    final cible = liste(r.cibleId);
+    if (cible?.statut == StatutListe.enCours) {
+      r.mode = null;
+      l.modifieePar = moi.id;
+      l.modifieeLe = DateTime.now();
+      modifie();
+      return 'envoyee';
+    }
+    if (cible != null && cible.statut != StatutListe.terminee) {
+      accepterRectificative(r, fusion: true);
+      return 'fusionnee';
+    }
+    _signaler(r);
+    return 'afaire';
   }
+
+  void _signaler(Rectificative r) {
+    final l = liste(r.listeId);
+    if (l == null) {
+      rectificatives.remove(r.listeId);
+      modifie();
+      return;
+    }
+    r.mode = 'signalee';
+    listePrete(l);
+  }
+
+  /// Refusée : elle passe en « À faire », marquée rectificative.
+  void refuserRectificative(Rectificative r) => _signaler(r);
 
   /// Ajoute les articles de la rectificative à la course ; un article déjà dans la course n'est pas doublé.
   void accepterRectificative(Rectificative r, {required bool fusion}) {
@@ -1619,6 +1660,8 @@ class Etat extends ChangeNotifier {
   // ------------------------------------------------------------ Courses
 
   void demarrerCourses(Liste l, String membreId, String? parcoursId) {
+    // Ses courses commencent : elle n'est plus marquée rectificative.
+    if (rectificatives[l.id]?.signalee ?? false) rectificatives.remove(l.id);
     // Sans parcours dans ce magasin, on propose d'emblée de l'enregistrer.
     if (parcoursDe(l.magasinId, membreId).isEmpty) apprentissage.add(l.id);
     l.statut = StatutListe.enCours;
@@ -1713,7 +1756,10 @@ class Etat extends ChangeNotifier {
   /// Départ annulé (rien de coché) : la liste redevient prête.
   void annulerDepart(Liste l) {
     apprentissage.remove(l.id);
-    rectificatives.removeWhere((_, r) => r.cibleId == l.id && r.enAttente);
+    // Les courses n'ont pas commencé : la rectificative en attente s'y ajoute.
+    for (final r in [...rectificatives.values.where((r) => r.cibleId == l.id && r.enAttente)]) {
+      accepterRectificative(r, fusion: true);
+    }
     l.statut = StatutListe.prete;
     l.membreId = null;
     l.parcoursId = null;
@@ -1739,8 +1785,14 @@ class Etat extends ChangeNotifier {
     retenirParcours(l);
     l.statut = StatutListe.terminee;
     l.interrompueLe = null;
-    // Une rectificative restée sans réponse redevient une liste ordinaire en préparation.
-    rectificatives.removeWhere((_, r) => r.cibleId == l.id);
+    // Une rectificative restée sans réponse passe en « À faire » ; une rectificative en préparation le sera à sa fin.
+    for (final r in [...rectificatives.values.where((r) => r.cibleId == l.id)]) {
+      if (r.enAttente) {
+        _signaler(r);
+      } else if (r.acceptee) {
+        rectificatives.remove(r.listeId);
+      }
+    }
     modifie();
     return c;
   }

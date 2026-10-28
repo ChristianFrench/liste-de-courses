@@ -357,32 +357,53 @@ void main() {
       expect(e.parcoursAppris, contains(appris.id));
     });
 
-    test('liste rectificative : une par course, acceptée en entier, oubliée à la fin des courses', () {
+    test('liste rectificative : une par liste, fusionnée, envoyée, refusée puis « À faire » marquée', () {
       final e = Etat.instance;
-      final l2 = e.liste('l2')!, l4 = e.liste('l4')!;
-      expect(e.ciblesRectificative().map((l) => l.id), ['l4']);
-      e.envoyerRectificative(l2, l4);
-      expect(e.ciblesRectificative(), isEmpty, reason: 'une seule rectificative par course');
-      expect(e.ciblesRectificative(sauf: 'l2').map((l) => l.id), ['l4']);
-      expect(e.rectificativeEnAttente(l4)?.listeId, 'l2');
-      // Relue à l'identique
+      Liste l(String id) => e.liste(id)!;
+      expect(e.ciblesRectificative().map((x) => x.id), ['l3', 'l4']);
+      final r1 = e.creerRectificative(l('l4'));
+      expect(e.estSimple(r1), isTrue);
+      expect(e.ciblesRectificative().map((x) => x.id), ['l3'], reason: 'une seule rectificative par liste');
+      e.ajouterLigne(r1, 'p20');
+      e.ajouterLigne(r1, 'p1');
+      expect(e.validerRectificative(r1), 'envoyee');
+      expect(e.rectificativeEnAttente(l('l4'))?.listeId, r1.id);
+      expect(e.mentionRectificative(r1), ' · rectificative envoyée');
       final avant = jsonEncode(e.versJson());
       e.lire(jsonDecode(avant) as Map<String, dynamic>);
       expect(jsonEncode(e.versJson()), avant);
 
-      final r = e.rectificativeEnAttente(e.liste('l4')!)!;
-      e.refuserRectificative(r);
-      expect(e.liste('l2')!.statut, StatutListe.enConstruction, reason: 'refusée : liste ordinaire en préparation');
-      expect(e.rectificativeDe(e.liste('l2')!), isNull);
+      // Refusée : « À faire », marquée, jusqu'à sa remise en préparation
+      e.refuserRectificative(e.rectificativeEnAttente(l('l4'))!);
+      expect(l(r1.id).statut, StatutListe.prete);
+      expect(e.mentionRectificative(l(r1.id)), ' · rectificative');
+      e.remettreEnPreparation(l(r1.id));
+      expect(e.mentionRectificative(l(r1.id)), '');
 
-      e.envoyerRectificative(e.liste('l2')!, e.liste('l4')!);
-      final avantNb = e.liste('l4')!.lignes.length;
-      e.accepterRectificative(e.rectificativeEnAttente(e.liste('l4')!)!, fusion: true);
-      expect(e.liste('l2'), isNull, reason: 'ses articles ont rejoint la course');
-      expect(e.liste('l4')!.lignes.length, avantNb + 3, reason: 'p1 était déjà dans la course');
-      expect(e.rectificativesAcceptees(e.liste('l4')!).single.produits, ['p20', 'p18', 'p7']);
-      e.terminerCourses(e.liste('l4')!);
-      expect(e.rectificatives, isEmpty);
+      // Liste « À faire » : fusion immédiate
+      final r2 = e.creerRectificative(l('l3'));
+      e.ajouterLigne(r2, 'p21');
+      expect(e.validerRectificative(r2), 'fusionnee');
+      expect(e.liste(r2.id), isNull);
+      expect(e.ligne(l('l3'), 'p21'), isNotNull);
+
+      // Courses en cours : acceptée, puis oubliée à la fin des courses
+      final r3 = e.creerRectificative(l('l4'));
+      e.ajouterLigne(r3, 'p18');
+      e.ajouterLigne(r3, 'p7');
+      e.validerRectificative(r3);
+      final nb = l('l4').lignes.length;
+      e.accepterRectificative(e.rectificativeEnAttente(l('l4'))!, fusion: true);
+      expect(l('l4').lignes.length, nb + 2);
+      expect(e.rectificativesAcceptees(l('l4')).single.produits, ['p18', 'p7']);
+
+      // En attente à la fin des courses : « À faire »
+      final r4 = e.creerRectificative(l('l3'));
+      e.ajouterLigne(r4, 'p5');
+      e.terminerCourses(l('l4'));
+      expect(e.rectificativesAcceptees(l('l4')), isEmpty);
+      expect(e.rectificatives.values.where((r) => r.cibleId == 'l4'), isEmpty);
+      expect(e.rectificativeDe(r4)?.enRedaction, isTrue);
     });
 
     test('enregistrement : les données relues sont identiques', () {
@@ -778,18 +799,24 @@ void main() {
       expect(Etat.instance.listes.last.lignes.length, 2);
     });
 
-    testWidgets('liste rectificative : envoyée en fin de liste, acceptée à part pendant les courses', (tester) async {
+    testWidgets('liste rectificative : saisie depuis Nouvelle liste, acceptée à part pendant les courses', (tester) async {
       EcranCoursesSecteur.clignoter = false;
       final etat = Etat.instance;
-      final l2 = etat.liste('l2')!, l4 = etat.liste('l4')!;
+      final l4 = etat.liste('l4')!;
       await _accueil(tester);
-      await _ouvrirListe(tester, etat.nomListe(l2), 'Continuer la préparation');
-      await _toucher(tester, find.text('Liste prête'));
+      await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste rectificative'));
-      expect(find.textContaining('Pour : '), findsOneWidget);
-      expect(find.text('Prête pour les courses'), findsNothing);
+      expect(find.text('Liste à rectifier'), findsOneWidget);
+      await _toucher(tester, find.text(etat.nomListe(l4)).last);
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'dentif');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 4));
+      await _toucher(tester, find.text('Liste prête'));
+      expect(find.textContaining('il l\'acceptera ou la refusera'), findsOneWidget);
       await _toucher(tester, find.text('Valider'));
-      expect(etat.rectificativeDe(l2)?.cibleId, 'l4');
+      expect(etat.rectificativeEnAttente(l4), isNotNull);
       expect(find.textContaining('rectificative envoyée'), findsWidgets);
       await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
@@ -798,7 +825,7 @@ void main() {
       await _ouvrirListe(tester, etat.nomListe(l4), 'Reprendre les courses');
       // Le résumé s'ouvre tout seul ; l'icône du titre reste tant que rien n'est décidé
       expect(find.text('Liste rectificative'), findsOneWidget);
-      expect(find.textContaining('propose 4 articles'), findsOneWidget);
+      expect(find.textContaining('propose 1 article'), findsOneWidget);
       await _toucher(tester, find.text('Plus tard'));
       expect(find.byKey(const ValueKey('bouton-rectificative')), findsOneWidget);
       await tester.pump(const Duration(seconds: 61));
@@ -809,8 +836,8 @@ void main() {
       await _toucher(tester, find.text('Garder à part'));
       expect(find.byKey(const ValueKey('bouton-rectificative')), findsNothing);
       expect(find.text('AJOUTS DE MEMBRE 1'), findsOneWidget);
-      expect(etat.liste('l2'), isNull);
-      expect(find.text('Magasin 1 · 4 / 12'), findsOneWidget);
+      expect(find.text('Dentifrice'), findsOneWidget);
+      expect(find.text('Magasin 1 · 4 / 10'), findsOneWidget);
       EcranCoursesSecteur.clignoter = true;
     });
 

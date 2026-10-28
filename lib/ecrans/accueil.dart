@@ -39,7 +39,7 @@ class EcranAccueil extends StatelessWidget {
                   listeGlissable(
                     context,
                     l,
-                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.rectificativeDe(l) != null ? ' · rectificative envoyée' : ''}'),
+                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
                     detail: '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · '
                         '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
                   ),
@@ -57,7 +57,7 @@ class EcranAccueil extends StatelessWidget {
                   listeGlissable(
                     context,
                     l,
-                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
                     detail: 'Prête · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}',
                   ),
               ],

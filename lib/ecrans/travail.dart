@@ -247,6 +247,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
   @override
   Widget build(BuildContext context) {
     final passees = etat.dernieresCourses(magasinId);
+    final cibles = etat.ciblesRectificative();
     return PageBase(
       entete: const EnTeteFenetre(retour: true, icone: Icons.checklist, titre: 'Nouvelle liste', aide: Aides.nouvelleListe),
       haut: [
@@ -308,8 +309,15 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 5,
+            nombre: 5 + (cibles.isEmpty ? 0 : 1),
             enfants: [
+              if (cibles.isNotEmpty)
+                LigneMenu(
+                  icone: Icons.playlist_add,
+                  titre: 'Liste rectificative',
+                  sousTitre: 'Des articles à ajouter à une liste « À faire » ou en cours de courses',
+                  onTap: () => _choisirCible(cibles),
+                ),
               LigneMenu(
                 icone: Icons.edit_note,
                 titre: 'Liste simple',
@@ -344,6 +352,28 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       ),
     );
   }
+
+  /// « Liste rectificative » : la liste à rectifier, puis une liste simple (la recherche dans tout le catalogue).
+  Future<void> _choisirCible(List<Liste> cibles) => volet<void>(
+        context,
+        builder: (ctx) => corpsVolet(
+          titre: 'Liste à rectifier',
+          contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (final c in cibles)
+              LigneMenu(
+                titre: etat.nomListe(c),
+                sousTitre: c.statut == StatutListe.enCours
+                    ? 'En cours de courses · ${etat.membre(c.membreId)?.nomAffiche ?? '?'}'
+                    : 'À faire · ${c.lignes.length} art.',
+                onTap: () {
+                  Navigator.of(ctx).pop();
+                  final l = etat.creerRectificative(c);
+                  Nav.remplacerTravail(EcranConstruction(listeId: l.id));
+                },
+              ),
+          ]),
+        ),
+      );
 
   /// « Liste type » : une liste vide, ou une liste type (glisser vers la gauche la supprime).
   Future<void> _choisirListeType() => volet<void>(
@@ -585,6 +615,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
 
   /// Fenêtre modale « Liste prête » : récapitulatif, envoi par mail éventuel, puis la liste passe dans Courses.
   Future<void> _valider(Liste l) async {
+    final r = etat.rectificativeDe(l);
+    if (r != null && (r.enRedaction || r.enAttente)) return _validerRectificative(l, r);
     var envoyer = false;
     var pourCourses = true;
     var enListeType = false;
@@ -593,12 +625,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nomType = TextEditingController(text: etat.nomListe(l));
     final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
-    // Liste rectificative : pour une course en cours d'un autre membre (une seule par course).
-    final cibles = etat.ciblesRectificative(sauf: l.id);
-    var rectif = etat.rectificativeDe(l) != null;
-    var cible = etat.rectificativeDe(l)?.cibleId ?? (cibles.isEmpty ? null : cibles.first.id);
-    if (cible != null && !cibles.any((c) => c.id == cible)) cible = cibles.isEmpty ? null : cibles.first.id;
-    String quiFait(Liste c) => '${etat.nomListe(c)} · ${etat.membre(c.membreId)?.nomAffiche ?? '?'}';
     final ok = await modale(
       context,
       titre: 'Fin de la liste',
@@ -622,29 +648,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 labelText: 'Commentaire (facultatif)', hintText: 'Ex. : passer aussi à la pharmacie'),
           ),
           const SizedBox(height: 6),
-          if (cibles.isNotEmpty)
-            CaseModale(
-              key: const ValueKey('case-rectificative'),
-              texte: 'Liste rectificative',
-              aide: 'Envoyée à celui qui fait les courses : il l\'accepte ou la refuse en entier.',
-              coche: rectif,
-              onChange: (v) => maj(() => rectif = v),
-            ),
-          if (rectif && cibles.length > 1)
-            Padding(
-              padding: const EdgeInsets.only(left: 38, bottom: 6),
-              child: ChoixDeroulant<String>(
-                valeur: cible!,
-                choix: {for (final c in cibles) c.id: quiFait(c)},
-                onChange: (v) => maj(() => cible = v),
-              ),
-            ),
-          if (rectif && cibles.length == 1)
-            Padding(
-              padding: const EdgeInsets.only(left: 38, bottom: 6),
-              child: Text('Pour : ${quiFait(cibles.first)}', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            ),
-          if (simple && !rectif)
+          if (simple)
             CaseModale(
               texte: 'Ranger par rayons et secteurs',
               aide: 'Pendant les courses, la liste suivra l\'ordre du magasin. Sinon, elle garde l\'ordre de saisie. '
@@ -652,7 +656,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
               coche: ranger,
               onChange: (v) => maj(() => ranger = v),
             ),
-          if (!rectif)
           CaseModale(
             texte: 'Prête pour les courses',
             aide: 'Elle passe en instance de courses ; vous pourrez encore la remettre en préparation.',
@@ -675,7 +678,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 decoration: const InputDecoration(labelText: 'Nom de la liste type'),
               ),
             ),
-          if (pourCourses && !rectif)
+          if (pourCourses)
             CaseModale(
               texte: 'Envoyer la liste par mail',
               aide: etat.envoiFoyer ? 'À tout le foyer' : null,
@@ -688,15 +691,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nom = nomType.text.trim();
     if (!ok || !mounted) return;
     etat.commenter(l, commentaire.text);
-    if (rectif && cible != null) {
-      final c = etat.liste(cible)!;
-      etat.envoyerRectificative(l, c);
-      if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
-      Nav.i.retourOnglet(Nav.preparer);
-      if (mounted) Nav.message(context, 'Liste rectificative envoyée à ${etat.membre(c.membreId)?.nomAffiche ?? 'celui qui fait les courses'}');
-      return;
-    }
-    etat.retirerRectificative(l);
     if (simple) etat.ranger(l, ranger);
     if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
     if (!pourCourses) {
@@ -712,6 +706,54 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
   }
 
+  /// Fin d'une liste rectificative : ajoutée à la liste visée si ses courses n'ont pas commencé, envoyée à
+  /// celui qui les fait sinon ; les courses finies, elle passe en « À faire ».
+  Future<void> _validerRectificative(Liste l, Rectificative r) async {
+    final cible = etat.liste(r.cibleId);
+    final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
+    final pour = cible == null || cible.statut == StatutListe.terminee
+        ? 'Les courses visées sont terminées : elle ira dans « À faire ».'
+        : cible.statut == StatutListe.enCours
+            ? 'Pour ${etat.nomListe(cible)}, en cours de courses par ${etat.membre(cible.membreId)?.nomAffiche ?? '?'} : '
+                'il l\'acceptera ou la refusera.'
+            : 'Ses articles seront ajoutés à ${etat.nomListe(cible)}.';
+    final ok = await modale(
+      context,
+      titre: 'Liste rectificative',
+      oui: 'Valider',
+      non: 'Continuer la préparation',
+      fermable: false,
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}. $pour', style: Charte.texte(16)),
+          const SizedBox(height: 6),
+          TextField(
+            key: const ValueKey('commentaire-liste'),
+            controller: commentaire,
+            style: Charte.texte(16),
+            minLines: 1,
+            maxLines: 4,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: const InputDecoration(labelText: 'Commentaire (facultatif)'),
+          ),
+        ],
+      ),
+    );
+    if (!ok || !mounted) return;
+    etat.commenter(l, commentaire.text);
+    final nomCible = cible == null ? '' : etat.nomListe(cible);
+    final fait = etat.validerRectificative(l);
+    Nav.i.retourOnglet(fait == 'envoyee' ? Nav.preparer : Nav.courses);
+    if (!mounted) return;
+    Nav.message(
+        context,
+        switch (fait) {
+          'envoyee' => 'Liste rectificative envoyée à ${etat.membre(cible?.membreId)?.nomAffiche ?? 'celui qui fait les courses'}',
+          'fusionnee' => 'Articles ajoutés à $nomCible',
+          _ => 'Liste rectificative mise dans « À faire »',
+        });
+  }
 }
 
 /// Une ligne d'article, la même en préparation et en courses (30 points) : le P des promotions, le nom
