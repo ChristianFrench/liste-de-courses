@@ -362,7 +362,7 @@ void main() {
       Liste l(String id) => e.liste(id)!;
       expect(e.ciblesRectificative().map((x) => x.id), ['l3', 'l4']);
       final r1 = e.creerRectificative(l('l4'));
-      expect(e.estSimple(r1), isTrue);
+      expect(e.estSimple(r1), isFalse, reason: 'recherche et secteurs');
       expect(e.rectificativeOuvertePour(l('l4'))?.listeId, r1.id, reason: 'une seule à la fois : elle sera reprise');
       e.ajouterLigne(r1, 'p20');
       e.ajouterLigne(r1, 'p1');

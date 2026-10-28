@@ -1527,10 +1527,9 @@ class Etat extends ChangeNotifier {
     return r.enAttente ? ' · rectificative envoyée' : ' · rectificative';
   }
 
-  /// Nouvelle liste rectificative de [cible] : une liste simple du même magasin.
+  /// Nouvelle liste rectificative de [cible], du même magasin : la recherche, les articles sous leur secteur.
   Liste creerRectificative(Liste cible) {
     final l = creerListe(cible.magasinId, [], nom: nomLibre('Rectificative ${nomListe(cible)}'));
-    marquerSimple(l, true);
     rectificatives[l.id] = Rectificative(l.id, cible.id, moi.id, DateTime.now(), mode: 'redaction');
     modifie();
     return l;

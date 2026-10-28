@@ -282,8 +282,14 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 6,
+            nombre: 7,
             enfants: [
+              LigneMenu(
+                icone: Icons.search,
+                titre: 'Nouvelle liste (recherche, par secteur)',
+                sousTitre: 'Cherchez les articles un à un : ils se rangent sous leur secteur au fur et à mesure',
+                onTap: () => _creer([]),
+              ),
               LigneMenu(
                 icone: Icons.playlist_add,
                 titre: 'Liste rectificative',
