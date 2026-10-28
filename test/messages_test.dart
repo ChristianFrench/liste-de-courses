@@ -52,7 +52,9 @@ void main() {
     MailDirect.disponibleEssai = true;
     expect(await MailDirect.envoyer([], 'Sujet', 'Texte'), isFalse);
     expect(await MailDirect.envoyer(['a@exemple.fr', 'b@exemple.fr'], 'Liste', 'Lait'), isTrue);
-    expect(envoyes.single['template_params'], {'destinataires': 'a@exemple.fr,b@exemple.fr', 'sujet': 'Liste', 'texte': 'Lait'});
+    expect(envoyes.single['template_params'],
+        allOf(containsPair('destinataires', 'a@exemple.fr,b@exemple.fr'), containsPair('sujet', 'Liste'), containsPair('texte', 'Lait'),
+            containsPair('expediteur', Etat.instance.moi.nomAffiche)));
     expect(messageEnvoi(Envoi.parti, 2), 'Mail envoyé à 2 personnes');
     MailDirect.disponibleEssai = null;
   });

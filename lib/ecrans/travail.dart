@@ -1680,7 +1680,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
     if (!ok || !context.mounted) return;
     // Le résumé se lit avant la fin des courses (la liste garde ses coches et ses manquants).
-    final envoi = resume ? messageEnvoi(await envoyerResume(etat, l), etat.membres.where((m) => m.email.isNotEmpty).length) : null;
+    final envoi = resume ? messageEnvoi(await envoyerResume(etat, l), adressesFoyer(etat).length) : null;
     if (!context.mounted) return;
     Etat.instance.terminerCourses(l);
     Nav.i.retourOnglet(Nav.courses);

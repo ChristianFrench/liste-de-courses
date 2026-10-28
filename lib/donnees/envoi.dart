@@ -37,7 +37,14 @@ class MailDirect {
                 'service_id': service,
                 'template_id': modele,
                 'user_id': cle,
-                'template_params': {'destinataires': a.join(','), 'sujet': sujet, 'texte': texte},
+                'template_params': {
+                  'destinataires': a.join(','),
+                  'sujet': sujet,
+                  'texte': texte,
+                  // Le mail part de la Gmail de l'application : le nom et l'adresse de réponse sont ceux de l'auteur.
+                  'expediteur': Etat.instance.moi.nomAffiche,
+                  'repondre_a': Etat.instance.moi.email,
+                },
               }))
           .timeout(const Duration(seconds: 20));
       if (r.statusCode >= 300) debugPrint('EmailJS : ${r.statusCode} ${r.body}');
@@ -108,9 +115,15 @@ String texteListe(Etat etat, Liste l) {
   return b.toString();
 }
 
-/// Adresses des destinataires : tout le foyer si l'option est choisie, sinon personne (on choisit dans la messagerie).
-List<String> destinataires(Etat etat) =>
-    etat.envoiFoyer ? [for (final m in etat.membres) if (m.email.isNotEmpty) m.email] : const [];
+/// Les autres membres du foyer qui ont une adresse (on ne s'envoie pas son propre mail).
+List<String> adressesFoyer(Etat etat) => [
+      for (final m in etat.membresVisibles)
+        if (m.email.isNotEmpty && m.id != etat.moi.id && m.email.toLowerCase() != etat.moi.email.toLowerCase()) m.email
+    ];
+
+/// Destinataires de la liste : le foyer quand le mail part directement ou si l'option est choisie ;
+/// sinon personne (on choisit dans la messagerie).
+List<String> destinataires(Etat etat) => (MailDirect.disponible || etat.envoiFoyer) ? adressesFoyer(etat) : const [];
 
 /// Résumé de fin de courses pour le foyer : les oubliés (non cochés), les absents des rayons (manquants)
 /// et les achetés. Un mail n'a pas de couleurs : des pastilles de couleur les remplacent.
@@ -140,8 +153,7 @@ String texteResume(Etat etat, Liste l) {
 
 /// Résumé des courses à tous les membres du foyer qui ont une adresse.
 Future<Envoi> envoyerResume(Etat etat, Liste l) {
-  final a = [for (final m in etat.membres) if (m.email.isNotEmpty) m.email];
-  return envoyerMail(a, 'Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''}', texteResume(etat, l));
+  return envoyerMail(adressesFoyer(etat), 'Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''}', texteResume(etat, l));
 }
 
 // Uri(queryParameters:) code les espaces en « + », que les messageries affichent tels quels.

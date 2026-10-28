@@ -181,15 +181,17 @@ void main() {
       expect(texte, startsWith('Liste de courses · Magasin 1 · 9 articles'));
       expect(texte.indexOf('FRAIS'), lessThan(texte.indexOf('ÉPICERIE')));
       expect(texte, contains('NON PLACÉ'));
-      e.modifierEmail(e.membres.first, 'a@exemple.fr');
+      final autre = e.membres.firstWhere((m) => m.id != e.moi.id);
+      e.modifierEmail(autre, 'a@exemple.fr');
+      e.modifierEmail(e.moi, 'moi@exemple.fr');
       expect(lienMail(e, l).path, '');
       e.options(envoiFoyer: true);
-      expect(lienMail(e, l).path, 'a@exemple.fr');
+      expect(lienMail(e, l).path, 'a@exemple.fr', reason: 'pas à soi-même');
       expect(lienMail(e, l).toString(), isNot(contains('+')));
       final relu = jsonEncode(e.versJson());
       e.lire(jsonDecode(relu) as Map<String, dynamic>);
       expect(e.envoiFoyer, isTrue);
-      expect(e.membres.first.email, 'a@exemple.fr');
+      expect(e.membre(autre.id)!.email, 'a@exemple.fr');
     });
 
     test('images : une image choisie pour un rayon ajouté est gardée', () {
