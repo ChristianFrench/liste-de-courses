@@ -175,7 +175,7 @@ class MenuGerer extends StatelessWidget {
                 const EcranTypesPackaging(lots: false)),
             ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings : lots de 2 à 10…',
                 const EcranTypesPackaging()),
-            ecran(Icons.sell_outlined, 'Marques', '${etat.marques.length} marque${etat.marques.length > 1 ? 's' : ''} · leurs produits',
+            ecran(Icons.sell_outlined, 'Catalogue des marques', 'Les marques de chaque secteur, proposées en préparation',
                 const EcranMarques()),
           ]),
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [

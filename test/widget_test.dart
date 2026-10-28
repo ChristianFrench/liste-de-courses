@@ -471,7 +471,7 @@ void main() {
       await _menuTitre(tester, 'Produits ajoutés (0)');
       expect(find.text('FRAIS'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Marques');
+      await _rubrique(tester, 'Catalogue des marques');
       await _ciblesTactiles(tester);
       await _depuisCourses(tester, 'Historique');
       expect(find.text('Par magasin'), findsOneWidget);
@@ -570,10 +570,23 @@ void main() {
       expect(etat.ligne(l, lait.id)!.consigne, 'bien frais');
       expect(find.textContaining('« bien frais »', findRichText: true), findsOneWidget, reason: 'la consigne suit le nom');
 
+      // La marque : liste déroulante des marques du secteur ; l'article devient « Lait demi-écrémé Lactel »
+      etat.lireMarquesType({
+        'secteurs': {etat.cleSecteur(etat.secteurCatalogue(lait.id)!): ['Lactel', 'Candia']}
+      });
+      await _toucher(tester, find.byKey(ValueKey('condense-${lait.id}')));
+      expect(find.text('MARQUE'), findsOneWidget);
+      await _toucher(tester, find.byKey(const ValueKey('choix-marque')));
+      await _toucher(tester, find.text('Lactel').last);
+      await _toucher(tester, find.text('Valider'));
+      final lactel = etat.produits.firstWhere((p) => p.nom == 'Lait demi-écrémé Lactel');
+      expect(etat.ligne(l, lactel.id)?.consigne, 'bien frais', reason: 'la ligne garde sa consigne');
+      etat.marquesType = {};
+
       // 8 : appui long : retiré
-      await tester.longPress(find.byKey(ValueKey('condense-${lait.id}')));
+      await tester.longPress(find.byKey(ValueKey('condense-${lactel.id}')));
       await tester.pumpAndSettle();
-      expect(etat.ligne(l, lait.id), isNull);
+      expect(etat.ligne(l, lactel.id), isNull);
       await tester.pump(const Duration(seconds: 6));
     });
 
@@ -1006,7 +1019,7 @@ void main() {
   });
 
   group('Gérer', () {
-    testWidgets('marques : une liste, renommer la marque renomme ses produits ; types en liste', (tester) async {
+    testWidgets('catalogue des marques : par secteur, renommer (ses produits aussi), retirer, ajouter ; types en liste', (tester) async {
       await _lancer(tester);
       final etat = Etat.instance;
       expect(etat.typesMesure, isEmpty, reason: 'données d\'essai : comme sur l\'appareil de M. Bezard');
@@ -1015,23 +1028,36 @@ void main() {
           catalogue: jsonDecode(File('assets/catalogue_type.json').readAsStringSync()) as Map<String, dynamic>);
       expect(etat.typesMesure.length, greaterThan(5), reason: 'les types de mesure reviennent du catalogue');
       final avecFormat = etat.produits.where((p) => p.packagingIds.isNotEmpty).length;
-      final s = etat.secteurs.first;
+      final s = etat.secteurCatalogue(etat.produits.first.id)!;
       final p = etat.enregistrerProduitAjoute(libelle: 'Camembert', marqueNom: 'Président', secteur: s);
       expect(p.nom, 'Camembert Président');
       expect(etat.produits.where((p) => p.packagingIds.isNotEmpty).length, avecFormat, reason: 'articles inchangés');
-      await _rubrique(tester, 'Marques');
+      etat.lireMarquesType({
+        'secteurs': {etat.cleSecteur(s): ['Lactel', 'Candia']}
+      });
+      expect(etat.marquesDuSecteur(s), ['Candia', 'Lactel', 'Président'], reason: 'catalogue des marques et marques des produits');
+      // En préparation : les marques du secteur de l'article
+      expect(etat.marquesProposees(null, etat.produits.first), containsAll(['Candia', 'Lactel']));
+
+      await _rubrique(tester, 'Catalogue des marques');
       expect(find.text('Produits réels'), findsNothing);
-      await _voir(tester, find.text('Camembert Président'));
-      expect(find.text('Camembert Président'), findsOneWidget, reason: 'les produits sous leur marque');
+      await _toucher(tester, find.text(s.nom).first);
+      expect(find.text('Lactel'), findsOneWidget);
+      expect(find.text('1 produit'), findsOneWidget, reason: 'Président porte Camembert Président');
       await _toucher(tester, find.byKey(const ValueKey('marque-Président')));
-      await _toucher(tester, find.text('Renommer (et ses 1 produits)'));
+      await _toucher(tester, find.text('Renommer'));
       await tester.enterText(find.byType(TextField).last, 'Président Fin');
       await _toucher(tester, find.text('Valider'));
       expect(p.nom, 'Camembert Président Fin');
-      await _toucher(tester, find.text('Camembert Président Fin'));
-      expect(find.text('Modifier'), findsOneWidget);
-      expect(find.text('Supprimer'), findsOneWidget);
-      await _fermerVolet(tester);
+      expect(etat.marquesDuSecteur(s), ['Candia', 'Lactel', 'Président Fin']);
+      await _toucher(tester, find.byKey(const ValueKey('marque-Candia')));
+      await _toucher(tester, find.text('Retirer de ce secteur'));
+      expect(find.text('Candia'), findsNothing);
+      await _toucher(tester, find.text('Nouvelle marque'));
+      await tester.enterText(find.byType(TextField).last, 'Candia');
+      await _toucher(tester, find.text('Valider'));
+      expect(etat.marquesDuSecteur(s), ['Candia', 'Lactel', 'Président Fin']);
+      await _ciblesTactiles(tester);
       await _rubrique(tester, 'Types de mesure');
       await _toucher(tester, find.text(etat.packaging(etat.typesMesure.first)!.libelle));
       expect(find.text('Fusionner avec un autre'), findsOneWidget);

@@ -489,6 +489,12 @@ class Etat extends ChangeNotifier {
   /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
   Map<String, String> produitsPerso = {};
 
+  /// Catalogue des marques livré (assets/marques_catalogue.json) : « Rayon/Secteur » → marques.
+  Map<String, List<String>> marquesType = {};
+
+  /// Changements du foyer au catalogue des marques : « Rayon/Secteur » → {'+': ajoutées, '-': retirées}.
+  Map<String, Map<String, List<String>>> marquesSecteurs = {};
+
   /// Membres radiés ('r') ou supprimés ('s') par l'administrateur.
   Map<String, String> statutsMembres = {};
 
@@ -864,6 +870,10 @@ class Etat extends ChangeNotifier {
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    marquesSecteurs = {
+      for (final e in (options?['marquesSecteurs'] as Map? ?? {}).entries)
+        e.key as String: {for (final x in (e.value as Map).entries) x.key as String: _ids(x.value)}
+    };
     statutsMembres = {for (final e in (options?['statutsMembres'] as Map? ?? {}).entries) e.key as String: e.value as String};
     structurePerso = {for (final x in (options?['structurePerso'] as List? ?? const [])) x as String};
     typesPackaging = _ids(options?['typesPackaging']);
@@ -980,6 +990,7 @@ class Etat extends ChangeNotifier {
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
+            if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
             if (structurePerso.isNotEmpty) 'structurePerso': structurePerso.toList()..sort(),
             'typesPackaging': typesPackaging,
@@ -1283,15 +1294,23 @@ class Etat extends ChangeNotifier {
     return '${p.nom} $mq';
   }
 
-  /// Marques proposées pour un article : celles du produit et de ses variantes (« Camembert Président »…).
+  /// Marques proposées pour un article : celles de son secteur dans le catalogue des marques, celles du
+  /// produit et de ses variantes (« Camembert Président »…).
   List<String> marquesProposees(LigneListe? g, Produit p) {
     final racine = nomSansMarque(g, p).toLowerCase();
+    final s = secteurCatalogue(p.id);
+    final duSecteur = s == null ? const <String>[] : marquesDuSecteur(s);
     final ids = <String>{
       ...p.marqueIds,
       for (final q in produits)
         if (q.nom.toLowerCase() == racine || q.nom.toLowerCase().startsWith('$racine ')) ...q.marqueIds,
     };
-    return [for (final id in ids) if (marque(id)?.nom case final n?) n]..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final noms = <String>{for (final n in duSecteur) n};
+    for (final id in ids) {
+      final n = marque(id)?.nom;
+      if (n != null && !noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
+    }
+    return noms.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
   }
 
   /// Change la marque d'un article de la liste : « Camembert » devient l'article « Camembert Président »
@@ -2915,6 +2934,79 @@ class Etat extends ChangeNotifier {
   void renommerMagasin(Magasin m, String nom) {
     if (nom.trim().isEmpty) return;
     m.nom = nom.trim();
+    modifie();
+  }
+
+  // ------------------------------------------------------------ Catalogue des marques (28/10/2026)
+
+  static const fichierMarques = 'assets/marques_catalogue.json';
+
+  Future<void> chargerMarquesType() async {
+    try {
+      lireMarquesType(jsonDecode(await rootBundle.loadString(fichierMarques)) as Map<String, dynamic>);
+    } catch (e) {
+      debugPrint('Catalogue des marques illisible : $e');
+    }
+  }
+
+  void lireMarquesType(Map<String, dynamic> j) {
+    marquesType = {for (final e in (j['secteurs'] as Map).entries) e.key as String: _ids(e.value)};
+  }
+
+  String cleSecteur(Secteur s) => '${rayon(s.rayonId)?.nom ?? ''}/${s.nom}';
+
+  /// Marques d'un secteur : celles du catalogue des marques, celles ajoutées par le foyer et celles des
+  /// produits du secteur, sans celles que le foyer a retirées ; par ordre alphabétique.
+  List<String> marquesDuSecteur(Secteur s) {
+    final cle = cleSecteur(s);
+    final perso = marquesSecteurs[cle] ?? const {};
+    final retirees = {for (final n in perso['-'] ?? const <String>[]) n.toLowerCase()};
+    final vues = <String>{};
+    final res = <String>[];
+    void ajoute(String n) {
+      if (retirees.contains(n.toLowerCase()) || !vues.add(n.toLowerCase())) return;
+      res.add(n);
+    }
+    for (final n in marquesType[cle] ?? const <String>[]) {
+      ajoute(n);
+    }
+    for (final n in perso['+'] ?? const <String>[]) {
+      ajoute(n);
+    }
+    for (final p in produitsDuSecteur(s)) {
+      for (final id in p.marqueIds) {
+        if (marque(id)?.nom case final n?) ajoute(n);
+      }
+    }
+    return res..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  }
+
+  void ajouterMarqueSecteur(Secteur s, String nom) {
+    final n = nom.trim();
+    if (n.isEmpty) return;
+    final perso = marquesSecteurs.putIfAbsent(cleSecteur(s), () => {});
+    perso['-']?.removeWhere((x) => x.toLowerCase() == n.toLowerCase());
+    if (!marquesDuSecteur(s).any((x) => x.toLowerCase() == n.toLowerCase())) (perso['+'] ??= []).add(n);
+    modifie();
+  }
+
+  void retirerMarqueSecteur(Secteur s, String nom) {
+    final perso = marquesSecteurs.putIfAbsent(cleSecteur(s), () => {});
+    perso['+']?.removeWhere((x) => x.toLowerCase() == nom.toLowerCase());
+    if (!(perso['-'] ?? []).any((x) => x.toLowerCase() == nom.toLowerCase())) (perso['-'] ??= []).add(nom);
+    modifie();
+  }
+
+  /// Renomme une marque partout : dans les secteurs où elle figure, et ses produits (« Camembert Président »).
+  void renommerMarqueCatalogue(String ancien, String nouveau) {
+    final n = nouveau.trim();
+    if (n.isEmpty || n == ancien) return;
+    for (final s in [for (final r in rayonsCatalogue) ...secteursDu(r.id)]) {
+      if (!marquesDuSecteur(s).any((x) => x.toLowerCase() == ancien.toLowerCase())) continue;
+      retirerMarqueSecteur(s, ancien);
+      ajouterMarqueSecteur(s, n);
+    }
+    if (_trouve(marques, (m) => m.nom.toLowerCase() == ancien.toLowerCase()) case final m?) renommerMarque(m, n);
     modifie();
   }
 

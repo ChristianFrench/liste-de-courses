@@ -14,6 +14,7 @@ import 'theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Etat.instance.charger();
+  await Etat.instance.chargerMarquesType();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
   runApp(const ListeDeCoursesApp());

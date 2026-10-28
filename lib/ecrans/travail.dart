@@ -954,12 +954,17 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   bool enMontant = false;
   String? packagingId;
 
+  /// Marque choisie ('' : indifférente) et celle de la ligne à l'ouverture du volet.
+  late String marque;
+  late final String marqueAvant;
+
   @override
   void initState() {
     super.initState();
     final p = widget.ligne.promotion;
     type = p?.type ?? FeuillePromotion.aucune;
     packagingId = widget.ligne.packagingId;
+    marque = marqueAvant = etat.marque(widget.ligne.marqueId)?.nom ?? '';
     consigne.text = widget.ligne.consigne ?? '';
     final par = p?.parametres ?? const {};
     String v(String k) => par[k] == null ? '' : '${par[k]}'.replaceAll('.', ',');
@@ -1035,6 +1040,9 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       final lib = libelle.text.trim().isEmpty ? _auto() : libelle.text.trim();
       etat.definirPromotion(widget.liste, id, PromotionLigne(type, _parametres(), lib));
     }
+    // La marque en dernier : « Camembert » devient l'article « Camembert Président ».
+    final p = etat.produit(id);
+    if (marque != marqueAvant && p != null) etat.changerMarque(widget.liste, p, marque.isEmpty ? null : marque);
     Navigator.of(context).pop();
   }
 
@@ -1090,6 +1098,25 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 child: Text('Formats courants du secteur, ce produit n\'en a pas encore.',
                     style: Charte.texte(13, couleur: Charte.texteSecondaire)),
               ),
+            if (p != null) ...[
+              const TitreSection('Marque', cote: 0, haut: 14),
+              ChoixDeroulant<String>(
+                key: const ValueKey('choix-marque'),
+                valeur: marque,
+                choix: {
+                  '': 'Indifférente',
+                  for (final n in {...etat.marquesProposees(widget.ligne, p), if (marque.isNotEmpty) marque}) n: n,
+                  _autreMarque: 'Autre marque…',
+                },
+                onChange: (v) async {
+                  if (v != _autreMarque) return setState(() => marque = v);
+                  final n = await demanderTexte(context, titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
+                  if (n == null || n.trim().isEmpty || !mounted) return;
+                  if (etat.secteurCatalogue(p.id) case final s?) etat.ajouterMarqueSecteur(s, n);
+                  setState(() => marque = n.trim());
+                },
+              ),
+            ],
             const TitreSection('Consigne', cote: 0, haut: 14),
             TextField(
               key: const ValueKey('consigne'),
@@ -1133,6 +1160,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         ),
     );
   }
+
+  static const _autreMarque = '\u0000autre';
 
   Widget _pastille(String texte, bool choisi, VoidCallback onTap) => Material(
         color: choisi ? Charte.accent : Charte.blanc,

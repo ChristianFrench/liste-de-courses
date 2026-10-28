@@ -38,6 +38,7 @@ flutter:
     - assets/donnees_maquette.json
     - assets/catalogue_type.json
     - assets/correspondances_mails.json
+    - assets/marques_catalogue.json
     - assets/pictos/png/
   fonts:
     - family: Atkinson
