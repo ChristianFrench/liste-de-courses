@@ -501,6 +501,9 @@ class Etat extends ChangeNotifier {
   /// Catalogue des marques livré (assets/marques_catalogue.json) : « Rayon/Secteur » → marques.
   Map<String, List<String>> marquesType = {};
 
+  /// Les magasins des enseignes à marques distributeur ont été créés (une fois : un magasin supprimé ne revient pas).
+  bool magasinsEnseignes = false;
+
   /// Marques distributeur livrées (assets/marques_distributeur.json), par enseigne.
   Map<String, List<MarqueDistributeur>> marquesDistributeur = {};
 
@@ -893,6 +896,7 @@ class Etat extends ChangeNotifier {
     apparence = options?['apparence'] as String?;
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
+    magasinsEnseignes = options?['magasinsEnseignes'] == 1;
     versionCatalogueCommun = (options?['catalogueCommun'] as num? ?? 0).toInt();
     nouveautesCatalogue = (options?['nouveautesCatalogue'] as Map?)?.cast<String, dynamic>();
     imagesChoisies
@@ -1011,6 +1015,7 @@ class Etat extends ChangeNotifier {
             if (apparence != null) 'apparence': apparence,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
+            if (magasinsEnseignes) 'magasinsEnseignes': 1,
             if (versionCatalogueCommun > 0) 'catalogueCommun': versionCatalogueCommun,
             if (nouveautesCatalogue != null) 'nouveautesCatalogue': nouveautesCatalogue,
           },
@@ -1504,9 +1509,8 @@ class Etat extends ChangeNotifier {
 
   Rectificative? rectificativeDe(Liste l) => rectificatives[l.id];
 
-  /// Listes « À faire » ou en cours de courses qu'une rectificative peut compléter.
-  List<Liste> ciblesRectificative() =>
-      [for (final l in listes) if (l.statut == StatutListe.prete || l.statut == StatutListe.enCours) l];
+  /// Courses en cours qu'une rectificative peut compléter (pas les listes « À faire », décision du 28/10/2026).
+  List<Liste> ciblesRectificative() => [for (final l in listes) if (l.statut == StatutListe.enCours) l];
 
   /// Rectificative pas encore réglée pour [cible] (en préparation ou en attente de décision) : une seule à la fois.
   Rectificative? rectificativeOuvertePour(Liste cible) => _trouve(
@@ -2999,6 +3003,20 @@ class Etat extends ChangeNotifier {
       if (e.value.any(t.contains)) return e.key;
     }
     return null;
+  }
+
+  /// Crée, une fois, un magasin pour chaque enseigne à marques distributeur qui n'en a pas encore.
+  Future<void> ajouterMagasinsEnseignes() async {
+    if (magasinsEnseignes || marquesDistributeur.isEmpty || magasins.isEmpty) return;
+    magasinsEnseignes = true;
+    final presentes = {for (final m in magasins) enseigneDe(m)};
+    for (final e in enseignesMdd) {
+      if (presentes.contains(e) || magasinNomme(e) != null) continue;
+      final m = creerMagasin(e);
+      m.enseigne = e;
+      await remplirMagasin(m);
+    }
+    modifie();
   }
 
   void definirEnseigne(Magasin m, String enseigne) {

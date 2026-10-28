@@ -360,7 +360,7 @@ void main() {
     test('liste rectificative : une par liste, fusionnée, envoyée, refusée puis « À faire » marquée', () {
       final e = Etat.instance;
       Liste l(String id) => e.liste(id)!;
-      expect(e.ciblesRectificative().map((x) => x.id), ['l3', 'l4']);
+      expect(e.ciblesRectificative().map((x) => x.id), ['l4']);
       final r1 = e.creerRectificative(l('l4'));
       expect(e.estSimple(r1), isFalse, reason: 'recherche et secteurs');
       expect(e.rectificativeOuvertePour(l('l4'))?.listeId, r1.id, reason: 'une seule à la fois : elle sera reprise');
@@ -420,6 +420,20 @@ void main() {
       e.definirEnseigne(m, '-');
       expect(e.enseigneDe(m), isNull, reason: '« Aucune » choisie');
       expect(e.marquesProposees(null, e.produits.first, magasinId: m.id), isNot(contains('Eco+')));
+    });
+
+    test('magasins ajoutés une fois pour les enseignes de marques distributeur qui n\'en ont pas', () async {
+      final e = Etat.instance;
+      e.lireMarquesDistributeur(jsonDecode(File('assets/marques_distributeur.json').readAsStringSync()) as Map<String, dynamic>);
+      final avant = e.magasins.length;
+      await e.ajouterMagasinsEnseignes();
+      final enseignes = {for (final m in e.magasins) e.enseigneDe(m)};
+      expect(enseignes, containsAll(e.enseignesMdd));
+      final n = e.magasins.length;
+      expect(n, greaterThan(avant));
+      e.magasins.last.enseigne = '-';
+      await e.ajouterMagasinsEnseignes();
+      expect(e.magasins.length, n, reason: 'une seule fois');
     });
 
     test('enregistrement : les données relues sont identiques', () {

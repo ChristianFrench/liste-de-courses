@@ -613,22 +613,35 @@ class EcranMarques extends StatelessWidget {
             ));
           }
         }
-        // Marques distributeur, par enseigne (proposées selon l'enseigne du magasin de la liste)
-        for (final e in etat.marquesDistributeur.entries) {
-          final cleE = 'marques/r/mdd/${e.key}';
-          final eOuvert = plis.ouvert(cleE, parDefaut: false);
-          cles.add(cleE);
+        // Marques distributeur : un rayon, un secteur par enseigne (proposées selon l'enseigne du magasin de la liste)
+        if (etat.marquesDistributeur.isNotEmpty) {
+          const cleR = 'marques/r/mdd';
+          final rOuvert = plis.ouvert(cleR, parDefaut: false);
+          cles.add(cleR);
           enfants.add(TitreGroupe(
-              key: ValueKey('mdd-${e.key}'),
-              nom: 'Marques distributeur · ${e.key}',
+              key: const ValueKey('rayon-mdd'),
+              nom: 'Marques distributeur',
               grand: true,
               icone: Icons.local_mall_outlined,
-              nombre: e.value.length,
-              ouvert: eOuvert,
-              onTap: () => plis.basculer(cleE, parDefaut: false)));
-          if (!eOuvert) continue;
-          for (final x in e.value) {
-            enfants.add(_LigneMarque(nom: x.marque, detail: x.categorie, onTap: () {}));
+              nombre: etat.marquesDistributeur.values.fold<int>(0, (n, l) => n + l.length),
+              ouvert: rOuvert,
+              onTap: () => plis.basculer(cleR, parDefaut: false)));
+          for (final e in etat.marquesDistributeur.entries) {
+            final cleE = 'marques/s/mdd/${e.key}';
+            cles.add(cleE);
+            if (!rOuvert) continue;
+            final eOuvert = plis.ouvert(cleE);
+            enfants.add(TitreGroupe(
+                key: ValueKey('mdd-${e.key}'),
+                nom: e.key,
+                nonPlace: true,
+                nombre: e.value.length,
+                ouvert: eOuvert,
+                onTap: () => plis.basculer(cleE)));
+            if (!eOuvert) continue;
+            for (final x in e.value) {
+              enfants.add(_LigneMarque(nom: x.marque, detail: x.categorie, onTap: () {}));
+            }
           }
         }
         // Rayons repliés par défaut, secteurs déployés : « tout déplier » les ouvre tous.

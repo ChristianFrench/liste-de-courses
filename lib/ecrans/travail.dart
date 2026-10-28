@@ -294,10 +294,10 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 icone: Icons.playlist_add,
                 titre: 'Liste rectificative',
                 sousTitre: cibles.isEmpty
-                    ? 'Aucune liste « À faire » ni en cours de courses à compléter'
-                    : 'Des articles à ajouter à une liste « À faire » ou en cours de courses',
+                    ? 'Aucune course en cours à compléter'
+                    : 'Des articles à ajouter à des courses en cours',
                 onTap: () => cibles.isEmpty
-                    ? Nav.message(context, 'Une rectificative complète une liste « À faire » ou en cours de courses : il n\'y en a pas.')
+                    ? Nav.message(context, 'Une rectificative complète des courses en cours : il n\'y en a pas.')
                     : _choisirCible(cibles),
               ),
               LigneMenu(
