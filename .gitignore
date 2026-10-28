@@ -1,3 +1,4 @@
 test/captures/
 *.log
 outils/__pycache__/
+definitions.json
