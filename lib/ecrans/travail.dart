@@ -309,15 +309,18 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 5 + (cibles.isEmpty ? 0 : 1),
+            nombre: 6,
             enfants: [
-              if (cibles.isNotEmpty)
-                LigneMenu(
-                  icone: Icons.playlist_add,
-                  titre: 'Liste rectificative',
-                  sousTitre: 'Des articles à ajouter à une liste « À faire » ou en cours de courses',
-                  onTap: () => _choisirCible(cibles),
-                ),
+              LigneMenu(
+                icone: Icons.playlist_add,
+                titre: 'Liste rectificative',
+                sousTitre: cibles.isEmpty
+                    ? 'Aucune liste « À faire » ni en cours de courses à compléter'
+                    : 'Des articles à ajouter à une liste « À faire » ou en cours de courses',
+                onTap: () => cibles.isEmpty
+                    ? Nav.message(context, 'Une rectificative complète une liste « À faire » ou en cours de courses : il n\'y en a pas.')
+                    : _choisirCible(cibles),
+              ),
               LigneMenu(
                 icone: Icons.edit_note,
                 titre: 'Liste simple',
@@ -362,12 +365,17 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             for (final c in cibles)
               LigneMenu(
                 titre: etat.nomListe(c),
-                sousTitre: c.statut == StatutListe.enCours
-                    ? 'En cours de courses · ${etat.membre(c.membreId)?.nomAffiche ?? '?'}'
-                    : 'À faire · ${c.lignes.length} art.',
+                sousTitre: [
+                  c.statut == StatutListe.enCours
+                      ? 'En cours de courses · ${etat.membre(c.membreId)?.nomAffiche ?? '?'}'
+                      : 'À faire · ${c.lignes.length} art.',
+                  if (etat.rectificativeOuvertePour(c) != null) 'rectificative déjà commencée : la reprendre',
+                ].join(' · '),
                 onTap: () {
                   Navigator.of(ctx).pop();
-                  final l = etat.creerRectificative(c);
+                  // Une seule rectificative à la fois par liste : celle déjà commencée est reprise.
+                  final r = etat.rectificativeOuvertePour(c);
+                  final l = r == null ? etat.creerRectificative(c) : etat.liste(r.listeId)!;
                   Nav.remplacerTravail(EcranConstruction(listeId: l.id));
                 },
               ),

@@ -1504,13 +1504,13 @@ class Etat extends ChangeNotifier {
 
   Rectificative? rectificativeDe(Liste l) => rectificatives[l.id];
 
-  /// Listes « À faire » ou en cours de courses qui peuvent recevoir une rectificative : une seule par liste.
-  List<Liste> ciblesRectificative() => [
-        for (final l in listes)
-          if ((l.statut == StatutListe.prete || l.statut == StatutListe.enCours) &&
-              !rectificatives.values.any((r) => r.cibleId == l.id && !r.signalee && (r.acceptee || liste(r.listeId) != null)))
-            l
-      ];
+  /// Listes « À faire » ou en cours de courses qu'une rectificative peut compléter.
+  List<Liste> ciblesRectificative() =>
+      [for (final l in listes) if (l.statut == StatutListe.prete || l.statut == StatutListe.enCours) l];
+
+  /// Rectificative pas encore réglée pour [cible] (en préparation ou en attente de décision) : une seule à la fois.
+  Rectificative? rectificativeOuvertePour(Liste cible) => _trouve(
+      rectificatives.values, (r) => r.cibleId == cible.id && (r.enRedaction || r.enAttente) && liste(r.listeId) != null);
 
   /// Rectificative qui attend la décision de celui qui fait la course [cible].
   Rectificative? rectificativeEnAttente(Liste cible) => _trouve(
