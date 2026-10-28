@@ -69,7 +69,7 @@ const _ensembles = {
 const _avecFoyer = {'membre', 'liste', 'parcours', 'ticket'};
 
 /// Réglages qui concernent tout le foyer (les autres restent propres à l'appareil).
-const _parametresPartages = {'options', 'frequences_preliste', 'corbeille'};
+const _parametresPartages = {'options', 'frequences_preliste', 'corbeille', 'rectificatives'};
 
 /// Options propres à l'appareil, jamais envoyées.
 const _optionsLocales = {'apparence'};
@@ -305,6 +305,8 @@ class Stockage {
     etat['frequencesPreliste'] = freq == null ? <String, dynamic>{} : jsonDecode(freq);
     final corbeille = reglage('corbeille');
     etat['corbeille'] = corbeille == null ? <dynamic>[] : jsonDecode(corbeille);
+    final rectificatives = reglage('rectificatives');
+    etat['rectificatives'] = rectificatives == null ? <dynamic>[] : jsonDecode(rectificatives);
 
     _ecrit
       ..clear()
@@ -663,6 +665,7 @@ class Stockage {
       if (moi != null) {'cle': 'membre_courant', 'valeur': moi},
       {'cle': 'frequences_preliste', 'valeur': jsonEncode(etat['frequencesPreliste'] ?? {})},
       {'cle': 'corbeille', 'valeur': jsonEncode(etat['corbeille'] ?? [])},
+      {'cle': 'rectificatives', 'valeur': jsonEncode(etat['rectificatives'] ?? [])},
       if ((etat['parametres'] as Map?)?['options'] != null)
         {'cle': 'options', 'valeur': jsonEncode((etat['parametres'] as Map)['options'])},
     ]);

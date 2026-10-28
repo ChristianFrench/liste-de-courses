@@ -36,7 +36,7 @@ class SousEcranPreparer extends StatelessWidget {
                 listeGlissable(
                   context,
                   l,
-                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.'),
+                  LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.rectificativeDe(l) != null ? ' · rectificative envoyée' : ''}'),
                   detail: '${_magasinSiRenommee(l)}${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · modifiée par '
                       '${etat.membre(l.modifieePar)?.nomAffiche ?? etat.moi.nomAffiche} · '
                       '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',

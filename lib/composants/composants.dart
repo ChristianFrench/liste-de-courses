@@ -480,8 +480,12 @@ class TitreGroupe extends StatelessWidget {
       this.focus = false,
       this.ajoute = false,
       this.grand = false,
+      this.marque,
       this.onTap});
   final String nom;
+
+  /// Petit signe après le nom (ex. : secteur qui a reçu des articles d'une liste rectificative).
+  final IconData? marque;
 
   /// Bandeau des listes autres que les articles : plus haut, police plus grosse, avec icône ou image.
   final bool grand;
@@ -531,6 +535,7 @@ class TitreGroupe extends StatelessWidget {
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
             if (ajoute) Text(' +', style: blanc),
+            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icon(marque, size: 18, color: Charte.blanc)),
             if (droite != null) Text(droite!, style: blanc),
             if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
           ]),

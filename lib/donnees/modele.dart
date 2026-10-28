@@ -341,6 +341,41 @@ class ElementCorbeille {
   Map<String, dynamic> toJson() => {'id': id, 'type': type, 'libelle': libelle, 'le': _iso(le), 'contenu': contenu};
 }
 
+/// Liste rectificative (cahier des charges du 28/10/2026) : quelques articles préparés par un membre pour
+/// une course en cours d'un autre. Celui qui fait les courses l'accepte ou la refuse en entier ; acceptée,
+/// ses articles rejoignent la course, fondus dans leur secteur ([fusion]) ou gardés à part en tête de liste.
+class Rectificative {
+  Rectificative(this.listeId, this.cibleId, this.auteurId, this.le, {this.mode, List<String>? produits}) : produits = produits ?? [];
+  /// Liste qui porte les articles (retirée une fois acceptée).
+  final String listeId;
+  /// Course en cours visée.
+  final String cibleId;
+  final String auteurId;
+  final DateTime le;
+
+  /// null : en attente de décision ; 'fusion' ou 'apart' : acceptée.
+  String? mode;
+
+  /// Articles ajoutés à la course à l'acceptation.
+  final List<String> produits;
+
+  bool get enAttente => mode == null;
+  bool get fusion => mode == 'fusion';
+
+  Map<String, dynamic> toJson() => {
+        'listeId': listeId,
+        'cibleId': cibleId,
+        'auteurId': auteurId,
+        'le': _iso(le),
+        if (mode != null) 'mode': mode,
+        if (produits.isNotEmpty) 'produits': produits,
+      };
+
+  static Rectificative depuis(Map r) => Rectificative(r['listeId'] as String, r['cibleId'] as String, r['auteurId'] as String,
+      _date(r['le']) ?? DateTime.now(),
+      mode: r['mode'] as String?, produits: [for (final x in (r['produits'] as List? ?? const [])) x as String]);
+}
+
 /// Étape des courses : un secteur (ou « Non placé » si [secteur] est nul) et ses lignes.
 class Etape {
   Etape(this.secteur, this.lignes);
@@ -483,6 +518,9 @@ class Etat extends ChangeNotifier {
   List<Ticket> tickets = [];
   Map<String, Map<String, int>> frequences = {};
   List<ElementCorbeille> corbeille = [];
+
+  /// Listes rectificatives envoyées ou acceptées, par liste qui les porte.
+  Map<String, Rectificative> rectificatives = {};
   String regleFrequence = '';
 
   int _compteur = 0;
@@ -889,6 +927,9 @@ class Etat extends ChangeNotifier {
         ElementCorbeille(c['id'] as String, c['type'] as String, c['libelle'] as String, _date(c['le']) ?? DateTime.now(),
             Map<String, dynamic>.from(c['contenu'] as Map))
     ];
+    rectificatives = {
+      for (final r in (j['rectificatives'] as List? ?? []).cast<Map>()) r['listeId'] as String: Rectificative.depuis(r)
+    };
     frequences = {};
     (j['frequencesPreliste'] as Map? ?? {}).forEach((cle, valeur) {
       if (cle == '_regle') {
@@ -976,6 +1017,7 @@ class Etat extends ChangeNotifier {
         ],
         'frequencesPreliste': {'_regle': regleFrequence, ...frequences},
         'corbeille': [for (final c in corbeille) c.toJson()],
+        'rectificatives': [for (final r in rectificatives.values) r.toJson()],
       };
 
   // ------------------------------------------------------------ Recherche
@@ -1416,6 +1458,67 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
+  // ------------------------------------------------------------ Liste rectificative
+
+  Rectificative? rectificativeDe(Liste l) => rectificatives[l.id];
+
+  /// Courses en cours auxquelles une rectificative peut être envoyée : une seule par course ([sauf] : la liste
+  /// déjà rattachée).
+  List<Liste> ciblesRectificative({String? sauf}) => [
+        for (final l in listes)
+          if (l.statut == StatutListe.enCours && !rectificatives.values.any((r) => r.cibleId == l.id && r.listeId != sauf)) l
+      ];
+
+  /// Rectificative qui attend la décision de celui qui fait la course [cible].
+  Rectificative? rectificativeEnAttente(Liste cible) => _trouve(
+      rectificatives.values, (r) => r.cibleId == cible.id && r.enAttente && liste(r.listeId) != null);
+
+  /// Rectificatives acceptées pour la course [cible].
+  List<Rectificative> rectificativesAcceptees(Liste cible) =>
+      [for (final r in rectificatives.values) if (r.cibleId == cible.id && !r.enAttente) r];
+
+  void envoyerRectificative(Liste l, Liste cible) {
+    final r = rectificatives[l.id];
+    if (r != null && r.cibleId == cible.id) return;
+    rectificatives[l.id] = Rectificative(l.id, cible.id, moi.id, DateTime.now());
+    l.modifieePar = moi.id;
+    l.modifieeLe = DateTime.now();
+    modifie();
+  }
+
+  /// La liste n'est plus une rectificative : une liste ordinaire en préparation.
+  void retirerRectificative(Liste l) {
+    if (rectificatives.remove(l.id) != null) modifie();
+  }
+
+  void refuserRectificative(Rectificative r) {
+    rectificatives.remove(r.listeId);
+    modifie();
+  }
+
+  /// Ajoute les articles de la rectificative à la course ; un article déjà dans la course n'est pas doublé.
+  void accepterRectificative(Rectificative r, {required bool fusion}) {
+    final rl = liste(r.listeId);
+    final cible = liste(r.cibleId);
+    if (rl == null || cible == null) return;
+    for (final g in rl.lignes) {
+      if (ligne(cible, g.produitId) != null) continue;
+      cible.lignes.add(LigneListe(
+          produitId: g.produitId,
+          marqueId: g.marqueId,
+          packagingId: g.packagingId,
+          quantite: g.quantite,
+          promotion: g.promotion,
+          consigne: g.consigne));
+      r.produits.add(g.produitId);
+    }
+    r.mode = fusion ? 'fusion' : 'apart';
+    final c = commentaires.remove(rl.id);
+    if (c != null) commentaires[cible.id] = [commentaires[cible.id], c].whereType<String>().join('\n');
+    listes.remove(rl);
+    modifie();
+  }
+
   // ------------------------------------------------------------ Préliste
 
   Map<String, int> frequencesDu(String magasinId) => frequences[magasinId] ?? const {};
@@ -1610,6 +1713,7 @@ class Etat extends ChangeNotifier {
   /// Départ annulé (rien de coché) : la liste redevient prête.
   void annulerDepart(Liste l) {
     apprentissage.remove(l.id);
+    rectificatives.removeWhere((_, r) => r.cibleId == l.id && r.enAttente);
     l.statut = StatutListe.prete;
     l.membreId = null;
     l.parcoursId = null;
@@ -1635,6 +1739,8 @@ class Etat extends ChangeNotifier {
     retenirParcours(l);
     l.statut = StatutListe.terminee;
     l.interrompueLe = null;
+    // Une rectificative restée sans réponse redevient une liste ordinaire en préparation.
+    rectificatives.removeWhere((_, r) => r.cibleId == l.id);
     modifie();
     return c;
   }

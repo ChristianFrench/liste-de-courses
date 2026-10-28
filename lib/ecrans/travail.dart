@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -591,6 +593,12 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nomType = TextEditingController(text: etat.nomListe(l));
     final commentaire = TextEditingController(text: etat.commentaire(l) ?? '');
     final nbSecteurs = {for (final g in l.lignes) etat.secteurDe(l.magasinId, g.produitId)?.id}.length;
+    // Liste rectificative : pour une course en cours d'un autre membre (une seule par course).
+    final cibles = etat.ciblesRectificative(sauf: l.id);
+    var rectif = etat.rectificativeDe(l) != null;
+    var cible = etat.rectificativeDe(l)?.cibleId ?? (cibles.isEmpty ? null : cibles.first.id);
+    if (cible != null && !cibles.any((c) => c.id == cible)) cible = cibles.isEmpty ? null : cibles.first.id;
+    String quiFait(Liste c) => '${etat.nomListe(c)} · ${etat.membre(c.membreId)?.nomAffiche ?? '?'}';
     final ok = await modale(
       context,
       titre: 'Fin de la liste',
@@ -614,7 +622,29 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 labelText: 'Commentaire (facultatif)', hintText: 'Ex. : passer aussi à la pharmacie'),
           ),
           const SizedBox(height: 6),
-          if (simple)
+          if (cibles.isNotEmpty)
+            CaseModale(
+              key: const ValueKey('case-rectificative'),
+              texte: 'Liste rectificative',
+              aide: 'Envoyée à celui qui fait les courses : il l\'accepte ou la refuse en entier.',
+              coche: rectif,
+              onChange: (v) => maj(() => rectif = v),
+            ),
+          if (rectif && cibles.length > 1)
+            Padding(
+              padding: const EdgeInsets.only(left: 38, bottom: 6),
+              child: ChoixDeroulant<String>(
+                valeur: cible!,
+                choix: {for (final c in cibles) c.id: quiFait(c)},
+                onChange: (v) => maj(() => cible = v),
+              ),
+            ),
+          if (rectif && cibles.length == 1)
+            Padding(
+              padding: const EdgeInsets.only(left: 38, bottom: 6),
+              child: Text('Pour : ${quiFait(cibles.first)}', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+          if (simple && !rectif)
             CaseModale(
               texte: 'Ranger par rayons et secteurs',
               aide: 'Pendant les courses, la liste suivra l\'ordre du magasin. Sinon, elle garde l\'ordre de saisie. '
@@ -622,6 +652,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
               coche: ranger,
               onChange: (v) => maj(() => ranger = v),
             ),
+          if (!rectif)
           CaseModale(
             texte: 'Prête pour les courses',
             aide: 'Elle passe en instance de courses ; vous pourrez encore la remettre en préparation.',
@@ -644,7 +675,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 decoration: const InputDecoration(labelText: 'Nom de la liste type'),
               ),
             ),
-          if (pourCourses)
+          if (pourCourses && !rectif)
             CaseModale(
               texte: 'Envoyer la liste par mail',
               aide: etat.envoiFoyer ? 'À tout le foyer' : null,
@@ -657,6 +688,15 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final nom = nomType.text.trim();
     if (!ok || !mounted) return;
     etat.commenter(l, commentaire.text);
+    if (rectif && cible != null) {
+      final c = etat.liste(cible)!;
+      etat.envoyerRectificative(l, c);
+      if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
+      Nav.i.retourOnglet(Nav.preparer);
+      if (mounted) Nav.message(context, 'Liste rectificative envoyée à ${etat.membre(c.membreId)?.nomAffiche ?? 'celui qui fait les courses'}');
+      return;
+    }
+    etat.retirerRectificative(l);
     if (simple) etat.ranger(l, ranger);
     if (enListeType && nom.isNotEmpty) etat.enregistrerListeType(l, nom);
     if (!pourCourses) {
@@ -1195,6 +1235,9 @@ class EcranCoursesSecteur extends StatefulWidget {
 
   static String court(String nom) => nom.split(' ').first;
 
+  /// Clignotement de l'icône de la liste rectificative (coupé dans les tests, qui attendent l'immobilité).
+  static bool clignoter = true;
+
   @override
   State<EcranCoursesSecteur> createState() => _EcranCoursesSecteurState();
 }
@@ -1216,6 +1259,109 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   final _titres = <String, GlobalKey>{};
   bool _place = false;
 
+  // ---------------------------------------------- Liste rectificative en attente de décision
+  Timer? _clignote;
+  Timer? _rappel;
+  bool _allume = true;
+  String? _rectifSuivie;
+  bool _rectifOuverte = false;
+
+  /// L'icône clignote et un résumé s'ouvre (tout de suite, puis toutes les 60 s) tant que la décision n'est pas prise.
+  void _suivreRectificative(Rectificative? r) {
+    if (r?.listeId == _rectifSuivie) return;
+    _rectifSuivie = r?.listeId;
+    _clignote?.cancel();
+    _rappel?.cancel();
+    _clignote = _rappel = null;
+    _allume = true;
+    if (r == null) return;
+    if (EcranCoursesSecteur.clignoter) {
+      _clignote = Timer.periodic(const Duration(milliseconds: 600), (_) {
+        if (mounted) setState(() => _allume = !_allume);
+      });
+    }
+    _rappel = Timer.periodic(const Duration(seconds: 60), (_) => _resumer());
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resumer());
+  }
+
+  @override
+  void dispose() {
+    _clignote?.cancel();
+    _rappel?.cancel();
+    super.dispose();
+  }
+
+  Rectificative? _enAttente() {
+    final l = Etat.instance.liste(widget.listeId);
+    return l == null ? null : Etat.instance.rectificativeEnAttente(l);
+  }
+
+  Widget _articlesRectificative(Rectificative r, {int? max}) {
+    final etat = Etat.instance;
+    final noms = [for (final g in etat.liste(r.listeId)?.lignes ?? const <LigneListe>[]) etat.produit(g.produitId)?.nom ?? ''];
+    final vus = max == null || noms.length <= max ? noms : noms.sublist(0, max);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('${etat.membre(r.auteurId)?.nomAffiche ?? 'Un membre'} propose ${noms.length} article${noms.length > 1 ? 's' : ''} '
+            'à ajouter à vos courses :', style: Charte.texte(16, gras: true)),
+        const SizedBox(height: 6),
+        for (final n in vus) Text('• $n', style: Charte.texte(15)),
+        if (vus.length < noms.length) Text('… et ${noms.length - vus.length} autre${noms.length - vus.length > 1 ? 's' : ''}', style: Charte.texte(15)),
+      ],
+    );
+  }
+
+  /// Résumé périodique : il propose d'ouvrir la décision.
+  Future<void> _resumer() async {
+    final r = _enAttente();
+    if (!mounted || r == null || _rectifOuverte || ModalRoute.of(context)?.isCurrent == false) return;
+    _rectifOuverte = true;
+    final voir = await confirmer(
+      context,
+      titre: 'Liste rectificative',
+      contenu: _articlesRectificative(r, max: 6),
+      plein: 'Voir et décider',
+      contour: 'Plus tard',
+    );
+    _rectifOuverte = false;
+    if (voir == false && mounted) await _decider();
+  }
+
+  /// La rectificative s'accepte ou se refuse en entier ; acceptée, ses articles rejoignent la liste
+  /// (surlignés dans leur secteur) ou restent à part, en tête.
+  Future<void> _decider() async {
+    final etat = Etat.instance;
+    final r = _enAttente();
+    if (r == null || _rectifOuverte) return;
+    final auteur = etat.membre(r.auteurId)?.nomAffiche ?? 'un membre';
+    _rectifOuverte = true;
+    try {
+      final refus = await confirmer(context,
+          titre: 'Liste rectificative de $auteur', contenu: _articlesRectificative(r), plein: 'Accepter', contour: 'Refuser');
+      if (refus == null || !mounted) return;
+      if (refus) {
+        etat.refuserRectificative(r);
+        Nav.message(context, 'Refusée : elle redevient une liste en préparation de $auteur');
+        return;
+      }
+      final aPart = await confirmer(
+        context,
+        titre: 'Où mettre ces articles ?',
+        contenu: Text('Ajoutés à votre liste, ils sont surlignés dans leur secteur. Gardés à part, ils sont groupés en tête, '
+            'sous « Ajouts de $auteur ».', style: Charte.texte(16)),
+        plein: 'Ajouter à ma liste',
+        contour: 'Garder à part',
+      );
+      if (aPart == null || !mounted) return;
+      etat.accepterRectificative(r, fusion: !aPart);
+      final n = r.produits.length;
+      Nav.message(context, n == 0 ? 'Ces articles étaient déjà dans votre liste' : '$n article${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''}');
+    } finally {
+      _rectifOuverte = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
@@ -1230,6 +1376,20 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           );
         }
         final etapes = etat.etapes(l, l.parcoursId);
+        final rectif = etat.rectificativeEnAttente(l);
+        _suivreRectificative(rectif);
+        final acceptees = etat.rectificativesAcceptees(l);
+        final aPart = {for (final r in acceptees) if (!r.fusion) ...r.produits};
+        final fondus = {for (final r in acceptees) if (r.fusion) ...r.produits};
+        final ajouts = [
+          for (final r in acceptees)
+            if (!r.fusion && r.produits.any((id) => etat.ligne(l, id) != null)) ...[
+              TitreGroupe(
+                  key: ValueKey('ajouts-${r.listeId}'), nom: 'Ajouts de ${etat.membre(r.auteurId)?.nomAffiche ?? '?'}', marque: Icons.playlist_add),
+              for (final id in r.produits)
+                if (etat.ligne(l, id) case final g?) _ligne(etat, l, g, ajout: true),
+            ],
+        ];
         // Liste simple non rangée : les articles dans l'ordre de saisie, sans bandeaux.
         final aplat = etat.aPlat(l);
         final total = l.lignes.length;
@@ -1255,19 +1415,45 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
               retour: true,
               titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total',
               aide: Aides.enMagasin,
-              droite: commentaire == null ? null : boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
+              droite: commentaire == null && rectif == null
+                  ? null
+                  : Row(mainAxisSize: MainAxisSize.min, children: [
+                      if (rectif != null)
+                        KeyedSubtree(
+                          key: const ValueKey('bouton-rectificative'),
+                          child: AnimatedOpacity(
+                            opacity: _allume ? 1 : 0.2,
+                            duration: const Duration(milliseconds: 250),
+                            child: boutonEnTete(Icons.playlist_add, 'Liste rectificative', _decider),
+                          ),
+                        ),
+                      if (commentaire != null)
+                        boutonEnTete(Icons.sticky_note_2_outlined, 'Commentaire', () => _commentaire(context, commentaire)),
+                    ]),
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
                 : ListView(
                     padding: const EdgeInsets.only(bottom: 16),
                     children: aplat
-                        ? [for (final g in l.lignes) _ligne(etat, l, g)]
+                        ? [
+                            ...ajouts,
+                            for (final g in l.lignes)
+                              if (!aPart.contains(g.produitId)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
+                          ]
                         : [
-                            for (final x in etapes) ...[
-                              TitreGroupe(key: _titres.putIfAbsent(x.id, GlobalKey.new), nom: x.nom, nonPlace: x.nonPlace),
-                              for (final g in x.lignes) _ligne(etat, l, g),
-                            ],
+                            ...ajouts,
+                            for (final x in etapes)
+                              if (x.lignes.any((g) => !aPart.contains(g.produitId))) ...[
+                                TitreGroupe(
+                                  key: _titres.putIfAbsent(x.id, GlobalKey.new),
+                                  nom: x.nom,
+                                  nonPlace: x.nonPlace,
+                                  marque: x.lignes.any((g) => fondus.contains(g.produitId)) ? Icons.playlist_add : null,
+                                ),
+                                for (final g in x.lignes)
+                                  if (!aPart.contains(g.produitId)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
+                              ],
                           ],
                   ),
             bas: [
@@ -1299,7 +1485,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     });
   }
 
-  Widget _ligne(Etat etat, Liste l, LigneListe g) {
+  Widget _ligne(Etat etat, Liste l, LigneListe g, {bool ajout = false}) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
     final manquant = etat.manquant(l, p.id);
@@ -1309,6 +1495,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       produit: p,
       coche: g.coche,
       manquant: manquant,
+      surligne: ajout,
       caseCourse: true,
       onTap: () => _appui(etat, l, p),
       onDetail: () => detailArticle(context, g),

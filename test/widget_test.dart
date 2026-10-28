@@ -24,7 +24,7 @@ import 'package:liste_de_courses/ecrans/archives.dart';
 import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
 import 'package:liste_de_courses/ecrans/historique.dart' show BlocTicket, SousEcranHistorique;
 import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
-import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, FeuillePromotion, LigneArticle, codeCourtPackaging;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranCoursesSecteur, FeuillePromotion, LigneArticle, codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -355,6 +355,34 @@ void main() {
       expect(appris.etapes, attendu);
       expect(appris.parDefaut, isTrue);
       expect(e.parcoursAppris, contains(appris.id));
+    });
+
+    test('liste rectificative : une par course, acceptée en entier, oubliée à la fin des courses', () {
+      final e = Etat.instance;
+      final l2 = e.liste('l2')!, l4 = e.liste('l4')!;
+      expect(e.ciblesRectificative().map((l) => l.id), ['l4']);
+      e.envoyerRectificative(l2, l4);
+      expect(e.ciblesRectificative(), isEmpty, reason: 'une seule rectificative par course');
+      expect(e.ciblesRectificative(sauf: 'l2').map((l) => l.id), ['l4']);
+      expect(e.rectificativeEnAttente(l4)?.listeId, 'l2');
+      // Relue à l'identique
+      final avant = jsonEncode(e.versJson());
+      e.lire(jsonDecode(avant) as Map<String, dynamic>);
+      expect(jsonEncode(e.versJson()), avant);
+
+      final r = e.rectificativeEnAttente(e.liste('l4')!)!;
+      e.refuserRectificative(r);
+      expect(e.liste('l2')!.statut, StatutListe.enConstruction, reason: 'refusée : liste ordinaire en préparation');
+      expect(e.rectificativeDe(e.liste('l2')!), isNull);
+
+      e.envoyerRectificative(e.liste('l2')!, e.liste('l4')!);
+      final avantNb = e.liste('l4')!.lignes.length;
+      e.accepterRectificative(e.rectificativeEnAttente(e.liste('l4')!)!, fusion: true);
+      expect(e.liste('l2'), isNull, reason: 'ses articles ont rejoint la course');
+      expect(e.liste('l4')!.lignes.length, avantNb + 3, reason: 'p1 était déjà dans la course');
+      expect(e.rectificativesAcceptees(e.liste('l4')!).single.produits, ['p20', 'p18', 'p7']);
+      e.terminerCourses(e.liste('l4')!);
+      expect(e.rectificatives, isEmpty);
     });
 
     test('enregistrement : les données relues sont identiques', () {
@@ -748,6 +776,42 @@ void main() {
       expect(find.textContaining('Dans 2 mails'), findsNWidgets(2));
       await _toucher(tester, find.text('Créer la liste'));
       expect(Etat.instance.listes.last.lignes.length, 2);
+    });
+
+    testWidgets('liste rectificative : envoyée en fin de liste, acceptée à part pendant les courses', (tester) async {
+      EcranCoursesSecteur.clignoter = false;
+      final etat = Etat.instance;
+      final l2 = etat.liste('l2')!, l4 = etat.liste('l4')!;
+      await _accueil(tester);
+      await _ouvrirListe(tester, etat.nomListe(l2), 'Continuer la préparation');
+      await _toucher(tester, find.text('Liste prête'));
+      await _toucher(tester, find.text('Liste rectificative'));
+      expect(find.textContaining('Pour : '), findsOneWidget);
+      expect(find.text('Prête pour les courses'), findsNothing);
+      await _toucher(tester, find.text('Valider'));
+      expect(etat.rectificativeDe(l2)?.cibleId, 'l4');
+      expect(find.textContaining('rectificative envoyée'), findsWidgets);
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pumpAndSettle();
+
+      await _toucher(tester, _onglet('Courses'));
+      await _ouvrirListe(tester, etat.nomListe(l4), 'Reprendre les courses');
+      // Le résumé s'ouvre tout seul ; l'icône du titre reste tant que rien n'est décidé
+      expect(find.text('Liste rectificative'), findsOneWidget);
+      expect(find.textContaining('propose 4 articles'), findsOneWidget);
+      await _toucher(tester, find.text('Plus tard'));
+      expect(find.byKey(const ValueKey('bouton-rectificative')), findsOneWidget);
+      await tester.pump(const Duration(seconds: 61));
+      await tester.pumpAndSettle();
+      expect(find.text('Voir et décider'), findsOneWidget, reason: 'rappel toutes les 60 s');
+      await _toucher(tester, find.text('Voir et décider'));
+      await _toucher(tester, find.text('Accepter'));
+      await _toucher(tester, find.text('Garder à part'));
+      expect(find.byKey(const ValueKey('bouton-rectificative')), findsNothing);
+      expect(find.text('AJOUTS DE MEMBRE 1'), findsOneWidget);
+      expect(etat.liste('l2'), isNull);
+      expect(find.text('Magasin 1 · 4 / 12'), findsOneWidget);
+      EcranCoursesSecteur.clignoter = true;
     });
 
     testWidgets('9. Courses : la liste condensée, cocher, manquant, Pause puis Interrompre', (tester) async {
