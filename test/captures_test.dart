@@ -163,8 +163,8 @@ void main() {
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Types-de-promotion');
     await _toucher(tester, find.byTooltip('Retour'));
-    await _toucher(tester, find.text('Marques'));
-    await _capture('17 Marques');
+    await _toucher(tester, find.text('Catalogue des marques'));
+    await _capture('17 Catalogue des marques');
     await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.text('Types de packaging'));
     await _capture('23 Types-de-packaging');
