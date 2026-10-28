@@ -400,10 +400,11 @@ class Aides {
       'Un petit + signale un produit ajouté par le foyer ; « Produits ajoutés » (en touchant le titre) les rassemble pour les modifier ou les supprimer. '
       'Toucher le bandeau d\'un rayon propose un nouveau secteur ou de changer l\'ordre des secteurs.\n$_gestes';
 
-  static const marques = 'Les marques de chaque secteur, rangées comme le catalogue des produits, par rayon et secteur. '
-      'En préparation, le volet d\'un article propose les marques de son secteur dans une liste déroulante. '
-      'Touchez un secteur pour voir ses marques ; « + Nouvelle marque » (en touchant le titre) en ajoute une ; touchez une marque '
-      'pour la renommer (partout, ses produits aussi) ou la retirer de ce secteur.\n$_gestes';
+  static const marques = 'Les marques de chaque secteur, rangées comme le catalogue des produits : seuls les rayons et secteurs '
+      'qui ont des marques paraissent, avec leur nombre. Touchez une marque pour la modifier (rayon, secteur, libellé ; '
+      'un autre nom la renomme partout, ses produits aussi) ; la poubelle ou un glissement vers la gauche la retire du secteur ; '
+      '« + Nouvelle marque », en fin de secteur ou en touchant le titre, en ajoute une. '
+      'En préparation, le volet d\'un article propose les marques de son secteur dans une liste déroulante.\n$_gestes';
 
   static const parcours = 'L\'ordre des secteurs appris pendant vos courses, pour chaque membre et chaque magasin. '
       'Il se complète tout seul quand vous passez par de nouveaux secteurs.\n$_gestes';

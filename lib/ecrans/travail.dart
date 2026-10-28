@@ -1014,6 +1014,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   void _majLibelle() {
     if (!libelleModifie) libelle.text = _auto();
     setState(() {});
+    _majVolet?.call(() {});
   }
 
   Map<String, dynamic> _parametres() {
@@ -1059,163 +1060,160 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         ? <String>[]
         : (p.packagingIds.isNotEmpty ? p.packagingIds : etat.formatsDuSecteur(widget.liste.magasinId, p.id));
     return SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
-            Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            const TitreSection('Packaging', cote: 0, haut: 12),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              _pastille('Indifférent', packagingId == null, () => setState(() => packagingId = null)),
-              for (final k in {...proposes, if (packagingId != null) packagingId!})
-                _pastille(etat.packaging(k)?.libelle ?? '', packagingId == k, () => setState(() => packagingId = k)),
-              _pastille('Autre format…', false, () async {
-                final autres = [for (final k in etat.typesPackaging) if (!proposes.contains(k)) k];
-                final v = await choisirDansListe<String>(
-                  context,
-                  titre: 'Choisir un format',
-                  choix: {'': '+ Nouveau format…', for (final k in autres) k: etat.packaging(k)?.libelle ?? ''},
-                );
-                if (v == null || p == null) return;
-                if (v.isNotEmpty) {
-                  etat.ajouterPackaging(p, etat.packaging(v)!.libelle);
-                  setState(() => packagingId = v);
-                  return;
-                }
-                if (!context.mounted) return;
-                final lib = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
-                if (lib == null || lib.isEmpty) return;
-                etat.ajouterPackaging(p, lib);
-                etat.ajouterTypePackaging(lib);
-                setState(() => packagingId = p.packagingIds.last);
-              }),
-            ]),
-            if (p != null && p.packagingIds.isEmpty && proposes.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text('Formats courants du secteur, ce produit n\'en a pas encore.',
-                    style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-              ),
-            if (p != null) ...[
-              const TitreSection('Marque', cote: 0, haut: 14),
-              ChoixDeroulant<String>(
-                key: const ValueKey('choix-marque'),
-                valeur: marque,
-                choix: {
-                  '': 'Indifférente',
-                  for (final n in {...etat.marquesProposees(widget.ligne, p), if (marque.isNotEmpty) marque}) n: n,
-                  _autreMarque: 'Autre marque…',
-                },
-                onChange: (v) async {
-                  if (v != _autreMarque) return setState(() => marque = v);
-                  final n = await demanderTexte(context, titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
-                  if (n == null || n.trim().isEmpty || !mounted) return;
-                  if (etat.secteurCatalogue(p.id) case final s?) etat.ajouterMarqueSecteur(s, n);
-                  setState(() => marque = n.trim());
-                },
-              ),
-            ],
-            const TitreSection('Consigne', cote: 0, haut: 14),
-            TextField(
-              key: const ValueKey('consigne'),
-              controller: consigne,
-              style: Charte.texte(17),
-              maxLines: 2,
-              minLines: 1,
-              decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
-            ),
-            const TitreSection('Promotion visée', cote: 0, haut: 14),
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              childAspectRatio: 1.75,
-              children: [_tuile(null), for (final t in types) _tuile(t)],
-            ),
-            const SizedBox(height: 12),
-            ..._champs(),
-            if (type != FeuillePromotion.aucune) ...[
-              const SizedBox(height: 10),
-              Text('Libellé', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-              const SizedBox(height: 4),
-              TextField(
-                controller: libelle,
-                style: Charte.texte(17),
-                onChanged: (_) => libelleModifie = true,
-              ),
-            ],
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(context).pop())),
-                const SizedBox(width: 10),
-                Expanded(child: Bouton(texte: 'Valider', plein: true, onTap: _valider)),
-              ],
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
+          Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          const TitreSection('Consigne', cote: 0, haut: 12),
+          TextField(
+            key: const ValueKey('consigne'),
+            controller: consigne,
+            style: Charte.texte(17),
+            maxLines: 2,
+            minLines: 1,
+            decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
+          ),
+          if (p != null) ...[
+            const TitreSection('Marque', cote: 0, haut: 14),
+            ChoixDeroulant<String>(
+              key: const ValueKey('choix-marque'),
+              valeur: marque,
+              choix: {
+                '': 'Indifférente',
+                for (final n in {...etat.marquesProposees(widget.ligne, p), if (marque.isNotEmpty) marque}) n: n,
+                _autre: 'Autre marque…',
+              },
+              onChange: (v) async {
+                if (v != _autre) return setState(() => marque = v);
+                final n = await demanderTexte(context, titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
+                if (n == null || n.trim().isEmpty || !mounted) return;
+                if (etat.secteurCatalogue(p.id) case final s?) etat.ajouterMarqueSecteur(s, n);
+                setState(() => marque = n.trim());
+              },
             ),
           ],
-        ),
+          const TitreSection('Promotion visée', cote: 0, haut: 14),
+          ChoixDeroulant<String>(
+            key: const ValueKey('choix-promo'),
+            valeur: type,
+            choix: {FeuillePromotion.aucune: 'Aucune', for (final t in types) t.id: _nomCourt(t)},
+            onChange: (v) {
+              _choisirType(v);
+              if (v != FeuillePromotion.aucune) _completerPromo();
+            },
+          ),
+          if (type != FeuillePromotion.aucune)
+            InkWell(
+              key: const ValueKey('complement-promo'),
+              onTap: _completerPromo,
+              child: Container(
+                constraints: const BoxConstraints(minHeight: Charte.ligneListe),
+                alignment: Alignment.centerLeft,
+                child: Row(children: [
+                  Expanded(child: Text(libelle.text.isEmpty ? _auto() : libelle.text, style: Charte.texte(16))),
+                  Icon(Icons.edit_outlined, size: 20, color: Charte.couleurIcone(Icons.edit_outlined)),
+                ]),
+              ),
+            ),
+          const TitreSection('Packaging', cote: 0, haut: 14),
+          ChoixDeroulant<String>(
+            key: const ValueKey('choix-packaging'),
+            valeur: packagingId ?? '',
+            choix: {
+              '': 'Indifférent',
+              for (final k in {...proposes, if (packagingId != null) packagingId!}) k: etat.packaging(k)?.libelle ?? '',
+              _autre: 'Autre format…',
+            },
+            onChange: (v) async {
+              if (v != _autre) return setState(() => packagingId = v.isEmpty ? null : v);
+              if (p != null) await _autreFormat(p, proposes);
+            },
+          ),
+          if (p != null && p.packagingIds.isEmpty && proposes.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 6),
+              child: Text('Formats courants du secteur, ce produit n\'en a pas encore.',
+                  style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+            ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(context).pop())),
+              const SizedBox(width: 10),
+              Expanded(child: Bouton(texte: 'Valider', plein: true, onTap: _valider)),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
-  static const _autreMarque = '\u0000autre';
+  static const _autre = '\u0000autre';
 
-  Widget _pastille(String texte, bool choisi, VoidCallback onTap) => Material(
-        color: choisi ? Charte.accent : Charte.blanc,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            child: Center(
-              widthFactor: 1,
-              child: Text(texte, style: Charte.texte(15, gras: choisi, couleur: choisi ? Charte.blanc : Charte.encre)),
-            ),
-          ),
-        ),
-      );
+  void _choisirType(String id) {
+    if (type != id) {
+      type = id;
+      enMontant = false;
+      libelleModifie = false;
+      // Valeurs proposées pour le type choisi
+      c1.text = switch (type) { 'lot' => '3', 'prixGlobal' => '2', _ => '' };
+      c2.text = switch (type) { 'lot' => '1', _ => '' };
+    }
+    _majLibelle();
+  }
 
-  Widget _tuile(TypePromotion? t) {
-    final id = t?.id ?? FeuillePromotion.aucune;
-    final choisi = id == type;
-    return Material(
-      color: choisi ? Charte.accent : Charte.blanc,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-        side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: () {
-          if (type != id) {
-            type = id;
-            enMontant = false;
-            libelleModifie = false;
-            // Valeurs proposées pour le type choisi
-            c1.text = switch (type) { 'lot' => '3', 'prixGlobal' => '2', _ => '' };
-            c2.text = switch (type) { 'lot' => '1', _ => '' };
-          }
-          _majLibelle();
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (t != null) IconePromo(code: t.code, inverse: choisi) else const SizedBox(height: 4),
+  StateSetter? _majVolet;
+
+  /// Complément de la promotion (lot, quantité, remise…) et son libellé, dans un volet.
+  Future<void> _completerPromo() async {
+    await volet<void>(
+      context,
+      builder: (ctx) => StatefulBuilder(builder: (ctx, maj) {
+        _majVolet = maj;
+        return corpsVolet(
+          titre: _nomCourt(etat.typePromotion(type)),
+          contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+            ..._champs(),
+            const SizedBox(height: 10),
+            Text('Libellé', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 4),
-            Text(_nomCourt(t), textAlign: TextAlign.center,
-                style: Charte.texte(14, gras: choisi, couleur: choisi ? Charte.blanc : Charte.encre)),
-          ],
-        ),
-      ),
+            TextField(
+              key: const ValueKey('libelle-promo'),
+              controller: libelle,
+              style: Charte.texte(17),
+              onChanged: (_) => libelleModifie = true,
+            ),
+          ]),
+          boutons: [Bouton(texte: 'OK', plein: true, onTap: () => Navigator.of(ctx).pop())],
+        );
+      }),
     );
+    _majVolet = null;
+    if (mounted) setState(() {});
+  }
+
+  /// « Autre format… » : un format connu de la famille, ou un nouveau.
+  Future<void> _autreFormat(Produit p, List<String> proposes) async {
+    final autres = [for (final k in etat.typesPackaging) if (!proposes.contains(k)) k];
+    final v = await choisirDansListe<String>(
+      context,
+      titre: 'Choisir un format',
+      choix: {'': '+ Nouveau format…', for (final k in autres) k: etat.packaging(k)?.libelle ?? ''},
+    );
+    if (v == null || !mounted) return;
+    if (v.isNotEmpty) {
+      etat.ajouterPackaging(p, etat.packaging(v)!.libelle);
+      setState(() => packagingId = v);
+      return;
+    }
+    final lib = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
+    if (lib == null || lib.isEmpty || !mounted) return;
+    etat.ajouterPackaging(p, lib);
+    etat.ajouterTypePackaging(lib);
+    setState(() => packagingId = p.packagingIds.last);
   }
 
   static String _nomCourt(TypePromotion? t) => switch (t?.id) {

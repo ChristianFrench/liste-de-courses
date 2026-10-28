@@ -539,8 +539,10 @@ class EcranProduitsPerso extends StatelessWidget {
 
 // ------------------------------------------------------------ Marques
 
-/// Gérer › Courses › Catalogue des marques (28/10/2026) : rangé comme le catalogue des produits, par rayon
-/// et secteur ; toucher un secteur montre ses marques.
+/// Gérer › Courses › Catalogue des marques (28/10/2026) : un seul écran, rangé comme le catalogue des produits.
+/// Seuls les rayons et secteurs qui ont des marques paraissent, avec leur nombre ; sous chaque secteur, ses
+/// marques (lignes de 40), puis « + Nouvelle marque ». Toucher une marque la modifie ; la poubelle ou un
+/// glissement vers la gauche la retire du secteur.
 class EcranMarques extends StatelessWidget {
   const EcranMarques({super.key});
 
@@ -549,88 +551,65 @@ class EcranMarques extends StatelessWidget {
     final etat = Etat.instance;
     return ListenableBuilder(
       listenable: etat,
-      builder: (context, _) => PageBase(
-        entete: const EnTeteFenetre(
-            retour: true, icone: Icons.sell_outlined, sousTitre: 'Gérer › Courses', titre: 'Catalogue des marques', aide: Aides.marques),
-        corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
-          children: [
-            for (final x in etat.rayonsCatalogue)
-              GroupeRetractable(
-                cle: 'marques/${x.nom}',
-                parDefaut: false,
-                titre: x.nom,
-                image: cleRayon(x.nom),
-                nombre: {for (final s in etat.secteursDu(x.id)) ...etat.marquesDuSecteur(s).map((n) => n.toLowerCase())}.length,
-                enfants: [
-                  for (final s in etat.secteursDu(x.id))
-                    LigneMenu(
-                      titre: s.nom,
-                      gauche: imageSecteur(context, s),
-                      sousTitre: _pluriel(etat.marquesDuSecteur(s).length, 'marque'),
-                      onTap: () => Nav.aller<void>(context, EcranMarquesSecteur(secteurId: s.id)),
-                    ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Les marques d'un secteur : en ajouter, en renommer, en retirer.
-class EcranMarquesSecteur extends StatelessWidget {
-  const EcranMarquesSecteur({super.key, required this.secteurId});
-  final String secteurId;
-
-  @override
-  Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    return ListenableBuilder(
-      listenable: etat,
       builder: (context, _) {
-        final s = etat.secteur(secteurId);
-        if (s == null) {
-          return PageBase(
-            entete: const EnTeteFenetre(retour: true, icone: Icons.sell_outlined, titre: 'Secteur'),
-            corps: Center(child: Text('Ce secteur n\'existe plus.', style: Charte.texte(16))),
-          );
+        final enfants = <Widget>[];
+        for (final r in etat.rayonsCatalogue) {
+          final secteurs = [
+            for (final s in etat.secteursDu(r.id))
+              if (etat.marquesDuSecteur(s) case final noms when noms.isNotEmpty) (s, noms)
+          ];
+          if (secteurs.isEmpty) continue;
+          enfants.add(TitreGroupe(
+              key: ValueKey('rayon-marques-${r.nom}'),
+              nom: r.nom,
+              grand: true,
+              image: cleRayon(r.nom),
+              nombre: {for (final (_, noms) in secteurs) ...noms.map((n) => n.toLowerCase())}.length));
+          for (final (s, noms) in secteurs) {
+            enfants.add(TitreGroupe(key: ValueKey('secteur-marques-${s.nom}'), nom: s.nom, nonPlace: true, nombre: noms.length));
+            for (final n in noms) {
+              enfants.add(Glissable(
+                key: ValueKey('glisser-marque-${s.id}-$n'),
+                titre: n,
+                versGauche: ActionLigne(Icons.delete_outline, 'Retirer', () => _retirer(context, s, n), danger: true),
+                child: _LigneMarque(
+                  key: ValueKey('marque-$n'),
+                  nom: n,
+                  detail: _produitsDeMarque(n),
+                  onTap: () => fenetreMarque(context, secteur: s, nom: n),
+                  onSupprimer: () => _retirer(context, s, n),
+                ),
+              ));
+            }
+            enfants.add(_LigneMarque(
+              key: ValueKey('nouvelle-marque-${s.nom}'),
+              nom: '+ Nouvelle marque',
+              ajout: true,
+              onTap: () => fenetreMarque(context, secteur: s),
+            ));
+          }
         }
-        final noms = etat.marquesDuSecteur(s);
-        Future<void> nouvelle() async {
-          final nom = await demanderTexte(context, titre: 'Nouvelle marque · ${s.nom}', aide: 'Ex. : Président');
-          if (nom != null && nom.trim().isNotEmpty) etat.ajouterMarqueSecteur(s, nom);
-        }
-
         return PageBase(
           entete: EnTeteFenetre(
             retour: true,
             icone: Icons.sell_outlined,
-            sousTitre: 'Marques › ${etat.rayon(s.rayonId)?.nom ?? ''}',
-            titre: s.nom,
+            sousTitre: 'Gérer › Courses',
+            titre: 'Catalogue des marques',
             aide: Aides.marques,
-            actions: [ActionLigne(Icons.add, '+ Nouvelle marque', nouvelle)],
+            actions: [ActionLigne(Icons.add, '+ Nouvelle marque', () => fenetreMarque(context))],
           ),
           corps: ListView(
             padding: const EdgeInsets.only(bottom: 16),
-            children: [
-              if (noms.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('Aucune marque dans ce secteur.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                ),
-              for (final n in noms)
-                LigneMenu(
-                  key: ValueKey('marque-$n'),
-                  titre: n,
-                  icone: Icons.sell_outlined,
-                  sousTitre: _produitsDeMarque(n),
-                  onTap: () => _marque(context, s, n),
-                ),
-            ],
+            children: enfants.isEmpty
+                ? [
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text('Aucune marque : touchez le titre pour en ajouter une.',
+                          style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                    ),
+                  ]
+                : enfants,
           ),
-          bas: [BarreAction(boutons: [Bouton(texte: 'Nouvelle marque', icone: Icons.add, plein: true, onTap: nouvelle)])],
         );
       },
     );
@@ -643,15 +622,112 @@ class EcranMarquesSecteur extends StatelessWidget {
     return n == 0 ? null : _pluriel(n, 'produit');
   }
 
-  Future<void> _marque(BuildContext context, Secteur s, String nom) async {
+  static void _retirer(BuildContext context, Secteur s, String nom) {
     final etat = Etat.instance;
-    await menuActions(context, titre: nom, actions: [
-      ActionLigne(Icons.edit_outlined, 'Renommer', () async {
-        final n = await demanderTexte(context, titre: 'Nom de la marque', initial: nom);
-        if (n != null && n.trim().isNotEmpty) etat.renommerMarqueCatalogue(nom, n);
-      }),
-      ActionLigne(Icons.remove_circle_outline, 'Retirer de ce secteur', () => etat.retirerMarqueSecteur(s, nom), danger: true),
-    ]);
+    etat.retirerMarqueSecteur(s, nom);
+    Nav.message(context, '« $nom » retirée de ${s.nom}', annuler: () => etat.ajouterMarqueSecteur(s, nom));
+  }
+}
+
+/// Ligne de 40 du catalogue des marques : le nom (et ses produits), la poubelle à droite.
+class _LigneMarque extends StatelessWidget {
+  const _LigneMarque({super.key, required this.nom, required this.onTap, this.onSupprimer, this.detail, this.ajout = false});
+  final String nom;
+  final String? detail;
+  final bool ajout;
+  final VoidCallback onTap;
+  final VoidCallback? onSupprimer;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: Charte.fond,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: Charte.ligneListe,
+            padding: const EdgeInsets.only(left: 16, right: 4),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+            child: Row(children: [
+              Expanded(
+                child: Text(nom,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: Charte.texte(16, couleur: ajout ? Charte.accent : Charte.encre, gras: ajout)),
+              ),
+              if (detail != null) Text(detail!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+              if (onSupprimer != null)
+                IconButton(
+                  tooltip: 'Retirer',
+                  onPressed: onSupprimer,
+                  icon: Icon(Icons.delete_outline, size: 22, color: Charte.couleurIcone(Icons.delete_outline)),
+                ),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// Volet de création ou de modification d'une marque : rayon, secteur du rayon, libellé.
+/// En modification, un autre nom renomme la marque partout (ses produits aussi) ; un autre secteur l'y déplace.
+Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}) async {
+  final etat = Etat.instance;
+  final rayons = [for (final r in etat.rayonsCatalogue) if (etat.secteursDu(r.id).isNotEmpty) r];
+  if (rayons.isEmpty) return;
+  var rayonId = secteur?.rayonId ?? rayons.first.id;
+  var secteurId = secteur?.id ?? etat.secteursDu(rayonId).first.id;
+  final libelle = TextEditingController(text: nom ?? '');
+  final ok = await modale(
+    context,
+    titre: nom == null ? 'Nouvelle marque' : 'Modifier la marque',
+    oui: 'Valider',
+    non: 'Annuler',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('Rayon', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        const SizedBox(height: 4),
+        ChoixDeroulant<String>(
+          key: const ValueKey('marque-rayon'),
+          valeur: rayonId,
+          choix: {for (final r in rayons) r.id: r.nom},
+          onChange: (v) => maj(() {
+            rayonId = v;
+            secteurId = etat.secteursDu(v).first.id;
+          }),
+        ),
+        const SizedBox(height: 10),
+        Text('Secteur', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        const SizedBox(height: 4),
+        ChoixDeroulant<String>(
+          key: const ValueKey('marque-secteur'),
+          valeur: secteurId,
+          choix: {for (final s in etat.secteursDu(rayonId)) s.id: s.nom},
+          onChange: (v) => maj(() => secteurId = v),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          key: const ValueKey('marque-libelle'),
+          controller: libelle,
+          autofocus: nom == null,
+          style: Charte.texte(17),
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(labelText: 'Marque', hintText: 'Ex. : Président'),
+        ),
+      ],
+    ),
+  );
+  final n = libelle.text.trim();
+  final cible = etat.secteur(secteurId);
+  if (!ok || n.isEmpty || cible == null) return;
+  if (nom == null) {
+    etat.ajouterMarqueSecteur(cible, n);
+    return;
+  }
+  if (n != nom) etat.renommerMarqueCatalogue(nom, n);
+  if (secteur != null && secteur.id != cible.id) {
+    etat.retirerMarqueSecteur(secteur, n);
+    etat.ajouterMarqueSecteur(cible, n);
   }
 }
 

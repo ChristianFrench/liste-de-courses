@@ -1041,20 +1041,27 @@ void main() {
 
       await _rubrique(tester, 'Catalogue des marques');
       expect(find.text('Produits réels'), findsNothing);
-      await _toucher(tester, find.text(s.nom).first);
+      // Les secteurs sans marque ne paraissent pas ; sous le secteur, ses marques puis « + Nouvelle marque »
+      expect(find.byKey(ValueKey('secteur-marques-${s.nom}')), findsOneWidget);
       expect(find.text('Lactel'), findsOneWidget);
       expect(find.text('1 produit'), findsOneWidget, reason: 'Président porte Camembert Président');
       await _toucher(tester, find.byKey(const ValueKey('marque-Président')));
-      await _toucher(tester, find.text('Renommer'));
-      await tester.enterText(find.byType(TextField).last, 'Président Fin');
+      expect(find.text('Modifier la marque'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('marque-libelle')), 'Président Fin');
       await _toucher(tester, find.text('Valider'));
       expect(p.nom, 'Camembert Président Fin');
       expect(etat.marquesDuSecteur(s), ['Candia', 'Lactel', 'Président Fin']);
-      await _toucher(tester, find.byKey(const ValueKey('marque-Candia')));
-      await _toucher(tester, find.text('Retirer de ce secteur'));
+      // La poubelle retire la marque du secteur
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
+      await tester.pumpAndSettle();
+      await _voir(tester, find.byKey(const ValueKey('marque-Candia')));
+      await _toucher(tester, find.descendant(of: find.byKey(const ValueKey('marque-Candia')), matching: find.byIcon(Icons.delete_outline)));
       expect(find.text('Candia'), findsNothing);
-      await _toucher(tester, find.text('Nouvelle marque'));
-      await tester.enterText(find.byType(TextField).last, 'Candia');
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.byKey(ValueKey('nouvelle-marque-${s.nom}')));
+      expect(find.text('Nouvelle marque'), findsOneWidget);
+      await tester.enterText(find.byKey(const ValueKey('marque-libelle')), 'Candia');
       await _toucher(tester, find.text('Valider'));
       expect(etat.marquesDuSecteur(s), ['Candia', 'Lactel', 'Président Fin']);
       await _ciblesTactiles(tester);
