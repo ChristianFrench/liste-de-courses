@@ -116,6 +116,10 @@ Future<void> coursesEnPreparation(BuildContext context, Liste l) async {
 /// Gestes d'une liste, partout où elle apparaît : glisser vers la gauche la supprime,
 /// vers la droite la remet en préparation (liste prête ou courses interrompues) ; le toucher (ou l'appui long)
 /// ouvre son volet : le détail, puis les actions.
+/// « Consulter » : la liste en lecture seule, quel que soit son état.
+ActionLigne consulterListe(BuildContext context, String listeId) =>
+    ActionLigne(Icons.visibility_outlined, 'Consulter', () => Nav.aller<void>(context, EcranConsultation(listeId: listeId)));
+
 Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interrompue = false, String? detail}) {
   final etat = Etat.instance;
   final supprimer =
@@ -133,7 +137,10 @@ Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interro
     actions.add(ActionLigne(Icons.checklist, 'Continuer la préparation', () => Nav.travail(EcranConstruction(listeId: l.id))));
   }
   if (droite != null) actions.add(ActionLigne(droite.icone, 'Remettre en préparation', droite.faire));
-  actions..add(renommer)..add(supprimer);
+  actions
+    ..add(consulterListe(context, l.id))
+    ..add(renommer)
+    ..add(supprimer);
   return Glissable(
     key: ValueKey('glisser-${l.id}'),
     titre: etat.nomListe(l),
@@ -599,6 +606,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
                   actions: [
                     ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
                     ActionLigne(Icons.receipt_long_outlined, 'Classer sans ticket', () => _classer(context, c)),
+                    if (etat.liste(c.id) != null) consulterListe(context, c.id),
                   ],
                   child: LigneMenu(
                     titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
@@ -731,6 +739,7 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
     actions: [
       if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
       if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+      if (liste != null) consulterListe(context, liste.id),
       if (liste != null && liste.lignes.isNotEmpty)
         ActionLigne(Icons.playlist_add, 'Créer une liste type', () => creerListeType(context, etat, liste)),
       if (t == null)

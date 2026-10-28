@@ -1698,3 +1698,79 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     Nav.message(context, 'Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
   }
 }
+
+// ---------------------------------------------------------------- Consultation d'une liste
+
+/// Consultation seule d'une liste, quel que soit son état (en préparation, à faire, en cours, terminée) :
+/// les articles sous leurs bandeaux de secteur, cochés et manquants compris. Toucher un article en montre le détail.
+class EcranConsultation extends StatelessWidget {
+  const EcranConsultation({super.key, required this.listeId});
+  final String listeId;
+
+  static String etatDe(Liste l) => switch (l.statut) {
+        StatutListe.enConstruction => 'En préparation',
+        StatutListe.prete => 'À faire',
+        StatutListe.enCours => 'En cours de courses',
+        StatutListe.terminee => 'Terminée',
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return ListenableBuilder(
+      listenable: etat,
+      builder: (context, _) {
+        final l = etat.liste(listeId);
+        if (l == null) {
+          return PageBase(
+            entete: const EnTeteFenetre(retour: true, titre: 'Liste'),
+            corps: Center(child: Text('Cette liste n\'existe plus.', style: Charte.texte(16))),
+          );
+        }
+        final avecCoches = l.statut == StatutListe.enCours || l.statut == StatutListe.terminee;
+        Widget ligne(LigneListe g) {
+          final p = etat.produit(g.produitId);
+          if (p == null) return const SizedBox.shrink();
+          return LigneArticle(
+            key: ValueKey('consulter-${p.id}'),
+            ligne: g,
+            produit: p,
+            coche: avecCoches && g.coche,
+            manquant: avecCoches && etat.manquant(l, p.id),
+            caseCourse: avecCoches,
+            onTap: () => detailArticle(context, g),
+            onDetail: () => detailArticle(context, g),
+          );
+        }
+
+        final commentaire = etat.commentaire(l);
+        return PageBase(
+          entete: EnTeteFenetre(
+            retour: true,
+            sousTitre: '${etatDe(l)} · ${etat.magasin(l.magasinId)?.nom ?? ''}',
+            titre: etat.nomListe(l),
+          ),
+          corps: ListView(
+            padding: const EdgeInsets.only(bottom: 16),
+            children: [
+              if (commentaire != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                  child: Text(commentaire, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                ),
+              if (l.lignes.isEmpty)
+                Padding(padding: const EdgeInsets.all(16), child: Text('La liste est vide.', style: Charte.texte(16))),
+              if (etat.aPlat(l))
+                for (final g in l.lignes) ligne(g)
+              else
+                for (final x in etat.etapes(l, l.parcoursId)) ...[
+                  TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length),
+                  for (final g in x.lignes) ligne(g),
+                ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+}

@@ -24,7 +24,7 @@ import 'package:liste_de_courses/ecrans/archives.dart';
 import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
 import 'package:liste_de_courses/ecrans/historique.dart' show BlocTicket, SousEcranHistorique;
 import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
-import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranCoursesSecteur, FeuillePromotion, LigneArticle, codeCourtPackaging;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranConsultation, EcranCoursesSecteur, FeuillePromotion, LigneArticle, codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -854,6 +854,19 @@ void main() {
       EcranCoursesSecteur.clignoter = true;
     });
 
+    testWidgets('consulter une liste, quel que soit son état', (tester) async {
+      final etat = Etat.instance;
+      await _accueil(tester);
+      await _toucher(tester, _onglet('Courses'));
+      await _ouvrirListe(tester, etat.nomListe(etat.liste('l4')!), 'Consulter');
+      expect(find.byType(EcranConsultation), findsOneWidget);
+      expect(find.textContaining('En cours de courses'), findsOneWidget);
+      expect(find.byType(LigneArticle), findsNWidgets(9));
+      expect(find.byType(Bouton), findsNothing, reason: 'consultation seule');
+      await _toucher(tester, find.text('Fromage râpé'));
+      expect(find.text('Quantité : 1'), findsOneWidget, reason: 'toucher un article en montre le détail');
+    });
+
     testWidgets('9. Courses : la liste condensée, cocher, manquant, Pause puis Interrompre', (tester) async {
       final etat = Etat.instance;
       final l4 = etat.liste('l4')!;
@@ -1041,6 +1054,9 @@ void main() {
 
       await _rubrique(tester, 'Catalogue des marques');
       expect(find.text('Produits réels'), findsNothing);
+      expect(find.text('Lactel'), findsNothing, reason: 'rayons repliés au départ');
+      await _toucher(tester, find.byTooltip('Tout déplier'));
+      expect(find.byTooltip('Tout replier'), findsOneWidget);
       // Les secteurs sans marque ne paraissent pas ; sous le secteur, ses marques puis « + Nouvelle marque »
       expect(find.byKey(ValueKey('secteur-marques-${s.nom}')), findsOneWidget);
       expect(find.text('Lactel'), findsOneWidget);

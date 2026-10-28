@@ -549,24 +549,43 @@ class EcranMarques extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
+    final plis = Retractables.i;
     return ListenableBuilder(
-      listenable: etat,
+      listenable: Listenable.merge([etat, plis]),
       builder: (context, _) {
         final enfants = <Widget>[];
+        final cles = <String>[];
         for (final r in etat.rayonsCatalogue) {
           final secteurs = [
             for (final s in etat.secteursDu(r.id))
               if (etat.marquesDuSecteur(s) case final noms when noms.isNotEmpty) (s, noms)
           ];
           if (secteurs.isEmpty) continue;
+          // Rayons repliés au départ ; un rayon déployé montre ses secteurs, déployés au départ.
+          final cleR = 'marques/r/${r.nom}';
+          final rOuvert = plis.ouvert(cleR, parDefaut: false);
+          cles.add(cleR);
           enfants.add(TitreGroupe(
               key: ValueKey('rayon-marques-${r.nom}'),
               nom: r.nom,
               grand: true,
               image: cleRayon(r.nom),
+              ouvert: rOuvert,
+              onTap: () => plis.basculer(cleR, parDefaut: false),
               nombre: {for (final (_, noms) in secteurs) ...noms.map((n) => n.toLowerCase())}.length));
           for (final (s, noms) in secteurs) {
-            enfants.add(TitreGroupe(key: ValueKey('secteur-marques-${s.nom}'), nom: s.nom, nonPlace: true, nombre: noms.length));
+            final cleS = 'marques/s/${r.nom}/${s.nom}';
+            cles.add(cleS);
+            if (!rOuvert) continue;
+            final sOuvert = plis.ouvert(cleS);
+            enfants.add(TitreGroupe(
+                key: ValueKey('secteur-marques-${s.nom}'),
+                nom: s.nom,
+                nonPlace: true,
+                nombre: noms.length,
+                ouvert: sOuvert,
+                onTap: () => plis.basculer(cleS)));
+            if (!sOuvert) continue;
             for (final n in noms) {
               enfants.add(Glissable(
                 key: ValueKey('glisser-marque-${s.id}-$n'),
@@ -589,6 +608,9 @@ class EcranMarques extends StatelessWidget {
             ));
           }
         }
+        // Rayons repliés par défaut, secteurs déployés : « tout déplier » les ouvre tous.
+        final toutOuvert = cles.isNotEmpty &&
+            cles.every((c) => plis.ouvert(c, parDefaut: !c.startsWith('marques/r/')));
         return PageBase(
           entete: EnTeteFenetre(
             retour: true,
@@ -597,6 +619,8 @@ class EcranMarques extends StatelessWidget {
             titre: 'Catalogue des marques',
             aide: Aides.marques,
             actions: [ActionLigne(Icons.add, '+ Nouvelle marque', () => fenetreMarque(context))],
+            droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier',
+                () => plis.tous(cles, !toutOuvert)),
           ),
           corps: ListView(
             padding: const EdgeInsets.only(bottom: 16),

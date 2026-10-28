@@ -497,8 +497,8 @@ class TitreGroupe extends StatelessWidget {
   /// Nombre d'articles ou d'éléments du groupe, à droite.
   final int? nombre;
 
-  /// [image] et [icone] ne s'affichent que sur un bandeau [grand] ; ne sont plus affichés : [numero],
-  /// [avancement], [ouvert], [focus], [fort].
+  /// [image] et [icone] ne s'affichent que sur un bandeau [grand] ; [ouvert] (non nul) montre le chevron
+  /// de déploiement ; ne sont plus affichés : [numero], [avancement], [focus], [fort].
   final String? numero;
   final String? image;
   final IconData? icone;
@@ -538,6 +538,11 @@ class TitreGroupe extends StatelessWidget {
             if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icon(marque, size: 18, color: Charte.blanc)),
             if (droite != null) Text(droite!, style: blanc),
             if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
+            if (ouvert != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.blanc),
+              ),
           ]),
         ),
       ),
