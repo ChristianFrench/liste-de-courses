@@ -1,13 +1,77 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'modele.dart';
 
-// Envoi de la liste par la messagerie de l'appareil, et tickets de caisse en PDF.
+// Envoi des mails (liste, résumé, invitation) et tickets de caisse en PDF.
+// Depuis le 28/10/2026, les mails partent directement par EmailJS (la Gmail de l'application, reliée par le
+// maître d'ouvrage ; identifiants = secrets GitHub EMAILJS_*). Sans ces secrets, ou si l'envoi échoue, la
+// messagerie de l'appareil s'ouvre avec le mail préparé, comme avant.
+
+class MailDirect {
+  static const service = String.fromEnvironment('EMAILJS_SERVICE');
+  static const modele = String.fromEnvironment('EMAILJS_MODELE');
+  static const cle = String.fromEnvironment('EMAILJS_CLE');
+
+  /// Remplaçable dans les essais.
+  static bool? disponibleEssai;
+  static http.Client client = http.Client();
+
+  static bool get disponible => disponibleEssai ?? (service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty);
+
+  /// Envoie le mail ; true s'il est parti.
+  static Future<bool> envoyer(List<String> a, String sujet, String texte) async {
+    if (!disponible || a.isEmpty) return false;
+    try {
+      final r = await client
+          .post(Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'service_id': service,
+                'template_id': modele,
+                'user_id': cle,
+                'template_params': {'destinataires': a.join(','), 'sujet': sujet, 'texte': texte},
+              }))
+          .timeout(const Duration(seconds: 20));
+      if (r.statusCode >= 300) debugPrint('EmailJS : ${r.statusCode} ${r.body}');
+      return r.statusCode < 300;
+    } catch (e) {
+      debugPrint('EmailJS : $e');
+      return false;
+    }
+  }
+}
+
+/// Résultat d'un envoi : parti directement, préparé dans la messagerie, ou rien n'a répondu.
+enum Envoi { parti, messagerie, echec }
+
+/// Envoie directement si possible, sinon ouvre la messagerie avec le mail préparé.
+Future<Envoi> envoyerMail(List<String> a, String sujet, String texte) async {
+  if (await MailDirect.envoyer(a, sujet, texte)) return Envoi.parti;
+  try {
+    final ok = await launchUrl(_mailto(a, sujet, texte));
+    return ok ? Envoi.messagerie : Envoi.echec;
+  } catch (_) {
+    return Envoi.echec;
+  }
+}
+
+Uri _mailto(List<String> a, String sujet, String texte) =>
+    Uri(scheme: 'mailto', path: a.join(','), query: _requete({'subject': sujet, 'body': texte}));
+
+/// Message à afficher après un envoi (null : la messagerie s'est ouverte, rien à dire).
+String? messageEnvoi(Envoi e, int n) => switch (e) {
+      Envoi.parti => n > 1 ? 'Mail envoyé à $n personnes' : 'Mail envoyé',
+      Envoi.messagerie => null,
+      Envoi.echec => 'Aucune messagerie n\'a répondu sur cet appareil',
+    };
 
 /// Texte de la liste, rangé par rayon dans l'ordre du magasin.
 String texteListe(Etat etat, Liste l) {
@@ -48,12 +112,6 @@ String texteListe(Etat etat, Liste l) {
 List<String> destinataires(Etat etat) =>
     etat.envoiFoyer ? [for (final m in etat.membres) if (m.email.isNotEmpty) m.email] : const [];
 
-Uri lienMail(Etat etat, Liste l) => Uri(
-      scheme: 'mailto',
-      path: destinataires(etat).join(','),
-      query: _requete({'subject': 'Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''}', 'body': texteListe(etat, l)}),
-    );
-
 /// Résumé de fin de courses pour le foyer : les oubliés (non cochés), les absents des rayons (manquants)
 /// et les achetés. Un mail n'a pas de couleurs : des pastilles de couleur les remplacent.
 String texteResume(Etat etat, Liste l) {
@@ -80,32 +138,24 @@ String texteResume(Etat etat, Liste l) {
   return b.toString();
 }
 
-/// Ouvre la messagerie avec le résumé des courses, adressé à tous les membres du foyer qui ont une adresse.
-/// Rien ne part sans que l'on appuie sur « Envoyer ». Rend false si aucune messagerie n'a répondu.
-Future<bool> envoyerResume(Etat etat, Liste l) async {
-  try {
-    return await launchUrl(Uri(
-      scheme: 'mailto',
-      path: [for (final m in etat.membres) if (m.email.isNotEmpty) m.email].join(','),
-      query: _requete({'subject': 'Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''}', 'body': texteResume(etat, l)}),
-    ));
-  } catch (_) {
-    return false;
-  }
+/// Résumé des courses à tous les membres du foyer qui ont une adresse.
+Future<Envoi> envoyerResume(Etat etat, Liste l) {
+  final a = [for (final m in etat.membres) if (m.email.isNotEmpty) m.email];
+  return envoyerMail(a, 'Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''}', texteResume(etat, l));
 }
 
 // Uri(queryParameters:) code les espaces en « + », que les messageries affichent tels quels.
 String _requete(Map<String, String> p) =>
     p.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
 
-/// Ouvre la messagerie avec la liste déjà écrite. Rend false si aucune messagerie n'a répondu.
-Future<bool> envoyerListe(Etat etat, Liste l) async {
-  try {
-    return await launchUrl(lienMail(etat, l));
-  } catch (_) {
-    return false;
-  }
-}
+/// La liste, au foyer si l'option est choisie ; sinon la messagerie s'ouvre et l'on choisit à qui l'envoyer.
+Future<Envoi> envoyerListe(Etat etat, Liste l) =>
+    envoyerMail(destinataires(etat), _sujetListe(etat, l), texteListe(etat, l));
+
+String _sujetListe(Etat etat, Liste l) => 'Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''}';
+
+/// Le mail préparé de la liste, pour la messagerie.
+Uri lienMail(Etat etat, Liste l) => _mailto(destinataires(etat), _sujetListe(etat, l), texteListe(etat, l));
 
 // ------------------------------------------------------------ Tickets PDF
 

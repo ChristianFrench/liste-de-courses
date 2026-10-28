@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/messages.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 
@@ -37,5 +38,22 @@ void main() {
     expect(m.canal, startsWith('ldc-'));
     expect(m.messages.single.texte, 'Il manque le lait é');
     expect(m.messages.single.titre, 'Zoé · Maison');
+  });
+
+  test('mail direct par EmailJS : destinataires, sujet et texte ; rien sans destinataire ni identifiants', () async {
+    final envoyes = <Map<String, dynamic>>[];
+    MailDirect.client = MockClient((r) async {
+      expect(r.url.toString(), 'https://api.emailjs.com/api/v1.0/email/send');
+      envoyes.add(jsonDecode(r.body) as Map<String, dynamic>);
+      return http.Response('OK', 200);
+    });
+    MailDirect.disponibleEssai = false;
+    expect(await MailDirect.envoyer(['a@exemple.fr'], 'Sujet', 'Texte'), isFalse);
+    MailDirect.disponibleEssai = true;
+    expect(await MailDirect.envoyer([], 'Sujet', 'Texte'), isFalse);
+    expect(await MailDirect.envoyer(['a@exemple.fr', 'b@exemple.fr'], 'Liste', 'Lait'), isTrue);
+    expect(envoyes.single['template_params'], {'destinataires': 'a@exemple.fr,b@exemple.fr', 'sujet': 'Liste', 'texte': 'Lait'});
+    expect(messageEnvoi(Envoi.parti, 2), 'Mail envoyé à 2 personnes');
+    MailDirect.disponibleEssai = null;
   });
 }

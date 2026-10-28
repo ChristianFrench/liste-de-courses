@@ -477,9 +477,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
             aide: simple ? Aides.listeSimple : Aides.preparation,
             actions: [
               ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
-                if (!await envoyerListe(etat, l) && context.mounted) {
-                  Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
-                }
+                final r = messageEnvoi(await envoyerListe(etat, l), destinataires(etat).length);
+                if (r != null && context.mounted) Nav.message(context, r);
               }),
             ],
           ),
@@ -686,12 +685,12 @@ class _EcranConstructionState extends State<EcranConstruction> {
       if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
       return;
     }
-    if (envoyer) await envoyerListe(etat, l);
+    final envoi = envoyer ? messageEnvoi(await envoyerListe(etat, l), destinataires(etat).length) : null;
     etat.listePrete(l);
     Nav.i.retourOnglet(Nav.courses);
     if (mounted) {
       Nav.message(context, '${enListeType && nom.isNotEmpty ? 'Liste type « $nom » enregistrée. ' : ''}'
-          'Liste prête : elle est dans l\'onglet Courses');
+          'Liste prête : elle est dans l\'onglet Courses${envoi == null ? '' : '. $envoi'}');
     }
   }
 
@@ -1681,13 +1680,11 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
     if (!ok || !context.mounted) return;
     // Le résumé se lit avant la fin des courses (la liste garde ses coches et ses manquants).
-    if (resume && !await envoyerResume(etat, l) && context.mounted) {
-      Nav.message(context, 'Aucune messagerie n\'a répondu sur cet appareil');
-    }
+    final envoi = resume ? messageEnvoi(await envoyerResume(etat, l), etat.membres.where((m) => m.email.isNotEmpty).length) : null;
     if (!context.mounted) return;
     Etat.instance.terminerCourses(l);
     Nav.i.retourOnglet(Nav.courses);
-    Nav.message(context, 'Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
+    Nav.message(context, '${envoi == null ? '' : '$envoi. '}Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
   }
 }
 

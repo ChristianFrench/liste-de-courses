@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../composants/composants.dart';
+import '../donnees/envoi.dart';
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
@@ -136,7 +136,7 @@ class EcranFoyer extends StatelessWidget {
   }
 }
 
-/// Mail d'invitation à [m], prérempli dans la messagerie de l'appareil (rien ne part tout seul).
+/// Mail d'invitation à [m] : envoyé directement, ou prérempli dans la messagerie de l'appareil.
 Future<void> envoyerInvitation(BuildContext context, Membre m) async {
   final etat = Etat.instance;
   final code = Synchro.instance.code ?? '';
@@ -145,12 +145,13 @@ Future<void> envoyerInvitation(BuildContext context, Membre m) async {
       '2. Au premier lancement, choisissez « Rejoindre un foyer ».\n'
       '3. Saisissez le code de partage : $code\n'
       '4. Dans la liste des membres, choisissez « ${m.nomAffiche} ».\n\n${etat.moi.nomAffiche}';
-  final q = {'subject': 'Rejoindre le foyer ${etat.foyerNom}', 'body': corps}
-      .entries
-      .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-      .join('&');
-  final ok = await launchUrl(Uri.parse('mailto:${Uri.encodeComponent(m.email)}?$q'));
-  if (!ok && context.mounted) Nav.message(context, 'Aucune messagerie trouvée : copiez le code (titre « Foyer »)');
+  final r = await envoyerMail([m.email], 'Rejoindre le foyer ${etat.foyerNom}', corps);
+  if (!context.mounted) return;
+  if (r == Envoi.parti) {
+    Nav.message(context, 'Invitation envoyée à ${m.email}');
+  } else if (r == Envoi.echec) {
+    Nav.message(context, 'Aucune messagerie trouvée : copiez le code (titre « Foyer »)');
+  }
 }
 
 /// Nouveau membre du foyer (prénom, mail), puis son invitation.
@@ -162,10 +163,15 @@ Future<void> nouveauMembre(BuildContext context) async {
   if (m == null || !context.mounted) return;
   final ok = await confirmer(context,
       titre: 'Inviter ${m.nomAffiche} ?',
-      contenu: Text('Votre messagerie s\'ouvre avec le mail d\'invitation : le code de partage, les liens pour installer '
-          'l\'application, et le nom à choisir. Vous l\'envoyez vous-même.', style: Charte.texte(16)),
+      contenu: Text(
+          MailDirect.disponible
+              ? 'Le mail d\'invitation part à ${m.email} : le code de partage, les liens pour installer l\'application, '
+                  'et le nom à choisir.'
+              : 'Votre messagerie s\'ouvre avec le mail d\'invitation : le code de partage, les liens pour installer '
+                  'l\'application, et le nom à choisir. Vous l\'envoyez vous-même.',
+          style: Charte.texte(16)),
       plein: 'Plus tard',
-      contour: 'Préparer le mail');
+      contour: MailDirect.disponible ? 'Envoyer l\'invitation' : 'Préparer le mail');
   if (ok == true && context.mounted) await envoyerInvitation(context, m);
 }
 
