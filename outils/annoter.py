@@ -48,6 +48,9 @@ def annoter_journal(lignes, titre):
 def main():
     if len(sys.argv) < 3:
         sys.exit("usage : annoter.py <journal> <titre> [analyse]")
+    # Sous Windows, la console n'accepte pas tous les caractères du journal : sans cela, le script plante
+    # avant d'annoter et l'erreur de compilation reste invisible.
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     with open(sys.argv[1], encoding="utf-8", errors="replace") as f:
         lignes = f.readlines()
     sys.stdout.write("".join(lignes[-200:]))
