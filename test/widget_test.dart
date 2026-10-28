@@ -357,6 +357,34 @@ void main() {
       expect(e.parcoursAppris, contains(appris.id));
     });
 
+    test('notifications : liste prête, départ, rectificative envoyée puis refusée, fin des courses', () {
+      final e = Etat.instance;
+      final avis = <(String, List<String>?)>[];
+      e.avertir = (t, a) => avis.add((t, a?.toList()));
+      addTearDown(() => e.avertir = null);
+      final l4 = e.liste('l4')!;
+      final r = e.creerRectificative(l4);
+      e.ajouterLigne(r, 'p20');
+      expect(e.validerRectificative(r), 'envoyee');
+      expect(avis.single.$1, contains('vous envoie une liste rectificative (1 article)'));
+      expect(avis.single.$2, [l4.membreId]);
+      e.refuserRectificative(e.rectificativeEnAttente(l4)!);
+      expect(avis.last.$1, contains('a refusé votre liste rectificative'));
+      expect(avis.last.$2, [e.moi.id]);
+      expect(avis.length, 2, reason: 'la rectificative refusée n\'est pas annoncée comme liste prête');
+      final l = e.creerListe(l4.magasinId, []);
+      e.ajouterLigne(l, 'p1');
+      e.ajouterLigne(l, 'p2');
+      e.listePrete(l);
+      expect(avis.last.$1, contains('prête (2 articles)'));
+      expect(avis.last.$2, isNull, reason: 'tout le foyer');
+      e.demarrerCourses(l, e.moi.id, null);
+      expect(avis.last.$1, contains('part faire les courses chez'));
+      e.terminerCourses(l);
+      expect(avis.last.$1, contains('a terminé les courses chez'));
+      expect(avis.length, 5);
+    });
+
     test('liste rectificative : une par liste, fusionnée, envoyée, refusée puis « À faire » marquée', () {
       final e = Etat.instance;
       Liste l(String id) => e.liste(id)!;
@@ -625,10 +653,10 @@ void main() {
       await _toucher(tester, find.text('Nouvelle liste'));
       expect(find.text('Liste calculée'), findsOneWidget);
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.text('Liste personnalisée'));
+      await _toucher(tester, find.text('Depuis une course passée'));
       expect(find.text('Dernières courses dans ce magasin'), findsOneWidget, reason: 'dans un volet du bas');
       await _fermerVolet(tester);
-      await _toucher(tester, find.text('Liste type'));
+      await _toucher(tester, find.text('Depuis une liste type'));
       await _toucher(tester, find.text('Liste vide'));
       expect(_nbEnPreparation(tester), 0);
       // La recherche ajoute l'article et va dessus
@@ -660,7 +688,7 @@ void main() {
       await tester.pumpAndSettle();
       await _toucher(tester, _onglet('Préparer'));
       await _toucher(tester, find.text('Nouvelle liste'));
-      await _toucher(tester, find.text('Liste type'));
+      await _toucher(tester, find.text('Depuis une liste type'));
       await _toucher(tester, find.text('Petit-déjeuner'));
       expect(_nbEnPreparation(tester), 1);
     });
@@ -707,7 +735,7 @@ void main() {
     testWidgets('liste simple : saisie sans secteurs, rangement à « Liste prête »', (tester) async {
       await _accueil(tester);
       await _toucher(tester, find.text('Nouvelle liste'));
-      await _toucher(tester, find.text('Liste simple'));
+      await _toucher(tester, find.text('Nouvelle liste simple'));
       final etat = Etat.instance;
       final l = etat.listes.firstWhere((x) => etat.estSimple(x));
       for (final t in ['jamb', 'cafe mou', 'pq maison']) {
@@ -810,7 +838,7 @@ void main() {
       await tester.runAsync(chargerCorrespondances); // lecture réelle de l'asset, hors horloge simulée
       await _accueil(tester);
       await _toucher(tester, find.text('Nouvelle liste'));
-      await _toucher(tester, find.text('Liste depuis un texte'));
+      await _toucher(tester, find.text('Depuis un texte'));
       await tester.enterText(find.byKey(const ValueKey('texte-mail')),
           'Bonjour,\n\nCRÈMERIE\n- Lait demi écrémé x2\n- beurre doux, bidule introuvable\n\nEnvoyé de mon iPhone');
       await _toucher(tester, find.text('Lire la liste'));
@@ -828,7 +856,7 @@ void main() {
       await tester.runAsync(chargerCorrespondances);
       await _accueil(tester);
       await _toucher(tester, find.text('Nouvelle liste'));
-      await _toucher(tester, find.text('Liste depuis un texte'));
+      await _toucher(tester, find.text('Depuis un texte'));
       expect(find.text('Coller'), findsNothing);
       expect(find.text('Ajouter un autre texte'), findsNothing);
       await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'Lait demi écrémé x2\nBeurre doux');
@@ -844,7 +872,7 @@ void main() {
       final l4 = etat.liste('l4')!;
       await _accueil(tester);
       await _toucher(tester, find.text('Nouvelle liste'));
-      await _toucher(tester, find.text('Liste rectificative'));
+      await _toucher(tester, find.text('Compléter des courses : rectificative'));
       expect(find.text('Liste à rectifier'), findsOneWidget);
       await _toucher(tester, find.text(etat.nomListe(l4)).last);
       await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'dentif');

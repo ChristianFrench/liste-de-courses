@@ -9,9 +9,10 @@ import 'package:http/http.dart' as http;
 import 'modele.dart';
 import 'synchro.dart';
 
-// Messages entre les membres du foyer (maquette du 27/10/2026), par le service gratuit ntfy.sh :
-// chaque membre s'abonne au canal du foyer dans l'appli ntfy (Android) ou sur ntfy.sh (navigateur),
-// et reçoit les messages même quand Liste de courses est fermée.
+// Messages entre les membres du foyer (maquette du 27/10/2026), par le service gratuit ntfy.sh.
+// Depuis le 28/10/2026 : chaque membre s'abonne à SON canal dans l'appli ntfy (Android) ou sur ntfy.sh
+// (navigateur), et y reçoit messages et notifications même quand Liste de courses est fermée. Tout ce qui
+// est envoyé passe aussi par le canal du foyer, que personne n'écoute : c'est le journal de l'écran Messages.
 
 /// Un message reçu du canal.
 class MessageFoyer {
@@ -35,7 +36,16 @@ class MessagesFoyer extends ChangeNotifier {
   String? erreur;
   bool enCours = false;
 
-  /// Canal du foyer : tiré du code de partage (le code lui-même ne circule pas) ; seul, un canal propre à l'appareil.
+  /// Canal personnel de [membreId] : seuls les membres du foyer (qui ont le code) peuvent le calculer.
+  String canalDe(String membreId) {
+    final code = Synchro.instance.code ?? canal;
+    return 'ldc-${sha256.convert(utf8.encode('liste-de-courses/ntfy/$code/$membreId')).toString().substring(0, 20)}';
+  }
+
+  /// Le canal auquel s'abonner sur cet appareil.
+  String get monCanal => canalDe(Etat.instance.moi.id);
+
+  /// Canal du foyer (journal) : tiré du code de partage (le code lui-même ne circule pas) ; seul, un canal propre à l'appareil.
   String get canal {
     final code = Synchro.instance.code;
     if (code != null && Synchro.instance.mode == 'foyer') {
@@ -54,34 +64,47 @@ class MessagesFoyer extends ChangeNotifier {
 
   String? _canalLocal;
 
-  String get lienWeb => '$serveur/$canal';
+  String get lienWeb => '$serveur/$monCanal';
 
   /// Lien qui abonne l'appli ntfy d'Android au canal.
-  String get lienAppli => 'ntfy://ntfy.sh/$canal';
+  String get lienAppli => 'ntfy://ntfy.sh/$monCanal';
 
-  /// Envoie [texte] à tout le foyer ; renvoie une erreur lisible, ou null.
-  Future<String?> envoyer(String texte) async {
+  /// Envoie [texte] au journal du foyer et sur le canal des membres [a] (tous si null), sauf soi-même ;
+  /// renvoie une erreur lisible, ou null.
+  Future<String?> envoyer(String texte, {Iterable<String>? a, bool notification = false}) async {
     final t = texte.trim();
     if (t.isEmpty) return 'Message vide';
     final etat = Etat.instance;
+    final moi = etat.moi.id;
+    final pour = [for (final id in a ?? [for (final m in etat.membresVisibles) m.id]) if (id != moi) id];
+    // Seul (ou personne à prévenir), une notification ne part pas.
+    if (notification && pour.isEmpty) return null;
     try {
-      final r = await client
-          .post(Uri.parse(serveur),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({
-                'topic': canal,
-                'title': '${etat.moi.nomAffiche} · ${etat.foyerNom}',
-                'message': t,
-                'tags': ['shopping_cart'],
-              }))
-          .timeout(const Duration(seconds: 15));
-      if (r.statusCode >= 300) return 'Le service ntfy a refusé le message (${r.statusCode})';
-      await lire();
+      for (final c in [canal, for (final id in pour.toSet()) canalDe(id)]) {
+        final r = await client
+            .post(Uri.parse(serveur),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode({
+                  'topic': c,
+                  'title': '${etat.moi.nomAffiche} · ${etat.foyerNom}',
+                  'message': t,
+                  'tags': [notification ? 'bell' : 'shopping_cart'],
+                }))
+            .timeout(const Duration(seconds: 15));
+        if (r.statusCode >= 300) return 'Le service ntfy a refusé le message (${r.statusCode})';
+      }
+      if (!notification) await lire();
       return null;
     } catch (e) {
       debugPrint('ntfy : $e');
       return 'Pas de réseau ou service ntfy injoignable';
     }
+  }
+
+  /// Notification automatique (Etat.avertir) : envoyée sans attendre, une erreur réseau est ignorée.
+  void avertir(String texte, Iterable<String>? a) {
+    if (Synchro.instance.mode != 'foyer') return;
+    envoyer(texte, a: a, notification: true);
   }
 
   /// Messages des dernières 48 heures, du plus ancien au plus récent.

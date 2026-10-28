@@ -1495,7 +1495,28 @@ class Etat extends ChangeNotifier {
     return l;
   }
 
+  // ------------------------------------------------------------ Notifications (décision du 28/10/2026)
+
+  /// Envoi d'une notification aux membres [a] (tout le foyer si null) ; branché sur ntfy au démarrage,
+  /// absent dans les essais. Celui qui agit n'est jamais prévenu.
+  void Function(String texte, Iterable<String>? a)? avertir;
+
+  void _avertir(String texte, {Iterable<String>? a}) {
+    try {
+      avertir?.call(texte, a);
+    } catch (_) {}
+  }
+
+  String _articles(Liste l) {
+    final n = l.lignes.length;
+    return n == 1 ? '1 article' : '$n articles';
+  }
+
   void listePrete(Liste l) {
+    // Une rectificative refusée ou restée sans réponse est signalée à son auteur, pas annoncée au foyer.
+    if (rectificatives[l.id] == null && l.statut != StatutListe.prete) {
+      _avertir('Liste « ${nomListe(l)} » prête (${_articles(l)})');
+    }
     l.statut = StatutListe.prete;
     l.interrompueLe = null;
     l.repriseRayonId = null;
@@ -1550,6 +1571,8 @@ class Etat extends ChangeNotifier {
       l.modifieePar = moi.id;
       l.modifieeLe = DateTime.now();
       modifie();
+      _avertir('${moi.nomAffiche} vous envoie une liste rectificative (${_articles(l)}) pour « ${nomListe(cible!)} »',
+          a: [if (cible.membreId != null) cible.membreId!]);
       return 'envoyee';
     }
     if (cible != null && cible.statut != StatutListe.terminee) {
@@ -1560,7 +1583,7 @@ class Etat extends ChangeNotifier {
     return 'afaire';
   }
 
-  void _signaler(Rectificative r) {
+  void _signaler(Rectificative r, {String? avis}) {
     final l = liste(r.listeId);
     if (l == null) {
       rectificatives.remove(r.listeId);
@@ -1569,10 +1592,12 @@ class Etat extends ChangeNotifier {
     }
     r.mode = 'signalee';
     listePrete(l);
+    if (avis != null) _avertir('$avis : elle est dans « À faire »', a: [r.auteurId]);
   }
 
   /// Refusée : elle passe en « À faire », marquée rectificative.
-  void refuserRectificative(Rectificative r) => _signaler(r);
+  void refuserRectificative(Rectificative r) =>
+      _signaler(r, avis: '${moi.nomAffiche} a refusé votre liste rectificative');
 
   /// Ajoute les articles de la rectificative à la course ; un article déjà dans la course n'est pas doublé.
   void accepterRectificative(Rectificative r, {required bool fusion}) {
@@ -1708,6 +1733,7 @@ class Etat extends ChangeNotifier {
     l.repriseRayonId = null;
     l.repriseSecteurId = null;
     modifie();
+    _avertir('${membre(membreId)?.nomAffiche ?? moi.nomAffiche} part faire les courses chez ${magasin(l.magasinId)?.nom ?? '?'}');
   }
 
   void cocher(Liste l, String produitId) {
@@ -1825,12 +1851,14 @@ class Etat extends ChangeNotifier {
     // Une rectificative restée sans réponse passe en « À faire » ; une rectificative en préparation le sera à sa fin.
     for (final r in [...rectificatives.values.where((r) => r.cibleId == l.id)]) {
       if (r.enAttente) {
-        _signaler(r);
+        _signaler(r, avis: 'Courses terminées sans votre liste rectificative');
       } else if (r.acceptee) {
         rectificatives.remove(r.listeId);
       }
     }
     modifie();
+    _avertir('${membre(c.membreId)?.nomAffiche ?? moi.nomAffiche} a terminé les courses chez '
+        '${magasin(l.magasinId)?.nom ?? '?'} (${l.nbCoches} ${l.nbCoches == 1 ? 'article acheté' : 'articles achetés'})');
     return c;
   }
 

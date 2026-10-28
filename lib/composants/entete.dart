@@ -357,12 +357,14 @@ class Aides {
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
       'deux listes ne peuvent pas porter le même nom).\n'
-      'Liste simple : vous tapez le début du nom des articles, ils s\'ajoutent les uns sous les autres, sans rayons ni secteurs. '
+      'Nouvelle liste, par secteur : vous cherchez les articles un à un, ils se rangent sous leur secteur.\n'
+      'Nouvelle liste simple : vous tapez le début du nom des articles, ils s\'ajoutent les uns sous les autres, sans rayons ni secteurs. '
       'À la fin, la liste peut être rangée par rayons et secteurs.\n'
-      'Liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou une liste vide.\n'
-      'Liste personnalisée : une de vos dernières courses ; cochez les articles à reprendre.\n'
-      'Liste depuis un texte : collez le texte d\'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, '
+      'Depuis une liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou une liste vide.\n'
+      'Depuis une course passée : une de vos dernières courses ; cochez les articles à reprendre.\n'
+      'Depuis un texte : collez le texte d\'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, '
       'vous décochez ceux à ne pas garder.\n'
+      'Compléter des courses : rectificative : des articles à ajouter à des courses en cours ; celui qui les fait accepte ou refuse.\n'
       'Liste calculée : à partir de vos tickets de caisse, prévue plus tard.';
 
   static const preparation = 'Le champ de recherche, sous le titre : tapez au moins trois lettres, la liste des articles '

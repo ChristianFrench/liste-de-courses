@@ -12,10 +12,10 @@ void main() {
     Etat.instance.enregistrementActif = false;
     Etat.instance.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
     final m = MessagesFoyer.instance;
-    Map<String, dynamic>? envoye;
+    final envoyes = <Map<String, dynamic>>[];
     m.client = MockClient((r) async {
       if (r.method == 'POST') {
-        envoye = jsonDecode(r.body) as Map<String, dynamic>;
+        envoyes.add(jsonDecode(r.body) as Map<String, dynamic>);
         return http.Response('{}', 200);
       }
       expect(r.url.path, '/${m.canal}/json');
@@ -27,8 +27,13 @@ void main() {
     });
     expect(await m.envoyer('  '), isNotNull);
     expect(await m.envoyer('Je passe chez Lidl'), isNull);
-    expect(envoye!['topic'], m.canal);
-    expect(envoye!['message'], 'Je passe chez Lidl');
+    // Au journal du foyer, puis sur le canal de chacun des autres membres
+    final e = Etat.instance;
+    expect([for (final x in envoyes) x['topic']],
+        [m.canal, for (final x in e.membresVisibles) if (x.id != e.moi.id) m.canalDe(x.id)]);
+    expect(envoyes.length, greaterThan(1));
+    expect(envoyes.map((x) => x['topic']), isNot(contains(m.monCanal)), reason: 'jamais à soi-même');
+    expect(envoyes.last['message'], 'Je passe chez Lidl');
     expect(m.canal, startsWith('ldc-'));
     expect(m.messages.single.texte, 'Il manque le lait é');
     expect(m.messages.single.titre, 'Zoé · Maison');

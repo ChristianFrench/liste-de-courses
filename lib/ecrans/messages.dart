@@ -77,8 +77,8 @@ class _EcranMessagesState extends State<EcranMessages> {
           actions: [
             ActionLigne(Icons.notifications_active_outlined, 'Être prévenu (ntfy)', _abonner),
             ActionLigne(Icons.copy, 'Copier le nom du canal', () {
-              Clipboard.setData(ClipboardData(text: m.canal));
-              Nav.message(context, 'Canal copié : ${m.canal}');
+              Clipboard.setData(ClipboardData(text: m.monCanal));
+              Nav.message(context, 'Canal copié : ${m.monCanal}');
             }),
             ActionLigne(Icons.refresh, 'Rafraîchir', m.lire),
           ],
@@ -98,10 +98,10 @@ class _EcranMessagesState extends State<EcranMessages> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
-                  'Essai : les messages vont à tout le foyer par le service gratuit ntfy. Pour être prévenu même quand '
-                  'l\'application est fermée, touchez le titre « Messages » puis « Être prévenu (ntfy) » : sur Android, '
-                  'installez d\'abord l\'appli ntfy ; dans un navigateur, autorisez les notifications sur la page ntfy. '
-                  'Canal : ${m.canal}',
+                  'Les messages et les notifications (liste prête, départ et fin des courses, liste rectificative) '
+                  'passent par le service gratuit ntfy. Pour les recevoir même quand l\'application est fermée, touchez '
+                  'le titre « Messages » puis « Être prévenu (ntfy) » : sur Android, installez d\'abord l\'appli ntfy ; '
+                  'dans un navigateur, autorisez les notifications sur la page ntfy. Votre canal : ${m.monCanal}',
                   style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ),
           ],

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_commun.dart';
+import 'donnees/messages.dart';
 import 'donnees/modele.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
@@ -15,6 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Etat.instance.charger();
   await Etat.instance.chargerMarquesType();
+  Etat.instance.avertir = MessagesFoyer.instance.avertir;
   await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur

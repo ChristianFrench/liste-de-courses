@@ -115,7 +115,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     final textes = <String>[];
     final lire = await modale(
       context,
-      titre: 'Liste depuis un texte',
+      titre: 'Depuis un texte',
       icone: Icons.notes,
       oui: 'Lire la liste',
       contenu: (context, maj) => Column(
@@ -185,7 +185,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     final choisis = <int>{};
     final ok = await modale(
       context,
-      titre: 'Liste personnalisée',
+      titre: 'Depuis une course passée',
       icone: Icons.history,
       oui: 'Créer la liste',
       contenu: (context, maj) => Column(
@@ -286,43 +286,43 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             enfants: [
               LigneMenu(
                 icone: Icons.search,
-                titre: 'Nouvelle liste (recherche, par secteur)',
+                titre: 'Nouvelle liste, par secteur',
                 sousTitre: 'Cherchez les articles un à un : ils se rangent sous leur secteur au fur et à mesure',
                 onTap: () => _creer([]),
               ),
               LigneMenu(
+                icone: Icons.edit_note,
+                titre: 'Nouvelle liste simple',
+                sousTitre: 'Tapez les articles un à un, sans rayons ni secteurs ; rangez-la par rayons à la fin si vous voulez',
+                onTap: () => _creer([], simple: true),
+              ),
+              LigneMenu(
+                icone: Icons.list_alt,
+                titre: 'Depuis une liste type',
+                sousTitre: 'Une de vos listes types, ou une liste vide',
+                onTap: () => _choisirListeType(),
+              ),
+              LigneMenu(
+                icone: Icons.history,
+                titre: 'Depuis une course passée',
+                sousTitre: 'Choisir dans une de vos dernières courses',
+                onTap: () => _choisirCourse(passees),
+              ),
+              LigneMenu(
+                icone: Icons.notes,
+                titre: 'Depuis un texte',
+                sousTitre: 'Collez un texte (mail, message, note) : les articles sont reconnus dans le catalogue',
+                onTap: _depuisMail,
+              ),
+              LigneMenu(
                 icone: Icons.playlist_add,
-                titre: 'Liste rectificative',
+                titre: 'Compléter des courses : rectificative',
                 sousTitre: cibles.isEmpty
                     ? 'Aucune course en cours à compléter'
                     : 'Des articles à ajouter à des courses en cours',
                 onTap: () => cibles.isEmpty
                     ? Nav.message(context, 'Une rectificative complète des courses en cours : il n\'y en a pas.')
                     : _choisirCible(cibles),
-              ),
-              LigneMenu(
-                icone: Icons.edit_note,
-                titre: 'Liste simple',
-                sousTitre: 'Tapez les articles un à un, sans rayons ni secteurs ; rangez-la par rayons à la fin si vous voulez',
-                onTap: () => _creer([], simple: true),
-              ),
-              LigneMenu(
-                icone: Icons.list_alt,
-                titre: 'Liste type',
-                sousTitre: 'Une de vos listes types, ou une liste vide',
-                onTap: () => _choisirListeType(),
-              ),
-              LigneMenu(
-                icone: Icons.history,
-                titre: 'Liste personnalisée',
-                sousTitre: 'Choisir dans une de vos dernières courses',
-                onTap: () => _choisirCourse(passees),
-              ),
-              LigneMenu(
-                icone: Icons.notes,
-                titre: 'Liste depuis un texte',
-                sousTitre: 'Collez un texte (mail, message, note) : les articles sont reconnus dans le catalogue',
-                onTap: _depuisMail,
               ),
               LigneMenu(
                 icone: Icons.calculate_outlined,
@@ -369,7 +369,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
         context,
         builder: (ctx) => StatefulBuilder(
           builder: (ctx, maj) => corpsVolet(
-            titre: 'Liste type',
+            titre: 'Depuis une liste type',
             contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               LigneMenu(
                 titre: 'Liste vide',
