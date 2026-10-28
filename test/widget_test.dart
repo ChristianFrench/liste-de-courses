@@ -810,20 +810,16 @@ void main() {
       expect(l.lignes.first.quantite, 2);
     });
 
-    testWidgets('liste depuis plusieurs mails, fusionnés', (tester) async {
+    testWidgets('liste depuis un texte : une seule grande zone de texte', (tester) async {
       await tester.runAsync(chargerCorrespondances);
       await _accueil(tester);
       await _toucher(tester, find.text('Nouvelle liste'));
       await _toucher(tester, find.text('Liste depuis un texte'));
+      expect(find.text('Coller'), findsNothing);
+      expect(find.text('Ajouter un autre texte'), findsNothing);
       await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'Lait demi écrémé x2\nBeurre doux');
-      await _toucher(tester, find.text('Ajouter un autre texte'));
-      expect(find.text('1 texte déjà ajouté'), findsOneWidget);
-      await tester.enterText(find.byKey(const ValueKey('texte-mail')), 'lait demi-écrémé\nbeurre doux\nbeurre doux');
       await _toucher(tester, find.text('Lire la liste'));
-      // Le lait : 2 dans un mail, 1 dans l'autre → 2 ; le beurre : 1, puis 2 dans le même mail → 2
       expect(find.text('Lait demi-écrémé × 2'), findsOneWidget);
-      expect(find.text('Beurre doux × 2'), findsOneWidget);
-      expect(find.textContaining('Dans 2 mails'), findsNWidgets(2));
       await _toucher(tester, find.text('Créer la liste'));
       expect(Etat.instance.listes.last.lignes.length, 2);
     });

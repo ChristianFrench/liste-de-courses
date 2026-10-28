@@ -121,38 +121,11 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Copiez la liste (mail, message, note…), puis touchez « Coller » : un article par ligne. '
-              'Chaque « Coller » ajoute le texte copié à la suite ; plusieurs textes forment une seule liste.',
-              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-          if (textes.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 6),
-              child: Text('${textes.length} texte${textes.length > 1 ? 's' : ''} déjà ajouté${textes.length > 1 ? 's' : ''}',
-                  style: Charte.texte(15, gras: true)),
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Lien('Ajouter un autre texte', onTap: () {
-                if (texte.text.trim().isEmpty) return;
-                maj(() {
-                  textes.add(texte.text);
-                  texte.clear();
-                });
-              }),
-              Lien('Coller', onTap: () async {
-                final d = await Clipboard.getData(Clipboard.kTextPlain);
-                // Le texte copié s'ajoute à la suite de ce qui est déjà là.
-                final t = d?.text?.trim() ?? '';
-                if (t.isNotEmpty) maj(() => texte.text = texte.text.trim().isEmpty ? t : '${texte.text.trimRight()}\n$t');
-              }),
-            ],
-          ),
           TextField(
             key: const ValueKey('texte-mail'),
             controller: texte,
-            minLines: 6,
-            maxLines: 12,
+            minLines: 16,
+            maxLines: 24,
             style: Charte.texte(15),
             decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'Lait\n2 baguettes\nTomates x4…'),
           ),
@@ -328,11 +301,13 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 onTap: () => _creer([], simple: true),
               ),
               LigneMenu(
+                icone: Icons.list_alt,
                 titre: 'Liste type',
                 sousTitre: 'Une de vos listes types, ou une liste vide',
                 onTap: () => _choisirListeType(),
               ),
               LigneMenu(
+                icone: Icons.history,
                 titre: 'Liste personnalisée',
                 sousTitre: 'Choisir dans une de vos dernières courses',
                 onTap: () => _choisirCourse(passees),
