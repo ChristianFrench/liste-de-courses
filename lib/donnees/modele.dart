@@ -593,6 +593,10 @@ class Etat extends ChangeNotifier {
         return;
       } catch (e, pile) {
         debugPrint('Base locale indisponible : $e');
+        // Fermée, pour pouvoir la mettre de côté ensuite.
+        try {
+          _foyer?.fermer();
+        } catch (_) {}
         _foyer = null;
         // Rien n'est montré ni enregistré : l'erreur s'affiche à la place de l'application (29/10/2026,
         // le web montrait les données d'essai et faisait croire la base perdue).

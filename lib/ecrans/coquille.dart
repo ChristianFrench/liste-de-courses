@@ -245,6 +245,7 @@ class _ErreurBaseState extends State<_ErreurBase> {
           padding: const EdgeInsets.all(20),
           children: [
             Text('La base de cet appareil n\'a pas pu s\'ouvrir', style: Charte.texte(20, gras: true)),
+            Text('Version $versionApplication', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             const SizedBox(height: 12),
             if (_misDeCote)
               Text('La base abîmée est gardée à part sur cet appareil. Fermez puis rouvrez l\'application, choisissez '
