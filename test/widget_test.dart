@@ -1045,8 +1045,13 @@ void main() {
       await _toucher(tester, find.text('+ Nouveau produit'));
       expect(find.textContaining('photo'), findsNothing);
       await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Camembert');
-      await tester.enterText(find.byKey(const ValueKey('produit-marque')), 'Président');
-      await tester.pumpAndSettle();
+      // La marque vient du catalogue des marques ; « Autre marque… » en ajoute une au secteur.
+      await _toucher(tester, find.byKey(const ValueKey('produit-marque')));
+      await _toucher(tester, find.text('Autre marque…').last);
+      await tester.enterText(find.byType(TextField).last, 'Président');
+      await _toucher(tester, find.text('Valider').last);
+      expect(etat.marquesDuSecteur(etat.secteurCatalogue(etat.produits.firstWhere((x) => x.nom == 'Lait demi-écrémé').id)!),
+          contains('Président'));
       expect(find.descendant(of: find.byKey(const ValueKey('produit-nom-retenu')), matching: find.text('Camembert Président')), findsOneWidget,
           reason: 'le nom retenu, en haut, sans saisie');
       await _ciblesTactiles(tester);

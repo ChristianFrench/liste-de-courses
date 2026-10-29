@@ -67,6 +67,8 @@ Future<(Secteur?,)?> choisirSecteur(BuildContext context, {required String titre
 Future<Produit?> nouveauProduit(BuildContext context, {Secteur? secteur, String? nom}) =>
     fenetreProduit(context, secteur: secteur, libelle: nom, ranger: secteur == null);
 
+const _autreMarque = '\u0000autre';
+
 /// Fenêtre d'un produit ajouté (avec une croix) : libellé, marque éventuelle, mesure et packaging.
 /// Sans [produit] : crée le produit dans [secteur] ; avec [produit] (ajouté par le foyer) : le corrige.
 /// Le produit s'appelle toujours « libellé marque » (« Camembert Président »).
@@ -76,6 +78,7 @@ Future<Produit?> fenetreProduit(BuildContext context,
   final etat = Etat.instance;
   String rayonId = secteur?.rayonId ?? '';
   String secteurId = secteur?.id ?? '';
+  Secteur? choisi() => ranger ? (secteurId.isEmpty ? null : etat.secteur(secteurId)) : secteur;
   final nom = TextEditingController(text: produit == null ? (libelle ?? '') : etat.libelleSansMarque(produit));
   final mq = TextEditingController(
       text: produit == null ? (marque ?? '') : (produit.marqueIds.isEmpty ? '' : etat.marque(produit.marqueIds.first)?.nom ?? ''));
@@ -138,20 +141,29 @@ Future<Produit?> fenetreProduit(BuildContext context,
             decoration: const InputDecoration(labelText: 'Nom (ex. : Camembert)'),
           ),
           const SizedBox(height: 14),
-          Autocomplete<String>(
-            initialValue: TextEditingValue(text: mq.text),
-            optionsBuilder: (v) => v.text.trim().isEmpty
-                ? const <String>[]
-                : [for (final m in etat.marquesTriees) if (m.nom.toLowerCase().startsWith(v.text.trim().toLowerCase())) m.nom],
-            onSelected: (v) => maj(() => mq.text = v),
-            fieldViewBuilder: (context, c, focus, valider) => TextField(
-              key: const ValueKey('produit-marque'),
-              controller: c,
-              focusNode: focus,
-              style: Charte.texte(17),
-              onChanged: (v) => maj(() => mq.text = v),
-              decoration: const InputDecoration(labelText: 'Marque (facultative)'),
-            ),
+          // La marque se choisit dans le catalogue des marques du secteur (toutes, sans secteur) ;
+          // « Autre marque… » en ajoute une au secteur.
+          ChoixDeroulant<String>(
+            key: const ValueKey('produit-marque'),
+            libelle: 'Marque (facultative)',
+            valeur: mq.text,
+            choix: {
+              '': 'Aucune',
+              for (final n in {
+                ...(choisi() == null ? etat.marquesTriees.map((m) => m.nom) : etat.marquesDuSecteur(choisi()!)),
+                if (mq.text.isNotEmpty) mq.text,
+              })
+                n: n,
+              _autreMarque: 'Autre marque…',
+            },
+            onChange: (v) async {
+              if (v != _autreMarque) return maj(() => mq.text = v);
+              final n = await demanderTexte(context, libelle: 'Marque', titre: 'Autre marque',
+                  aide: choisi() == null ? null : 'Ajoutée aux marques du secteur ${choisi()!.nom}');
+              if (n == null || n.trim().isEmpty) return;
+              if (choisi() case final s?) etat.ajouterMarqueSecteur(s, n.trim());
+              maj(() => mq.text = n.trim());
+            },
           ),
           // Les mesures sont nombreuses : une liste déroulante.
           const SizedBox(height: 14),
