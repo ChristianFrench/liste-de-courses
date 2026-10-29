@@ -145,8 +145,35 @@ List<ArticleLu> consoliderTextes(Etat etat, List<String> textes) {
   return res.values.toList();
 }
 
+/// Texte HTML (source d'un mail Gmail, par exemple) ramené à du texte simple : un retour à la ligne
+/// par paragraphe, ligne de tableau ou élément de liste ; balises retirées, entités décodées.
+/// Un texte sans balise est rendu tel quel.
+String depuisHtml(String t) {
+  if (!RegExp(r'<(br|p|div|li|tr|td|span|b|i|font|table|ul|ol|html|body)\b', caseSensitive: false).hasMatch(t)) return t;
+  var s = t
+      .replaceAll(RegExp(r'<(style|script|head)\b[^>]*>.*?</\1\s*>', caseSensitive: false, dotAll: true), '')
+      .replaceAll(RegExp(r'<!--.*?-->', dotAll: true), '')
+      .replaceAll(RegExp(r'\r?\n'), ' ')
+      .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
+      .replaceAll(RegExp(r'</?(p|div|li|tr|h[1-6]|ul|ol|table)\b[^>]*>', caseSensitive: false), '\n')
+      .replaceAll(RegExp(r'</td\s*>', caseSensitive: false), ' ')
+      .replaceAll(RegExp(r'<[^>]*>'), '');
+  const entites = {'nbsp': ' ', 'amp': '&', 'lt': '<', 'gt': '>', 'quot': '"', 'apos': "'", 'eacute': 'é', 'egrave': 'è',
+      'ecirc': 'ê', 'agrave': 'à', 'acirc': 'â', 'ccedil': 'ç', 'ocirc': 'ô', 'icirc': 'î', 'ugrave': 'ù', 'ucirc': 'û',
+      'oelig': 'œ', 'euro': '€', 'rsquo': '\u2019', 'laquo': '«', 'raquo': '»', 'middot': '·'};
+  s = s.replaceAllMapped(RegExp(r'&(#x[0-9a-fA-F]+|#\d+|[a-zA-Z]+);'), (m) {
+    final e = m[1]!;
+    if (e.startsWith('#x')) return String.fromCharCode(int.parse(e.substring(2), radix: 16));
+    if (e.startsWith('#')) return String.fromCharCode(int.parse(e.substring(1)));
+    return entites[e] ?? m[0]!;
+  });
+  return s.split('\n').map((l) => l.replaceAll(RegExp(r'[ \t\u00a0]+'), ' ').trim()).where((l) => l.isNotEmpty).join('\n');
+}
+
 /// Lit le texte collé : un article par ligne (ou séparés par des virgules sur une même ligne).
+/// Le HTML (source d'un mail) est d'abord ramené à du texte.
 List<ArticleLu> lireTexte(Etat etat, String texte) {
+  texte = depuisHtml(texte);
   final res = <ArticleLu>[];
   final produits = etat.produits;
   Produit? parNom(String nom) {
