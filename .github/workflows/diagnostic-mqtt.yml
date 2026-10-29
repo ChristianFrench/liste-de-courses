@@ -18,3 +18,25 @@ jobs:
           MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR }}
           MQTT_MOT_DE_PASSE: ${{ secrets.MQTT_MOT_DE_PASSE }}
         run: python3 outils/diagnostic_mqtt.py "${{ inputs.canal }}"
+
+  navigateur:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - name: Compilation de la page de diagnostic
+        env:
+          MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR }}
+          MQTT_MOT_DE_PASSE: ${{ secrets.MQTT_MOT_DE_PASSE }}
+        working-directory: outils/diagnostic_web
+        run: |
+          dart pub get
+          dart compile js -O2 -o web/main.dart.js web/main.dart -DMQTT_HOTE=w041270a.ala.us-east-1.emqxsl.com \
+            "-DMQTT_UTILISATEUR=$MQTT_UTILISATEUR" "-DMQTT_MOT_DE_PASSE=$MQTT_MOT_DE_PASSE"
+      - name: Essai dans Chromium
+        working-directory: outils/diagnostic_web
+        run: |
+          (cd web && python3 -m http.server 8790 >/dev/null 2>&1 &)
+          npm install --no-save playwright@1.48.2 >/dev/null
+          npx playwright install chromium >/dev/null
+          node essai.js

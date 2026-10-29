@@ -1,0 +1,6 @@
+name: diagnostic_web
+publish_to: none
+environment:
+  sdk: ^3.5.0
+dependencies:
+  mqtt_client: 10.14.0
