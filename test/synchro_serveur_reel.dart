@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/stockage.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
@@ -123,6 +124,27 @@ void main() {
     notice('Suppression de A reçue par B', '${DateTime.now().difference(t3).inMilliseconds} ms');
 
     await tb.fermer();
+
+    // État gardé sur le serveur : un appareil C qui arrive sans rien demander (aucun « bonjour ») reçoit
+    // tout le foyer par les messages retenus, comme si tous les autres étaient fermés.
+    await attendre(() => s.journal.any((e) => e.texte.startsWith('État complet gardé sur le serveur')), secondes: 60);
+    final c = Stockage.ouvrir('${dossier.path}/c.db');
+    c.ecrire({...b.lire(), 'produits': <dynamic>[], 'listes': <dynamic>[], 'emplacements': <dynamic>[]});
+    c.horloge = Horloge('NOEUDC');
+    final tc = TransportMqtt(serveur);
+    var partsC = 0;
+    tc.messages.listen((m) {
+      if (!m.$1.startsWith('$base/etat/') || m.$2.isEmpty) return;
+      partsC++;
+      final j = CatalogueCommun.deballer(m.$2);
+      c.appliquer([for (final o in j['objets'] as List) Map<String, dynamic>.from(o as Map)]);
+    });
+    final t4 = DateTime.now();
+    await tc.connecter(identifiant: 'ldc-essai-C-${s.code}', sujetTestament: '$base/presence/NOEUDC', testament: '{}', abonnement: '$base/#');
+    await attendre(() => (c.lire()['produits'] as List).length >= attendus, secondes: 60);
+    notice('C a reçu l\'état gardé sur le serveur',
+        '$partsC parts en ${DateTime.now().difference(t4).inMilliseconds} ms : ${(c.lire()['produits'] as List).length} produits');
+    await tc.fermer();
     await s.arreterPartage();
   }, timeout: const Timeout(Duration(minutes: 4)));
 
@@ -149,6 +171,7 @@ void main() {
     final base = 'ldc/$code';
     final ta = TransportMqtt(serveur);
     ta.messages.listen((m) {
+      if (m.$1.contains('/etat/') || m.$2.isEmpty) return;
       final j = jsonDecode(m.$2) as Map;
       if (j['de'] == 'NOEUDA') return;
       if (m.$1 == '$base/bonjour') {

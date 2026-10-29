@@ -16,6 +16,7 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
+import 'catalogue_commun.dart' show CatalogueCommun;
 import 'client_mqtt.dart';
 import 'modele.dart';
 import 'stockage.dart';
@@ -585,6 +586,9 @@ class Synchro extends ChangeNotifier {
           _controle?.cancel();
           _controle = Timer.periodic(const Duration(seconds: 30), (_) => _controler());
           _sansPanne('l\'annonce aux autres appareils', _annoncer);
+          if (_reglage('etat_publie') != '$code/$noeud' || _partsASalir.isNotEmpty) {
+            _etatDiffere ??= Timer(const Duration(seconds: 5), _publierEtat);
+          }
         } else if (e == 'deconnecte') {
           if (etatReseau == 'connecte') _noter('Hors ligne : les modifications attendent le retour du réseau');
           liaisonOk = false;
@@ -612,6 +616,8 @@ class Synchro extends ChangeNotifier {
     _transport = null;
     _controle?.cancel();
     _delaiControle?.cancel();
+    _etatDiffere?.cancel();
+    _etatDiffere = null;
     liaisonOk = false;
     if (presence && t != null && t.connecte) t.publier('$_sujet/presence/$noeud', jsonEncode(_presence(false)), retenu: true);
     for (final a in _abonnements) {
@@ -752,6 +758,12 @@ class Synchro extends ChangeNotifier {
   void _publier(List<Map<String, Object?>> objets, {String? pour}) {
     final t = _transport;
     if (t == null) return;
+    if (pour == null) {
+      for (final o in objets) {
+        if (o['n'] == noeud) _partsASalir.add(partDe(o['t'] as String, o['k'] as String));
+      }
+      if (_partsASalir.isNotEmpty) _etatDiffere ??= Timer(const Duration(seconds: 10), _publierEtat);
+    }
     for (var i = 0; i < objets.length; i += tailleLot) {
       final lot = objets.sublist(i, min(i + tailleLot, objets.length));
       t.publier('$_sujet/modifs/$noeud', jsonEncode({'de': noeud, 'pour': pour, 'objets': lot}));
@@ -760,6 +772,78 @@ class Synchro extends ChangeNotifier {
     if (objets.isNotEmpty) _marquerEchange();
     if (pour == null) _noter('Envoyé : ${_resume(objets)}');
     notifyListeners();
+  }
+
+  // ------------------------------------------------------------ État gardé sur le serveur (29/10/2026)
+
+  // Le serveur ne garde les messages d'un appareil fermé que deux heures (EMQX Cloud gratuit, MQTT 3.1.1).
+  // Chaque appareil y laisse donc, en messages retenus (gardés sans limite de durée), la dernière version
+  // des objets dont il est l'auteur, en [nbParts] parts compressées : ldc/<code>/etat/<appareil>/<part>.
+  // Un appareil qui s'ouvre les reçoit à l'abonnement et se met à jour même si tous les autres sont fermés ;
+  // la version la plus récente de chaque objet l'emporte, comme pour les autres messages.
+
+  static const nbParts = 32;
+
+  /// Part d'un objet : toujours la même pour un objet donné, sur tous les appareils.
+  static int partDe(String table, String cle) {
+    var h = 7;
+    for (final c in utf8.encode('$table|$cle')) {
+      h = (h * 31 + c) & 0x3fffffff;
+    }
+    return h % nbParts;
+  }
+
+  final _partsASalir = <int>{};
+  Timer? _etatDiffere;
+  bool _etatEnCours = false;
+
+  Future<void> _publierEtat() async {
+    _etatDiffere = null;
+    final t = _transport, base = _base;
+    if (t == null || base == null || !t.connecte || _etatEnCours) return;
+    final marque = '$code/$noeud';
+    final tout = _reglage('etat_publie') != marque;
+    final parts = tout ? List.generate(nbParts, (i) => i) : (_partsASalir.toList()..sort());
+    _partsASalir.clear();
+    if (parts.isEmpty) return;
+    _etatEnCours = true;
+    try {
+      final parPart = <int, List<Map<String, Object?>>>{};
+      for (final o in base.objetsDe(noeud, '')) {
+        final p = partDe(o['t'] as String, o['k'] as String);
+        if (parts.contains(p)) (parPart[p] ??= []).add(o);
+      }
+      var octets = 0;
+      for (final (i, p) in parts.indexed) {
+        if (!identical(_transport, t) || !t.connecte) {
+          _partsASalir.addAll(parts.skip(i)); // reprises à la prochaine connexion
+          return;
+        }
+        final objets = parPart[p];
+        final contenu = objets == null ? '' : CatalogueCommun.emballer({'de': noeud, 'objets': objets});
+        octets += contenu.length;
+        t.publier('$_sujet/etat/$noeud/$p', contenu, retenu: true);
+        await Future<void>.delayed(const Duration(milliseconds: 150)); // sans engorger le navigateur
+      }
+      if (tout) {
+        _definir('etat_publie', marque);
+        _noter('État complet gardé sur le serveur : ${parPart.values.fold(0, (n, l) => n + l.length)} objets, '
+            '${(octets / 1024).round()} Ko');
+      }
+    } catch (e, pile) {
+      _partsASalir.addAll(parts); // réessayé au prochain envoi
+      _signalerPanne('l\'état gardé sur le serveur', e, pile);
+    } finally {
+      _etatEnCours = false;
+    }
+  }
+
+  void _recevoirEtat(String sujet, String contenu) {
+    final de = sujet.split('/')[3];
+    if (contenu.isEmpty || de == noeud) return;
+    final m = CatalogueCommun.deballer(contenu);
+    _recus.addAll([for (final o in m['objets'] as List) Map<String, dynamic>.from(o as Map)]);
+    _receptionDifferee ??= Timer(const Duration(milliseconds: 400), _integrer);
   }
 
   // ------------------------------------------------------------ Réception
@@ -771,6 +855,10 @@ class Synchro extends ChangeNotifier {
     _messagesRecus++;
     if (!sujet.startsWith('$_sujet/')) return;
     final type = sujet.substring(_sujet.length + 1).split('/').first;
+    if (type == 'etat') {
+      _recevoirEtat(sujet, contenu);
+      return;
+    }
     if (contenu.isEmpty) {
       // Présence effacée : l'appareil a quitté le partage.
       if (type == 'presence' && appareils.remove(sujet.split('/').last) != null) notifyListeners();
