@@ -1130,7 +1130,8 @@ class Etat extends ChangeNotifier {
   String complement(LigneListe? g, Produit p, {bool marque = true, bool avecPackaging = true}) {
     final m = <String>[];
     final mq = this.marque(g?.marqueId);
-    if (marque && mq != null) m.add(mq.nom);
+    // Pas de répétition quand le nom du produit porte déjà la marque (« Poulet entier Carrefour Bio »).
+    if (marque && mq != null && !p.nom.toLowerCase().contains(mq.nom.toLowerCase())) m.add(mq.nom);
     final k = packagingDe(g, p);
     if (avecPackaging && k != null) m.add(k.libelle.toLowerCase());
     return m.join(' · ');
