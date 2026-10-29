@@ -555,6 +555,10 @@ class Synchro extends ChangeNotifier {
           _noter('Certificat du serveur accepté : ${ServeurMqtt.empreinteCourte(empreinte)}');
           return;
         }
+        if (e.startsWith('info:')) {
+          _noter(e.substring(5));
+          return;
+        }
         if (e.startsWith('certificat-refuse:')) {
           certificatRefuse = e.substring(18);
           _noter('Le serveur présente un autre certificat (${ServeurMqtt.empreinteCourte(certificatRefuse!)}) : connexion refusée',
@@ -620,7 +624,11 @@ class Synchro extends ChangeNotifier {
     _envoiControle = DateTime.now().millisecondsSinceEpoch;
     t.publier('$_sujet/controle/$noeud', jsonEncode({'de': noeud, 't': _envoiControle}));
     _delaiControle?.cancel();
-    _delaiControle = Timer(const Duration(seconds: 10), () => _changerLiaison(false));
+    _delaiControle = Timer(const Duration(seconds: 10), () {
+      if (liaisonOk || !_controleNote) _noter('Contrôle sans retour après 10 s (messages reçus depuis le lancement : $_messagesRecus)', erreur: true);
+      _controleNote = true;
+      _changerLiaison(false);
+    });
   }
 
   void _changerLiaison(bool ok) {
@@ -707,7 +715,11 @@ class Synchro extends ChangeNotifier {
 
   // ------------------------------------------------------------ Réception
 
+  int _messagesRecus = 0;
+  bool _controleNote = false;
+
   void _recevoir(String sujet, String contenu) {
+    _messagesRecus++;
     if (!sujet.startsWith('$_sujet/')) return;
     final type = sujet.substring(_sujet.length + 1).split('/').first;
     if (contenu.isEmpty) {
@@ -880,6 +892,8 @@ class TransportMqtt implements Transport {
         .withWillQos(MqttQos.atLeastOnce)
         .withWillRetain(); // pas de startClean : le serveur garde la session et les messages manqués
     c.onConnected = _connecte;
+    c.onSubscribed = (s) => _etats.add('info:Abonnement accepté par le serveur ($s)');
+    c.onSubscribeFail = (s) => _etats.add('Abonnement refusé par le serveur ($s)');
     c.onAutoReconnect = () => _etats.add('connexion');
     c.onAutoReconnected = _connecte;
     c.onDisconnected = () {
