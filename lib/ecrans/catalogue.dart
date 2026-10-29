@@ -69,6 +69,72 @@ Future<Produit?> nouveauProduit(BuildContext context, {Secteur? secteur, String?
 
 const _autreMarque = '\u0000autre';
 
+/// Toutes les marques du catalogue des marques (tous secteurs), et celles déjà portées par des produits.
+List<String> marquesDuCatalogue() {
+  final etat = Etat.instance;
+  final res = <String, String>{};
+  for (final r in etat.rayonsCatalogue) {
+    for (final x in etat.secteursDu(r.id)) {
+      for (final n in etat.marquesDuSecteur(x)) {
+        res.putIfAbsent(n.toLowerCase(), () => n);
+      }
+    }
+  }
+  for (final m in etat.marques) {
+    res.putIfAbsent(m.nom.toLowerCase(), () => m.nom);
+  }
+  return res.values.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+}
+
+/// « Autre marque… » : une marque prise dans tout le catalogue des marques (proposée dès les premières
+/// lettres), ou une nouvelle. Elle est ajoutée aux marques de [secteur]. Rend son nom, ou null.
+Future<String?> autreMarque(BuildContext context, Secteur? secteur) async {
+  final toutes = marquesDuCatalogue();
+  var saisie = '';
+  final n = await volet<String>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: 'Autre marque',
+      contenu: Autocomplete<String>(
+        optionsBuilder: (v) {
+          final t = v.text.trim().toLowerCase();
+          if (t.isEmpty) return const <String>[];
+          return [
+            for (final m in toutes) if (m.toLowerCase().startsWith(t)) m,
+            for (final m in toutes) if (!m.toLowerCase().startsWith(t) && m.toLowerCase().contains(t)) m,
+          ];
+        },
+        onSelected: (v) => Navigator.of(ctx).pop(v),
+        fieldViewBuilder: (context, c, focus, valider) => TextField(
+          key: const ValueKey('autre-marque'),
+          controller: c,
+          focusNode: focus,
+          autofocus: true,
+          style: Charte.texte(16),
+          onChanged: (v) => saisie = v,
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+          decoration: InputDecoration(
+            labelText: 'Marque',
+            hintText: secteur == null ? 'Tapez les premières lettres' : 'Ajoutée aux marques du secteur ${secteur.nom}',
+          ),
+        ),
+      ),
+      boutons: [
+        Row(children: [
+          Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop())),
+          const SizedBox(width: 10),
+          Expanded(child: Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(saisie.trim()))),
+        ]),
+      ],
+    ),
+  );
+  if (n == null || n.trim().isEmpty) return null;
+  // Écrite autrement qu'une marque connue (« president ») : on garde l'orthographe du catalogue.
+  final nom = toutes.firstWhere((m) => m.toLowerCase() == n.trim().toLowerCase(), orElse: () => n.trim());
+  if (secteur != null) Etat.instance.ajouterMarqueSecteur(secteur, nom);
+  return nom;
+}
+
 /// Fenêtre d'un produit ajouté (avec une croix) : libellé, marque éventuelle, mesure et packaging.
 /// Sans [produit] : crée le produit dans [secteur] ; avec [produit] (ajouté par le foyer) : le corrige.
 /// Le produit s'appelle toujours « libellé marque » (« Camembert Président »).
@@ -158,11 +224,8 @@ Future<Produit?> fenetreProduit(BuildContext context,
             },
             onChange: (v) async {
               if (v != _autreMarque) return maj(() => mq.text = v);
-              final n = await demanderTexte(context, libelle: 'Marque', titre: 'Autre marque',
-                  aide: choisi() == null ? null : 'Ajoutée aux marques du secteur ${choisi()!.nom}');
-              if (n == null || n.trim().isEmpty) return;
-              if (choisi() case final s?) etat.ajouterMarqueSecteur(s, n.trim());
-              maj(() => mq.text = n.trim());
+              final n = await autreMarque(context, choisi());
+              if (n != null) maj(() => mq.text = n);
             },
           ),
           // Les mesures sont nombreuses : une liste déroulante.

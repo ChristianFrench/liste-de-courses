@@ -9,7 +9,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show nouveauProduit;
+import 'catalogue.dart' show autreMarque, nouveauProduit;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -1057,10 +1057,9 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               },
               onChange: (v) async {
                 if (v != _autre) return setState(() => marque = v);
-                final n = await demanderTexte(context, libelle: 'Marque', titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
-                if (n == null || n.trim().isEmpty || !mounted) return;
-                if (etat.secteurCatalogue(p.id) case final s?) etat.ajouterMarqueSecteur(s, n);
-                setState(() => marque = n.trim());
+                final n = await autreMarque(context, etat.secteurCatalogue(p.id));
+                if (n == null || !mounted) return;
+                setState(() => marque = n);
               },
             ),
           ],
