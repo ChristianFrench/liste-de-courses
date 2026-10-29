@@ -62,23 +62,20 @@ Future<(Secteur?,)?> choisirSecteur(BuildContext context, {required String titre
   );
 }
 
-/// Nouveau produit depuis la recherche d'une liste : son rayon et son secteur (ou « Ne pas ranger »),
-/// puis la fenêtre du produit. Rend le produit créé, ou null.
-Future<Produit?> nouveauProduit(BuildContext context, {Secteur? secteur, String? nom}) async {
-  var s = secteur;
-  if (s == null) {
-    final choix = await choisirSecteur(context, titre: nom ?? 'le nouveau produit', sansSecteur: true);
-    if (choix == null || !context.mounted) return null;
-    s = choix.$1;
-  }
-  return fenetreProduit(context, secteur: s, libelle: nom);
-}
+/// Nouveau produit depuis la recherche d'une liste : une seule fenêtre, rayon et secteur compris
+/// (« Ne pas ranger » possible). Rend le produit créé, ou null.
+Future<Produit?> nouveauProduit(BuildContext context, {Secteur? secteur, String? nom}) =>
+    fenetreProduit(context, secteur: secteur, libelle: nom, ranger: secteur == null);
 
 /// Fenêtre d'un produit ajouté (avec une croix) : libellé, marque éventuelle, mesure et packaging.
 /// Sans [produit] : crée le produit dans [secteur] ; avec [produit] (ajouté par le foyer) : le corrige.
 /// Le produit s'appelle toujours « libellé marque » (« Camembert Président »).
-Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur? secteur, String? libelle, String? marque}) async {
+/// [ranger] : le rayon et le secteur se choisissent dans la fenêtre.
+Future<Produit?> fenetreProduit(BuildContext context,
+    {Produit? produit, Secteur? secteur, String? libelle, String? marque, bool ranger = false}) async {
   final etat = Etat.instance;
+  String rayonId = secteur?.rayonId ?? '';
+  String secteurId = secteur?.id ?? '';
   final nom = TextEditingController(text: produit == null ? (libelle ?? '') : etat.libelleSansMarque(produit));
   final mq = TextEditingController(
       text: produit == null ? (marque ?? '') : (produit.marqueIds.isEmpty ? '' : etat.marque(produit.marqueIds.first)?.nom ?? ''));
@@ -89,23 +86,12 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
   final lots = <String>{for (final id in etat.typesLot) etat.packaging(id)!.libelle, if (l0 != null) l0}.toList();
   final ok = await modale(
     context,
-    titre: produit == null ? 'Nouveau produit${secteur == null ? '' : ' · ${secteur.nom}'}' : 'Modifier le produit',
+    titre: produit == null ? 'Nouveau produit${secteur == null || ranger ? '' : ' · ${secteur.nom}'}' : 'Modifier le produit',
     icone: Icons.shopping_basket_outlined,
     oui: produit == null ? 'Ajouter' : 'Enregistrer',
     non: null,
     croix: true,
     contenu: (context, maj) {
-      Widget choix(String titre, List<String> valeurs, String? choisi, int couleur, ValueChanged<String?> onChoix) => Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 14),
-              Text(titre, style: Charte.texte(15, gras: true)),
-              Wrap(spacing: 8, children: [
-                for (final v in valeurs)
-                  Pastille(v, couleur: Color(couleur), vide: v != choisi, onTap: () => maj(() => onChoix(v == choisi ? null : v))),
-              ]),
-            ],
-          );
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -119,7 +105,30 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
               style: Charte.texte(18, gras: true, couleur: nom.text.trim().isEmpty ? Charte.texteSecondaire : Charte.encre),
             ),
           ),
-          const SizedBox(height: 12),
+          if (ranger) ...[
+            const SizedBox(height: 16),
+            ChoixDeroulant<String>(
+              key: const ValueKey('produit-rayon'),
+              libelle: 'Rayon',
+              valeur: rayonId,
+              choix: {'': 'Ne pas ranger', for (final r in etat.rayonsCatalogue) r.id: r.nom},
+              onChange: (v) => maj(() {
+                rayonId = v;
+                secteurId = v.isEmpty ? '' : etat.secteursDu(v).first.id;
+              }),
+            ),
+            if (rayonId.isNotEmpty) ...[
+              const SizedBox(height: 14),
+              ChoixDeroulant<String>(
+                key: const ValueKey('produit-secteur'),
+                libelle: 'Secteur',
+                valeur: secteurId,
+                choix: {for (final x in etat.secteursDu(rayonId)) x.id: x.nom},
+                onChange: (v) => maj(() => secteurId = v),
+              ),
+            ],
+          ],
+          const SizedBox(height: 14),
           TextField(
             key: const ValueKey('produit-nom'),
             controller: nom,
@@ -128,7 +137,7 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
             onChanged: (_) => maj(() {}),
             decoration: const InputDecoration(labelText: 'Nom (ex. : Camembert)'),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 14),
           Autocomplete<String>(
             initialValue: TextEditingValue(text: mq.text),
             optionsBuilder: (v) => v.text.trim().isEmpty
@@ -152,7 +161,14 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
             choix: {'': 'Aucune', for (final m in mesures) m: m},
             onChange: (v) => maj(() => mesure = v.isEmpty ? null : v),
           ),
-          choix('Packaging', lots, lot, etat.couleurLots, (v) => lot = v),
+          const SizedBox(height: 14),
+          ChoixDeroulant<String>(
+            key: const ValueKey('produit-packaging'),
+            libelle: 'Packaging',
+            valeur: lot ?? '',
+            choix: {'': 'Aucun', for (final x in lots) x: x},
+            onChange: (v) => maj(() => lot = v.isEmpty ? null : v),
+          ),
         ],
       );
     },
@@ -163,6 +179,7 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
     Nav.message(context, 'Le produit n\'a pas de nom : rien n\'est enregistré');
     return null;
   }
+  if (ranger) secteur = secteurId.isEmpty ? null : etat.secteur(secteurId);
   final complet = [n, mq.text.trim()].where((x) => x.isNotEmpty).join(' ').toLowerCase();
   // Le même nom peut exister dans un autre secteur, pas deux fois dans le même.
   final ici = secteur ?? (produit == null ? null : etat.secteurCatalogue(produit.id));

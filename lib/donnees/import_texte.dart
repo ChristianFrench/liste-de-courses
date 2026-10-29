@@ -9,7 +9,7 @@ import 'modele.dart';
 
 /// Un article lu dans le texte.
 class ArticleLu {
-  ArticleLu(this.texte, this.nom, this.quantite, {this.produit, this.marque, this.mails = 1});
+  ArticleLu(this.texte, this.nom, this.quantite, {this.produit, this.marque, this.mails = 1, this.secteur});
 
   /// Nombre de mails où l'article figure (liste consolidée).
   final int mails;
@@ -24,6 +24,16 @@ class ArticleLu {
   /// Produit du catalogue reconnu, ou null (produit à créer).
   final Produit? produit;
   final String? marque;
+
+  /// Secteur du titre sous lequel l'article était écrit : un produit à créer y est rangé.
+  final Secteur? secteur;
+}
+
+/// Ce que la lecture n'a pas pu faire sûrement : [ligne] telle qu'écrite, [explication] pour l'utilisateur.
+class Difficulte {
+  const Difficulte(this.ligne, this.explication);
+  final String ligne;
+  final String explication;
 }
 
 /// Minuscules, sans accents ni ponctuation : « Pâtes (Panzani) » → « pates panzani ».
@@ -123,23 +133,24 @@ Produit? _chercher(Iterable<Produit> produits, String texte) {
 /// Plusieurs textes (plusieurs mails) fusionnés en une seule liste : un même produit n'apparaît qu'une fois.
 /// Dans un même texte, les quantités s'additionnent ; d'un texte à l'autre, on garde la plus grande
 /// (deux personnes qui demandent du lait n'en veulent pas forcément deux fois plus).
-List<ArticleLu> consoliderTextes(Etat etat, List<String> textes) {
+/// [rapport] reçoit les titres reconnus et les difficultés rencontrées.
+List<ArticleLu> consoliderTextes(Etat etat, List<String> textes, {List<Difficulte>? rapport}) {
   final res = <String, ArticleLu>{};
   for (final t in textes) {
     final duTexte = <String, ArticleLu>{};
-    for (final a in lireTexte(etat, t)) {
+    for (final a in lireTexte(etat, t, rapport: rapport)) {
       final cle = a.produit?.id ?? 'nouveau:${normaliser(a.nom)}';
       final d = duTexte[cle];
       duTexte[cle] = d == null
           ? a
-          : ArticleLu(d.texte, d.nom, d.quantite + a.quantite, produit: d.produit, marque: d.marque ?? a.marque);
+          : ArticleLu(d.texte, d.nom, d.quantite + a.quantite, produit: d.produit, marque: d.marque ?? a.marque, secteur: d.secteur);
     }
     for (final e in duTexte.entries) {
       final r = res[e.key];
       res[e.key] = r == null
           ? e.value
           : ArticleLu('${r.texte} | ${e.value.texte}', r.nom, r.quantite > e.value.quantite ? r.quantite : e.value.quantite,
-              produit: r.produit, marque: r.marque ?? e.value.marque, mails: r.mails + 1);
+              produit: r.produit, marque: r.marque ?? e.value.marque, mails: r.mails + 1, secteur: r.secteur ?? e.value.secteur);
     }
   }
   return res.values.toList();
@@ -170,9 +181,55 @@ String depuisHtml(String t) {
   return s.split('\n').map((l) => l.replaceAll(RegExp(r'[ \t\u00a0]+'), ' ').trim()).where((l) => l.isNotEmpty).join('\n');
 }
 
+/// Titre de rubrique reconnu : un rayon (et peut-être un de ses secteurs) du catalogue.
+class _Titre {
+  _Titre(this.rayon, this.secteur);
+  final Rayon rayon;
+  final Secteur? secteur;
+  String get nom => secteur == null ? rayon.nom : '${rayon.nom} › ${secteur!.nom}';
+}
+
+/// La ligne est-elle le nom d'un rayon ou d'un secteur du catalogue (« BOUCHERIE », « Fruits et légumes : »,
+/// « Crèmerie / Fromages ») ? On compare les mots, sans majuscules, accents ni pluriels.
+_Titre? _titre(Etat etat, String ligne) {
+  final t = ligne.trim();
+  if (RegExp(r'^[-–—*•·+>]').hasMatch(t) || RegExp(r'\d').hasMatch(t)) return null;
+  final sans = t.replaceFirst(RegExp(r'\s*:\s*$'), '');
+  String cle(String x) => _mots(x).join(' ');
+  final parties = sans.split(RegExp(r'\s*(/|›|>|-)\s*')).where((x) => x.trim().isNotEmpty).toList();
+  final rayons = etat.rayonsCatalogue;
+  // « Rayon / Secteur »
+  if (parties.length == 2) {
+    for (final r in rayons) {
+      if (cle(r.nom) != cle(parties[0])) continue;
+      for (final x in etat.secteursDu(r.id)) {
+        if (cle(x.nom) == cle(parties[1])) return _Titre(r, x);
+      }
+    }
+  }
+  final c = cle(sans);
+  if (c.isEmpty) return null;
+  for (final r in rayons) {
+    for (final x in etat.secteursDu(r.id)) {
+      if (cle(x.nom) == c) return _Titre(r, x);
+    }
+  }
+  for (final r in rayons) {
+    if (cle(r.nom) == c) return _Titre(r, null);
+  }
+  return null;
+}
+
+/// Produits rangés sous un titre (le secteur, ou tout le rayon).
+List<Produit> _produitsDu(Etat etat, _Titre t) => t.secteur != null
+    ? etat.produitsDuSecteur(t.secteur!)
+    : [for (final x in etat.secteursDu(t.rayon.id)) ...etat.produitsDuSecteur(x)];
+
 /// Lit le texte collé : un article par ligne (ou séparés par des virgules sur une même ligne).
-/// Le HTML (source d'un mail) est d'abord ramené à du texte.
-List<ArticleLu> lireTexte(Etat etat, String texte) {
+/// Le HTML (source d'un mail) est d'abord ramené à du texte. Une ligne qui porte le nom d'un rayon ou
+/// d'un secteur est un titre : les produits qui la suivent y sont cherchés d'abord, et un produit inconnu
+/// y est rangé. [rapport] reçoit les titres reconnus et les difficultés.
+List<ArticleLu> lireTexte(Etat etat, String texte, {List<Difficulte>? rapport}) {
   texte = depuisHtml(texte);
   final res = <ArticleLu>[];
   final produits = etat.produits;
@@ -184,13 +241,39 @@ List<ArticleLu> lireTexte(Etat etat, String texte) {
     return null;
   }
 
+  final lignes = texte.split(RegExp(r'\r?\n'));
+  _Titre? titre;
   var precedente = '';
-  for (final brute in texte.split(RegExp(r'\r?\n'))) {
+  for (var i = 0; i < lignes.length; i++) {
+    final brute = lignes[i];
     // Suite d'une longue ligne coupée par la messagerie (« … conserver à » / « l'occasion. »)
     final suite = precedente.length > 30 && RegExp(r'[a-zà-ÿ(,]$').hasMatch(precedente.trim()) &&
         RegExp(r'^[a-zà-ÿ]').hasMatch(brute.trim());
     precedente = brute;
-    if (suite && _chercher(produits, brute) == null) continue;
+    if (suite && _chercher(produits, brute) == null) {
+      rapport?.add(Difficulte(brute.trim(), 'Prise pour la suite de la ligne précédente, ignorée.'));
+      continue;
+    }
+    // Titre de rayon ou de secteur. En capitales ou suivi de « : », c'est sûr ; sinon (« Fromages » peut être
+    // un article), ce n'est un titre que si la ligne suivante est un produit de ce rayon ou secteur.
+    final t = _titre(etat, brute);
+    if (t != null) {
+      final sans = brute.trim().replaceFirst(RegExp(r'\s*:\s*$'), '');
+      var estTitre = brute.trim().endsWith(':') || (sans == sans.toUpperCase() && sans.length > 3);
+      if (estTitre) {
+        rapport?.add(Difficulte(brute.trim(), 'Titre reconnu : ${t.nom}.'));
+      } else {
+        final suivante = lignes.skip(i + 1).firstWhere((x) => x.trim().isNotEmpty, orElse: () => '');
+        estTitre = suivante.isNotEmpty && _chercher(_produitsDu(etat, t), _nettoyer(suivante).$1) != null;
+        rapport?.add(Difficulte(brute.trim(), estTitre
+            ? 'Nom de ${t.secteur == null ? 'rayon' : 'secteur'} : pris pour le titre ${t.nom}, la ligne suivante en faisant partie.'
+            : 'Nom de ${t.secteur == null ? 'rayon' : 'secteur'}, mais la ligne suivante n\'en fait pas partie : pris pour un article.'));
+      }
+      if (estTitre) {
+        titre = t;
+        continue;
+      }
+    }
     // « pain, beurre, œufs » : plusieurs articles sur une ligne ; pas une phrase avec une virgule.
     final parts = brute.split(',');
     final morceaux = parts.length > 1 && !brute.contains('(') && !RegExp(r'\d,\d').hasMatch(brute) &&
@@ -198,16 +281,43 @@ List<ArticleLu> lireTexte(Etat etat, String texte) {
         ? parts
         : [brute];
     for (final ligne in morceaux) {
-      if (_horsListe(ligne)) continue;
+      if (_horsListe(ligne)) {
+        if (normaliser(ligne).length > 2 && RegExp(r'[a-z]').hasMatch(normaliser(ligne))) {
+          rapport?.add(Difficulte(ligne.trim(), 'Formule du mail (salutation, signature…), ignorée.'));
+        }
+        continue;
+      }
       final (nom, q) = _nettoyer(ligne);
       if (nom.isEmpty) continue;
-      // Intertitre de rubrique (« FRUITS ET LÉGUMES ») : en capitales, sans article reconnu
       final capitales = nom == nom.toUpperCase() && nom.length > 3;
       final appris = _correspondances[normaliser(ligne)] ?? _correspondances[normaliser(nom)];
-      final p = (appris == null ? null : parNom(appris[0])) ?? _chercher(produits, nom);
-      if (p == null && capitales) continue;
+      Produit? p = appris == null ? null : parNom(appris[0]);
+      // Sous un titre, le produit est cherché d'abord dans ce rayon ou secteur.
+      if (p == null && titre != null) p = _chercher(_produitsDu(etat, titre), nom);
+      p ??= _chercher(produits, nom);
+      // Intertitre en capitales qui n'est ni un rayon, ni un secteur, ni un produit.
+      if (p == null && capitales) {
+        rapport?.add(Difficulte(ligne.trim(), 'En capitales mais inconnu du catalogue : ni rayon, ni secteur, ni produit. '
+            'Ignoré ; les produits qui suivent ne sont plus rangés sous le titre précédent.'));
+        titre = null;
+        continue;
+      }
+      if (p == null) {
+        rapport?.add(Difficulte(ligne.trim(), titre?.secteur != null
+            ? 'Produit inconnu : sera créé dans ${titre!.nom}.'
+            : titre != null
+                ? 'Produit inconnu : sera créé non placé (le titre ${titre.nom} est un rayon, pas un secteur).'
+                : 'Produit inconnu : sera créé non placé (aucun titre au-dessus).'));
+      } else if (titre != null) {
+        final s = etat.secteurCatalogue(p.id);
+        final dedans = titre.secteur != null ? s?.id == titre.secteur!.id : s?.rayonId == titre.rayon.id;
+        if (!dedans) {
+          rapport?.add(Difficulte(ligne.trim(), 'Reconnu comme « ${p.nom} », rangé dans '
+              '${s == null ? 'aucun secteur' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}'}, pas sous ${titre.nom}.'));
+        }
+      }
       res.add(ArticleLu(ligne.trim(), nom, q,
-          produit: p, marque: appris == null || appris[1].isEmpty ? null : appris[1]));
+          produit: p, marque: appris == null || appris[1].isEmpty ? null : appris[1], secteur: titre?.secteur));
     }
   }
   return res;

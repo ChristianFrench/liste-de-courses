@@ -111,7 +111,8 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     );
     if (!lire || !mounted) return;
     if (texte.text.trim().isNotEmpty) textes.add(texte.text);
-    final lus = consoliderTextes(etat, textes);
+    final rapport = <Difficulte>[];
+    final lus = consoliderTextes(etat, textes, rapport: rapport);
     if (lus.isEmpty) {
       Nav.message(context, 'Aucun article trouvé dans ce texte');
       return;
@@ -128,11 +129,24 @@ class _EcranPrelisteState extends State<EcranPreliste> {
           Text('${lus.where((a) => a.produit != null).length} reconnus dans le catalogue, '
               '${lus.where((a) => a.produit == null).length} nouveaux produits. Décochez ce qu\'il ne faut pas garder.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          if (rapport.isNotEmpty) ...[
+            const TitreSection('Compte rendu de la lecture', cote: 0, haut: 12),
+            for (final d in rapport)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Text.rich(TextSpan(children: [
+                  TextSpan(text: '« ${d.ligne} » ', style: Charte.texte(14, gras: true)),
+                  TextSpan(text: d.explication, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                ])),
+              ),
+            const TitreSection('Articles', cote: 0, haut: 12),
+          ],
           for (var i = 0; i < lus.length; i++)
             CaseModale(
               texte: '${lus[i].produit?.nom ?? '${lus[i].nom} (nouveau)'}${lus[i].quantite > 1 ? ' × ${lus[i].quantite}' : ''}',
               aide: '${lus[i].mails > 1 ? 'Dans ${lus[i].mails} mails · ' : ''}Lu : ${lus[i].texte}'
-                  '${lus[i].marque != null ? ' · marque ${lus[i].marque}' : ''}',
+                  '${lus[i].marque != null ? ' · marque ${lus[i].marque}' : ''}'
+                  '${lus[i].produit == null && lus[i].secteur != null ? ' · rangé dans ${lus[i].secteur!.nom}' : ''}',
               coche: choisis.contains(i),
               onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
             ),
@@ -145,7 +159,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     for (var i = 0; i < lus.length; i++) {
       if (!choisis.contains(i)) continue;
       final a = lus[i];
-      final p = a.produit ?? etat.creerProduit(a.nom);
+      final p = a.produit ?? etat.creerProduit(a.nom, secteur: a.secteur);
       final g = lignes[p.id];
       if (g != null) {
         g.quantite += a.quantite;

@@ -745,8 +745,7 @@ void main() {
         await tester.pumpAndSettle();
         await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
         await tester.pumpAndSettle();
-        // Article absent du catalogue : on peut le ranger, ou non.
-        if (find.text('Ne pas ranger').evaluate().isNotEmpty) await _toucher(tester, find.text('Ne pas ranger'));
+        // Article absent du catalogue : une seule fenêtre, rayon « Ne pas ranger » par défaut.
         if (find.text('Ajouter').evaluate().isNotEmpty) await _toucher(tester, find.text('Ajouter'));
       }
       expect([for (final g in l.lignes) etat.produit(g.produitId)!.nom], ['Jambon', 'Café moulu', 'pq maison'],
