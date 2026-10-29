@@ -77,15 +77,24 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
   if (rayons.isEmpty) return false;
   var rayonId = actuel?.rayonId ?? rayons.first.id;
   var secteurId = actuel?.id ?? etat.secteursDu(rayonId).first.id;
+  final libelle = TextEditingController(text: p.nom);
   final ok = await modale(
     context,
-    titre: 'Placer « ${p.nom} »',
+    titre: 'Placer le produit',
     oui: 'Placer',
     contenu: (context, maj) => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 6),
+        TextField(
+          key: const ValueKey('placer-libelle'),
+          controller: libelle,
+          style: Charte.texte(17),
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(labelText: 'Libellé'),
+        ),
+        const SizedBox(height: 14),
         ChoixDeroulant<String>(
           key: const ValueKey('placer-rayon'),
           libelle: 'Rayon',
@@ -110,6 +119,8 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
     ),
   );
   if (!ok) return false;
+  final n = libelle.text.trim();
+  if (n.isNotEmpty && n != p.nom) etat.renommerProduit(p, n);
   etat.placer(etat.rayon(rayonId)!.magasinId, p.id, secteurId);
   return true;
 }

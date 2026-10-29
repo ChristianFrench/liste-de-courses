@@ -837,7 +837,9 @@ void main() {
       // Toucher le bandeau : choisir l'article, puis son rayon et son secteur
       await _toucher(tester, find.text('NON PLACÉ'));
       await _toucher(tester, find.text('Truc mystère').last);
+      await tester.enterText(find.byKey(const ValueKey('placer-libelle')), 'Truc connu');
       await _toucher(tester, find.text('Placer'));
+      expect(truc.nom, 'Truc connu', reason: 'le libellé se corrige en le plaçant');
       expect(etat.secteurCatalogue(truc.id), isNotNull, reason: 'placé dans le premier secteur proposé');
       for (final m in etat.magasins) {
         expect(etat.secteurDe(m.id, truc.id)?.nom, etat.secteurCatalogue(truc.id)!.nom, reason: 'dans tous les magasins');
