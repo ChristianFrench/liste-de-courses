@@ -547,7 +547,7 @@ class Synchro extends ChangeNotifier {
     base.horloge ??= Horloge(noeud, dernier: base.connus()[noeud] ?? '');
     final t = _transport = fabrique(serveur);
     _abonnements
-      ..add(t.messages.listen((m) => _recevoir(m.$1, m.$2)))
+      ..add(t.messages.listen((m) => _sansPanne('la réception (${m.$1.split('/').skip(2).join('/')})', () => _recevoir(m.$1, m.$2))))
       ..add(t.etats.listen((e) {
         if (e.startsWith('certificat:')) {
           final empreinte = e.substring(11);
@@ -573,10 +573,12 @@ class Synchro extends ChangeNotifier {
             t.publier('ldc/annuaire/$cle', jsonEncode({'cree': DateTime.now().millisecondsSinceEpoch}), retenu: true);
             _annuaire = null;
           }
-          _annoncer();
+          // Le contrôle d'abord : une erreur à l'annonce (29/10/2026, web) le laissait sans minuterie,
+          // voyant rouge sans explication.
           _controler();
           _controle?.cancel();
           _controle = Timer.periodic(const Duration(seconds: 30), (_) => _controler());
+          _sansPanne('l\'annonce aux autres appareils', _annoncer);
         } else if (e == 'deconnecte') {
           if (etatReseau == 'connecte') _noter('Hors ligne : les modifications attendent le retour du réseau');
           liaisonOk = false;
@@ -611,6 +613,21 @@ class Synchro extends ChangeNotifier {
     }
     _abonnements.clear();
     await t?.fermer();
+  }
+
+  int _pannes = 0;
+
+  /// Une erreur imprévue est écrite dans le journal (les 20 premières) au lieu d'arrêter l'échange en silence.
+  void _sansPanne(String quoi, void Function() faire) {
+    try {
+      faire();
+    } catch (e, pile) {
+      if (++_pannes <= 20) {
+        final texte = '$e';
+        _noter('Erreur pendant $quoi : ${texte.length > 200 ? '${texte.substring(0, 200)}…' : texte}', erreur: true);
+      }
+      debugPrint('$e\n$pile');
+    }
   }
 
   /// Message de contrôle : l'appareil s'écoute lui-même ; s'il revient, le serveur fonctionne.
@@ -677,7 +694,7 @@ class Synchro extends ChangeNotifier {
   void signaler() {
     if (!actif) return;
     _envoiDiffere?.cancel();
-    _envoiDiffere = Timer(const Duration(milliseconds: 300), envoyerModifs);
+    _envoiDiffere = Timer(const Duration(milliseconds: 300), () => _sansPanne('l\'envoi des modifications', envoyerModifs));
   }
 
   void envoyerModifs() {
