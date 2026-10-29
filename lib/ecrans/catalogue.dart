@@ -69,6 +69,60 @@ Future<Produit?> nouveauProduit(BuildContext context, {Secteur? secteur, String?
 
 const _autreMarque = '\u0000autre';
 
+/// Range un produit non placé (ou le déplace) : rayon et secteur, les mêmes dans tous les magasins.
+Future<bool> placerProduit(BuildContext context, Produit p) async {
+  final etat = Etat.instance;
+  final actuel = etat.secteurCatalogue(p.id);
+  final rayons = [for (final r in etat.rayonsCatalogue) if (etat.secteursDu(r.id).isNotEmpty) r];
+  if (rayons.isEmpty) return false;
+  var rayonId = actuel?.rayonId ?? rayons.first.id;
+  var secteurId = actuel?.id ?? etat.secteursDu(rayonId).first.id;
+  final ok = await modale(
+    context,
+    titre: 'Placer « ${p.nom} »',
+    oui: 'Placer',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 6),
+        ChoixDeroulant<String>(
+          key: const ValueKey('placer-rayon'),
+          libelle: 'Rayon',
+          valeur: rayonId,
+          choix: {for (final r in rayons) r.id: r.nom},
+          onChange: (v) => maj(() {
+            rayonId = v;
+            secteurId = etat.secteursDu(v).first.id;
+          }),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('placer-secteur'),
+          libelle: 'Secteur',
+          valeur: secteurId,
+          choix: {for (final x in etat.secteursDu(rayonId)) x.id: x.nom},
+          onChange: (v) => maj(() => secteurId = v),
+        ),
+        const SizedBox(height: 8),
+        Text('Le même rangement dans tous les magasins.', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      ],
+    ),
+  );
+  if (!ok) return false;
+  etat.placer(etat.rayon(rayonId)!.magasinId, p.id, secteurId);
+  return true;
+}
+
+/// « Non placé » touché dans une liste : choisir l'article à placer, puis son rayon et son secteur.
+Future<void> placerNonPlaces(BuildContext context, List<Produit> produits) async {
+  if (produits.isEmpty) return;
+  final p = produits.length == 1
+      ? produits.single
+      : await choisirDansListe<Produit>(context, titre: 'Placer quel article ?', choix: {for (final x in produits) x: x.nom});
+  if (p != null && context.mounted) await placerProduit(context, p);
+}
+
 /// Toutes les marques du catalogue des marques (tous secteurs), et celles déjà portées par des produits.
 List<String> marquesDuCatalogue() {
   final etat = Etat.instance;
@@ -508,10 +562,22 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                     if (nonRanges.isNotEmpty)
                       GroupeRetractable(
                         cle: 'catalogue/nonRanges',
-                        titre: 'Non rangés',
+                        titre: 'Non placés',
                         icone: Icons.help_outline,
                         nombre: nonRanges.length,
-                        enfants: [for (final p in nonRanges) ligneProduit(context, p)],
+                        enfants: [
+                          for (final p in nonRanges)
+                            LigneMenu(
+                              titre: p.nom,
+                              icone: Icons.shopping_basket_outlined,
+                              apresTitre: SignePerso(p),
+                              sousTitre: 'Touchez pour le placer',
+                              onTap: () => menuActions(context, titre: p.nom, actions: [
+                                ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
+                                ActionLigne(Icons.info_outline, 'Voir la fiche', () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id))),
+                              ]),
+                            ),
+                        ],
                       ),
                   ],
           ),

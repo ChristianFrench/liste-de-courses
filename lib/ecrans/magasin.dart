@@ -54,6 +54,8 @@ class EcranFicheProduit extends StatelessWidget {
             sousTitre: 'Catalogue',
             titre: p.nom,
             actions: [
+              if (etat.secteurCatalogue(p.id) == null)
+                ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
               if (ajoute) ...[
                 ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
                 ActionLigne(Icons.delete_outline, 'Supprimer', () async {

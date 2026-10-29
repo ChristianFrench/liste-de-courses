@@ -9,7 +9,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show autreMarque, nouveauProduit;
+import 'catalogue.dart' show autreMarque, nouveauProduit, placerNonPlaces;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -487,7 +487,14 @@ class _EcranConstructionState extends State<EcranConstruction> {
                       ? [for (final g in l.lignes) _ligne(l, g)]
                       : [
                           for (final x in etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id)) ...[
-                            TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length),
+                            TitreGroupe(
+                              nom: x.nom,
+                              nonPlace: x.nonPlace,
+                              nombre: x.lignes.length,
+                              onTap: x.nonPlace
+                                  ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p])
+                                  : null,
+                            ),
                             for (final g in x.lignes) _ligne(l, g),
                           ],
                         ],
@@ -1512,6 +1519,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                   key: _titres.putIfAbsent(x.id, GlobalKey.new),
                                   nom: x.nom,
                                   nonPlace: x.nonPlace,
+                                  onTap: x.nonPlace
+                                      ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p])
+                                      : null,
                                   marque: x.lignes.any((g) => fondus.contains(g.produitId)) ? Icons.playlist_add : null,
                                 ),
                                 for (final g in x.lignes)

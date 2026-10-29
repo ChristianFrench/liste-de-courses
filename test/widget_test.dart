@@ -817,6 +817,7 @@ void main() {
 
     testWidgets('non placés : visibles en fin de liste, sous leur bandeau', (tester) async {
       final etat = Etat.instance;
+      etat.harmoniserCatalogue(); // fait à l'ouverture du foyer
       final l = etat.liste('l1')!;
       for (var i = 1; i <= 25; i++) {
         etat.ajouterLigne(l, etat.creerProduit('Article inconnu $i').id);
@@ -833,6 +834,14 @@ void main() {
             scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
       }
       expect(find.text('NON PLACÉ'), findsOneWidget);
+      // Toucher le bandeau : choisir l'article, puis son rayon et son secteur
+      await _toucher(tester, find.text('NON PLACÉ'));
+      await _toucher(tester, find.text('Truc mystère').last);
+      await _toucher(tester, find.text('Placer'));
+      expect(etat.secteurCatalogue(truc.id), isNotNull, reason: 'placé dans le premier secteur proposé');
+      for (final m in etat.magasins) {
+        expect(etat.secteurDe(m.id, truc.id)?.nom, etat.secteurCatalogue(truc.id)!.nom, reason: 'dans tous les magasins');
+      }
     });
 
     testWidgets('nouvelle liste depuis le texte d\'un mail', (tester) async {
