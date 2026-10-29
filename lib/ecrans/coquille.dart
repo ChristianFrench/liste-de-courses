@@ -91,6 +91,7 @@ class Coquille extends StatelessWidget {
       listenable: Synchro.instance,
       builder: (context, coquille) {
         final s = Synchro.instance;
+        if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
       child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: ListenableBuilder(
@@ -211,4 +212,30 @@ class EcranRubrique extends StatelessWidget {
           ),
         _ => const EcranMagasins(),
       };
+}
+
+/// La base de l'appareil n'a pas pu s'ouvrir : on le dit, sans rien montrer ni enregistrer d'autre.
+class _ErreurBase extends StatelessWidget {
+  const _ErreurBase(this.erreur);
+  final String erreur;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text('La base de cet appareil n\'a pas pu s\'ouvrir', style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 12),
+            Text('Vos données ne sont pas effacées : rien n\'a été modifié. Fermez puis rouvrez l\'application ; '
+                'si ce message revient, envoyez une capture de cet écran.',
+                style: Charte.texte(16)),
+            const SizedBox(height: 16),
+            SelectableText(erreur, style: Charte.texte(13, couleur: const Color(0xFFB00020))),
+          ],
+        ),
+      ),
+    );
+  }
 }

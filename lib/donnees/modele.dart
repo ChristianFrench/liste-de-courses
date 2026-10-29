@@ -570,6 +570,9 @@ class Etat extends ChangeNotifier {
   Future<Map<String, dynamic>> _donneesDemo() async =>
       jsonDecode(await rootBundle.loadString(fichierDonnees)) as Map<String, dynamic>;
 
+  /// Erreur à l'ouverture de la base de l'appareil (null : base ouverte normalement).
+  String? erreurBase;
+
   /// Base du foyer (vraies données) et, en mode démonstration, base de démonstration.
   /// [dossier] : dossier des bases (essais) ; par défaut, celui de l'application.
   Future<void> charger({Directory? dossier}) async {
@@ -580,9 +583,12 @@ class Etat extends ChangeNotifier {
         await _reprendreDemonstration();
         await _ouvrirActif();
         return;
-      } catch (e) {
+      } catch (e, pile) {
         debugPrint('Base locale indisponible : $e');
         _foyer = null;
+        // Rien n'est montré ni enregistré : l'erreur s'affiche à la place de l'application (29/10/2026,
+        // le web montrait les données d'essai et faisait croire la base perdue).
+        erreurBase = '$e\n\n${pile.toString().split('\n').take(12).join('\n')}';
       }
     }
     lire(await _donneesDemo());
