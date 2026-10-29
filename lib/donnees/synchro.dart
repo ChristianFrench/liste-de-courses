@@ -621,13 +621,32 @@ class Synchro extends ChangeNotifier {
   void _sansPanne(String quoi, void Function() faire) {
     try {
       faire();
-    } catch (e, pile) {
-      if (++_pannes <= 20) {
-        final texte = '$e';
-        _noter('Erreur pendant $quoi : ${texte.length > 200 ? '${texte.substring(0, 200)}…' : texte}', erreur: true);
+    } catch (e) {
+      // Base du navigateur abîmée dans le journal d'échange (29/10/2026) : réparée une fois, puis on réessaie.
+      final base = _base;
+      if (_journalRepare || base == null || !'$e'.contains('malformed')) {
+        _signalerPanne(quoi, e, StackTrace.current);
+        return;
       }
-      debugPrint('$e\n$pile');
+      _journalRepare = true;
+      _noter('Base abîmée pendant $quoi : réparation du journal d\'échange…', erreur: true);
+      try {
+        _noter('Journal d\'échange réparé : ${base.reparerJournal()}');
+        faire();
+      } catch (e2, pile) {
+        _signalerPanne('la réparation', e2, pile);
+      }
     }
+  }
+
+  bool _journalRepare = false;
+
+  void _signalerPanne(String quoi, Object e, StackTrace pile) {
+    if (++_pannes <= 20) {
+      final texte = '$e';
+      _noter('Erreur pendant $quoi : ${texte.length > 200 ? '${texte.substring(0, 200)}…' : texte}', erreur: true);
+    }
+    debugPrint('$e\n$pile');
   }
 
   /// Message de contrôle : l'appareil s'écoute lui-même ; s'il revient, le serveur fonctionne.

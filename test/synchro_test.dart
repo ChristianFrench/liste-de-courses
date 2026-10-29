@@ -290,4 +290,16 @@ void main() {
     expect(b.compareTo(a), greaterThan(0));
     expect(b.compareTo(futur), greaterThan(0));
   });
+
+  test('réparation du journal d\'échange : index reconstruits, rien de perdu', () {
+    final a = Stockage.ouvrir(':memory:');
+    a.ecrire(parLeModele(demo()));
+    a.horloge = Horloge('A');
+    a.toutJournaliser(a.lire());
+    final avant = envoi(a, 'A').length;
+    final r = a.reparerJournal();
+    expect(r, startsWith('index reconstruits'));
+    expect(r, contains('ok'));
+    expect(envoi(a, 'A').length, avant, reason: 'rien n\'est renoté : la base et le journal concordent');
+  });
 }

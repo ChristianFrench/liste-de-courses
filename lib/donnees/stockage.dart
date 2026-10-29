@@ -747,6 +747,52 @@ class Stockage {
     }
   }
 
+  /// Journal abîmé (29/10/2026, web : « database disk image is malformed » en lisant synchro_objet).
+  /// D'abord ses index reconstruits ; sinon le journal est refait avec ce qui reste lisible. Ensuite toute
+  /// ligne de la base qui diffère du journal y est notée à nouveau, donc renvoyée aux autres appareils.
+  String reparerJournal() {
+    String resultat;
+    try {
+      _db.execute('REINDEX synchro_objet');
+      _db.select('SELECT count(*) FROM synchro_objet NOT INDEXED');
+      connus();
+      objetsDe('', '');
+      resultat = 'index reconstruits';
+    } catch (_) {
+      var lignes = <List<Object?>>[];
+      try {
+        lignes = [
+          for (final r in _db.select('SELECT tab, cle, hlc, noeud, valeurs FROM synchro_objet NOT INDEXED'))
+            [r['tab'], r['cle'], r['hlc'], r['noeud'], r['valeurs']]
+        ];
+      } catch (_) {}
+      _db.execute('DROP TABLE IF EXISTS synchro_objet');
+      _db.execute(_sqlSynchro);
+      _db.execute('BEGIN');
+      final inserer = _db.prepare('INSERT OR REPLACE INTO synchro_objet (tab, cle, hlc, noeud, valeurs) VALUES (?, ?, ?, ?, ?)');
+      try {
+        for (final l in lignes) {
+          inserer.execute(l);
+        }
+        _db.execute('COMMIT');
+      } catch (_) {
+        _db.execute('ROLLBACK');
+        rethrow;
+      } finally {
+        inserer.dispose();
+      }
+      resultat = 'journal refait, ${lignes.length} objets gardés';
+    }
+    if (horloge != null) toutJournaliser(lire());
+    try {
+      final controle = _db.select('PRAGMA quick_check(3)').map((r) => r.values.first).join(' ; ');
+      resultat += ', vérification de la base : $controle';
+    } catch (e) {
+      resultat += ', vérification de la base impossible : $e';
+    }
+    return resultat;
+  }
+
   /// Objets modifiés par [noeud] après [apres] (ordre de l'horloge).
   List<Map<String, Object?>> objetsDe(String noeud, String apres) => [
         for (final r in _db.select(
