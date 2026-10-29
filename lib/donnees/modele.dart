@@ -573,6 +573,9 @@ class Etat extends ChangeNotifier {
   /// Erreur à l'ouverture de la base de l'appareil (null : base ouverte normalement).
   String? erreurBase;
 
+  /// Web : l'application est déjà ouverte dans un autre onglet ou une autre fenêtre ; la base n'est pas ouverte ici.
+  bool dejaOuverte = false;
+
   /// Base illisible : gardée à part sur l'appareil ; au prochain lancement, on repart d'une base neuve
   /// (« Rejoindre un foyer » recharge alors tout depuis le serveur).
   Future<void> mettreBaseDeCote() async {
@@ -587,6 +590,11 @@ class Etat extends ChangeNotifier {
     if (enregistrementActif) {
       try {
         _dossier = await preparerDossierBases(dossier?.path);
+        if (!await prendreVerrou()) {
+          dejaOuverte = true;
+          lire(await _donneesDemo());
+          return;
+        }
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
         await _reprendreDemonstration();
         await _ouvrirActif();

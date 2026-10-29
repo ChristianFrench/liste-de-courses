@@ -91,6 +91,7 @@ class Coquille extends StatelessWidget {
       listenable: Synchro.instance,
       builder: (context, coquille) {
         final s = Synchro.instance;
+        if (Etat.instance.dejaOuverte) return const _DejaOuverte();
         if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
@@ -262,6 +263,30 @@ class _ErreurBaseState extends State<_ErreurBase> {
             if (_echec != null) Text(_echec!, style: Charte.texte(14, couleur: const Color(0xFFB00020))),
             const SizedBox(height: 16),
             SelectableText(widget.erreur, style: Charte.texte(13, couleur: const Color(0xFFB00020))),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Web : l'application est déjà ouverte ailleurs dans ce navigateur ; cette page n'ouvre pas la base.
+class _DejaOuverte extends StatelessWidget {
+  const _DejaOuverte();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            Text('Liste de courses est déjà ouverte', style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 12),
+            Text('Elle est ouverte dans un autre onglet ou une autre fenêtre de ce navigateur (par exemple l\'icône de '
+                'l\'écran d\'accueil). Pour protéger vos données, elle ne s\'ouvre qu\'une fois à la fois.\n\n'
+                'Fermez cette page et utilisez l\'autre, ou fermez l\'autre puis rouvrez celle-ci.',
+                style: Charte.texte(16)),
           ],
         ),
       ),

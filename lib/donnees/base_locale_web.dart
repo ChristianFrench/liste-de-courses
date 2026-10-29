@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:js_interop';
 import 'dart:typed_data';
 
 import 'package:sqlite3/wasm.dart';
@@ -55,4 +57,29 @@ Future<void> mettreDeCote(String de, String vers) async {
     if (f.xAccess(x, 0) != 0) f.xDelete(x, 0);
   }
   await f.flush();
+}
+
+// Une seule instance de l'application par navigateur (29/10/2026) : deux onglets, ou l'icône de l'écran
+// d'accueil et un onglet, écrivant chacun de son côté dans la même base l'ont abîmée. Verrou « Web Locks » :
+// gardé tant que la page est ouverte, rendu par le navigateur quand elle se ferme.
+@JS('navigator.locks')
+external _Verrous? get _verrous;
+
+extension type _Verrous._(JSObject _) implements JSObject {
+  external JSPromise<JSAny?> request(String nom, JSObject options, JSFunction rappel);
+}
+
+/// true si cette page a la main sur la base ; false si l'application est déjà ouverte ailleurs dans ce navigateur.
+Future<bool> prendreVerrou() async {
+  final verrous = _verrous;
+  if (verrous == null) return true; // navigateur trop ancien : pas de protection
+  final obtenu = Completer<bool>();
+  JSPromise<JSAny?> rappel(JSAny? verrou) {
+    obtenu.complete(verrou != null);
+    // Tenu jusqu'à la fermeture de la page : une promesse qui ne se termine jamais.
+    return verrou == null ? Future<JSAny?>.value(null).toJS : Completer<JSAny?>().future.toJS;
+  }
+
+  verrous.request('liste-de-courses-base', {'ifAvailable': true}.jsify() as JSObject, rappel.toJS);
+  return obtenu.future;
 }

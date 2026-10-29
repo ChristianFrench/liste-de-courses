@@ -27,3 +27,6 @@ Future<void> mettreDeCote(String de, String vers) async {
     if (File(x).existsSync()) File(x).deleteSync();
   }
 }
+
+/// Sur Windows et Android, une seule instance de l'application : pas de verrou à prendre.
+Future<bool> prendreVerrou() async => true;
