@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/stockage.dart';
@@ -308,14 +309,54 @@ void main() {
     final a = Stockage.ouvrir('${dossier.path}/abimee.db');
     a.ecrire(parLeModele(demo()));
     expect(a.verifier(), isNull);
-    final (n, echecs) = a.recopierDans('${dossier.path}/neuve.db');
+    final (n, echecs, pertes) = a.recopierDans('${dossier.path}/neuve.db');
     expect(echecs, isEmpty);
+    expect(pertes, isEmpty);
     expect(n, greaterThan(100));
     final b = Stockage.ouvrir('${dossier.path}/neuve.db');
     expect(b.verifier(), isNull);
     expect(jsonEncode(b.lire()), jsonEncode(a.lire()));
     a.fermer();
     b.fermer();
+    dossier.deleteSync(recursive: true);
+  });
+
+  test('base abîmée dans une table : les lignes lisibles sont recopiées une à une', () {
+    final dossier = Directory.systemTemp.createTempSync('reparation');
+    final chemin = '${dossier.path}/abimee.db';
+    final a = Stockage.ouvrir(chemin);
+    a.ecrire(parLeModele(demo()));
+    for (var i = 0; i < 600; i++) {
+      a.definirReglage('essai_$i', 'x' * 200);
+    }
+    a.fermer();
+    // Page racine de la table parametre : le premier enfant pointe vers une page qui n'existe pas.
+    final brut = sqlite3.open(chemin);
+    final racine = brut.select("SELECT rootpage FROM sqlite_master WHERE name = 'parametre'").first['rootpage'] as int;
+    final taille = brut.select('PRAGMA page_size').first.values.first as int;
+    brut.dispose();
+    final f = File(chemin).openSync(mode: FileMode.append);
+    final debut = (racine - 1) * taille;
+    f.setPositionSync(debut);
+    final entete = f.readSync(12);
+    expect(entete[0], 5, reason: 'page intérieure');
+    f.setPositionSync(debut + 12);
+    final cellule = f.readSync(2);
+    f.setPositionSync(debut + (cellule[0] << 8 | cellule[1]));
+    f.writeFromSync([13, 0, 0, 0]);
+    f.closeSync();
+
+    final b = Stockage.ouvrir(chemin);
+    expect(b.verifier(), isNotNull);
+    final (n, echecs, pertes) = b.recopierDans('${dossier.path}/neuve.db');
+    expect(echecs, isEmpty);
+    expect(pertes.single, startsWith('parametre'));
+    final c = Stockage.ouvrir('${dossier.path}/neuve.db');
+    expect(c.verifier(), isNull);
+    expect(c.reglage('essai_599'), 'x' * 200);
+    expect((c.lire()['listes'] as List).length, 4);
+    b.fermer();
+    c.fermer();
     dossier.deleteSync(recursive: true);
   });
 }

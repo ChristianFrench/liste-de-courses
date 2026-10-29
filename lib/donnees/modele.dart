@@ -624,7 +624,7 @@ class Etat extends ChangeNotifier {
     final constat = _foyer!.verifier();
     if (constat == null) return;
     final chemin = _chemin(baseFoyer), neuve = '$chemin.reparee-${_horodatage()}';
-    final (n, echecs) = _foyer!.recopierDans(neuve);
+    final (n, echecs, pertes) = _foyer!.recopierDans(neuve);
     if (echecs.isNotEmpty) {
       // Une table illisible : la base neuve serait incomplète, on garde l'abîmée telle quelle.
       reparationBase = 'Base abîmée ($constat), réparation impossible : ${echecs.join(' ; ')}';
@@ -635,7 +635,8 @@ class Etat extends ChangeNotifier {
     await mettreDeCote(chemin, '$chemin.endommagee-${_horodatage()}');
     await renommerBase(neuve, chemin);
     _foyer = Stockage.ouvrir(chemin);
-    reparationBase = 'Base abîmée réparée au lancement ($constat) : $n lignes recopiées, '
+    reparationBase = 'Base abîmée réparée au lancement ($constat) : $n lignes recopiées'
+        '${pertes.isEmpty ? '' : ' (${pertes.join(' ; ')})'}, '
         'vérification : ${_foyer!.verifier() ?? 'ok'}';
   }
 

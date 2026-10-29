@@ -146,11 +146,11 @@ class Stockage {
 
   /// Base abîmée (29/10/2026, web : index des listes faux, des listes revenaient en arrière) : chaque ligne
   /// lisible est recopiée dans la base neuve [chemin], lue sans les index abîmés. Deux lignes de même clé :
-  /// la dernière écrite l'emporte. Renvoie le nombre de lignes recopiées et les tables illisibles.
-  (int, List<String>) recopierDans(String chemin) {
+  /// la dernière écrite l'emporte. Renvoie le nombre de lignes recopiées, les tables illisibles et les pertes.
+  (int, List<String>, List<String>) recopierDans(String chemin) {
     Stockage.ouvrir(chemin).fermer(); // schéma à jour
     var n = 0;
-    final echecs = <String>[];
+    final echecs = <String>[], pertes = <String>[];
     _db.execute('PRAGMA foreign_keys = OFF');
     _db.execute('ATTACH DATABASE ? AS neuve', [chemin]);
     // Les déclencheurs (compteurs d'utilisation…) ne doivent pas rejouer : les valeurs sont recopiées telles quelles.
@@ -177,7 +177,15 @@ class Stockage {
           _db.execute('INSERT OR REPLACE INTO neuve."$t" ($communes) SELECT $communes FROM main."$t" NOT INDEXED ORDER BY rowid');
           n += _db.updatedRows;
         } catch (e) {
-          echecs.add('$t ($e)');
+          // Page de la table illisible (29/10/2026, table parametre) : ligne par ligne, chaque ligne
+          // retrouvée par la table elle-même jusqu'à la page abîmée, puis par chacun de ses index.
+          final (lues, perdues) = _recopierLigneParLigne(t, communes);
+          n += lues;
+          if (lues == 0) {
+            echecs.add('$t ($e)');
+          } else if (perdues > 0) {
+            pertes.add('$t : $perdues ligne(s) illisible(s)');
+          }
         }
       }
     } finally {
@@ -192,7 +200,45 @@ class Stockage {
       }
       _db.execute('PRAGMA foreign_keys = ON');
     }
-    return (n, echecs);
+    return (n, echecs, pertes);
+  }
+
+  /// Lignes d'une table abîmée recopiées une à une ; renvoie le nombre de lignes recopiées et perdues.
+  (int, int) _recopierLigneParLigne(String t, String communes) {
+    final ids = <int>{};
+    void lire(String sql) {
+      final requete = _db.prepare(sql);
+      try {
+        final curseur = requete.selectCursor();
+        while (curseur.moveNext()) {
+          ids.add(curseur.current.columnAt(0) as int);
+        }
+      } catch (_) {
+        // page abîmée : on garde ce qui a été lu avant
+      } finally {
+        requete.dispose();
+      }
+    }
+
+    lire('SELECT rowid FROM main."$t" NOT INDEXED');
+    for (final r in _db.select("SELECT name FROM main.sqlite_master WHERE type = 'index' AND tbl_name = ?", [t])) {
+      lire('SELECT rowid FROM main."$t" INDEXED BY "${r['name']}"');
+    }
+    var lues = 0, perdues = 0;
+    final inserer = _db.prepare('INSERT OR REPLACE INTO neuve."$t" ($communes) SELECT $communes FROM main."$t" WHERE rowid = ?');
+    try {
+      for (final id in ids.toList()..sort()) {
+        try {
+          inserer.execute([id]);
+          lues += _db.updatedRows;
+        } catch (_) {
+          perdues++;
+        }
+      }
+    } finally {
+      inserer.dispose();
+    }
+    return (lues, perdues);
   }
 
   bool get vide => _db.select('SELECT 1 FROM foyer LIMIT 1').isEmpty;
