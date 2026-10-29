@@ -134,6 +134,67 @@ class Stockage {
 
   void fermer() => _db.dispose();
 
+  /// Vérification rapide de la base : null si elle est saine, sinon ce que SQLite y trouve.
+  String? verifier() {
+    try {
+      final r = [for (final l in _db.select('PRAGMA quick_check(5)')) '${l.values.first}'];
+      return r.length == 1 && r.first == 'ok' ? null : r.join(' ; ');
+    } catch (e) {
+      return '$e';
+    }
+  }
+
+  /// Base abîmée (29/10/2026, web : index des listes faux, des listes revenaient en arrière) : chaque ligne
+  /// lisible est recopiée dans la base neuve [chemin], lue sans les index abîmés. Deux lignes de même clé :
+  /// la dernière écrite l'emporte. Renvoie le nombre de lignes recopiées et les tables illisibles.
+  (int, List<String>) recopierDans(String chemin) {
+    Stockage.ouvrir(chemin).fermer(); // schéma à jour
+    var n = 0;
+    final echecs = <String>[];
+    _db.execute('PRAGMA foreign_keys = OFF');
+    _db.execute('ATTACH DATABASE ? AS neuve', [chemin]);
+    // Les déclencheurs (compteurs d'utilisation…) ne doivent pas rejouer : les valeurs sont recopiées telles quelles.
+    final declencheurs = [
+      for (final r in _db.select("SELECT name, sql FROM neuve.sqlite_master WHERE type = 'trigger'"))
+        (r['name'] as String, r['sql'] as String)
+    ];
+    for (final (nom, _) in declencheurs) {
+      _db.execute('DROP TRIGGER neuve."$nom"');
+    }
+    try {
+      final tables = [
+        for (final r in _db.select("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"))
+          r['name'] as String
+      ];
+      for (final t in tables) {
+        final colonnes = {for (final r in _db.select('PRAGMA main.table_info("$t")')) r['name'] as String};
+        final dansNeuve = [for (final r in _db.select('PRAGMA neuve.table_info("$t")')) r['name'] as String];
+        if (dansNeuve.isEmpty) _db.execute('CREATE TABLE neuve."$t" AS SELECT * FROM main."$t" WHERE 0');
+        final communes = (dansNeuve.isEmpty ? colonnes.toList() : dansNeuve.where(colonnes.contains).toList())
+            .map((c) => '"$c"')
+            .join(', ');
+        try {
+          _db.execute('INSERT OR REPLACE INTO neuve."$t" ($communes) SELECT $communes FROM main."$t" NOT INDEXED ORDER BY rowid');
+          n += _db.updatedRows;
+        } catch (e) {
+          echecs.add('$t ($e)');
+        }
+      }
+    } finally {
+      _db.execute('DETACH DATABASE neuve');
+      final neuve = ouvrirBase(chemin);
+      try {
+        for (final (_, sql) in declencheurs) {
+          neuve.execute(sql);
+        }
+      } finally {
+        neuve.dispose();
+      }
+      _db.execute('PRAGMA foreign_keys = ON');
+    }
+    return (n, echecs);
+  }
+
   bool get vide => _db.select('SELECT 1 FROM foyer LIMIT 1').isEmpty;
 
   // ------------------------------------------------------------ Réglages de l'appareil

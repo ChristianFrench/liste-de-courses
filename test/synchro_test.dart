@@ -302,4 +302,20 @@ void main() {
     expect(r, contains('ok'));
     expect(envoi(a, 'A').length, avant, reason: 'rien n\'est renoté : la base et le journal concordent');
   });
+
+  test('base abîmée : toutes les lignes recopiées dans une base neuve', () {
+    final dossier = Directory.systemTemp.createTempSync('reparation');
+    final a = Stockage.ouvrir('${dossier.path}/abimee.db');
+    a.ecrire(parLeModele(demo()));
+    expect(a.verifier(), isNull);
+    final (n, echecs) = a.recopierDans('${dossier.path}/neuve.db');
+    expect(echecs, isEmpty);
+    expect(n, greaterThan(100));
+    final b = Stockage.ouvrir('${dossier.path}/neuve.db');
+    expect(b.verifier(), isNull);
+    expect(jsonEncode(b.lire()), jsonEncode(a.lire()));
+    a.fermer();
+    b.fermer();
+    dossier.deleteSync(recursive: true);
+  });
 }

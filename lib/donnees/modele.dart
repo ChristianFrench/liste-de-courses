@@ -597,6 +597,7 @@ class Etat extends ChangeNotifier {
           return;
         }
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
+        await _reparerSiAbimee();
         await _reprendreDemonstration();
         await _ouvrirActif();
         return;
@@ -613,6 +614,29 @@ class Etat extends ChangeNotifier {
       }
     }
     lire(await _donneesDemo());
+  }
+
+  /// Compte rendu de la réparation de la base faite au lancement, repris dans le journal du partage.
+  String? reparationBase;
+
+  /// Base abîmée à l'ouverture : recopiée dans une base neuve, l'abîmée gardée à part sur l'appareil.
+  Future<void> _reparerSiAbimee() async {
+    final constat = _foyer!.verifier();
+    if (constat == null) return;
+    final chemin = _chemin(baseFoyer), neuve = '$chemin.reparee-${_horodatage()}';
+    final (n, echecs) = _foyer!.recopierDans(neuve);
+    if (echecs.isNotEmpty) {
+      // Une table illisible : la base neuve serait incomplète, on garde l'abîmée telle quelle.
+      reparationBase = 'Base abîmée ($constat), réparation impossible : ${echecs.join(' ; ')}';
+      return;
+    }
+    _foyer!.fermer();
+    _foyer = null;
+    await mettreDeCote(chemin, '$chemin.endommagee-${_horodatage()}');
+    await renommerBase(neuve, chemin);
+    _foyer = Stockage.ouvrir(chemin);
+    reparationBase = 'Base abîmée réparée au lancement ($constat) : $n lignes recopiées, '
+        'vérification : ${_foyer!.verifier() ?? 'ok'}';
   }
 
   static String _horodatage() => DateTime.now().toIso8601String().substring(0, 16).replaceAll(RegExp('[-:T]'), '');

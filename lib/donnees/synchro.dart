@@ -545,6 +545,12 @@ class Synchro extends ChangeNotifier {
     final base = _base;
     if (base == null || !actif) return;
     base.horloge ??= Horloge(noeud, dernier: base.connus()[noeud] ?? '');
+    if (_etat.reparationBase case final r?) {
+      // Lignes reprises de la base abîmée : celles qui diffèrent du journal partent aux autres appareils.
+      _etat.reparationBase = null;
+      _noter(r, erreur: !r.endsWith('ok'));
+      _sansPanne('la reprise après réparation', () => base.toutJournaliser(base.lire()));
+    }
     final t = _transport = fabrique(serveur);
     _abonnements
       ..add(t.messages.listen((m) => _sansPanne('la réception (${m.$1.split('/').skip(2).join('/')})', () => _recevoir(m.$1, m.$2))))
