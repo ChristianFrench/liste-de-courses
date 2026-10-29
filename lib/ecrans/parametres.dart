@@ -34,13 +34,13 @@ Future<void> ajouterMembreParNom(BuildContext context) => _ajouterMembre(context
 
 /// Ajout d'un membre directement par son nom, sans passer par l'invitation.
 Future<void> _ajouterMembre(BuildContext context, Etat etat) async {
-  final nom = await demanderTexte(context, titre: 'Nouveau membre', aide: 'Prénom ou nom', valider: 'Ajouter');
+  final nom = await demanderTexte(libelle: 'Prénom', context, titre: 'Nouveau membre', aide: 'Prénom ou nom', valider: 'Ajouter');
   if (nom == null || nom.trim().isEmpty || !context.mounted) return;
   if (etat.membres.any((m) => m.nomAffiche.toLowerCase() == nom.trim().toLowerCase())) {
     Nav.message(context, '« ${nom.trim()} » fait déjà partie du foyer');
     return;
   }
-  final email = await demanderTexte(context, titre: 'Adresse mail · ${nom.trim()}', aide: 'prenom.nom@exemple.fr (facultatif)');
+  final email = await demanderTexte(libelle: 'Adresse mail', context, titre: 'Adresse mail · ${nom.trim()}', aide: 'prenom.nom@exemple.fr (facultatif)');
   etat.ajouterMembre(nom, email ?? '');
   if (context.mounted) Nav.message(context, '${nom.trim()} fait maintenant partie du foyer');
 }
@@ -115,9 +115,8 @@ class EcranApparence extends _EcranVivant {
       ),
       const SizedBox(height: 12),
       // Les autres palettes, dans une liste déroulante pour ne pas prendre de place.
-      Text('Autres palettes', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      const SizedBox(height: 4),
       ChoixDeroulant<String>(
+        libelle: 'Autres palettes',
         valeur: autresPalettes.any((p) => p.nom == Charte.palette.nom) ? Charte.palette.nom : '',
         choix: {'': 'Choisir…', for (final p in autresPalettes) p.nom: p.nom},
         onChange: (v) {
@@ -195,7 +194,7 @@ class EcranDonnees extends _EcranVivant {
 
 /// Le code d'éditeur (secret GitHub CODE_EDITEUR) ouvre Gérer › Courses › Catalogue commun sur cet appareil.
 Future<void> _deverrouillerEditeur(BuildContext context) async {
-  final code = await demanderTexte(context, titre: 'Éditeur du catalogue commun', aide: 'Code d\'éditeur', valider: 'Ouvrir');
+  final code = await demanderTexte(libelle: 'Code', context, titre: 'Éditeur du catalogue commun', aide: 'Code d\'éditeur', valider: 'Ouvrir');
   if (code == null || !context.mounted) return;
   if (CatalogueCommun.instance.deverrouiller(code)) {
     Etat.instance.modifie();
@@ -257,7 +256,7 @@ class EcranTypesPromotion extends StatelessWidget {
           final etat = Etat.instance;
           final nom = await demanderTexte(context, titre: 'Nom du type de promotion', initial: t.nom);
           if (nom == null || nom.isEmpty || !context.mounted) return;
-          final code = await demanderTexte(context, titre: 'Code court (3 caractères)', initial: t.code);
+          final code = await demanderTexte(libelle: 'Code', context, titre: 'Code court (3 caractères)', initial: t.code);
           if (code == null || code.isEmpty) return;
           etat.modifierTypePromotion(t, nom: nom, code: code.length > 4 ? code.substring(0, 4) : code);
         }),
@@ -484,7 +483,7 @@ class EcranTypesPackaging extends StatelessWidget {
     if (action == null || !context.mounted) return;
     switch (action) {
       case 'renommer':
-        final nom = await demanderTexte(context, titre: 'Libellé', initial: k.libelle, aide: lots ? 'Ex. : Lot de 4' : 'Ex. : 500 g, 75 cl');
+        final nom = await demanderTexte(libelle: 'Libellé', context, titre: 'Libellé', initial: k.libelle, aide: lots ? 'Ex. : Lot de 4' : 'Ex. : 500 g, 75 cl');
         if (nom != null && nom.isNotEmpty) etat.renommerPackaging(id, nom);
       case 'fusionner':
         final autres = lots ? etat.typesLot : etat.typesMesure;
@@ -531,7 +530,7 @@ class EcranTypesPackaging extends StatelessWidget {
               titre: lots ? 'Types de packaging' : 'Types de mesure',
               actions: [
                 ActionLigne(Icons.add, lots ? '+ Nouveau packaging' : '+ Nouvelle mesure', () async {
-                  final nom = await demanderTexte(context,
+                  final nom = await demanderTexte(libelle: 'Libellé', context,
                       titre: lots ? 'Nouveau packaging' : 'Nouvelle mesure', aide: lots ? 'Ex. : Lot de 12' : 'Ex. : 500 g, 75 cl');
                   if (nom == null || nom.isEmpty) return;
                   // Un packaging est un lot : « 12 » devient « Lot de 12 ».

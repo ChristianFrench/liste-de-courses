@@ -999,29 +999,26 @@ class ImageAbsente extends StatelessWidget {
   }
 }
 
-/// Liste déroulante encadrée.
+/// Liste déroulante, dans le même cadre que les zones de saisie, avec son libellé sur le trait du haut.
 class ChoixDeroulant<T> extends StatelessWidget {
-  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.hauteur = 48});
+  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle});
   final T valeur;
   final Map<T, String> choix;
   final ValueChanged<T> onChange;
-  final double hauteur;
+  final String? libelle;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: hauteur,
-      padding: const EdgeInsets.only(left: 12, right: 6),
-      decoration: BoxDecoration(
-        color: Charte.fond,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
-      ),
+    return InputDecorator(
+      decoration: InputDecoration(labelText: libelle, contentPadding: const EdgeInsets.fromLTRB(12, 4, 6, 4)),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: choix.containsKey(valeur) ? valeur : null,
           isExpanded: true,
-          icon: Icon(Icons.expand_more, color: Charte.couleurIcone(Icons.expand_more)),
+          isDense: true,
+          // La hauteur d'une liste dense suit iconSize : 32, pour une cible tactile suffisante.
+          iconSize: 32,
+          icon: Icon(Icons.expand_more, size: 24, color: Charte.couleurIcone(Icons.expand_more)),
           style: Charte.texte(16),
           dropdownColor: Charte.fond,
           items: [
@@ -1035,6 +1032,56 @@ class ChoixDeroulant<T> extends StatelessWidget {
             if (v != null) onChange(v);
           },
         ),
+      ),
+    );
+  }
+}
+
+/// Date choisie dans un calendrier, dans le même cadre que les zones de saisie.
+class ChampDate extends StatelessWidget {
+  const ChampDate({super.key, required this.libelle, required this.valeur, required this.onChange, this.premier, this.dernier});
+  final String libelle;
+  /// Vide : « Non renseignée ».
+  final DateTime? valeur;
+  final ValueChanged<DateTime> onChange;
+  final DateTime? premier;
+  final DateTime? dernier;
+
+  static const _jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+  /// « jeudi 29/10/2026 », avec « aujourd'hui » ou « demain » devant quand c'est le cas.
+  static String texte(DateTime d) {
+    String n(int x) => x.toString().padLeft(2, '0');
+    final auj = DateTime.now();
+    final ecart = DateTime(d.year, d.month, d.day).difference(DateTime(auj.year, auj.month, auj.day)).inDays;
+    final relatif = switch (ecart) { 0 => 'aujourd\'hui, ', 1 => 'demain, ', _ => '' };
+    return '$relatif${_jours[d.weekday - 1]} ${n(d.day)}/${n(d.month)}/${d.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () async {
+        final d = await showDatePicker(
+          context: context,
+          initialDate: valeur ?? DateTime.now(),
+          firstDate: premier ?? DateTime(2020),
+          lastDate: dernier ?? DateTime(2100),
+          locale: const Locale('fr', 'FR'),
+          helpText: libelle,
+          cancelText: 'Annuler',
+          confirmText: 'OK',
+        );
+        if (d != null) onChange(DateTime(d.year, d.month, d.day, valeur?.hour ?? 0, valeur?.minute ?? 0));
+      },
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: libelle,
+          contentPadding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+          suffixIcon: Icon(Icons.calendar_month_outlined, color: Charte.couleurIcone(Icons.calendar_month_outlined)),
+        ),
+        child: Text(valeur == null ? 'Non renseignée' : texte(valeur!), style: Charte.texte(16)),
       ),
     );
   }
@@ -1198,7 +1245,7 @@ Future<List<String>?> ordonner(BuildContext context, {required String titre, req
 
 /// Saisie d'un texte court ; renvoie null si annulée.
 Future<String?> demanderTexte(BuildContext context,
-    {required String titre, String initial = '', String? aide, String valider = 'Valider'}) {
+    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider'}) {
   final controleur = TextEditingController(text: initial);
   return volet<String>(
     context,
@@ -1208,7 +1255,7 @@ Future<String?> demanderTexte(BuildContext context,
         controller: controleur,
         autofocus: true,
         style: Charte.texte(16),
-        decoration: InputDecoration(hintText: aide),
+        decoration: InputDecoration(labelText: libelle, hintText: aide),
         onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
       ),
       boutons: [

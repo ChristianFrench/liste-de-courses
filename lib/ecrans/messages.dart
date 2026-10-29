@@ -119,7 +119,7 @@ class _EcranMessagesState extends State<EcranMessages> {
                   maxLines: 4,
                   textCapitalization: TextCapitalization.sentences,
                   style: Charte.texte(16),
-                  decoration: const InputDecoration(hintText: 'Message au foyer', isDense: true),
+                  decoration: const InputDecoration(labelText: 'Message au foyer', isDense: true),
                   onSubmitted: (_) => _envoyer(),
                 ),
               ),

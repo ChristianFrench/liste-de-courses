@@ -271,7 +271,7 @@ Future<void> _fiche(BuildContext context, Membre m) => modale(
           LigneMenu(
             titre: 'Adresse mail',
             onTap: () async {
-              final email = await demanderTexte(ctx, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
+              final email = await demanderTexte(libelle: 'Adresse mail', ctx, titre: 'Adresse mail · ${m.nomAffiche}', initial: m.email, aide: 'prenom.nom@exemple.fr');
               if (email != null) etat.modifierEmail(m, email);
               maj(() {});
             },
@@ -330,7 +330,7 @@ Future<void> choisirPersonne(BuildContext context, {bool premiereFois = false}) 
     case null:
       return;
     case 'nouveau':
-      final nom = await demanderTexte(context, titre: 'Votre prénom', aide: 'Il apparaîtra sur vos listes', valider: 'Valider');
+      final nom = await demanderTexte(libelle: 'Prénom', context, titre: 'Votre prénom', aide: 'Il apparaîtra sur vos listes', valider: 'Valider');
       if (nom == null || nom.trim().isEmpty) {
         if (context.mounted) await choisirPersonne(context, premiereFois: true);
         return;

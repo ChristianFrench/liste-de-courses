@@ -623,8 +623,8 @@ void main() {
       // 6 : toucher la ligne ouvre le volet de l'article : packaging, consigne et promotion ensemble
       await _toucher(tester, find.byKey(ValueKey('condense-${lait.id}')));
       expect(find.byType(FeuillePromotion), findsOneWidget);
-      expect(find.text('PACKAGING'), findsOneWidget);
-      expect(find.text('PROMOTION VISÉE'), findsOneWidget);
+      expect(find.text('Packaging'), findsOneWidget);
+      expect(find.text('Promotion visée'), findsOneWidget);
       await tester.enterText(find.byKey(const ValueKey('consigne')), 'bien frais');
       await _toucher(tester, find.text('Valider'));
       expect(etat.ligne(l, lait.id)!.consigne, 'bien frais');
@@ -635,7 +635,7 @@ void main() {
         'secteurs': {etat.cleSecteur(etat.secteurCatalogue(lait.id)!): ['Lactel', 'Candia']}
       });
       await _toucher(tester, find.byKey(ValueKey('condense-${lait.id}')));
-      expect(find.text('MARQUE'), findsOneWidget);
+      expect(find.text('Marque'), findsOneWidget);
       await _toucher(tester, find.byKey(const ValueKey('choix-marque')));
       await _toucher(tester, find.text('Lactel').last);
       await _toucher(tester, find.text('Valider'));

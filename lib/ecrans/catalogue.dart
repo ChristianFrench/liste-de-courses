@@ -146,9 +146,8 @@ Future<Produit?> fenetreProduit(BuildContext context, {Produit? produit, Secteur
           ),
           // Les mesures sont nombreuses : une liste déroulante.
           const SizedBox(height: 14),
-          Text('Mesure', style: Charte.texte(15, gras: true)),
-          const SizedBox(height: 4),
           ChoixDeroulant<String>(
+            libelle: 'Mesure',
             valeur: mesure ?? '',
             choix: {'': 'Aucune', for (final m in mesures) m: m},
             onChange: (v) => maj(() => mesure = v.isEmpty ? null : v),
@@ -361,7 +360,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               child: TextField(
                 key: const ValueKey('catalogue-recherche'),
                 style: Charte.texte(16),
-                decoration: const InputDecoration(hintText: 'Rechercher un produit, une marque…'),
+                decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un produit, une marque…'),
                 onChanged: (v) => setState(() => recherche = v.trim()),
               ),
             ),
@@ -745,10 +744,10 @@ Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Rayon', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         ChoixDeroulant<String>(
           key: const ValueKey('marque-rayon'),
+          libelle: 'Rayon',
           valeur: rayonId,
           choix: {for (final r in rayons) r.id: r.nom},
           onChange: (v) => maj(() {
@@ -756,11 +755,10 @@ Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}
             secteurId = etat.secteursDu(v).first.id;
           }),
         ),
-        const SizedBox(height: 10),
-        Text('Secteur', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        const SizedBox(height: 4),
+        const SizedBox(height: 14),
         ChoixDeroulant<String>(
           key: const ValueKey('marque-secteur'),
+          libelle: 'Secteur',
           valeur: secteurId,
           choix: {for (final s in etat.secteursDu(rayonId)) s.id: s.nom},
           onChange: (v) => maj(() => secteurId = v),

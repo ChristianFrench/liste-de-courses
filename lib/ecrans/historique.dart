@@ -261,11 +261,11 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
   final valeur = lu.montant ?? (t.montant > 0 ? t.montant : null);
   final montant = TextEditingController(text: valeur == null ? '' : valeur.toStringAsFixed(2).replaceAll('.', ','));
   final image = lu.image || (etat.ticketImage(t) && t.montant <= 0);
-  final date = TextEditingController(text: image ? '' : jjmmaaaa(lu.date ?? t.date));
+  DateTime? date = image ? null : lu.date ?? t.date;
   final luSurLeTicket = lu.date != null || lu.montant != null;
   final ok = await volet<bool>(
     context,
-    builder: (ctx) => corpsVolet(
+    builder: (ctx) => StatefulBuilder(builder: (ctx, maj) => corpsVolet(
       titre: 'Ticket de caisse',
       contenu: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (image)
@@ -280,6 +280,7 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
           style: Charte.texte(16),
           decoration: const InputDecoration(labelText: 'Libellé', hintText: 'Ex. : Courses de la semaine (facultatif)'),
         ),
+        const SizedBox(height: 14),
         TextField(
           key: const ValueKey('ticket-montant'),
           controller: montant,
@@ -288,31 +289,26 @@ Future<void> decrireTicket(BuildContext context, Ticket t, {LectureTicket lu = c
           decoration: const InputDecoration(labelText: 'Montant', hintText: 'Ex. : 84,30 (facultatif)'),
           onSubmitted: (_) => Navigator.of(ctx).pop(true),
         ),
-        TextField(
+        const SizedBox(height: 14),
+        ChampDate(
           key: const ValueKey('ticket-date'),
-          controller: date,
-          style: Charte.texte(16),
-          keyboardType: TextInputType.datetime,
-          decoration: const InputDecoration(labelText: 'Date du ticket', hintText: 'jj/mm/aaaa'),
-          onSubmitted: (_) => Navigator.of(ctx).pop(true),
+          libelle: 'Date du ticket',
+          valeur: date,
+          dernier: DateTime.now(),
+          onChange: (d) => maj(() => date = d),
         ),
       ]),
       boutons: [
         Bouton(texte: 'Passer', onTap: () => Navigator.of(ctx).pop(false)),
         Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(true)),
       ],
-    ),
+    )),
   );
   if (ok != true) return;
   etat.nommerTicket(t, libelle.text);
   final v = double.tryParse(montant.text.replaceAll(',', '.').replaceAll('€', '').replaceAll(' ', '').trim());
   if (v != null) etat.montantTicket(t, v);
-  final d = RegExp(r'^(\d{1,2})[/.-](\d{1,2})[/.-](\d{2}|\d{4})$').firstMatch(date.text.trim());
-  if (d != null) {
-    final a = int.parse(d[3]!);
-    final jour = DateTime(a < 100 ? 2000 + a : a, int.parse(d[2]!), int.parse(d[1]!));
-    if (jour.day == int.parse(d[1]!)) etat.dateTicket(t, jour);
-  }
+  if (date case final d?) etat.dateTicket(t, DateTime(d.year, d.month, d.day));
 }
 
 /// Affiche le ticket PDF dans l'application (lecteur intégré).

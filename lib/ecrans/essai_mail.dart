@@ -85,7 +85,7 @@ class _EcranEssaiMailState extends State<EcranEssaiMail> {
                 minLines: e.key == 'texte' ? 4 : 1,
                 maxLines: e.key == 'texte' ? 10 : 1,
                 style: Charte.texte(16),
-                decoration: InputDecoration(labelText: e.value, border: const OutlineInputBorder(), isDense: true),
+                decoration: InputDecoration(labelText: e.value),
               ),
             ),
           if (_reponse != null)

@@ -494,9 +494,9 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
       children: [
         Text('${etat.nomListe(l)} · ${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''}', style: Charte.texte(16)),
         if (etat.membres.length > 1) ...[
-          const SizedBox(height: 12),
-          Text('Courses faites par', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 14),
           ChoixDeroulant<String>(
+            libelle: 'Courses faites par',
             valeur: membreId,
             choix: {for (final m in etat.membres) m.id: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche},
             onChange: (v) => maj(() {
@@ -506,9 +506,9 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
             }),
           ),
         ],
-        const SizedBox(height: 12),
-        Text('Parcours', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        const SizedBox(height: 14),
         ChoixDeroulant<String>(
+          libelle: 'Parcours',
           valeur: parcoursId,
           choix: {for (final p in etat.parcoursDe(l.magasinId, membreId)) p.id: p.nom, '': 'Ordre des rayons'},
           onChange: (v) => maj(() => parcoursId = v),

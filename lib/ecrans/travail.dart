@@ -51,29 +51,6 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     if (!nomModifie) nom.text = etat.nomLibre(etat.nomPrevu(magasinId, prevue));
   }
 
-  /// 0 : aujourd'hui, 1 : demain, 2 : un autre jour.
-  int get _choixJour {
-    final j = DateTime(debut.year, debut.month, debut.day);
-    return prevue == j ? 0 : prevue == j.add(const Duration(days: 1)) ? 1 : 2;
-  }
-
-  Future<void> _choisirJour(int i) async {
-    final j = DateTime(debut.year, debut.month, debut.day);
-    DateTime? d = i == 0 ? j : i == 1 ? j.add(const Duration(days: 1)) : null;
-    d ??= await showDatePicker(
-      context: context,
-      initialDate: prevue,
-      firstDate: j,
-      lastDate: j.add(const Duration(days: 365)),
-      helpText: 'Jour prévu des courses',
-    );
-    if (d == null || !mounted) return;
-    setState(() {
-      prevue = d!;
-      _initialiser();
-    });
-  }
-
   /// Supprimée d'un glissement ; « Annuler » dans le message la remet.
   void _supprimerListeType(ListeType t) {
     final etat = Etat.instance;
@@ -127,7 +104,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             minLines: 16,
             maxLines: 24,
             style: Charte.texte(15),
-            decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'Lait\n2 baguettes\nTomates x4…'),
+            decoration: const InputDecoration(labelText: 'Texte de la liste', hintText: 'Lait\n2 baguettes\nTomates x4…'),
           ),
         ],
       ),
@@ -225,51 +202,36 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       entete: const EnTeteFenetre(retour: true, icone: Icons.checklist, titre: 'Nouvelle liste', aide: Aides.nouvelleListe),
       haut: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 6),
-          child: Row(
+          padding: const EdgeInsets.fromLTRB(10, 14, 10, 10),
+          child: Column(
             children: [
-              SizedBox(width: 70, child: Text('Magasin', style: Charte.texte(15))),
-              Expanded(
-                child: ChoixDeroulant<String>(
-                  valeur: magasinId,
-                  choix: {for (final m in etat.magasins) m.id: m.nom},
-                  onChange: (v) => setState(() {
-                    magasinId = v;
-                    _initialiser();
-                  }),
-                ),
+              ChoixDeroulant<String>(
+                libelle: 'Magasin',
+                valeur: magasinId,
+                choix: {for (final m in etat.magasins) m.id: m.nom},
+                onChange: (v) => setState(() {
+                  magasinId = v;
+                  _initialiser();
+                }),
               ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
-          child: Row(
-            children: [
-              SizedBox(width: 70, child: Text('Courses', style: Charte.texte(15))),
-              Expanded(
-                child: Bascule(
-                  options: ['Aujourd\'hui', 'Demain', _choixJour == 2 ? jjmm(prevue) : 'Autre jour'],
-                  index: _choixJour,
-                  douce: true,
-                  onChange: _choisirJour,
-                ),
+              const SizedBox(height: 14),
+              ChampDate(
+                libelle: 'Date des courses',
+                valeur: prevue,
+                premier: DateTime(debut.year, debut.month, debut.day),
+                dernier: DateTime(debut.year, debut.month, debut.day).add(const Duration(days: 365)),
+                onChange: (d) => setState(() {
+                  prevue = DateTime(d.year, d.month, d.day);
+                  _initialiser();
+                }),
               ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(10, 0, 10, 10),
-          child: Row(
-            children: [
-              SizedBox(width: 70, child: Text('Nom', style: Charte.texte(15))),
-              Expanded(
-                child: TextField(
-                  key: const ValueKey('nom-liste'),
-                  controller: nom,
-                  style: Charte.texte(16),
-                  onChanged: (_) => nomModifie = true,
-                ),
+              const SizedBox(height: 14),
+              TextField(
+                key: const ValueKey('nom-liste'),
+                controller: nom,
+                style: Charte.texte(16),
+                decoration: const InputDecoration(labelText: 'Nom'),
+                onChanged: (_) => nomModifie = true,
               ),
             ],
           ),
@@ -1057,19 +1019,20 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         children: [
           Text(p?.nom ?? 'Article', style: Charte.texte(21, gras: true)),
           Text(m?.nom ?? '', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          const TitreSection('Consigne', cote: 0, haut: 12),
+          const SizedBox(height: 14),
           TextField(
             key: const ValueKey('consigne'),
             controller: consigne,
             style: Charte.texte(17),
             maxLines: 2,
             minLines: 1,
-            decoration: const InputDecoration(hintText: 'Ex. : bien mûres, la moins chère'),
+            decoration: const InputDecoration(labelText: 'Consigne', hintText: 'Ex. : bien mûres, la moins chère'),
           ),
           if (p != null) ...[
-            const TitreSection('Marque', cote: 0, haut: 14),
+            const SizedBox(height: 14),
             ChoixDeroulant<String>(
               key: const ValueKey('choix-marque'),
+              libelle: 'Marque',
               valeur: marque,
               choix: {
                 '': 'Indifférente',
@@ -1079,16 +1042,17 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
               },
               onChange: (v) async {
                 if (v != _autre) return setState(() => marque = v);
-                final n = await demanderTexte(context, titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
+                final n = await demanderTexte(context, libelle: 'Marque', titre: 'Autre marque', aide: 'Ajoutée aux marques du secteur');
                 if (n == null || n.trim().isEmpty || !mounted) return;
                 if (etat.secteurCatalogue(p.id) case final s?) etat.ajouterMarqueSecteur(s, n);
                 setState(() => marque = n.trim());
               },
             ),
           ],
-          const TitreSection('Promotion visée', cote: 0, haut: 14),
+          const SizedBox(height: 14),
           ChoixDeroulant<String>(
             key: const ValueKey('choix-promo'),
+            libelle: 'Promotion visée',
             valeur: type,
             choix: {FeuillePromotion.aucune: 'Aucune', for (final t in types) t.id: _nomCourt(t)},
             onChange: (v) {
@@ -1109,9 +1073,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 ]),
               ),
             ),
-          const TitreSection('Packaging', cote: 0, haut: 14),
+          const SizedBox(height: 14),
           ChoixDeroulant<String>(
             key: const ValueKey('choix-packaging'),
+            libelle: 'Packaging',
             valeur: packagingId ?? '',
             choix: {
               '': 'Indifférent',
@@ -1168,13 +1133,12 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
           titre: _nomCourt(etat.typePromotion(type)),
           contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
             ..._champs(),
-            const SizedBox(height: 10),
-            Text('Libellé', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 4),
+            const SizedBox(height: 14),
             TextField(
               key: const ValueKey('libelle-promo'),
               controller: libelle,
               style: Charte.texte(17),
+              decoration: const InputDecoration(labelText: 'Libellé'),
               onChanged: (_) => libelleModifie = true,
             ),
           ]),
@@ -1200,7 +1164,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
       setState(() => packagingId = v);
       return;
     }
-    final lib = await demanderTexte(context, titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
+    final lib = await demanderTexte(context, libelle: 'Format', titre: 'Nouveau format', aide: 'Ex. : 500 g, 75 cl, lot de 4, pack de 6');
     if (lib == null || lib.isEmpty || !mounted) return;
     etat.ajouterPackaging(p, lib);
     etat.ajouterTypePackaging(lib);
@@ -1215,19 +1179,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         _ => t!.nom,
       };
 
-  Widget _champ(String etiquette, Widget champ) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(etiquette, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          const SizedBox(height: 4),
-          champ,
-        ],
-      );
-
-  Widget _nombre(TextEditingController c) => TextField(
+  Widget _nombre(TextEditingController c, String libelle) => TextField(
         controller: c,
         style: Charte.texte(17),
+        decoration: InputDecoration(labelText: libelle),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (_) => _majLibelle(),
       );
@@ -1241,22 +1196,19 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         return const [];
       case 'lot':
         return [
-          _deux(_champ('Lot de', _nombre(c1)), _champ('dont gratuits', _nombre(c2))),
+          _deux(_nombre(c1, 'Lot de'), _nombre(c2, 'dont gratuits')),
           const SizedBox(height: 6),
           Text('La quantité de la liste est mise au nombre du lot.', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
         ];
       case 'prixGlobal':
         return [
           _deux(
-            _champ('Quantité à acheter', _nombre(c1)),
-            _champ(
-              'Avantage',
-              TextField(
-                controller: c2,
-                style: Charte.texte(17),
-                decoration: const InputDecoration(hintText: '2e à −50 %'),
-                onChanged: (_) => _majLibelle(),
-              ),
+            _nombre(c1, 'Quantité à acheter'),
+            TextField(
+              controller: c2,
+              style: Charte.texte(17),
+              decoration: const InputDecoration(labelText: 'Avantage', hintText: '2e à −50 %'),
+              onChanged: (_) => _majLibelle(),
             ),
           ),
         ];
@@ -1272,7 +1224,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
             },
           ),
           const SizedBox(height: 10),
-          _champ(enMontant ? 'Montant (€)' : 'Pourcentage (%)', _nombre(c1)),
+          _nombre(c1, enMontant ? 'Montant (€)' : 'Pourcentage (%)'),
         ];
       default:
         return [Text('Décrivez l\'offre dans le libellé.', style: Charte.texte(14, couleur: Charte.texteSecondaire))];

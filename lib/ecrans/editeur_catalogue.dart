@@ -313,6 +313,7 @@ Future<CatRayon?> _choisirRayon(BuildContext context, Brouillon b, {required Str
     icone: Icons.drive_file_move_outline,
     oui: 'Déplacer',
     contenu: (context, maj) => ChoixDeroulant<String>(
+      libelle: 'Rayon',
       valeur: choisi?.nom ?? '',
       choix: {
         '': 'Choisir un rayon',
@@ -365,7 +366,7 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
           minLines: 6,
           maxLines: 12,
           style: Charte.texte(15),
-          decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'Animalerie / Chats :\nCroquettes\nLitière'),
+          decoration: const InputDecoration(labelText: 'Produits à ajouter', hintText: 'Animalerie / Chats :\nCroquettes\nLitière'),
         ),
       ],
     ),
@@ -394,9 +395,9 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
           for (final g in lu.groupes) ...[
             const SizedBox(height: 10),
             if (g.rayonAChoisir) ...[
-              Text('${g.secteur} (nouveau secteur) : dans quel rayon ?', style: Charte.texte(15, gras: true)),
               const SizedBox(height: 4),
               ChoixDeroulant<String>(
+                libelle: '${g.secteur} (nouveau secteur) : rayon',
                 valeur: g.rayonNeuf ? '+' : g.rayon,
                 choix: {'': 'Choisir un rayon', for (final r in b.catalogue.rayons) r.nom: r.nom, '+': 'Nouveau rayon « ${g.secteur} »'},
                 onChange: (v) => maj(() {

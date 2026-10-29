@@ -203,6 +203,10 @@ class Charte {
           borderSide: BorderSide(color: accent, width: 3),
         ),
         hintStyle: const TextStyle(fontFamily: police, color: texteSecondaire),
+        // Modèle unique des zones de saisie (29/10/2026) : le libellé posé sur le trait du haut, toujours visible.
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(fontFamily: police, fontSize: 15, color: texteSecondaire),
+        floatingLabelStyle: const TextStyle(fontFamily: police, fontSize: 15, color: texteSecondaire),
       ),
     );
   }
