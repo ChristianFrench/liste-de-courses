@@ -628,6 +628,13 @@ class Synchro extends ChangeNotifier {
       if (liaisonOk || !_controleNote) _noter('Contrôle sans retour après 10 s (messages reçus depuis le lancement : $_messagesRecus)', erreur: true);
       _controleNote = true;
       _changerLiaison(false);
+      // Navigateur (29/10/2026) : connecté et abonné, mais plus aucun message ne revenait. Deux contrôles
+      // perdus de suite : nouvelle connexion, avec une réception repartie de zéro.
+      if (++_controlesPerdus >= 2 && identical(_transport, t) && t.connecte) {
+        _controlesPerdus = 0;
+        _noter('Nouvelle connexion au serveur');
+        unawaited(_deconnecter(presence: false).then((_) => _connecter()));
+      }
     });
   }
 
@@ -715,7 +722,7 @@ class Synchro extends ChangeNotifier {
 
   // ------------------------------------------------------------ Réception
 
-  int _messagesRecus = 0;
+  int _messagesRecus = 0, _controlesPerdus = 0;
   bool _controleNote = false;
 
   void _recevoir(String sujet, String contenu) {
@@ -742,6 +749,7 @@ class Synchro extends ChangeNotifier {
     if (type == 'controle') {
       if (de == noeud && m['t'] == _envoiControle) {
         _delaiControle?.cancel();
+        _controlesPerdus = 0;
         derniereVerification = DateTime.now();
         dureeVerification = derniereVerification!.millisecondsSinceEpoch - _envoiControle;
         _changerLiaison(true);
@@ -891,6 +899,9 @@ class TransportMqtt implements Transport {
         .withWillMessage(_ascii(testament)) // le client refuse les accents dans le testament
         .withWillQos(MqttQos.atLeastOnce)
         .withWillRetain(); // pas de startClean : le serveur garde la session et les messages manqués
+    // Navigateur : session neuve à chaque connexion. Une session gardée côté serveur a bloqué toute
+    // réception (29/10/2026) ; les modifications manquées reviennent par « bonjour » (connus).
+    if (kIsWeb) c.connectionMessage!.startClean();
     c.onConnected = _connecte;
     c.onSubscribed = (s) => _etats.add('info:Abonnement accepté par le serveur ($s)');
     c.onSubscribeFail = (s) => _etats.add('Abonnement refusé par le serveur ($s)');
