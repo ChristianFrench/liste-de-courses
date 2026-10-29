@@ -1,0 +1,20 @@
+name: Diagnostic MQTT
+
+# Écoute le canal d'un foyer comme le web (WebSocket) et comme l'exe (TCP) ; n'affiche que sujets et tailles.
+on:
+  workflow_dispatch:
+    inputs:
+      canal:
+        description: Code du foyer
+        required: true
+
+jobs:
+  diagnostic:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install paho-mqtt==2.1.0
+      - env:
+          MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR }}
+          MQTT_MOT_DE_PASSE: ${{ secrets.MQTT_MOT_DE_PASSE }}
+        run: python3 outils/diagnostic_mqtt.py "${{ inputs.canal }}"
