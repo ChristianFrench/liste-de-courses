@@ -19,3 +19,11 @@ bool baseExiste(String chemin) => File(chemin).existsSync();
 
 /// La base doit être fermée.
 Future<void> renommerBase(String de, String vers) async => File(de).renameSync(vers);
+
+/// Met de côté une base illisible (abîmée).
+Future<void> mettreDeCote(String de, String vers) async {
+  File(de).renameSync(vers);
+  for (final x in ['$de-journal', '$de-wal']) {
+    if (File(x).existsSync()) File(x).deleteSync();
+  }
+}

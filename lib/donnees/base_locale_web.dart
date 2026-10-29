@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:sqlite3/wasm.dart';
 
 // Dans le navigateur, les bases sont rangées dans IndexedDB par sqlite3 compilé en WebAssembly
@@ -32,4 +34,25 @@ Future<void> renommerBase(String de, String vers) async {
   }
   _fichiers!.xDelete(de, 0);
   await _fichiers!.flush();
+}
+
+/// Met de côté une base illisible (abîmée) : copie octet par octet, puis suppression de l'original.
+Future<void> mettreDeCote(String de, String vers) async {
+  final f = _fichiers!;
+  const lecture = SqlFlag.SQLITE_OPEN_READWRITE | SqlFlag.SQLITE_OPEN_MAIN_DB;
+  const creation = lecture | SqlFlag.SQLITE_OPEN_CREATE;
+  final source = f.xOpen(Sqlite3Filename(de), lecture).file;
+  final copie = f.xOpen(Sqlite3Filename(vers), creation).file;
+  try {
+    final octets = Uint8List(source.xFileSize());
+    source.xRead(octets, 0);
+    copie.xWrite(octets, 0);
+  } finally {
+    source.xClose();
+    copie.xClose();
+  }
+  for (final x in [de, '$de-journal', '$de-wal']) {
+    if (f.xAccess(x, 0) != 0) f.xDelete(x, 0);
+  }
+  await f.flush();
 }

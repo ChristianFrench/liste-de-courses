@@ -215,9 +215,27 @@ class EcranRubrique extends StatelessWidget {
 }
 
 /// La base de l'appareil n'a pas pu s'ouvrir : on le dit, sans rien montrer ni enregistrer d'autre.
-class _ErreurBase extends StatelessWidget {
+/// Une base abîmée peut être mise de côté, puis le foyer rechargé depuis le serveur (« Rejoindre un foyer »).
+class _ErreurBase extends StatefulWidget {
   const _ErreurBase(this.erreur);
   final String erreur;
+
+  @override
+  State<_ErreurBase> createState() => _ErreurBaseState();
+}
+
+class _ErreurBaseState extends State<_ErreurBase> {
+  bool _misDeCote = false;
+  String? _echec;
+
+  Future<void> _mettreDeCote() async {
+    try {
+      await Etat.instance.mettreBaseDeCote();
+      setState(() => _misDeCote = true);
+    } catch (e) {
+      setState(() => _echec = '$e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,11 +246,21 @@ class _ErreurBase extends StatelessWidget {
           children: [
             Text('La base de cet appareil n\'a pas pu s\'ouvrir', style: Charte.texte(20, gras: true)),
             const SizedBox(height: 12),
-            Text('Vos données ne sont pas effacées : rien n\'a été modifié. Fermez puis rouvrez l\'application ; '
-                'si ce message revient, envoyez une capture de cet écran.',
-                style: Charte.texte(16)),
+            if (_misDeCote)
+              Text('La base abîmée est gardée à part sur cet appareil. Fermez puis rouvrez l\'application, choisissez '
+                  '« Rejoindre un foyer », saisissez le code de partage (sur votre téléphone : Gérer › Mon foyer › Foyer), '
+                  'puis votre nom : le foyer revient depuis le serveur.',
+                  style: Charte.texte(16, gras: true))
+            else ...[
+              Text('Rien n\'a été modifié. Si le texte en rouge dit « malformed », la base est abîmée : mettez-la de côté, '
+                  'puis rechargez le foyer depuis le serveur. Sinon, fermez puis rouvrez l\'application.',
+                  style: Charte.texte(16)),
+              const SizedBox(height: 12),
+              Bouton(texte: 'Mettre la base abîmée de côté', icone: Icons.inventory_2_outlined, plein: true, onTap: _mettreDeCote),
+            ],
+            if (_echec != null) Text(_echec!, style: Charte.texte(14, couleur: const Color(0xFFB00020))),
             const SizedBox(height: 16),
-            SelectableText(erreur, style: Charte.texte(13, couleur: const Color(0xFFB00020))),
+            SelectableText(widget.erreur, style: Charte.texte(13, couleur: const Color(0xFFB00020))),
           ],
         ),
       ),

@@ -573,6 +573,14 @@ class Etat extends ChangeNotifier {
   /// Erreur à l'ouverture de la base de l'appareil (null : base ouverte normalement).
   String? erreurBase;
 
+  /// Base illisible : gardée à part sur l'appareil ; au prochain lancement, on repart d'une base neuve
+  /// (« Rejoindre un foyer » recharge alors tout depuis le serveur).
+  Future<void> mettreBaseDeCote() async {
+    if (_dossier == null) return;
+    final f = _chemin(baseFoyer);
+    if (baseExiste(f)) await mettreDeCote(f, '$f.endommagee-${_horodatage()}');
+  }
+
   /// Base du foyer (vraies données) et, en mode démonstration, base de démonstration.
   /// [dossier] : dossier des bases (essais) ; par défaut, celui de l'application.
   Future<void> charger({Directory? dossier}) async {
