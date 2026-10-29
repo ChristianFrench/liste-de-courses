@@ -9,7 +9,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show autreMarque, nouveauProduit, placerNonPlaces;
+import 'catalogue.dart' show actionsNonPlace, autreMarque, nouveauProduit, placerNonPlaces;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -492,7 +492,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                               nonPlace: x.nonPlace,
                               nombre: x.lignes.length,
                               onTap: x.nonPlace
-                                  ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p])
+                                  ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
                                   : null,
                             ),
                             for (final g in x.lignes) _ligne(l, g),
@@ -568,7 +568,13 @@ class _EcranConstructionState extends State<EcranConstruction> {
       surligne: _surligne == p.id,
       onTap: () => ouvrirFeuillePromotion(context, l, g),
       onDetail: () => ouvrirFeuillePromotion(context, l, g),
-      onLongPress: () => _retirer(l, p),
+      // Appui long : retirer ; un produit ajouté par le foyer se corrige aussi (renommer, déplacer, supprimer).
+      onLongPress: etat.estAjoute(p)
+          ? () => menuActions(context, titre: p.nom, actions: [
+                ActionLigne(Icons.remove_circle_outline, 'Retirer de la liste', () => _retirer(l, p)),
+                ...actionsNonPlace(context, p, liste: l),
+              ])
+          : () => _retirer(l, p),
       reglage: Row(mainAxisSize: MainAxisSize.min, children: [
         // − N + : à 0, l'article quitte la liste (« Annuler » le remet).
         _petitBouton('−', 'Moins', ValueKey('moins-${p.id}'),
@@ -1520,7 +1526,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                   nom: x.nom,
                                   nonPlace: x.nonPlace,
                                   onTap: x.nonPlace
-                                      ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p])
+                                      ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
                                       : null,
                                   marque: x.lignes.any((g) => fondus.contains(g.produitId)) ? Icons.playlist_add : null,
                                 ),

@@ -643,9 +643,10 @@ void main() {
       expect(etat.ligne(l, lactel.id)?.consigne, 'bien frais', reason: 'la ligne garde sa consigne');
       etat.marquesType = {};
 
-      // 8 : appui long : retiré
+      // 8 : appui long : retiré (produit ajouté par le foyer : par son menu)
       await tester.longPress(find.byKey(ValueKey('condense-${lactel.id}')));
       await tester.pumpAndSettle();
+      await _toucher(tester, find.text('Retirer de la liste'));
       expect(etat.ligne(l, lactel.id), isNull);
       await tester.pump(const Duration(seconds: 6));
     });
@@ -837,9 +838,28 @@ void main() {
       // Toucher le bandeau : choisir l'article, puis son rayon et son secteur
       await _toucher(tester, find.text('NON PLACÉ'));
       await _toucher(tester, find.text('Truc mystère').last);
+      await _toucher(tester, find.text('Placer dans un rayon et un secteur'));
       await tester.enterText(find.byKey(const ValueKey('placer-libelle')), 'Truc connu');
       await _toucher(tester, find.text('Placer'));
       expect(truc.nom, 'Truc connu', reason: 'le libellé se corrige en le plaçant');
+      // Une fois placé, le produit ajouté reste modifiable par l'appui long sur sa ligne
+      if (find.byKey(ValueKey('condense-${truc.id}')).evaluate().isEmpty) {
+        await tester.scrollUntilVisible(find.byKey(ValueKey('condense-${truc.id}')), -150,
+            scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
+      }
+      await tester.longPress(find.byKey(ValueKey('condense-${truc.id}')));
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.text('Renommer'));
+      await tester.enterText(find.byType(TextField).last, 'Truc renommé');
+      await _toucher(tester, find.text('Valider').last);
+      expect(truc.nom, 'Truc renommé');
+      // Une ligne qui n'est pas un produit : retirée de la liste, le produit supprimé
+      final faux = etat.produits.firstWhere((x) => x.nom == 'Article inconnu 1');
+      await _toucher(tester, find.text('NON PLACÉ'));
+      await _toucher(tester, find.text('Article inconnu 1').last);
+      await _toucher(tester, find.textContaining('Supprimer'));
+      expect(etat.ligne(l, faux.id), isNull);
+      expect(etat.produits.contains(faux), isFalse);
       expect(etat.secteurCatalogue(truc.id), isNotNull, reason: 'placé dans le premier secteur proposé');
       for (final m in etat.magasins) {
         expect(etat.secteurDe(m.id, truc.id)?.nom, etat.secteurCatalogue(truc.id)!.nom, reason: 'dans tous les magasins');

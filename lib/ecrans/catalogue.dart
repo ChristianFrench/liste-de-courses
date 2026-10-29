@@ -125,13 +125,44 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
   return true;
 }
 
-/// « Non placé » touché dans une liste : choisir l'article à placer, puis son rayon et son secteur.
-Future<void> placerNonPlaces(BuildContext context, List<Produit> produits) async {
+/// Renomme un produit (libellé seul, le rangement ne change pas).
+Future<void> renommerProduit(BuildContext context, Produit p) async {
+  final n = await demanderTexte(context, titre: 'Renommer le produit', libelle: 'Libellé', initial: p.nom);
+  if (n != null && n.trim().isNotEmpty) Etat.instance.renommerProduit(p, n);
+}
+
+/// Actions sur un non placé ou un produit ajouté par le foyer : le placer (ou le déplacer), le renommer,
+/// le supprimer. Depuis une liste ([liste]), « Supprimer » retire la ligne (ce n'était pas un produit) et
+/// supprime le produit s'il n'est dans aucune autre liste.
+List<ActionLigne> actionsNonPlace(BuildContext context, Produit p, {Liste? liste}) {
+  final etat = Etat.instance;
+  final place = etat.secteurCatalogue(p.id) != null;
+  return [
+    ActionLigne(Icons.place_outlined, place ? 'Déplacer dans un autre secteur' : 'Placer dans un rayon et un secteur',
+        () => placerProduit(context, p)),
+    ActionLigne(Icons.edit_outlined, 'Renommer', () => renommerProduit(context, p)),
+    ActionLigne(Icons.delete_outline, liste == null ? 'Supprimer' : 'Supprimer (ce n\'est pas un produit)', () async {
+      if (liste == null) {
+        await demanderSuppression(context, p, 'le produit ${p.nom}');
+        return;
+      }
+      etat.quantite(liste, p.id, 0);
+      final aussi = !etat.produitUtilise(p) && etat.estAjoute(p);
+      if (aussi) etat.supprimer(p);
+      if (context.mounted) {
+        Nav.message(context, aussi ? '« ${p.nom} » retiré de la liste et supprimé (dans la corbeille)' : '« ${p.nom} » retiré de la liste');
+      }
+    }, danger: true),
+  ];
+}
+
+/// « Non placé » touché dans une liste : choisir l'article, puis le placer, le renommer ou le supprimer.
+Future<void> placerNonPlaces(BuildContext context, List<Produit> produits, {Liste? liste}) async {
   if (produits.isEmpty) return;
   final p = produits.length == 1
       ? produits.single
-      : await choisirDansListe<Produit>(context, titre: 'Placer quel article ?', choix: {for (final x in produits) x: x.nom});
-  if (p != null && context.mounted) await placerProduit(context, p);
+      : await choisirDansListe<Produit>(context, titre: 'Quel article ?', choix: {for (final x in produits) x: x.nom});
+  if (p != null && context.mounted) await menuActions(context, titre: p.nom, actions: actionsNonPlace(context, p, liste: liste));
 }
 
 /// Toutes les marques du catalogue des marques (tous secteurs), et celles déjà portées par des produits.
@@ -584,7 +615,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                               apresTitre: SignePerso(p),
                               sousTitre: 'Touchez pour le placer',
                               onTap: () => menuActions(context, titre: p.nom, actions: [
-                                ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
+                                ...actionsNonPlace(context, p),
                                 ActionLigne(Icons.info_outline, 'Voir la fiche', () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id))),
                               ]),
                             ),
