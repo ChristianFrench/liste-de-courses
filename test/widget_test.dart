@@ -186,7 +186,7 @@ void main() {
       e.modifierEmail(e.moi, 'moi@exemple.fr');
       expect(lienMail(e, l).path, '');
       e.options(envoiFoyer: true);
-      expect(lienMail(e, l).path, 'a@exemple.fr', reason: 'pas à soi-même');
+      expect(lienMail(e, l).path.split(','), unorderedEquals(['a@exemple.fr', 'moi@exemple.fr']), reason: 'l\'auteur garde la trace');
       expect(lienMail(e, l).toString(), isNot(contains('+')));
       final relu = jsonEncode(e.versJson());
       e.lire(jsonDecode(relu) as Map<String, dynamic>);

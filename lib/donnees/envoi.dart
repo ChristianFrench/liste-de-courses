@@ -119,11 +119,15 @@ String texteListe(Etat etat, Liste l) {
   return b.toString();
 }
 
-/// Les autres membres du foyer qui ont une adresse (on ne s'envoie pas son propre mail).
-List<String> adressesFoyer(Etat etat) => [
-      for (final m in etat.membresVisibles)
-        if (m.email.isNotEmpty && m.id != etat.moi.id && m.email.toLowerCase() != etat.moi.email.toLowerCase()) m.email
-    ];
+/// Les membres du foyer qui ont une adresse, l'auteur compris : le mail garde la trace d'un acte important
+/// (décision du 29/10/2026). Une adresse n'apparaît qu'une fois.
+List<String> adressesFoyer(Etat etat) {
+  final vues = <String>{};
+  return [
+    for (final m in etat.membresVisibles)
+      if (m.email.isNotEmpty && vues.add(m.email.trim().toLowerCase())) m.email.trim()
+  ];
+}
 
 /// Destinataires de la liste : le foyer quand le mail part directement ou si l'option est choisie ;
 /// sinon personne (on choisit dans la messagerie).

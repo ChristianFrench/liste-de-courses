@@ -145,7 +145,10 @@ Future<void> envoyerInvitation(BuildContext context, Membre m) async {
       '2. Au premier lancement, choisissez « Rejoindre un foyer ».\n'
       '3. Saisissez le code de partage : $code\n'
       '4. Dans la liste des membres, choisissez « ${m.nomAffiche} ».\n\n${etat.moi.nomAffiche}';
-  final r = await envoyerMail([m.email], 'Rejoindre le foyer ${etat.foyerNom}', corps);
+  // L'auteur en garde une copie (trace de l'invitation).
+  final moi = etat.moi.email.trim();
+  final a = [m.email, if (moi.isNotEmpty && moi.toLowerCase() != m.email.trim().toLowerCase()) moi];
+  final r = await envoyerMail(a, 'Rejoindre le foyer ${etat.foyerNom}', corps);
   if (!context.mounted) return;
   if (r == Envoi.parti) {
     Nav.message(context, 'Invitation envoyée à ${m.email}');
