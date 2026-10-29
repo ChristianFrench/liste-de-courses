@@ -39,8 +39,7 @@ def essai(transport, port):
             lisible = 'json' if not texte or isinstance(json.loads(texte), dict) else 'autre'
         except Exception as e:  # noqa
             lisible = f'ILLISIBLE ({type(e).__name__})'
-        recus.append(m.topic)
-        print(f'  {m.topic}  {len(m.payload)} octets  retenu={int(m.retain)}  {lisible}')
+        recus.append((m.topic, len(m.payload), m.retain, lisible))
 
     c.on_connect, c.on_subscribe, c.on_message = connecte, abonne, message
     print(f'== {transport} port {port}')
@@ -49,8 +48,17 @@ def essai(transport, port):
     time.sleep(15)
     c.loop_stop()
     c.disconnect()
-    print(f'  connexion={etat.get("connexion")} abonnement={etat.get("abonnement")} messages={len(recus)}'
-          f' contrôle revenu={"oui" if any(t.endswith("/controle/diagnostic") for t in recus) else "NON"}')
+    types = {}
+    for t, n, r, l in recus:
+        k = t.split('/')[2] if t.count('/') >= 2 else t
+        nb, mx = types.get(k, (0, 0))
+        types[k] = (nb + 1, max(mx, n))
+    print(f'::notice title={transport}::connexion={etat.get("connexion")} abonnement={etat.get("abonnement")} messages={len(recus)}'
+          f' controle revenu={"oui" if any(t.endswith("/controle/diagnostic") for t, *_ in recus) else "NON"}'
+          f' types={types}')
+    for t, n, r, l in recus:
+        if n > 30000 or l != 'json':
+            print(f'::notice title={transport} message particulier::{t} {n} octets retenu={int(r)} {l}')
 
 
 essai('websockets', 8084)
