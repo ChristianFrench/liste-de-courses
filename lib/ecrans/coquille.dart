@@ -14,6 +14,7 @@ import 'catalogue.dart';
 import 'corbeille.dart';
 import 'editeur_catalogue.dart';
 import 'foyer.dart';
+import 'essai_mail.dart';
 import 'messages.dart';
 import 'historique.dart';
 import 'listes.dart';
@@ -162,6 +163,7 @@ class MenuGerer extends StatelessWidget {
             ecran(Icons.home_outlined, 'Foyer',
                 '${etat.foyerNom} · ${etat.membresVisibles.length} membre${etat.membresVisibles.length > 1 ? 's' : ''}', const EcranFoyer()),
             ecran(Icons.chat_outlined, 'Messages', 'Écrire au foyer · essai avec ntfy', const EcranMessages()),
+            ecran(Icons.outgoing_mail, 'Essai d\'envoi de mail', 'Les champs du modèle EmailJS et sa réponse', const EcranEssaiMail()),
           ]),
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''} · leurs parcours', const EcranMagasins()),

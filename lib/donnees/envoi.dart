@@ -26,32 +26,36 @@ class MailDirect {
 
   static bool get disponible => disponibleEssai ?? (service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty);
 
+  /// Paramètres du modèle EmailJS (champs {{...}} du modèle).
+  static Map<String, String> parametres(List<String> a, String sujet, String texte) => {
+        'destinataires': a.join(','),
+        'sujet': sujet,
+        'texte': texte,
+        // Le mail part de la Gmail de l'application : le nom et l'adresse de réponse sont ceux de l'auteur.
+        'expediteur': Etat.instance.moi.nomAffiche,
+        'repondre_a': Etat.instance.moi.email,
+      };
+
   /// Envoie le mail ; true s'il est parti.
   static Future<bool> envoyer(List<String> a, String sujet, String texte) async {
     if (!disponible || a.isEmpty) return false;
+    return (await envoyerParametres(parametres(a, sujet, texte))).$1;
+  }
+
+  /// Envoi brut (écran d'essai) : parti ou non, et la réponse d'EmailJS telle quelle.
+  static Future<(bool, String)> envoyerParametres(Map<String, String> p) async {
+    if (!disponible) return (false, 'Identifiants EmailJS absents de cette version (secrets GitHub EMAILJS_*)');
     try {
       final r = await client
           .post(Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
               headers: {'Content-Type': 'application/json'},
-              body: jsonEncode({
-                'service_id': service,
-                'template_id': modele,
-                'user_id': cle,
-                'template_params': {
-                  'destinataires': a.join(','),
-                  'sujet': sujet,
-                  'texte': texte,
-                  // Le mail part de la Gmail de l'application : le nom et l'adresse de réponse sont ceux de l'auteur.
-                  'expediteur': Etat.instance.moi.nomAffiche,
-                  'repondre_a': Etat.instance.moi.email,
-                },
-              }))
+              body: jsonEncode({'service_id': service, 'template_id': modele, 'user_id': cle, 'template_params': p}))
           .timeout(const Duration(seconds: 20));
       if (r.statusCode >= 300) debugPrint('EmailJS : ${r.statusCode} ${r.body}');
-      return r.statusCode < 300;
+      return (r.statusCode < 300, 'Réponse ${r.statusCode} : ${r.body}');
     } catch (e) {
       debugPrint('EmailJS : $e');
-      return false;
+      return (false, 'Pas de réponse : $e');
     }
   }
 }
