@@ -61,7 +61,8 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     });
   }
 
-  void _creer(List<LigneListe> lignes, {bool simple = false}) {
+  /// [marques] : marque à donner à l'article d'un produit (« Beurre » devient « Beurre Président »).
+  void _creer(List<LigneListe> lignes, {bool simple = false, Map<String, String> marques = const {}}) {
     final texte = nom.text.trim().isEmpty ? etat.nomLibre(etat.nomPrevu(magasinId, prevue)) : nom.text.trim();
     if (etat.nomPris(texte)) {
       Nav.message(context, 'Une liste s\'appelle déjà « $texte » : choisissez un autre nom.');
@@ -69,6 +70,9 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     }
     final l = etat.creerListe(magasinId, lignes, nom: texte);
     etat.fixerDatePrevue(l, prevue);
+    for (final e in marques.entries) {
+      if (etat.produit(e.key) case final p?) etat.changerMarque(l, p, e.value);
+    }
     if (simple) etat.marquerSimple(l, true);
     Nav.remplacerTravail(EcranConstruction(listeId: l.id));
   }
@@ -156,6 +160,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     if (!ok || !mounted) return;
     // Un même produit lu deux fois : une seule ligne, quantités additionnées.
     final lignes = <String, LigneListe>{};
+    final marques = <String, String>{};
     for (var i = 0; i < lus.length; i++) {
       if (!choisis.contains(i)) continue;
       final a = lus[i];
@@ -164,10 +169,11 @@ class _EcranPrelisteState extends State<EcranPreliste> {
       if (g != null) {
         g.quantite += a.quantite;
       } else {
-        lignes[p.id] = LigneListe(produitId: p.id, quantite: a.quantite, consigne: a.marque);
+        lignes[p.id] = LigneListe(produitId: p.id, quantite: a.quantite);
       }
+      if (a.marque != null) marques[p.id] = a.marque!;
     }
-    _creer(lignes.values.toList());
+    _creer(lignes.values.toList(), marques: marques);
   }
 
   /// Liste personnalisée : les articles d'une course passée, aucun coché d'avance ; on coche ceux à reprendre.

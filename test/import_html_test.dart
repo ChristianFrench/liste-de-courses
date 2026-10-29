@@ -41,4 +41,19 @@ void main() {
     expect(textes, contains('Kakis : Produit inconnu : sera créé dans Frais › Fruits et légumes.'));
     expect(textes, contains('ANIMAUX : En capitales mais inconnu'));
   });
+
+  test('une marque écrite dans la ligne va en marque, pas en consigne', () {
+    final e = Etat.instance
+      ..enregistrementActif = false
+      ..lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
+    final mq = e.marques.firstWhere((m) => !e.produits.any((p) => p.nom == 'Pommes ${m.nom}')).nom;
+    final rapport = <Difficulte>[];
+    final lus = lireTexte(e, '- Pommes $mq\n- Bidule $mq\n', rapport: rapport);
+    expect(lus[0].produit?.nom, 'Pommes');
+    expect(lus[0].marque, mq);
+    expect(lus[1].produit, isNull);
+    expect(lus[1].nom, 'Bidule', reason: 'la marque ne fait pas partie du nom du produit à créer');
+    expect(lus[1].marque, mq);
+    expect(rapport.where((d) => d.explication.startsWith('Marque reconnue')), hasLength(2));
+  });
 }

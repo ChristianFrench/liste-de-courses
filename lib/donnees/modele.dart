@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math' show Random;
@@ -735,6 +736,43 @@ class Etat extends ChangeNotifier {
     };
   }
 
+  /// Modifications qui ne parviennent pas sur le disque (web : IndexedDB bloqué), ou lignes refusées par la
+  /// base : affiché en bandeau rouge, pour ne pas perdre de travail sans le savoir. Null : tout est écrit.
+  String? get alerteEnregistrement => disqueBloque
+      ? 'Vos modifications ne sont plus écrites sur le disque. Ne fermez pas l\'application et prévenez Claude.'
+      : refusBase.isNotEmpty
+          ? 'Enregistrement refusé par la base : ${refusBase.first}'
+          : null;
+  bool disqueBloque = false;
+  List<String> refusBase = const [];
+  DateTime? derniereEcritureDisque;
+  int _ecritures = 0;
+
+  /// Web : attend la recopie sur le disque du navigateur ; au-delà de 15 s, alerte.
+  void _verifierDisque() {
+    final n = ++_ecritures;
+    var fini = false;
+    Timer(const Duration(seconds: 15), () {
+      if (fini || disqueBloque) return;
+      disqueBloque = true;
+      debugPrint('Écriture sur le disque en attente depuis 15 s (écriture $n)');
+      notifyListeners();
+    });
+    ecrireSurDisque().then((_) {
+      fini = true;
+      derniereEcritureDisque = DateTime.now();
+      if (disqueBloque) {
+        disqueBloque = false;
+        notifyListeners();
+      }
+    }, onError: (Object e) {
+      fini = true;
+      debugPrint('Écriture sur le disque impossible : $e');
+      disqueBloque = true;
+      notifyListeners();
+    });
+  }
+
   Future<void> enregistrer() async {
     if (!enregistrementActif) return;
     final s = _actif;
@@ -744,6 +782,12 @@ class Etat extends ChangeNotifier {
       for (final e in s.erreurs) {
         debugPrint('Refusé par la base : $e');
       }
+      if (s.erreurs.isNotEmpty || refusBase.isNotEmpty) {
+        final avant = refusBase;
+        refusBase = [...s.erreurs];
+        if (avant.length != refusBase.length) scheduleMicrotask(notifyListeners);
+      }
+      if (kIsWeb) _verifierDisque();
       // Le compteur d'utilisation est tenu par la base (règle R4).
       final c = s.compteurs();
       for (final p in produits) {

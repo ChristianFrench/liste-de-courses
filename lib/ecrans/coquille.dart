@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/catalogue_commun.dart';
+import '../donnees/base_locale.dart' show ecrireSurDisque;
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
@@ -95,7 +96,7 @@ class Coquille extends StatelessWidget {
         if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: ListenableBuilder(
+      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -117,9 +118,68 @@ class Coquille extends StatelessWidget {
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
       ),
-      ))),
+      )))),
     );
   }
+}
+
+/// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du
+/// navigateur bloqué ; lignes refusées par la base). Web : quand la page est masquée ou fermée, on attend
+/// que tout soit recopié sur le disque.
+class AlerteEnregistrement extends StatefulWidget {
+  const AlerteEnregistrement({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<AlerteEnregistrement> createState() => _AlerteEnregistrementState();
+}
+
+class _AlerteEnregistrementState extends State<AlerteEnregistrement> {
+  late final AppLifecycleListener _cycle = AppLifecycleListener(
+    onInactive: ecrireSurDisque,
+    onHide: ecrireSurDisque,
+    onPause: ecrireSurDisque,
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    _cycle;
+  }
+
+  @override
+  void dispose() {
+    _cycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Etat.instance,
+        builder: (context, enfant) {
+          final alerte = Etat.instance.alerteEnregistrement;
+          return Column(children: [
+            if (alerte != null)
+              Material(
+                key: const ValueKey('alerte-enregistrement'),
+                color: Charte.rouge,
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+                    child: Row(children: [
+                      const Icon(Icons.warning_amber_rounded, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text(alerte, style: Charte.texte(14, gras: true, couleur: Colors.white))),
+                    ]),
+                  ),
+                ),
+              ),
+            Expanded(child: MediaQuery.removePadding(context: context, removeTop: alerte != null, child: enfant!)),
+          ]);
+        },
+        child: widget.child,
+      );
 }
 
 /// Écran racine d'un onglet : Préparer, Courses, ou le menu de Gérer.

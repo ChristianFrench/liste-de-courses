@@ -225,6 +225,36 @@ List<Produit> _produitsDu(Etat etat, _Titre t) => t.secteur != null
     ? etat.produitsDuSecteur(t.secteur!)
     : [for (final x in etat.secteursDu(t.rayon.id)) ...etat.produitsDuSecteur(x)];
 
+/// Marques connues (catalogue des marques de tous les secteurs, et marques des produits), les plus longues
+/// d'abord : « Paysan Breton » avant « Paysan ».
+List<String> _marquesConnues(Etat etat) {
+  final res = <String, String>{};
+  for (final r in etat.rayonsCatalogue) {
+    for (final x in etat.secteursDu(r.id)) {
+      for (final n in etat.marquesDuSecteur(x)) {
+        res.putIfAbsent(normaliser(n), () => n);
+      }
+    }
+  }
+  for (final m in etat.marques) {
+    res.putIfAbsent(normaliser(m.nom), () => m.nom);
+  }
+  res.remove('');
+  return res.values.toList()..sort((a, b) => normaliser(b).length.compareTo(normaliser(a).length));
+}
+
+/// La marque écrite dans la ligne (mots entiers), si elle n'est pas déjà dans le nom du produit reconnu.
+String? _marqueDans(List<String> marques, String ligne, Produit? p) {
+  final t = ' ${normaliser(ligne)} ';
+  final dansNom = p == null ? '' : ' ${normaliser(p.nom)} ';
+  for (final m in marques) {
+    final n = normaliser(m);
+    if (n.length < 2 || !t.contains(' $n ') || dansNom.contains(' $n ')) continue;
+    return m;
+  }
+  return null;
+}
+
 /// Lit le texte collé : un article par ligne (ou séparés par des virgules sur une même ligne).
 /// Le HTML (source d'un mail) est d'abord ramené à du texte. Une ligne qui porte le nom d'un rayon ou
 /// d'un secteur est un titre : les produits qui la suivent y sont cherchés d'abord, et un produit inconnu
@@ -242,6 +272,7 @@ List<ArticleLu> lireTexte(Etat etat, String texte, {List<Difficulte>? rapport}) 
   }
 
   final lignes = texte.split(RegExp(r'\r?\n'));
+  final marques = _marquesConnues(etat);
   _Titre? titre;
   var precedente = '';
   for (var i = 0; i < lignes.length; i++) {
@@ -316,8 +347,17 @@ List<ArticleLu> lireTexte(Etat etat, String texte, {List<Difficulte>? rapport}) 
               '${s == null ? 'aucun secteur' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}'}, pas sous ${titre.nom}.'));
         }
       }
-      res.add(ArticleLu(ligne.trim(), nom, q,
-          produit: p, marque: appris == null || appris[1].isEmpty ? null : appris[1], secteur: titre?.secteur));
+      // Marque : apprise sur les listes du foyer, sinon écrite dans la ligne (« Beurre Président »).
+      // Elle va dans la marque de l'article, pas dans la consigne.
+      var marque = appris == null || appris[1].isEmpty ? null : appris[1];
+      marque ??= _marqueDans(marques, ligne, p);
+      if (marque != null && p != null && normaliser(p.nom).contains(normaliser(marque))) marque = null;
+      if (marque != null) rapport?.add(Difficulte(ligne.trim(), 'Marque reconnue : $marque, mise en marque de l\'article.'));
+      // Produit à créer : la marque ne fait pas partie de son nom
+      final nomSeul = p == null && marque != null
+          ? nom.replaceAll(RegExp(RegExp.escape(marque), caseSensitive: false), '').replaceAll(RegExp(r'\s+'), ' ').trim()
+          : nom;
+      res.add(ArticleLu(ligne.trim(), nomSeul.isEmpty ? nom : nomSeul, q, produit: p, marque: marque, secteur: titre?.secteur));
     }
   }
   return res;

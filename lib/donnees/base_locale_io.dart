@@ -30,3 +30,6 @@ Future<void> mettreDeCote(String de, String vers) async {
 
 /// Sur Windows et Android, une seule instance de l'application : pas de verrou à prendre.
 Future<bool> prendreVerrou() async => true;
+
+/// Sur disque, SQLite écrit directement : rien à attendre.
+Future<void> ecrireSurDisque() async {}

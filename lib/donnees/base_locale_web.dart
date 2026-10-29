@@ -26,6 +26,9 @@ CommonDatabase ouvrirBase(String chemin) => _sqlite!.open(chemin);
 
 bool baseExiste(String chemin) => _fichiers!.xAccess(chemin, 0) != 0;
 
+/// Attend que tout ce qui a été écrit soit recopié dans IndexedDB (le disque du navigateur).
+Future<void> ecrireSurDisque() async => _fichiers?.flush();
+
 /// La base doit être fermée. IndexedDB ne sait pas renommer : copie puis suppression.
 Future<void> renommerBase(String de, String vers) async {
   final db = _sqlite!.open(de);
