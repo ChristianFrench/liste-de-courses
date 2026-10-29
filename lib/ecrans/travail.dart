@@ -452,6 +452,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · ${etat.creeeLe(l)}',
             aide: simple ? Aides.listeSimple : Aides.preparation,
             actions: [
+              ActionLigne(Icons.event_outlined, 'Changer le magasin ou la date', () => changerMagasinEtDate(context, l)),
               ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
                 final r = messageEnvoi(await envoyerListe(etat, l), destinataires(etat).length);
                 if (r != null && context.mounted) Nav.message(context, r);
@@ -1244,6 +1245,43 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
         return [Text('Décrivez l\'offre dans le libellé.', style: Charte.texte(14, couleur: Charte.texteSecondaire))];
     }
   }
+}
+
+/// Volet « Changer le magasin ou la date » d'une liste en préparation.
+Future<void> changerMagasinEtDate(BuildContext context, Liste l) async {
+  final etat = Etat.instance;
+  var magasinId = l.magasinId;
+  final auj = DateTime.now();
+  var prevue = etat.datePrevue(l) ?? DateTime(auj.year, auj.month, auj.day);
+  final ok = await modale(
+    context,
+    titre: 'Magasin et date',
+    oui: 'Valider',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 6),
+        ChoixDeroulant<String>(
+          key: const ValueKey('changer-magasin'),
+          libelle: 'Magasin',
+          valeur: magasinId,
+          choix: {for (final m in etat.magasins) m.id: m.nom},
+          onChange: (v) => maj(() => magasinId = v),
+        ),
+        const SizedBox(height: 14),
+        ChampDate(
+          key: const ValueKey('changer-date'),
+          libelle: 'Date des courses',
+          valeur: prevue,
+          premier: DateTime(auj.year, auj.month, auj.day).isAfter(prevue) ? prevue : DateTime(auj.year, auj.month, auj.day),
+          dernier: DateTime(auj.year, auj.month, auj.day).add(const Duration(days: 365)),
+          onChange: (d) => maj(() => prevue = d),
+        ),
+      ],
+    ),
+  );
+  if (ok) etat.changerMagasinEtDate(l, magasinId, prevue);
 }
 
 /// Clé de tri alphabétique : sans majuscules ni accents (« Œufs » avec les O).

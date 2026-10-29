@@ -261,7 +261,7 @@ class Liste {
 
   /// Nom donné par l'utilisateur ; null = nom par défaut (magasin et date, voir Etat.nomListe).
   String? nom;
-  final String magasinId;
+  String magasinId;
   StatutListe statut;
   final DateTime dateCreation;
   final List<LigneListe> lignes;
@@ -2409,6 +2409,23 @@ class Etat extends ChangeNotifier {
 
   void fixerDatePrevue(Liste l, DateTime d) {
     datesPrevues[l.id] = _iso(DateTime(d.year, d.month, d.day))!.substring(0, 10);
+    modifie();
+  }
+
+  /// Change le magasin et le jour prévu d'une liste en préparation. Le nom suit s'il était celui proposé
+  /// à la création (« Intermarché · samedi 25/10 ») ; un nom choisi par l'utilisateur est gardé.
+  void changerMagasinEtDate(Liste l, String magasinId, DateTime prevue) {
+    final avant = datePrevue(l) ?? l.dateCreation;
+    final nomAuto = l.nom == null || l.nom!.startsWith(nomPrevu(l.magasinId, avant));
+    if (l.magasinId != magasinId) {
+      l.magasinId = magasinId;
+      l.parcoursId = null; // le parcours est propre à un magasin
+    }
+    datesPrevues[l.id] = _iso(DateTime(prevue.year, prevue.month, prevue.day))!.substring(0, 10);
+    if (nomAuto) {
+      l.nom = null;
+      l.nom = nomLibre(nomPrevu(magasinId, prevue));
+    }
     modifie();
   }
 
