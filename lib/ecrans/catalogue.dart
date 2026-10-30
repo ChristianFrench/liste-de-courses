@@ -638,6 +638,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                                   titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
                               if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
                             }),
+                          if (etat.rayonAjoute(x)) ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
                         ],
                         enfants: [
                           for (final s in etat.secteursVisibles(x.id))
@@ -726,13 +727,14 @@ class EcranSecteurCatalogue extends StatelessWidget {
   }
 }
 
-/// Actions d'un secteur du catalogue : nouveau produit. Renommer, déplacer ou supprimer est réservé à l'éditeur
-/// du catalogue commun (30/10/2026) : le catalogue est celui de tous les foyers.
+/// Actions d'un secteur du catalogue : nouveau produit ; le renommer s'il a été créé par le foyer. Supprimer est
+/// réservé à l'éditeur du catalogue commun (30/10/2026) : le catalogue est celui de tous les foyers.
 List<ActionLigne> actionsSecteur(BuildContext context, Secteur s) => [
       ActionLigne(Icons.add, '+ Nouveau produit', () async {
         final p = await fenetreProduit(context, secteur: s);
         if (p != null && context.mounted) Nav.message(context, '« ${p.nom} » ajouté au catalogue');
       }),
+      if (Etat.instance.secteurAjoute(s)) ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () => _renommerSecteur(context, s)),
     ];
 
 /// Catalogue › Produits ajoutés : les produits que le foyer a ajoutés, à corriger (fenêtre du produit) ou supprimer.
@@ -1069,4 +1071,16 @@ Future<void> _nouveauSecteur(BuildContext context, Rayon r) async {
   }
   await choisirImageSecteur(context, r.nom, s.nom);
   if (context.mounted) Nav.message(context, 'Secteur « ${s.nom} » ajouté');
+}
+
+Future<void> _renommerRayon(BuildContext context, Rayon r) async {
+  final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
+  if (nom == null || nom.trim().isEmpty) return;
+  Etat.instance.renommerRayonCatalogue(r, nom);
+}
+
+Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
+  final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
+  if (nom == null || nom.trim().isEmpty) return;
+  Etat.instance.renommerSecteurCatalogue(s, nom);
 }
