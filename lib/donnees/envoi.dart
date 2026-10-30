@@ -68,10 +68,12 @@ class MailDirect {
 }
 
 /// Résultat d'un envoi : parti directement, préparé dans la messagerie, ou rien n'a répondu.
-enum Envoi { parti, messagerie, echec }
+/// [demonstration] : version de démonstration, aucun mail ne part (ni direct ni par la messagerie).
+enum Envoi { parti, messagerie, echec, demonstration }
 
 /// Envoie directement si possible, sinon ouvre la messagerie avec le mail préparé.
 Future<Envoi> envoyerMail(List<String> a, String sujet, String texte, {String? html}) async {
+  if (demonstration) return Envoi.demonstration;
   if (await MailDirect.envoyer(a, sujet, texte, html: html)) return Envoi.parti;
   try {
     final ok = await launchUrl(_mailto(a, sujet, texte));
@@ -89,6 +91,7 @@ String? messageEnvoi(Envoi e, int n) => switch (e) {
       Envoi.parti => n > 1 ? 'Mail envoyé à $n personnes' : 'Mail envoyé',
       Envoi.messagerie => null,
       Envoi.echec => 'Aucune messagerie n\'a répondu sur cet appareil',
+      Envoi.demonstration => 'Démonstration : aucun mail n\'est envoyé',
     };
 
 String _echapper(String t) => t.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');

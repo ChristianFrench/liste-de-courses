@@ -160,6 +160,8 @@ Future<void> envoyerInvitation(BuildContext context, Membre m) async {
   if (!context.mounted) return;
   if (r == Envoi.parti) {
     Nav.message(context, 'Invitation envoyée à ${m.email}');
+  } else if (r == Envoi.demonstration) {
+    Nav.message(context, messageEnvoi(r, 1)!);
   } else if (r == Envoi.echec) {
     Nav.message(context, 'Aucune messagerie trouvée : copiez le code (titre « Foyer »)');
   }
