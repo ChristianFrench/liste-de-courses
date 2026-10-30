@@ -331,8 +331,11 @@ class RacineOnglet extends StatelessWidget {
 class MenuGerer extends StatelessWidget {
   const MenuGerer({super.key});
 
+  // Les nombres (corbeille, magasins, produits…) suivent les changements faits dans les écrans ouverts depuis ici.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: Etat.instance, builder: (context, _) => _construire(context));
+
+  Widget _construire(BuildContext context) {
     final etat = Etat.instance;
     final n = etat.magasins.length;
     Widget ecran(IconData icone, String titre, String sousTitre, Widget e) =>
