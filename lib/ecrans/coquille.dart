@@ -1,3 +1,5 @@
+import 'dart:async';
+
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 
@@ -96,7 +98,7 @@ class Coquille extends StatelessWidget {
         if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
+      child: GuetteurQuiSuisJe(child: GuetteurMiseAJour(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -118,9 +120,128 @@ class Coquille extends StatelessWidget {
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
       ),
-      )))),
+      ))))),
     );
   }
+}
+
+/// Fenêtre de la mise à jour faite à l'ouverture (30/10/2026) : étapes avec le rond qui tourne,
+/// au moins 5 secondes, même quand il n'y a rien de nouveau.
+class GuetteurMiseAJour extends StatefulWidget {
+  const GuetteurMiseAJour({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<GuetteurMiseAJour> createState() => _GuetteurMiseAJourState();
+}
+
+class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
+  MiseAJourOuverture? _montree;
+
+  @override
+  void initState() {
+    super.initState();
+    Synchro.instance.addListener(_verifier);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _verifier());
+  }
+
+  @override
+  void dispose() {
+    Synchro.instance.removeListener(_verifier);
+    super.dispose();
+  }
+
+  Future<void> _verifier() async {
+    final o = Synchro.instance.ouverture;
+    if (o == null || identical(o, _montree) || !mounted) return;
+    _montree = o;
+    final montree = DateTime.now();
+    final fermer = Completer<void>();
+    unawaited(showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(canPop: false, child: _FenetreMiseAJour(o)),
+    ).whenComplete(() {
+      if (!fermer.isCompleted) fermer.complete();
+    }));
+    while (!o.finie && mounted) {
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+    }
+    final ferme = [montree.add(const Duration(seconds: 5)), o.fin!.add(const Duration(milliseconds: 1500))]
+        .reduce((a, b) => a.isAfter(b) ? a : b);
+    final reste = ferme.difference(DateTime.now());
+    if (!reste.isNegative) await Future<void>.delayed(reste);
+    if (mounted && !fermer.isCompleted) Navigator.of(context, rootNavigator: true).pop();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
+class _FenetreMiseAJour extends StatelessWidget {
+  const _FenetreMiseAJour(this.o);
+  final MiseAJourOuverture o;
+
+  Widget _etape(String texte, {required bool enCours, required bool faite, bool echec = false}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(children: [
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: enCours
+                ? const Padding(padding: EdgeInsets.all(2), child: CircularProgressIndicator(strokeWidth: 2.5))
+                : Icon(echec ? Icons.cloud_off : (faite ? Icons.check_circle : Icons.radio_button_unchecked),
+                    size: 22, color: echec ? Charte.rouge : (faite ? Charte.accent : Charte.texteSecondaire)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Text(texte, style: const TextStyle(fontSize: 16))),
+        ]),
+      );
+
+  /// Les autres membres dont un appareil est ouvert en ce moment.
+  static List<String> _presents() {
+    final etat = Etat.instance;
+    final ids = {
+      for (final a in Synchro.instance.appareils.values)
+        if (a.enLigne && a.membreId != null && a.membreId != etat.moi.id) a.membreId!
+    };
+    return [
+      for (final m in etat.membres)
+        if (ids.contains(m.id)) m.nomAffiche
+    ];
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+        title: Text('Bonjour ${Etat.instance.moi.nomAffiche}'),
+        content: ListenableBuilder(
+          listenable: Synchro.instance,
+          builder: (context, _) => Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final nom in _presents())
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Text('$nom est aussi là', style: const TextStyle(fontSize: 16)),
+                ),
+              _etape('Connexion au serveur', enCours: o.etape == 0, faite: o.etape > 0, echec: o.horsLigne),
+              _etape('Lecture de l\'état du foyer', enCours: o.etape == 1, faite: o.finie && !o.horsLigne),
+              if (o.finie) ...[
+                const SizedBox(height: 10),
+                Text(
+                  o.horsLigne
+                      ? 'Pas de réseau : vous travaillez avec les données de cet appareil.'
+                      : o.recues == 0
+                          ? 'Déjà à jour.'
+                          : '${o.recues} modification${o.recues > 1 ? 's' : ''} reçue${o.recues > 1 ? 's' : ''}.',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+              ],
+            ],
+          ),
+        ),
+      );
 }
 
 /// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du

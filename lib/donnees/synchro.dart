@@ -286,7 +286,47 @@ class Synchro extends ChangeNotifier {
   /// Au lancement de l'application : reprend le partage s'il est en place.
   Future<void> demarrer() async {
     _etat.surEnregistrement = signaler;
-    if (actif) await _connecter();
+    if (actif) {
+      ouverture = MiseAJourOuverture();
+      _dernierEtatRecu = DateTime.now();
+      _suiviOuverture = Timer.periodic(const Duration(milliseconds: 300), (_) => _suivreOuverture());
+      await _connecter();
+    }
+  }
+
+  // ------------------------------------------------------------ Mise à jour à l'ouverture (30/10/2026)
+
+  /// Étapes de la mise à jour faite à l'ouverture de l'application, montrées dans une fenêtre.
+  MiseAJourOuverture? ouverture;
+  Timer? _suiviOuverture;
+  DateTime _dernierEtatRecu = DateTime.now();
+
+  void _suivreOuverture() {
+    final o = ouverture;
+    if (o == null || o.finie) {
+      _suiviOuverture?.cancel();
+      return;
+    }
+    final maintenant = DateTime.now();
+    final avant = o.etape;
+    if (o.etape == 0) {
+      if (etatReseau == 'connecte') {
+        o.etape = 1;
+        _dernierEtatRecu = maintenant;
+      } else if (maintenant.difference(o.debut).inSeconds >= 15) {
+        o
+          ..horsLigne = true
+          ..etape = 2;
+      }
+    } else if (o.etape == 1) {
+      // L'état gardé sur le serveur arrive dès l'abonnement : fini quand plus rien n'arrive depuis 2 s.
+      final calme = maintenant.difference(_dernierEtatRecu).inMilliseconds > 2000 && _recus.isEmpty && _receptionDifferee == null;
+      if (calme || maintenant.difference(o.debut).inSeconds >= 45) o.etape = 2;
+    }
+    if (o.etape != avant) {
+      if (o.finie) o.fin = maintenant;
+      notifyListeners();
+    }
   }
 
   /// Premier appareil : crée le code de partage et prépare l'envoi de tout le foyer.
@@ -845,6 +885,7 @@ class Synchro extends ChangeNotifier {
 
   void _recevoirEtat(String sujet, String contenu) {
     final de = sujet.split('/')[3];
+    _dernierEtatRecu = DateTime.now();
     if (contenu.isEmpty || de == noeud) return;
     final m = CatalogueCommun.deballer(contenu);
     _recus.addAll([for (final o in m['objets'] as List) Map<String, dynamic>.from(o as Map)]);
@@ -920,6 +961,7 @@ class Synchro extends ChangeNotifier {
         if (pour != null && pour != noeud) return;
         a.enLigne = true;
         _marquerEchange();
+        _dernierEtatRecu = DateTime.now();
         _recus.addAll([for (final o in m['objets'] as List) Map<String, dynamic>.from(o as Map)]);
         _receptionDifferee ??= Timer(const Duration(milliseconds: 400), _integrer);
     }
@@ -947,6 +989,7 @@ class Synchro extends ChangeNotifier {
     try {
       final n = _etat.integrerDistant(lot);
       recus += n;
+      if (ouverture case final o? when !o.finie) o.recues += n;
       final ignores = _base?.ignores ?? 0, attente = _base?.nbEnAttente ?? 0;
       final de = {for (final o in lot) appareils[o['n']]?.nom ?? '?'}.join(', ');
       _noter('Reçu de $de : ${_resume(lot)}'
@@ -1113,4 +1156,14 @@ class TransportMqtt implements Transport {
     await _sub?.cancel();
     _client?.disconnect();
   }
+}
+
+/// Mise à jour faite à l'ouverture de l'application : 0 connexion, 1 lecture de l'état du foyer, 2 finie.
+class MiseAJourOuverture {
+  final debut = DateTime.now();
+  DateTime? fin;
+  int etape = 0;
+  int recues = 0;
+  bool horsLigne = false;
+  bool get finie => etape >= 2;
 }
