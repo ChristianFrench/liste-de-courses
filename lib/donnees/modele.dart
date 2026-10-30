@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'base_locale.dart';
 import 'catalogue_type.dart';
+import 'demonstration.dart';
 import 'images_choisies.dart';
 import 'stockage.dart';
 
@@ -682,6 +683,7 @@ class Etat extends ChangeNotifier {
         await appliquerModele(m, tailleComplete, catalogue: catalogue);
       }
       creerExemples(enregistrer: false);
+      if (demonstration) remplirDemonstration();
       s.ecrire(versJson());
     } else {
       lire(s.lire());

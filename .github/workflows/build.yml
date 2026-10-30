@@ -180,11 +180,23 @@ jobs:
           exit $code
       - name: Ouverture sans réseau (service worker hors_ligne.js)
         run: python3 outils/web/hors_ligne.py build/web
-      - name: Assembler le site (page de présentation + application)
+      - name: Compiler la version de démonstration (foyer d'exemples, sans partage)
+        run: |
+          set +e
+          # Sans aucun secret : la démonstration ne peut joindre ni le serveur du partage ni le service de mail.
+          jq '{VERSION, COMMIT}' definitions.json > definitions-demo.json
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/demo/ --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true -o "$PWD/build/demo" > compilation-demo.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation démonstration"; else tail -n 5 compilation-demo.log; fi
+          exit $code
+      - name: Ouverture sans réseau de la démonstration
+        run: python3 outils/web/hors_ligne.py build/demo ldc-demo-
+      - name: Assembler le site (page de présentation + application + démonstration)
         run: |
           mkdir site
           cp -r docs/. site/
           cp -r build/web site/web
+          cp -r build/demo site/demo
           touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }

@@ -8,6 +8,7 @@ import 'package:file_selector/file_selector.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'demonstration.dart';
 import 'modele.dart';
 
 // Envoi des mails (liste, résumé, invitation) et tickets de caisse en PDF.
@@ -24,7 +25,7 @@ class MailDirect {
   static bool? disponibleEssai;
   static http.Client client = http.Client();
 
-  static bool get disponible => disponibleEssai ?? (service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty);
+  static bool get disponible => disponibleEssai ?? (!demonstration && service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty);
 
   /// Paramètres du modèle EmailJS (champs {{...}} du modèle).
   /// [html] : le même contenu mis en forme (champ {{{texte_html}}} du modèle) ; par défaut, le texte tel quel.

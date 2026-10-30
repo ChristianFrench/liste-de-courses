@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'donnees/catalogue_commun.dart';
+import 'donnees/demonstration.dart';
 import 'donnees/messages.dart';
 import 'donnees/modele.dart';
 import 'donnees/synchro.dart';
@@ -19,9 +20,12 @@ Future<void> main() async {
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
   await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
+  // Démonstration : un foyer seul, sans partage ni catalogue commun (rien n'en sort, rien n'y entre)
+  if (demonstration && Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
   runApp(const ListeDeCoursesApp());
   if (!kIsWeb) TicketRecu.demarrer();
+  if (demonstration) return;
   // Partage du foyer entre appareils (si cet appareil partage)
   Synchro.instance.demarrer();
   // Catalogue commun : les nouveautés publiées par l'éditeur s'ajoutent au foyer
@@ -54,7 +58,14 @@ class ListeDeCoursesApp extends StatelessWidget {
         bindings: {
           const SingleActivator(LogicalKeyboardKey.escape): () => Nav.i.racine.currentState?.maybePop(),
         },
-        child: Focus(autofocus: true, child: FormatTelephone(child: enfant!)),
+        child: Focus(
+          autofocus: true,
+          child: FormatTelephone(
+            child: demonstration
+                ? Banner(message: 'DÉMO', location: BannerLocation.topEnd, color: const Color(0xFFC62828), child: enfant!)
+                : enfant!,
+          ),
+        ),
       ),
     );
   }

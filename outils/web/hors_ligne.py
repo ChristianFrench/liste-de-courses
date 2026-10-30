@@ -3,6 +3,8 @@
 import hashlib, json, pathlib, sys
 
 WEB = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else "build/web")
+# Préfixe des réserves : la démonstration (même site, dossier demo/) a le sien, sinon chacune effacerait l'autre.
+PREFIXE = sys.argv[2] if len(sys.argv) > 2 else "liste-de-courses-"
 
 # Fichiers inutiles au rendu CanvasKit utilisé ici (symboles de débogage, autres moteurs)
 def utile(nom):
@@ -19,7 +21,7 @@ version = empreinte.hexdigest()[:16]
 modele = r"""'use strict';
 // Écrit par outils/web/hors_ligne.py : à chaque nouvelle version, ce fichier change, le navigateur
 // le réinstalle, met la nouvelle version en réserve et supprime l'ancienne.
-const RESERVE = 'liste-de-courses-__VERSION__';
+const RESERVE = '__PREFIXE____VERSION__';
 const FICHIERS = __FICHIERS__;
 
 self.addEventListener('install', (e) => {
@@ -28,7 +30,7 @@ self.addEventListener('install', (e) => {
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
-    .then((noms) => Promise.all(noms.filter((n) => n.startsWith('liste-de-courses-') && n !== RESERVE).map((n) => caches.delete(n))))
+    .then((noms) => Promise.all(noms.filter((n) => n.startsWith('__PREFIXE__') && n !== RESERVE).map((n) => caches.delete(n))))
     .then(() => self.clients.claim()));
 });
 
@@ -51,6 +53,6 @@ self.addEventListener('fetch', (e) => {
 });
 """
 (WEB / "hors_ligne.js").write_text(
-    modele.replace("__VERSION__", version).replace("__FICHIERS__", json.dumps(fichiers, indent=0)), encoding="utf-8")
+    modele.replace("__PREFIXE__", PREFIXE).replace("__VERSION__", version).replace("__FICHIERS__", json.dumps(fichiers, indent=0)), encoding="utf-8")
 taille = sum((WEB / f).stat().st_size for f in fichiers)
 print(f"hors_ligne.js : {len(fichiers)} fichiers mis en réserve ({taille / 1e6:.1f} Mo), version {version}")
