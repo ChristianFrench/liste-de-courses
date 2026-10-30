@@ -91,6 +91,14 @@ class EcranFoyer extends StatelessWidget {
             onChange: (v) => etat.appareilPartage = v,
           ),
         ],
+        const TitreSection('Catalogue', cote: 0),
+        OptionFoyer(
+          texte: 'Catalogue du foyer seul',
+          aide: 'Le catalogue est commun à tous les foyers et s\'enrichit de leurs ajouts. Coché : seuls le catalogue '
+              'de départ et vos propres ajouts sont montrés ; ceux des autres foyers sont cachés, pas perdus.',
+          coche: etat.catalogueIsole,
+          onChange: etat.isolerCatalogue,
+        ),
       ]),
     );
   }

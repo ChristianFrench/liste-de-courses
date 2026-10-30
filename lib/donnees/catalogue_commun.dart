@@ -19,6 +19,10 @@ import 'synchro.dart';
 //   images    image choisie pour un rayon ou un secteur (clé : voir images_choisies.dart)
 //   renommes  [{type: rayon|secteur|produit, rayon?, ancien, nouveau}], cumulés d'une version à l'autre
 //   retires   [{type, rayon?, nom}], cumulés
+//
+// Catalogue ouvert à tous les foyers (30/10/2026) : chaque foyer dépose aussi ses propres ajouts, en message
+// retenu sous « ldc/catalogue-commun/apports/<identifiant du foyer> » (Etat.apports) ; au lancement, chaque
+// application lit le catalogue commun et tous les apports, et ajoute au foyer ce qui lui manque.
 
 class CatalogueCommun extends ChangeNotifier {
   CatalogueCommun._();
@@ -51,7 +55,8 @@ class CatalogueCommun extends ChangeNotifier {
   // ------------------------------------------------------------ Serveur
 
   /// Une connexion courte au serveur, le temps de [action].
-  Future<T?> _avecServeur<T>(Future<T?> Function(Transport t, Stream<(String, String)> messages) action) async {
+  Future<T?> _avecServeur<T>(Future<T?> Function(Transport t, Stream<(String, String)> messages) action,
+      {String abonnement = sujet}) async {
     final t = Synchro.instance.fabrique(Synchro.instance.serveur);
     final connecte = Completer<bool>();
     final messages = t.messages.asBroadcastStream();
@@ -64,7 +69,7 @@ class CatalogueCommun extends ChangeNotifier {
         identifiant: 'ldc-catalogue-${DateTime.now().millisecondsSinceEpoch}',
         sujetTestament: 'ldc/verif',
         testament: '',
-        abonnement: sujet,
+        abonnement: abonnement,
       ));
       await connecte.future.timeout(const Duration(seconds: 15));
       return await action(t, messages);
@@ -154,22 +159,107 @@ class CatalogueCommun extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Au lancement : lit le catalogue commun et ajoute au foyer ce qui est nouveau.
+  static String sujetApports(String id) => '$sujet/apports/$id';
+
+  /// Apports du foyer tels que le serveur les a (texte JSON), pour ne redéposer que s'ils ont changé.
+  String? _deposes;
+  Timer? _veille;
+
+  /// Au lancement : lit le catalogue commun et les apports des autres foyers, ajoute au foyer ce qui est
+  /// nouveau, puis dépose les apports du foyer s'ils ont changé. Ensuite, toutes les 3 minutes, redépose
+  /// les apports du foyer s'ils ont changé.
   Future<void> verifier() async {
-    if (Etat.instance.stockageFoyer == null) return;
+    final etat = Etat.instance;
+    if (etat.stockageFoyer == null) return;
     try {
-      final j = await recuperer();
-      if (j == null) return;
-      _definir('catalogue_commun', jsonEncode(j));
-      _appliquer(j);
+      final recus = await _avecServeur<Map<String, String>>((t, messages) async {
+        final recus = <String, String>{};
+        // Tout arrive dès l'abonnement (messages retenus) : fini quand plus rien n'arrive depuis 2 s.
+        final fini = Completer<void>();
+        Timer? silence;
+        void relancer() {
+          silence?.cancel();
+          silence = Timer(const Duration(seconds: 2), () {
+            if (!fini.isCompleted) fini.complete();
+          });
+        }
+
+        relancer();
+        final sub = messages.listen((m) {
+          recus[m.$1] = m.$2;
+          relancer();
+        });
+        await fini.future.timeout(const Duration(seconds: 12), onTimeout: () {});
+        silence?.cancel();
+        await sub.cancel();
+        _appliquerRecus(recus);
+        // Puis les apports du foyer, s'ils ont changé (le catalogue commun a pu en reprendre).
+        _deposes = _texte(recus[sujetApports(etat.identifiantApports())]);
+        if (_deposer(t)) await Future<void>.delayed(const Duration(seconds: 2));
+        return recus;
+      }, abonnement: '$sujet/#');
+      if (recus != null) notifyListeners();
     } catch (e) {
       debugPrint('Catalogue commun : $e');
+    } finally {
+      _veille ??= Timer.periodic(const Duration(minutes: 3), (_) => _redeposer());
     }
   }
 
-  void _appliquer(Map<String, dynamic> j) {
-    Etat.instance.appliquerCatalogueCommun(j);
-    notifyListeners();
+  void _appliquerRecus(Map<String, String> recus) {
+    final etat = Etat.instance;
+    final commun = recus[sujet];
+    if (commun != null && commun.isNotEmpty) {
+      final j = deballer(commun);
+      _definir('catalogue_commun', jsonEncode(j));
+      etat.appliquerCatalogueCommun(j);
+    }
+    final moi = sujetApports(etat.identifiantApports());
+    etat.appliquerApports([
+      for (final e in recus.entries)
+        if (e.key.startsWith('$sujet/apports/') && e.key != moi && e.value.isNotEmpty)
+          if (_lire(e.value) case final j?) j
+    ]);
+  }
+
+  static Map<String, dynamic>? _lire(String t) {
+    try {
+      return deballer(t);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  static String? _texte(String? t) => t == null || t.isEmpty ? null : (_lire(t) == null ? null : jsonEncode(_lire(t)));
+
+  /// Dépose les apports du foyer s'ils ont changé depuis le dernier dépôt connu.
+  bool _deposer(Transport t) {
+    final etat = Etat.instance;
+    if (etat.magasins.isEmpty) return false;
+    final a = etat.apports();
+    final texte = jsonEncode(a);
+    if (texte == _deposes) return false;
+    final vide = (a['rayons'] as List).isEmpty && (a['secteurs'] as List).isEmpty && (a['produits'] as List).isEmpty && (a['marques'] as Map).isEmpty;
+    if (vide && _deposes == null) return false;
+    t.publier(sujetApports(etat.identifiantApports()), emballer(a), retenu: true);
+    _deposes = texte;
+    return true;
+  }
+
+  Future<void> _redeposer() async {
+    final etat = Etat.instance;
+    if (etat.stockageFoyer == null || etat.magasins.isEmpty) return;
+    if (jsonEncode(etat.apports()) == _deposes) return;
+    try {
+      await _avecServeur<bool>((t, messages) async {
+        final fait = _deposer(t);
+        // Le temps que le message parte avant la fermeture de la liaison.
+        if (fait) await Future<void>.delayed(const Duration(seconds: 2));
+        return fait;
+      }, abonnement: 'ldc/verif');
+    } catch (e) {
+      debugPrint('Apports au catalogue : $e');
+    }
   }
 
   /// Dernier catalogue commun connu (reçu ou publié), sinon le catalogue livré avec l'application.

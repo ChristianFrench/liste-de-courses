@@ -205,6 +205,64 @@ void main() {
     expect(ids, contains('pc-litière'));
   });
 
+  test('catalogue ouvert à tous les foyers : apports reçus, renommer crée un produit, foyer isolé', () {
+    final e = Etat.instance..enregistrementActif = false;
+    // Foyer A : un rayon, un secteur, un produit rangé et une marque de secteur ajoutés.
+    e.lire(parLeModele(demo()));
+    final r = e.ajouterRayonCatalogue('Animalerie')!;
+    final chats = e.ajouterSecteurCatalogue(r, 'Chats')!;
+    e.enregistrerProduitAjoute(libelle: 'Croquettes', marqueNom: 'Félix', secteur: chats);
+    e.ajouterMarqueSecteur(chats, 'Whiskas');
+    e.creerProduit('Non placé du foyer A');
+    final apportsA = jsonDecode(jsonEncode(e.apports())) as Map<String, dynamic>;
+    expect(apportsA['rayons'], ['Animalerie']);
+    expect(apportsA['secteurs'], containsAll(['Animalerie/Animalerie', 'Animalerie/Chats']));
+    expect([for (final p in apportsA['produits'] as List) p['nom']], ['Croquettes Félix'], reason: 'un non placé reste au foyer');
+    expect(jsonEncode(e.apports()), jsonEncode(apportsA), reason: 'le même texte tant que rien ne change');
+
+    // Foyer B (le catalogue de départ) reçoit les apports de A.
+    e.lire(parLeModele(demo()));
+    final nb = e.produits.length;
+    expect(e.appliquerApports([apportsA]), greaterThan(0));
+    final ref = e.rayonsCatalogue.firstWhere((x) => x.nom == 'Animalerie');
+    final chatsB = e.secteursDu(ref.id).firstWhere((x) => x.nom == 'Chats');
+    final croquettes = e.produitsDuSecteur(chatsB).single;
+    expect(croquettes.nom, 'Croquettes Félix');
+    expect(e.estRecu(croquettes), isTrue);
+    expect(e.marque(croquettes.marqueIds.first)?.nom, 'Félix');
+    expect(e.marquesDuSecteur(chatsB), contains('Whiskas'));
+    for (final m in e.magasins) {
+      expect(e.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
+    }
+    expect(e.produits.length, nb + 1);
+    expect(e.appliquerApports([apportsA]), 0, reason: 'rien de doublé à la lecture suivante');
+    expect(e.apports()['produits'], isEmpty, reason: 'ce qui est reçu ne repart pas');
+
+    // Foyer isolé : les apports reçus sont gardés mais cachés.
+    e.isolerCatalogue(true);
+    expect(e.produitsDuSecteur(chatsB), isEmpty);
+    expect(e.produitsVisibles.contains(croquettes), isFalse);
+    expect(e.rayonsVisibles.any((x) => x.nom == 'Animalerie'), isFalse);
+    expect(e.marquesDuSecteur(chatsB), isNot(contains('Whiskas')));
+    e.isolerCatalogue(false);
+    expect(e.produitsDuSecteur(chatsB), [croquettes]);
+
+    // Renommer et ranger ailleurs un article d'une liste : un nouveau produit, l'ancien reste.
+    final l = e.listes.firstWhere((x) => x.lignes.isNotEmpty);
+    final g = l.lignes.first;
+    final ancien = e.produit(g.produitId)!;
+    final autre = e.secteursDu(e.rayonsCatalogue.first.id).last;
+    final q = e.remplacerArticle(l, ancien, 'Noix de cajou', autre);
+    expect(q.id, isNot(ancien.id));
+    expect(e.produit(ancien.id), isNotNull);
+    expect(l.lignes.first.produitId, q.id);
+    expect(l.lignes.first.quantite, g.quantite);
+    expect(e.secteurCatalogue(q.id)?.id, autre.id);
+    expect(e.estAjoute(q), isTrue);
+    expect([for (final p in e.apports()['produits'] as List) p['nom']], contains('Noix de cajou'));
+    expect(e.remplacerArticle(l, q, 'Noix de cajou', autre).id, q.id, reason: 'rien ne change');
+  });
+
   test('ajout au catalogue commun depuis un texte : titres de secteur, puis produits', () {
     final b = Brouillon.lire(demo()..['rayons'] = [
           {

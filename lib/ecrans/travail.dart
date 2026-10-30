@@ -9,7 +9,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show actionsNonPlace, autreMarque, nouveauProduit, placerNonPlaces;
+import 'catalogue.dart' show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -468,7 +468,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
           haut: [
             ChampRecherche(
               key: ValueKey('recherche-${l.id}'),
-              produits: () => etat.produits,
+              produits: () => etat.produitsVisibles,
               detail: ou,
               aide: 'Ajouter un article (3 lettres ou plus)',
               onChoix: (p) => _ajouter(l, p),
@@ -1016,6 +1016,12 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
   }
 
   void _valider() {
+    _enregistrer();
+    Navigator.of(context).pop();
+  }
+
+  /// Enregistre le volet ; rend l'article de la ligne (il change avec la marque).
+  String _enregistrer() {
     final id = widget.ligne.produitId;
     etat.definirPackaging(widget.liste, id, packagingId);
     etat.definirConsigne(widget.liste, id, consigne.text);
@@ -1027,8 +1033,17 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     }
     // La marque en dernier : « Camembert » devient l'article « Camembert Président ».
     final p = etat.produit(id);
-    if (marque != marqueAvant && p != null) etat.changerMarque(widget.liste, p, marque.isEmpty ? null : marque);
-    Navigator.of(context).pop();
+    if (marque != marqueAvant && p != null) return etat.changerMarque(widget.liste, p, marque.isEmpty ? null : marque).id;
+    return id;
+  }
+
+  /// « Nom, rayon, secteur » : le volet est enregistré, puis l'article renommé ou rangé ailleurs.
+  Future<void> _modifierArticle() async {
+    final nav = Navigator.of(context);
+    final id = _enregistrer();
+    nav.pop();
+    final p = etat.produit(id);
+    if (p != null) await modifierArticle(nav.context, widget.liste, p);
   }
 
   @override
@@ -1128,6 +1143,10 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                   style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ),
           const SizedBox(height: 14),
+          if (p != null) ...[
+            Bouton(key: const ValueKey('modifier-article'), texte: 'Nom, rayon, secteur', onTap: _modifierArticle),
+            const SizedBox(height: 10),
+          ],
           Row(
             children: [
               Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(context).pop())),

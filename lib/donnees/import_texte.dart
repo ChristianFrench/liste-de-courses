@@ -197,12 +197,12 @@ _Titre? _titre(Etat etat, String ligne) {
   final sans = t.replaceFirst(RegExp(r'\s*:\s*$'), '');
   String cle(String x) => _mots(x).join(' ');
   final parties = sans.split(RegExp(r'\s*(/|›|>|-)\s*')).where((x) => x.trim().isNotEmpty).toList();
-  final rayons = etat.rayonsCatalogue;
+  final rayons = etat.rayonsVisibles;
   // « Rayon / Secteur »
   if (parties.length == 2) {
     for (final r in rayons) {
       if (cle(r.nom) != cle(parties[0])) continue;
-      for (final x in etat.secteursDu(r.id)) {
+      for (final x in etat.secteursVisibles(r.id)) {
         if (cle(x.nom) == cle(parties[1])) return _Titre(r, x);
       }
     }
@@ -210,7 +210,7 @@ _Titre? _titre(Etat etat, String ligne) {
   final c = cle(sans);
   if (c.isEmpty) return null;
   for (final r in rayons) {
-    for (final x in etat.secteursDu(r.id)) {
+    for (final x in etat.secteursVisibles(r.id)) {
       if (cle(x.nom) == c) return _Titre(r, x);
     }
   }
@@ -223,14 +223,14 @@ _Titre? _titre(Etat etat, String ligne) {
 /// Produits rangés sous un titre (le secteur, ou tout le rayon).
 List<Produit> _produitsDu(Etat etat, _Titre t) => t.secteur != null
     ? etat.produitsDuSecteur(t.secteur!)
-    : [for (final x in etat.secteursDu(t.rayon.id)) ...etat.produitsDuSecteur(x)];
+    : [for (final x in etat.secteursVisibles(t.rayon.id)) ...etat.produitsDuSecteur(x)];
 
 /// Marques connues (catalogue des marques de tous les secteurs, et marques des produits), les plus longues
 /// d'abord : « Paysan Breton » avant « Paysan ».
 List<String> _marquesConnues(Etat etat) {
   final res = <String, String>{};
-  for (final r in etat.rayonsCatalogue) {
-    for (final x in etat.secteursDu(r.id)) {
+  for (final r in etat.rayonsVisibles) {
+    for (final x in etat.secteursVisibles(r.id)) {
       for (final n in etat.marquesDuSecteur(x)) {
         res.putIfAbsent(normaliser(n), () => n);
       }
@@ -262,7 +262,7 @@ String? _marqueDans(List<String> marques, String ligne, Produit? p) {
 List<ArticleLu> lireTexte(Etat etat, String texte, {List<Difficulte>? rapport}) {
   texte = depuisHtml(texte);
   final res = <ArticleLu>[];
-  final produits = etat.produits;
+  final produits = etat.produitsVisibles;
   Produit? parNom(String nom) {
     final n = normaliser(nom);
     for (final p in produits) {

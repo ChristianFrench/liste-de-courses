@@ -517,6 +517,19 @@ class Etat extends ChangeNotifier {
   /// Rayons (« Animalerie ») et secteurs (« Animalerie/Chats ») ajoutés par le foyer.
   Set<String> structurePerso = {};
 
+  /// Le foyer ne montre que le catalogue de départ, les corrections de l'éditeur et ses propres ajouts :
+  /// ce que les autres foyers ont ajouté est gardé, mais caché.
+  bool catalogueIsole = false;
+
+  /// Identifiant sous lequel le foyer dépose ses ajouts au catalogue (tiré une fois, le même sur ses appareils).
+  String? idApports;
+
+  /// Rayons (« Animalerie ») et secteurs (« Animalerie/Chats ») reçus d'autres foyers.
+  Set<String> structureRecue = {};
+
+  /// Marques reçues d'autres foyers, par « Rayon/Secteur ».
+  Map<String, List<String>> marquesRecues = {};
+
   /// Version du catalogue commun déjà ajoutée au foyer (0 : catalogue livré avec l'application),
   /// et ses nouveautés, montrées une fois sur chaque appareil.
   int versionCatalogueCommun = 0;
@@ -986,6 +999,10 @@ class Etat extends ChangeNotifier {
     };
     statutsMembres = {for (final e in (options?['statutsMembres'] as Map? ?? {}).entries) e.key as String: e.value as String};
     structurePerso = {for (final x in (options?['structurePerso'] as List? ?? const [])) x as String};
+    catalogueIsole = options?['catalogueIsole'] == 1;
+    idApports = options?['idApports'] as String?;
+    structureRecue = {for (final x in (options?['structureRecue'] as List? ?? const [])) x as String};
+    marquesRecues = {for (final e in (options?['marquesRecues'] as Map? ?? {}).entries) e.key as String: _ids(e.value)};
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -1104,6 +1121,10 @@ class Etat extends ChangeNotifier {
             if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
             if (structurePerso.isNotEmpty) 'structurePerso': structurePerso.toList()..sort(),
+            if (catalogueIsole) 'catalogueIsole': 1,
+            if (idApports != null) 'idApports': idApports,
+            if (structureRecue.isNotEmpty) 'structureRecue': structureRecue.toList()..sort(),
+            if (marquesRecues.isNotEmpty) 'marquesRecues': marquesRecues,
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -2057,8 +2078,11 @@ class Etat extends ChangeNotifier {
   /// Secteur du catalogue où est rangé le produit, ou null.
   Secteur? secteurCatalogue(String produitId) => magasinReference == null ? null : secteurDe(magasinReference!.id, produitId);
 
-  /// Produits d'un secteur du catalogue (secteur du magasin de référence).
-  List<Produit> produitsDuSecteur(Secteur s) => produitsDu(rayon(s.rayonId)?.magasinId ?? '', s.id);
+  /// Produits d'un secteur du catalogue (secteur du magasin de référence) ; sans ceux des autres foyers si le
+  /// catalogue est isolé.
+  List<Produit> produitsDuSecteur(Secteur s) => [for (final p in _tousDuSecteur(s)) if (produitVisible(p)) p];
+
+  List<Produit> _tousDuSecteur(Secteur s) => produitsDu(rayon(s.rayonId)?.magasinId ?? '', s.id);
 
   /// Le même secteur (mêmes noms de rayon et de secteur) dans le magasin [magasinId].
   Secteur? secteurHomologue(String magasinId, Secteur s) {
@@ -2805,6 +2829,7 @@ class Etat extends ChangeNotifier {
       final rayonNeuf = _trouve(rayonsCatalogue, (r) => r.nom == rn) == null;
       if (rayonNeuf) lignes.add('Nouveau rayon : $rn');
       structurePerso.remove(rn);
+      structureRecue.remove(rn);
       for (final m in magasins) {
         if (_trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn) == null) rayons.add(Rayon('r-${m.id}-${_cleNom(rn)}', m.id, rn));
       }
@@ -2813,6 +2838,7 @@ class Etat extends ChangeNotifier {
         final ref = _trouve(rayonsCatalogue, (r) => r.nom == rn)!;
         if (!rayonNeuf && _trouve(secteursDu(ref.id), (x) => x.nom == sn) == null) lignes.add('Nouveau secteur : $rn › $sn');
         structurePerso.remove('$rn/$sn');
+        structureRecue.remove('$rn/$sn');
         for (final m in magasins) {
           final r = _trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn)!;
           if (_trouve(secteurs, (x) => x.rayonId == r.id && x.nom == sn) == null) secteurs.add(Secteur('s-${r.id}-${_cleNom(sn)}', r.id, sn));
@@ -2896,6 +2922,177 @@ class Etat extends ChangeNotifier {
     return lignes;
   }
 
+  // ------------------------------------------------------------ Catalogue ouvert à tous les foyers (30/10/2026)
+  //
+  // Un seul catalogue, enrichi par tous : chaque foyer dépose sur le serveur ce qu'il a ajouté (rayons,
+  // secteurs, produits rangés avec leur marque et leur format, marques des secteurs), et chaque application
+  // ajoute ce que les autres ont déposé. Rien n'est retiré : renommer ou déplacer un article crée un
+  // nouveau produit, l'ancien reste. Un foyer isolé garde ce qu'il reçoit, sans le montrer.
+
+  /// Produit reçu d'un autre foyer.
+  bool estRecu(Produit p) => produitsPerso[p.id] == 'e';
+
+  bool produitVisible(Produit p) => !catalogueIsole || !estRecu(p);
+
+  /// Produits proposés à la recherche : tous, ou sans ceux des autres foyers si le catalogue est isolé.
+  List<Produit> get produitsVisibles => catalogueIsole ? [for (final p in produits) if (!estRecu(p)) p] : produits;
+
+  bool rayonVisible(Rayon r) => !catalogueIsole || !structureRecue.contains(r.nom);
+  bool secteurVisible(Secteur s) => !catalogueIsole || !structureRecue.contains(cleSecteur(s));
+
+  /// Rayons et secteurs du catalogue montrés au foyer.
+  List<Rayon> get rayonsVisibles => [for (final r in rayonsCatalogue) if (rayonVisible(r)) r];
+  List<Secteur> secteursVisibles(String rayonId) => [for (final s in secteursDu(rayonId)) if (secteurVisible(s)) s];
+
+  void isolerCatalogue(bool oui) {
+    catalogueIsole = oui;
+    modifie();
+  }
+
+  /// Identifiant des apports du foyer (tiré au premier dépôt).
+  String identifiantApports() {
+    if (idApports == null) {
+      final r = Random();
+      idApports = List.generate(12, (_) => 'abcdefghijkmnpqrstuvwxyz23456789'[r.nextInt(32)]).join();
+      modifie();
+    }
+    return idApports!;
+  }
+
+  /// Ce que le foyer a ajouté au catalogue, à déposer pour les autres foyers (trié : deux appels sur les
+  /// mêmes données rendent le même texte).
+  Map<String, dynamic> apports() {
+    final rayonsA = [for (final c in structurePerso) if (!c.contains('/')) c]..sort();
+    final secteursA = [for (final c in structurePerso) if (c.contains('/')) c]..sort();
+    final prods = <Map<String, dynamic>>[];
+    for (final p in produitsAjoutes) {
+      final s = secteurCatalogue(p.id);
+      final r = s == null ? null : rayon(s.rayonId);
+      if (s == null || r == null) continue; // un non placé reste dans le foyer
+      final mq = p.marqueIds.isEmpty ? null : marque(p.marqueIds.first)?.nom;
+      final formats = [for (final id in p.packagingIds) if (packaging(id)?.libelle case final l?) l];
+      prods.add({
+        'nom': p.nom,
+        'rayon': r.nom,
+        'secteur': s.nom,
+        if (mq != null) 'marque': mq,
+        if (formats.isNotEmpty) 'formats': formats.take(2).toList(),
+      });
+    }
+    prods.sort((a, b) => '${a['rayon']}/${a['secteur']}/${a['nom']}'.compareTo('${b['rayon']}/${b['secteur']}/${b['nom']}'));
+    final mqs = <String, List<String>>{
+      for (final e in (marquesSecteurs.entries.toList()..sort((a, b) => a.key.compareTo(b.key))))
+        if ((e.value['+'] ?? const []).isNotEmpty) e.key: [...e.value['+']!]..sort(),
+    };
+    return {'rayons': rayonsA, 'secteurs': secteursA, 'produits': prods, 'marques': mqs};
+  }
+
+  /// Ajoute au foyer ce que les autres foyers ont déposé ; rend le nombre d'éléments ajoutés.
+  int appliquerApports(Iterable<Map<String, dynamic>> lots) {
+    if (magasins.isEmpty) return 0;
+    var n = 0;
+    String bas(String t) => t.trim().toLowerCase();
+    Rayon rayonNomme(String rn) {
+      final ref = _trouve(rayonsCatalogue, (r) => bas(r.nom) == bas(rn));
+      if (ref != null) return ref;
+      for (final m in magasins) {
+        if (_trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn) == null) rayons.add(Rayon('r-${m.id}-${_cleNom(rn)}', m.id, rn));
+      }
+      structureRecue.add(rn);
+      n++;
+      return _trouve(rayonsCatalogue, (r) => r.nom == rn)!;
+    }
+
+    Secteur secteurNomme(Rayon ref, String sn) {
+      final s = _trouve(secteursDu(ref.id), (x) => bas(x.nom) == bas(sn));
+      if (s != null) return s;
+      for (final m in magasins) {
+        final r = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == ref.nom);
+        if (r != null && _trouve(secteurs, (x) => x.rayonId == r.id && x.nom == sn) == null) {
+          secteurs.add(Secteur('s-${r.id}-${_cleNom(sn)}', r.id, sn));
+        }
+      }
+      structureRecue.add('${ref.nom}/$sn');
+      n++;
+      return _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
+    }
+
+    for (final j in lots) {
+      for (final rn in (j['rayons'] as List? ?? const []).cast<String>()) {
+        if (rn.trim().isNotEmpty) rayonNomme(rn);
+      }
+      for (final c in (j['secteurs'] as List? ?? const []).cast<String>()) {
+        final i = c.indexOf('/');
+        if (i > 0 && i < c.length - 1) secteurNomme(rayonNomme(c.substring(0, i)), c.substring(i + 1));
+      }
+      for (final pj in (j['produits'] as List? ?? const []).cast<Map>()) {
+        final nom = pj['nom'] as String?, rn = pj['rayon'] as String?, sn = pj['secteur'] as String?;
+        if (nom == null || rn == null || sn == null || nom.trim().isEmpty) continue;
+        final s = secteurNomme(rayonNomme(rn), sn);
+        if (_tousDuSecteur(s).any((p) => bas(p.nom) == bas(nom))) continue;
+        final id = 'pe-${_cleNom(rn)}-${_cleNom(sn)}-${_cleNom(nom)}';
+        var p = produit(id);
+        if (p == null) {
+          p = Produit(id, nom.trim(), [], [], 0);
+          if (pj['marque'] case final String mq when mq.trim().isNotEmpty) p.marqueIds.add(marqueNommee(mq).id);
+          for (final f in (pj['formats'] as List? ?? const []).cast<String>()) {
+            p.packagingIds.add(_packagingNomme(f).id);
+          }
+          produits.add(p);
+          produitsPerso[id] = 'e';
+        }
+        placer('', p.id, s.id);
+        n++;
+      }
+      for (final e in (j['marques'] as Map? ?? const {}).entries) {
+        final l = marquesRecues.putIfAbsent(e.key as String, () => []);
+        for (final mq in (e.value as List).cast<String>()) {
+          if (!l.any((x) => bas(x) == bas(mq))) {
+            l.add(mq);
+            n++;
+          }
+        }
+      }
+    }
+    if (n > 0) modifie();
+    return n;
+  }
+
+  /// Renomme ou range autrement un article de la liste : un nouveau produit est créé dans le secteur choisi
+  /// (ou repris s'il y existe déjà sous ce nom) ; la ligne le prend, l'ancien produit reste au catalogue.
+  /// Rend l'article de la ligne.
+  Produit remplacerArticle(Liste l, Produit p, String nom, Secteur? secteur) {
+    final n = nom.trim();
+    final g = ligne(l, p.id);
+    if (n.isEmpty || g == null) return p;
+    final avant = secteurCatalogue(p.id);
+    if (n == p.nom && avant?.id == secteur?.id) return p;
+    var q = _trouve(produits,
+        (x) => x.id != p.id && x.nom.toLowerCase() == n.toLowerCase() && secteurCatalogue(x.id)?.id == secteur?.id);
+    if (q == null) {
+      q = Produit(nouvelId('p'), n, [...p.marqueIds], [...p.packagingIds], 0);
+      produits.add(q);
+      _marquerAjoute(q);
+      if (secteur != null) placer(rayon(secteur.rayonId)?.magasinId ?? '', q.id, secteur.id);
+    }
+    final i = l.lignes.indexOf(g);
+    if (ligne(l, q.id) != null) {
+      l.lignes.removeAt(i);
+    } else {
+      q.nbUtilisations++;
+      l.lignes[i] = LigneListe(
+          produitId: q.id,
+          marqueId: g.marqueId,
+          packagingId: g.packagingId,
+          quantite: g.quantite,
+          promotion: g.promotion,
+          consigne: g.consigne);
+    }
+    _toucheConstruction(l);
+    modifie();
+    return q;
+  }
+
   // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
 
   bool rayonAjoute(Rayon r) => structurePerso.contains(r.nom);
@@ -2972,7 +3169,7 @@ class Etat extends ChangeNotifier {
 
   /// Un secteur ajouté et vide se supprime (dans tous les magasins) ; rend faux s'il a des produits.
   bool supprimerSecteurCatalogue(Secteur s) {
-    if (!secteurAjoute(s) || produitsDuSecteur(s).isNotEmpty) return false;
+    if (!secteurAjoute(s) || _tousDuSecteur(s).isNotEmpty) return false;
     final rn = rayon(s.rayonId)?.nom ?? '';
     final ids = {for (final x in secteurs) if (x.nom == s.nom && rayon(x.rayonId)?.nom == rn) x.id};
     secteurs.removeWhere((x) => ids.contains(x.id));
@@ -2986,7 +3183,7 @@ class Etat extends ChangeNotifier {
 
   /// Un rayon ajouté se supprime quand ses secteurs sont vides.
   bool supprimerRayonCatalogue(Rayon r) {
-    if (!rayonAjoute(r) || secteursDu(r.id).any((s) => produitsDuSecteur(s).isNotEmpty)) return false;
+    if (!rayonAjoute(r) || secteursDu(r.id).any((s) => _tousDuSecteur(s).isNotEmpty)) return false;
     final ids = {for (final x in rayons) if (x.nom == r.nom) x.id};
     final sids = {for (final x in secteurs) if (ids.contains(x.rayonId)) x.id};
     secteurs.removeWhere((x) => sids.contains(x.id));
@@ -3199,6 +3396,11 @@ class Etat extends ChangeNotifier {
     }
     for (final n in perso['+'] ?? const <String>[]) {
       ajoute(n);
+    }
+    if (!catalogueIsole) {
+      for (final n in marquesRecues[cle] ?? const <String>[]) {
+        ajoute(n);
+      }
     }
     for (final p in produitsDuSecteur(s)) {
       for (final id in p.marqueIds) {

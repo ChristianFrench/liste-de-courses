@@ -36,7 +36,7 @@ Future<(Secteur?,)?> choisirSecteur(BuildContext context, {required String titre
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
               child: Text('Où ranger « $titre » ? Choisissez le rayon, puis le secteur.', style: Charte.texte(17, gras: true)),
             ),
-            for (final r in etat.rayonsCatalogue) ...[
+            for (final r in etat.rayonsVisibles) ...[
               TitreGroupe(
                 nom: r.nom,
                 image: cleRayon(r.nom),
@@ -46,7 +46,7 @@ Future<(Secteur?,)?> choisirSecteur(BuildContext context, {required String titre
                 onTap: () => maj(() => ouvert = ouvert == r.id ? null : r.id),
               ),
               if (ouvert == r.id)
-                for (final s in etat.secteursDu(r.id))
+                for (final s in etat.secteursVisibles(r.id))
                   TitreGroupe(nom: s.nom, image: cleSecteur(r.nom, s.nom), onTap: () => Navigator.of(ctx).pop((s,))),
             ],
             if (sansSecteur)
@@ -73,10 +73,10 @@ const _autreMarque = '\u0000autre';
 Future<bool> placerProduit(BuildContext context, Produit p) async {
   final etat = Etat.instance;
   final actuel = etat.secteurCatalogue(p.id);
-  final rayons = [for (final r in etat.rayonsCatalogue) if (etat.secteursDu(r.id).isNotEmpty) r];
+  final rayons = [for (final r in etat.rayonsVisibles) if (etat.secteursVisibles(r.id).isNotEmpty) r];
   if (rayons.isEmpty) return false;
   var rayonId = actuel?.rayonId ?? rayons.first.id;
-  var secteurId = actuel?.id ?? etat.secteursDu(rayonId).first.id;
+  var secteurId = actuel?.id ?? etat.secteursVisibles(rayonId).first.id;
   final libelle = TextEditingController(text: p.nom);
   final ok = await modale(
     context,
@@ -102,7 +102,7 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
           choix: {for (final r in rayons) r.id: r.nom},
           onChange: (v) => maj(() {
             rayonId = v;
-            secteurId = etat.secteursDu(v).first.id;
+            secteurId = etat.secteursVisibles(v).first.id;
           }),
         ),
         const SizedBox(height: 14),
@@ -110,7 +110,7 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
           key: const ValueKey('placer-secteur'),
           libelle: 'Secteur',
           valeur: secteurId,
-          choix: {for (final x in etat.secteursDu(rayonId)) x.id: x.nom},
+          choix: {for (final x in etat.secteursVisibles(rayonId)) x.id: x.nom},
           onChange: (v) => maj(() => secteurId = v),
         ),
         const SizedBox(height: 8),
@@ -123,6 +123,62 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
   if (n.isNotEmpty && n != p.nom) etat.renommerProduit(p, n);
   etat.placer(etat.rayon(rayonId)!.magasinId, p.id, secteurId);
   return true;
+}
+
+/// Renomme un article d'une liste ou le range ailleurs (30/10/2026) : un nouveau produit, partagé avec tous
+/// les foyers, prend sa place dans la liste ; l'ancien reste au catalogue.
+Future<void> modifierArticle(BuildContext context, Liste l, Produit p) async {
+  final etat = Etat.instance;
+  final actuel = etat.secteurCatalogue(p.id);
+  final rayons = [for (final r in etat.rayonsVisibles) if (etat.secteursVisibles(r.id).isNotEmpty) r];
+  if (rayons.isEmpty) return;
+  var rayonId = rayons.any((r) => r.id == actuel?.rayonId) ? actuel!.rayonId : rayons.first.id;
+  var secteurId = etat.secteursVisibles(rayonId).any((s) => s.id == actuel?.id) ? actuel!.id : etat.secteursVisibles(rayonId).first.id;
+  final libelle = TextEditingController(text: p.nom);
+  final ok = await modale(
+    context,
+    titre: 'Nom, rayon, secteur',
+    oui: 'Valider',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 6),
+        TextField(
+          key: const ValueKey('article-libelle'),
+          controller: libelle,
+          style: Charte.texte(17),
+          textCapitalization: TextCapitalization.sentences,
+          decoration: const InputDecoration(labelText: 'Libellé'),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('article-rayon'),
+          libelle: 'Rayon',
+          valeur: rayonId,
+          choix: {for (final r in rayons) r.id: r.nom},
+          onChange: (v) => maj(() {
+            rayonId = v;
+            secteurId = etat.secteursVisibles(v).first.id;
+          }),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('article-secteur'),
+          libelle: 'Secteur',
+          valeur: secteurId,
+          choix: {for (final x in etat.secteursVisibles(rayonId)) x.id: x.nom},
+          onChange: (v) => maj(() => secteurId = v),
+        ),
+        const SizedBox(height: 8),
+        Text('Un nouveau produit prend sa place dans la liste et rejoint le catalogue de tous les foyers ; '
+            '« ${p.nom} » reste au catalogue.', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      ],
+    ),
+  );
+  if (!ok) return;
+  final q = etat.remplacerArticle(l, p, libelle.text, etat.secteur(secteurId));
+  if (q.id != p.id && context.mounted) Nav.message(context, '« ${q.nom} » remplace « ${p.nom} » dans la liste');
 }
 
 /// Renomme un produit (libellé seul, le rangement ne change pas).
@@ -169,8 +225,8 @@ Future<void> placerNonPlaces(BuildContext context, List<Produit> produits, {List
 List<String> marquesDuCatalogue() {
   final etat = Etat.instance;
   final res = <String, String>{};
-  for (final r in etat.rayonsCatalogue) {
-    for (final x in etat.secteursDu(r.id)) {
+  for (final r in etat.rayonsVisibles) {
+    for (final x in etat.secteursVisibles(r.id)) {
       for (final n in etat.marquesDuSecteur(x)) {
         res.putIfAbsent(n.toLowerCase(), () => n);
       }
@@ -276,10 +332,10 @@ Future<Produit?> fenetreProduit(BuildContext context,
               key: const ValueKey('produit-rayon'),
               libelle: 'Rayon',
               valeur: rayonId,
-              choix: {'': 'Ne pas ranger', for (final r in etat.rayonsCatalogue) r.id: r.nom},
+              choix: {'': 'Ne pas ranger', for (final r in etat.rayonsVisibles) r.id: r.nom},
               onChange: (v) => maj(() {
                 rayonId = v;
-                secteurId = v.isEmpty ? '' : etat.secteursDu(v).first.id;
+                secteurId = v.isEmpty ? '' : etat.secteursVisibles(v).first.id;
               }),
             ),
             if (rayonId.isNotEmpty) ...[
@@ -288,7 +344,7 @@ Future<Produit?> fenetreProduit(BuildContext context,
                 key: const ValueKey('produit-secteur'),
                 libelle: 'Secteur',
                 valeur: secteurId,
-                choix: {for (final x in etat.secteursDu(rayonId)) x.id: x.nom},
+                choix: {for (final x in etat.secteursVisibles(rayonId)) x.id: x.nom},
                 onChange: (v) => maj(() => secteurId = v),
               ),
             ],
@@ -527,8 +583,8 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
         final r = recherche.toLowerCase();
         bool garde(Produit p) =>
             p.nom.toLowerCase().contains(r) || p.marqueIds.any((id) => (etat.marque(id)?.nom.toLowerCase() ?? '').contains(r));
-        final trouves = r.length < 2 ? <Produit>[] : ([for (final p in etat.produits) if (garde(p)) p]..sort((a, b) => a.nom.compareTo(b.nom)));
-        final nonRanges = [for (final p in etat.produits) if (etat.secteurCatalogue(p.id) == null) p]..sort((a, b) => a.nom.compareTo(b.nom));
+        final trouves = r.length < 2 ? <Produit>[] : ([for (final p in etat.produitsVisibles) if (garde(p)) p]..sort((a, b) => a.nom.compareTo(b.nom)));
+        final nonRanges = [for (final p in etat.produitsVisibles) if (etat.secteurCatalogue(p.id) == null) p]..sort((a, b) => a.nom.compareTo(b.nom));
         final perso = etat.produitsAjoutes.length;
         return PageBase(
           entete: EnTeteFenetre(
@@ -566,20 +622,20 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                     for (final p in trouves) ligneProduit(context, p, avecRangement: true),
                   ]
                 : [
-                    for (final x in etat.rayonsCatalogue)
+                    for (final x in etat.rayonsVisibles)
                       GroupeRetractable(
                         cle: 'catalogue/${x.nom}',
                         parDefaut: false,
                         titre: x.nom,
                         image: cleRayon(x.nom),
-                        nombre: etat.secteursDu(x.id).length,
+                        nombre: etat.secteursVisibles(x.id).length,
                         ajoute: etat.rayonAjoute(x),
                         actions: [
                           ActionLigne(Icons.add, '+ Nouveau secteur', () => _nouveauSecteur(context, x)),
-                          if (etat.secteursDu(x.id).length > 1)
+                          if (etat.secteursVisibles(x.id).length > 1)
                             ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
                               final noms = await ordonner(context,
-                                  titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursDu(x.id)) s.nom]);
+                                  titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
                               if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
                             }),
                           if (etat.rayonAjoute(x)) ...[
@@ -588,7 +644,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                           ],
                         ],
                         enfants: [
-                          for (final s in etat.secteursDu(x.id))
+                          for (final s in etat.secteursVisibles(x.id))
                             LigneMenu(
                               titre: s.nom,
                               apresTitre: etat.secteurAjoute(s) ? const SigneAjoute() : null,
@@ -759,9 +815,9 @@ class EcranMarques extends StatelessWidget {
       builder: (context, _) {
         final enfants = <Widget>[];
         final cles = <String>[];
-        for (final r in etat.rayonsCatalogue) {
+        for (final r in etat.rayonsVisibles) {
           final secteurs = [
-            for (final s in etat.secteursDu(r.id))
+            for (final s in etat.secteursVisibles(r.id))
               if (etat.marquesDuSecteur(s) case final noms when noms.isNotEmpty) (s, noms)
           ];
           if (secteurs.isEmpty) continue;
@@ -930,10 +986,10 @@ class _LigneMarque extends StatelessWidget {
 /// En modification, un autre nom renomme la marque partout (ses produits aussi) ; un autre secteur l'y déplace.
 Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}) async {
   final etat = Etat.instance;
-  final rayons = [for (final r in etat.rayonsCatalogue) if (etat.secteursDu(r.id).isNotEmpty) r];
+  final rayons = [for (final r in etat.rayonsVisibles) if (etat.secteursVisibles(r.id).isNotEmpty) r];
   if (rayons.isEmpty) return;
   var rayonId = secteur?.rayonId ?? rayons.first.id;
-  var secteurId = secteur?.id ?? etat.secteursDu(rayonId).first.id;
+  var secteurId = secteur?.id ?? etat.secteursVisibles(rayonId).first.id;
   final libelle = TextEditingController(text: nom ?? '');
   final ok = await modale(
     context,
@@ -952,7 +1008,7 @@ Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}
           choix: {for (final r in rayons) r.id: r.nom},
           onChange: (v) => maj(() {
             rayonId = v;
-            secteurId = etat.secteursDu(v).first.id;
+            secteurId = etat.secteursVisibles(v).first.id;
           }),
         ),
         const SizedBox(height: 14),
@@ -960,7 +1016,7 @@ Future<void> fenetreMarque(BuildContext context, {Secteur? secteur, String? nom}
           key: const ValueKey('marque-secteur'),
           libelle: 'Secteur',
           valeur: secteurId,
-          choix: {for (final s in etat.secteursDu(rayonId)) s.id: s.nom},
+          choix: {for (final s in etat.secteursVisibles(rayonId)) s.id: s.nom},
           onChange: (v) => maj(() => secteurId = v),
         ),
         const SizedBox(height: 10),
@@ -1032,7 +1088,7 @@ Future<void> _renommerRayon(BuildContext context, Rayon r) async {
 
 Future<void> _supprimerRayon(BuildContext context, Rayon r) async {
   final etat = Etat.instance;
-  if (etat.secteursDu(r.id).any((s) => etat.produitsDuSecteur(s).isNotEmpty)) {
+  if (etat.secteursVisibles(r.id).any((s) => etat.produitsDuSecteur(s).isNotEmpty)) {
     Nav.message(context, 'Ce rayon contient des produits : déplacez-les ou supprimez-les d\'abord');
     return;
   }
