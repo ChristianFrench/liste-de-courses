@@ -800,7 +800,12 @@ class Synchro extends ChangeNotifier {
   Future<void> _publierEtat() async {
     _etatDiffere = null;
     final t = _transport, base = _base;
-    if (t == null || base == null || !t.connecte || _etatEnCours) return;
+    if (t == null || base == null || !t.connecte) return;
+    if (_etatEnCours) {
+      // Modification pendant un dépôt : ses parts repartent juste après.
+      _etatDiffere = Timer(const Duration(seconds: 10), _publierEtat);
+      return;
+    }
     final marque = '$code/$noeud';
     final tout = _reglage('etat_publie') != marque;
     final parts = tout ? List.generate(nbParts, (i) => i) : (_partsASalir.toList()..sort());
