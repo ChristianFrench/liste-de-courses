@@ -179,8 +179,11 @@ void main() {
       final l = e.liste('l4')!;
       final texte = texteListe(e, l);
       expect(texte, startsWith('Liste de courses · Magasin 1 · 9 articles'));
-      expect(texte.indexOf('FRAIS'), lessThan(texte.indexOf('ÉPICERIE')));
+      expect(texte.indexOf('FRAIS - '), lessThan(texte.indexOf('ÉPICERIE - ')), reason: 'rayon et secteur, dans l\'ordre du magasin');
       expect(texte, contains('NON PLACÉ'));
+      final html = htmlListe(e, l);
+      expect(html, contains('<b>Liste de courses · Magasin 1 · 9 articles</b>'));
+      expect(html, contains('<li>'));
       final autre = e.membres.firstWhere((m) => m.id != e.moi.id);
       e.modifierEmail(autre, 'a@exemple.fr');
       e.modifierEmail(e.moi, 'moi@exemple.fr');
