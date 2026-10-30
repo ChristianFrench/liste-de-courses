@@ -638,10 +638,6 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                                   titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
                               if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
                             }),
-                          if (etat.rayonAjoute(x)) ...[
-                            ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
-                            ActionLigne(Icons.delete_outline, 'Supprimer le rayon', () => _supprimerRayon(context, x), danger: true),
-                          ],
                         ],
                         enfants: [
                           for (final s in etat.secteursVisibles(x.id))
@@ -730,16 +726,13 @@ class EcranSecteurCatalogue extends StatelessWidget {
   }
 }
 
-/// Actions d'un secteur du catalogue : nouveau produit ; renommer et supprimer s'il a été ajouté par le foyer.
+/// Actions d'un secteur du catalogue : nouveau produit. Renommer, déplacer ou supprimer est réservé à l'éditeur
+/// du catalogue commun (30/10/2026) : le catalogue est celui de tous les foyers.
 List<ActionLigne> actionsSecteur(BuildContext context, Secteur s) => [
       ActionLigne(Icons.add, '+ Nouveau produit', () async {
         final p = await fenetreProduit(context, secteur: s);
         if (p != null && context.mounted) Nav.message(context, '« ${p.nom} » ajouté au catalogue');
       }),
-      if (Etat.instance.secteurAjoute(s)) ...[
-        ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () => _renommerSecteur(context, s)),
-        ActionLigne(Icons.delete_outline, 'Supprimer le secteur', () => _supprimerSecteur(context, s), danger: true),
-      ],
     ];
 
 /// Catalogue › Produits ajoutés : les produits que le foyer a ajoutés, à corriger (fenêtre du produit) ou supprimer.
@@ -770,10 +763,8 @@ class EcranProduitsPerso extends StatelessWidget {
                   key: ValueKey('perso-${p.id}'),
                   titre: p.nom,
                   auToucher: true,
-                  versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
                   actions: [
                     ActionLigne(Icons.edit_outlined, 'Modifier', () => modifier(p)),
-                    ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, p, 'le produit ${p.nom}'), danger: true),
                   ],
                   child: LigneMenu(
                     titre: p.nom,
@@ -785,8 +776,8 @@ class EcranProduitsPerso extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Text(
-                    'Les produits d\'origine du catalogue ne se modifient pas. Touchez un produit ajouté pour le modifier '
-                    'ou le supprimer (s\'il n\'est dans aucune liste).',
+                    'Vos produits ajoutés rejoignent le catalogue de tous les foyers. Touchez-en un pour le modifier. '
+                    'Seul l\'éditeur du catalogue commun supprime un produit.',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),
             ],
@@ -1078,46 +1069,4 @@ Future<void> _nouveauSecteur(BuildContext context, Rayon r) async {
   }
   await choisirImageSecteur(context, r.nom, s.nom);
   if (context.mounted) Nav.message(context, 'Secteur « ${s.nom} » ajouté');
-}
-
-Future<void> _renommerRayon(BuildContext context, Rayon r) async {
-  final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
-  if (nom == null || nom.trim().isEmpty) return;
-  Etat.instance.renommerRayonCatalogue(r, nom);
-}
-
-Future<void> _supprimerRayon(BuildContext context, Rayon r) async {
-  final etat = Etat.instance;
-  if (etat.secteursVisibles(r.id).any((s) => etat.produitsDuSecteur(s).isNotEmpty)) {
-    Nav.message(context, 'Ce rayon contient des produits : déplacez-les ou supprimez-les d\'abord');
-    return;
-  }
-  final ok = await confirmer(context,
-      titre: 'Supprimer le rayon ${r.nom} ?',
-      contenu: Text('Le rayon et ses secteurs disparaissent de tous les magasins.', style: Charte.texte(16)),
-      plein: 'Annuler',
-      contour: 'Supprimer');
-  if (ok == true) etat.supprimerRayonCatalogue(r);
-}
-
-Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
-  final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
-  if (nom == null || nom.trim().isEmpty) return;
-  Etat.instance.renommerSecteurCatalogue(s, nom);
-}
-
-Future<void> _supprimerSecteur(BuildContext context, Secteur s) async {
-  final etat = Etat.instance;
-  if (etat.produitsDuSecteur(s).isNotEmpty) {
-    Nav.message(context, 'Ce secteur contient des produits : déplacez-les ou supprimez-les d\'abord');
-    return;
-  }
-  final ok = await confirmer(context,
-      titre: 'Supprimer le secteur ${s.nom} ?',
-      contenu: Text('Il disparaît de tous les magasins.', style: Charte.texte(16)),
-      plein: 'Annuler',
-      contour: 'Supprimer');
-  if (ok != true) return;
-  etat.supprimerSecteurCatalogue(s);
-  if (context.mounted) Navigator.of(context).pop();
 }

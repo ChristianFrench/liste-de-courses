@@ -215,11 +215,14 @@ class CatalogueCommun extends ChangeNotifier {
       etat.appliquerCatalogueCommun(j);
     }
     final moi = sujetApports(etat.identifiantApports());
-    etat.appliquerApports([
+    final apports = [
       for (final e in recus.entries)
         if (e.key.startsWith('$sujet/apports/') && e.key != moi && e.value.isNotEmpty)
           if (_lire(e.value) case final j?) j
-    ]);
+    ];
+    // Gardés sur l'appareil : l'éditeur les reprend dans son brouillon.
+    _definir('apports_recus', jsonEncode(apports));
+    etat.appliquerApports(apports);
   }
 
   static Map<String, dynamic>? _lire(String t) {
@@ -272,9 +275,17 @@ class CatalogueCommun extends ChangeNotifier {
   // ------------------------------------------------------------ Brouillon de l'éditeur
 
   /// Le brouillon en cours, gardé sur cet appareil jusqu'à la publication.
+  /// Les ajouts de tous les foyers (reçus au lancement, et ceux du foyer de l'éditeur) y sont repris :
+  /// l'éditeur les voit, et peut les retirer, les renommer ou les déplacer.
   Future<Brouillon> brouillon() async {
     final t = _reglage('catalogue_brouillon');
-    return Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
+    final b = Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
+    final recus = _reglage('apports_recus');
+    b.absorber([
+      if (recus != null) ...(jsonDecode(recus) as List).cast<Map<String, dynamic>>(),
+      Etat.instance.apports(),
+    ]);
+    return b;
   }
 
   void enregistrerBrouillon(Brouillon b) => _definir('catalogue_brouillon', jsonEncode(b.versJson()));
@@ -468,6 +479,51 @@ class Brouillon {
       retires.add({'type': 'rayon', 'nom': de.nom});
     }
     modifications++;
+  }
+
+  /// Reprend les ajouts des foyers ([Etat.apports]) qui manquent au brouillon, sauf ce que l'éditeur a
+  /// retiré ou renommé. Rend le nombre d'éléments repris (comptés comme modifications).
+  int absorber(Iterable<Map<String, dynamic>> lots) {
+    final exclus = Etat.exclusDu({'retires': retires, 'renommes': renommes});
+    var n = 0;
+    CatRayon? rayonNomme(String rn) {
+      if (Etat.estExclu(exclus, rayon: rn)) return null;
+      final r = rayon(rn);
+      if (r != null) return r;
+      n++;
+      return CatRayon(rn.trim())..let(catalogue.rayons.add);
+    }
+
+    CatSecteur? secteurNomme(String rn, String sn) {
+      if (Etat.estExclu(exclus, rayon: rn, secteur: sn)) return null;
+      final r = rayonNomme(rn);
+      if (r == null) return null;
+      final s = secteur(r, sn);
+      if (s != null) return s;
+      n++;
+      return CatSecteur(sn.trim(), 1)..let(r.secteurs.add);
+    }
+
+    for (final j in lots) {
+      for (final rn in (j['rayons'] as List? ?? const []).cast<String>()) {
+        rayonNomme(rn);
+      }
+      for (final c in (j['secteurs'] as List? ?? const []).cast<String>()) {
+        final i = c.indexOf('/');
+        if (i > 0 && i < c.length - 1) secteurNomme(c.substring(0, i), c.substring(i + 1));
+      }
+      for (final pj in (j['produits'] as List? ?? const []).cast<Map>()) {
+        final nom = pj['nom'] as String?, rn = pj['rayon'] as String?, sn = pj['secteur'] as String?;
+        if (nom == null || rn == null || sn == null || nom.trim().isEmpty) continue;
+        if (Etat.estExclu(exclus, rayon: rn, secteur: sn, produit: nom)) continue;
+        final s = secteurNomme(rn, sn);
+        if (s == null || produitDans(s, nom) != null) continue;
+        s.produits.add(CatProduit(nom.trim(), 1, marques: [if (pj['marque'] case final String m) m], formats: [...(pj['formats'] as List? ?? const []).cast<String>()]));
+        n++;
+      }
+    }
+    modifications += n;
+    return n;
   }
 
   void choisirImage(String cle, String? picto) {

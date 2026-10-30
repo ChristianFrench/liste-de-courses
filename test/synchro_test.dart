@@ -263,6 +263,38 @@ void main() {
     expect(e.remplacerArticle(l, q, 'Noix de cajou', autre).id, q.id, reason: 'rien ne change');
   });
 
+  test('éditeur : les ajouts des foyers entrent dans son brouillon ; ce qu\'il retire ne revient plus', () {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(demo()));
+    final r = e.ajouterRayonCatalogue('Animalerie')!;
+    final chats = e.ajouterSecteurCatalogue(r, 'Chats')!;
+    e.enregistrerProduitAjoute(libelle: 'Croquettes', marqueNom: 'Félix', secteur: chats);
+    e.enregistrerProduitAjoute(libelle: 'Croquetes', secteur: chats); // une faute de frappe
+    final apportsA = jsonDecode(jsonEncode(e.apports())) as Map<String, dynamic>;
+
+    // L'éditeur reprend les ajouts, retire la faute, publie.
+    final b = Brouillon.lire({'rayons': [], 'version': 1});
+    expect(b.absorber([apportsA]), greaterThanOrEqualTo(4));
+    final ry = b.rayon('Animalerie')!, sc = b.secteur(ry, 'Chats')!;
+    expect([for (final p in sc.produits) p.nom], containsAll(['Croquettes Félix', 'Croquetes']));
+    b.retirerProduit(sc, b.produitDans(sc, 'Croquetes')!);
+    expect(b.absorber([apportsA]), 0, reason: 'ce qui est retiré ne revient pas dans le brouillon');
+    final commun = jsonDecode(jsonEncode(b.versJson()..['version'] = 50)) as Map<String, dynamic>;
+
+    // Le foyer A reçoit la correction : la faute disparaît, et n'est plus déposée.
+    e.appliquerCatalogueCommun(commun);
+    expect(e.produits.any((p) => p.nom == 'Croquetes'), isFalse);
+    expect(e.estAjoute(e.produits.firstWhere((p) => p.nom == 'Croquettes Félix')), isFalse, reason: 'au catalogue commun');
+    expect(e.apports()['produits'], isEmpty);
+
+    // Un foyer B qui reçoit encore l'ancien dépôt de A ne reprend pas la faute.
+    e.lire(parLeModele(demo()));
+    e.appliquerCatalogueCommun(commun);
+    e.appliquerApports([apportsA]);
+    expect(e.produits.any((p) => p.nom == 'Croquetes'), isFalse);
+    expect(e.produits.where((p) => p.nom == 'Croquettes Félix'), hasLength(1));
+  });
+
   test('ajout au catalogue commun depuis un texte : titres de secteur, puis produits', () {
     final b = Brouillon.lire(demo()..['rayons'] = [
           {

@@ -1115,9 +1115,8 @@ void main() {
       await _toucher(tester, find.text('Enregistrer'));
       expect(p.nom, 'Brie Président');
       await _toucher(tester, find.text('Brie Président'));
-      await _toucher(tester, find.text('Supprimer'));
-      await _toucher(tester, find.text('Supprimer').last);
-      expect(etat.produit(p.id), isNull, reason: 'un produit ajouté se supprime depuis la liste des produits ajoutés');
+      expect(find.text('Supprimer'), findsNothing, reason: 'seul l\'éditeur du catalogue commun supprime un produit');
+      await _fermerVolet(tester);
       await _ciblesTactiles(tester);
     });
   });

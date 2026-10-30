@@ -530,6 +530,10 @@ class Etat extends ChangeNotifier {
   /// Marques reçues d'autres foyers, par « Rayon/Secteur ».
   Map<String, List<String>> marquesRecues = {};
 
+  /// Ce que l'éditeur a retiré ou renommé dans le catalogue commun (clés de [cleExclue]) : ni déposé, ni
+  /// repris des autres foyers.
+  Set<String> exclusCommun = {};
+
   /// Version du catalogue commun déjà ajoutée au foyer (0 : catalogue livré avec l'application),
   /// et ses nouveautés, montrées une fois sur chaque appareil.
   int versionCatalogueCommun = 0;
@@ -1003,6 +1007,7 @@ class Etat extends ChangeNotifier {
     idApports = options?['idApports'] as String?;
     structureRecue = {for (final x in (options?['structureRecue'] as List? ?? const [])) x as String};
     marquesRecues = {for (final e in (options?['marquesRecues'] as Map? ?? {}).entries) e.key as String: _ids(e.value)};
+    exclusCommun = _ids(options?['exclusCommun']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -1125,6 +1130,7 @@ class Etat extends ChangeNotifier {
             if (idApports != null) 'idApports': idApports,
             if (structureRecue.isNotEmpty) 'structureRecue': structureRecue.toList()..sort(),
             if (marquesRecues.isNotEmpty) 'marquesRecues': marquesRecues,
+            if (exclusCommun.isNotEmpty) 'exclusCommun': exclusCommun.toList()..sort(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -2796,6 +2802,7 @@ class Etat extends ChangeNotifier {
       }
     }
     final pris = <String>{};
+    exclusCommun = exclusDu(j);
 
     // 1. Noms changés par l'éditeur.
     var renommes = 0;
@@ -2816,7 +2823,7 @@ class Etat extends ChangeNotifier {
           }
         case 'produit':
           final p = produitDuSecteur(ancien, o['secteur']);
-          if (p != null && !estAjoute(p) && produitDuSecteur(nouveau, o['secteur']) == null) {
+          if (p != null && produitDuSecteur(nouveau, o['secteur']) == null) {
             p.nom = nouveau;
             renommes++;
           }
@@ -2890,8 +2897,10 @@ class Etat extends ChangeNotifier {
       switch (o['type']) {
         case 'produit':
           final p = produitDuSecteur(nom, o['secteur']);
-          if (p == null || estAjoute(p) || produitUtilise(p)) continue;
+          // Ajouté par un foyer ou non : l'éditeur corrige pour tous ; seul ce qui sert à une liste reste.
+          if (p == null || produitUtilise(p)) continue;
           produits.remove(p);
+          produitsPerso.remove(p.id);
           emplacements.removeWhere((e) => e.produitId == p.id);
           retires++;
         case 'secteur':
@@ -2901,6 +2910,8 @@ class Etat extends ChangeNotifier {
           };
           if (ids.isEmpty || emplacements.any((e) => ids.contains(e.secteurId))) continue;
           secteurs.removeWhere((x) => ids.contains(x.id));
+          structurePerso.remove('${o['rayon']}/$nom');
+          structureRecue.remove('${o['rayon']}/$nom');
           for (final pc in parcours) {
             pc.etapes.removeWhere(ids.contains);
           }
@@ -2909,6 +2920,8 @@ class Etat extends ChangeNotifier {
           final ids = {for (final r in rayons) if (r.nom == nom) r.id};
           if (ids.isEmpty || secteurs.any((x) => ids.contains(x.rayonId))) continue;
           rayons.removeWhere((r) => ids.contains(r.id));
+          structurePerso.remove(nom);
+          structureRecue.remove(nom);
           retires++;
       }
     }
@@ -2931,6 +2944,32 @@ class Etat extends ChangeNotifier {
 
   /// Produit reçu d'un autre foyer.
   bool estRecu(Produit p) => produitsPerso[p.id] == 'e';
+
+  /// Clé d'un rayon (« r:rayon »), d'un secteur (« s:rayon/secteur ») ou d'un produit (« p:secteur|nom »),
+  /// en minuscules.
+  static String cleExclue(String type, String nom, {String? rayon, String? secteur}) => switch (type) {
+        'rayon' => 'r:${nom.trim().toLowerCase()}',
+        'secteur' => 's:${(rayon ?? '').trim().toLowerCase()}/${nom.trim().toLowerCase()}',
+        _ => 'p:${(secteur ?? '').trim().toLowerCase()}|${nom.trim().toLowerCase()}',
+      };
+
+  /// Ce que le catalogue commun [j] retire ou renomme (les anciens noms).
+  static Set<String> exclusDu(Map<String, dynamic> j) => {
+        for (final o in (j['retires'] as List? ?? const []).cast<Map>())
+          cleExclue(o['type'] as String, o['nom'] as String, rayon: o['rayon'] as String?, secteur: o['secteur'] as String?),
+        for (final o in (j['renommes'] as List? ?? const []).cast<Map>())
+          cleExclue(o['type'] as String, o['ancien'] as String, rayon: o['rayon'] as String?, secteur: o['secteur'] as String?),
+      };
+
+  /// Retiré ou renommé par l'éditeur (un produit retiré sans secteur l'est dans tous les secteurs).
+  static bool estExclu(Set<String> exclus, {required String rayon, String? secteur, String? produit}) {
+    if (exclus.isEmpty) return false;
+    if (exclus.contains(cleExclue('rayon', rayon))) return true;
+    if (secteur == null) return false;
+    if (exclus.contains(cleExclue('secteur', secteur, rayon: rayon))) return true;
+    if (produit == null) return false;
+    return exclus.contains(cleExclue('produit', produit, secteur: secteur)) || exclus.contains(cleExclue('produit', produit));
+  }
 
   bool produitVisible(Produit p) => !catalogueIsole || !estRecu(p);
 
@@ -2962,13 +3001,19 @@ class Etat extends ChangeNotifier {
   /// Ce que le foyer a ajouté au catalogue, à déposer pour les autres foyers (trié : deux appels sur les
   /// mêmes données rendent le même texte).
   Map<String, dynamic> apports() {
-    final rayonsA = [for (final c in structurePerso) if (!c.contains('/')) c]..sort();
-    final secteursA = [for (final c in structurePerso) if (c.contains('/')) c]..sort();
+    bool exclu(String c) {
+      final i = c.indexOf('/');
+      return i < 0 ? estExclu(exclusCommun, rayon: c) : estExclu(exclusCommun, rayon: c.substring(0, i), secteur: c.substring(i + 1));
+    }
+
+    final rayonsA = [for (final c in structurePerso) if (!c.contains('/') && !exclu(c)) c]..sort();
+    final secteursA = [for (final c in structurePerso) if (c.contains('/') && !exclu(c)) c]..sort();
     final prods = <Map<String, dynamic>>[];
     for (final p in produitsAjoutes) {
       final s = secteurCatalogue(p.id);
       final r = s == null ? null : rayon(s.rayonId);
       if (s == null || r == null) continue; // un non placé reste dans le foyer
+      if (estExclu(exclusCommun, rayon: r.nom, secteur: s.nom, produit: p.nom)) continue;
       final mq = p.marqueIds.isEmpty ? null : marque(p.marqueIds.first)?.nom;
       final formats = [for (final id in p.packagingIds) if (packaging(id)?.libelle case final l?) l];
       prods.add({
@@ -3019,15 +3064,18 @@ class Etat extends ChangeNotifier {
 
     for (final j in lots) {
       for (final rn in (j['rayons'] as List? ?? const []).cast<String>()) {
-        if (rn.trim().isNotEmpty) rayonNomme(rn);
+        if (rn.trim().isNotEmpty && !estExclu(exclusCommun, rayon: rn)) rayonNomme(rn);
       }
       for (final c in (j['secteurs'] as List? ?? const []).cast<String>()) {
         final i = c.indexOf('/');
-        if (i > 0 && i < c.length - 1) secteurNomme(rayonNomme(c.substring(0, i)), c.substring(i + 1));
+        if (i <= 0 || i >= c.length - 1) continue;
+        final rn = c.substring(0, i), sn = c.substring(i + 1);
+        if (!estExclu(exclusCommun, rayon: rn, secteur: sn)) secteurNomme(rayonNomme(rn), sn);
       }
       for (final pj in (j['produits'] as List? ?? const []).cast<Map>()) {
         final nom = pj['nom'] as String?, rn = pj['rayon'] as String?, sn = pj['secteur'] as String?;
         if (nom == null || rn == null || sn == null || nom.trim().isEmpty) continue;
+        if (estExclu(exclusCommun, rayon: rn, secteur: sn, produit: nom)) continue;
         final s = secteurNomme(rayonNomme(rn), sn);
         if (_tousDuSecteur(s).any((p) => bas(p.nom) == bas(nom))) continue;
         final id = 'pe-${_cleNom(rn)}-${_cleNom(sn)}-${_cleNom(nom)}';
