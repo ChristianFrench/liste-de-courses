@@ -2,7 +2,8 @@
 
 Lit l'export complet d'Open Food Facts (CSV, environ 1 Go compressé, lu au fil de l'eau), garde les produits
 vendus en France, et range chacun sous la nature du catalogue la plus précise dont tous les mots sont dans son nom
-(« Pâte à tartiner chocolat noisette » va à « Pâte à tartiner chocolat », pas à « Pâte »). Pour chaque nature :
+(« Pâte à tartiner chocolat noisette » va à « Pâte à tartiner chocolat », pas à « Pâte »), à condition que le nom
+commence comme la nature (« Yaourt à la fraise » n'est pas une fraise, « Jambon -25 % de sel » n'est pas du sel). Pour chaque nature :
 le nombre de produits (sa popularité) et les marques présentes dans au moins 3 produits.
 Écrit outils/off/natures_off.json. Lancé par le workflow « Open Food Facts - extraction » (l'environnement de
 Claude n'a pas accès au site)."""
@@ -16,15 +17,19 @@ def sans_accents(t):
     return "".join(c for c in unicodedata.normalize("NFD", t) if unicodedata.category(c) != "Mn").replace("œ", "oe").replace("æ", "ae")
 
 
-def mots(nom):
-    res = set()
+def liste_mots(nom):
+    res = []
     for m in re.split(r"[^a-z0-9]+", sans_accents(nom.lower())):
-        if not m or m in VIDES:
+        if not m or m in VIDES or m.isdigit():
             continue
         if len(m) > 3 and m[-1] in "sx":
             m = m[:-1]
-        res.add(m)
-    return frozenset(res)
+        res.append(m)
+    return res
+
+
+def mots(nom):
+    return frozenset(liste_mots(nom))
 
 
 def cle_marque(m):
@@ -37,11 +42,11 @@ natures = []  # (clé, mots)
 for r in cat["rayons"]:
     for s in r["secteurs"]:
         for p in s["produits"]:
-            m = mots(p["nom"])
-            if m:
-                natures.append((f"{r['nom']}/{s['nom']}/{p['nom']}", m))
+            lm = liste_mots(p["nom"])
+            if lm:
+                natures.append((f"{r['nom']}/{s['nom']}/{p['nom']}", frozenset(lm), lm[0]))
 par_mot = collections.defaultdict(list)
-for i, (_, m) in enumerate(natures):
+for i, (_, m, _) in enumerate(natures):
     for x in m:
         par_mot[x].append(i)
 
@@ -63,10 +68,11 @@ with urllib.request.urlopen(req, timeout=300) as flux:
         if len(ligne) <= max(i_nom, i_marques, i_pays) or "en:france" not in ligne[i_pays]:
             continue
         francais += 1
-        mp = mots(ligne[i_nom])
-        if not mp:
+        lp = liste_mots(ligne[i_nom])
+        if not lp:
             continue
-        candidats = {j for x in mp for j in par_mot.get(x, ())}
+        mp = frozenset(lp)
+        candidats = {j for j in par_mot.get(lp[0], ()) if natures[j][2] == lp[0]}
         meilleurs, taille = [], 0
         for j in candidats:
             m = natures[j][1]
@@ -91,7 +97,7 @@ with urllib.request.urlopen(req, timeout=300) as flux:
             print(f"{lus} lignes, {francais} en France, {ranges} rangées, {time.time() - debut:.0f} s", flush=True)
 
 res = {}
-for j, (cle, _) in enumerate(natures):
+for j, (cle, _, _) in enumerate(natures):
     n = compte.get(j, 0)
     if not n:
         continue
