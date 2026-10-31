@@ -140,18 +140,20 @@ void main() {
     await _capture('13 Catalogue-Actions');
     await tester.tapAt(const Offset(195, 20));
     await tester.pumpAndSettle();
+    // Le rayon se déplie, puis le secteur touché déplie ses produits sur place
+    await _toucher(tester, find.text('FRAIS'));
     await _toucher(tester, find.text('Crèmerie'));
-    await _capture('15 Secteur-Actions');
+    await _capture('15 Catalogue-Secteur');
     await _toucher(tester, find.text('+ Nouveau produit'));
     await _capture('15 Nouveau-produit');
     await tester.tapAt(const Offset(195, 20));
     await tester.pumpAndSettle();
-    await _toucher(tester, find.text('Crèmerie'));
-    await _toucher(tester, find.text('Voir et modifier les produits'));
-    await _capture('15 Catalogue-Secteur');
+    await _toucher(tester, find.text('Actions du rayon Frais'));
+    await _capture('15 Rayon-Actions');
+    await tester.tapAt(const Offset(195, 20));
+    await tester.pumpAndSettle();
     await _toucher(tester, find.text('Lait demi-écrémé'));
     await _capture('16 Fiche-Produit');
-    await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.byTooltip('Retour'));
     await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
     await _toucher(tester, find.textContaining('Produits ajoutés'));
