@@ -104,6 +104,13 @@ with urllib.request.urlopen(req, timeout=300) as flux:
         cats = tuple(sorted({c for c in ligne[i_cat].split(",") if c}))
         frequence_categories.update(cats)
         lp = liste_mots(ligne[i_nom])
+        if BASE != "off":
+            # Hors alimentaire, le nom commence souvent par la marque (« Ariel lessive liquide ») : on l'ôte.
+            cles_m = {cle_marque(x) for x in ligne[i_marques].split(",") if x.strip()} - {""}
+            for k in (3, 2, 1):
+                if len(lp) > k and cle_marque("".join(lp[:k])) in cles_m:
+                    lp = lp[k:]
+                    break
         if not lp:
             continue
         mp = frozenset(lp)
