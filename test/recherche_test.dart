@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/recherche.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/univers.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -42,5 +43,12 @@ void main() {
     expect(e.naturesOff.length, greaterThan(1000));
     expect(e.naturesOff.values.every((v) => v.marques.length <= 10), isTrue);
     expect(e.naturesOff['camembert']?.marques, contains('Président'));
+  });
+
+  test('chaque rayon du catalogue livré a son univers', () {
+    final j = jsonDecode(File(Etat.fichierCatalogueType).readAsStringSync()) as Map<String, dynamic>;
+    for (final r in (j['rayons'] as List).cast<Map>()) {
+      expect(universDuRayon(r['nom'] as String), isNot(autresRayons), reason: r['nom'] as String);
+    }
   });
 }
