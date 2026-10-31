@@ -1,6 +1,6 @@
 {
 "huile": {
-"n": 202,
+"n": 218,
 "noms": [
 "huile de massage",
 "huile de douche",
@@ -18,26 +18,26 @@
 ],
 [
 "en:hair",
-23
+27
 ],
 [
 "en:cosmetic-products",
 15
 ]
 ],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"secteur": "Parfumerie et soins/Cheveux",
 "marques": [
-"Weleda",
 "L'Oréal",
+"L'Oreal Consumer products",
+"Weleda",
 "Yves Rocher",
 "Léa Nature",
-"L'Oreal Consumer products",
 "Garnier"
 ],
 "part_marque": 0.0
 },
 "creme": {
-"n": 345,
+"n": 364,
 "noms": [
 "crème de douche",
 "crème de soin",
@@ -59,22 +59,22 @@
 ],
 [
 "en:open-beauty-facts",
-27
+31
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Cadum",
+"Nivea",
 "Le Petit Olivier",
 "Mixa",
 "L'arbre vert",
-"Cien",
-"Nivea"
+"Cien"
 ],
 "part_marque": 0.0
 },
 "gel": {
-"n": 344,
+"n": 375,
 "noms": [
 "gel lavant mains",
 "gel lavant corps",
@@ -84,7 +84,7 @@
 "categories": [
 [
 "en:hygiene",
-91
+93
 ],
 [
 "en:soaps",
@@ -104,18 +104,18 @@
 "Carrefour",
 "Cosmia",
 "Auchan",
+"Mustela",
 "Yves Rocher",
-"Mennen",
-"Henkel"
+"Cadum"
 ],
 "part_marque": 0.0
 },
 "expert": {
-"n": 41,
+"n": 55,
 "noms": [
 "expert blancheur",
 "expert sensitive",
-"expert complet"
+"mixa expert peau"
 ],
 "categorie": null,
 "categories": [
@@ -128,27 +128,27 @@
 6
 ],
 [
-"en:shampoos",
+"en:hygiene",
 6
 ],
 [
-"en:facial-creams",
-5
+"en:toothpastes",
+6
 ]
 ],
-"secteur": "Parfumerie et soins/Cheveux",
+"secteur": "Parfumerie et soins/Santé dentaire",
 "marques": [
 "Henkel",
 "Franck Provost",
 "Dentamyl",
+"Unilever",
 "Vademecum",
-"Diadermine",
-"Marque Repère"
+"Mixa"
 ],
-"part_marque": 0.0
+"part_marque": 0.02
 },
 "soin": {
-"n": 210,
+"n": 229,
 "noms": [
 "soin des lèvres",
 "soin de jour",
@@ -162,15 +162,15 @@
 ],
 [
 "en:open-beauty-facts",
-20
+21
 ],
 [
 "en:hygiene",
-18
+21
 ],
 [
 "en:non-food-products",
-16
+17
 ]
 ],
 "secteur": "Parfumerie et soins/Santé dentaire",
@@ -178,51 +178,51 @@
 "Sanogyl",
 "Cosmia",
 "Le Petit Marseillais",
+"Saforelle",
 "Caudalie",
-"Nivea",
-"Doctissimo parapharmacie"
+"Unilever"
 ],
 "part_marque": 0.0
 },
 "shampoing": {
-"n": 226,
+"n": 259,
 "noms": [
 "shampoing",
-"shampoing extra doux",
-"shampoing sec"
+"cosmia - shampoing",
+"shampoing extra doux"
 ],
 "categorie": null,
 "categories": [
 [
 "en:hair",
-57
+59
 ],
 [
 "en:shampoos",
-57
+59
 ],
 [
 "en:open-beauty-facts",
-30
+32
 ],
 [
 "en:non-food-products",
-21
+23
 ]
 ],
 "secteur": "Parfumerie et soins/Cheveux",
 "marques": [
 "Cosmia",
+"Unilever",
+"Timotei",
 "Garnier",
 "Klorane",
-"L'Oréal",
-"Head & Shoulders",
 "Auchan"
 ],
 "part_marque": 0.0
 },
 "eau": {
-"n": 118,
+"n": 134,
 "noms": [
 "eau de cologne",
 "eau nettoyante",
@@ -232,29 +232,29 @@
 "categories": [
 [
 "en:face",
-12
+13
 ],
 [
 "en:perfumes",
 9
 ],
 [
-"en:cleansers",
-7
+"en:non-food-products",
+9
 ],
 [
-"en:hygiene",
-6
+"en:open-beauty-facts",
+9
 ]
 ],
 "secteur": "Parfumerie et soins/Cosmétiques et parfums",
 "marques": [
 "Cosmia",
-"Caudalie",
 "Avène",
+"Caudalie",
+"Mustela",
 "Fragonard",
-"Christian Lenart",
-"Melvita"
+"Christian Lenart"
 ],
 "part_marque": 0.0
 },
@@ -284,7 +284,7 @@
 3
 ]
 ],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
 "marques": [
 "Mixa Solaire",
 "Yves Rocher",
@@ -293,47 +293,47 @@
 "Elisabeth Arden",
 "Sol de Janeiro"
 ],
-"part_marque": 0.03
+"part_marque": 0.0
 },
-"dove": {
-"n": 143,
+"men": {
+"n": 42,
 "noms": [
-"dove gel douche",
-"dove déodorant femme",
-"dove men care"
+"dove men care",
+"men power action",
+"rexona men anti-transpirant"
 ],
-"categorie": "en:hygiene",
+"categorie": null,
 "categories": [
 [
 "en:hygiene",
-50
+10
+],
+[
+"en:hair",
+9
+],
+[
+"en:shampoos",
+9
 ],
 [
 "en:deodorants",
-34
-],
-[
-"en:showers-and-baths",
-16
-],
-[
-"en:shower-gels",
-15
+7
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
-"Dove",
 "Unilever",
-"For Women",
-"Dove Men+Care",
-"Ferma",
-"cream oil"
+"Dove",
+"Rexona",
+"Schwarzkopf",
+"Henkel",
+"Nivea"
 ],
-"part_marque": 0.94
+"part_marque": 0.02
 },
 "masque": {
-"n": 137,
+"n": 138,
 "noms": [
 "masque",
 "masque nutritif technique",
@@ -370,7 +370,7 @@
 "part_marque": 0.0
 },
 "sensitive": {
-"n": 46,
+"n": 51,
 "noms": [
 "sensitive",
 "sensitive végétal",
@@ -380,7 +380,7 @@
 "categories": [
 [
 "en:hygiene",
-8
+9
 ],
 [
 "en:toothpastes",
@@ -395,25 +395,25 @@
 3
 ]
 ],
-"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Elmex",
 "Yves Rocher",
 "Carrefour",
-"Hema",
-"Garnier",
-"Nivea Men"
+"Nivea",
+"Nivea Men",
+"Hema"
 ],
 "part_marque": 0.0
 },
 "pure": {
-"n": 39,
+"n": 43,
 "noms": [
 "pure calmille",
 "pure algue",
 "pure natural soin"
 ],
-"categorie": "en:face",
+"categorie": null,
 "categories": [
 [
 "en:face",
@@ -425,21 +425,21 @@
 ],
 [
 "en:hygiene",
-4
+5
 ],
 [
 "en:deodorants",
-3
+4
 ]
 ],
-"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Yves Rocher",
 "Nivea",
 "L'Oréal",
 "L'Oreal Consumer products",
 "Garnier",
-"MYVITAMINS"
+"Timotei"
 ],
 "part_marque": 0.0
 },
@@ -481,44 +481,44 @@
 "part_marque": 0.0
 },
 "anti": {
-"n": 90,
+"n": 118,
 "noms": [
-"anti-transpirant",
-"anti-tartre",
-"anti transpirant"
+"axe anti-transpirant homme",
+"monsavon anti-transpirant femme",
+"anti-transpirant"
 ],
 "categorie": null,
 "categories": [
 [
 "en:hygiene",
-24
+35
 ],
 [
 "en:deodorants",
-20
+29
 ],
 [
 "en:anti-perspirants",
-17
+19
 ],
 [
 "en:roll-on-deodorants",
-14
+15
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Narta",
+"Axe",
 "Nivea",
 "L'Oréal",
-"Cosmia",
-"Elmex",
-"Ushuaïa"
+"Monsavon",
+"Cosmia"
 ],
 "part_marque": 0.0
 },
 "lotion": {
-"n": 57,
+"n": 60,
 "noms": [
 "lotion tonique",
 "lotion anti moustiques",
@@ -545,8 +545,8 @@
 ],
 "secteur": "Parfumerie et soins/Cosmétiques et parfums",
 "marques": [
-"Diadermine",
 "Henkel",
+"Diadermine",
 "Cosmia",
 "Cien",
 "Marque Repère",
@@ -555,7 +555,7 @@
 "part_marque": 0.0
 },
 "spray": {
-"n": 114,
+"n": 119,
 "noms": [
 "spray solaire enfant",
 "spray coiffant micro-aéré",
@@ -565,19 +565,19 @@
 "categories": [
 [
 "en:in-sun-protections",
-20
+21
 ],
 [
 "en:suncare",
-20
+21
 ],
 [
 "en:sunscreen",
-16
+17
 ],
 [
 "en:hair",
-8
+9
 ]
 ],
 "secteur": "Parapharmacie/Solaires et soins spécifiques",
@@ -588,6 +588,80 @@
 "Vivelle Dop",
 "Avène",
 "Corinne de Farme"
+],
+"part_marque": 0.0
+},
+"apre": {
+"n": 37,
+"noms": [
+"timotei après shampoing",
+"après shampoing",
+"après shampoing extra"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+8
+],
+[
+"en:hair-conditioners",
+8
+],
+[
+"en:non-food-products",
+6
+],
+[
+"en:open-beauty-facts",
+6
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Unilever",
+"Timotei",
+"Cosmia",
+"Le Petit Marseillais",
+"Garnier",
+"Art naturals"
+],
+"part_marque": 0.0
+},
+"apre shampoing": {
+"n": 35,
+"noms": [
+"après shampoing",
+"après shampoing extra doux",
+"timotei après shampoing à"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+8
+],
+[
+"en:hair-conditioners",
+8
+],
+[
+"en:non-food-products",
+6
+],
+[
+"en:open-beauty-facts",
+6
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Unilever",
+"Timotei",
+"Cosmia",
+"Le Petit Marseillais",
+"Garnier",
+"Art naturals"
 ],
 "part_marque": 0.0
 },
@@ -621,15 +695,89 @@
 "marques": [
 "The Body Shop",
 "Cattier",
-"L'Oréal",
 "L'Oreal Luxe",
+"L'Oréal",
 "Palmer's",
 "Oléanat"
 ],
 "part_marque": 0.0
 },
+"pro": {
+"n": 33,
+"noms": [
+"pro-expert",
+"pro expert",
+"pro repair"
+],
+"categorie": "en:hygiene",
+"categories": [
+[
+"en:hygiene",
+10
+],
+[
+"en:toothpastes",
+9
+],
+[
+"en:non-food-products",
+4
+],
+[
+"en:open-beauty-facts",
+4
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Oral-B",
+"Sensodyne",
+"Henkel",
+"Elemis",
+"Ora-B",
+"GSK"
+],
+"part_marque": 0.0
+},
+"bebe": {
+"n": 45,
+"noms": [
+"weleda bébé calendula",
+"klorane bébé crème",
+"bébé"
+],
+"categorie": null,
+"categories": [
+[
+"en:non-food-products",
+2
+],
+[
+"en:open-beauty-facts",
+2
+],
+[
+"en:hair",
+2
+],
+[
+"en:shampoos",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Klorane",
+"Weleda",
+"Leader Price",
+"Mixa",
+"Cadum",
+"Cattier"
+],
+"part_marque": 0.02
+},
 "hydra": {
-"n": 38,
+"n": 42,
 "noms": [
 "hydra aloe vera",
 "hydra végétal",
@@ -659,18 +807,18 @@
 "L'Oréal",
 "Léa Nature",
 "L'Oréal Men Expert",
+"Mustela",
 "Yves Rocher",
-"So' Bio étic",
-"Clarins"
+"So' Bio étic"
 ],
 "part_marque": 0.0
 },
 "serum": {
-"n": 55,
+"n": 58,
 "noms": [
 "sérum correcteur éclat",
-"serum végétal rides",
-"sérum niacinamide 10"
+"cosmia - serum",
+"serum végétal rides"
 ],
 "categorie": null,
 "categories": [
@@ -691,25 +839,62 @@
 3
 ]
 ],
-"secteur": "Parfumerie et soins/Santé dentaire",
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
 "marques": [
 "L'Oréal Paris",
 "Yves Rocher",
+"Cosmia",
 "Dr. Hauschka",
 "Léa Nature",
-"Cosmia Bio",
-"Novexpert"
+"Cosmia Bio"
+],
+"part_marque": 0.0
+},
+"total": {
+"n": 31,
+"noms": [
+"total care",
+"elseve total repair",
+"total repair 5"
+],
+"categorie": "en:hygiene",
+"categories": [
+[
+"en:hygiene",
+12
+],
+[
+"en:toothpastes",
+6
+],
+[
+"en:hair",
+6
+],
+[
+"en:mouthwashes",
+5
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Colgate",
+"Listerine",
+"L'Oréal",
+"Elseve",
+"L'Oreal Consumer products",
+"L'Oréal Paris"
 ],
 "part_marque": 0.0
 },
 "protection": {
-"n": 36,
+"n": 37,
 "noms": [
 "protection caries",
 "protection complète",
 "protection gencives"
 ],
-"categorie": "en:hygiene",
+"categorie": null,
 "categories": [
 [
 "en:hygiene",
@@ -720,11 +905,11 @@
 5
 ],
 [
-"en:in-sun-protections",
-2
+"en:open-beauty-facts",
+3
 ],
 [
-"en:suncare",
+"en:in-sun-protections",
 2
 ]
 ],
@@ -739,82 +924,8 @@
 ],
 "part_marque": 0.0
 },
-"signal": {
-"n": 197,
-"noms": [
-"signal brosse à",
-"signal integral 8",
-"signal white now"
-],
-"categorie": "en:toothpaste",
-"categories": [
-[
-"en:open-beauty-facts",
-114
-],
-[
-"en:non-food-products",
-112
-],
-[
-"en:toothpaste",
-76
-],
-[
-"en:hygiene",
-42
-]
-],
-"secteur": "Parfumerie et soins/Santé dentaire",
-"marques": [
-"Signal",
-"Unilever",
-"Integral 8",
-"White Now",
-"Signal fdi",
-"Fdi"
-],
-"part_marque": 0.94
-},
-"nivea": {
-"n": 61,
-"noms": [
-"nivea sun",
-"nivea",
-"nivea creme"
-],
-"categorie": null,
-"categories": [
-[
-"en:open-beauty-facts",
-11
-],
-[
-"en:hygiene",
-7
-],
-[
-"en:deodorants",
-6
-],
-[
-"en:suncare",
-5
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Nivea",
-"Nivea Men",
-"Intense bronze",
-"Beiersdorf",
-"Nivea hommes",
-"Nivea Sun"
-],
-"part_marque": 0.69
-},
 "lait": {
-"n": 342,
+"n": 366,
 "noms": [
 "lait de douche",
 "lait corps hydratant",
@@ -824,19 +935,19 @@
 "categories": [
 [
 "en:body",
-78
+79
 ],
 [
 "en:body-milks",
-76
+77
 ],
 [
 "en:open-beauty-facts",
-26
+27
 ],
 [
-"en:cleansers",
-20
+"en:face",
+23
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
@@ -844,18 +955,18 @@
 "Le Petit Marseillais",
 "Yves Rocher",
 "Nivea",
-"Mixa",
 "Cosmia",
+"Mixa",
 "L'Oréal"
 ],
 "part_marque": 0.0
 },
 "petit": {
-"n": 42,
+"n": 44,
 "noms": [
 "le petit marseillais",
 "le petit olivier",
-"le petit remède"
+"klorane petit junior"
 ],
 "categorie": null,
 "categories": [
@@ -868,19 +979,19 @@
 7
 ],
 [
-"en:hair",
-4
+"en:body",
+3
 ],
 [
-"en:body",
+"en:hair",
 3
 ]
 ],
 "secteur": "Parapharmacie/Solaires et soins spécifiques",
 "marques": [
 "Le Petit Marseillais",
+"Klorane",
 "Le Petit Olivier",
-"Marque Repère",
 "Le Petit Marsellais",
 "L'Occitane en Provence",
 "Les petits plaisirs"
@@ -888,7 +999,7 @@
 "part_marque": 0.0
 },
 "bain": {
-"n": 54,
+"n": 56,
 "noms": [
 "bain douche énergisant",
 "bain moussant",
@@ -898,15 +1009,15 @@
 "categories": [
 [
 "en:hygiene",
-15
+16
 ],
 [
 "en:showers-and-baths",
-15
+16
 ],
 [
 "en:bubble-baths",
-9
+10
 ],
 [
 "en:shower-gels",
@@ -925,7 +1036,7 @@
 "part_marque": 0.0
 },
 "liquide": {
-"n": 52,
+"n": 53,
 "noms": [
 "liquide vaisselle",
 "liquide vaisselle peaux",
@@ -950,7 +1061,7 @@
 5
 ]
 ],
-"secteur": "Parfumerie et soins/Santé dentaire",
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Auchan",
 "Carrefour",
@@ -962,7 +1073,7 @@
 "part_marque": 0.0
 },
 "liquide vaisselle": {
-"n": 44,
+"n": 45,
 "noms": [
 "liquide vaisselle",
 "liquide vaisselle peaux sensibles",
@@ -999,7 +1110,7 @@
 "part_marque": 0.0
 },
 "lingette": {
-"n": 92,
+"n": 95,
 "noms": [
 "lingettes fraîcheur",
 "lingettes",
@@ -1009,7 +1120,7 @@
 "categories": [
 [
 "en:open-beauty-facts",
-26
+27
 ],
 [
 "en:non-food-products",
@@ -1017,11 +1128,11 @@
 ],
 [
 "en:accessories",
-16
+17
 ],
 [
 "en:moist-wipes",
-16
+17
 ]
 ],
 "secteur": "Bébé/Hygiène bébé",
@@ -1031,12 +1142,12 @@
 "Carrefour",
 "Auchan",
 "Biolane",
-"Pampers"
+"Mustela"
 ],
 "part_marque": 0.0
 },
 "douche": {
-"n": 136,
+"n": 141,
 "noms": [
 "douche crème douceurs",
 "douche crème extra",
@@ -1046,11 +1157,11 @@
 "categories": [
 [
 "en:hygiene",
-93
+94
 ],
 [
 "en:showers-and-baths",
-93
+94
 ],
 [
 "en:shower-gels",
@@ -1058,7 +1169,7 @@
 ],
 [
 "fr:cremes-douche",
-42
+43
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
@@ -1073,7 +1184,7 @@
 "part_marque": 0.0
 },
 "douche creme": {
-"n": 55,
+"n": 57,
 "noms": [
 "douche crème douceurs d'enfance",
 "douche crème extra doux",
@@ -1083,15 +1194,15 @@
 "categories": [
 [
 "en:hygiene",
-46
+47
 ],
 [
 "en:showers-and-baths",
-46
+47
 ],
 [
 "fr:cremes-douche",
-36
+37
 ],
 [
 "en:shower-gels",
@@ -1110,13 +1221,13 @@
 "part_marque": 0.0
 },
 "gel lavant": {
-"n": 101,
+"n": 110,
 "noms": [
 "gel lavant corps et",
 "gel lavant mains",
 "gel lavant pour les"
 ],
-"categorie": "en:hygiene",
+"categorie": null,
 "categories": [
 [
 "en:hygiene",
@@ -1140,88 +1251,125 @@
 "Cosmia",
 "Auchan",
 "Carrefour",
-"Henkel",
 "Le Chat",
-"Kids"
+"Henkel",
+"Mustela"
 ],
 "part_marque": 0.0
 },
 "anti transpirant": {
-"n": 41,
+"n": 65,
 "noms": [
+"monsavon anti-transpirant femme spray",
 "anti-transpirant",
-"anti transpirant",
-"anti-transpirant 48h tolérance optimale"
+"anti transpirant"
 ],
-"categorie": "en:anti-perspirants",
+"categorie": "en:deodorants",
 "categories": [
 [
 "en:deodorants",
-19
+28
 ],
 [
 "en:hygiene",
-19
+28
 ],
 [
 "en:anti-perspirants",
-16
+18
 ],
 [
 "en:roll-on-deodorants",
-13
+14
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
 "Narta",
-"L'Oréal",
+"Axe",
+"Monsavon",
 "Cosmia",
 "Nivea",
-"Ushuaïa",
-"LASCAD"
+"L'Oréal"
 ],
 "part_marque": 0.0
 },
-"elseve": {
-"n": 63,
+"lessive": {
+"n": 46,
 "noms": [
-"elseve",
-"elseve arginine resist",
-"elseve huile extraordinaire"
+"persil lessive liquide",
+"skip lessive liquide",
+"lessive liquide"
 ],
-"categorie": "en:shampoos",
+"categorie": null,
 "categories": [
 [
+"fr:lessive",
+9
+],
+[
+"en:household-chemicals",
+2
+],
+[
+"en:liquid-detergent",
+2
+],
+[
+"en:non-open-products-facts",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Henkel",
+"Persil",
+"Skip",
+"X-TRA",
+"maison verte",
+"Biovie Lea Nature"
+],
+"part_marque": 0.0
+},
+"bio": {
+"n": 62,
+"noms": [
+"monsavon bio déodorant",
+"bio capilargil specific",
+"bio naïa"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+11
+],
+[
 "en:hair",
-49
+9
+],
+[
+"en:open-beauty-facts",
+8
 ],
 [
 "en:shampoos",
-39
-],
-[
-"en:hair-care",
 7
-],
-[
-"en:anti-dandruff-shampoos",
-5
 ]
 ],
-"secteur": "Parfumerie et soins/Cheveux",
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
 "marques": [
-"L'Oréal",
-"L'Oréal Paris",
-"Elseve",
-"L'Oreal Consumer products",
-"Phytoclear",
-"180 ml"
+"BIO",
+"Monsavon",
+"Unilever",
+"Dermaclay",
+"Henkel",
+"Vademecum"
 ],
-"part_marque": 0.73
+"part_marque": 0.29
 },
 "creme douche": {
-"n": 82,
+"n": 85,
 "noms": [
 "crème douche extra douce",
 "crème douche",
@@ -1257,45 +1405,8 @@
 ],
 "part_marque": 0.0
 },
-"bio": {
-"n": 31,
-"noms": [
-"bio capilargil specific",
-"bio naïa",
-"bio naia"
-],
-"categorie": null,
-"categories": [
-[
-"en:hair",
-8
-],
-[
-"en:shampoos",
-7
-],
-[
-"en:open-beauty-facts",
-6
-],
-[
-"fr:shampooings-aux-extraits-naturels",
-5
-]
-],
-"secteur": "Parfumerie et soins/Cheveux",
-"marques": [
-"Dermaclay",
-"Vademecum",
-"Henkel",
-"Marque Repère",
-"Leclerc",
-"Signal"
-],
-"part_marque": 0.0
-},
 "lait demaquillant": {
-"n": 35,
+"n": 37,
 "noms": [
 "lait démaquillant",
 "lait démaquillant douceur",
@@ -1305,15 +1416,15 @@
 "categories": [
 [
 "en:cleansers",
-16
-],
-[
-"en:cleansing-milks",
-16
+18
 ],
 [
 "en:face",
-16
+18
+],
+[
+"en:cleansing-milks",
+17
 ],
 [
 "en:open-beauty-facts",
@@ -1328,6 +1439,41 @@
 "Monoprix",
 "Carrefour",
 "Inell"
+],
+"part_marque": 0.0
+},
+"integral": {
+"n": 44,
+"noms": [
+"signal integral 8",
+"integral 8 actions",
+"signal intégral 8"
+],
+"categorie": "en:toothpaste",
+"categories": [
+[
+"en:non-food-products",
+27
+],
+[
+"en:open-beauty-facts",
+27
+],
+[
+"en:toothpaste",
+17
+],
+[
+"en:hygiene",
+14
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Signal",
+"Unilever",
+"Integral 8",
+"Paic"
 ],
 "part_marque": 0.0
 },
@@ -1357,7 +1503,7 @@
 2
 ]
 ],
-"secteur": "Bébé/Hygiène bébé",
+"secteur": "Parfumerie et soins/Cheveux",
 "marques": [
 "Ben & Anna",
 "Revlon",
@@ -1368,45 +1514,8 @@
 ],
 "part_marque": 0.0
 },
-"deo": {
-"n": 48,
-"noms": [
-"deo",
-"deo pierre alun",
-"deo rollon"
-],
-"categorie": null,
-"categories": [
-[
-"en:deodorants",
-14
-],
-[
-"en:hygiene",
-14
-],
-[
-"en:roll-on-deodorants",
-6
-],
-[
-"en:open-beauty-facts",
-2
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Léa Nature",
-"Lavera",
-"So' Bio étic",
-"Ushuaïa",
-"Cadum",
-"DEO"
-],
-"part_marque": 0.02
-},
 "ultra": {
-"n": 81,
+"n": 85,
 "noms": [
 "ultra doux shampooing",
 "ultra doux après-shampooing",
@@ -1416,15 +1525,15 @@
 "categories": [
 [
 "en:hair",
-46
+47
 ],
 [
 "en:shampoos",
-34
+35
 ],
 [
 "fr:shampooings-aux-extraits-naturels",
-12
+13
 ],
 [
 "en:hair-conditioners",
@@ -1443,7 +1552,7 @@
 "part_marque": 0.0
 },
 "gel nettoyant": {
-"n": 34,
+"n": 36,
 "noms": [
 "gel nettoyant purifiant",
 "gel nettoyant visage",
@@ -1480,7 +1589,7 @@
 "part_marque": 0.0
 },
 "lait douche": {
-"n": 31,
+"n": 35,
 "noms": [
 "lait de douche aux",
 "lait de douche hydratant",
@@ -1498,11 +1607,11 @@
 ],
 [
 "en:hygiene",
-6
+7
 ],
 [
 "en:showers-and-baths",
-6
+7
 ]
 ],
 "secteur": "Parfumerie et soins/Toilette et soins du corps",
@@ -1517,11 +1626,11 @@
 "part_marque": 0.0
 },
 "soin levre": {
-"n": 34,
+"n": 36,
 "noms": [
 "soin des lèvres",
-"soin lèvres sensibles",
-"soin levres au mien"
+"cosmia - soin des",
+"soin lèvres sensibles"
 ],
 "categorie": "en:lip-cosmetics",
 "categories": [
@@ -1545,16 +1654,16 @@
 "secteur": "Parapharmacie/Solaires et soins spécifiques",
 "marques": [
 "Cosmia",
+"Doctissimo",
 "Doctissimo parapharmacie",
 "FDG Group",
-"Doctissimo",
 "Laino",
 "Le Petit Marseillais"
 ],
 "part_marque": 0.0
 },
 "ultra dou": {
-"n": 57,
+"n": 59,
 "noms": [
 "ultra doux shampooing à",
 "ultra doux",
@@ -1564,15 +1673,15 @@
 "categories": [
 [
 "en:hair",
-43
+44
 ],
 [
 "en:shampoos",
-32
+33
 ],
 [
 "fr:shampooings-aux-extraits-naturels",
-12
+13
 ],
 [
 "en:hair-conditioners",
@@ -1590,7 +1699,7 @@
 "part_marque": 0.0
 },
 "baume": {
-"n": 114,
+"n": 118,
 "noms": [
 "baume après rasage",
 "baume corps nourrissant",
@@ -1603,15 +1712,15 @@
 13
 ],
 [
+"en:face",
+9
+],
+[
 "en:body-creams",
 9
 ],
 [
 "en:aftershaves",
-8
-],
-[
-"en:face",
 8
 ]
 ],
@@ -1623,6 +1732,42 @@
 "Le Petit Marseillais",
 "Emma Noël",
 "L'Oréal"
+],
+"part_marque": 0.0
+},
+"fructi": {
+"n": 30,
+"noms": [
+"fructis shampooing fortifiant",
+"fructis nutri repair",
+"fructis après-shampooing fortifiant"
+],
+"categorie": "en:shampoos",
+"categories": [
+[
+"en:hair",
+22
+],
+[
+"en:shampoos",
+17
+],
+[
+"en:anti-dandruff-shampoos",
+4
+],
+[
+"en:shampoo-for-dry-hair",
+4
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Garnier",
+"L'Oreal Consumer products",
+"L'Oréal",
+"Fructis",
+"Garnier Fructis"
 ],
 "part_marque": 0.0
 },
@@ -1664,7 +1809,7 @@
 "part_marque": 0.0
 },
 "stick": {
-"n": 50,
+"n": 52,
 "noms": [
 "stick lèvres hydratant",
 "stick à lèvres",
@@ -1686,7 +1831,7 @@
 ],
 [
 "en:hygiene",
-7
+8
 ]
 ],
 "secteur": "Parapharmacie/Solaires et soins spécifiques",
@@ -1699,43 +1844,6 @@
 "La Rosée"
 ],
 "part_marque": 0.0
-},
-"mixa": {
-"n": 38,
-"noms": [
-"mixa intensif peaux",
-"mixa",
-"mixa expert peau"
-],
-"categorie": null,
-"categories": [
-[
-"en:body",
-5
-],
-[
-"en:open-beauty-facts",
-4
-],
-[
-"en:body-milks",
-3
-],
-[
-"en:hand-creams",
-2
-]
-],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
-"marques": [
-"Mixa",
-"Mixa Bébé",
-"L'Oréal",
-"LASCAD",
-"Mixa Solaire",
-"mixa lascad"
-],
-"part_marque": 0.66
 },
 "papier": {
 "n": 31,
@@ -1767,8 +1875,8 @@
 "marques": [
 "Floralys",
 "Lotus",
-"Aldi",
 "Sublimo",
+"Aldi",
 "U",
 "Mimosa"
 ],
@@ -1804,8 +1912,8 @@
 "marques": [
 "Floralys",
 "Lotus",
-"Aldi",
 "Sublimo",
+"Aldi",
 "U",
 "Mimosa"
 ],
@@ -1848,45 +1956,8 @@
 ],
 "part_marque": 0.0
 },
-"cosmia": {
-"n": 82,
-"noms": [
-"cosmia gel douche",
-"cosmia - shampoing",
-"cosmia - eau"
-],
-"categorie": null,
-"categories": [
-[
-"en:non-food-products",
-24
-],
-[
-"en:open-beauty-facts",
-23
-],
-[
-"en:hygiene",
-8
-],
-[
-"en:shower-gels",
-8
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Cosmia",
-"Cosmia Bio",
-"Auchan",
-"Dentalux",
-"Cosmia Baby",
-"Kids"
-],
-"part_marque": 0.9
-},
 "mouchoir": {
-"n": 42,
+"n": 46,
 "noms": [
 "mouchoirs",
 "mouchoirs blancs",
@@ -1896,11 +1967,11 @@
 "categories": [
 [
 "fr:mouchoirs",
-18
+21
 ],
 [
 "en:non-open-products-facts",
-16
+19
 ],
 [
 "en:open-beauty-facts",
@@ -1919,6 +1990,43 @@
 "U",
 "Monoprix",
 "Top budget"
+],
+"part_marque": 0.0
+},
+"deo": {
+"n": 66,
+"noms": [
+"deo",
+"dove deo bio",
+"dove deo invdr"
+],
+"categorie": "en:deodorants",
+"categories": [
+[
+"en:hygiene",
+27
+],
+[
+"en:deodorants",
+26
+],
+[
+"en:roll-on-deodorants",
+6
+],
+[
+"en:anti-perspirants",
+3
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Unilever",
+"Dove",
+"Nivea",
+"Lavera",
+"Brut",
+"Léa Nature"
 ],
 "part_marque": 0.0
 },
@@ -1953,14 +2061,51 @@
 "Love Beauty and Planet",
 "Watsons",
 "Nocibé",
-"L'Oréal",
 "L'Oreal Luxe",
-"Kiehl's"
+"Kiehl's",
+"L'Oréal"
+],
+"part_marque": 0.0
+},
+"lessive liquide": {
+"n": 34,
+"noms": [
+"persil lessive liquide bouquet",
+"lessive liquide",
+"skip lessive liquide active"
+],
+"categorie": null,
+"categories": [
+[
+"fr:lessive",
+3
+],
+[
+"en:household-chemicals",
+2
+],
+[
+"en:liquid-detergent",
+2
+],
+[
+"en:non-open-products-facts",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Henkel",
+"Persil",
+"Skip",
+"Omo",
+"Tandil",
+"Apta"
 ],
 "part_marque": 0.0
 },
 "lait corp": {
-"n": 108,
+"n": 112,
 "noms": [
 "lait corps",
 "lait corps hydratant",
@@ -1970,11 +2115,11 @@
 "categories": [
 [
 "en:body",
-35
+36
 ],
 [
 "en:body-milks",
-35
+36
 ],
 [
 "en:open-beauty-facts",
@@ -1989,433 +2134,11 @@
 "marques": [
 "Mixa",
 "Yves Rocher",
-"Le Petit Olivier",
 "Nivea",
+"Le Petit Olivier",
 "Cattier",
-"Labell"
+"Dove"
 ],
 "part_marque": 0.0
-},
-"signal dentifrice": {
-"n": 69,
-"noms": [
-"signal dentifrice integral 8",
-"signal dentifrice système blancheur",
-"signal dentifrice expert protection"
-],
-"categorie": "en:toothpaste",
-"categories": [
-[
-"en:non-food-products",
-67
-],
-[
-"en:open-beauty-facts",
-67
-],
-[
-"en:toothpaste",
-46
-],
-[
-"en:hygiene",
-23
-]
-],
-"secteur": "Parfumerie et soins/Santé dentaire",
-"marques": [
-"Unilever",
-"Signal"
-],
-"part_marque": 0.99
-},
-"signal brosse": {
-"n": 40,
-"noms": [
-"signal brosse à dents"
-],
-"categorie": null,
-"categories": [
-[
-"fr:brosse-a-dents",
-6
-]
-],
-"secteur": "Parfumerie et soins/Santé dentaire",
-"marques": [
-"Signal",
-"Unilever"
-],
-"part_marque": 1.0
-},
-"rexona": {
-"n": 52,
-"noms": [
-"rexona déodorant femme",
-"rexona men déodorant",
-"rexona men anti-transpirant"
-],
-"categorie": "en:deodorants",
-"categories": [
-[
-"en:deodorants",
-33
-],
-[
-"en:hygiene",
-33
-],
-[
-"en:anti-perspirants",
-4
-],
-[
-"en:deodorants-anti-transpirants",
-3
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Rexona",
-"Unilever",
-"Rexona Men",
-"For Women",
-"For Men",
-"Sensitive"
-],
-"part_marque": 0.9
-},
-"brut": {
-"n": 31,
-"noms": [
-"brut déodorant homme",
-"brut a r",
-"brut musk déodorant"
-],
-"categorie": "en:deodorants",
-"categories": [
-[
-"en:deodorants",
-14
-],
-[
-"en:hygiene",
-14
-],
-[
-"en:open-beauty-facts",
-2
-],
-[
-"en:aftershaves",
-1
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Brut",
-"Unilever",
-"Brut de coques"
-],
-"part_marque": 0.97
-},
-"timotei": {
-"n": 69,
-"noms": [
-"timotei après shampoing",
-"timotei shampoing femme",
-"timotei blond lumière"
-],
-"categorie": null,
-"categories": [
-[
-"en:hair",
-8
-],
-[
-"en:hair-conditioners",
-5
-],
-[
-"en:shampoos",
-3
-],
-[
-"en:cosmetic-products",
-2
-]
-],
-"secteur": "Parfumerie et soins/Cheveux",
-"marques": [
-"Timotei",
-"Unilever",
-"BIO",
-"Elida beauty B.V"
-],
-"part_marque": 0.97
-},
-"monsavon": {
-"n": 97,
-"noms": [
-"monsavon déodorant femme",
-"monsavon gel douche",
-"monsavon bio déodorant"
-],
-"categorie": "en:deodorants",
-"categories": [
-[
-"en:hygiene",
-49
-],
-[
-"en:deodorants",
-30
-],
-[
-"en:showers-and-baths",
-18
-],
-[
-"en:shower-gels",
-16
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Monsavon",
-"BIO",
-"Unilever",
-"Monsavon au Lait",
-"Au Lait",
-"Cosmébio"
-],
-"part_marque": 1.0
-},
-"auchan": {
-"n": 34,
-"noms": [
-"auchan - dentifrice",
-"auchan kids dentifrice",
-"auchan bio dentifrice"
-],
-"categorie": null,
-"categories": [
-[
-"en:non-food-products",
-8
-],
-[
-"en:open-beauty-facts",
-8
-],
-[
-"en:hygiene",
-3
-],
-[
-"en:non-open-products-facts",
-3
-]
-],
-"secteur": "Parfumerie et soins/Santé dentaire",
-"marques": [
-"Auchan",
-"Kids",
-"Auchan Bio",
-"Pouce",
-"auchan 1er prix",
-"Auchan Baby Bio"
-],
-"part_marque": 0.79
-},
-"mustela": {
-"n": 31,
-"noms": [
-"mustela eau rafraîchissante",
-"mustela eau nettoyante",
-"mustela gel lavant"
-],
-"categorie": null,
-"categories": [
-[
-"en:baby-cream",
-1
-]
-],
-"secteur": null,
-"marques": [
-"Mustela"
-],
-"part_marque": 1.0
-},
-"axe": {
-"n": 230,
-"noms": [
-"axe gel douche",
-"axe déodorant homme",
-"axe déodorant bodyspray"
-],
-"categorie": "en:hygiene",
-"categories": [
-[
-"en:hygiene",
-95
-],
-[
-"en:deodorants",
-65
-],
-[
-"en:shower-gels",
-32
-],
-[
-"en:showers-and-baths",
-32
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Axe",
-"Unilever",
-"Gold Compressé",
-"Ice Gold",
-"3en1",
-"Black"
-],
-"part_marque": 0.98
-},
-"axe gel": {
-"n": 71,
-"noms": [
-"axe gel douche homme",
-"axe gel douche you",
-"axe gel douche dark"
-],
-"categorie": "en:shower-gels",
-"categories": [
-[
-"en:shower-gels",
-28
-],
-[
-"en:showers-and-baths",
-28
-],
-[
-"en:hygiene",
-27
-],
-[
-"en:hair",
-4
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Axe",
-"Unilever",
-"3en1"
-],
-"part_marque": 1.0
-},
-"axe deodorant": {
-"n": 68,
-"noms": [
-"axe déodorant homme spray",
-"axe déodorant bodyspray homme",
-"axe déodorant homme bodyspray"
-],
-"categorie": "en:deodorants",
-"categories": [
-[
-"en:deodorants",
-37
-],
-[
-"en:hygiene",
-37
-],
-[
-"en:open-beauty-facts",
-3
-],
-[
-"en:non-food-products",
-2
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Axe"
-],
-"part_marque": 1.0
-},
-"signal integral": {
-"n": 31,
-"noms": [
-"signal integral 8 dentifrice",
-"signal intégral 8 dentifrice",
-"signal intégral 8"
-],
-"categorie": "en:toothpaste",
-"categories": [
-[
-"en:non-food-products",
-27
-],
-[
-"en:open-beauty-facts",
-27
-],
-[
-"en:toothpaste",
-17
-],
-[
-"en:hygiene",
-11
-]
-],
-"secteur": "Parfumerie et soins/Santé dentaire",
-"marques": [
-"Signal",
-"Unilever",
-"Integral 8"
-],
-"part_marque": 0.97
-},
-"dove gel": {
-"n": 34,
-"noms": [
-"dove gel douche surgras",
-"dove gel douche pouvoir",
-"dove gel douche soin"
-],
-"categorie": "en:shower-gels",
-"categories": [
-[
-"en:hygiene",
-13
-],
-[
-"en:shower-gels",
-13
-],
-[
-"en:showers-and-baths",
-13
-],
-[
-"en:non-food-products",
-2
-]
-],
-"secteur": "Parfumerie et soins/Toilette et soins du corps",
-"marques": [
-"Dove",
-"Unilever"
-],
-"part_marque": 1.0
 }
 }

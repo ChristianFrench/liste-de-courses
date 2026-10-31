@@ -1,8 +1,8 @@
 {
-"_description": "openpetfoodfacts, 2026-10-31 : 5289 produits vendus en France, 339 rangés sous 18 natures du catalogue sur 44",
+"_description": "openpetfoodfacts, 2026-10-31 : 5289 produits vendus en France, 347 rangés sous 19 natures du catalogue sur 44",
 "natures": {
 "Animaux/Chiens/Croquettes pour chien": {
-"n": 85,
+"n": 86,
 "categorie": "en:dog-food",
 "marques": [
 [
@@ -55,9 +55,14 @@
 "marques": []
 },
 "Animaux/Chats/Croquettes pour chat": {
-"n": 44,
+"n": 47,
 "categorie": "en:dog-and-cat-food",
-"marques": []
+"marques": [
+[
+"royal canin",
+3
+]
+]
 },
 "Animaux/Chats/Pâtée pour chat": {
 "n": 13,
@@ -117,13 +122,18 @@
 "categorie": "en:dog-and-cat-food",
 "marques": []
 },
+"Animaux/Chats/Sachets en gelée pour chat": {
+"n": 1,
+"categorie": "en:dog-and-cat-food",
+"marques": []
+},
 "Animaux/Autres animaux/Graines pour oiseaux": {
 "n": 4,
 "categorie": null,
 "marques": []
 },
 "Animaux/Autres animaux/Nourriture pour poissons": {
-"n": 11,
+"n": 12,
 "categorie": null,
 "marques": []
 },

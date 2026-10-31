@@ -36,8 +36,45 @@
 ],
 "part_marque": 0.0
 },
+"harry": {
+"n": 30,
+"noms": [
+"harry potter et",
+"harry potter",
+"harry potter y"
+],
+"categorie": "en:printed-media",
+"categories": [
+[
+"en:printed-media",
+11
+],
+[
+"en:printed-publications",
+11
+],
+[
+"en:published-products",
+11
+],
+[
+"en:media",
+3
+]
+],
+"secteur": "Loisirs/Papeterie et librairie",
+"marques": [
+"Kinda new",
+"Sony BMG",
+"Auchan",
+"Lego",
+"Fluidifiez",
+"gallimard"
+],
+"part_marque": 0.0
+},
 "paracetamol": {
-"n": 69,
+"n": 74,
 "noms": [
 "paracetamol",
 "paracetamol 500",
@@ -47,51 +84,51 @@
 "categories": [
 [
 "en:paracetamol",
-65
+67
 ],
 [
 "en:health-beauty",
-56
+60
 ],
 [
 "en:health-care",
-56
+60
 ],
 [
 "en:medicine-drugs",
-56
+60
 ]
 ],
 "secteur": "Parapharmacie/Soins et premiers secours",
 "marques": [
 "Galpharm",
+"Waitrose",
 "Tesco",
 "Boots",
 "Etos",
-"Ratiopharm",
-"Sainsbury’s healthcare"
+"Ratiopharm"
 ],
 "part_marque": 0.0
 },
 "super": {
-"n": 50,
+"n": 62,
 "noms": [
 "super mario maker",
-"super mario 3d",
-"super glue"
+"dragon ball super",
+"super mario 3d"
 ],
 "categorie": null,
 "categories": [
+[
+"en:non-food-products",
+6
+],
 [
 "en:software",
 4
 ],
 [
 "en:video-games",
-4
-],
-[
-"en:non-food-products",
 4
 ],
 [
@@ -103,10 +140,10 @@
 "marques": [
 "Loctite",
 "Nintendo",
+"Dragon Ball",
 "Nintendo Switch",
 "Super Croix",
-"Briochin",
-"star"
+"Briochin"
 ],
 "part_marque": 0.0
 },
@@ -147,75 +184,42 @@
 ],
 "part_marque": 0.0
 },
-"camel": {
-"n": 32,
+"the": {
+"n": 78,
 "noms": [
-"camel",
-"camel blue",
-"camel crush"
+"the legend of",
+"the promised neverland",
+"the crew 2"
 ],
-"categorie": "en:cigarettes",
+"categorie": "en:media",
 "categories": [
 [
-"en:tobacco-products",
-16
+"en:media",
+24
 ],
 [
-"en:cigarettes",
-10
+"en:books",
+20
 ],
 [
-"en:non-food-products",
-2
+"en:publications",
+7
 ],
 [
-"fr:tabac",
-2
+"en:dvds-videos",
+4
 ]
 ],
-"secteur": "Entretien / Droguerie",
+"secteur": "Loisirs/Papeterie et librairie",
 "marques": [
+"Penguin",
+"Scrub Daddy",
+"Dreft",
 "Camel",
-"Camel Blue",
-"JTI SWEDEN AB"
+"Original B&J",
+"Really Useful Records"
 ],
-"part_marque": 0.66
-},
-"winston": {
-"n": 41,
-"noms": [
-"winston",
-"winston compact",
-"winston silver"
-],
-"categorie": "en:tobacco-products",
-"categories": [
-[
-"en:tobacco-products",
-22
-],
-[
-"en:cigarettes",
-12
-],
-[
-"en:non-food-products",
-2
-],
-[
-"en:sigarettes",
-1
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Winston",
-"w",
-"Winston slims",
-"Winston experience silver",
-"JT International"
-],
-"part_marque": 0.78
+"part_marque": 0.0
 },
 "fifa": {
 "n": 30,
@@ -255,7 +259,7 @@
 "part_marque": 0.03
 },
 "all": {
-"n": 41,
+"n": 56,
 "noms": [
 "all in 1",
 "all in one",
@@ -265,34 +269,71 @@
 "categories": [
 [
 "en:home-garden",
-8
+9
 ],
 [
 "en:household-cleaning-products",
-8
+9
 ],
 [
 "en:household-cleaning-supplies",
-8
+9
 ],
 [
 "en:household-supplies",
-8
+9
 ]
 ],
 "secteur": "Textile/Lingerie",
 "marques": [
 "Ariel",
-"Method",
-"Tesco",
+"Somat",
 "Flash",
-"Marks & Spencer",
-"Columbia"
+"Henkel",
+"Method",
+"Dettol"
+],
+"part_marque": 0.0
+},
+"all in": {
+"n": 37,
+"noms": [
+"somat all in 1",
+"all in one dishwasher",
+"all in 1 pods"
+],
+"categorie": null,
+"categories": [
+[
+"en:home-garden",
+3
+],
+[
+"en:household-cleaning-products",
+3
+],
+[
+"en:household-cleaning-supplies",
+3
+],
+[
+"en:household-supplies",
+3
+]
+],
+"secteur": "Bricolage, auto et jardin/Jardinage et extérieur",
+"marques": [
+"Ariel",
+"Somat",
+"Henkel",
+"Dettol",
+"Tesco",
+"Bold"
 ],
 "part_marque": 0.0
 },
 "power": {
-"n": 55,
+"n": 65,
 "noms": [
 "power gel",
 "power plus 10x",
@@ -302,19 +343,19 @@
 "categories": [
 [
 "en:home-garden",
-5
+6
 ],
 [
 "en:household-supplies",
-5
+6
 ],
 [
 "en:household-cleaning-products",
-3
+4
 ],
 [
 "en:household-cleaning-supplies",
-3
+4
 ]
 ],
 "secteur": "Loisirs/Papeterie et librairie",
@@ -324,12 +365,49 @@
 "Carrefour",
 "Dettol",
 "Leovet",
-"Power"
+"Ariel"
 ],
-"part_marque": 0.04
+"part_marque": 0.02
+},
+"color": {
+"n": 30,
+"noms": [
+"color gel",
+"savin color protect",
+"color pulver"
+],
+"categorie": null,
+"categories": [
+[
+"en:household-chemicals",
+7
+],
+[
+"en:laundry-detergents",
+7
+],
+[
+"en:office-instruments",
+2
+],
+[
+"en:office-supplies",
+2
+]
+],
+"secteur": "Loisirs/Papeterie et librairie",
+"marques": [
+"Ariel",
+"Maped",
+"Persil",
+"Savin",
+"wilton",
+"Bic"
+],
+"part_marque": 0.0
 },
 "cigarette": {
-"n": 133,
+"n": 137,
 "noms": [
 "cigarette",
 "cigarettes",
@@ -339,11 +417,11 @@
 "categories": [
 [
 "en:cigarettes",
-107
+110
 ],
 [
 "en:tobacco-products",
-99
+102
 ],
 [
 "en:cigarettes-or-cigars",
@@ -359,14 +437,14 @@
 "Marlboro",
 "Camel",
 "Lucky Strike",
+"Dunhill",
 "News",
-"Winston",
-"Philip Morris"
+"Winston"
 ],
 "part_marque": 0.0
 },
 "led": {
-"n": 34,
+"n": 36,
 "noms": [
 "led",
 "led warm white",
@@ -395,29 +473,29 @@
 "marques": [
 "Philips",
 "Osram",
+"I-Glow",
 "Lexman",
 "XCell",
-"Tchibo",
-"Verbatim"
+"Tchibo"
 ],
 "part_marque": 0.0
 },
 "ultra": {
-"n": 77,
+"n": 101,
 "noms": [
 "ultra strong",
 "ultra soft",
 "ultra dégraissant"
 ],
-"categorie": "en:2-ply",
+"categorie": "en:toilet-papers",
 "categories": [
 [
 "en:home-garden",
-33
+39
 ],
 [
 "en:household-supplies",
-33
+37
 ],
 [
 "en:household-paper-products",
@@ -431,16 +509,16 @@
 "secteur": "Entretien / Droguerie",
 "marques": [
 "CHARMIN",
+"Fairy",
 "Always",
 "COTTONELLE",
-"QUILTED NORTHERN",
-"Great Value",
-"SanDisk"
+"SanDisk",
+"Duracell"
 ],
 "part_marque": 0.0
 },
 "dishwasher": {
-"n": 37,
+"n": 42,
 "noms": [
 "dishwasher tablets",
 "dishwasher salt",
@@ -450,19 +528,19 @@
 "categories": [
 [
 "en:detergents",
-2
+4
 ],
 [
 "en:household-chemicals",
-2
+4
 ],
 [
 "en:incorrect-product-type",
-2
+4
 ],
 [
 "en:non-food-products",
-2
+4
 ]
 ],
 "secteur": "Entretien / Droguerie",
@@ -470,14 +548,14 @@
 "Finish",
 "Sainsbury's",
 "Fairy",
-"Crystale",
-"Great Value",
-"Sprouts"
+"Seventh Generation",
+"Tesco",
+"Crystale"
 ],
 "part_marque": 0.0
 },
 "anti": {
-"n": 42,
+"n": 45,
 "noms": [
 "anti-diarrheal",
 "anti bacterial surface",
@@ -506,15 +584,15 @@
 "marques": [
 "Dettol",
 "Apta",
+"Tesco",
 "WC NET",
 "Sainsbury's",
-"Flugator",
-"elixirs & co"
+"Carolin"
 ],
 "part_marque": 0.0
 },
 "laundry": {
-"n": 37,
+"n": 41,
 "noms": [
 "laundry detergent",
 "laundry soap",
@@ -524,15 +602,15 @@
 "categories": [
 [
 "en:non-food-products",
-24
+25
 ],
 [
 "en:incorrect-product-type",
-23
+24
 ],
 [
 "en:open-products-facts",
-23
+24
 ],
 [
 "en:detergents",
@@ -551,7 +629,7 @@
 "part_marque": 0.0
 },
 "multi": {
-"n": 52,
+"n": 61,
 "noms": [
 "multi surface cleaner",
 "multi-surface everyday cleaner",
@@ -579,11 +657,48 @@
 "secteur": "Entretien / Droguerie",
 "marques": [
 "Method",
+"Asda",
+"Doom",
 "Mrs. Meyer's",
 "Mr Sheen",
-"Dettol",
-"Tesco",
-"Nature Made"
+"Dettol"
+],
+"part_marque": 0.0
+},
+"pure": {
+"n": 31,
+"noms": [
+"pure",
+"air wick pure",
+"palmolive pure clear"
+],
+"categorie": null,
+"categories": [
+[
+"en:supplement",
+1
+],
+[
+"de:haushalt",
+1
+],
+[
+"de:reinigung",
+1
+],
+[
+"en:air-fresheners",
+1
+]
+],
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"marques": [
+"Air Wick",
+"Nutrition Geeks",
+"Palmolive",
+"Great Value",
+"JBL",
+"Rubson"
 ],
 "part_marque": 0.0
 },
@@ -624,42 +739,42 @@
 ],
 "part_marque": 0.0
 },
-"mr": {
-"n": 34,
+"book": {
+"n": 30,
 "noms": [
-"mr propre",
-"mr muscle",
-"mr clean magic"
+"book",
+"books",
+"classmate book"
 ],
-"categorie": null,
+"categorie": "en:books",
 "categories": [
 [
-"de:haushalt",
-1
+"en:media",
+19
 ],
 [
-"en:hardware",
-1
+"en:books",
+15
 ],
 [
-"en:pipe-tube-cleaners",
-1
+"en:printed-publications",
+8
 ],
 [
-"en:tools",
-1
+"en:printed-media",
+4
 ]
 ],
-"secteur": "Entretien / Droguerie",
+"secteur": "Loisirs/Papeterie et librairie",
 "marques": [
-"Mr Propre",
-"Mr Muscle",
-"SC Johnson",
-"Procter & Gamble",
-"Mr. Clean",
-"HOLSTER"
+"Penguin",
+"Paroza",
+"windmills paperbacks",
+"book",
+"Classmate",
+"Hutchinson"
 ],
-"part_marque": 0.0
+"part_marque": 0.03
 },
 "alway": {
 "n": 41,
@@ -698,45 +813,82 @@
 ],
 "part_marque": 0.0
 },
-"ariel": {
-"n": 83,
+"original": {
+"n": 45,
 "noms": [
-"ariel",
-"ariel all in",
-"ariel color"
+"original",
+"original washing up",
+"original blue"
 ],
 "categorie": null,
 "categories": [
 [
-"en:household-chemicals",
-7
+"en:non-food-products",
+4
 ],
 [
-"en:laundry-detergents",
-6
+"en:tobacco-products",
+4
 ],
 [
 "en:home-garden",
-5
+3
 ],
 [
 "en:household-supplies",
-4
+3
 ]
 ],
 "secteur": "Entretien / Droguerie",
 "marques": [
 "Ariel",
+"Fairy",
+"Sainsbury's",
+"Cascade",
+"Royals",
+"DG health"
+],
+"part_marque": 0.0
+},
+"ariel": {
+"n": 47,
+"noms": [
+"ariel",
+"ariel 3 en",
+"ariel color"
+],
+"categorie": null,
+"categories": [
+[
+"en:home-garden",
+3
+],
+[
+"en:household-supplies",
+3
+],
+[
+"en:laundry-detergent",
+3
+],
+[
+"en:laundry-supplies",
+3
+]
+],
+"secteur": "Entretien / Droguerie",
+"marques": [
 "P&G",
+"Ariel",
 "Procter & Gamble",
 "Ariel is sold by Procter and Gamble",
 "P&G Professional",
 "Ariel Pods"
 ],
-"part_marque": 0.52
+"part_marque": 0.15
 },
 "lingette": {
-"n": 66,
+"n": 70,
 "noms": [
 "lingettes",
 "lingettes désinfectantes",
@@ -746,11 +898,11 @@
 "categories": [
 [
 "en:non-food-products",
-16
+17
 ],
 [
 "en:open-products-facts",
-12
+13
 ],
 [
 "en:non-open-products-facts",
@@ -768,89 +920,18 @@
 "Carolin",
 "Marque Repère",
 "St Marc",
-"Eco+"
+"Cosmia"
 ],
 "part_marque": 0.0
-},
-"the": {
-"n": 74,
-"noms": [
-"the legend of",
-"the promised neverland",
-"the crew 2"
-],
-"categorie": "en:media",
-"categories": [
-[
-"en:media",
-24
-],
-[
-"en:books",
-20
-],
-[
-"en:publications",
-7
-],
-[
-"en:dvds-videos",
-4
-]
-],
-"secteur": "Loisirs/Papeterie et librairie",
-"marques": [
-"Penguin",
-"Original B&J",
-"Really Useful Records",
-"4 Seasons Creative",
-"Springbok",
-"Rhe perfume Co.africa"
-],
-"part_marque": 0.0
-},
-"lego": {
-"n": 31,
-"noms": [
-"lego",
-"lego city",
-"lego harry potter"
-],
-"categorie": null,
-"categories": [
-[
-"en:childrens-blocks-and-building-systems",
-8
-],
-[
-"en:construction-sets",
-8
-],
-[
-"en:games",
-8
-],
-[
-"en:musical-instruments-and-games-and-toys-and-arts-and-crafts-and-educational-equipment-and-materials-and-accessories-and-supplies",
-8
-]
-],
-"secteur": "Loisirs/Jouets",
-"marques": [
-"Lego",
-"pal",
-"QILINN"
-],
-"part_marque": 0.9
 },
 "jeu": {
-"n": 33,
+"n": 34,
 "noms": [
 "jeu nintendo 3ds",
 "jeu playstation 4",
 "jeu nintendo switch"
 ],
-"categorie": "en:video-games",
+"categorie": null,
 "categories": [
 [
 "en:software",
@@ -874,25 +955,21 @@
 "Lutti",
 "HERON",
 "LUDI",
+"Telestar",
 "Schmidt",
-"Nintendo Switch",
-"Disney"
+"Nintendo Switch"
 ],
 "part_marque": 0.0
 },
 "fairy": {
-"n": 100,
+"n": 58,
 "noms": [
 "fairy",
-"fairy non bio",
+"fairy platinum plus",
 "fairy liquid"
 ],
 "categorie": null,
 "categories": [
-[
-"en:home-garden",
-3
-],
 [
 "en:printed-media",
 3
@@ -904,25 +981,29 @@
 [
 "en:published-products",
 3
+],
+[
+"en:publications",
+1
 ]
 ],
 "secteur": "Loisirs/Papeterie et librairie",
 "marques": [
-"Fairy",
 "P&G",
-"Procter & Gamble",
 "Proctor and Gamble",
+"Procter & Gamble",
+"Fairy",
 "Proctor & Gamble",
 "Antibacterial"
 ],
-"part_marque": 0.44
+"part_marque": 0.03
 },
 "air": {
-"n": 41,
+"n": 40,
 "noms": [
 "air freshener",
 "air mist",
-"air wick pure"
+"air"
 ],
 "categorie": null,
 "categories": [
@@ -945,50 +1026,49 @@
 ],
 "secteur": "Loisirs/Papeterie et librairie",
 "marques": [
-"Air Wick",
 "Febreze",
 "Alcon",
+"termo",
+"Febreeze",
 "Glad",
-"Glade",
-"Abrp"
+"Glade"
 ],
 "part_marque": 0.0
 },
-"finish": {
-"n": 56,
+"powerball": {
+"n": 34,
 "noms": [
 "finish powerball",
-"finish powerball quantum",
-"finish powerball ultimate"
+"powerball",
+"finish powerball quantum"
 ],
 "categorie": null,
 "categories": [
 [
 "en:home-garden",
-6
-],
-[
-"en:household-supplies",
 5
 ],
 [
-"en:incorrect-product-type",
-2
+"en:household-supplies",
+4
 ],
 [
-"en:non-food-products",
-2
+"en:dishwashers",
+1
+],
+[
+"en:kitchen-appliances",
+1
 ]
 ],
-"secteur": "Entretien / Droguerie",
+"secteur": "Bricolage, auto et jardin/Jardinage et extérieur",
 "marques": [
 "Finish",
 "Reckitt Benckiser",
-"Quantum",
-"Calgonit",
-"Reckitt"
+"Calgon",
+"Finish Powerball"
 ],
-"part_marque": 0.59
+"part_marque": 0.0
 },
 "filtre": {
 "n": 44,
@@ -1028,7 +1108,7 @@
 "part_marque": 0.0
 },
 "sac": {
-"n": 47,
+"n": 48,
 "noms": [
 "sac",
 "sac plastique",
@@ -1065,7 +1145,7 @@
 "part_marque": 0.0
 },
 "mini": {
-"n": 57,
+"n": 58,
 "noms": [
 "mini sprays désodorisants",
 "6 mini pinces",
@@ -1096,13 +1176,50 @@
 "Auchan",
 "Silvercrest",
 "Kids",
-"Dekor",
-"Schou Company"
+"Schou Company",
+"Dekor"
+],
+"part_marque": 0.0
+},
+"fabric": {
+"n": 31,
+"noms": [
+"fabric softener",
+"fabric conditioner",
+"fairy fabric softener"
+],
+"categorie": null,
+"categories": [
+[
+"en:home-garden",
+2
+],
+[
+"en:household-supplies",
+2
+],
+[
+"en:laundry-supplies",
+2
+],
+[
+"en:fabric-softeners-dryer-sheets",
+1
+]
+],
+"secteur": "Entretien / Droguerie",
+"marques": [
+"Lenor",
+"Fairy",
+"Elastoplast",
+"Ecover",
+"Febreze",
+"Comfort"
 ],
 "part_marque": 0.0
 },
 "nettoyant": {
-"n": 72,
+"n": 74,
 "noms": [
 "nettoyant multi-surfaces",
 "nettoyant",
@@ -1212,43 +1329,6 @@
 ],
 "part_marque": 0.01
 },
-"bic": {
-"n": 32,
-"noms": [
-"bic 4 couleurs",
-"bic 4 couleur",
-"bic"
-],
-"categorie": null,
-"categories": [
-[
-"en:office-supplies",
-7
-],
-[
-"en:office-instruments",
-5
-],
-[
-"en:writing-drawing-instruments",
-5
-],
-[
-"en:pens-pencils",
-4
-]
-],
-"secteur": "Loisirs/Papeterie et librairie",
-"marques": [
-"Bic",
-"BIC NORWAY (NUF)",
-"Bic Velleda",
-"BIC SA",
-"BIC NORDIC AB",
-"Pilot"
-],
-"part_marque": 0.44
-},
 "eau": {
 "n": 32,
 "noms": [
@@ -1287,7 +1367,7 @@
 "part_marque": 0.0
 },
 "one": {
-"n": 37,
+"n": 38,
 "noms": [
 "one piece",
 "one piece tome",
@@ -1316,6 +1396,7 @@
 "marques": [
 "Glénat",
 "Philips",
+"Calvin Klein",
 "Wacom",
 "OnePlus",
 "Reese’s"
@@ -1323,7 +1404,7 @@
 "part_marque": 0.0
 },
 "iphone": {
-"n": 65,
+"n": 69,
 "noms": [
 "iphone 11",
 "iphone 17 512",
@@ -1333,19 +1414,19 @@
 "categories": [
 [
 "en:communications",
-54
+57
 ],
 [
 "en:electronics",
-54
+57
 ],
 [
 "en:telephony",
-54
+57
 ],
 [
 "en:smartphones",
-52
+55
 ]
 ],
 "secteur": null,
@@ -1357,8 +1438,82 @@
 ],
 "part_marque": 0.0
 },
+"blue": {
+"n": 30,
+"noms": [
+"chesterfield blue",
+"camel blue",
+"blue"
+],
+"categorie": "en:tobacco-products",
+"categories": [
+[
+"en:tobacco-products",
+12
+],
+[
+"en:cigarettes",
+7
+],
+[
+"fr:vape",
+1
+],
+[
+"fr:tabac",
+1
+]
+],
+"secteur": "Loisirs/Papeterie et librairie",
+"marques": [
+"Camel",
+"Chesterfield",
+"Camel Blue",
+"Winston",
+"Lucky Strike",
+"Terea"
+],
+"part_marque": 0.0
+},
+"classic": {
+"n": 32,
+"noms": [
+"classic",
+"classic comfycush old",
+"classic 27oz with"
+],
+"categorie": null,
+"categories": [
+[
+"en:tobacco-products",
+3
+],
+[
+"de:haushalt",
+1
+],
+[
+"de:1-5-kg",
+1
+],
+[
+"de:küchenrolle",
+1
+]
+],
+"secteur": "Loisirs/Jouets",
+"marques": [
+"Sun",
+"Somat",
+"Winston",
+"Finish",
+"Vans",
+"Klean Kanteen"
+],
+"part_marque": 0.0
+},
 "gel": {
-"n": 92,
+"n": 106,
 "noms": [
 "gel wc",
 "gel lavant mains",
@@ -1368,19 +1523,19 @@
 "categories": [
 [
 "en:home-garden",
-26
+28
 ],
 [
 "en:household-supplies",
-26
+28
 ],
 [
 "en:household-cleaning-products",
-25
+27
 ],
 [
 "en:household-cleaning-supplies",
-25
+27
 ]
 ],
 "secteur": "Entretien / Droguerie",
@@ -1388,68 +1543,36 @@
 "Auchan",
 "Cosmia",
 "Pouce",
+"W5",
 "Harpic",
-"Dexal",
-"La Croix"
+"Apta"
 ],
 "part_marque": 0.0
 },
-"samsung": {
-"n": 45,
-"noms": [
-"samsung a56 graphite",
-"samsung a56 gris",
-"samsung a56 rose"
-],
-"categorie": "en:smart-devices",
-"categories": [
-[
-"en:electronics",
-35
-],
-[
-"en:communications",
-34
-],
-[
-"en:smartphones",
-34
-],
-[
-"en:telephony",
-34
-]
-],
-"secteur": null,
-"marques": [
-"Samsung"
-],
-"part_marque": 0.98
-},
 "marlboro": {
-"n": 88,
+"n": 47,
 "noms": [
 "marlboro",
-"marlboro gold",
-"marlboro red"
+"marlboro double burst",
+"marlboro fuse beyond"
 ],
 "categorie": "en:cigarettes",
 "categories": [
 [
 "en:tobacco-products",
-85
+47
 ],
 [
 "en:cigarettes",
-63
+25
 ],
 [
 "en:non-food-products",
-3
+1
 ],
 [
 "en:tobacco",
-2
+1
 ]
 ],
 "secteur": "Entretien / Droguerie",
@@ -1457,14 +1580,14 @@
 "Marlboro",
 "Swedish match sales norway",
 "PHILIP MORRIS NORWAY AS",
+"Sprite",
 "Malboro",
-"Philip Morris",
-"Sprite"
+"Marlboro Light"
 ],
-"part_marque": 0.75
+"part_marque": 0.53
 },
 "lessive": {
-"n": 72,
+"n": 80,
 "noms": [
 "lessive",
 "lessive au savon",
@@ -1493,15 +1616,15 @@
 "marques": [
 "Auchan",
 "maison verte",
+"Skip",
 "L'arbre vert",
 "Henkel",
-"Carrefour",
-"Ariel"
+"Carrefour"
 ],
 "part_marque": 0.0
 },
 "spray": {
-"n": 48,
+"n": 52,
 "noms": [
 "spray nettoyant vitres",
 "spray nettoyant",
@@ -1531,9 +1654,9 @@
 "Auchan",
 "La Croix",
 "Pouce",
-"La fourche",
-"Equate",
-"BEAPHAR"
+"Dettol",
+"Flash",
+"La fourche"
 ],
 "part_marque": 0.0
 },
@@ -1684,6 +1807,43 @@
 ],
 "part_marque": 0.0
 },
+"gold": {
+"n": 36,
+"noms": [
+"marlboro gold",
+"gold",
+"gold orchid chic"
+],
+"categorie": "en:cigarettes",
+"categories": [
+[
+"en:tobacco-products",
+23
+],
+[
+"en:cigarettes",
+20
+],
+[
+"en:non-food-products",
+2
+],
+[
+"en:loose-tobacco",
+1
+]
+],
+"secteur": "Loisirs/Papeterie et librairie",
+"marques": [
+"Marlboro",
+"Lenor",
+"Fair & White paris",
+"Philip Morris GmbH",
+"Goldfield",
+"Vanish"
+],
+"part_marque": 0.0
+},
 "med": {
 "n": 42,
 "noms": [
@@ -1699,80 +1859,45 @@
 ],
 "part_marque": 0.0
 },
-"omo": {
-"n": 85,
+"gel wc": {
+"n": 30,
 "noms": [
-"omo lessive liquide",
-"omo lessive capsules",
-"omo"
+"gel wc",
+"gel wc avec javel",
+"gel wc javel"
 ],
-"categorie": "en:cleaning-and-disinfecting-solutions",
+"categorie": "en:toilet-gel",
 "categories": [
 [
 "en:home-garden",
-43
+25
 ],
 [
-"en:household-supplies",
-43
+"en:household-chemicals",
+25
 ],
 [
-"en:laundry-supplies",
-43
+"en:household-cleaning-products",
+25
 ],
 [
-"en:cleaning-and-disinfecting-solutions",
-40
+"en:household-cleaning-supplies",
+25
 ]
 ],
 "secteur": "Entretien / Droguerie",
 "marques": [
-"Omo",
-"LILLEBORG AS",
-"Orkla home and personal care as",
-"Unilever",
-"Orkla home & personal care",
-"110da"
+"Auchan",
+"Apta",
+"Pouce",
+"W5",
+"Una Mat",
+"Aldi"
 ],
-"part_marque": 0.8
-},
-"persil": {
-"n": 69,
-"noms": [
-"persil lessive liquide",
-"persil",
-"persil lessive poudre"
-],
-"categorie": "en:cleaning-and-disinfecting-solutions",
-"categories": [
-[
-"en:home-garden",
-39
-],
-[
-"en:household-supplies",
-38
-],
-[
-"en:cleaning-and-disinfecting-solutions",
-37
-],
-[
-"en:cleaning-and-janitorial-supplies",
-37
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Persil",
-"Henkel",
-"Unilever",
-"Gardenland"
-],
-"part_marque": 0.67
+"part_marque": 0.0
 },
 "wc": {
-"n": 110,
+"n": 107,
 "noms": [
 "wc reiniger",
 "wc papier",
@@ -1782,29 +1907,29 @@
 "categories": [
 [
 "en:home-garden",
-14
+15
 ],
 [
 "en:household-supplies",
-14
+15
 ],
 [
 "en:household-cleaning-products",
-13
+14
 ],
 [
 "en:household-cleaning-supplies",
-13
+14
 ]
 ],
 "secteur": "Entretien / Droguerie",
 "marques": [
-"WC NET",
 "WC Frisch",
 "Denkmit",
 "Henkel",
 "domol",
-"SC Johnson"
+"Canard",
+"Shine"
 ],
 "part_marque": 0.0
 },
@@ -1826,79 +1951,6 @@
 "Pampers Procter & Gamble"
 ],
 "part_marque": 0.0
-},
-"lucky": {
-"n": 30,
-"noms": [
-"lucky strike red",
-"lucky strike",
-"lucky strike blue"
-],
-"categorie": "en:cigarettes",
-"categories": [
-[
-"en:tobacco-products",
-19
-],
-[
-"en:cigarettes",
-11
-],
-[
-"en:non-food-products",
-2
-],
-[
-"en:printed-media",
-2
-]
-],
-"secteur": "Loisirs/Papeterie et librairie",
-"marques": [
-"Lucky Strike",
-"British american tobacco norway as",
-"Lucky striket",
-"British American tobacco group",
-"Lucky",
-"Lucky blue"
-],
-"part_marque": 0.03
-},
-"vanish": {
-"n": 32,
-"noms": [
-"vanish oxi action",
-"vanish",
-"vanish oxi advance"
-],
-"categorie": null,
-"categories": [
-[
-"en:home-garden",
-1
-],
-[
-"en:household-supplies",
-1
-],
-[
-"es:lavado",
-1
-],
-[
-"en:non-food-products",
-1
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Vanish",
-"Rosa",
-"Oxi Action",
-"Giltor as",
-"Reckitt Benckiser"
-],
-"part_marque": 0.53
 },
 "recharge": {
 "n": 34,
@@ -1937,43 +1989,8 @@
 ],
 "part_marque": 0.0
 },
-"auchan": {
-"n": 138,
-"noms": [
-"auchan baby couches",
-"auchan lessive liquide",
-"auchan sacs poubelles"
-],
-"categorie": null,
-"categories": [
-[
-"en:home-garden",
-36
-],
-[
-"en:household-supplies",
-32
-],
-[
-"en:baby-toddler",
-17
-],
-[
-"en:diapering",
-17
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Auchan",
-"Auchan Baby",
-"Better life",
-"Auchan Essentiel"
-],
-"part_marque": 0.86
-},
 "lave": {
-"n": 409,
+"n": 410,
 "noms": [
 "lave-linge top -",
 "lave-linge hublot -",
@@ -2083,41 +2100,6 @@
 ],
 "part_marque": 0.0
 },
-"lenor": {
-"n": 39,
-"noms": [
-"lenor",
-"lenor unstoppables",
-"lenor color"
-],
-"categorie": null,
-"categories": [
-[
-"en:fabric-softeners-dryer-sheets",
-2
-],
-[
-"en:home-garden",
-2
-],
-[
-"en:household-supplies",
-2
-],
-[
-"en:laundry-supplies",
-2
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Lenor",
-"P&G",
-"Weichspüler",
-"Procter & Gamble"
-],
-"part_marque": 0.38
-},
 "ordinateur": {
 "n": 1025,
 "noms": [
@@ -2171,171 +2153,5 @@
 "Asus"
 ],
 "part_marque": 0.0
-},
-"ace": {
-"n": 32,
-"noms": [
-"ace color verde",
-"ace wc gel",
-"ace detergent pardoseli"
-],
-"categorie": null,
-"categories": [
-[
-"it:altro",
-1
-],
-[
-"en:bleach",
-1
-],
-[
-"en:home-garden",
-1
-],
-[
-"en:household-chemicals",
-1
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Ace"
-],
-"part_marque": 0.12
-},
-"skip": {
-"n": 66,
-"noms": [
-"skip lessive liquide",
-"skip lessive capsules",
-"skip active clean"
-],
-"categorie": "en:cleaning-and-disinfecting-solutions",
-"categories": [
-[
-"en:home-garden",
-55
-],
-[
-"en:household-supplies",
-55
-],
-[
-"en:cleaning-and-disinfecting-solutions",
-53
-],
-[
-"en:cleaning-and-janitorial-supplies",
-53
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Skip",
-"Ultimate",
-"3en1",
-"Unilever",
-"Essence De La Nature"
-],
-"part_marque": 0.95
-},
-"skip lessive": {
-"n": 46,
-"noms": [
-"skip lessive liquide sensitive",
-"skip lessive liquide active",
-"skip lessive liquide fraîcheur"
-],
-"categorie": "en:cleaning-and-disinfecting-solutions",
-"categories": [
-[
-"en:cleaning-and-disinfecting-solutions",
-44
-],
-[
-"en:cleaning-and-janitorial-supplies",
-44
-],
-[
-"en:cleaning-equipment-and-supplies",
-44
-],
-[
-"en:home-garden",
-44
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Skip",
-"3en1",
-"Ultimate"
-],
-"part_marque": 1.0
-},
-"persil lessive": {
-"n": 35,
-"noms": [
-"persil lessive liquide bouquet",
-"persil lessive poudre bouquet",
-"persil lessive liquide fraîcheur"
-],
-"categorie": "en:cleaning-and-disinfecting-solutions",
-"categories": [
-[
-"en:cleaning-and-disinfecting-solutions",
-31
-],
-[
-"en:cleaning-and-janitorial-supplies",
-31
-],
-[
-"en:cleaning-equipment-and-supplies",
-31
-],
-[
-"en:home-garden",
-31
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Persil"
-],
-"part_marque": 1.0
-},
-"omo lessive": {
-"n": 35,
-"noms": [
-"omo lessive capsules 2en1",
-"omo lessive liquide jasmin",
-"omo lessive liquide rose"
-],
-"categorie": "en:cleaning-and-disinfecting-solutions",
-"categories": [
-[
-"en:cleaning-and-disinfecting-solutions",
-35
-],
-[
-"en:cleaning-and-janitorial-supplies",
-35
-],
-[
-"en:cleaning-equipment-and-supplies",
-35
-],
-[
-"en:home-garden",
-35
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Omo"
-],
-"part_marque": 1.0
 }
 }

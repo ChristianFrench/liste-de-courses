@@ -1,5 +1,5 @@
 {
-"_description": "openbeautyfacts, 2026-10-31 : 21780 produits vendus en France, 3502 rangés sous 93 natures du catalogue sur 157",
+"_description": "openbeautyfacts, 2026-10-31 : 21780 produits vendus en France, 4093 rangés sous 96 natures du catalogue sur 157",
 "natures": {
 "Bébé/Alimentation bébé/Eau pour bébé": {
 "n": 5,
@@ -22,12 +22,16 @@
 "marques": []
 },
 "Bébé/Hygiène bébé/Liniment": {
-"n": 41,
+"n": 46,
 "categorie": null,
 "marques": [
 [
 "Gifrer",
 5
+],
+[
+"Mustela",
+3
 ],
 [
 "Léa Nature",
@@ -41,12 +45,12 @@
 "marques": []
 },
 "Bébé/Hygiène bébé/Gel lavant bébé": {
-"n": 2,
+"n": 3,
 "categorie": "fr:gel-lavant",
 "marques": []
 },
 "Bébé/Hygiène bébé/Crème change": {
-"n": 4,
+"n": 5,
 "categorie": "fr:cremes-pour-le-change",
 "marques": []
 },
@@ -61,12 +65,28 @@
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Gel douche": {
-"n": 321,
+"n": 457,
 "categorie": "en:shower-gels",
 "marques": [
 [
+"Axe",
+67
+],
+[
+"Unilever",
+34
+],
+[
 "Cosmia",
-25
+33
+],
+[
+"Dove",
+31
+],
+[
+"Monsavon",
+26
 ],
 [
 "Le Petit Marseillais",
@@ -181,6 +201,10 @@
 3
 ],
 [
+"Natessance",
+3
+],
+[
 "Coslys",
 3
 ],
@@ -203,7 +227,7 @@
 ]
 },
 "Parfumerie et soins/Toilette et soins du corps/Savon": {
-"n": 384,
+"n": 396,
 "categorie": "en:soaps",
 "marques": [
 [
@@ -303,11 +327,23 @@
 4
 ],
 [
+"Unilever",
+4
+],
+[
+"Dove",
+4
+],
+[
 "La Boucle",
 3
 ],
 [
 "Comme avant",
+3
+],
+[
+"Monsavon",
 3
 ],
 [
@@ -357,9 +393,29 @@
 ]
 },
 "Parfumerie et soins/Toilette et soins du corps/Déodorant": {
-"n": 254,
+"n": 417,
 "categorie": "en:deodorants",
 "marques": [
+[
+"Axe",
+67
+],
+[
+"Unilever",
+53
+],
+[
+"Rexona",
+33
+],
+[
+"Dove",
+27
+],
+[
+"Monsavon",
+25
+],
 [
 "Narta",
 12
@@ -377,15 +433,39 @@
 10
 ],
 [
-"Dove",
+"Respire",
+10
+],
+[
+"Schmidt's",
 9
 ],
 [
-"Respire",
-9
+"Rexona Men",
+7
+],
+[
+"Brut",
+7
 ],
 [
 "Nivea",
+6
+],
+[
+"Cosmia",
+6
+],
+[
+"Weleda",
+6
+],
+[
+"For Women",
+6
+],
+[
+"Labell",
 5
 ],
 [
@@ -401,19 +481,7 @@
 5
 ],
 [
-"Weleda",
-5
-],
-[
 "Nuxe",
-4
-],
-[
-"Cosmia",
-4
-],
-[
-"Labell",
 4
 ],
 [
@@ -430,10 +498,6 @@
 ],
 [
 "Acorelle",
-4
-],
-[
-"Unilever",
 4
 ],
 [
@@ -467,25 +531,13 @@
 [
 "Horace",
 3
-],
-[
-"Axe",
-3
-],
-[
-"Rexona",
-3
 ]
 ]
 },
 "Parfumerie et soins/Toilette et soins du corps/Crème hydratante": {
-"n": 73,
-"categorie": "en:body",
+"n": 69,
+"categorie": "en:body-creams",
 "marques": [
-[
-"Yves Rocher",
-6
-],
 [
 "L'Oréal",
 3
@@ -495,7 +547,7 @@
 3
 ],
 [
-"Le Petit Olivier",
+"Marque Repère",
 3
 ]
 ]
@@ -511,7 +563,7 @@
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Savon liquide": {
-"n": 54,
+"n": 56,
 "categorie": "fr:savons-liquides",
 "marques": [
 [
@@ -529,9 +581,18 @@
 ]
 },
 "Parfumerie et soins/Toilette et soins du corps/Gel hydroalcoolique": {
-"n": 8,
+"n": 11,
 "categorie": "en:hydro-alcoholic-gels",
-"marques": []
+"marques": [
+[
+"Unilever",
+3
+],
+[
+"Lifebuoy",
+3
+]
+]
 },
 "Parfumerie et soins/Toilette et soins du corps/Lait corporel": {
 "n": 23,
@@ -542,6 +603,11 @@
 3
 ]
 ]
+},
+"Parfumerie et soins/Toilette et soins du corps/Gel douche enfant": {
+"n": 1,
+"categorie": "en:shower-gels",
+"marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Crème pour les pieds": {
 "n": 7,
@@ -559,17 +625,17 @@
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Gommage corps": {
-"n": 7,
+"n": 8,
 "categorie": "en:body-scrubs",
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Talc": {
-"n": 8,
+"n": 9,
 "categorie": "fr:talc",
 "marques": []
 },
 "Parfumerie et soins/Cheveux/Shampooing": {
-"n": 418,
+"n": 438,
 "categorie": "en:shampoos",
 "marques": [
 [
@@ -602,10 +668,14 @@
 ],
 [
 "Carrefour",
-12
+13
 ],
 [
 "Eugène Perma",
+11
+],
+[
+"Unilever",
 11
 ],
 [
@@ -625,6 +695,10 @@
 10
 ],
 [
+"Timotei",
+10
+],
+[
 "Yves Rocher",
 9
 ],
@@ -637,15 +711,15 @@
 9
 ],
 [
+"Klorane",
+8
+],
+[
 "Le Petit Olivier",
 8
 ],
 [
 "Cora",
-7
-],
-[
-"Klorane",
 7
 ],
 [
@@ -661,6 +735,10 @@
 6
 ],
 [
+"Naturé Moi",
+6
+],
+[
 "Léa Nature",
 6
 ],
@@ -673,7 +751,7 @@
 5
 ],
 [
-"Naturé Moi",
+"Cattier",
 5
 ],
 [
@@ -697,11 +775,15 @@
 4
 ],
 [
-"Cattier",
+"Elseve",
 4
 ],
 [
-"Elseve",
+"Mixa",
+4
+],
+[
+"Mixa Bébé",
 4
 ],
 [
@@ -715,40 +797,32 @@
 [
 "Cosmo naturel",
 3
-],
-[
-"Léa nature Floressance",
-3
-],
-[
-"Weleda",
-3
-],
-[
-"Cosmia",
-3
-],
-[
-"Mixa",
-3
 ]
 ]
 },
 "Parfumerie et soins/Cheveux/Après-shampooing": {
-"n": 43,
+"n": 48,
 "categorie": "en:hair-conditioners",
 "marques": [
-[
-"L'Oreal Consumer products",
-7
-],
 [
 "Garnier",
 7
 ],
 [
+"L'Oreal Consumer products",
+7
+],
+[
 "L'Oréal",
 7
+],
+[
+"Unilever",
+6
+],
+[
+"Timotei",
+5
 ],
 [
 "Nectar of Beauty",
@@ -765,7 +839,7 @@
 ]
 },
 "Parfumerie et soins/Cheveux/Coloration": {
-"n": 16,
+"n": 17,
 "categorie": "en:hair-dyes",
 "marques": [
 [
@@ -783,12 +857,12 @@
 ]
 },
 "Parfumerie et soins/Cheveux/Gel coiffant": {
-"n": 24,
+"n": 26,
 "categorie": "en:hair-gel",
 "marques": [
 [
 "Vivelle Dop",
-4
+6
 ],
 [
 "Cosmia",
@@ -797,9 +871,14 @@
 ]
 },
 "Parfumerie et soins/Cheveux/Laque": {
-"n": 17,
+"n": 20,
 "categorie": "en:hair-sprays",
-"marques": []
+"marques": [
+[
+"Cosmia",
+3
+]
+]
 },
 "Parfumerie et soins/Cheveux/Shampooing sec": {
 "n": 11,
@@ -831,7 +910,7 @@
 "marques": []
 },
 "Parfumerie et soins/Cheveux/Mousse coiffante": {
-"n": 1,
+"n": 2,
 "categorie": null,
 "marques": []
 },
@@ -846,9 +925,21 @@
 "marques": []
 },
 "Parfumerie et soins/Santé dentaire/Dentifrice": {
-"n": 272,
+"n": 307,
 "categorie": "en:toothpastes",
 "marques": [
+[
+"Unilever",
+28
+],
+[
+"Signal",
+22
+],
+[
+"Auchan",
+13
+],
 [
 "Coslys",
 12
@@ -862,23 +953,19 @@
 10
 ],
 [
+"Zendium",
+9
+],
+[
 "Carrefour",
 8
 ],
 [
-"Signal",
+"Henkel",
 7
 ],
 [
-"Henkel",
-6
-],
-[
 "U",
-6
-],
-[
-"Auchan",
 6
 ],
 [
@@ -892,10 +979,6 @@
 [
 "Elmex",
 6
-],
-[
-"Unilever",
-5
 ],
 [
 "Comme avant",
@@ -926,6 +1009,10 @@
 4
 ],
 [
+"Teraxyl",
+4
+],
+[
 "Argiletz",
 4
 ],
@@ -939,10 +1026,6 @@
 ],
 [
 "Les savons de Joya",
-3
-],
-[
-"Teraxyl",
 3
 ],
 [
@@ -970,11 +1053,11 @@
 3
 ],
 [
-"Dentavie",
+"Léa Nature",
 3
 ],
 [
-"Léa Nature",
+"Dentavie",
 3
 ],
 [
@@ -1000,17 +1083,34 @@
 ]
 },
 "Parfumerie et soins/Santé dentaire/Brosse à dents": {
-"n": 12,
-"categorie": null,
-"marques": []
+"n": 48,
+"categorie": "fr:brosse-a-dents",
+"marques": [
+[
+"Unilever",
+40
+],
+[
+"Signal",
+38
+]
+]
 },
 "Parfumerie et soins/Santé dentaire/Bain de bouche": {
-"n": 48,
+"n": 55,
 "categorie": "en:mouthwashes",
 "marques": [
 [
 "Auchan",
-7
+8
+],
+[
+"Unilever",
+5
+],
+[
+"Signal",
+4
 ]
 ]
 },
@@ -1029,12 +1129,21 @@
 ]
 ]
 },
+"Parfumerie et soins/Santé dentaire/Brosse à dents enfant": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
 "Parfumerie et soins/Santé dentaire/Dentifrice enfant": {
-"n": 10,
+"n": 11,
 "categorie": "en:toothpastes",
 "marques": [
 [
 "Auchan",
+4
+],
+[
+"Kids",
 3
 ]
 ]
@@ -1045,9 +1154,17 @@
 "marques": []
 },
 "Parfumerie et soins/Santé dentaire/Dentifrice blancheur": {
-"n": 25,
-"categorie": "en:whitening-toothpastes",
+"n": 41,
+"categorie": "en:toothpastes",
 "marques": [
+[
+"Unilever",
+9
+],
+[
+"Signal",
+9
+],
 [
 "Auchan",
 3
@@ -1065,7 +1182,7 @@
 "marques": []
 },
 "Parfumerie et soins/Cosmétiques et parfums/Parfum": {
-"n": 12,
+"n": 13,
 "categorie": null,
 "marques": []
 },
@@ -1095,12 +1212,12 @@
 "marques": []
 },
 "Parfumerie et soins/Cosmétiques et parfums/Fond de teint": {
-"n": 13,
-"categorie": null,
+"n": 12,
+"categorie": "en:makeup",
 "marques": [
 [
 "L'Oréal",
-3
+5
 ]
 ]
 },
@@ -1118,11 +1235,11 @@
 4
 ],
 [
-"Diadermine",
+"Henkel",
 3
 ],
 [
-"Henkel",
+"Diadermine",
 3
 ],
 [
@@ -1132,7 +1249,7 @@
 ]
 },
 "Parfumerie et soins/Cosmétiques et parfums/Eau micellaire": {
-"n": 60,
+"n": 61,
 "categorie": "en:micellar-water",
 "marques": [
 [
@@ -1140,17 +1257,17 @@
 4
 ],
 [
-"Barbara Gould",
-3
+"Uriage",
+4
 ],
 [
-"Uriage",
+"Barbara Gould",
 3
 ]
 ]
 },
 "Parfumerie et soins/Cosmétiques et parfums/Crème de jour": {
-"n": 30,
+"n": 33,
 "categorie": "en:facial-creams",
 "marques": [
 [
@@ -1175,16 +1292,24 @@
 "marques": []
 },
 "Parfumerie et soins/Cosmétiques et parfums/Eau de toilette": {
-"n": 28,
+"n": 37,
 "categorie": "en:eau-de-toilette",
 "marques": [
+[
+"Alix de Faure",
+12
+],
 [
 "Marque Repère",
 12
 ],
 [
-"Alix de Faure",
-12
+"Axe",
+6
+],
+[
+"Cosmia",
+3
 ]
 ]
 },
@@ -1244,7 +1369,7 @@
 "marques": []
 },
 "Hygiène/Rasage/Rasoirs": {
-"n": 2,
+"n": 3,
 "categorie": "en:razors",
 "marques": []
 },
@@ -1259,12 +1384,12 @@
 ]
 },
 "Hygiène/Rasage/Gel à raser": {
-"n": 16,
+"n": 17,
 "categorie": "en:shaving",
 "marques": []
 },
 "Hygiène/Rasage/Après-rasage": {
-"n": 3,
+"n": 4,
 "categorie": "fr:lotion-post-rasage",
 "marques": []
 },
@@ -1303,7 +1428,7 @@
 "marques": []
 },
 "Parapharmacie/Soins et premiers secours/Sérum physiologique": {
-"n": 3,
+"n": 5,
 "categorie": "en:non-food-products",
 "marques": []
 },
@@ -1311,6 +1436,20 @@
 "n": 1,
 "categorie": null,
 "marques": []
+},
+"Parapharmacie/Soins et premiers secours/Compresses": {
+"n": 4,
+"categorie": "en:deodorants",
+"marques": [
+[
+"Unilever",
+3
+],
+[
+"Rexona",
+3
+]
+]
 },
 "Parapharmacie/Soins et premiers secours/Sparadrap": {
 "n": 1,
@@ -1343,7 +1482,7 @@
 ]
 },
 "Parapharmacie/Solaires et soins spécifiques/Crème mains": {
-"n": 181,
+"n": 184,
 "categorie": "en:hand-creams",
 "marques": [
 [
@@ -1363,15 +1502,15 @@
 6
 ],
 [
+"Cosmia",
+6
+],
+[
 "Caudalie",
 6
 ],
 [
 "Dermophil",
-4
-],
-[
-"Cosmia",
 4
 ],
 [
@@ -1463,7 +1602,7 @@
 "marques": []
 },
 "Parapharmacie/Solaires et soins spécifiques/Huiles essentielles": {
-"n": 28,
+"n": 29,
 "categorie": null,
 "marques": []
 },

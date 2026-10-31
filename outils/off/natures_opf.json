@@ -1,18 +1,18 @@
 {
-"_description": "openproductsfacts, 2026-10-31 : 41133 produits vendus en France, 2849 rangés sous 374 natures du catalogue sur 772",
+"_description": "openproductsfacts, 2026-10-31 : 41133 produits vendus en France, 3109 rangés sous 376 natures du catalogue sur 772",
 "natures": {
 "Bébé/Hygiène bébé/Couches": {
-"n": 27,
+"n": 41,
 "categorie": "en:diapering",
 "marques": [
 [
 "Auchan Baby",
-20
+34
 ]
 ]
 },
 "Bébé/Hygiène bébé/Lingettes bébé": {
-"n": 1,
+"n": 2,
 "categorie": null,
 "marques": []
 },
@@ -47,14 +47,23 @@
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Savon": {
-"n": 17,
+"n": 18,
 "categorie": null,
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Déodorant": {
-"n": 9,
+"n": 14,
 "categorie": "en:open-beauty-facts",
-"marques": []
+"marques": [
+[
+"Rexona",
+5
+],
+[
+"FOR WOMEN",
+3
+]
+]
 },
 "Parfumerie et soins/Toilette et soins du corps/Coton": {
 "n": 5,
@@ -67,8 +76,8 @@
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Savon liquide": {
-"n": 3,
-"categorie": null,
+"n": 5,
+"categorie": "en:bar-soap",
 "marques": []
 },
 "Parfumerie et soins/Toilette et soins du corps/Gel hydroalcoolique": {
@@ -107,16 +116,16 @@
 "marques": []
 },
 "Parfumerie et soins/Cheveux/Élastiques à cheveux": {
-"n": 30,
+"n": 31,
 "categorie": "en:ponytail-holders",
 "marques": [
 [
 "Cosmia",
-30
+31
 ],
 [
 "Kids",
-15
+16
 ],
 [
 "Auchan",
@@ -325,7 +334,7 @@
 "marques": []
 },
 "Hygiène/Rasage/Rasoirs": {
-"n": 4,
+"n": 5,
 "categorie": "fr:rasoirs-jetables",
 "marques": [
 [
@@ -445,53 +454,70 @@
 "marques": []
 },
 "Entretien / Droguerie/Lessives et soin du linge/Lessive liquide": {
-"n": 52,
-"categorie": "en:liquid-detergent",
+"n": 85,
+"categorie": "en:cleaning-and-disinfecting-solutions",
 "marques": [
 [
-"Auchan",
-11
+"Skip",
+33
 ],
 [
-"U",
-6
+"Persil",
+23
 ],
 [
-"Le Chat",
-3
-],
-[
-"L'arbre vert",
-3
-],
-[
-"Rainett",
-3
+"Omo",
+22
 ]
 ]
 },
 "Entretien / Droguerie/Lessives et soin du linge/Lessive en poudre": {
-"n": 9,
-"categorie": null,
-"marques": []
-},
-"Entretien / Droguerie/Lessives et soin du linge/Lessive en capsules": {
-"n": 9,
-"categorie": "en:laundry-supplies",
+"n": 18,
+"categorie": "en:cleaning-and-disinfecting-solutions",
 "marques": [
 [
 "Auchan",
-3
+4
+],
+[
+"Persil",
+4
+],
+[
+"Skip",
+4
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Lessive en capsules": {
+"n": 21,
+"categorie": "en:cleaning-and-disinfecting-solutions",
+"marques": [
+[
+"Omo",
+11
+],
+[
+"Skip",
+5
+],
+[
+"Persil",
+4
 ]
 ]
 },
 "Entretien / Droguerie/Lessives et soin du linge/Adoucissant": {
-"n": 25,
+"n": 36,
 "categorie": "fr:adoucissants",
 "marques": [
 [
 "Auchan",
-12
+19
+],
+[
+"Cajoline",
+5
 ]
 ]
 },
@@ -510,8 +536,8 @@
 ]
 },
 "Entretien / Droguerie/Lessives et soin du linge/Désinfectant linge": {
-"n": 6,
-"categorie": "en:liquide-desinfectant-du-linge",
+"n": 8,
+"categorie": "en:cleaning-and-disinfecting-solutions",
 "marques": [
 [
 "Sanytol",
@@ -560,12 +586,12 @@
 "marques": []
 },
 "Entretien / Droguerie/Produits Vaisselle/Liquide vaisselle": {
-"n": 104,
+"n": 107,
 "categorie": "fr:liquide-vaisselle",
 "marques": [
 [
 "Auchan",
-18
+19
 ],
 [
 "W5",
@@ -597,17 +623,22 @@
 "marques": []
 },
 "Entretien / Droguerie/Produits Vaisselle/Liquide de rinçage": {
-"n": 8,
+"n": 10,
 "categorie": "fr:liquide-vaisselle",
-"marques": []
+"marques": [
+[
+"Auchan",
+3
+]
+]
 },
 "Entretien / Droguerie/Produits Vaisselle/Éponges": {
-"n": 44,
+"n": 45,
 "categorie": "en:household-sponges",
 "marques": [
 [
 "Auchan",
-11
+12
 ],
 [
 "Cosmia",
@@ -625,9 +656,14 @@
 "marques": []
 },
 "Entretien / Droguerie/Produits Vaisselle/Nettoyant lave-vaisselle": {
-"n": 4,
+"n": 5,
 "categorie": "fr:nettoyant",
-"marques": []
+"marques": [
+[
+"Auchan",
+3
+]
+]
 },
 "Entretien / Droguerie/Produits Vaisselle/Brosse vaisselle": {
 "n": 1,
@@ -645,7 +681,7 @@
 "marques": []
 },
 "Entretien / Droguerie/Nettoyants ménagers/Nettoyant vitres": {
-"n": 10,
+"n": 11,
 "categorie": null,
 "marques": []
 },
@@ -665,9 +701,14 @@
 ]
 },
 "Entretien / Droguerie/Nettoyants ménagers/Javel": {
-"n": 24,
+"n": 28,
 "categorie": "en:bleach",
-"marques": []
+"marques": [
+[
+"Apta",
+3
+]
+]
 },
 "Entretien / Droguerie/Nettoyants ménagers/Nettoyant WC": {
 "n": 2,
@@ -675,12 +716,12 @@
 "marques": []
 },
 "Entretien / Droguerie/Nettoyants ménagers/Lingettes nettoyantes": {
-"n": 7,
+"n": 8,
 "categorie": "en:open-products-facts",
 "marques": [
 [
 "Auchan",
-6
+7
 ]
 ]
 },
@@ -729,7 +770,7 @@
 ]
 },
 "Entretien / Droguerie/Nettoyants ménagers/Désodorisant": {
-"n": 38,
+"n": 39,
 "categorie": "en:non-food-products",
 "marques": [
 [
@@ -752,8 +793,8 @@
 "marques": []
 },
 "Entretien / Droguerie/Nettoyants ménagers/Acide citrique": {
-"n": 3,
-"categorie": "fr:acide-citrique",
+"n": 5,
+"categorie": null,
 "marques": []
 },
 "Entretien / Droguerie/Nettoyants ménagers/Détartrant WC": {
@@ -787,12 +828,12 @@
 "marques": []
 },
 "Entretien / Droguerie/Accessoires de ménage/Serpillière": {
-"n": 5,
+"n": 8,
 "categorie": "fr:serpillieres",
 "marques": [
 [
 "Auchan",
-3
+6
 ]
 ]
 },
@@ -922,11 +963,15 @@
 ]
 },
 "Entretien / Droguerie/Papier/Mouchoirs": {
-"n": 37,
+"n": 39,
 "categorie": "fr:mouchoirs",
 "marques": [
 [
 "U",
+3
+],
+[
+"Auchan",
 3
 ]
 ]
@@ -947,9 +992,14 @@
 ]
 },
 "Entretien / Droguerie/Papier/Mouchoirs en boîte": {
-"n": 1,
+"n": 6,
 "categorie": "fr:mouchoirs",
-"marques": []
+"marques": [
+[
+"Auchan",
+5
+]
+]
 },
 "Entretien / Droguerie/Papier/Paquets de mouchoirs": {
 "n": 2,
@@ -957,12 +1007,16 @@
 "marques": []
 },
 "Entretien / Droguerie/Emballages et Aluminium etc/Sacs poubelle": {
-"n": 62,
+"n": 76,
 "categorie": "en:garbage-bags",
 "marques": [
 [
 "Auchan",
-28
+39
+],
+[
+"Pouce",
+6
 ],
 [
 "Elembal",
@@ -979,25 +1033,21 @@
 [
 "handy bag",
 3
-],
-[
-"Pouce",
-3
 ]
 ]
 },
 "Entretien / Droguerie/Emballages et Aluminium etc/Papier aluminium": {
-"n": 9,
+"n": 10,
 "categorie": "en:aluminium-kitchen-foil",
 "marques": []
 },
 "Entretien / Droguerie/Emballages et Aluminium etc/Papier cuisson": {
-"n": 19,
+"n": 20,
 "categorie": "en:parchment-paper",
 "marques": [
 [
 "Auchan",
-3
+4
 ]
 ]
 },
@@ -1177,7 +1227,7 @@
 "marques": []
 },
 "Bricolage, auto et jardin/Bricolage et quincaillerie/Piles": {
-"n": 43,
+"n": 44,
 "categorie": "en:batteries",
 "marques": [
 [
@@ -1208,12 +1258,12 @@
 "marques": []
 },
 "Bricolage, auto et jardin/Bricolage et quincaillerie/Colle": {
-"n": 21,
+"n": 22,
 "categorie": null,
 "marques": [
 [
 "Uhu",
-4
+5
 ]
 ]
 },
@@ -1272,10 +1322,20 @@
 "categorie": null,
 "marques": []
 },
-"Bricolage, auto et jardin/Bricolage et quincaillerie/Allume-feu": {
-"n": 11,
-"categorie": "fr:allume-feu",
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Mètre ruban": {
+"n": 1,
+"categorie": null,
 "marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Allume-feu": {
+"n": 13,
+"categorie": "fr:allume-feu",
+"marques": [
+[
+"Pouce",
+4
+]
+]
 },
 "Bricolage, auto et jardin/Bricolage et quincaillerie/Allumettes": {
 "n": 11,
@@ -1428,12 +1488,12 @@
 "marques": []
 },
 "Bricolage, auto et jardin/Peinture, colles et mastics/Pinceaux": {
-"n": 9,
+"n": 14,
 "categorie": "en:non-food-products",
 "marques": [
 [
 "Cosmia",
-7
+12
 ]
 ]
 },
@@ -1468,16 +1528,16 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Cahiers": {
-"n": 96,
+"n": 98,
 "categorie": "en:notebooks",
 "marques": [
 [
 "Clairefontaine",
-8
+9
 ],
 [
 "Oxford",
-7
+8
 ],
 [
 "Esquisse",
@@ -1501,12 +1561,12 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Magazines": {
-"n": 11,
+"n": 13,
 "categorie": "en:media",
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Crayons de couleur": {
-"n": 7,
+"n": 8,
 "categorie": "fr:crayons-de-couleur",
 "marques": []
 },
@@ -1516,18 +1576,23 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Feutres": {
-"n": 16,
+"n": 17,
 "categorie": "fr:feutres",
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Gomme": {
-"n": 12,
+"n": 15,
 "categorie": "en:office-supplies",
-"marques": []
+"marques": [
+[
+"Maped",
+4
+]
+]
 },
 "Loisirs/Papeterie et librairie/Taille-crayon": {
-"n": 6,
-"categorie": "en:office-supplies",
+"n": 5,
+"categorie": "en:pencil-sharpeners",
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Ramettes de papier": {
@@ -1546,12 +1611,12 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Post-it": {
-"n": 7,
-"categorie": "de:узкие-клейкие-закладки",
+"n": 6,
+"categorie": null,
 "marques": [
 [
 "Post-it",
-5
+4
 ]
 ]
 },
@@ -1566,12 +1631,12 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Ciseaux": {
-"n": 11,
+"n": 13,
 "categorie": "en:hairdressing-cosmetology",
 "marques": [
 [
 "Cosmia",
-8
+10
 ]
 ]
 },
@@ -1581,17 +1646,17 @@
 "marques": []
 },
 "Loisirs/Papeterie et librairie/Surligneurs": {
-"n": 11,
+"n": 13,
 "categorie": "en:highlighters",
 "marques": [
 [
 "Stabilo",
-4
+5
 ]
 ]
 },
 "Loisirs/Papeterie et librairie/Agenda": {
-"n": 34,
+"n": 35,
 "categorie": "en:printed-media",
 "marques": []
 },
@@ -1621,7 +1686,7 @@
 "marques": []
 },
 "Loisirs/Jouets/Puzzle": {
-"n": 11,
+"n": 13,
 "categorie": "en:jigsaw-puzzles",
 "marques": []
 },
@@ -1676,12 +1741,12 @@
 "marques": []
 },
 "Loisirs/Bagagerie/Trousses": {
-"n": 5,
+"n": 7,
 "categorie": null,
 "marques": [
 [
 "Cosmia",
-3
+5
 ]
 ]
 },
@@ -1789,9 +1854,14 @@
 "marques": []
 },
 "Électroménager et décoration/Décoration/Bougies": {
-"n": 27,
+"n": 30,
 "categorie": "en:candles",
-"marques": []
+"marques": [
+[
+"Auchan",
+4
+]
+]
 },
 "Électroménager et décoration/Décoration/Cadres": {
 "n": 1,
@@ -1824,14 +1894,19 @@
 "marques": []
 },
 "Électroménager et décoration/Décoration/Miroirs": {
-"n": 6,
+"n": 7,
 "categorie": "en:mirrors",
 "marques": [
 [
 "Cosmia",
-5
+6
 ]
 ]
+},
+"Électroménager et décoration/Décoration/Diffuseur de parfum": {
+"n": 2,
+"categorie": null,
+"marques": []
 },
 "Électroménager et décoration/Décoration/Horloge": {
 "n": 2,
@@ -1859,7 +1934,7 @@
 "marques": []
 },
 "Textile/Vêtements femme/T-shirts": {
-"n": 26,
+"n": 27,
 "categorie": "en:t-shirts",
 "marques": [
 [
@@ -1888,7 +1963,7 @@
 "marques": []
 },
 "Textile/Vêtements femme/Jeans": {
-"n": 10,
+"n": 11,
 "categorie": "xx:jeans",
 "marques": [
 [
@@ -1913,7 +1988,7 @@
 "marques": []
 },
 "Textile/Vêtements femme/Tops": {
-"n": 6,
+"n": 7,
 "categorie": "en:collectibles",
 "marques": []
 },
@@ -1963,7 +2038,7 @@
 "marques": []
 },
 "Textile/Vêtements homme/T-shirts": {
-"n": 26,
+"n": 27,
 "categorie": "en:t-shirts",
 "marques": [
 [
@@ -1997,7 +2072,7 @@
 "marques": []
 },
 "Textile/Vêtements homme/Jeans": {
-"n": 10,
+"n": 11,
 "categorie": "xx:jeans",
 "marques": [
 [
@@ -2052,7 +2127,7 @@
 "marques": []
 },
 "Textile/Vêtements enfant et bébé/T-shirts": {
-"n": 26,
+"n": 27,
 "categorie": "en:t-shirts",
 "marques": [
 [
@@ -2081,7 +2156,7 @@
 "marques": []
 },
 "Textile/Vêtements enfant et bébé/Jeans": {
-"n": 10,
+"n": 11,
 "categorie": "xx:jeans",
 "marques": [
 [
@@ -2156,12 +2231,12 @@
 ]
 },
 "Textile/Lingerie/Culottes": {
-"n": 29,
+"n": 31,
 "categorie": "fr:culottes-de-regles",
 "marques": [
 [
 "Auchan",
-16
+18
 ],
 [
 "Auchan Baby",

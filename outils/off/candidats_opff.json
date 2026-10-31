@@ -72,7 +72,7 @@
 "part_marque": 0.0
 },
 "pate": {
-"n": 57,
+"n": 59,
 "noms": [
 "pâté pour chat",
 "paté pour chat",
@@ -93,23 +93,23 @@
 10
 ],
 [
-"en:dog-food",
-8
+"en:open-pet-food-facts",
+9
 ]
 ],
 "secteur": "Animaux/Chiens",
 "marques": [
+"Yarrah",
 "Edgard Cooper",
 "U",
 "Real Nature",
-"Yarrah",
 "Gourmet purina",
 "Juliette seraille"
 ],
 "part_marque": 0.0
 },
 "croquette": {
-"n": 152,
+"n": 153,
 "noms": [
 "croquettes",
 "croquette",
@@ -119,7 +119,7 @@
 "categories": [
 [
 "en:pet-food",
-58
+59
 ],
 [
 "en:dry-pet-food",
@@ -127,7 +127,7 @@
 ],
 [
 "en:cat-food",
-41
+42
 ],
 [
 "en:dry-cat-food",
@@ -145,109 +145,156 @@
 ],
 "part_marque": 0.0
 },
-"royal": {
-"n": 36,
+"nature": {
+"n": 30,
 "noms": [
-"royal canin -",
-"royal canin sterilised",
-"royal canin"
-],
-"categorie": "en:pet-food",
-"categories": [
-[
-"en:pet-food",
-11
-],
-[
-"en:dog-food",
-10
-],
-[
-"en:dog-and-cat-food",
-8
-],
-[
-"en:cat-food",
-7
-]
-],
-"secteur": "Animaux/Chats",
-"marques": [
-"royal canin",
-"Royal",
-"Premiere"
-],
-"part_marque": 0.06
-},
-"royal canin": {
-"n": 34,
-"noms": [
-"royal canin sterilised",
-"royal canin - croquettes",
-"royal canin"
-],
-"categorie": "en:pet-food",
-"categories": [
-[
-"en:pet-food",
-11
-],
-[
-"en:dog-food",
-10
-],
-[
-"en:dog-and-cat-food",
-8
-],
-[
-"en:cat-food",
-7
-]
-],
-"secteur": "Animaux/Chiens",
-"marques": [
-"royal canin",
-"Royal"
-],
-"part_marque": 0.59
-},
-"purina": {
-"n": 41,
-"noms": [
-"purina pro plan",
-"purina one",
-"purina"
+"nature",
+"nature grain free",
+"ultima nature adulte"
 ],
 "categorie": null,
 "categories": [
 [
-"en:cat-food",
-10
-],
-[
-"en:open-pet-food-facts",
-10
-],
-[
 "en:pet-food",
-9
+8
+],
+[
+"en:cat-food",
+6
 ],
 [
 "en:dry-pet-food",
+5
+],
+[
+"en:open-pet-food-facts",
+3
+]
+],
+"secteur": "Animaux/Chats",
+"marques": [
+"Ultima",
+"Nutrivia",
+"Versele-Laga",
+"Almo",
+"Hill's",
+"Multifit"
+],
+"part_marque": 0.0
+},
+"chat": {
+"n": 30,
+"noms": [
+"auchan chat terrine",
+"auchan chat boite",
+"chat stérilisé -"
+],
+"categorie": "en:cat-food",
+"categories": [
+[
+"en:cat-food",
+13
+],
+[
+"en:dog-and-cat-food",
+8
+],
+[
+"en:pet-food",
+8
+],
+[
+"en:dry-cat-food",
 5
 ]
 ],
 "secteur": "Animaux/Chats",
 "marques": [
+"Auchan",
 "Purina",
-"Purina One",
-"Bifensis"
+"Ultima",
+"Juliet",
+"Pouce",
+"Felichef"
 ],
-"part_marque": 0.39
+"part_marque": 0.0
+},
+"menu": {
+"n": 30,
+"noms": [
+"menus gourmands en",
+"menu x'perf",
+"menu complet pour"
+],
+"categorie": null,
+"categories": [
+[
+"en:pet-food",
+5
+],
+[
+"en:cat-food",
+3
+],
+[
+"en:dog-and-cat-food",
+2
+],
+[
+"en:wet-pet-food",
+2
+]
+],
+"secteur": "Animaux/Chats",
+"marques": [
+"Riga",
+"Cora",
+"Marque Repère",
+"Coshida",
+"Belle France",
+"Tous mes amis"
+],
+"part_marque": 0.0
+},
+"repa": {
+"n": 30,
+"noms": [
+"repas complet pour",
+"hamiform - repas",
+"repas frais bœuf"
+],
+"categorie": "en:pet-food",
+"categories": [
+[
+"en:pet-food",
+12
+],
+[
+"en:open-pet-food-facts",
+5
+],
+[
+"en:non-food-products",
+4
+],
+[
+"en:rabbit-food",
+3
+]
+],
+"secteur": "Animaux/Chiens",
+"marques": [
+"Hami form",
+"Ultima",
+"Elmut",
+"Casino",
+"Canaillou",
+"U"
+],
+"part_marque": 0.0
 },
 "aliment": {
-"n": 63,
+"n": 64,
 "noms": [
 "aliment complet pour",
 "aliment pour chien",
@@ -276,15 +323,15 @@
 "marques": [
 "Bob Martin",
 "Cesar",
+"Tetra",
 "Animalis",
 "Pedigree",
-"saint Bernard",
-"Friskies Purina"
+"saint Bernard"
 ],
 "part_marque": 0.0
 },
 "emince": {
-"n": 76,
+"n": 79,
 "noms": [
 "emincés en gelée",
 "emincés en sauce",
@@ -297,11 +344,11 @@
 24
 ],
 [
-"en:pet-food",
-15
+"en:open-pet-food-facts",
+16
 ],
 [
-"en:open-pet-food-facts",
+"en:pet-food",
 15
 ],
 [
@@ -314,9 +361,9 @@
 "Auchan",
 "U",
 "Coshida",
+"Canaillou",
 "Carrefour",
-"Felix",
-"Canaillou"
+"Felix"
 ],
 "part_marque": 0.0
 },
@@ -358,7 +405,7 @@
 "part_marque": 0.0
 },
 "bouchee": {
-"n": 70,
+"n": 72,
 "noms": [
 "bouchées en sauce",
 "bouchées en gelée",
@@ -368,11 +415,11 @@
 "categories": [
 [
 "en:pet-food",
-24
+25
 ],
 [
 "en:cat-food",
-23
+24
 ],
 [
 "en:dog-food",
@@ -389,13 +436,13 @@
 "U",
 "Orlando",
 "Leader Price",
-"Pouce",
-"Canaillou"
+"Carrefour",
+"Pouce"
 ],
 "part_marque": 0.0
 },
 "bouchee sauce": {
-"n": 38,
+"n": 39,
 "noms": [
 "bouchées en sauce au",
 "bouchées en sauce à",
@@ -423,11 +470,11 @@
 "secteur": "Animaux/Chiens",
 "marques": [
 "Auchan",
+"Carrefour",
 "Pouce",
 "Canaillou",
-"Carrefour",
 "Opticat Premium",
-"Mieze Katz"
+"Norma"
 ],
 "part_marque": 0.0
 },
@@ -543,17 +590,17 @@
 "part_marque": 0.0
 },
 "emince gelee": {
-"n": 31,
+"n": 33,
 "noms": [
 "emincés en gelée au",
 "emincés en gelée",
 "émincés en gelée pour"
 ],
-"categorie": null,
+"categorie": "en:open-pet-food-facts",
 "categories": [
 [
 "en:open-pet-food-facts",
-9
+10
 ],
 [
 "en:cat-food",
@@ -572,15 +619,15 @@
 "marques": [
 "Auchan",
 "Felix",
+"Canaillou",
 "Coshida",
-"Purina",
 "Nestlé",
-"hyper u"
+"Purina"
 ],
 "part_marque": 0.0
 },
 "aliment complet": {
-"n": 31,
+"n": 32,
 "noms": [
 "aliment complet pour chien",
 "aliment complet pour chat",
@@ -605,14 +652,14 @@
 8
 ]
 ],
-"secteur": "Animaux/Chiens",
+"secteur": "Animaux/Chats",
 "marques": [
 "Cesar",
 "Bob Martin",
+"Tetra",
 "saint Bernard",
 "Friskies Purina",
-"Casino",
-"Elmut"
+"Casino"
 ],
 "part_marque": 0.0
 },
@@ -650,22 +697,59 @@
 ],
 "part_marque": 0.0
 },
-"adult": {
-"n": 79,
+"mini": {
+"n": 30,
 "noms": [
-"adult - terrine",
-"adult multi croquettes",
-"adult royal mix"
+"mini biscuits fourrés",
+"mini snacks",
+"mini bones"
 ],
 "categorie": null,
 "categories": [
 [
+"en:dog-food",
+7
+],
+[
+"en:pet-food",
+6
+],
+[
 "en:dog-and-cat-food",
-17
+5
 ],
 [
 "en:open-pet-food-facts",
-16
+3
+]
+],
+"secteur": "Animaux/Chiens",
+"marques": [
+"Carrefour",
+"Sheba",
+"royal canin",
+"pure family",
+"pure Familly",
+"Carrefour Companino"
+],
+"part_marque": 0.0
+},
+"adult": {
+"n": 89,
+"noms": [
+"adult - terrine",
+"adult multi croquettes",
+"auchan adult regal'dog"
+],
+"categorie": null,
+"categories": [
+[
+"en:open-pet-food-facts",
+19
+],
+[
+"en:dog-and-cat-food",
+18
 ],
 [
 "en:pet-food",
@@ -688,11 +772,11 @@
 "part_marque": 0.0
 },
 "companino": {
-"n": 194,
+"n": 169,
 "noms": [
 "companino vitalive terrine",
 "companino vitalive selection",
-"companino vitalive en"
+"companino vitalive original"
 ],
 "categorie": null,
 "categories": [
@@ -702,11 +786,11 @@
 ],
 [
 "en:cat-food",
-27
+26
 ],
 [
 "en:dog-and-cat-food",
-25
+23
 ],
 [
 "en:pet-food",
@@ -716,32 +800,31 @@
 "secteur": "Animaux/Chats",
 "marques": [
 "Carrefour",
-"Companino",
 "Carrefour BIO",
 "carffeure"
 ],
-"part_marque": 0.13
+"part_marque": 0.0
 },
 "companino vitalive": {
-"n": 145,
+"n": 132,
 "noms": [
 "companino vitalive terrine pour",
 "companino vitalive selection terrine",
-"companino vitalive en sauce"
+"companino vitalive original selection"
 ],
 "categorie": null,
 "categories": [
 [
 "en:cat-food",
-24
-],
-[
-"en:dog-and-cat-food",
-24
+23
 ],
 [
 "en:open-pet-food-facts",
 23
+],
+[
+"en:dog-and-cat-food",
+22
 ],
 [
 "en:pet-food",
@@ -751,13 +834,12 @@
 "secteur": "Animaux/Chats",
 "marques": [
 "Carrefour",
-"Companino",
 "carffeure"
 ],
-"part_marque": 0.09
+"part_marque": 0.0
 },
 "simpl": {
-"n": 37,
+"n": 36,
 "noms": [
 "simpl terrine au",
 "simpl terrine pour",
@@ -784,13 +866,12 @@
 ],
 "secteur": "Animaux/Chiens",
 "marques": [
-"Carrefour",
-"Simpl"
+"Carrefour"
 ],
-"part_marque": 0.03
+"part_marque": 0.0
 },
 "ultima": {
-"n": 43,
+"n": 30,
 "noms": [
 "ultima nature",
 "ultima",
@@ -800,28 +881,27 @@
 "categories": [
 [
 "en:cat-food",
-16
+9
 ],
 [
 "en:pet-food",
-15
+9
 ],
 [
 "en:dog-and-cat-food",
-10
+8
 ],
 [
 "en:open-pet-food-facts",
-9
+7
 ]
 ],
-"secteur": "Animaux/Chats",
+"secteur": "Animaux/Chiens",
 "marques": [
-"Ultima",
 "Affinity",
-"Affinity petcare",
-"Ultima Nature"
+"Ultima",
+"Affinity petcare"
 ],
-"part_marque": 0.35
+"part_marque": 0.07
 }
 }
