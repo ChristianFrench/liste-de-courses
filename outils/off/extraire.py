@@ -47,6 +47,15 @@ for r in cat["rayons"]:
             lm = liste_mots(p["nom"])
             if lm:
                 natures.append((f"{r['nom']}/{s['nom']}/{p['nom']}", frozenset(lm), lm[0]))
+# Autres noms (chez Open Food Facts) de natures du catalogue : « Spaghetti » → « Pâtes spaghetti » (validés le 31/10/2026).
+cles_du_nom = collections.defaultdict(list)
+for cle_n, _, _ in list(natures):
+    cles_du_nom[cle_n.split("/")[-1]].append(cle_n)
+for autre, nature in json.load(open("outils/off/autres_noms.json", encoding="utf-8")).items():
+    lm = liste_mots(autre)
+    for cle_n in cles_du_nom.get(nature, []):
+        if lm:
+            natures.append((cle_n, frozenset(lm), lm[0]))
 par_mot = collections.defaultdict(list)
 for i, (_, m, _) in enumerate(natures):
     for x in m:
@@ -112,16 +121,16 @@ with urllib.request.urlopen(req, timeout=300) as flux:
         ranges += 1
         ms = {x.strip() for x in ligne[i_marques].split(",") if x.strip()}
         cles = tuple({cle_marque(m) for m in ms} - {""})
-        for j in meilleurs:
-            ranges_par_nature[j].append((cats, cles))
+        for cle_n in {natures[j][0] for j in meilleurs}:
+            ranges_par_nature[cle_n].append((cats, cles))
         for m in ms:
             graphies[cle_marque(m)][m] += 1
         if lus % 500000 == 0:
             print(f"{lus} lignes, {francais} en France, {ranges} rangées, {time.time() - debut:.0f} s", flush=True)
 
 res = {}
-for j, (cle, _, _) in enumerate(natures):
-    produits = ranges_par_nature.get(j)
+for cle in dict.fromkeys(n[0] for n in natures):
+    produits = ranges_par_nature.get(cle)
     if not produits:
         continue
     # Catégorie dominante : portée par au moins 40 % des produits classés ; la plus précise (la plus rare en France).
@@ -138,7 +147,7 @@ for j, (cle, _, _) in enumerate(natures):
         "marques": [[graphies[k].most_common(1)[0][0], c] for k, c in marques.most_common(40) if c >= 3],
     }
 json.dump({"_description": f"Open Food Facts, {time.strftime('%Y-%m-%d')} : {francais} produits vendus en France, "
-                           f"{ranges} rangés sous {len(res)} natures du catalogue sur {len(natures)}",
+                           f"{ranges} rangés sous {len(res)} natures du catalogue sur {len(cles_du_nom)}",
            "natures": res}, open("outils/off/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 # Catégorie de chaque nature rangée, pour proposer un rayon et un secteur aux natures nouvelles.
 secteur_par_categorie = collections.defaultdict(collections.Counter)
@@ -169,4 +178,4 @@ for pre, n in orphelins.items():
 json.dump(candidats, open("outils/off/candidats_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(f"::notice title=Natures candidates::{len(candidats)} groupes d'au moins 200 produits sans nature")
 print(f"Fini : {lus} lignes, {francais} en France, {ranges} rangées, {len(res)} natures, {time.time() - debut:.0f} s")
-print(f"::notice title=Extraction Open Food Facts::{francais} produits en France, {ranges} rangés sous {len(res)} natures sur {len(natures)}")
+print(f"::notice title=Extraction Open Food Facts::{francais} produits en France, {ranges} rangés sous {len(res)} natures sur {len(cles_du_nom)}")
