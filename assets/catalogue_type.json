@@ -12980,6 +12980,42 @@
         "lot de 30",
         "lot de 50"
        ]
+      },
+      {
+       "nom": "Siège auto",
+       "taille": 3
+      },
+      {
+       "nom": "Poussette canne",
+       "taille": 3
+      },
+      {
+       "nom": "Poussette",
+       "taille": 3
+      },
+      {
+       "nom": "Lit parapluie",
+       "taille": 3
+      },
+      {
+       "nom": "Miroir de surveillance voiture",
+       "taille": 3
+      },
+      {
+       "nom": "Chaise haute",
+       "taille": 3
+      },
+      {
+       "nom": "Chauffe-biberon",
+       "taille": 3
+      },
+      {
+       "nom": "Transat bébé",
+       "taille": 3
+      },
+      {
+       "nom": "Tapis d'éveil",
+       "taille": 3
       }
      ]
     }
@@ -16335,6 +16371,30 @@
        "formats": [
         "à la pièce"
        ]
+      },
+      {
+       "nom": "Additif carburant",
+       "taille": 3
+      },
+      {
+       "nom": "Triangle de présignalisation",
+       "taille": 3
+      },
+      {
+       "nom": "Couvre-volant",
+       "taille": 3
+      },
+      {
+       "nom": "Tapis de sol voiture",
+       "taille": 3
+      },
+      {
+       "nom": "Support smartphone voiture",
+       "taille": 3
+      },
+      {
+       "nom": "Chargeur allume-cigare",
+       "taille": 3
       }
      ]
     },
@@ -17094,6 +17154,14 @@
        "formats": [
         "à la pièce"
        ]
+      },
+      {
+       "nom": "Sangle de valise",
+       "taille": 3
+      },
+      {
+       "nom": "Pèse-bagage",
+       "taille": 3
       }
      ]
     }
@@ -18293,6 +18361,14 @@
         "lot de 8",
         "lot de 30"
        ]
+      },
+      {
+       "nom": "Collier anti-puces",
+       "taille": 2
+      },
+      {
+       "nom": "Harnais",
+       "taille": 2
       }
      ]
     },
@@ -18529,6 +18605,10 @@
        "formats": [
         "à la pièce"
        ]
+      },
+      {
+       "nom": "Arbre à chat",
+       "taille": 1
       }
      ]
     },
@@ -18588,6 +18668,14 @@
         "lot de 30",
         "lot de 12"
        ]
+      },
+      {
+       "nom": "Cage pour rongeur",
+       "taille": 2
+      },
+      {
+       "nom": "Épuisette d'aquarium",
+       "taille": 2
       }
      ]
     }
