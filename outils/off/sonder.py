@@ -35,10 +35,25 @@ for cat in sys.argv[1].split(","):
     cat = cat.strip().removeprefix("en:")
     if not cat:
         continue
-    marques = facette(cat, "brands")
-    sous = facette(cat, "categories")
-    j = lire(f"https://world.openfoodfacts.org/api/v2/search?categories_tags_en={cat}&countries_tags_en=france&page_size=1&fields=code")
-    total = j.get("count") if j else "?"
+    # Les pages de facettes répondent 503 aux robots : marques et catégories comptées sur les produits eux-mêmes.
+    compte_m, compte_c, total = {}, {}, "?"
+    for page in range(1, 6):
+        j = lire(f"https://world.openfoodfacts.org/api/v2/search?categories_tags_en={cat}&countries_tags_en=france"
+                 f"&page_size=500&page={page}&fields=brands,categories_tags")
+        if not j:
+            break
+        total = j.get("count", total)
+        produits = j.get("products", [])
+        for p in produits:
+            for m in {x.strip().lower() for x in (p.get("brands") or "").split(",") if x.strip()}:
+                compte_m[m] = compte_m.get(m, 0) + 1
+            for c in p.get("categories_tags") or []:
+                compte_c[c] = compte_c.get(c, 0) + 1
+        time.sleep(7)
+        if len(produits) < 500:
+            break
+    marques = sorted(compte_m.items(), key=lambda x: -x[1])
+    sous = sorted(compte_c.items(), key=lambda x: -x[1])
     lignes = [f"{cat} : {total} produits en France, {len(marques)} marques"]
     lignes += ["Marques : " + " ; ".join(f"{n} ({c})" for n, c in marques[:60])]
     lignes += ["Catégories : " + " ; ".join(f"{n} ({c})" for n, c in sous[:60])]
