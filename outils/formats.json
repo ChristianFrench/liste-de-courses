@@ -910,7 +910,69 @@
     ]
    }
   },
-  "Boucherie traditionnelle et Volailles": {
+  "Produits du terroir": {
+   "formats": [
+    "à la pièce",
+    "à la coupe",
+    "300 g",
+    "au poids",
+    "lot de 2",
+    "lot de 4",
+    "250 g",
+    "200 g",
+    "100 g",
+    "lot de 12"
+   ],
+   "produits": {
+    "Foie gras": [
+     "à la pièce",
+     "200 g",
+     "300 g",
+     "au poids"
+    ],
+    "Confit de canard": [
+     "à la pièce",
+     "lot de 2",
+     "lot de 4"
+    ],
+    "Spécialités régionales": [
+     "au poids",
+     "à la coupe",
+     "à la pièce"
+    ],
+    "Gésiers confits": [
+     "à la pièce",
+     "250 g"
+    ],
+    "Magret de canard séché": [
+     "100 g",
+     "à la pièce",
+     "à la coupe"
+    ],
+    "Escargots": [
+     "lot de 12",
+     "lot de 24",
+     "lot de 50",
+     "à la pièce"
+    ],
+    "Graisse de canard": [
+     "à la pièce",
+     "300 g"
+    ],
+    "Andouillette": [
+     "lot de 2",
+     "lot de 4",
+     "à la pièce"
+    ],
+    "Andouille": [
+     "à la coupe",
+     "125 g",
+     "250 g",
+     "à la pièce"
+    ]
+   }
+  },
+  "Viandes et volailles au comptoir": {
    "formats": [
     "au poids",
     "à la coupe",
@@ -1038,68 +1100,6 @@
     "Viande pour couscous": [
      "au poids",
      "à la coupe"
-    ]
-   }
-  },
-  "Produits du terroir": {
-   "formats": [
-    "à la pièce",
-    "à la coupe",
-    "300 g",
-    "au poids",
-    "lot de 2",
-    "lot de 4",
-    "250 g",
-    "200 g",
-    "100 g",
-    "lot de 12"
-   ],
-   "produits": {
-    "Foie gras": [
-     "à la pièce",
-     "200 g",
-     "300 g",
-     "au poids"
-    ],
-    "Confit de canard": [
-     "à la pièce",
-     "lot de 2",
-     "lot de 4"
-    ],
-    "Spécialités régionales": [
-     "au poids",
-     "à la coupe",
-     "à la pièce"
-    ],
-    "Gésiers confits": [
-     "à la pièce",
-     "250 g"
-    ],
-    "Magret de canard séché": [
-     "100 g",
-     "à la pièce",
-     "à la coupe"
-    ],
-    "Escargots": [
-     "lot de 12",
-     "lot de 24",
-     "lot de 50",
-     "à la pièce"
-    ],
-    "Graisse de canard": [
-     "à la pièce",
-     "300 g"
-    ],
-    "Andouillette": [
-     "lot de 2",
-     "lot de 4",
-     "à la pièce"
-    ],
-    "Andouille": [
-     "à la coupe",
-     "125 g",
-     "250 g",
-     "à la pièce"
     ]
    }
   }
@@ -1416,7 +1416,7 @@
     ]
    }
   },
-  "Poissonnerie traditionnelle": {
+  "Poissonnerie au comptoir": {
    "formats": [
     "au poids",
     "à la pièce",
@@ -2145,7 +2145,7 @@
     ]
    }
   },
-  "Fromages à la coupe": {
+  "Fromages au comptoir": {
    "formats": [
     "à la coupe",
     "au poids",
@@ -2406,7 +2406,7 @@
     ]
    }
   },
-  "Charcuterie à la coupe": {
+  "Charcuterie au comptoir": {
    "formats": [
     "au poids",
     "à la coupe",
@@ -2685,7 +2685,7 @@
     ]
    }
   },
-  "Traiteur à la coupe": {
+  "Traiteur au comptoir": {
    "formats": [
     "à la pièce",
     "au poids",

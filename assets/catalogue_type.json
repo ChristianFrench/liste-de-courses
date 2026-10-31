@@ -1821,7 +1821,7 @@
      ]
     },
     {
-     "nom": "Boucherie traditionnelle et Volailles",
+     "nom": "Viandes et volailles au comptoir",
      "ordre": 2,
      "taille": 3,
      "formats": [
@@ -3020,7 +3020,7 @@
      ]
     },
     {
-     "nom": "Poissonnerie traditionnelle",
+     "nom": "Poissonnerie au comptoir",
      "ordre": 2,
      "taille": 3,
      "formats": [
@@ -4610,7 +4610,7 @@
      ]
     },
     {
-     "nom": "Fromages à la coupe",
+     "nom": "Fromages au comptoir",
      "ordre": 2,
      "taille": 3,
      "formats": [
@@ -5319,7 +5319,7 @@
      ]
     },
     {
-     "nom": "Charcuterie à la coupe",
+     "nom": "Charcuterie au comptoir",
      "ordre": 2,
      "taille": 3,
      "formats": [
@@ -5958,7 +5958,7 @@
      ]
     },
     {
-     "nom": "Traiteur à la coupe",
+     "nom": "Traiteur au comptoir",
      "ordre": 3,
      "taille": 3,
      "formats": [

@@ -318,9 +318,24 @@ class CatalogueCommun extends ChangeNotifier {
     final b = Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
     // Seulement ce qui passe les règles (ni foyer bloqué, ni nom refusé, ni produit signalé).
     final f = Moderation.filtrer(apportsRecus, bloques: b.bloques, signales: Etat.instance.signalements);
+    // Secteurs renommés dans le catalogue livré (31/10/2026) : renommés aussi pour tous les foyers à la publication.
+    for (final (rn, ancien, nouveau) in secteursRenommes) {
+      final r = b.rayon(rn);
+      final s = r == null ? null : b.secteur(r, ancien);
+      if (r != null && s != null) b.renommerSecteur(r, s, nouveau);
+    }
     b.absorber([...f.lots, Etat.instance.apports(), await _nouveautesLivrees(b)]);
     return b;
   }
+
+  /// Secteurs renommés dans le catalogue livré : (rayon, ancien nom, nouveau nom).
+  static const secteursRenommes = [
+    ('Boucherie', 'Boucherie traditionnelle et Volailles', 'Viandes et volailles au comptoir'),
+    ('Charcuterie', 'Charcuterie à la coupe', 'Charcuterie au comptoir'),
+    ('Fromagerie', 'Fromages à la coupe', 'Fromages au comptoir'),
+    ('Poissonnerie', 'Poissonnerie traditionnelle', 'Poissonnerie au comptoir'),
+    ('Traiteur', 'Traiteur à la coupe', 'Traiteur au comptoir'),
+  ];
 
   /// Produits du catalogue livré avec l'application absents du dernier catalogue publié (ajoutés au catalogue
   /// livré depuis : natures d'Open Food Facts, 31/10/2026). L'éditeur les publie ensuite pour tous les foyers.
