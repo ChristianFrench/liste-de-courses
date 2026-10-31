@@ -9,9 +9,23 @@ que portent au moins 40 % d'entre eux) : « Fraises Tagada » (bonbons) quittent
 le nombre de produits (sa popularité) et les marques présentes dans au moins 3 produits.
 Écrit outils/off/natures_off.json. Lancé par le workflow « Open Food Facts - extraction » (l'environnement de
 Claude n'a pas accès au site)."""
-import collections, csv, gzip, io, json, re, sys, time, unicodedata, urllib.request
+import collections, csv, gzip, io, json, os, re, sys, time, unicodedata, urllib.request
 
-EXPORT = "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz"
+# Base lue : off (Open Food Facts, par défaut), obf (Open Beauty Facts), opf (Open Products Facts),
+# opff (Open Pet Food Facts). Les bases non alimentaires ne servent qu'aux rayons qui les concernent.
+BASE = os.environ.get("BASE", "off")
+SITE = {"off": "openfoodfacts", "obf": "openbeautyfacts", "opf": "openproductsfacts", "opff": "openpetfoodfacts"}[BASE]
+EXPORT = f"https://static.{SITE}.org/data/en.{SITE}.org.products.csv.gz"
+RAYONS = {
+    "obf": {"Bébé", "Parfumerie et soins", "Hygiène", "Parapharmacie"},
+    "opf": {"Bébé", "Parfumerie et soins", "Hygiène", "Parapharmacie", "Entretien / Droguerie", "Cuisine et arts de la table",
+            "Bricolage, auto et jardin", "Loisirs", "Électroménager et décoration", "Textile", "Saisonnier", "Animaux"},
+    "opff": {"Animaux"},
+}.get(BASE)
+# Open Products Facts compte peu de produits et renseigne rarement le pays : on n'y filtre pas sur la France.
+FRANCE = BASE != "opf"
+SEUIL_CANDIDATS = 200 if BASE == "off" else 30
+SUFFIXE = "off" if BASE == "off" else BASE
 VIDES = {"de", "du", "des", "la", "le", "les", "l", "d", "a", "au", "aux", "et", "en", "pour", "avec", "un", "une", "sans"}
 
 
@@ -42,6 +56,8 @@ def cle_marque(m):
 cat = json.load(open("assets/catalogue_type.json", encoding="utf-8"))
 natures = []  # (clé, mots)
 for r in cat["rayons"]:
+    if RAYONS and r["nom"] not in RAYONS:
+        continue
     for s in r["secteurs"]:
         for p in s["produits"]:
             lm = liste_mots(p["nom"])
@@ -51,7 +67,7 @@ for r in cat["rayons"]:
 cles_du_nom = collections.defaultdict(list)
 for cle_n, _, _ in list(natures):
     cles_du_nom[cle_n.split("/")[-1]].append(cle_n)
-for autre, nature in json.load(open("outils/off/autres_noms.json", encoding="utf-8")).items():
+for autre, nature in (json.load(open("outils/off/autres_noms.json", encoding="utf-8")) if BASE == "off" else {}).items():
     lm = liste_mots(autre)
     for cle_n in cles_du_nom.get(nature, []):
         if lm:
@@ -82,7 +98,7 @@ with urllib.request.urlopen(req, timeout=300) as flux:
     i_nom, i_marques, i_pays, i_cat = col["product_name"], col["brands"], col["countries_tags"], col["categories_tags"]
     for ligne in lecteur:
         lus += 1
-        if len(ligne) <= max(i_nom, i_marques, i_pays, i_cat) or "en:france" not in ligne[i_pays]:
+        if len(ligne) <= max(i_nom, i_marques, i_pays, i_cat) or (FRANCE and "en:france" not in ligne[i_pays]):
             continue
         francais += 1
         cats = tuple(sorted({c for c in ligne[i_cat].split(",") if c}))
@@ -153,9 +169,9 @@ for cle in dict.fromkeys(n[0] for n in natures):
         "categorie": categorie,
         "marques": [[graphie(k), c] for k, c in marques.most_common(40) if c >= 3],
     }
-json.dump({"_description": f"Open Food Facts, {time.strftime('%Y-%m-%d')} : {francais} produits vendus en France, "
+json.dump({"_description": f"{SITE}, {time.strftime('%Y-%m-%d')} : {francais} produits vendus en France, "
                            f"{ranges} rangés sous {len(res)} natures du catalogue sur {len(cles_du_nom)}",
-           "natures": res}, open("outils/off/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+           "natures": res}, open(f"outils/off/natures_{SUFFIXE}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 # Catégorie de chaque nature rangée, pour proposer un rayon et un secteur aux natures nouvelles.
 secteur_par_categorie = collections.defaultdict(collections.Counter)
 for cle, v in res.items():
@@ -163,7 +179,7 @@ for cle, v in res.items():
         secteur_par_categorie[v["categorie"]]["/".join(cle.split("/")[:2])] += v["n"]
 candidats = {}
 for pre, n in orphelins.items():
-    if n < 200:
+    if n < SEUIL_CANDIDATS:
         continue
     cats = orph_cats[pre]
     # catégorie la plus précise portée par au moins 30 % des produits
@@ -182,7 +198,7 @@ for pre, n in orphelins.items():
         "marques": [graphies[k].most_common(1)[0][0] for k, _ in orph_marques[pre].most_common(6) if k and graphies[k]],
         "part_marque": round(orph_debut_marque[pre] / n, 2),
     }
-json.dump(candidats, open("outils/off/candidats_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
-print(f"::notice title=Natures candidates::{len(candidats)} groupes d'au moins 200 produits sans nature")
+json.dump(candidats, open(f"outils/off/candidats_{SUFFIXE}.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+print(f"::notice title=Natures candidates {BASE}::{len(candidats)} groupes d'au moins {SEUIL_CANDIDATS} produits sans nature")
 print(f"Fini : {lus} lignes, {francais} en France, {ranges} rangées, {len(res)} natures, {time.time() - debut:.0f} s")
-print(f"::notice title=Extraction Open Food Facts::{francais} produits en France, {ranges} rangés sous {len(res)} natures sur {len(cles_du_nom)}")
+print(f"::notice title=Extraction {SITE}::{lus} produits lus, {francais} retenus, {ranges} rangés sous {len(res)} natures sur {len(cles_du_nom)}")
