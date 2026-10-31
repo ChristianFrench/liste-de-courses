@@ -7,12 +7,16 @@ import '../theme.dart';
 /// Nombre de lettres à taper avant que la liste des articles s'affiche.
 const lettresRecherche = 3;
 
+/// Résultats montrés d'abord ; « Voir plus » montre les autres (31/10/2026 : affichage moins encombré).
+const premiersResultats = 8;
+
 /// Articles dont un mot commence par le texte tapé (sans tenir compte des accents ni des majuscules) ;
 /// chaque mot tapé doit commencer un mot du nom. Ceux dont le nom commence par le texte viennent d'abord,
-/// puis les plus achetés.
+/// puis les plus achetés par le foyer, puis les plus courants en magasin (popularité Open Food Facts).
 List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int max = 40}) {
   final q = normaliser(texte).split(' ').where((m) => m.isNotEmpty).toList();
   if (q.isEmpty || normaliser(texte).length < lettresRecherche) return [];
+  final etat = Etat.instance;
   final res = <(Produit, bool)>[];
   for (final p in produits) {
     final n = normaliser(p.nom);
@@ -22,9 +26,39 @@ List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int ma
   res.sort((a, b) {
     if (a.$2 != b.$2) return a.$2 ? -1 : 1;
     final u = b.$1.nbUtilisations.compareTo(a.$1.nbUtilisations);
-    return u != 0 ? u : normaliser(a.$1.nom).compareTo(normaliser(b.$1.nom));
+    if (u != 0) return u;
+    final c = etat.popularite(b.$1).compareTo(etat.popularite(a.$1));
+    return c != 0 ? c : normaliser(a.$1.nom).compareTo(normaliser(b.$1.nom));
   });
   return [for (final r in res.take(max)) r.$1];
+}
+
+/// Natures portant une marque qui commence par le texte tapé (« nut » : Pâte à tartiner chocolat · Nutella),
+/// les plus courantes d'abord ; seulement celles de [produits].
+List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte, {int max = 6}) {
+  final etat = Etat.instance;
+  final q = normaliser(texte);
+  if (q.length < lettresRecherche || etat.naturesParMarque.isEmpty) return [];
+  final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
+  final res = <(Produit, String, int)>[];
+  for (final e in etat.naturesParMarque.entries) {
+    final m = normaliser(e.key);
+    if (!m.startsWith(q) && !m.split(' ').any((x) => x.startsWith(q))) continue;
+    for (final n in e.value) {
+      final p = parNom[n];
+      if (p == null) continue;
+      final marque = etat.naturesOff[n]!.marques.firstWhere((x) => x.toLowerCase() == e.key);
+      res.add((p, marque, etat.popularite(p)));
+    }
+  }
+  res.sort((a, b) => b.$3.compareTo(a.$3));
+  return [for (final r in res.take(max)) (r.$1, r.$2)];
+}
+
+/// Option « Voir plus » de la liste déroulante.
+class _VoirPlus {
+  const _VoirPlus(this.reste);
+  final int reste;
 }
 
 /// Champ de recherche sous le titre : à partir de trois lettres, une liste déroulante montre les articles
@@ -36,6 +70,7 @@ class ChampRecherche extends StatefulWidget {
     required this.produits,
     required this.onChoix,
     this.onNouveau,
+    this.onMarque,
     this.detail,
     this.droite,
     this.largeur,
@@ -44,6 +79,10 @@ class ChampRecherche extends StatefulWidget {
   final Iterable<Produit> Function() produits;
   final void Function(Produit p) onChoix;
   final void Function(String nom)? onNouveau;
+
+  /// Choix d'une nature avec sa marque (« Pâte à tartiner chocolat · Nutella ») ; sans lui, pas de recherche
+  /// par marque.
+  final void Function(Produit p, String marque)? onMarque;
 
   /// Ligne d'explication sous le nom (ex. : rayon › secteur).
   final String Function(Produit p)? detail;
@@ -74,6 +113,10 @@ class _ChampRechercheState extends State<ChampRecherche> {
   /// sous un champ vide.
   int _generation = 0;
 
+  /// « Voir plus » touché pour ce texte : tous les résultats.
+  bool _tout = false;
+  String _dernier = '';
+
   void _fini() {
     _texte.clear();
     _focus.unfocus();
@@ -102,15 +145,31 @@ class _ChampRechercheState extends State<ChampRecherche> {
         displayStringForOption: (_) => '',
         optionsBuilder: (v) {
           final t = v.text.trim();
+          if (t != _dernier) _tout = false;
+          _dernier = t;
           if (normaliser(t).length < lettresRecherche) return const [];
-          final res = <Object>[...chercherProduits(widget.produits(), t)];
-          final existe = res.any((p) => normaliser((p as Produit).nom) == normaliser(t));
+          final produits = widget.produits();
+          final trouves = chercherProduits(produits, t);
+          final existe = trouves.any((p) => normaliser(p.nom) == normaliser(t));
+          final res = <Object>[...(_tout ? trouves : trouves.take(premiersResultats))];
+          if (!_tout && trouves.length > premiersResultats) res.add(_VoirPlus(trouves.length - premiersResultats));
+          // Les marques seulement si le texte tapé en est une (et n'est pas déjà un article trouvé).
+          if (widget.onMarque != null && trouves.length < premiersResultats) res.addAll(chercherMarques(produits, t));
           if (widget.onNouveau != null && !existe) res.add(t);
           return res;
         },
         onSelected: (o) {
+          if (o is _VoirPlus) {
+            // Le champ vient d'être vidé par le choix : on remet le texte, avec tous les résultats.
+            _tout = true;
+            _texte.text = _dernier;
+            _texte.selection = TextSelection.collapsed(offset: _dernier.length);
+            return;
+          }
           _fini();
-          if (o is Produit) {
+          if (o is (Produit, String)) {
+            widget.onMarque?.call(o.$1, o.$2);
+          } else if (o is Produit) {
             widget.onChoix(o);
           } else if (o is String) {
             widget.onNouveau?.call(o);
@@ -186,7 +245,19 @@ class _ChampRechercheState extends State<ChampRecherche> {
                             decoration: BoxDecoration(
                               border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
                             ),
-                            child: o is Produit
+                            child: o is _VoirPlus
+                                ? Text('Voir plus (${o.reste})', style: Charte.texte(16, gras: true, couleur: Charte.cadre))
+                                : o is (Produit, String)
+                                ? Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('${o.$1.nom} · ${o.$2}', style: Charte.texte(16)),
+                                      if (widget.detail?.call(o.$1) case final d? when d.isNotEmpty)
+                                        Text(d, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                                    ],
+                                  )
+                                : o is Produit
                                 ? Row(
                                     children: [
                                       Expanded(

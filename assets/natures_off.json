@@ -1,0 +1,10583 @@
+{
+"_description": "Open Food Facts, 2026-10-31 : 1293287 produits vendus en France, 406688 rangés sous 1373 natures du catalogue sur 1673 ; marques d'enseigne retirées (outils/off/natures.py)",
+"natures": {
+"Abondance": {
+"n": 231,
+"m": [
+"Le Fromager Des Halles"
+]
+},
+"Abricots": {
+"n": 568,
+"m": [
+"Maison Roucadil",
+"Maître Prunille",
+"Confit de Provence",
+"La Chambre aux Confitures",
+"Sun",
+"St Mamet",
+"Lucien Georgelin",
+"Favols",
+"Les Vergers d'Escoute",
+"Andros"
+]
+},
+"Abricots au sirop": {
+"n": 47,
+"m": [
+"Douceur du Verger"
+]
+},
+"Abricots secs": {
+"n": 602,
+"m": [
+"O'Régal",
+"Maître Prunille",
+"Daco Bello",
+"Holy Fruits",
+"Meyva",
+"Transgourmet",
+"Domino",
+"Brousse & Fils",
+"Fruidyllic",
+"Ciloglu"
+]
+},
+"Accras de morue": {
+"n": 57,
+"m": [
+"Cité Marine"
+]
+},
+"Acide citrique": {
+"n": 19
+},
+"Adoucissant": {
+"n": 12
+},
+"Agenda": {
+"n": 14
+},
+"Aiguillettes de poulet": {
+"n": 1401,
+"m": [
+"La Nouvelle Agriculture",
+"Le Gaulois",
+"Maître CoQ",
+"Volaé",
+"Loué",
+"Nature de France",
+"Fleury Michon",
+"L'etal Du Volailler",
+"Père Dodu",
+"Duc"
+]
+},
+"Ail": {
+"n": 728,
+"m": [
+"Ducros",
+"Fuchs",
+"Condichef",
+"Santé Nat",
+"L'épicurien",
+"Bedros",
+"Espig",
+"Festifruits",
+"Le Geste Saveur",
+"Cook"
+]
+},
+"Ail du Sud-Ouest": {
+"n": 1
+},
+"Ail en poudre": {
+"n": 31
+},
+"Ail violet": {
+"n": 21
+},
+"Ailes de poulet": {
+"n": 218,
+"m": [
+"Le Gaulois",
+"Royal Bernard",
+"Maître CoQ",
+"Volailles Champenoises",
+"L'etal Du Volailler"
+]
+},
+"Alcool à 70°": {
+"n": 83,
+"m": [
+"Ricqles"
+]
+},
+"Algues nori": {
+"n": 29
+},
+"Allume-feu": {
+"n": 3
+},
+"Allumettes": {
+"n": 313,
+"m": [
+"Herta",
+"Fleury Michon",
+"Tradilège",
+"Saint Alby",
+"Nestlé",
+"Brocéliande",
+"Les eleveurs de bretagne",
+"Bonneterre",
+"Groupe Auchan",
+"Le Cochon de Marzan"
+]
+},
+"Allumettes de bacon": {
+"n": 30,
+"m": [
+"Fleury Michon"
+]
+},
+"Amandes": {
+"n": 2201,
+"m": [
+"Vahiné",
+"Maître Prunille",
+"O'Régal",
+"Meyva",
+"Sainte Lucie",
+"Daco Bello",
+"Holy Fruits",
+"Sun",
+"Domino",
+"Medicis"
+]
+},
+"Amandes grillées": {
+"n": 284,
+"m": [
+"Maître Prunille",
+"Daco Bello",
+"Wonderful",
+"Vico",
+"Fruidyllic",
+"Bénénuts",
+"Bedros Et Savino",
+"Seeberger",
+"Couleurs Vives"
+]
+},
+"Ampoules": {
+"n": 14
+},
+"Ananas": {
+"n": 1165,
+"m": [
+"Del Monte",
+"Florette",
+"Del Monte Quality",
+"St Mamet",
+"Dole",
+"La Fraîcherie",
+"Andros",
+"Ananas Extra Sweet",
+"Saint Mamet",
+"Ethiquable"
+]
+},
+"Ananas au sirop": {
+"n": 37,
+"m": [
+"St Mamet"
+]
+},
+"Anchois": {
+"n": 229,
+"m": [
+"La Sablaise",
+"Le Grand Lejon",
+"Palais Des Mets",
+"Pêcheries Sétoises",
+"La Monégasque",
+"Micéli",
+"L'Apéro du Poissonnier",
+"Pêcheur de Saveurs",
+"La Monégasque Vanelli",
+"La Barre"
+]
+},
+"Andouille": {
+"n": 373,
+"m": [
+"Kerandou",
+"Guyader"
+]
+},
+"Andouillette": {
+"n": 688,
+"m": [
+"Le Gaulois",
+"Popy",
+"Cooperl",
+"Hiruak",
+"Tradilège",
+"Saint Alby",
+"La Bresse",
+"Gilbert Lemelle",
+"Saveurs des mauges"
+]
+},
+"Aneth": {
+"n": 81,
+"m": [
+"Ducros"
+]
+},
+"Anti-moustiques": {
+"n": 6
+},
+"Antipasti": {
+"n": 66,
+"m": [
+"Delicemer"
+]
+},
+"Après-rasage": {
+"n": 2
+},
+"Après-shampooing": {
+"n": 7
+},
+"Après-soleil": {
+"n": 2
+},
+"Apéricube": {
+"n": 31,
+"m": [
+"Apéricube",
+"Bel"
+]
+},
+"Apérivrais": {
+"n": 10,
+"m": [
+"Savencia",
+"Apérivrais"
+]
+},
+"Arrosoir": {
+"n": 1
+},
+"Artichauts": {
+"n": 204,
+"m": [
+"Polli",
+"biorganica nuova",
+"Bio Gustiamo",
+"Ponti",
+"L'atelier Bernard Marot"
+]
+},
+"Arôme vanille": {
+"n": 109,
+"m": [
+"Sainte Lucie",
+"Vahiné",
+"La pateliere"
+]
+},
+"Asperges": {
+"n": 325,
+"m": [
+"Rochefontaine",
+"Notre Jardin",
+"Géant Vert",
+"Olabe",
+"Rochambeau",
+"Jyrela",
+"Priméale",
+"Gustadéa",
+"La Fragua",
+"Celorrio"
+]
+},
+"Asperges vertes": {
+"n": 137,
+"m": [
+"Géant Vert",
+"Rochefontaine",
+"Notre Jardin"
+]
+},
+"Aspirateur": {
+"n": 2
+},
+"Assaisonnement pour paella": {
+"n": 6,
+"m": [
+"Fuchs"
+]
+},
+"Assiette": {
+"n": 163,
+"m": [
+"Montagne Noire",
+"Saint-Azay",
+"Frais Devant",
+"Charculor",
+"Fratelli Beretta"
+]
+},
+"Assiettes en carton": {
+"n": 1
+},
+"Asti": {
+"n": 4
+},
+"Aubergines": {
+"n": 377,
+"m": [
+"Cassegrain",
+"Kerets",
+"Maayane",
+"Baktat",
+"Suntat",
+"Brio",
+"Baton Rouge",
+"Eden Gourmet",
+"Sera",
+"L' Atelier de Noor"
+]
+},
+"Autobronzant": {
+"n": 6
+},
+"Avocats": {
+"n": 302,
+"m": [
+"Westfalia Fruit",
+"Comexa",
+"Mon Marché Plaisir",
+"Montosa",
+"Halls"
+]
+},
+"Bacon": {
+"n": 399,
+"m": [
+"Herta",
+"Fleury Michon",
+"Gourmets de l'Artois",
+"Saint Alby",
+"Cochonnailles du Haut-Bois",
+"Maison Milhau",
+"Montagne Noire",
+"Daunat",
+"Saint-Azay"
+]
+},
+"Bagels": {
+"n": 142,
+"m": [
+"New York Bakery Co",
+"Regent's Park",
+"Crous Resto'",
+"Starbucks"
+]
+},
+"Baguette": {
+"n": 1893,
+"m": [
+"La Campanière",
+"Les 3 Meuniers",
+"Terre & Saveurs",
+"Menissez",
+"Biofournil",
+"La Boulangère",
+"Les Pains Pérènes",
+"Les Délices de Mendès",
+"Croustifrance",
+"Jacquet"
+]
+},
+"Baguette bio": {
+"n": 117,
+"m": [
+"Les 3 Meuniers"
+]
+},
+"Baguette fine": {
+"n": 1
+},
+"Baguette rustique": {
+"n": 28
+},
+"Baguette tradition": {
+"n": 187,
+"m": [
+"Tradi'rouge",
+"La Trad'ici Normande"
+]
+},
+"Bain de bouche": {
+"n": 21,
+"m": [
+"Listerine"
+]
+},
+"Balai": {
+"n": 1
+},
+"Ballons": {
+"n": 10
+},
+"Bananes": {
+"n": 1567,
+"m": [
+"Simplement Bon Et Bio",
+"Fruidor",
+"€co+",
+"Max havelaar",
+"Côté Marché",
+"Fairtrade",
+"Cavendish",
+"Sélection Intermarché",
+"La Banane Française",
+"Del Monte"
+]
+},
+"Bandes de cire": {
+"n": 3
+},
+"Bar": {
+"n": 136,
+"m": [
+"Pural",
+"Teisseire",
+"9bar",
+"Le Comptoir de Mathilde"
+]
+},
+"Barres chocolatées": {
+"n": 39,
+"m": [
+"Kinder",
+"Ferrero"
+]
+},
+"Barres de céréales": {
+"n": 479,
+"m": [
+"Aptonia",
+"Bio Soleil",
+"Brin de Jour",
+"Nestlé",
+"Kellogg's",
+"LU",
+"U Oxygn",
+"Germline",
+"MelTonic",
+"Eat Natural"
+]
+},
+"Barres glacées": {
+"n": 28,
+"m": [
+"Mars",
+"Twix"
+]
+},
+"Barrettes": {
+"n": 17
+},
+"Bas": {
+"n": 9
+},
+"Basilic": {
+"n": 225,
+"m": [
+"Ducros",
+"Daregal",
+"Cigalou",
+"Rustica",
+"Fuchs",
+"Sainte Lucie",
+"Lamprien Provence"
+]
+},
+"Baskets": {
+"n": 8
+},
+"Basse côte": {
+"n": 25
+},
+"Batavia": {
+"n": 37,
+"m": [
+"Les Crudettes"
+]
+},
+"Batteur": {
+"n": 2
+},
+"Baume à lèvres": {
+"n": 15,
+"m": [
+"Le Petit Olivier",
+"Yves Rocher"
+]
+},
+"Bavette": {
+"n": 380,
+"m": [
+"Charal",
+"L'Étal du Boucher"
+]
+},
+"Bavoirs": {
+"n": 1
+},
+"Beaufort": {
+"n": 342,
+"m": [
+"Le Fromager Des Halles",
+"Verdannet",
+"Les Délices de Belle France",
+"La Coop",
+"Sélection du fromager"
+]
+},
+"Beaujolais nouveau": {
+"n": 89,
+"m": [
+"Antoine Barrier",
+"Georges Duboeuf",
+"Le père La Grolle"
+]
+},
+"Betteraves cuites": {
+"n": 52
+},
+"Beurre": {
+"n": 1037,
+"m": [
+"Président",
+"Elle & Vire",
+"Savencia",
+"Grand Fermage",
+"Les Croisés",
+"Paysan Breton",
+"Elle et Vire",
+"Isigny Ste Mère",
+"St Hubert",
+"Le Gall"
+]
+},
+"Beurre allégé": {
+"n": 6
+},
+"Beurre clarifié": {
+"n": 5
+},
+"Beurre de baratte": {
+"n": 200,
+"m": [
+"Le Gall",
+"Grandeur Nature",
+"Bordier",
+"Ker Argoet",
+"Échiré",
+"Tante Hélène",
+"Le Montsûrais"
+]
+},
+"Beurre de cacahuète": {
+"n": 190,
+"m": [
+"Go Nuts",
+"Ethiquable",
+"Skippy",
+"Whole Earth",
+"Dakatine",
+"Nu3",
+"Menguy's",
+"Mandy"
+]
+},
+"Beurre de cacahuète crunchy": {
+"n": 36,
+"m": [
+"Rapunzel"
+]
+},
+"Beurre demi-sel": {
+"n": 537,
+"m": [
+"Elle & Vire",
+"Savencia",
+"Paysan Breton",
+"Grand Fermage",
+"Président",
+"Les Croisés",
+"Le Gall",
+"C'est qui le patron ?!",
+"Échiré",
+"Ker Argoet"
+]
+},
+"Beurre doux": {
+"n": 389,
+"m": [
+"Président",
+"Le Gall",
+"Elle & Vire",
+"Savencia",
+"Les Croisés",
+"Isigny Ste Mère",
+"Grand Fermage",
+"Dia",
+"Paysan Breton",
+"Beillevaire"
+]
+},
+"Biberons": {
+"n": 5
+},
+"Bicarbonate de soude": {
+"n": 47
+},
+"Biscottes": {
+"n": 489,
+"m": [
+"Heudebert",
+"La Chanteracoise",
+"LU",
+"Roger",
+"Pasquier",
+"Brioche Pasquier",
+"Maître Jean Pierre",
+"Moulin des Moines",
+"Epi d'Or",
+"Gateau"
+]
+},
+"Biscottes complètes": {
+"n": 43,
+"m": [
+"Borsa",
+"Le Moulin du Pivert"
+]
+},
+"Biscottes sans sel": {
+"n": 29
+},
+"Biscuits Granola": {
+"n": 5
+},
+"Biscuits apéritif": {
+"n": 199,
+"m": [
+"Le Crétin des Alpes",
+"Marguerite en Bourgogne"
+]
+},
+"Biscuits au chocolat": {
+"n": 698,
+"m": [
+"LU",
+"P'tit Déli",
+"Delacre",
+"Gerblé",
+"BN",
+"Ferrero",
+"Delichoc",
+"Dukan",
+"La Cure Gourmande",
+"Delaunay Léveillé"
+]
+},
+"Biscuits bébé": {
+"n": 9,
+"m": [
+"U Tout Petits Bio"
+]
+},
+"Biscuits fourrés": {
+"n": 245,
+"m": [
+"La Cure Gourmande",
+"Bjorg",
+"Les Malins Plaisirs",
+"Le Moulin du Pivert",
+"P'tit Déli",
+"Germinal",
+"Continental Bakeries",
+"Milical",
+"Élibio"
+]
+},
+"Biscuits pour le goûter": {
+"n": 9,
+"m": [
+"Nooglo"
+]
+},
+"Biscuits sans sucre": {
+"n": 55,
+"m": [
+"Vecteur sante",
+"Gerblé",
+"Arthur et Marguerite"
+]
+},
+"Biscuits secs": {
+"n": 10
+},
+"Biscuits soufflés": {
+"n": 14
+},
+"Bière IPA": {
+"n": 89
+},
+"Bière ambrée": {
+"n": 127,
+"m": [
+"Jade",
+"Pietra"
+]
+},
+"Bière aromatisée": {
+"n": 40,
+"m": [
+"Desquiles",
+"Desperados",
+"Guesty"
+]
+},
+"Bière blanche": {
+"n": 219,
+"m": [
+"Hoegaarden",
+"Hilborg",
+"1664",
+"Mandrin",
+"Perlembourg",
+"Les Brasseurs de la Jonte"
+]
+},
+"Bière blonde": {
+"n": 451,
+"m": [
+"Leffe",
+"Kronenbourg",
+"Jade",
+"Heineken",
+"Brasserie des estives",
+"Falsbourg",
+"Perlembourg",
+"1664",
+"Meteor",
+"Graindorge"
+]
+},
+"Bière brune": {
+"n": 51
+},
+"Bière d'abbaye": {
+"n": 29,
+"m": [
+"GRIMBERGEN"
+]
+},
+"Bière sans alcool": {
+"n": 177,
+"m": [
+"TOURTEL TWIST",
+"TOURTEL",
+"Kronenbourg",
+"Falsbourg",
+"Jade",
+"Heineken",
+"0%",
+"Guesty",
+"Volsberg",
+"Bavaria"
+]
+},
+"Blanc de dinde": {
+"n": 163,
+"m": [
+"Fleury Michon",
+"Tradilège",
+"Réghalal",
+"Herta",
+"Saint Alby",
+"Le Gaulois",
+"Isla Mondial"
+]
+},
+"Blanc de poulet tranché": {
+"n": 43,
+"m": [
+"Fleury Michon",
+"Saint Alby",
+"Dia"
+]
+},
+"Blancs d'œufs liquides": {
+"n": 9
+},
+"Blancs de poulet": {
+"n": 499,
+"m": [
+"Fleury Michon",
+"Saint Alby",
+"Tradilège",
+"Le Gaulois",
+"Herta",
+"Réghalal",
+"Isla Mondial",
+"Volibon",
+"Halal",
+"Coop"
+]
+},
+"Blanquette de Limoux": {
+"n": 3
+},
+"Blanquette de veau": {
+"n": 163,
+"m": [
+"Tendre & Plus",
+"Tendre et Plus"
+]
+},
+"Blender": {
+"n": 4
+},
+"Bleu d'Auvergne": {
+"n": 213,
+"m": [
+"Laiterie de la Montagne",
+"Fromapac"
+]
+},
+"Blocs WC": {
+"n": 6
+},
+"Boisson amande": {
+"n": 94,
+"m": [
+"Bjorg"
+]
+},
+"Boisson au riz": {
+"n": 140,
+"m": [
+"The Bridge",
+"Bjorg",
+"Isola Bio",
+"Alter Eco",
+"Regain",
+"Bonneterre",
+"Vegetalia",
+"Source Vegetale",
+"Le Bio pour Tous",
+"La Fourche"
+]
+},
+"Boisson coco": {
+"n": 71,
+"m": [
+"Bjorg",
+"Evernat"
+]
+},
+"Boisson maltée": {
+"n": 2
+},
+"Boisson riz": {
+"n": 140,
+"m": [
+"The Bridge",
+"Bjorg",
+"Isola Bio",
+"Alter Eco",
+"Regain",
+"Bonneterre",
+"Vegetalia",
+"Source Vegetale",
+"Le Bio pour Tous",
+"La Fourche"
+]
+},
+"Boisson soja": {
+"n": 188,
+"m": [
+"Soy",
+"Sojasun",
+"Sojade",
+"Céréal Bio",
+"Bjorg",
+"Nutrition & Santé",
+"Ensemble",
+"Regain",
+"Nature Bio",
+"Le Réflexe Bio"
+]
+},
+"Boisson végétale avoine": {
+"n": 20
+},
+"Boisson énergisante": {
+"n": 69,
+"m": [
+"X-Tense",
+"Red Bull",
+"MONSTER",
+"CELSIUS"
+]
+},
+"Bols": {
+"n": 164,
+"m": [
+"Carte Nature",
+"Babybio"
+]
+},
+"Bonbons": {
+"n": 2702,
+"m": [
+"Haribo",
+"La Confiserie Bressaude",
+"Ricola",
+"Tic Tac",
+"Lucien Georgelin",
+"Ferrero",
+"Apidis",
+"Fini",
+"Lutti",
+"DV SAS"
+]
+},
+"Bonbons en vrac": {
+"n": 7
+},
+"Bonbons menthe sans sucre": {
+"n": 26
+},
+"Bonbons sans sucre": {
+"n": 152,
+"m": [
+"Halter",
+"Ricola",
+"Lucien Georgelin",
+"Elodie",
+"La Confiserie Bressaude",
+"Confiséo"
+]
+},
+"Bonnets": {
+"n": 6
+},
+"Bouchées à la reine": {
+"n": 69
+},
+"Boudin blanc": {
+"n": 651,
+"m": [
+"Bahier",
+"Maison Prunier",
+"Le Gaulois",
+"Demoizet",
+"Les Brasérades",
+"Charcuteries bahier",
+"Tallec",
+"Brient",
+"Maître CoQ",
+"Despi"
+]
+},
+"Boudin noir": {
+"n": 412,
+"m": [
+"Mainjolle",
+"Le Père Benoît",
+"Maison Prunier",
+"Bahier"
+]
+},
+"Boudin noir aux oignons": {
+"n": 214,
+"m": [
+"Tradilège",
+"Bioporc",
+"Cochonailles du Haut-Bois"
+]
+},
+"Boudoirs": {
+"n": 115,
+"m": [
+"Gateau"
+]
+},
+"Bougies": {
+"n": 9
+},
+"Bougies parfumées": {
+"n": 1
+},
+"Bouillon cube": {
+"n": 105,
+"m": [
+"Léa Nature",
+"Jardin Bio",
+"Maggi",
+"Rapunzel",
+"Jardin Bio étic",
+"Evernat",
+"Natur compagnie",
+"Les secrets de Manou"
+]
+},
+"Boules de Noël": {
+"n": 22
+},
+"Boules de graisse pour oiseaux": {
+"n": 2
+},
+"Boulgour": {
+"n": 275,
+"m": [
+"Priméal",
+"Moulin des Moines",
+"Tipiak",
+"Celnat",
+"Happy Bio",
+"Markal",
+"Mix Buffet",
+"Sabarot",
+"Ofal",
+"Ekibio"
+]
+},
+"Boursin ail et fines herbes": {
+"n": 21,
+"m": [
+"Boursin",
+"Bel",
+"Boursin atartiner/core cheese"
+]
+},
+"Boxers": {
+"n": 2
+},
+"Boîtes alimentaires": {
+"n": 1
+},
+"Boîtes de rangement": {
+"n": 2
+},
+"Brandade de morue": {
+"n": 327,
+"m": [
+"Briau",
+"Tipiak",
+"Coudène",
+"Sar'Océan",
+"Maison Briau",
+"Pecheries Basques",
+"Delpierre",
+"Le Grand Lejon",
+"Toupargel",
+"La Cuisine du Poissonnier"
+]
+},
+"Bretzels": {
+"n": 231,
+"m": [
+"Ancel",
+"Moulin des Moines",
+"Dr. Oetker",
+"Daniel Stoffel",
+"Poulaillon"
+]
+},
+"Brie": {
+"n": 503,
+"m": [
+"Le Roitelet",
+"Le Fromager Des Halles",
+"Président",
+"Savencia",
+"Fromapac",
+"Paysan Breton",
+"CF&R",
+"Coeur de Lion",
+"Lactalis",
+"Pâturages Comtois"
+]
+},
+"Brie de Meaux": {
+"n": 364,
+"m": [
+"Le Fromager Des Halles"
+]
+},
+"Brie à la truffe": {
+"n": 24
+},
+"Brioche": {
+"n": 2162,
+"m": [
+"La Fournée Dorée",
+"Sicard",
+"Thomas Brioche",
+"Podis",
+"Brioches Fonteneau",
+"Pasquier",
+"Brioche Pasquier",
+"Pitch",
+"Maline Thomas",
+"La Boulangère"
+]
+},
+"Brioche tranchée": {
+"n": 318,
+"m": [
+"Harrys",
+"La Fournée Dorée",
+"Maître Jean Pierre",
+"Pasquier",
+"La Boulangère",
+"Brioche Pasquier",
+"Brioches Fonteneau",
+"Epi d'Or",
+"Les Pâtissades",
+"Brioche fonteneau"
+]
+},
+"Briquettes de jus": {
+"n": 3
+},
+"Brochettes de bœuf": {
+"n": 143,
+"m": [
+"Socopa",
+"Bigard",
+"Férial",
+"Jean Rozé",
+"L'Étal du Boucher"
+]
+},
+"Brochettes de poulet": {
+"n": 271,
+"m": [
+"Le Gaulois",
+"L'etal Du Volailler",
+"Maître Jacques",
+"Deli's World",
+"La Nouvelle Agriculture"
+]
+},
+"Brocoli": {
+"n": 109,
+"m": [
+"Bonduelle"
+]
+},
+"Brocolis surgelés": {
+"n": 14
+},
+"Brosse à dents": {
+"n": 7
+},
+"Brosse à dents enfant": {
+"n": 1
+},
+"Brossettes interdentaires": {
+"n": 1
+},
+"Brugnons": {
+"n": 3
+},
+"Bulbes": {
+"n": 2
+},
+"Bulots": {
+"n": 35,
+"m": [
+"Mer et terroirs"
+]
+},
+"Burgers surgelés": {
+"n": 18
+},
+"Burrata": {
+"n": 342,
+"m": [
+"Treo",
+"Italie",
+"Deliziosa",
+"Casa Azzurra",
+"Ambrosi",
+"L'Italie des Fromages",
+"Gioiella",
+"Del Gaudio Gourmet",
+"Tamburro",
+"d'amore"
+]
+},
+"Bâton de colle": {
+"n": 3
+},
+"Bâtonnets glacés": {
+"n": 66
+},
+"Bûche de Noël": {
+"n": 19
+},
+"Bûche glacée": {
+"n": 205,
+"m": [
+"Erhard",
+"L'Angélys",
+"Glaces des Alpes",
+"Gourmet Finest Cuisine",
+"Nestlé",
+"Toupargel",
+"Terres Bleues",
+"La Belle Aude",
+"Jampi"
+]
+},
+"Bœuf bourguignon": {
+"n": 215,
+"m": [
+"Tendre & Plus",
+"Jean Rozé",
+"William Saurin",
+"Toque du Chef",
+"Charal",
+"Tendre et Plus",
+"Côté Table"
+]
+},
+"Cacahuètes": {
+"n": 712,
+"m": [
+"Menguy's",
+"Tokapi",
+"Bénénuts",
+"Vico",
+"Brut de coques",
+"KoRo",
+"Montperal",
+"Pfiff",
+"Les Niçois",
+"Pépite"
+]
+},
+"Cacao en poudre bio": {
+"n": 11
+},
+"Cacao en poudre non sucré": {
+"n": 12,
+"m": [
+"Van Houten"
+]
+},
+"Café décaféiné": {
+"n": 113,
+"m": [
+"Bellarom",
+"Maxwell House",
+"L'Or",
+"Carte Noire",
+"Lavazza",
+"Sati"
+]
+},
+"Café en dosettes": {
+"n": 116,
+"m": [
+"Senseo",
+"Carte Noire",
+"Legal",
+"Lavazza",
+"Sati",
+"San Marco"
+]
+},
+"Café en grains": {
+"n": 451,
+"m": [
+"Greenweez",
+"Carte Noire",
+"Bibal",
+"Lobodis",
+"Lavazza",
+"Naturela",
+"Malongo",
+"Ethiquable",
+"Bellarom",
+"San Marco"
+]
+},
+"Café en vrac": {
+"n": 1
+},
+"Café moulu": {
+"n": 486,
+"m": [
+"Carte Noire",
+"Bibal",
+"Ethiquable",
+"Artisans du Monde",
+"Bellarom",
+"Malongo",
+"Méo",
+"Destination",
+"Lavazza",
+"Quai Sud"
+]
+},
+"Café soluble": {
+"n": 171,
+"m": [
+"Nescafé",
+"Bellarom",
+"L'Or",
+"Le Bio pour Tous",
+"Maxwell House",
+"Summa",
+"Café Michel",
+"Rochambeau"
+]
+},
+"Cahiers": {
+"n": 18
+},
+"Cake aux fruits": {
+"n": 219,
+"m": [
+"La Boîte à Cake",
+"Lemarie patissier",
+"Le Ster",
+"Forchy",
+"Fossier",
+"Tante Odile",
+"Brossard",
+"Berrou",
+"P'tit Déli",
+"Les Saveurs du Clavon"
+]
+},
+"Calamars": {
+"n": 138,
+"m": [
+"Escal",
+"Esmeralda",
+"Spanico",
+"Ederki",
+"Delpierre",
+"Pêcheur de Saveurs",
+"Palais Des Mets",
+"Palacio de oriente",
+"La Coca",
+"Casa Ramon"
+]
+},
+"Calamars surgelés": {
+"n": 3
+},
+"Calamars à la romaine": {
+"n": 16
+},
+"Calendrier de l'Avent": {
+"n": 362,
+"m": [
+"Bon Bon Buddies",
+"Kinder",
+"Ferrero",
+"Milka",
+"Lindt",
+"Nestlé",
+"Rohan",
+"Riegelein",
+"Mondelez",
+"Mazet"
+]
+},
+"Calvados": {
+"n": 22
+},
+"Camembert": {
+"n": 391,
+"m": [
+"Président",
+"Isigny Ste Mère",
+"Gillot",
+"Coeur de Lion",
+"CF&R",
+"Lactalis",
+"Le Rustique",
+"Chêne d'argent",
+"Savencia",
+"Les Croisés"
+]
+},
+"Camembert de Normandie": {
+"n": 164,
+"m": [
+"Gillot",
+"Réo",
+"Lactalis",
+"E. Graindorge",
+"Jort",
+"Pré Saint-Jean",
+"Fromagerie du val de Sienne",
+"Graindorge",
+"Marie Harel",
+"La Perelle"
+]
+},
+"Camomille": {
+"n": 61,
+"m": [
+"Bio Conseils"
+]
+},
+"Canard": {
+"n": 291,
+"m": [
+"Esprit Gourmet",
+"Lechef",
+"Saveur d'Auge",
+"Nature de France",
+"Le Gaulois",
+"La Truffe",
+"Delpeyrat",
+"Les Bories",
+"Pierre Champion",
+"Père Dodu"
+]
+},
+"Cannelle": {
+"n": 251,
+"m": [
+"Sainte Lucie",
+"Ducros",
+"Masalchi",
+"Bedros",
+"Espig",
+"La Conquête des Saveurs",
+"Cook",
+"Arcadie",
+"Portland",
+"La Planète des Épices"
+]
+},
+"Cantal": {
+"n": 639,
+"m": [
+"Ets Schoepfer",
+"Le Fromager Des Halles",
+"Saveur De Nos Regions",
+"Les fromageries occitanes",
+"Société fromagère de Riom",
+"Entremont",
+"Les Délices de Belle France"
+]
+},
+"Capsules de café": {
+"n": 165,
+"m": [
+"Nespresso",
+"Café Royal",
+"San Marco",
+"Starbucks",
+"Legal",
+"Le Temps des Cerises",
+"L'Or",
+"Bibal",
+"Moreno",
+"Méo"
+]
+},
+"Carafe": {
+"n": 5
+},
+"Caramels": {
+"n": 1805,
+"m": [
+"La Maison d'Armorine",
+"DV SAS",
+"Carabreizh",
+"Delaunay Léveillé",
+"Klaus",
+"La Trinitaine",
+"Les Delices De Josephine",
+"Le Comptoir de Mathilde",
+"Pinson",
+"Starbucks"
+]
+},
+"Carottes": {
+"n": 775,
+"m": [
+"Priméale",
+"Planète Végétal",
+"Auchan Baby Bio",
+"Prim'Bio",
+"Terre et Mer",
+"D'aucy",
+"Florette",
+"Bonduelle",
+"Blédina",
+"Babybio"
+]
+},
+"Carottes râpées": {
+"n": 459,
+"m": [
+"Mix Buffet",
+"Bonduelle",
+"Pierre Martinet",
+"Tout feu tout frais",
+"Saladinettes",
+"Brédial",
+"Qualité Traiteur",
+"Brindélices",
+"Menu Fraîcheur"
+]
+},
+"Carottes surgelées": {
+"n": 7
+},
+"Carpaccio": {
+"n": 209,
+"m": [
+"Charal",
+"Férial",
+"Jean Rozé",
+"L'Étal du Boucher",
+"Bigard"
+]
+},
+"Carpaccio de saumon": {
+"n": 46,
+"m": [
+"Rolmer"
+]
+},
+"Carré d'agneau": {
+"n": 6
+},
+"Cartes d'anniversaire": {
+"n": 1
+},
+"Casserole": {
+"n": 7
+},
+"Cassis": {
+"n": 114,
+"m": [
+"Lucien Georgelin",
+"Les Confituriers du Morvan"
+]
+},
+"Cassonade": {
+"n": 92,
+"m": [
+"Daddy",
+"Saint Louis",
+"Navarre",
+"Tablier Blanc",
+"Erstein"
+]
+},
+"Cassoulet": {
+"n": 1002,
+"m": [
+"La Belle Chaurienne",
+"William Saurin",
+"Larnaudie",
+"Maison Rivière",
+"Raynal et Roquelaure",
+"Micouleau",
+"Raynal & Roquelaure",
+"Le Revelois",
+"Les Saveurs De Bourdette",
+"Les Bories"
+]
+},
+"Cava": {
+"n": 13
+},
+"Caviar": {
+"n": 594,
+"m": [
+"Petrossian",
+"Jean Martin",
+"Méditéa",
+"Cruscana",
+"Les Mets De Provence",
+"Maayane",
+"Maison Raymond",
+"Albert Ménès",
+"Prosain",
+"L'Apéro du Poissonnier"
+]
+},
+"Cerfeuil": {
+"n": 16
+},
+"Cerises": {
+"n": 316,
+"m": [
+"Andros",
+"Chambe",
+"Lucien Georgelin",
+"Bonne Maman",
+"Les 3 Capucins",
+"Beyer",
+"Saveurs attitudes"
+]
+},
+"Cervelle d'agneau": {
+"n": 4
+},
+"Chamois d'Or": {
+"n": 51
+},
+"Champagne": {
+"n": 530,
+"m": [
+"Danremont",
+"Nicolas Feuillatte",
+"Pol Carson",
+"Piper Heidsieck",
+"Canard-Duchêne",
+"Vranken",
+"Veuve Émille",
+"Montaudon",
+"Mumm",
+"Champagne"
+]
+},
+"Champagne rosé": {
+"n": 22
+},
+"Champignons de Paris": {
+"n": 332,
+"m": [
+"Notre Jardin",
+"Blanchaud",
+"Aro",
+"Rochambeau",
+"Dia",
+"Valtonia"
+]
+},
+"Champignons en boîte": {
+"n": 12
+},
+"Champignons surgelés": {
+"n": 10
+},
+"Champignons émincés": {
+"n": 139,
+"m": [
+"Florette",
+"Notre Jardin"
+]
+},
+"Chaource": {
+"n": 63,
+"m": [
+"Lincet",
+"Didier lincet"
+]
+},
+"Chapelure": {
+"n": 118,
+"m": [
+"Tipiak",
+"Bloch",
+"Vivien Paille",
+"Moulin des Moines",
+"La Chanteracoise",
+"Yarden"
+]
+},
+"Charbon de bois": {
+"n": 1
+},
+"Chaumes": {
+"n": 45,
+"m": [
+"Chaumes",
+"Savencia"
+]
+},
+"Chaussettes": {
+"n": 2
+},
+"Chaussons": {
+"n": 118,
+"m": [
+"Nutella",
+"Bioryza"
+]
+},
+"Chaussons aux pommes": {
+"n": 493,
+"m": [
+"Les 3 Meuniers"
+]
+},
+"Chaussée aux Moines": {
+"n": 17,
+"m": [
+"Chaussée aux Moines",
+"Lactalis"
+]
+},
+"Cheddar": {
+"n": 407,
+"m": [
+"Wyke Farms",
+"Les Croisés",
+"Kraft",
+"Les Délices D'Amélie",
+"Wyke",
+"Marks & Spencers",
+"Nature & Moi",
+"Miraflores",
+"Paladin",
+"Mlekovita"
+]
+},
+"Cheddar en tranches": {
+"n": 17
+},
+"Chevilles": {
+"n": 1
+},
+"Chewing-gums": {
+"n": 364,
+"m": [
+"Mentos",
+"Hollywood",
+"Wrigley's",
+"Freedent",
+"Trident",
+"Mondelez",
+"Dietaroma",
+"Orbit",
+"Perfetti Van Melle"
+]
+},
+"Chewing-gums sans sucre": {
+"n": 63,
+"m": [
+"Hollywood",
+"Mentos",
+"New'R",
+"Freedent",
+"Perfetti Van Melle",
+"JETgum",
+"Airwaves"
+]
+},
+"Chicorée": {
+"n": 238,
+"m": [
+"Leroux",
+"Favrichon",
+"Lima",
+"Cherico",
+"Bellarom",
+"Aromandise",
+"Destination"
+]
+},
+"Chili con carne": {
+"n": 233,
+"m": [
+"Paul & Louise",
+"Zapetti",
+"Fleury Michon",
+"Claude Vétillard",
+"Garbit",
+"Côté Table",
+"Raynal et Roquelaure",
+"Old El Paso",
+"Tendre & Plus",
+"Comme j'aime"
+]
+},
+"Chipolatas": {
+"n": 1871,
+"m": [
+"Jean Rozé",
+"Hiruak",
+"Socopa",
+"L'Étal du Boucher",
+"Madrange",
+"Au Fumé Vosgien",
+"Vallégrain",
+"Saveurs des mauges",
+"Tradival",
+"Férial"
+]
+},
+"Chips": {
+"n": 2638,
+"m": [
+"Brets",
+"Lay's",
+"Vico",
+"Sibell",
+"Pom'Lisse",
+"Intersnack",
+"Pirato",
+"Frit Ravich",
+"Crusti Croc",
+"Añavieja"
+]
+},
+"Chips allégées": {
+"n": 12
+},
+"Chips allégées en sel": {
+"n": 4,
+"m": [
+"Sibell"
+]
+},
+"Chips barbecue": {
+"n": 76,
+"m": [
+"Lay's",
+"Sibell",
+"Brets",
+"Pom'Lisse",
+"Vico"
+]
+},
+"Chips de lentilles": {
+"n": 80,
+"m": [
+"Vico",
+"Jardin Bio étic",
+"Les Poppés",
+"Jardin Bio",
+"Mr Steve",
+"Celiane"
+]
+},
+"Chips de légumes": {
+"n": 135,
+"m": [
+"La parenthèse bio",
+"Pirato",
+"Brets"
+]
+},
+"Chips saveur poulet": {
+"n": 38,
+"m": [
+"Lay's",
+"Brets",
+"Vico"
+]
+},
+"Chips à la truffe": {
+"n": 74
+},
+"Chips épicées": {
+"n": 3
+},
+"Chocapic": {
+"n": 99,
+"m": [
+"Chocapic",
+"Nestlé"
+]
+},
+"Chocolat aux noisettes": {
+"n": 509,
+"m": [
+"Côte d'Or",
+"Chevaliers d'Argouges",
+"Lindt",
+"Nestlé",
+"Milka",
+"Saveurs & Nature",
+"Lindt & Sprüngli",
+"Monbana",
+"Bovetti",
+"Tablette d'Or"
+]
+},
+"Chocolat blanc": {
+"n": 433,
+"m": [
+"Bovetti",
+"Rochambeau",
+"Le Comptoir de Mathilde",
+"Nestlé",
+"Maison Taillefer",
+"Cémoi",
+"Valrhona",
+"Tablette d'Or",
+"Saveurs & Nature",
+"Frey"
+]
+},
+"Chocolat en poudre": {
+"n": 158,
+"m": [
+"Monbana",
+"Chocolaterie Monbana",
+"Poulain",
+"Terre d'Oc",
+"Dolfin",
+"Cémoi",
+"Gilbert",
+"Nestlé",
+"Dulcinea"
+]
+},
+"Chocolat instantané": {
+"n": 12,
+"m": [
+"Ethiquable"
+]
+},
+"Chocolat pâtissier": {
+"n": 55,
+"m": [
+"Tablette d'Or",
+"Nestlé",
+"Rochambeau",
+"Dia"
+]
+},
+"Chocolats de Noël": {
+"n": 48,
+"m": [
+"Jacquot",
+"Le Comptoir de Mathilde"
+]
+},
+"Chocolats de Pâques": {
+"n": 47,
+"m": [
+"Rohan"
+]
+},
+"Chorizo": {
+"n": 1448,
+"m": [
+"Hiruak",
+"César Moroni",
+"Revilla",
+"Argal",
+"Elpozo",
+"Berni",
+"Maison Milhau",
+"Boadas",
+"L'assiette d'Antoine",
+"Espuña"
+]
+},
+"Chorizo fort": {
+"n": 228,
+"m": [
+"César Moroni",
+"Elpozo",
+"Palacios",
+"Le Césarin",
+"Berni",
+"Argal",
+"Saveur & Passion"
+]
+},
+"Chou rouge": {
+"n": 171,
+"m": [
+"Hak"
+]
+},
+"Chou vert": {
+"n": 14
+},
+"Chou-fleur": {
+"n": 126,
+"m": [
+"Bonduelle",
+"Toupargel"
+]
+},
+"Choucroute": {
+"n": 478,
+"m": [
+"André Laurent",
+"Stoeffler",
+"Charles Christ",
+"William Saurin",
+"Le Pic",
+"Ferme Frieh",
+"Saint Benoît",
+"Angsthelm & Fils",
+"Roger Karst",
+"Priméal"
+]
+},
+"Choucroute garnie": {
+"n": 291,
+"m": [
+"Stoeffler",
+"Pierre Schmidt",
+"Produits de la Cigogne",
+"William Saurin",
+"Terroir",
+"Stemmelen",
+"La Ronde Des Gourmands",
+"Côté Table",
+"Cochonnailles du Haut-Bois"
+]
+},
+"Chouquettes": {
+"n": 395
+},
+"Choux de Bruxelles": {
+"n": 119,
+"m": [
+"Priméale",
+"Notre Jardin"
+]
+},
+"Choux à la crème": {
+"n": 19
+},
+"Choux-fleurs surgelés": {
+"n": 8
+},
+"Chutney de mangue": {
+"n": 57,
+"m": [
+"Le Coq Noir"
+]
+},
+"Chèvre bûche": {
+"n": 26
+},
+"Chèvre frais": {
+"n": 88,
+"m": [
+"Chêne d'argent",
+"Les Croisés"
+]
+},
+"Ciboule": {
+"n": 1
+},
+"Ciboulette": {
+"n": 163,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Cigalou",
+"Lamprien Provence",
+"Rustica"
+]
+},
+"Cidre": {
+"n": 539,
+"m": [
+"Loïc Raison",
+"Ecusson",
+"Kerisac",
+"Val de Rance",
+"Le Brun",
+"Les Vergers de Ducy",
+"Château de Lézergué",
+"Les Celliers Associés",
+"Côteaux Nantais",
+"Sautter"
+]
+},
+"Cidre brut": {
+"n": 223,
+"m": [
+"Kerisac",
+"Ecusson",
+"Loïc Raison",
+"Val de Rance",
+"Les Goelleries",
+"Les Vergers de Ducy",
+"André Jalbert",
+"Cidrerie Dujardin",
+"Le Brun",
+"Cidrerie de Savoie"
+]
+},
+"Cidre doux": {
+"n": 148,
+"m": [
+"Kerisac",
+"Loïc Raison",
+"Ecusson",
+"Val de Rance",
+"Les Goelleries",
+"La Fauconnerie"
+]
+},
+"Cirage": {
+"n": 2
+},
+"Cire coiffante": {
+"n": 1
+},
+"Ciseaux": {
+"n": 1
+},
+"Citronnade": {
+"n": 294,
+"m": [
+"Andros",
+"Pulco",
+"Alain Milliat",
+"Vitamont",
+"Lorina",
+"Tidélice",
+"Florette",
+"Sains et Saufs",
+"Tropicana"
+]
+},
+"Citrons": {
+"n": 669,
+"m": [
+"Le Coq Noir",
+"Brio",
+"Saveurs attitudes",
+"Provence Olives",
+"La Perdiz",
+"Eureka",
+"Lorina",
+"Pulco",
+"Nahil",
+"Clipper"
+]
+},
+"Citrons verts": {
+"n": 104,
+"m": [
+"Pulco"
+]
+},
+"Clairette de Die": {
+"n": 48,
+"m": [
+"Jaillance"
+]
+},
+"Classeurs": {
+"n": 4
+},
+"Clous": {
+"n": 118,
+"m": [
+"Ducros",
+"Rustica",
+"Fuchs",
+"Samia",
+"Sainte Lucie"
+]
+},
+"Clémentines": {
+"n": 397,
+"m": [
+"AGRUCORSE",
+"Corsica Comptoir",
+"Bouquet"
+]
+},
+"Coca-Cola light": {
+"n": 51,
+"m": [
+"Coca-Cola",
+"Coca-Cola-light"
+]
+},
+"Cocktail de fruits": {
+"n": 287,
+"m": [
+"St Mamet",
+"Rochambeau",
+"Del Monte",
+"Escal",
+"Metro",
+"Metro Chef",
+"Mocitos"
+]
+},
+"Cognac": {
+"n": 84,
+"m": [
+"Camus"
+]
+},
+"Cola": {
+"n": 403,
+"m": [
+"Coca-Cola",
+"Freeway",
+"Vitamont",
+"River",
+"Jean's",
+"Dia",
+"Sodastream",
+"Pepsi",
+"Look"
+]
+},
+"Cola zéro": {
+"n": 60,
+"m": [
+"Freeway"
+]
+},
+"Colin surgelé": {
+"n": 11,
+"m": [
+"Marie"
+]
+},
+"Collants": {
+"n": 1
+},
+"Colle": {
+"n": 22
+},
+"Coloration": {
+"n": 4,
+"m": [
+"henkel"
+]
+},
+"Compote en gourdes": {
+"n": 19
+},
+"Compote en pot": {
+"n": 3
+},
+"Compote sans sucre ajouté": {
+"n": 112,
+"m": [
+"Andros",
+"Materne",
+"Charles & Alice",
+"Pom'Potes",
+"Charles et Alice"
+]
+},
+"Compotes bébé": {
+"n": 9
+},
+"Compotes en coupelles": {
+"n": 1
+},
+"Compresses": {
+"n": 6
+},
+"Comté": {
+"n": 2066,
+"m": [
+"JuraFlore",
+"Le Berger Comtois",
+"Marcel Petite",
+"Comté",
+"Le Fromager Des Halles",
+"Entremont",
+"Rivoire jacquemin",
+"Fromageries Arnaud",
+"Jean Perrin",
+"Les Croisés"
+]
+},
+"Concentré de cassis": {
+"n": 1
+},
+"Concentré de tomate": {
+"n": 81,
+"m": [
+"Mutti",
+"Danival",
+"Rochambeau",
+"Aro"
+]
+},
+"Concombre": {
+"n": 264,
+"m": [
+"Yarden",
+"Oceane",
+"Mix Buffet"
+]
+},
+"Confipote abricots": {
+"n": 2
+},
+"Confit de canard": {
+"n": 511,
+"m": [
+"Delpeyrat",
+"Larnaudie",
+"Labeyrie",
+"Maison Montfort",
+"Rougié",
+"La Belle Chaurienne",
+"Maison Rivière",
+"Les Bories",
+"Jean Larnaudie",
+"Ducs de Gascogne"
+]
+},
+"Confiture allégée en sucre": {
+"n": 35,
+"m": [
+"Mocitos"
+]
+},
+"Confiture d'abricots": {
+"n": 957,
+"m": [
+"Bonne Maman",
+"Lucien Georgelin",
+"Andros",
+"Les Comtes de Provence",
+"Saveurs attitudes",
+"Vergers des Alpilles",
+"Côteaux Nantais",
+"Pure Via",
+"La Chambre aux Confitures",
+"Le Bois Jumel"
+]
+},
+"Confiture d'abricots allégée": {
+"n": 32,
+"m": [
+"Maribel"
+]
+},
+"Confiture d'oignons": {
+"n": 3
+},
+"Confiture d'oranges amères": {
+"n": 74,
+"m": [
+"Collines en Limousin",
+"Bonne Maman"
+]
+},
+"Confiture de cerises": {
+"n": 459,
+"m": [
+"Bonne Maman",
+"Francis Miot",
+"Les Comtes de Provence",
+"Les Confitures de Haute Soule",
+"Léonce Blanc",
+"Materne",
+"Vergers des Alpilles",
+"Comme Autrefois",
+"Miguelgorry",
+"Charles Antona"
+]
+},
+"Confiture de figues": {
+"n": 585,
+"m": [
+"Charles Antona",
+"Maison Cappaccini",
+"Bonne Maman",
+"Lucien Georgelin",
+"Les Comtes de Provence",
+"André Guépratte",
+"Côteaux Nantais",
+"Biolo'Klock",
+"Eric Bur",
+"Albert Ménès"
+]
+},
+"Confiture de fraises": {
+"n": 1339,
+"m": [
+"Bonne Maman",
+"Lucien Georgelin",
+"Mocitos",
+"Andros",
+"Côteaux Nantais",
+"Charles Antona",
+"Les Comtes de Provence",
+"Biolo'Klock",
+"Le Bois Jumel",
+"Maison Jougla"
+]
+},
+"Confiture de framboises": {
+"n": 806,
+"m": [
+"Bonne Maman",
+"Côteaux Nantais",
+"Favols",
+"Lucien Georgelin",
+"Bellamy",
+"Beyer",
+"Les Comtes de Provence",
+"Thomas Le Prince",
+"Maribel",
+"Maison Andrésy"
+]
+},
+"Confiture de fruits rouges": {
+"n": 162,
+"m": [
+"Douceur du Verger",
+"Tamara",
+"Vergers des Alpilles",
+"Confit de Provence",
+"Les Comtes de Provence",
+"Charles Antona"
+]
+},
+"Confiture de myrtilles allégée": {
+"n": 10
+},
+"Cookies": {
+"n": 2147,
+"m": [
+"La Mère Poulard",
+"Bonne Maman",
+"Nestlé",
+"Michel et Augustin",
+"Hershey's",
+"Milka",
+"P'tit Déli",
+"Delacre",
+"Les Deux Gourmands",
+"Unicq"
+]
+},
+"Coppa": {
+"n": 436,
+"m": [
+"Despi",
+"Montorsi",
+"Negroni",
+"La Jasse",
+"Veronesi",
+"Boadas",
+"Saint Alby",
+"Berni",
+"L'assiette d'Antoine",
+"Casa Modena"
+]
+},
+"Coquelet": {
+"n": 46,
+"m": [
+"L'etal Du Volailler",
+"Maître CoQ"
+]
+},
+"Coquillages": {
+"n": 25
+},
+"Coquilles Saint-Jacques": {
+"n": 188,
+"m": [
+"Tipiak",
+"Toque du Chef",
+"Maës",
+"Pêcheur de Saveurs",
+"Sapresti",
+"Française de Gastronomie"
+]
+},
+"Cordons bleus": {
+"n": 751,
+"m": [
+"Père Dodu",
+"Le Gaulois",
+"Despi",
+"Maître CoQ",
+"Nature de France",
+"Isla Délice",
+"Volaé",
+"Réghalal",
+"Toque du Chef",
+"Id Halal"
+]
+},
+"Cordons bleus surgelés": {
+"n": 9
+},
+"Coriandre": {
+"n": 163,
+"m": [
+"Sainte Lucie",
+"Ducros",
+"Bedros",
+"Masalchi",
+"Spigol",
+"Espig"
+]
+},
+"Corn-flakes": {
+"n": 283,
+"m": [
+"Kellogg's",
+"Joe's Farm",
+"Nestlé",
+"Brin de Jour",
+"Hahne",
+"Harrisons",
+"Grillon d'Or",
+"Terres et Céréales Bio",
+"Country Farm"
+]
+},
+"Cornichons": {
+"n": 493,
+"m": [
+"Kühne",
+"Maille",
+"Hugo Reitzel",
+"Polonia",
+"Amora",
+"Develey",
+"Rustica",
+"Alélor",
+"Maison Marc",
+"Les Saveurs du Clavon"
+]
+},
+"Cornichons apéritif": {
+"n": 1
+},
+"Coton": {
+"n": 8
+},
+"Cotons-tiges": {
+"n": 9
+},
+"Couches": {
+"n": 12,
+"m": [
+"Auchan Baby"
+]
+},
+"Couettes": {
+"n": 3
+},
+"Coulommiers": {
+"n": 217,
+"m": [
+"Coeur de Lion",
+"CF&R",
+"Président",
+"Savencia",
+"E. Graindorge",
+"Les Croisés",
+"Chêne d'argent",
+"Lactalis",
+"Bons mayennais",
+"Le Fromager Des Halles"
+]
+},
+"Coupes glacées": {
+"n": 23,
+"m": [
+"Toupargel"
+]
+},
+"Courge butternut": {
+"n": 31
+},
+"Courgettes": {
+"n": 377,
+"m": [
+"Cassegrain",
+"Bouquet Bio",
+"Les Paysans Bio",
+"Terre de BIO"
+]
+},
+"Courgettes en spaghetti": {
+"n": 4
+},
+"Couronne des rois briochée": {
+"n": 21,
+"m": [
+"Brioches Fonteneau"
+]
+},
+"Couscous royal": {
+"n": 86,
+"m": [
+"Garbit",
+"Toupargel",
+"Toque du Chef",
+"La cuisine des Saveurs"
+]
+},
+"Coussins": {
+"n": 17
+},
+"Couteaux": {
+"n": 22
+},
+"Couverts": {
+"n": 3
+},
+"Crackers": {
+"n": 993,
+"m": [
+"Heudebert",
+"Tokapi",
+"Conad",
+"Mille et Une Huiles",
+"Crich",
+"Delser",
+"RESURRECTION",
+"Sun Snacks",
+"Joody",
+"LU"
+]
+},
+"Cranberries séchées": {
+"n": 211,
+"m": [
+"Sun"
+]
+},
+"Crayons de couleur": {
+"n": 3
+},
+"Crevettes crues": {
+"n": 96
+},
+"Crevettes cuites": {
+"n": 473,
+"m": [
+"Odyssee",
+"Pescanova",
+"Delpierre",
+"Maison Mer",
+"Miti",
+"Krustanord",
+"L'Atelier Poissonnerie",
+"Crusta C",
+"Trad p&c",
+"Bleu Vert"
+]
+},
+"Crevettes grises": {
+"n": 52,
+"m": [
+"Heiploeg",
+"Klaas Puul"
+]
+},
+"Crevettes roses": {
+"n": 67,
+"m": [
+"Pescanova"
+]
+},
+"Crevettes surgelées": {
+"n": 31
+},
+"Cristaux de soude": {
+"n": 2
+},
+"Crochets adhésifs": {
+"n": 1
+},
+"Croissants": {
+"n": 1594,
+"m": [
+"Les 3 Meuniers",
+"Pasquier",
+"Brioche Pasquier",
+"La Fournée Campanière",
+"Maître Jean Pierre",
+"Délifrance",
+"Brioches Pasquier",
+"Epi d'Or",
+"Selex"
+]
+},
+"Croissants aux amandes": {
+"n": 51
+},
+"Croque-monsieur": {
+"n": 174,
+"m": [
+"Herta",
+"Valentin Traiteur",
+"Maison Monterrat",
+"Côté Croc",
+"L'assiette d'Antoine"
+]
+},
+"Croquettes pour chat": {
+"n": 13
+},
+"Croquettes pour chat senior": {
+"n": 2
+},
+"Croquettes pour chat stérilisé": {
+"n": 6,
+"m": [
+"Purina One",
+"Empreintes"
+]
+},
+"Croquettes pour chaton": {
+"n": 5
+},
+"Croquettes pour chien": {
+"n": 24,
+"m": [
+"Empreintes"
+]
+},
+"Croquettes pour chiot": {
+"n": 2
+},
+"Croustibat": {
+"n": 22,
+"m": [
+"Findus"
+]
+},
+"Croûtons": {
+"n": 604,
+"m": [
+"Tipiak",
+"Epi d'Or",
+"Vico",
+"Florette",
+"Fresh Gourmet",
+"La Chanteracoise",
+"Intersnack",
+"Toque du Chef",
+"Mannapain",
+"Brioche Pasquier"
+]
+},
+"Crème anti-âge": {
+"n": 10
+},
+"Crème catalane": {
+"n": 8
+},
+"Crème change": {
+"n": 4
+},
+"Crème chantilly": {
+"n": 18
+},
+"Crème chantilly légère": {
+"n": 1
+},
+"Crème de cassis": {
+"n": 94,
+"m": [
+"Cherry Rocher",
+"Vedrenne",
+"Giffard"
+]
+},
+"Crème de jour": {
+"n": 9
+},
+"Crème de marrons": {
+"n": 465,
+"m": [
+"Clément Faugier",
+"Les Comtes de Provence",
+"Soppreg",
+"Imbert",
+"Léonce Blanc",
+"Valade",
+"Confiserie Azureenne",
+"Roger Descours",
+"La Chareyrade",
+"Angelina"
+]
+},
+"Crème de nuit": {
+"n": 6,
+"m": [
+"Avril"
+]
+},
+"Crème dépilatoire": {
+"n": 7
+},
+"Crème fraîche légère": {
+"n": 73,
+"m": [
+"Yoplait",
+"Alsace lait",
+"Rochambeau"
+]
+},
+"Crème fraîche épaisse": {
+"n": 242,
+"m": [
+"Yoplait",
+"Rochambeau",
+"YOgourmand",
+"E. Graindorge",
+"Alsace lait",
+"Laitière de la Motte",
+"U de nos Régions",
+"Bridélice",
+"Paysan Breton",
+"Grand Fermage"
+]
+},
+"Crème hydratante": {
+"n": 24
+},
+"Crème liquide": {
+"n": 140,
+"m": [
+"Metro Chef",
+"Lait Plaisirs",
+"Natur Avenir"
+]
+},
+"Crème mains": {
+"n": 60,
+"m": [
+"Yves Rocher",
+"Cosmia",
+"Caudalie"
+]
+},
+"Crème pieds secs": {
+"n": 3
+},
+"Crème pour les pieds": {
+"n": 1
+},
+"Crème solaire": {
+"n": 13,
+"m": [
+"Nivea sun"
+]
+},
+"Crème solaire SPF 50": {
+"n": 3
+},
+"Crème solaire enfant": {
+"n": 1
+},
+"Crème végétale": {
+"n": 7
+},
+"Crèmes desserts": {
+"n": 919,
+"m": [
+"Yabon",
+"Mont Blanc",
+"Invitation à la Ferme",
+"Delical",
+"Danette",
+"Danone",
+"Elle & Vire",
+"Mamie Nova",
+"Les P'tits Fermiers",
+"Nestlé"
+]
+},
+"Crémant": {
+"n": 143,
+"m": [
+"Veuve Ambal"
+]
+},
+"Crêpes": {
+"n": 2202,
+"m": [
+"Whaou!",
+"La Crêpe de Brocéliande",
+"Gavottes",
+"Bertel",
+"Crêperie Colas",
+"Dessaint",
+"Bernard Jarnoux",
+"Les Délices de Landeleau",
+"Paysan Breton",
+"Creperie de guerledan"
+]
+},
+"Cuisses de canard": {
+"n": 312,
+"m": [
+"Nature de France",
+"Le Gaulois",
+"Larnaudie"
+]
+},
+"Cuisses de poulet": {
+"n": 1598,
+"m": [
+"Le Gaulois",
+"La Nouvelle Agriculture",
+"Maître CoQ",
+"Loué",
+"Volaé",
+"L'etal Du Volailler",
+"Saint Charmin",
+"Simplement Bon Et Bio",
+"Nature de France",
+"Volandry"
+]
+},
+"Cuisses de poulet rôties": {
+"n": 123,
+"m": [
+"Volaé",
+"Maître CoQ",
+"Carrefour Original"
+]
+},
+"Cuisses de poulet surgelées": {
+"n": 9
+},
+"Cuisses de poulet à la mexicaine": {
+"n": 14,
+"m": [
+"Le Gaulois"
+]
+},
+"Culottes": {
+"n": 9
+},
+"Cumin": {
+"n": 135,
+"m": [
+"Ducros",
+"Masalchi",
+"Cepasco",
+"Rustica",
+"Bedros",
+"Spigol",
+"La Phénicienne",
+"Cap 2000",
+"Épice d'Or"
+]
+},
+"Curcuma": {
+"n": 395,
+"m": [
+"Ducros",
+"Maison rama",
+"Bedros",
+"Masalchi",
+"Cook",
+"Espig",
+"Sainte Lucie",
+"Moulin des peupliers",
+"Fuchs",
+"La Conquête des Saveurs"
+]
+},
+"Curry": {
+"n": 615,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Fuchs",
+"Terre exotique",
+"Espig",
+"Masalchi",
+"D'aucy",
+"Cook",
+"Seazon",
+"Albert Ménès"
+]
+},
+"Câpres": {
+"n": 189,
+"m": [
+"Crespo",
+"Metro Chef",
+"Rustica",
+"En Cuisine",
+"Horeca",
+"Savino",
+"Hugo Reitzel",
+"Ducros"
+]
+},
+"Céleri": {
+"n": 156,
+"m": [
+"Mix Buffet"
+]
+},
+"Céleri rémoulade": {
+"n": 191,
+"m": [
+"Qualité Traiteur",
+"Saladinettes",
+"Pierre Martinet",
+"Brédial",
+"Tout feu tout frais"
+]
+},
+"Céréales": {
+"n": 630,
+"m": [
+"Kellogg's",
+"Nestlé",
+"Tipiak",
+"Lion",
+"Loumaë",
+"General Mills",
+"Favrichon",
+"Bauducco",
+"Kinder",
+"U Mat & Lou"
+]
+},
+"Céréales Trésor": {
+"n": 8,
+"m": [
+"Kellogg's"
+]
+},
+"Céréales bébé": {
+"n": 5
+},
+"Céréales chocolatées": {
+"n": 9
+},
+"Céréales complètes": {
+"n": 8
+},
+"Céréales enfant": {
+"n": 1
+},
+"Céréales fourrées": {
+"n": 90,
+"m": [
+"Day Break",
+"P'tit Déli",
+"Swing"
+]
+},
+"Cônes glacés": {
+"n": 22
+},
+"Côte de bœuf": {
+"n": 29
+},
+"Côtelettes d'agneau": {
+"n": 11
+},
+"Côtes de porc": {
+"n": 516,
+"m": [
+"L'Étal du Boucher",
+"Charcuterie Ruel",
+"Socopa",
+"Jean Rozé",
+"Férial",
+"Maison Prunier",
+"Boucherie St Clément",
+"Cooperl",
+"Jean Floc'h",
+"L'Ardoise du Boucher"
+]
+},
+"Côtes de veau": {
+"n": 50,
+"m": [
+"Les éleveurs de chez nous"
+]
+},
+"Côtes-du-rhône": {
+"n": 312,
+"m": [
+"Rives et Terrasses",
+"Grégoire XI",
+"La Cave d'Augustin Florent",
+"Cellier des Dauphins",
+"Club des Sommeliers",
+"Pierre Chanau",
+"Côtes-du-Rhône"
+]
+},
+"Cœur de Neufchâtel": {
+"n": 10
+},
+"Cœurs de palmier": {
+"n": 170,
+"m": [
+"Géant Vert",
+"Rochefontaine",
+"Notre Jardin",
+"Fleurs des Champs",
+"General Mills",
+"Barima",
+"D'aucy"
+]
+},
+"Darne de saumon": {
+"n": 15
+},
+"Dattes": {
+"n": 862,
+"m": [
+"Maître Prunille",
+"Brousse Vergez",
+"Holy Fruits",
+"Sun",
+"Brousse & Fils",
+"Deglet Nour",
+"Rapunzel",
+"Direct Producteurs Fruits Secs",
+"La Fourche",
+"La Favorite"
+]
+},
+"Daurade": {
+"n": 18
+},
+"Dentifrice": {
+"n": 83,
+"m": [
+"Elmex",
+"Sensodyne",
+"Unilever",
+"Signal",
+"Coslys",
+"Parodontax",
+"Centifolia"
+]
+},
+"Dentifrice blancheur": {
+"n": 17
+},
+"Dentifrice enfant": {
+"n": 3
+},
+"Desserts lactés bébé": {
+"n": 10,
+"m": [
+"U Tout Petits Bio"
+]
+},
+"Dissolvant": {
+"n": 11,
+"m": [
+"diadermine",
+"henkel"
+]
+},
+"Donuts": {
+"n": 1185,
+"m": [
+"Milka",
+"Oreo",
+"Donuts",
+"St Michel",
+"Poppies",
+"Daim",
+"Poppies Berlidon",
+"Mandul",
+"Nutella",
+"McDonald's"
+]
+},
+"Dosettes souples": {
+"n": 14
+},
+"Draps housse": {
+"n": 1
+},
+"Débardeurs": {
+"n": 2
+},
+"Dégivrant": {
+"n": 1
+},
+"Dégraissant cuisine": {
+"n": 1
+},
+"Démaquillant": {
+"n": 5
+},
+"Déodorant": {
+"n": 103,
+"m": [
+"Narta",
+"Respire",
+"Ushuaïa",
+"Unilever",
+"Cosmia",
+"Sanex",
+"Weleda",
+"Mennen",
+"Dove",
+"endro"
+]
+},
+"Désinfectant": {
+"n": 12,
+"m": [
+"Sanytol"
+]
+},
+"Désinfectant linge": {
+"n": 4
+},
+"Désodorisant": {
+"n": 14,
+"m": [
+"Febreze"
+]
+},
+"Détachant": {
+"n": 2
+},
+"Détartrant": {
+"n": 2
+},
+"Eau aromatisée": {
+"n": 107,
+"m": [
+"Badoit",
+"Sainte Marguerite",
+"Volvic",
+"Ondine",
+"Rue Des Plantes"
+]
+},
+"Eau de source": {
+"n": 399,
+"m": [
+"Cristaline",
+"Saguaro",
+"Laqueuille",
+"Ondine",
+"Chanflor",
+"Rochambeau",
+"Carola",
+"Cristalline",
+"Dia",
+"Evian"
+]
+},
+"Eau de toilette": {
+"n": 6
+},
+"Eau déminéralisée": {
+"n": 7
+},
+"Eau gazeuse": {
+"n": 174,
+"m": [
+"Badoit",
+"Perrier",
+"San Pellegrino",
+"Nestlé",
+"Sainte Marguerite",
+"S. pellegrino",
+"Cristaline",
+"Didier"
+]
+},
+"Eau micellaire": {
+"n": 22
+},
+"Eau minérale": {
+"n": 526,
+"m": [
+"Evian",
+"Volvic",
+"Vittel",
+"Saguaro",
+"Hépar",
+"Celtic",
+"Perrier",
+"Courmayeur",
+"Plancoët",
+"Rocheval"
+]
+},
+"Eau oxygénée": {
+"n": 4
+},
+"Eau plate": {
+"n": 15
+},
+"Eau riche en magnésium": {
+"n": 1
+},
+"Edulcorant": {
+"n": 163,
+"m": [
+"Navarre",
+"Ginko",
+"Canderel",
+"Edulcorel"
+]
+},
+"Emmental": {
+"n": 1624,
+"m": [
+"Etoile d'Or",
+"Entremont",
+"Le Cavalier",
+"Le Fromager Des Halles",
+"Président",
+"Les Croisés",
+"Tendre Pré",
+"Paysan Breton",
+"Chêne d'argent",
+"Lis D’Or"
+]
+},
+"Emmental en tranches": {
+"n": 30
+},
+"Emmental râpé": {
+"n": 520,
+"m": [
+"Les Croisés",
+"Président",
+"Chêne d'argent",
+"Entremont",
+"Valmartin",
+"Etoile d'Or",
+"Le Cavalier",
+"Paysan Breton",
+"Reybier",
+"Etrez"
+]
+},
+"Encornets": {
+"n": 127,
+"m": [
+"Briau",
+"Agis",
+"Bon Appetit",
+"Spaña Sol"
+]
+},
+"Endives": {
+"n": 143,
+"m": [
+"Perle du Nord",
+"Prince de Bretagne",
+"Les Nouveaux Producteurs Du Nord",
+"En'Diva"
+]
+},
+"Engrais": {
+"n": 7
+},
+"Entrecôte": {
+"n": 235,
+"m": [
+"Charal",
+"L'Étal du Boucher",
+"Jean Rozé"
+]
+},
+"Enveloppes": {
+"n": 8
+},
+"Escalopes de dinde": {
+"n": 2142,
+"m": [
+"Le Gaulois",
+"Volaé",
+"Maître CoQ",
+"Loué",
+"Volandrie",
+"Père Dodu",
+"Volandry",
+"Les Fermiers de Loué",
+"La Nouvelle Agriculture",
+"Réghalal"
+]
+},
+"Escalopes de poulet surgelées": {
+"n": 1
+},
+"Escalopes de veau": {
+"n": 106,
+"m": [
+"Tendriade",
+"Charal"
+]
+},
+"Escargots": {
+"n": 462,
+"m": [
+"Escal",
+"Française de Gastronomie",
+"Maison Larzul",
+"En Cuisine",
+"Romanzini",
+"Grandjean",
+"Maitre Coquille",
+"Sabarot",
+"Roger Dutruy",
+"Toupargel"
+]
+},
+"Esquimaux": {
+"n": 8
+},
+"Essuie-tout": {
+"n": 17
+},
+"Estragon": {
+"n": 50,
+"m": [
+"Ducros",
+"Rustica",
+"Bedros"
+]
+},
+"Faisselle": {
+"n": 223,
+"m": [
+"Rians",
+"Areilladou",
+"Royans Frais",
+"Ferme Collet",
+"Baskalia",
+"Campagne de France"
+]
+},
+"Faitout": {
+"n": 2
+},
+"Fanta sans sucre": {
+"n": 8,
+"m": [
+"Fanta"
+]
+},
+"Farine": {
+"n": 1800,
+"m": [
+"Moulin des Moines",
+"Francine",
+"MelBio",
+"Markal",
+"Celnat",
+"Priméal",
+"Greenweez",
+"La Fourche",
+"Navarre",
+"Moulins Waast"
+]
+},
+"Farine complète": {
+"n": 158,
+"m": [
+"Moulin des Moines",
+"Priméal",
+"Celnat",
+"Naturaline",
+"Kazidomi"
+]
+},
+"Farine en vrac": {
+"n": 1
+},
+"Farine sans gluten": {
+"n": 23
+},
+"Faux-filet": {
+"n": 285,
+"m": [
+"Charal",
+"L'Étal du Boucher"
+]
+},
+"Fenouil": {
+"n": 89,
+"m": [
+"Masalchi"
+]
+},
+"Fer à repasser": {
+"n": 1
+},
+"Feta": {
+"n": 355,
+"m": [
+"Salakis",
+"Hotos",
+"Olympus",
+"Casa Azzurra",
+"Bio Verde",
+"Dodoni",
+"Simos",
+"Eridanous",
+"Le Fromager Des Halles",
+"Les Croisés"
+]
+},
+"Feuille de chêne": {
+"n": 62,
+"m": [
+"Bonduelle",
+"Florette",
+"Les Crudettes"
+]
+},
+"Feuilles de brick": {
+"n": 75,
+"m": [
+"Mil brick"
+]
+},
+"Feuilles de riz": {
+"n": 36
+},
+"Feuilletés": {
+"n": 607,
+"m": [
+"Toupargel",
+"Française de Gastronomie",
+"Pierre Clot",
+"La compagnie artique",
+"Côté Table",
+"Randy",
+"Maréval",
+"Eismann",
+"Tipiak",
+"Sapresti"
+]
+},
+"Feutres": {
+"n": 15,
+"m": [
+"Scrapcooking"
+]
+},
+"Ficelle": {
+"n": 77,
+"m": [
+"La Crêpe de Brocéliande",
+"Maës",
+"Dessaint",
+"SDB Traiteur",
+"Dessaint Traiteur"
+]
+},
+"Figues": {
+"n": 581,
+"m": [
+"Maître Prunille",
+"Charles Antona",
+"Direct Producteurs Fruits Secs",
+"Rapunzel",
+"Maison Roucadil",
+"Vijaya",
+"La Favorite",
+"Saveurs attitudes",
+"Holy Fruits",
+"L'Aliment Sain"
+]
+},
+"Figues sèches": {
+"n": 107,
+"m": [
+"Rapunzel",
+"Arev",
+"Maître Prunille"
+]
+},
+"Figurine Funko Pop": {
+"n": 1
+},
+"Fil dentaire": {
+"n": 1
+},
+"Filet de bœuf": {
+"n": 15
+},
+"Filet de porc": {
+"n": 223,
+"m": [
+"Bigard",
+"Tendre & Plus",
+"Socopa",
+"Nobles",
+"L'Étal du Boucher",
+"Maître Jacques"
+]
+},
+"Filet mignon de porc": {
+"n": 508,
+"m": [
+"L'Étal du Boucher",
+"Boucherie St Clément",
+"Madrange",
+"Secrets Du Val D'argent",
+"Saveurs des mauges",
+"La Cuisine d'Océane"
+]
+},
+"Filets de cabillaud": {
+"n": 220,
+"m": [
+"Cité Marine",
+"Findus",
+"Toupargel",
+"Sacrebleu",
+"L'assiette Bleue",
+"La Cuisine du Poissonnier",
+"Pêche Océan"
+]
+},
+"Filets de cabillaud surgelés": {
+"n": 7
+},
+"Filets de dinde": {
+"n": 184,
+"m": [
+"Le Gaulois",
+"Maître CoQ",
+"Volaé",
+"Les Fermiers de Loué",
+"Loué",
+"Père Dodu",
+"L'etal Du Volailler"
+]
+},
+"Filets de lieu": {
+"n": 77,
+"m": [
+"Mericq"
+]
+},
+"Filets de merlu": {
+"n": 95,
+"m": [
+"Cité Marine"
+]
+},
+"Filets de morue": {
+"n": 33,
+"m": [
+"Delpierre"
+]
+},
+"Filets de poulet": {
+"n": 5336,
+"m": [
+"Le Gaulois",
+"La Nouvelle Agriculture",
+"Maître CoQ",
+"Volaé",
+"Loué",
+"L'etal Du Volailler",
+"Père Dodu",
+"Saint Charmin",
+"Volandrie",
+"Nature de France"
+]
+},
+"Filets de saumon": {
+"n": 234,
+"m": [
+"Findus",
+"Golden Seafood",
+"Frais Embal",
+"Loc Marée",
+"Nouvelle Vague",
+"Costa"
+]
+},
+"Filets de saumon surgelés": {
+"n": 1
+},
+"Filets de truite": {
+"n": 130
+},
+"Film étirable": {
+"n": 6
+},
+"Filtres à café": {
+"n": 14
+},
+"Finocchiona": {
+"n": 3
+},
+"Flageolets": {
+"n": 313,
+"m": [
+"Notre Jardin",
+"Maingourd",
+"D'aucy",
+"Cassegrain",
+"Avril",
+"Rochambeau",
+"Jean nicolas",
+"Alain Martin",
+"Prosain",
+"Valfray"
+]
+},
+"Flan pâtissier": {
+"n": 135,
+"m": [
+"Alsa",
+"Toupargel",
+"Tartefrais"
+]
+},
+"Flans": {
+"n": 833,
+"m": [
+"France Délices",
+"Alsa",
+"Monbana",
+"Supplex",
+"Piton Des Neiges",
+"Le Bio De Manon",
+"La Ferme Saint Ulrich"
+]
+},
+"Fleur de sel": {
+"n": 547,
+"m": [
+"Terre exotique",
+"Le Saunier De Camargue",
+"Le Natursel",
+"Rivesaline",
+"Les Sauniers de l'Île de Ré",
+"Le Guérandais",
+"Maison Telme",
+"La Baleine",
+"Portland",
+"U de nos Régions"
+]
+},
+"Flocons d'avoine": {
+"n": 398,
+"m": [
+"Quaker",
+"Terres et Céréales Bio",
+"Bjorg",
+"Greenweez",
+"Grainéa",
+"Grillon d'Or",
+"Markal",
+"Priméal",
+"Terres & Céréales Bio",
+"Lucien Georgelin"
+]
+},
+"Flocons d'avoine en vrac": {
+"n": 5
+},
+"Foie de veau": {
+"n": 126,
+"m": [
+"Socopa",
+"Jean Rozé",
+"Tendriade"
+]
+},
+"Foie gras": {
+"n": 2038,
+"m": [
+"Larnaudie",
+"Delpeyrat",
+"Maison Montfort",
+"Labeyrie",
+"Jean Larnaudie",
+"Valette",
+"Terres Paysannes",
+"Maistres Occitans",
+"Lartigue",
+"Montfort"
+]
+},
+"Foies de volaille": {
+"n": 56,
+"m": [
+"Le Gaulois",
+"Maître CoQ",
+"La Table Du Fermier"
+]
+},
+"Fond de veau": {
+"n": 70,
+"m": [
+"Maggi",
+"Nestlé",
+"Rustica",
+"Knorr"
+]
+},
+"Fonds d'artichaut": {
+"n": 52
+},
+"Fouet": {
+"n": 70,
+"m": [
+"Gusto y Sabor"
+]
+},
+"Fougasse": {
+"n": 247,
+"m": [
+"Les Délices de Mendès"
+]
+},
+"Fourme d'Ambert": {
+"n": 347,
+"m": [
+"Le Fromager Des Halles",
+"Les Délices de Belle France",
+"Sélection du fromager"
+]
+},
+"Fraises": {
+"n": 853,
+"m": [
+"Les Paysans de Rougeline",
+"Fruits Rouges & Co",
+"Pronatura",
+"Lucien Georgelin",
+"Sacfel",
+"Savéol",
+"Douceur du Verger",
+"Bonne Maman",
+"Jardin des Papes"
+]
+},
+"Fraises Gariguette": {
+"n": 56,
+"m": [
+"Les Paysans de Rougeline",
+"Savéol"
+]
+},
+"Fraisier": {
+"n": 53,
+"m": [
+"Bonne Maman",
+"Les creations",
+"Hafner"
+]
+},
+"Framboises": {
+"n": 432,
+"m": [
+"Fruits Rouges & Co",
+"Driscoll's",
+"Berryworld",
+"Holly Fruit",
+"Confit de Provence",
+"Andros"
+]
+},
+"Friandises pour chat": {
+"n": 2
+},
+"Friandises pour chien": {
+"n": 1
+},
+"Frisée": {
+"n": 9,
+"m": [
+"Les Crudettes"
+]
+},
+"Frites surgelées": {
+"n": 12
+},
+"Friteuse sans huile": {
+"n": 1
+},
+"Fromage blanc": {
+"n": 919,
+"m": [
+"Vrai",
+"Alsace lait",
+"Danone",
+"Yoplait",
+"Beillevaire",
+"Laiterie Les Fayes",
+"Metro Chef",
+"Le Clos des Vaches",
+"Ferme Adam",
+"Nejelis"
+]
+},
+"Fromage de brebis": {
+"n": 376,
+"m": [
+"Salakis",
+"Istara",
+"Les Croisés",
+"La Bergerie",
+"Metro Chef",
+"Corsica",
+"Savencia",
+"Etorki",
+"Agour"
+]
+},
+"Fromage de chèvre": {
+"n": 744,
+"m": [
+"Soignon",
+"Chêne d'argent",
+"Les Croisés",
+"Saint-Loup",
+"Savencia",
+"Vrai",
+"Bio Verde",
+"Le Fromager Des Halles",
+"Chèvrefin",
+"Rians"
+]
+},
+"Fromage de tête": {
+"n": 188,
+"m": [
+"Bahier",
+"Charcuterie des Papes",
+"Aux Saveurs d'Ardennes"
+]
+},
+"Fromage manchego": {
+"n": 5
+},
+"Fromage pour burger": {
+"n": 11
+},
+"Fromage à la coupe": {
+"n": 2
+},
+"Fromage à tartiner": {
+"n": 178,
+"m": [
+"Les Croisés",
+"Paysan Breton",
+"Alsace lait",
+"Kiri",
+"Le Fromage Fouetté Madame Loïk",
+"Laita",
+"Grandeur Nature"
+]
+},
+"Fromages en portions": {
+"n": 30,
+"m": [
+"U Mat & Lou"
+]
+},
+"Fruit du dragon": {
+"n": 15
+},
+"Fruits au sirop": {
+"n": 21,
+"m": [
+"Andros"
+]
+},
+"Fruits de la passion": {
+"n": 64
+},
+"Fruits découpés": {
+"n": 5
+},
+"Fruits rouges surgelés": {
+"n": 7
+},
+"Fumet de poisson": {
+"n": 24,
+"m": [
+"Knorr"
+]
+},
+"Fécule de maïs": {
+"n": 13
+},
+"Fût de bière": {
+"n": 1
+},
+"Galabart": {
+"n": 2
+},
+"Galantine": {
+"n": 72,
+"m": [
+"Fleurons de Lomagne",
+"Prunier"
+]
+},
+"Galette des rois": {
+"n": 253,
+"m": [
+"Galettes des rois",
+"La Campanière"
+]
+},
+"Galette des rois brioche": {
+"n": 1
+},
+"Galettes bretonnes": {
+"n": 209,
+"m": [
+"La Trinitaine",
+"Ker Cadélac",
+"Ty Délice",
+"P'tit Déli",
+"Maison Le Goff"
+]
+},
+"Galettes de maïs": {
+"n": 154,
+"m": [
+"Gerblé",
+"Bjorg",
+"Castelfood",
+"Priméal",
+"Lima"
+]
+},
+"Galettes de riz": {
+"n": 496,
+"m": [
+"Bjorg",
+"Gerblé",
+"Moulin des Moines",
+"Evernat",
+"Lima",
+"Priméal",
+"Bongran",
+"Grillon d'Or",
+"Ekorigin",
+"Hipp"
+]
+},
+"Galettes de sarrasin": {
+"n": 150,
+"m": [
+"Gaia",
+"Régalette",
+"Céréal Bio",
+"La Compagnie des Crêpes"
+]
+},
+"Gambas": {
+"n": 213,
+"m": [
+"Pacific West",
+"Delpierre",
+"Oso",
+"Pescanova",
+"Gel-Pêche",
+"Gimbert Océan",
+"Costa",
+"Odyssee",
+"La Table des Pêcheurs",
+"Instant Traiteur"
+]
+},
+"Gants": {
+"n": 5
+},
+"Gants de ménage": {
+"n": 1
+},
+"Gaspacho": {
+"n": 393,
+"m": [
+"Giraudet",
+"Green Shoot",
+"Alvalle",
+"La Potagère",
+"Ferme d'Anchin",
+"M. de Turenne",
+"Sains et Saufs",
+"Grandeur Nature",
+"Jean Martin",
+"Le Potager de Babette"
+]
+},
+"Gaufres": {
+"n": 1034,
+"m": [
+"La Dunkerquoise",
+"Lotus",
+"Bourdon",
+"Pâtisserie des Flandres",
+"Rita",
+"Les Renardises",
+"Tante Odile",
+"Serebis",
+"Bjorg",
+"Le Chalet des Gaufres"
+]
+},
+"Gaufrier": {
+"n": 2
+},
+"Gel coiffant": {
+"n": 6
+},
+"Gel douche": {
+"n": 85,
+"m": [
+"Cosmia",
+"Le Petit Marseillais",
+"Ushuaïa"
+]
+},
+"Gel hydroalcoolique": {
+"n": 3
+},
+"Gel toilette intime": {
+"n": 2
+},
+"Gel à raser": {
+"n": 3
+},
+"Gelée de groseilles": {
+"n": 109,
+"m": [
+"Bonne Maman",
+"Côteaux Nantais",
+"Planet Bio"
+]
+},
+"Get 27": {
+"n": 38,
+"m": [
+"Get 27",
+"Get"
+]
+},
+"Gigot d'agneau": {
+"n": 92,
+"m": [
+"L'Étal du Boucher",
+"+33 IMPORT EXPORT"
+]
+},
+"Gin": {
+"n": 82,
+"m": [
+"Gibson's",
+"Gordon's"
+]
+},
+"Gingembre": {
+"n": 767,
+"m": [
+"Ducros",
+"Rustica",
+"Bedros",
+"Yogi Tea",
+"Sainte Lucie",
+"Cock Brand",
+"Assil",
+"Cock",
+"Arcadie",
+"Cook"
+]
+},
+"Gingembre mariné": {
+"n": 28
+},
+"Ginger ale": {
+"n": 75,
+"m": [
+"Schweppes",
+"Canada Dry"
+]
+},
+"Glace café": {
+"n": 85,
+"m": [
+"Terre Adélice",
+"Glace de la Ferme"
+]
+},
+"Glace chocolat": {
+"n": 290,
+"m": [
+"Glace de la Ferme",
+"Nestlé",
+"Erhard",
+"Glaces des Alpes",
+"Mucci",
+"Carte d'Or",
+"Raimo",
+"Maison de la Glace",
+"Promis Juré",
+"Häagen-Dazs"
+]
+},
+"Glace en bac": {
+"n": 3
+},
+"Glace menthe-chocolat": {
+"n": 30
+},
+"Glace sans lactose": {
+"n": 2
+},
+"Glace stracciatella": {
+"n": 16
+},
+"Glace vanille": {
+"n": 281,
+"m": [
+"Carte d'Or",
+"Mucci",
+"Erhard",
+"Nestlé",
+"Glace de la Ferme",
+"Histoires de Glaces",
+"HDG",
+"La Laitière"
+]
+},
+"Glace vanille-fraise": {
+"n": 10
+},
+"Glace à l'italienne": {
+"n": 21,
+"m": [
+"Montaigu"
+]
+},
+"Gnocchis": {
+"n": 882,
+"m": [
+"Lustucru",
+"Rana",
+"Giovanni Rana",
+"Lustucru selection",
+"Master",
+"Saint Jean",
+"Colomba",
+"Turini",
+"Treo",
+"Buona compagnia gourmet"
+]
+},
+"Gobelets": {
+"n": 9,
+"m": [
+"Movies Pop"
+]
+},
+"Gommage corps": {
+"n": 3
+},
+"Gomme": {
+"n": 308,
+"m": [
+"Valda",
+"Famille Mary",
+"Vecteur sante",
+"Fleurance nature",
+"Ballot-Flurin",
+"Biofloral",
+"Auzier Chabernac",
+"Propos Nature",
+"La Confiserie Bressaude",
+"HerbalGem"
+]
+},
+"Gorgonzola": {
+"n": 570,
+"m": [
+"Le Fromager Des Halles",
+"Vivaldi",
+"Les Croisés",
+"Tavola in Italia",
+"Galbani",
+"Ambrosi",
+"IGOR",
+"L'Italie des Fromages",
+"Bontà Della Tradizione"
+]
+},
+"Gouda": {
+"n": 1287,
+"m": [
+"€co+",
+"Moulin D'or",
+"Le Fromager Des Halles",
+"Holland Master",
+"Fromapac",
+"Molenland",
+"Les Croisés",
+"Ets Schoepfer",
+"Vergeer Holland",
+"Bonneterre"
+]
+},
+"Gourdes bébé": {
+"n": 2
+},
+"Gousse de vanille": {
+"n": 59,
+"m": [
+"Sainte Lucie",
+"Vahiné"
+]
+},
+"Graines de chia": {
+"n": 369,
+"m": [
+"Markal",
+"Celnat",
+"Jardin Bio étic",
+"Linwoods",
+"Greenweez",
+"Sana Gaïa",
+"Naturaline",
+"Madia Bio",
+"JusteBio",
+"Iswari"
+]
+},
+"Graines de courge": {
+"n": 408,
+"m": [
+"Markal",
+"Celnat",
+"Priméal",
+"Jardin Bio étic",
+"Belledonne",
+"Ofal",
+"Moulin des Moines",
+"Agidra",
+"O'Régal",
+"Biothentic"
+]
+},
+"Graines de fleurs": {
+"n": 4
+},
+"Graines de lin": {
+"n": 192,
+"m": [
+"Markal",
+"Priméal",
+"Linwoods",
+"Pural",
+"Ofal",
+"Naturéo",
+"Greenweez"
+]
+},
+"Graines de tournesol": {
+"n": 440,
+"m": [
+"Fruidyllic",
+"Tadim",
+"Celnat",
+"Priméal",
+"Meray",
+"O'Régal",
+"Pinar",
+"Montperal"
+]
+},
+"Graines de tournesol salées": {
+"n": 56,
+"m": [
+"Meyva",
+"Maître Prunille"
+]
+},
+"Graines en vrac": {
+"n": 7
+},
+"Graines pour oiseaux": {
+"n": 1
+},
+"Graisse de canard": {
+"n": 121,
+"m": [
+"Maison Montfort",
+"Maistres Occitans",
+"Terres Paysannes"
+]
+},
+"Granola": {
+"n": 954,
+"m": [
+"Jordans",
+"LU",
+"nüMorning",
+"OneDayMore",
+"Joody",
+"Miam République",
+"Les Fruits Détendus",
+"La Main dans le Bol",
+"Dear Muesli",
+"Bjorg"
+]
+},
+"Gratin surgelé": {
+"n": 11
+},
+"Grattoirs": {
+"n": 1
+},
+"Gressins": {
+"n": 531,
+"m": [
+"La Buona Terra",
+"Le Père Gourmand",
+"Moulin des Moines",
+"Grissinificio Genovese",
+"Qualitalia",
+"Uniongriss",
+"Zyos",
+"Le Vieux Bistrot",
+"Ciro",
+"Les Saveurs du Clavon"
+]
+},
+"Grignottes de poulet": {
+"n": 83,
+"m": [
+"Volaé",
+"Réghalal"
+]
+},
+"Grillades": {
+"n": 101,
+"m": [
+"Socopa",
+"Le Gaulois",
+"Père Dodu"
+]
+},
+"Grille-pain": {
+"n": 1
+},
+"Groseilles": {
+"n": 51,
+"m": [
+"Fruits Rouges & Co"
+]
+},
+"Grosses crevettes": {
+"n": 2
+},
+"Guacamole": {
+"n": 259,
+"m": [
+"Old El Paso",
+"Blini",
+"Florette",
+"Kerets",
+"Le Traiteur Gourmet",
+"Bio Verde"
+]
+},
+"Guimauves": {
+"n": 918,
+"m": [
+"Les Gourmandises De Sophie",
+"Le Comptoir de Mathilde",
+"Little Extra",
+"Maison Taillefer",
+"Auzier Chabernac",
+"La Confiserie Bressaude",
+"DV SAS",
+"Truffettes De France",
+"Arnaud Soubeyran",
+"Belledonne"
+]
+},
+"Gâteau d'anniversaire": {
+"n": 3
+},
+"Gâteau de semoule": {
+"n": 40,
+"m": [
+"Yabon",
+"Légendes Gourmandes"
+]
+},
+"Gâteau glacé": {
+"n": 4
+},
+"Gâteaux moelleux": {
+"n": 69,
+"m": [
+"St Michel"
+]
+},
+"Gélatine": {
+"n": 115,
+"m": [
+"Vahiné",
+"Condi",
+"Sainte Lucie",
+"Tresors De Chefs",
+"La pateliere",
+"Tablier Blanc"
+]
+},
+"Gésiers confits": {
+"n": 135,
+"m": [
+"Le Gaulois",
+"La Belle Chaurienne",
+"Pierre Laguilhon",
+"Maistres Occitans"
+]
+},
+"Hachis parmentier": {
+"n": 280,
+"m": [
+"Toque du Chef",
+"Côté Table",
+"La cuisine des Saveurs",
+"Fleury Michon",
+"William Saurin",
+"Marie",
+"Toupargel",
+"Findus",
+"Isla Délice",
+"Voyager"
+]
+},
+"Hachis parmentier surgelé": {
+"n": 6
+},
+"Haché 15 %": {
+"n": 486,
+"m": [
+"Socopa",
+"Bigard",
+"Fleury Michon",
+"Charal",
+"L'Étal du Boucher",
+"Maître CoQ",
+"Férial",
+"Jean Rozé",
+"Viande Bovine Francaise",
+"Tendre et Plus"
+]
+},
+"Haché 5 %": {
+"n": 486,
+"m": [
+"Socopa",
+"Bigard",
+"Fleury Michon",
+"Charal",
+"L'Étal du Boucher",
+"Maître CoQ",
+"Férial",
+"Jean Rozé",
+"Viande Bovine Francaise",
+"Tendre et Plus"
+]
+},
+"Haché de veau": {
+"n": 42,
+"m": [
+"Tendriade"
+]
+},
+"Halloumi": {
+"n": 92,
+"m": [
+"Mavrommatis",
+"Alambra",
+"Kalios"
+]
+},
+"Harengs marinés": {
+"n": 11
+},
+"Haricots beurre surgelés": {
+"n": 4
+},
+"Haricots noirs": {
+"n": 64
+},
+"Haricots plats surgelés": {
+"n": 1
+},
+"Haricots rouges": {
+"n": 252,
+"m": [
+"D'aucy",
+"Notre Jardin",
+"Bonduelle",
+"Royal Bourbon",
+"Avril",
+"Rochambeau",
+"La Bio Idea"
+]
+},
+"Haricots verts": {
+"n": 484,
+"m": [
+"Notre Jardin",
+"D'aucy",
+"Bonduelle",
+"Maingourd",
+"Jean nicolas",
+"Priméal",
+"Rochefontaine",
+"Avril",
+"Rochambeau",
+"Cassegrain"
+]
+},
+"Haricots verts en boîte": {
+"n": 1
+},
+"Haricots verts extra-fins": {
+"n": 326,
+"m": [
+"D'aucy",
+"Notre Jardin",
+"Cassegrain",
+"Prosain",
+"Jean nicolas",
+"Bonduelle",
+"M. de Turenne",
+"Jardin Bio étic",
+"En Cuisine",
+"Maingourd"
+]
+},
+"Haricots verts surgelés": {
+"n": 16
+},
+"Harissa": {
+"n": 312,
+"m": [
+"Le Phare du Cap Bon",
+"Amilcar",
+"Jouda",
+"Zgolli",
+"La Flamme du Cap Bon",
+"Socodal",
+"Sicam",
+"Tucal",
+"Le Petit Paris",
+"Tradco France"
+]
+},
+"Hauts de cuisse de poulet": {
+"n": 368,
+"m": [
+"La Nouvelle Agriculture",
+"Le Gaulois",
+"Maître CoQ",
+"L'etal Du Volailler",
+"Volaé",
+"Père Dodu"
+]
+},
+"Herbes de Provence": {
+"n": 301,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Rustica",
+"Provence d'Antan",
+"Bedros",
+"Fuchs",
+"Cigalou",
+"Provence Tradition",
+"Spigol",
+"Amora"
+]
+},
+"Homard cuit": {
+"n": 12
+},
+"Horloge": {
+"n": 1
+},
+"Houmous": {
+"n": 999,
+"m": [
+"Blini",
+"Kerets",
+"L'Atelier Blini",
+"Eden Gourmet",
+"Maayane",
+"Yarden",
+"Florette",
+"Ifantis",
+"Le Traiteur Gourmet",
+"Sud'n'sol"
+]
+},
+"Huile d'arachide": {
+"n": 38
+},
+"Huile d'olive": {
+"n": 4021,
+"m": [
+"Carapelli",
+"Puget",
+"Cauvin",
+"Oliviers & Co",
+"Huilerie Richard",
+"Tramier",
+"Primadonna",
+"L'Oulibo",
+"Robert",
+"Bio planete"
+]
+},
+"Huile de colza": {
+"n": 480,
+"m": [
+"Cauvin",
+"Bio planete",
+"Emile noel",
+"Huilerie de Lapalisse",
+"Huilerie Richard",
+"Paul Laurent",
+"Huilerie Moog",
+"Vigean",
+"Lesieur",
+"Moulin à huile Paul Laurent"
+]
+},
+"Huile de sésame": {
+"n": 208,
+"m": [
+"Emile noel",
+"Bio planete",
+"Cauvin",
+"Huilerie de Lapalisse",
+"La Tourangelle",
+"Vigean",
+"Jia",
+"Mont Asie"
+]
+},
+"Huile de tournesol": {
+"n": 613,
+"m": [
+"Vita d'Or",
+"Lesieur",
+"Maurel",
+"Huilerie de Lapalisse",
+"Emile noel",
+"Tramier",
+"Huilor",
+"Bio planete",
+"Coppelia",
+"Grand Olio"
+]
+},
+"Huile essentielle de ravintsara": {
+"n": 7
+},
+"Huile moteur": {
+"n": 1
+},
+"Huile pour le corps": {
+"n": 5
+},
+"Huile solaire": {
+"n": 3
+},
+"Huiles essentielles": {
+"n": 159,
+"m": [
+"Rue Des Plantes",
+"Messegue",
+"Terra Etica",
+"Kazidomi",
+"Pranarom",
+"Ethiquable",
+"Léa Nature",
+"Florame",
+"Phytosun Aroms"
+]
+},
+"Huîtres": {
+"n": 96,
+"m": [
+"Cultimer",
+"Chevaliers d'Argouges",
+"Mytilimer"
+]
+},
+"Huîtres fines de claire": {
+"n": 9
+},
+"Infusion": {
+"n": 1995,
+"m": [
+"Pagès",
+"Palais des Thés",
+"Léa Nature",
+"Jardin Bio étic",
+"Lord Nelson",
+"BiOrigine",
+"Lipton",
+"Elephant",
+"Jardin Bio",
+"Quai Sud"
+]
+},
+"Infusion menthe": {
+"n": 168,
+"m": [
+"Pagès",
+"Léa Nature",
+"Jardin Bio étic",
+"Lord Nelson",
+"Jardin Bio",
+"Elephant",
+"Cotterley",
+"Tiséa",
+"Ethiquable"
+]
+},
+"Insecticide": {
+"n": 6
+},
+"Jambon blanc": {
+"n": 672,
+"m": [
+"Fleury Michon",
+"Charcuterie Cosme",
+"Saint Alby",
+"Bioporc",
+"Cochonnailles du Haut-Bois",
+"Les éleveurs de la Charentonne",
+"Madrange",
+"Bonneterre",
+"Ensemble"
+]
+},
+"Jambon blanc supérieur sans nitrite": {
+"n": 8
+},
+"Jambon cru": {
+"n": 394,
+"m": [
+"Aoste",
+"Fleury Michon",
+"Bell",
+"Aoste SNC",
+"Cochonou",
+"Jeca"
+]
+},
+"Jambon de Bayonne": {
+"n": 270,
+"m": [
+"Delpeyrat",
+"Aoste",
+"Michel Dupuy",
+"Saint-Azay",
+"Bayonne",
+"Despi",
+"Labeyrie",
+"Saint Alby",
+"Patrimoine Gourmand",
+"Terroir"
+]
+},
+"Jambon de Parme": {
+"n": 55,
+"m": [
+"Parma",
+"Citterio"
+]
+},
+"Jambon de dinde": {
+"n": 71,
+"m": [
+"Fleury Michon",
+"Réghalal",
+"Oriental Viandes",
+"Isla Mondial"
+]
+},
+"Jambon persillé": {
+"n": 96
+},
+"Jambon rôti aux herbes": {
+"n": 111,
+"m": [
+"Despi"
+]
+},
+"Jambon serrano": {
+"n": 560,
+"m": [
+"Delpeyrat",
+"Espuña",
+"Despi",
+"Boadas",
+"Aoste",
+"Elpozo",
+"Labeyrie",
+"La Jasse",
+"Serrano",
+"Charcuterie des Papes"
+]
+},
+"Jambon à l'os": {
+"n": 172,
+"m": [
+"Aoste",
+"Saint Alby"
+]
+},
+"Jambon à la coupe": {
+"n": 11
+},
+"Jarret de veau": {
+"n": 4
+},
+"Javel": {
+"n": 5
+},
+"Jeans": {
+"n": 101,
+"m": [
+"Jean Rozé",
+"Jean Floc'h",
+"Esprit Gourmet"
+]
+},
+"Jeunes pousses d'épinards": {
+"n": 29,
+"m": [
+"Priméale"
+]
+},
+"Jeux de cartes": {
+"n": 2
+},
+"Jeux de société": {
+"n": 2
+},
+"Joues de bœuf": {
+"n": 37,
+"m": [
+"Bigard"
+]
+},
+"Jus bébé": {
+"n": 1
+},
+"Jus d'ananas": {
+"n": 222,
+"m": [
+"Solal",
+"Plein Fruit",
+"Jafaden",
+"Andros",
+"Pago",
+"Réa",
+"Spring Valley",
+"Alain Milliat",
+"1 2 3 FRUITS",
+"Fruima"
+]
+},
+"Jus d'orange": {
+"n": 1025,
+"m": [
+"Tropicana",
+"Joker",
+"Jafaden",
+"innocent",
+"Minute Maid",
+"Andros",
+"Granini",
+"Alain Milliat",
+"Pago",
+"Gilbert"
+]
+},
+"Jus d'orange frais": {
+"n": 32
+},
+"Jus de carotte frais": {
+"n": 1
+},
+"Jus de citron concentré": {
+"n": 19,
+"m": [
+"Polenghi"
+]
+},
+"Jus de fruits frais": {
+"n": 6
+},
+"Jus de pamplemousse": {
+"n": 101,
+"m": [
+"Andros",
+"Jus de pamplemousse rose",
+"Alain Milliat",
+"Jafaden",
+"Tropicana"
+]
+},
+"Jus de pamplemousse frais": {
+"n": 4
+},
+"Jus de pomme": {
+"n": 2167,
+"m": [
+"Jafaden",
+"Pressade",
+"Tropicana",
+"Andros",
+"Côteaux Nantais",
+"Thomas Le Prince",
+"Jacoby",
+"Fruima",
+"Le Coq Toqué",
+"Sibio!"
+]
+},
+"Jus de pomme frais": {
+"n": 4
+},
+"Jus de raisin": {
+"n": 276,
+"m": [
+"Alain Milliat",
+"Réa",
+"Côteaux Nantais",
+"La Grande Epicerie de Paris",
+"Spring Valley",
+"Jafaden",
+"Finesse des Vergers",
+"Sibio!"
+]
+},
+"Jus de tomate": {
+"n": 206,
+"m": [
+"Alain Milliat",
+"Pago",
+"La Grande Epicerie de Paris",
+"Granini",
+"Atelier Patrick Font",
+"Finesse des Vergers"
+]
+},
+"Jus multifruits": {
+"n": 131,
+"m": [
+"Jafaden",
+"Plein Fruit",
+"Pressade",
+"innocent",
+"Joker",
+"Gilbert"
+]
+},
+"Kakis": {
+"n": 49,
+"m": [
+"Bouquet"
+]
+},
+"Ketchup": {
+"n": 759,
+"m": [
+"Heinz",
+"Amora",
+"Lesieur",
+"Rustica",
+"Hellmann's",
+"Gyma",
+"Develey",
+"Hela",
+"Colona",
+"Le Cabanon"
+]
+},
+"Ketchup hot": {
+"n": 10
+},
+"Kir": {
+"n": 1
+},
+"Kit fajitas": {
+"n": 34,
+"m": [
+"Old El Paso"
+]
+},
+"Kit tacos": {
+"n": 4,
+"m": [
+"Old El Paso"
+]
+},
+"Kiwis": {
+"n": 358,
+"m": [
+"Zespri",
+"Les Paysans Bio",
+"Oscar",
+"Sapa",
+"Sikig"
+]
+},
+"Kiwis jaunes": {
+"n": 46,
+"m": [
+"Zespri"
+]
+},
+"Knacki": {
+"n": 65,
+"m": [
+"Herta",
+"Knacki",
+"Nestlé",
+"Original Knacki"
+]
+},
+"Kombucha": {
+"n": 818,
+"m": [
+"Lökki",
+"Lökki Kombucha",
+"Karma",
+"Atika",
+"Voelkel",
+"Ucha",
+"Jubiles",
+"Archipel",
+"Germline",
+"Biogroupe"
+]
+},
+"Kéfir": {
+"n": 402,
+"m": [
+"Lökki",
+"La Sélection des Comptoirs",
+"Activia",
+"Kerguillet",
+"The Collective",
+"Le Labo Dumoulin LLD &CIE",
+"Kremly",
+"Lactel",
+"Danone",
+"Bionova"
+]
+},
+"Lacets": {
+"n": 23
+},
+"Laisse": {
+"n": 1
+},
+"Lait chocolaté": {
+"n": 40,
+"m": [
+"Grandeur Nature",
+"Laiterie Les Fayes"
+]
+},
+"Lait corporel": {
+"n": 7
+},
+"Lait d'amande": {
+"n": 154,
+"m": [
+"Bjorg",
+"La Mandorle",
+"alpro",
+"Ecomil",
+"Végémil",
+"Perl'Amande"
+]
+},
+"Lait d'avoine": {
+"n": 45,
+"m": [
+"Cosmia",
+"Bjorg",
+"Oatly"
+]
+},
+"Lait de chèvre": {
+"n": 39,
+"m": [
+"Lactel"
+]
+},
+"Lait de coco": {
+"n": 442,
+"m": [
+"Suzi Wan",
+"Kara",
+"Ayam",
+"Grace",
+"Aroy-D",
+"Jardin Bio",
+"Base Organic Food",
+"Racines",
+"Léa Nature",
+"Autour du riz"
+]
+},
+"Lait de croissance": {
+"n": 63,
+"m": [
+"U Tout Petits Bio",
+"Babybio",
+"Holle",
+"Candia"
+]
+},
+"Lait de soja": {
+"n": 35
+},
+"Lait de toilette bébé": {
+"n": 2
+},
+"Lait demi-écrémé": {
+"n": 629,
+"m": [
+"Lactel",
+"Candia",
+"Agrilait",
+"C'est qui le patron ?!",
+"Grandeur Nature",
+"LSDH",
+"La marque du consommateur",
+"Bonneterre",
+"Les eleveurs de bretagne",
+"Natur Avenir"
+]
+},
+"Lait entier": {
+"n": 381,
+"m": [
+"Lactel",
+"Agrilait",
+"Alsace lait",
+"Verneuil",
+"Candia",
+"C'est qui le patron ?!",
+"Fromagerie Ebrard",
+"Anchor",
+"Marque U"
+]
+},
+"Lait fermenté": {
+"n": 77,
+"m": [
+"Luxlait",
+"Yoplait"
+]
+},
+"Lait frais microfiltré": {
+"n": 10,
+"m": [
+"Marguerite"
+]
+},
+"Lait infantile": {
+"n": 31,
+"m": [
+"Hipp"
+]
+},
+"Lait pour chat": {
+"n": 2
+},
+"Lait sans lactose": {
+"n": 47,
+"m": [
+"Candia",
+"Lactel"
+]
+},
+"Lait écrémé": {
+"n": 154,
+"m": [
+"Lactel",
+"C'est qui le patron ?!",
+"Agrilait",
+"Laitik",
+"Candia",
+"Bonneterre"
+]
+},
+"Laitue": {
+"n": 121,
+"m": [
+"Florette",
+"Notre Jardin",
+"Les Crudettes",
+"Saladinettes"
+]
+},
+"Laitue iceberg en sachet": {
+"n": 3
+},
+"Langoustines": {
+"n": 51,
+"m": [
+"Errigal Bay",
+"Delpierre",
+"La Paimpolaise"
+]
+},
+"Lapin": {
+"n": 380,
+"m": [
+"L'etal Du Volailler",
+"LOEUL ET PIRIOT",
+"Lindt",
+"Ets Ribot",
+"LOEUL & PIRIOT",
+"Volaé"
+]
+},
+"Lapin en chocolat": {
+"n": 176,
+"m": [
+"Rohan",
+"Chevaliers d'Argouges",
+"Frey",
+"Lindt",
+"Daniel Stoffel"
+]
+},
+"Laque": {
+"n": 4
+},
+"Lardons": {
+"n": 607,
+"m": [
+"Herta",
+"Marion",
+"Merle",
+"Saint Alby",
+"Tradilège",
+"Fleury Michon",
+"Nestlé",
+"Brocéliande",
+"Le Porc Français",
+"Les Frères Adam"
+]
+},
+"Lasagnes fraîches": {
+"n": 7
+},
+"Lasagnes surgelées": {
+"n": 20
+},
+"Laurier": {
+"n": 55,
+"m": [
+"Ducros"
+]
+},
+"Lavettes microfibre": {
+"n": 1
+},
+"Le Braison": {
+"n": 1
+},
+"Leerdammer": {
+"n": 98,
+"m": [
+"Leerdammer",
+"Bel"
+]
+},
+"Lemon curd": {
+"n": 39,
+"m": [
+"Fortnum & Mason",
+"Mackays",
+"Chivers"
+]
+},
+"Lentilles": {
+"n": 1552,
+"m": [
+"Sabarot",
+"Vivien Paille",
+"Priméal",
+"Bonduelle",
+"Jardin Bio étic",
+"Notre Jardin",
+"Golden Sun",
+"D'aucy",
+"Léa Nature",
+"Raynal et Roquelaure"
+]
+},
+"Lentilles corail": {
+"n": 251,
+"m": [
+"Sabarot",
+"Vivien Paille",
+"Markal",
+"Priméal",
+"Grain de frais",
+"alliance Bio",
+"La Fourche",
+"Celnat",
+"Golden Sun"
+]
+},
+"Lentilles cuisinées": {
+"n": 167,
+"m": [
+"Athos",
+"Raynal et Roquelaure",
+"Raynal & Roquelaure",
+"Alain Martin",
+"Claude Vétillard",
+"Mercadier",
+"Prosain"
+]
+},
+"Lessive en capsules": {
+"n": 7
+},
+"Lessive en poudre": {
+"n": 7
+},
+"Lessive liquide": {
+"n": 35,
+"m": [
+"L'arbre vert",
+"Epsil"
+]
+},
+"Levure boulangère": {
+"n": 42,
+"m": [
+"La pateliere",
+"Sainte Lucie"
+]
+},
+"Levure chimique": {
+"n": 84,
+"m": [
+"Alsa",
+"Vahiné",
+"Sainte Lucie",
+"La pateliere"
+]
+},
+"Lime à ongles": {
+"n": 2
+},
+"Limonade": {
+"n": 935,
+"m": [
+"Lorina",
+"Elixia",
+"La Gosse",
+"Vitamont",
+"Freeway",
+"Geyer Frères",
+"River",
+"La Mortuacienne",
+"Jean d'Audignac",
+"Liness"
+]
+},
+"Lingettes anti-décoloration": {
+"n": 1
+},
+"Lingettes bébé": {
+"n": 13
+},
+"Lingettes intimes": {
+"n": 6
+},
+"Lingettes nettoyantes": {
+"n": 3
+},
+"Lingettes à l'eau": {
+"n": 3
+},
+"Liniment": {
+"n": 10
+},
+"Liqueur": {
+"n": 281,
+"m": [
+"Cocktail collection",
+"Vedrenne",
+"Bigallet",
+"Auguste Mugniot",
+"Marie Brizard",
+"Cherry Rocher",
+"Monin",
+"Eyguebelle",
+"Clément",
+"Giffard"
+]
+},
+"Liquide de rinçage": {
+"n": 9
+},
+"Liquide vaisselle": {
+"n": 50,
+"m": [
+"Better life",
+"Rainett"
+]
+},
+"Liquide vaisselle main": {
+"n": 1
+},
+"Litière": {
+"n": 10
+},
+"Litière silice": {
+"n": 1
+},
+"Litière végétale": {
+"n": 2
+},
+"Livarot": {
+"n": 60,
+"m": [
+"E. Graindorge",
+"Graindorge"
+]
+},
+"Livres": {
+"n": 7
+},
+"Liégeois": {
+"n": 183,
+"m": [
+"Danette",
+"La Fermière",
+"Danone",
+"Ursi",
+"Andros",
+"La Laitière",
+"Mamie Nova",
+"Nestlé",
+"Campagne de France",
+"Marie Morin"
+]
+},
+"Lomo": {
+"n": 515,
+"m": [
+"Hiruak",
+"Les Brasérades",
+"Aoste",
+"Boadas",
+"Maison Milhau"
+]
+},
+"Lotte": {
+"n": 43,
+"m": [
+"Lotte",
+"Lechef"
+]
+},
+"Louche": {
+"n": 1
+},
+"Légumes pour couscous surgelés": {
+"n": 2
+},
+"Légumes pour wok": {
+"n": 24
+},
+"Macarons": {
+"n": 911,
+"m": [
+"Pasquier",
+"Brioche Pasquier",
+"Dulcesol",
+"Macarons de Pauline",
+"Fossier",
+"GIE BPGR",
+"Poppies",
+"Tipiak",
+"P'tit macaron d'Auvergne",
+"Bofrost"
+]
+},
+"Macarons glacés": {
+"n": 3,
+"m": [
+"Tiliz"
+]
+},
+"Madeleines": {
+"n": 1610,
+"m": [
+"St Michel",
+"Ker Cadélac",
+"Maison Colibri",
+"Bonne Maman",
+"Bijou",
+"Le Ster",
+"Biscuiterie Jeannette",
+"Armor Délices",
+"Mistral",
+"Bio Soleil"
+]
+},
+"Magazines": {
+"n": 2
+},
+"Magnum Classic": {
+"n": 9,
+"m": [
+"Magnum"
+]
+},
+"Magret de canard": {
+"n": 1337,
+"m": [
+"Delpeyrat",
+"L'etal Du Volailler",
+"Maison Montfort",
+"Labeyrie",
+"Secret d eleveurs",
+"Montfort",
+"Maistres Occitans",
+"Les Brasérades",
+"Delmond",
+"Diamant Noir"
+]
+},
+"Magret de canard séché": {
+"n": 48,
+"m": [
+"Maison Montfort",
+"Labeyrie",
+"Delpeyrat"
+]
+},
+"Maillots de bain": {
+"n": 2
+},
+"Mandarines": {
+"n": 274,
+"m": [
+"Mon Marché Plaisir",
+"Destination Saveurs",
+"Bouquet",
+"Terre d'agrumes"
+]
+},
+"Mangue": {
+"n": 556
+},
+"Maquereau fumé": {
+"n": 51,
+"m": [
+"Delpierre",
+"Herens"
+]
+},
+"Maquereaux": {
+"n": 173,
+"m": [
+"Saupiquet",
+"La Pointe de Penmarc'h",
+"Imperial",
+"Petit Navire",
+"Le Trésor des Dieux"
+]
+},
+"Maquillage": {
+"n": 3
+},
+"Margarine": {
+"n": 122,
+"m": [
+"St Hubert",
+"Primevère",
+"Planta Fin",
+"Fruit d'Or",
+"Becel",
+"NAT&vie",
+"Unilever"
+]
+},
+"Maroilles": {
+"n": 138,
+"m": [
+"Savencia",
+"Fauquet",
+"Lesire",
+"Leduc",
+"Les fromagers de Thiérache",
+"Le Fromager Des Halles",
+"Lebeau",
+"Claire Halleux",
+"La ferme du pont des loups"
+]
+},
+"Martini blanc": {
+"n": 1
+},
+"Mascara": {
+"n": 2
+},
+"Mascarpone": {
+"n": 213,
+"m": [
+"Castelli",
+"Casa Azzurra",
+"Galbani",
+"Ambrosi",
+"Sterilgarda",
+"Valcolatte",
+"L'Italie des Fromages",
+"Lovilio",
+"Les Croisés",
+"Zanetti"
+]
+},
+"Masque visage": {
+"n": 4
+},
+"Mayonnaise": {
+"n": 1442,
+"m": [
+"Bénédicta",
+"Lesieur",
+"Amora",
+"Heinz",
+"Rustica",
+"Colona",
+"Maille",
+"Hellmann's",
+"Delouis",
+"Calvé"
+]
+},
+"Maïs": {
+"n": 809,
+"m": [
+"Géant Vert",
+"D'aucy",
+"Bonduelle",
+"Notre Jardin",
+"Maingourd",
+"Avril",
+"Prosain",
+"Priméal",
+"Meray",
+"Montperal"
+]
+},
+"Melon": {
+"n": 419,
+"m": [
+"Florette",
+"Soldive",
+"Le rouge gorge"
+]
+},
+"Menthe": {
+"n": 251,
+"m": [
+"Lamprien Provence",
+"Palais des Thés",
+"Messegue",
+"Florette",
+"Teisseire"
+]
+},
+"Merguez": {
+"n": 1288,
+"m": [
+"Socopa",
+"Hiruak",
+"Jean Rozé",
+"Bigard",
+"Férial",
+"Nature de France",
+"Maître CoQ",
+"Le Gaulois",
+"Au Fumé Vosgien",
+"L'Étal du Boucher"
+]
+},
+"Meringues": {
+"n": 442,
+"m": [
+"Louvat",
+"La Turbine à Saveurs",
+"Biscuiterie du Quercy",
+"Réauté",
+"Astruc Pâtisserie",
+"Réauté Chocolat",
+"Domino",
+"Vital Ainé",
+"Le Croquet",
+"Biscuiterie de Chambord"
+]
+},
+"Merlan": {
+"n": 12
+},
+"Mexicain": {
+"n": 15
+},
+"Micro-ondes": {
+"n": 3
+},
+"Miel": {
+"n": 10853,
+"m": [
+"Famille Mary",
+"Apidis",
+"Miel Besacier",
+"Lune de Miel",
+"Le Manoir des Abeilles",
+"Les Compagnons du Miel",
+"Famille Perronneau",
+"Provenance Nature",
+"Famille Michaud",
+"La Maison du Miel"
+]
+},
+"Miel d'acacia": {
+"n": 967,
+"m": [
+"Miel Besacier",
+"Apidis",
+"Famille Mary",
+"Provenance Nature",
+"Le Verger des Abeilles",
+"Lune de Miel",
+"Le Manoir des Abeilles",
+"Les Compagnons du Miel",
+"Albert Ménès",
+"Miels Chailan"
+]
+},
+"Miel liquide": {
+"n": 73,
+"m": [
+"Lune de Miel"
+]
+},
+"Miettes de crabe": {
+"n": 23
+},
+"Millefeuille": {
+"n": 128,
+"m": [
+"Délifrance",
+"Tartefrais",
+"Hafner"
+]
+},
+"Mimolette": {
+"n": 1031,
+"m": [
+"€co+",
+"Isigny Ste Mère",
+"Le Fromager Des Halles",
+"Moulin D'or",
+"Isigny Sainte-Mère",
+"Centurion",
+"Fromapac",
+"Boule d'Or",
+"Cartry",
+"Ets Schoepfer"
+]
+},
+"Mini Carambar": {
+"n": 6,
+"m": [
+"Carambar"
+]
+},
+"Mini pizzas": {
+"n": 58,
+"m": [
+"Buitoni"
+]
+},
+"Mini-glaces": {
+"n": 21
+},
+"Miroirs": {
+"n": 12
+},
+"Mixeur": {
+"n": 1
+},
+"Mochis glacés": {
+"n": 148,
+"m": [
+"Erhard",
+"La Compagnie du Mochi",
+"Tiliz",
+"Tang Frères",
+"Asia Green Garden",
+"Mei Asia",
+"Little Moons",
+"Maya Moki"
+]
+},
+"Monaco": {
+"n": 22,
+"m": [
+"Belin"
+]
+},
+"Monster Munch": {
+"n": 109,
+"m": [
+"Vico",
+"Monster Munch",
+"Intersnack"
+]
+},
+"Mont d'or": {
+"n": 97,
+"m": [
+"Fromageries Arnaud",
+"Les Monts de Joux",
+"Patrimoine Gourmand",
+"Badoz"
+]
+},
+"Morbier": {
+"n": 754,
+"m": [
+"JuraFlore",
+"Jean Perrin",
+"Le Fromager Des Halles",
+"Le Montagnon",
+"Les Délices de Belle France",
+"Ets Schoepfer"
+]
+},
+"Mortadelle": {
+"n": 262,
+"m": [
+"Despi",
+"Rovagnati",
+"Berni",
+"Réghalal",
+"La Jasse",
+"Citterio",
+"Montorsi",
+"L'assiette d'Antoine",
+"Al Jadid",
+"Negroni"
+]
+},
+"Morue": {
+"n": 92,
+"m": [
+"Delpierre"
+]
+},
+"Mouchoirs": {
+"n": 32
+},
+"Mouchoirs en boîte": {
+"n": 4
+},
+"Moule à gâteau": {
+"n": 1
+},
+"Moules": {
+"n": 586,
+"m": [
+"La Cancalaise",
+"Delicemer",
+"Odyssee",
+"Angulas Aguinaga",
+"Miti",
+"Premier",
+"Mytilimer",
+"Cultimer",
+"Ronde des Mers",
+"Française de Gastronomie"
+]
+},
+"Moules en papier": {
+"n": 1
+},
+"Moules surgelées": {
+"n": 5
+},
+"Moules à l'escabèche": {
+"n": 70,
+"m": [
+"La Coca"
+]
+},
+"Mousse au chocolat": {
+"n": 441,
+"m": [
+"Marie Morin",
+"Bonne Maman",
+"La Fermière",
+"Oh la vache!",
+"Alsa",
+"Yoplait",
+"Nestlé",
+"La Laitière",
+"Malo",
+"Le Petit Basque"
+]
+},
+"Mousse coiffante": {
+"n": 1
+},
+"Mousse à raser": {
+"n": 9
+},
+"Mousseux": {
+"n": 7
+},
+"Moutarde": {
+"n": 3015,
+"m": [
+"Reine de Dijon",
+"Maille",
+"Edmond Fallot",
+"Le Comptoir de Mathilde",
+"Alélor",
+"Amora",
+"Martin Pouret",
+"Clovis",
+"Delouis",
+"Domaine des terres rouges"
+]
+},
+"Mozzarella": {
+"n": 1119,
+"m": [
+"Galbani",
+"Casa Azzurra",
+"L'Italie des Fromages",
+"Ambrosi",
+"Valcolatte",
+"Tre Stelle",
+"Rega",
+"Azienda agricola Ponte Reale",
+"Lovilio",
+"Les Croisés"
+]
+},
+"Muesli": {
+"n": 1925,
+"m": [
+"Favrichon",
+"Celnat",
+"Terres et Céréales Bio",
+"Grillon d'Or",
+"Bjorg",
+"Moulin des Moines",
+"Charles Vignon",
+"Quaker",
+"Happy Bio",
+"Terres et Céréales"
+]
+},
+"Muffins": {
+"n": 852,
+"m": [
+"Les Délices des 7 Vallées",
+"Prozis",
+"Milka",
+"Nutella",
+"Schär",
+"Wiso",
+"Daunat",
+"Sicard",
+"Eurobis",
+"Montes Lara"
+]
+},
+"Mugs": {
+"n": 43,
+"m": [
+"Dr. Oetker"
+]
+},
+"Munster": {
+"n": 149,
+"m": [
+"Ermitage",
+"Haxaire",
+"Maison Dodin",
+"Le Fromager Des Halles"
+]
+},
+"Muscadet": {
+"n": 70
+},
+"Muscat": {
+"n": 121
+},
+"Myrtilles": {
+"n": 499,
+"m": [
+"Fruits Rouges & Co",
+"Driscoll's",
+"Bonne Maman",
+"Douceur du Verger",
+"Royal",
+"Crop's",
+"Bofrost",
+"Socave",
+"Rue Des Plantes"
+]
+},
+"Mâche": {
+"n": 226,
+"m": [
+"Florette",
+"Bonduelle",
+"Priméale",
+"Oceane",
+"Les Crudettes",
+"Nantial",
+"Saladinettes",
+"Atlantic",
+"Val Nantais",
+"Cuisine et Potager"
+]
+},
+"Mélange apéritif": {
+"n": 175,
+"m": [
+"Ti! Bio"
+]
+},
+"Mélange apéritif japonais": {
+"n": 9
+},
+"Mélange pour soupe": {
+"n": 4
+},
+"Mélange étudiant": {
+"n": 24,
+"m": [
+"La Fourche",
+"Bioday"
+]
+},
+"Mûres": {
+"n": 108,
+"m": [
+"Fruits Rouges & Co",
+"Les 4 Saisons",
+"Driscoll's",
+"Fini"
+]
+},
+"Nappe": {
+"n": 20,
+"m": [
+"Bisson"
+]
+},
+"Navarin d'agneau": {
+"n": 14
+},
+"Navets": {
+"n": 80
+},
+"Nectar d'abricot": {
+"n": 299,
+"m": [
+"Vitamont",
+"Emmanuelle Baillard",
+"Emile Vergeois",
+"Sibio!",
+"Pago",
+"La Grande Epicerie de Paris",
+"Pressoirs De Provence",
+"Alain Milliat",
+"Jafaden",
+"Finesse des Vergers"
+]
+},
+"Nectar de mangue": {
+"n": 126,
+"m": [
+"Spring Valley",
+"Alain Milliat",
+"Caresse Antillaise",
+"Emmanuelle Baillard"
+]
+},
+"Nectarines": {
+"n": 126
+},
+"Nems": {
+"n": 685,
+"m": [
+"Agis",
+"Toque du Chef",
+"Traditions d'Asie",
+"SFPA",
+"Carte Nature",
+"Hoa Nam",
+"Le cantonnais",
+"Délices d'Orient",
+"Casino Saveurs d'Ailleurs",
+"Hauky"
+]
+},
+"Nems surgelés": {
+"n": 10
+},
+"Nesquik": {
+"n": 154,
+"m": [
+"Nestlé",
+"Nesquik"
+]
+},
+"Nettoyant four": {
+"n": 1
+},
+"Nettoyant lave-linge": {
+"n": 1
+},
+"Nettoyant lave-vaisselle": {
+"n": 1
+},
+"Nettoyant multi-usages": {
+"n": 1
+},
+"Nettoyant salle de bain": {
+"n": 2
+},
+"Nettoyant sol": {
+"n": 2
+},
+"Nettoyant vitres": {
+"n": 8
+},
+"Noisettes": {
+"n": 799,
+"m": [
+"Vahiné",
+"Daco Bello",
+"O'Régal",
+"Sainte Lucie",
+"JusteBio",
+"Sun",
+"Holy Fruits",
+"Maître Prunille",
+"La Fabrique Givrée",
+"Les Fadas !"
+]
+},
+"Noix": {
+"n": 1225,
+"m": [
+"Alp'noix",
+"Valnoix",
+"Daco Bello",
+"Pepinoix",
+"Fleury Michon",
+"Perlim",
+"Domaine Picard",
+"Kéo",
+"Roches blanches",
+"Boy"
+]
+},
+"Noix de Saint-Jacques": {
+"n": 214,
+"m": [
+"Hubco",
+"Gineys",
+"Nautilus",
+"Pescanova",
+"Escal"
+]
+},
+"Noix de cajou": {
+"n": 2115,
+"m": [
+"Daco Bello",
+"Vico",
+"O'Régal",
+"La Fourche",
+"JusteBio",
+"Bénénuts",
+"Menguy's",
+"Tokapi",
+"Ethiquable",
+"Greenweez"
+]
+},
+"Noix de coco râpée": {
+"n": 179,
+"m": [
+"Vahiné",
+"Sainte Lucie",
+"Daco Bello",
+"Meyva",
+"Maître Prunille"
+]
+},
+"Noix de muscade": {
+"n": 35
+},
+"Noix de pécan": {
+"n": 205,
+"m": [
+"Daco Bello",
+"JusteBio"
+]
+},
+"Nougat de Montélimar": {
+"n": 214,
+"m": [
+"Chabert & Guillot",
+"Arnaud Soubeyran",
+"Chabert et Guillot",
+"Le Chaudron d'Or",
+"Suprem'Nougat",
+"La Ruche D'Or",
+"Diane de Poytiers",
+"Les Trois Abeilles",
+"Motta"
+]
+},
+"Nougat glacé": {
+"n": 18,
+"m": [
+"Erhard"
+]
+},
+"Nouilles chinoises": {
+"n": 123,
+"m": [
+"Asia Green Garden",
+"Tien Shan",
+"Mont Asie",
+"Ming",
+"Mei Asia"
+]
+},
+"Nouilles de riz": {
+"n": 89,
+"m": [
+"Tien Shan",
+"Ayam",
+"Suzi Wan",
+"Asia Green Garden",
+"Tanoshi"
+]
+},
+"Nouilles instantanées": {
+"n": 256,
+"m": [
+"Wai Wai",
+"Tien Shan",
+"Apollo",
+"Kailo Brand",
+"Vifon",
+"Ayam",
+"Soï",
+"Mamee",
+"Yum Yum",
+"Tanoshi"
+]
+},
+"Nourriture pour poissons": {
+"n": 1
+},
+"Nuggets de poulet": {
+"n": 294,
+"m": [
+"Père Dodu",
+"Maître CoQ",
+"Le Gaulois",
+"Iglo",
+"Volaé",
+"Toque du Chef",
+"Nature de France",
+"St Clément"
+]
+},
+"Nuoc-mâm": {
+"n": 18
+},
+"Nutella": {
+"n": 200,
+"m": [
+"Nutella",
+"Ferrero",
+"Nutella & go",
+"Nutella b-ready"
+]
+},
+"Oignons": {
+"n": 518,
+"m": [
+"Condichef",
+"Le Geste Saveur",
+"Jardins Du Midi",
+"La Ferme d'Erquinvillers",
+"Ferme des Arches",
+"Sainte Lucie",
+"Priméale"
+]
+},
+"Oignons blancs": {
+"n": 43
+},
+"Oignons rouges": {
+"n": 127,
+"m": [
+"Condichef"
+]
+},
+"Oignons surgelés": {
+"n": 11
+},
+"Oignons séchés": {
+"n": 5
+},
+"Oignons émincés": {
+"n": 45
+},
+"Olives": {
+"n": 1689,
+"m": [
+"Tramier",
+"Croc'Frais",
+"Maayane",
+"Les Domaines des Oliviers",
+"Menguy's",
+"Spaña Sol",
+"Tropic Apéro",
+"Mille et un Sud",
+"Madama Oliva",
+"Crespo"
+]
+},
+"Olives apéritif": {
+"n": 14
+},
+"Olives farcies": {
+"n": 139,
+"m": [
+"GAEA",
+"Crespo",
+"Croc'Frais"
+]
+},
+"Olives farcies aux anchois": {
+"n": 51,
+"m": [
+"Tramier"
+]
+},
+"Olives farcies aux poivrons": {
+"n": 102,
+"m": [
+"Tramier",
+"Menguy's"
+]
+},
+"Olives noires": {
+"n": 725,
+"m": [
+"Tramier",
+"Barral",
+"Le Brin d'Olivier",
+"Crespo",
+"Nyonsolive",
+"Provence Olives",
+"Bellenature",
+"Bio Gustiamo",
+"Tropic Apéro",
+"Baresa"
+]
+},
+"Olives vertes": {
+"n": 989,
+"m": [
+"Tropic Apéro",
+"Tramier",
+"Croc'Frais",
+"Crespo",
+"Barral",
+"L'Oulibo",
+"Le Brin d'Olivier",
+"Pépé Olivo",
+"Provence Olives",
+"Rustica"
+]
+},
+"Omelette norvégienne": {
+"n": 42,
+"m": [
+"Pilpa",
+"Erhard",
+"L'Angélys"
+]
+},
+"Oranges": {
+"n": 1300,
+"m": [
+"Tropicana",
+"Andros",
+"innocent",
+"Fanta",
+"Granini",
+"Pressade",
+"Danao",
+"Fortnum & Mason",
+"River",
+"Vitamont"
+]
+},
+"Orangina sans sucre": {
+"n": 1
+},
+"Oreillers": {
+"n": 2
+},
+"Origan": {
+"n": 139,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Bedros",
+"Fuchs",
+"Spigol",
+"Albert Ménès",
+"Rustica",
+"Paysans d'ici"
+]
+},
+"Os à moelle": {
+"n": 12
+},
+"Os à mâcher": {
+"n": 4
+},
+"Ossau-iraty": {
+"n": 315,
+"m": [
+"Le Fromager Des Halles",
+"Istara",
+"Sélection du fromager"
+]
+},
+"Osso-buco": {
+"n": 42,
+"m": [
+"Tendre & Plus"
+]
+},
+"Paella": {
+"n": 381,
+"m": [
+"Toque du Chef",
+"Fleury Michon",
+"Côté Table",
+"Garbit",
+"La cuisine des Saveurs",
+"Zapetti",
+"Toupargel",
+"Agis",
+"Briau",
+"Lechef"
+]
+},
+"Paella surgelée": {
+"n": 7
+},
+"Pailles": {
+"n": 80,
+"m": [
+"LU"
+]
+},
+"Pain": {
+"n": 5492,
+"m": [
+"Boulangerie de l'hermitage",
+"Belledonne",
+"La Campanière",
+"Biofournil",
+"La Boulangère",
+"L'Angélus",
+"Robin du Bio",
+"Jacquet",
+"Le pain des fleurs",
+"Soezie"
+]
+},
+"Pain aux céréales": {
+"n": 1182,
+"m": [
+"Boulangerie de l'hermitage",
+"Epi d'Or",
+"Wiso",
+"Harrys",
+"Genius",
+"La Fournée Campanière",
+"La Campanière",
+"Biofournil",
+"Jacquet",
+"Bjorg"
+]
+},
+"Pain azyme": {
+"n": 57,
+"m": [
+"Paul Heumann",
+"Baton Rouge"
+]
+},
+"Pain complet": {
+"n": 1437,
+"m": [
+"Jacquet",
+"Harrys",
+"Maître Jean Pierre",
+"La Boulangère",
+"Epi d'Or",
+"Biofournil",
+"Pural",
+"Bjorg",
+"Belledonne",
+"Mannapain"
+]
+},
+"Pain d'épices": {
+"n": 1018,
+"m": [
+"Fortwenger",
+"Apidis",
+"Mulot & Petitjean",
+"Baramel",
+"Famille Mary",
+"Le Manoir des Abeilles",
+"Vondelmolen",
+"France Cake Tradition",
+"Maison Peltier",
+"Finabeil"
+]
+},
+"Pain de campagne": {
+"n": 503,
+"m": [
+"Biofournil",
+"Neuhauser",
+"Galzin"
+]
+},
+"Pain de mie": {
+"n": 1135,
+"m": [
+"Harrys",
+"Jacquet",
+"Epi d'Or",
+"La Boulangère",
+"Maître Jean Pierre",
+"Mannapain",
+"Gerblé",
+"Yami",
+"Bien",
+"St Rolan"
+]
+},
+"Pain de seigle": {
+"n": 516,
+"m": [
+"Pema",
+"Terrasana",
+"Céréal Bio",
+"Jacquet",
+"Boulangerie de l'hermitage",
+"Bjorg",
+"Epi d'Or",
+"Poilâne"
+]
+},
+"Pain grillé": {
+"n": 152,
+"m": [
+"Pelletier",
+"LU",
+"Borsa",
+"Jacquet",
+"Céréal Bio",
+"Epi d'Or"
+]
+},
+"Pain pita": {
+"n": 67,
+"m": [
+"La Boulangère"
+]
+},
+"Pain précuit": {
+"n": 23
+},
+"Pain sans gluten": {
+"n": 285,
+"m": [
+"Wiso",
+"Gerblé",
+"Genius",
+"Schär",
+"U Sans Gluten",
+"Valpibio",
+"Santé",
+"Océrès",
+"Terra Cérès",
+"Pural"
+]
+},
+"Pain surgelé": {
+"n": 13
+},
+"Pain viennois": {
+"n": 19
+},
+"Pains au chocolat": {
+"n": 2042,
+"m": [
+"Les 3 Meuniers",
+"Pasquier",
+"La Boulangère",
+"Brioche Pasquier",
+"Epi d'Or",
+"Maître Jean Pierre",
+"La Fournée Dorée",
+"Les Pâtissades",
+"La Fournée Campanière",
+"Brioches Pasquier"
+]
+},
+"Pains au lait": {
+"n": 409,
+"m": [
+"Pasquier",
+"Brioche Pasquier",
+"La Boulangère",
+"Maître Jean Pierre",
+"La Fournée Dorée",
+"Brioches Pasquier",
+"Brioches Fonteneau",
+"Epi d'Or",
+"Brio",
+"Bien"
+]
+},
+"Pains aux raisins": {
+"n": 359,
+"m": [
+"Boulangerie de l'hermitage",
+"Les 3 Meuniers"
+]
+},
+"Pains burger": {
+"n": 195,
+"m": [
+"Jacquet",
+"Epi d'Or",
+"La Boulangère",
+"Maître Jean Pierre",
+"Biofournil",
+"La Fournée Dorée",
+"Brioche Pasquier"
+]
+},
+"Pains hot-dog": {
+"n": 54,
+"m": [
+"Jacquet",
+"Serebis"
+]
+},
+"Pains suédois": {
+"n": 20
+},
+"Paleron": {
+"n": 59,
+"m": [
+"Bigard"
+]
+},
+"Palmiers": {
+"n": 345,
+"m": [
+"Michel et Augustin",
+"Fossier",
+"ArruaBarrena",
+"P'tit Déli",
+"Mes P'tits Secrets",
+"Jacques Menou",
+"Armor Délices",
+"Bisson",
+"Léa Nature",
+"La Fabrique"
+]
+},
+"Palourdes": {
+"n": 15
+},
+"Pamplemousse": {
+"n": 79,
+"m": [
+"Tropicana"
+]
+},
+"Panaché": {
+"n": 217,
+"m": [
+"Falsbourg",
+"Sterling",
+"Kingsbräu",
+"Volsberg",
+"Perlembourg",
+"Cité Marine",
+"Sojasun",
+"Charles & Alice",
+"Panache des Landes"
+]
+},
+"Panais": {
+"n": 34,
+"m": [
+"Babybio"
+]
+},
+"Pancakes": {
+"n": 354,
+"m": [
+"Prozis",
+"Brioche Pasquier",
+"Pasquier",
+"La Fournée Dorée",
+"Le Ster",
+"Whaou!",
+"Iswari",
+"Les Pâtissades",
+"Lemarie patissier",
+"Céréal Bio"
+]
+},
+"Pancetta": {
+"n": 135,
+"m": [
+"Berni",
+"L'assiette d'Antoine",
+"Negroni",
+"Fratelli Beretta",
+"Villani"
+]
+},
+"Panna cotta": {
+"n": 192,
+"m": [
+"Rians",
+"Dr. Oetker",
+"Bontà Divina",
+"Laiterie du Périgord",
+"Bonneterre",
+"Sacré Willy",
+"Elena",
+"Cameo",
+"Alsa",
+"Marie Morin"
+]
+},
+"Pansements": {
+"n": 13
+},
+"Pansements ampoules": {
+"n": 4
+},
+"Pantalons": {
+"n": 3
+},
+"Papaye": {
+"n": 193,
+"m": [
+"O'Régal"
+]
+},
+"Papier cuisson": {
+"n": 20
+},
+"Papier toilette": {
+"n": 35,
+"m": [
+"Lotus",
+"Floralys"
+]
+},
+"Papier toilette humide": {
+"n": 4
+},
+"Paprika": {
+"n": 308,
+"m": [
+"Ducros",
+"Fuchs",
+"Bedros",
+"Sainte Lucie",
+"Albert Ménès",
+"Cigalou",
+"La Conquête des Saveurs",
+"Rustica",
+"Ecoidées",
+"ETHNOSCIENCE"
+]
+},
+"Paprika fort": {
+"n": 4
+},
+"Paquets de mouchoirs": {
+"n": 1
+},
+"Parfum": {
+"n": 36,
+"m": [
+"Les Jardins de Gaïa"
+]
+},
+"Parfum de linge": {
+"n": 2
+},
+"Paris-brest": {
+"n": 168,
+"m": [
+"Tartefrais"
+]
+},
+"Parmesan": {
+"n": 150,
+"m": [
+"Lovilio",
+"Castelli"
+]
+},
+"Parmesan râpé": {
+"n": 11
+},
+"Passoire": {
+"n": 1
+},
+"Pastilles": {
+"n": 525,
+"m": [
+"Leone",
+"Vichy",
+"Fisherman's Friend",
+"Apidis",
+"Famille Mary",
+"Rendez-Vous",
+"Maison Moinet",
+"Aromandise",
+"Valda",
+"Tic Tac"
+]
+},
+"Pastis": {
+"n": 213,
+"m": [
+"Ricard",
+"Pastis 51",
+"Pernod Ricard",
+"Duval",
+"Vivalis",
+"Lidanis",
+"Henri Bardouin",
+"Prado",
+"janot",
+"Belanis"
+]
+},
+"Pastèque": {
+"n": 231,
+"m": [
+"Florette",
+"Bouquet Bio"
+]
+},
+"Patates douces": {
+"n": 128
+},
+"Paupiettes de veau": {
+"n": 183,
+"m": [
+"Tendriade",
+"Toupargel",
+"Comtesse du Barry",
+"Agis"
+]
+},
+"Pavés de bœuf": {
+"n": 131,
+"m": [
+"Charal",
+"Férial",
+"Tendre et Plus",
+"L'Étal du Boucher",
+"Socopa"
+]
+},
+"Pavés de merlu surgelés": {
+"n": 2
+},
+"Pavés de saumon": {
+"n": 602,
+"m": [
+"Mericq",
+"L'Atelier Poissonnerie",
+"Loc Marée",
+"Sacrebleu",
+"Pescanova",
+"Herens",
+"Petit Navire",
+"Delpierre",
+"Odyssee",
+"La Table des Pêcheurs"
+]
+},
+"Pecorino": {
+"n": 163,
+"m": [
+"Casa Azzurra",
+"Le Fromager Des Halles",
+"Ambrosi",
+"Zanetti"
+]
+},
+"Peluches": {
+"n": 5
+},
+"Persil": {
+"n": 245,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Cigalou",
+"Rustica",
+"Fuchs",
+"Spigol"
+]
+},
+"Pesto": {
+"n": 1009,
+"m": [
+"Saclà",
+"Polli",
+"Panzani",
+"Barilla",
+"Florelli",
+"Nord Salse",
+"Cascina San Cassiano",
+"Artigiana Genovese",
+"Biffi",
+"Antico casale"
+]
+},
+"Petit Basque": {
+"n": 73,
+"m": [
+"Istara",
+"Le Petit Basque"
+]
+},
+"Petit Écolier chocolat noir": {
+"n": 2
+},
+"Petites voitures": {
+"n": 1
+},
+"Petits pois carottes": {
+"n": 287,
+"m": [
+"D'aucy",
+"Maingourd",
+"Notre Jardin",
+"Cassegrain",
+"Jean nicolas",
+"Rochambeau",
+"Avril",
+"Priméal",
+"Bonduelle",
+"Jardin Bio étic"
+]
+},
+"Petits pois extra-fins": {
+"n": 143,
+"m": [
+"Notre Jardin",
+"D'aucy",
+"Jean nicolas",
+"Prosain",
+"Dia"
+]
+},
+"Petits pois surgelés": {
+"n": 10
+},
+"Petits pots": {
+"n": 188,
+"m": [
+"Nestlé",
+"La Laitière",
+"Beillevaire",
+"Holle",
+"Blédina",
+"Babybio",
+"Alsa",
+"Bonne Maman",
+"Carrefour Original",
+"La Grande Epicerie de Paris"
+]
+},
+"Petits pots légumes": {
+"n": 11
+},
+"Petits-beurre": {
+"n": 432,
+"m": [
+"LU",
+"P'tit Déli",
+"Bisson",
+"Ker Cadélac",
+"Filet Bleu",
+"Dia",
+"Schär",
+"Nature & Cie",
+"Fauchon",
+"La Mère Poulard"
+]
+},
+"Petits-suisses": {
+"n": 80,
+"m": [
+"Danone",
+"Gervais"
+]
+},
+"Pieds de porc": {
+"n": 60
+},
+"Pignons de pin": {
+"n": 185,
+"m": [
+"Vahiné",
+"Sun",
+"Bedros Et Savino",
+"Daco Bello"
+]
+},
+"Piles": {
+"n": 6
+},
+"Pilons de poulet": {
+"n": 366,
+"m": [
+"La Nouvelle Agriculture",
+"Le Gaulois",
+"Maître CoQ",
+"L'etal Du Volailler",
+"Volaé",
+"Père Dodu",
+"Corril",
+"Volaille Francaise"
+]
+},
+"Piment d'Espelette": {
+"n": 127,
+"m": [
+"Ederki",
+"Bipia",
+"Baionade",
+"Marius"
+]
+},
+"Piment de Cayenne": {
+"n": 41,
+"m": [
+"Bedros"
+]
+},
+"Piments jalapeños": {
+"n": 14
+},
+"Pimentón": {
+"n": 44,
+"m": [
+"Ducros",
+"La Odalisca"
+]
+},
+"Pintade": {
+"n": 223,
+"m": [
+"Maître CoQ",
+"Père Dodu"
+]
+},
+"Pintade rôtie": {
+"n": 3
+},
+"Pissaladière": {
+"n": 35,
+"m": [
+"Coudène"
+]
+},
+"Pistaches": {
+"n": 643,
+"m": [
+"Vico",
+"Tokapi",
+"Fruidyllic",
+"Daco Bello",
+"O'Régal",
+"Menguy's",
+"Intersnack",
+"Maître Prunille",
+"JusteBio",
+"Profruit"
+]
+},
+"Pizza fraîche": {
+"n": 16
+},
+"Pizza surgelée": {
+"n": 26,
+"m": [
+"Fiorini"
+]
+},
+"Pizza à la part": {
+"n": 1
+},
+"Planche à découper": {
+"n": 1
+},
+"Plants": {
+"n": 112,
+"m": [
+"Gardein",
+"alpro",
+"Dream Farm"
+]
+},
+"Plaques à pizza": {
+"n": 1
+},
+"Plat cuisiné surgelé": {
+"n": 1
+},
+"Plat de côtes": {
+"n": 33
+},
+"Plat à four": {
+"n": 1
+},
+"Plats bébé": {
+"n": 90,
+"m": [
+"U Tout Petits Bio",
+"Nestlé"
+]
+},
+"Plats cuisinés en barquette": {
+"n": 26
+},
+"Plumeau": {
+"n": 1
+},
+"Poireaux": {
+"n": 169,
+"m": [
+"Priméale"
+]
+},
+"Poires": {
+"n": 464,
+"m": [
+"Santos & Pereira",
+"Andros",
+"Les Paysans Bio",
+"Apifood",
+"Extaz",
+"Lucien Georgelin",
+"Terre de BIO"
+]
+},
+"Poires au sirop": {
+"n": 70,
+"m": [
+"Baccara"
+]
+},
+"Pois chiches": {
+"n": 936,
+"m": [
+"Sabarot",
+"Priméal",
+"D'aucy",
+"Bonduelle",
+"Vivien Paille",
+"Prosain",
+"Notre Jardin",
+"Samia",
+"Olabe",
+"Ederki"
+]
+},
+"Poisson pané": {
+"n": 21,
+"m": [
+"Pêche Océan"
+]
+},
+"Poitrine de porc": {
+"n": 352,
+"m": [
+"Socopa",
+"Les Brasérades",
+"Hiruak",
+"Férial",
+"L'Étal du Boucher",
+"Cooperl",
+"Jean Rozé",
+"En Cuisine"
+]
+},
+"Poitrine fumée": {
+"n": 516,
+"m": [
+"André Loussouarn",
+"Les Brasérades",
+"Jean Rozé",
+"Clavière",
+"Au Fumé Vosgien",
+"Bonjour Campagne",
+"Férial",
+"Cooperl",
+"Gourmets de l'Artois"
+]
+},
+"Poitrine salée": {
+"n": 48
+},
+"Poivre": {
+"n": 929,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Terre exotique",
+"Fuchs",
+"Spigol",
+"Bedros",
+"Masalchi",
+"Albert Ménès",
+"Rustica",
+"Espig"
+]
+},
+"Poivrons": {
+"n": 560,
+"m": [
+"Polli",
+"Arev",
+"Albert Ménès",
+"Olabe",
+"Maayane",
+"Florelli",
+"Vicasol",
+"Magda",
+"Altesse",
+"Kerets"
+]
+},
+"Poivrons piquillos": {
+"n": 61,
+"m": [
+"La Fragua",
+"Bixente Ibarra",
+"Ederki"
+]
+},
+"Polenta": {
+"n": 238,
+"m": [
+"Tipiak",
+"Alpina Savoie",
+"Alpina",
+"Molino Riva",
+"Les Saveurs du Clavon",
+"Molino Filippini",
+"Molino di Ferro",
+"L'Italie des Saveurs",
+"Priméal",
+"Castello"
+]
+},
+"Pommes": {
+"n": 1989,
+"m": [
+"Charles & Alice",
+"Andros",
+"Materne",
+"Blédina",
+"Babybio",
+"Pom'Potes",
+"Il était un fruit",
+"Douceur du Verger",
+"Thomas Le Prince",
+"Hipp"
+]
+},
+"Pommes Golden": {
+"n": 107
+},
+"Pommes de terre": {
+"n": 1517,
+"m": [
+"Priméale",
+"Lunor",
+"Doreoc",
+"Parmentine",
+"Vitalis",
+"Panier du Primeur",
+"Mon Marché Plaisir",
+"Prince de Bretagne",
+"Allaire",
+"Frichot"
+]
+},
+"Pommes de terre à frites": {
+"n": 39
+},
+"Pommes de terre épluchées": {
+"n": 8
+},
+"Pommes duchesse à la truffe": {
+"n": 3
+},
+"Pommes noisettes": {
+"n": 55,
+"m": [
+"Findus",
+"Pom'Lisse"
+]
+},
+"Pont-l'évêque": {
+"n": 143,
+"m": [
+"Graindorge",
+"E. Graindorge",
+"Gillot",
+"Fleuron du Plessis",
+"Domaine du Plessis"
+]
+},
+"Popcorn": {
+"n": 388,
+"m": [
+"Jimmy's",
+"Menguy's",
+"Movies Pop",
+"M Classic",
+"Easypop",
+"Joe & Seph's",
+"McEnnedy",
+"Seeberger",
+"Zweifel",
+"PAPApéro !"
+]
+},
+"Porto": {
+"n": 96,
+"m": [
+"Cruz",
+"Dorrao",
+"Porto Cruz"
+]
+},
+"Potiron": {
+"n": 52,
+"m": [
+"Liebig",
+"Knorr"
+]
+},
+"Pots de fleurs": {
+"n": 3
+},
+"Pots en verre": {
+"n": 1
+},
+"Poudre d'amande": {
+"n": 52,
+"m": [
+"Tresors De Chefs"
+]
+},
+"Poulet entier": {
+"n": 191,
+"m": [
+"Les Fermiers de Loué"
+]
+},
+"Poulet rôti": {
+"n": 784,
+"m": [
+"L'etal Du Volailler",
+"Maître CoQ",
+"Le Gaulois",
+"Toque du Chef",
+"Volaé",
+"Fleury Michon",
+"Daunat",
+"La Cuisine d'Océane"
+]
+},
+"Poulpe": {
+"n": 129,
+"m": [
+"Pêcheur de Saveurs",
+"L'Apéro du Poissonnier",
+"Spanico",
+"Azais Polito"
+]
+},
+"Poupées": {
+"n": 2
+},
+"Poêle": {
+"n": 52
+},
+"Poêlée de légumes": {
+"n": 154,
+"m": [
+"Toupargel",
+"Bofrost",
+"Notre Jardin",
+"Bonduelle"
+]
+},
+"Profiteroles": {
+"n": 120,
+"m": [
+"Bontà Divina",
+"Solo Italia"
+]
+},
+"Prosecco": {
+"n": 78,
+"m": [
+"Riccadonna"
+]
+},
+"Protège-matelas": {
+"n": 1
+},
+"Protège-slips": {
+"n": 4
+},
+"Pruneaux": {
+"n": 906,
+"m": [
+"Maison Roucadil",
+"Maître Prunille",
+"Lou Prunel",
+"Coufidou",
+"Les Vergers d'Escoute",
+"La Compagnie Des Pruneaux",
+"Prunidor",
+"Couleurs Vives",
+"Pruneaux d'Antan",
+"Ferm'en bio"
+]
+},
+"Prunes": {
+"n": 177
+},
+"Prunes rouges": {
+"n": 7
+},
+"Préparation pour crêpes": {
+"n": 35
+},
+"Préparation pour gâteau": {
+"n": 43,
+"m": [
+"Tablier Blanc"
+]
+},
+"Pulls": {
+"n": 5
+},
+"Pulpe de tomate": {
+"n": 204,
+"m": [
+"Cirio",
+"Petti",
+"Mutti",
+"Del Monte",
+"Heinz",
+"En Cuisine",
+"Conserve Italia",
+"Florelli",
+"Olabe",
+"Jardin Bio étic"
+]
+},
+"Purée de fruits": {
+"n": 208,
+"m": [
+"Danival",
+"Biolo'Klock",
+"Auchan Baby Bio"
+]
+},
+"Purée en flocons": {
+"n": 34,
+"m": [
+"Mousline"
+]
+},
+"Purée surgelée": {
+"n": 28,
+"m": [
+"Ardo"
+]
+},
+"Puzzle": {
+"n": 16,
+"m": [
+"Ravensburger"
+]
+},
+"Pyjamas": {
+"n": 1
+},
+"Pâte brisée": {
+"n": 129,
+"m": [
+"Herta",
+"Marie",
+"Nature & Cie",
+"Crusti Frais",
+"Croustipate",
+"Tablier Blanc"
+]
+},
+"Pâte de curry indienne": {
+"n": 1
+},
+"Pâte de curry thaï": {
+"n": 12,
+"m": [
+"Autour du riz"
+]
+},
+"Pâte de spéculoos": {
+"n": 46,
+"m": [
+"Lotus",
+"Le Comptoir de Mathilde"
+]
+},
+"Pâte feuilletée": {
+"n": 188,
+"m": [
+"Croustipate",
+"Marie",
+"Herta",
+"Biobleud"
+]
+},
+"Pâte feuilletée surgelée": {
+"n": 2
+},
+"Pâte filo": {
+"n": 6
+},
+"Pâte sablée": {
+"n": 50
+},
+"Pâte à pain": {
+"n": 26
+},
+"Pâte à pizza": {
+"n": 210,
+"m": [
+"Herta",
+"Croustipate",
+"Toque du Chef",
+"CERELIA",
+"Toques & Tartes",
+"Maizena",
+"Biobleud"
+]
+},
+"Pâte à pizza rectangulaire": {
+"n": 16,
+"m": [
+"Herta"
+]
+},
+"Pâte à sucre": {
+"n": 367,
+"m": [
+"Scrapcooking",
+"Patisdecor",
+"Fun Cakes",
+"La pateliere",
+"Vahiné",
+"Modecor",
+"Sainte Lucie",
+"Alice Délice",
+"Niclaus",
+"Florensuc"
+]
+},
+"Pâte à tartiner chocolat": {
+"n": 244,
+"m": [
+"Bovetti",
+"Mamie Bio",
+"Dardenne",
+"Léa Nature",
+"Jardin Bio",
+"Jardin Bio étic",
+"Natur Attitud",
+"Brinkers",
+"La Fourche",
+"Lucien Georgelin"
+]
+},
+"Pâte à tartiner noisette": {
+"n": 784,
+"m": [
+"Le Comptoir de Mathilde",
+"Lucien Georgelin",
+"Bonne Maman",
+"Jardin Bio",
+"Léa Nature",
+"Mamie Bio",
+"Bovetti",
+"Dardenne",
+"Jardin Bio étic",
+"Les P'tites Tartines"
+]
+},
+"Pâtes complètes": {
+"n": 57,
+"m": [
+"Castagno"
+]
+},
+"Pâtes coquillettes": {
+"n": 41,
+"m": [
+"Panzani"
+]
+},
+"Pâtes de fruits": {
+"n": 608,
+"m": [
+"Cruzilles",
+"Lucien Georgelin",
+"Motta",
+"Le Comptoir de Mathilde",
+"Favorina",
+"Perl'Amande",
+"Daco Bello",
+"François Doucet",
+"Gerblé",
+"Gayelord Hauser"
+]
+},
+"Pâtes en vrac": {
+"n": 3
+},
+"Pâtes farfalle": {
+"n": 22
+},
+"Pâtes fraîches": {
+"n": 108,
+"m": [
+"Saint Jean",
+"Lustucru",
+"Panzani",
+"Garofalo",
+"Corte del Gusto",
+"Lustucru selection"
+]
+},
+"Pâtes fraîches farcies": {
+"n": 9
+},
+"Pâtes fusilli": {
+"n": 17
+},
+"Pâtes macaroni": {
+"n": 19,
+"m": [
+"Panzani"
+]
+},
+"Pâtes penne": {
+"n": 28,
+"m": [
+"Panzani"
+]
+},
+"Pâtes pipe rigate": {
+"n": 1
+},
+"Pâtes sans gluten": {
+"n": 61,
+"m": [
+"Nature & Cie",
+"U Sans Gluten",
+"Biobleud"
+]
+},
+"Pâtes spaghetti": {
+"n": 33,
+"m": [
+"Panzani"
+]
+},
+"Pâtes tagliatelles": {
+"n": 14
+},
+"Pâtes à lasagnes": {
+"n": 14
+},
+"Pâté": {
+"n": 6851,
+"m": [
+"Hénaff",
+"Lucien Georgelin",
+"Maison Torres",
+"Stéphan",
+"Orocbat",
+"Jean Brunet",
+"Mainjolle",
+"Panzani",
+"Mère Lalie",
+"Le Comptoir de Mathilde"
+]
+},
+"Pâté en croûte": {
+"n": 515,
+"m": [
+"Roland Monterrat",
+"Michel Bolard",
+"Tempé",
+"Despi",
+"Maison Monterrat",
+"Maison Bolard",
+"Secrets Du Val D'argent",
+"L'assiette d'Antoine",
+"Metzger Muller",
+"Le Bistronome"
+]
+},
+"Pâtée pour chat": {
+"n": 2
+},
+"Pâtée pour chien": {
+"n": 2
+},
+"Pépites de chocolat": {
+"n": 247,
+"m": [
+"La pateliere",
+"Vahiné",
+"Sainte Lucie",
+"Tresors De Chefs",
+"La Fourche",
+"Tablier Blanc",
+"McCormick",
+"Moulin des Moines",
+"Scrapcooking",
+"Weiss"
+]
+},
+"Pétales au miel": {
+"n": 1
+},
+"Pétillant sans alcool": {
+"n": 15
+},
+"Pêches": {
+"n": 373,
+"m": [
+"St Mamet",
+"Lucien Georgelin",
+"Bonne Maman",
+"Saint Mamet",
+"Saveurs attitudes"
+]
+},
+"Pêches au sirop": {
+"n": 46,
+"m": [
+"Douceur du Verger"
+]
+},
+"Quatre-quarts": {
+"n": 294,
+"m": [
+"Mistral",
+"Ker Cadélac",
+"Biscuits Mistral",
+"Bonne Maman",
+"Le Guillou",
+"Le Ster",
+"P'tit Déli",
+"Baramel",
+"Rochambeau",
+"Fossier"
+]
+},
+"Quatre-épices": {
+"n": 30,
+"m": [
+"Ducros"
+]
+},
+"Queue de bœuf": {
+"n": 4
+},
+"Queue de lotte": {
+"n": 13
+},
+"Queue de porc": {
+"n": 12,
+"m": [
+"Marion"
+]
+},
+"Quiche lorraine": {
+"n": 292,
+"m": [
+"Marie",
+"Toupargel",
+"Côté Table",
+"Rochambeau"
+]
+},
+"Quiche surgelée": {
+"n": 10
+},
+"Quinoa": {
+"n": 817,
+"m": [
+"Tipiak",
+"Priméal",
+"Quinoa blanc",
+"Quinoa",
+"Sabarot",
+"Moulin des Moines",
+"Lustucru",
+"Quinola",
+"Bjorg",
+"Simplement Bon Et Bio"
+]
+},
+"Raclette": {
+"n": 677,
+"m": [
+"RichesMonts",
+"Jean Perrin",
+"Entremont",
+"Ermitage",
+"Savencia",
+"Le Cavalier",
+"Chêne d'argent",
+"CF&R",
+"Les Croisés",
+"Le Fromager Des Halles"
+]
+},
+"Radis": {
+"n": 274,
+"m": [
+"Priméale",
+"Florette",
+"Top Légumes",
+"Oceane",
+"Mon Marché Plaisir",
+"The Greenery",
+"Germline"
+]
+},
+"Raie": {
+"n": 1
+},
+"Raisin": {
+"n": 635,
+"m": [
+"Brio",
+"Arev",
+"Meyva",
+"Barbera",
+"Fresh Garden",
+"El ciruelo",
+"Maison Guinguet"
+]
+},
+"Raisin rose": {
+"n": 12
+},
+"Raisin rouge": {
+"n": 32
+},
+"Raisins secs": {
+"n": 450,
+"m": [
+"O'Régal",
+"Sun",
+"Fruidyllic",
+"Vahiné",
+"Maître Prunille",
+"Fruidelys",
+"Orienco",
+"Meyva",
+"Petit prix",
+"Melissa"
+]
+},
+"Ras el hanout": {
+"n": 87,
+"m": [
+"Espig",
+"Ducros",
+"Sainte Lucie"
+]
+},
+"Rasoirs": {
+"n": 3
+},
+"Rasoirs jetables": {
+"n": 1
+},
+"Ratatouille": {
+"n": 533,
+"m": [
+"Jean Martin",
+"Mocitos",
+"Cassegrain",
+"D'aucy",
+"Prosain",
+"Maison Rivière",
+"Notre Jardin",
+"Barbier Dauphin",
+"Maingourd",
+"Jardin Bio étic"
+]
+},
+"Ratatouille surgelée": {
+"n": 2
+},
+"Ravioles du Dauphiné": {
+"n": 79,
+"m": [
+"Saint Jean",
+"Royans"
+]
+},
+"Ravioles fraîches": {
+"n": 7
+},
+"Raviolis en boîte": {
+"n": 9
+},
+"Raviolis frais": {
+"n": 33,
+"m": [
+"Bio Verde"
+]
+},
+"Reblochon": {
+"n": 845,
+"m": [
+"Le Fromager Des Halles",
+"Pochat & Fils",
+"Saveur De Nos Regions",
+"Reblochon De Savoie",
+"U de nos Régions",
+"Pochat et fils",
+"Fromagerie Chabert",
+"Verdannet",
+"Masson",
+"Fromagerie Masson"
+]
+},
+"Religieuse": {
+"n": 121
+},
+"Rhum": {
+"n": 436,
+"m": [
+"Saint James",
+"Clément",
+"Trois Rivières",
+"Havana Club",
+"Charrette",
+"Dillon",
+"Negrita",
+"HSE",
+"Diplomatico",
+"Bologne"
+]
+},
+"Rhum arrangé": {
+"n": 74,
+"m": [
+"Rue Des Plantes",
+"Isautier"
+]
+},
+"Ribs à griller": {
+"n": 74,
+"m": [
+"Maître Jacques"
+]
+},
+"Ricotta": {
+"n": 178,
+"m": [
+"Casa Azzurra",
+"Galbani",
+"Le Fromager Des Halles",
+"Castelli",
+"Valcolatte",
+"L'Italie des Fromages"
+]
+},
+"Rideau de douche": {
+"n": 1
+},
+"Rideaux": {
+"n": 2
+},
+"Rillettes": {
+"n": 2397,
+"m": [
+"Petit Navire",
+"Groix & Nature",
+"Guyader",
+"Le Grand Lejon",
+"L'Atelier du Poissonnier",
+"Le Père Eugène",
+"Cap Océan",
+"Algoplus",
+"La Cancalaise",
+"La Chikolodenn"
+]
+},
+"Risotto": {
+"n": 827,
+"m": [
+"Gallo",
+"Cascina Belvedere",
+"Les Saveurs du Clavon",
+"Sapori Nostrani",
+"Al dente",
+"Lechef",
+"Seazon",
+"Légendes Gourmandes",
+"Saveurs d'Italie",
+"Casale Paradiso"
+]
+},
+"Riz au lait": {
+"n": 592,
+"m": [
+"Nestlé",
+"La Laitière",
+"La Fermière",
+"Teurgoule de Janville",
+"Légendes Gourmandes",
+"Marie Morin",
+"Invitation à la Ferme",
+"Ursi",
+"Bonne Maman",
+"Éclats De Riz"
+]
+},
+"Riz basmati": {
+"n": 321,
+"m": [
+"Taureau Ailé",
+"Riz du monde",
+"Le Forban",
+"Lustucru",
+"Golden Sun",
+"Vivien Paille",
+"Uncle Ben's",
+"Moulin des Moines",
+"Autour du riz",
+"Markal"
+]
+},
+"Riz basmati thaï": {
+"n": 2
+},
+"Riz complet": {
+"n": 274,
+"m": [
+"Markal",
+"Priméal",
+"Uncle Ben's",
+"Moulin des Moines",
+"Celnat",
+"Autour du riz",
+"Naturaline",
+"Bongran",
+"Graines de Nature Seeds of change",
+"Ben's Original"
+]
+},
+"Riz en vrac": {
+"n": 11
+},
+"Riz long": {
+"n": 703,
+"m": [
+"Riz du monde",
+"Uncle Ben's",
+"Ben's Original",
+"Markal",
+"Priméal",
+"Comptoir du Grain",
+"Lustucru",
+"Bongran",
+"Celnat",
+"Golden Sun"
+]
+},
+"Riz pour paella": {
+"n": 16,
+"m": [
+"Uncle Ben's"
+]
+},
+"Riz pour sushi": {
+"n": 45,
+"m": [
+"Tanoshi"
+]
+},
+"Riz rond": {
+"n": 103,
+"m": [
+"Priméal",
+"Markal",
+"Celnat",
+"Moulin des Moines",
+"Greenweez",
+"Vivien Paille",
+"Bongran"
+]
+},
+"Riz thaï": {
+"n": 266,
+"m": [
+"Taureau Ailé",
+"Autour du riz",
+"Priméal",
+"Golden Sun",
+"Celnat",
+"Markal",
+"Artisans du Monde",
+"Bio par nature",
+"Comptoir du Grain",
+"Bon-Ri"
+]
+},
+"Riz à risotto": {
+"n": 53,
+"m": [
+"Taureau Ailé"
+]
+},
+"Rochers au chocolat": {
+"n": 38
+},
+"Rochers au chocolat noir": {
+"n": 18
+},
+"Rooibos": {
+"n": 439,
+"m": [
+"Palais des Thés",
+"Les Jardins de Gaïa",
+"Dammann Frères",
+"La Route des Comptoirs",
+"Terre d'Oc",
+"Alter Eco",
+"Thés de la Pagode",
+"Terra Etica",
+"Destination",
+"Ethiquable"
+]
+},
+"Roquefort": {
+"n": 715,
+"m": [
+"Société",
+"Gabriel Coulet",
+"Papillon",
+"Le Fromager Des Halles",
+"Roquefort",
+"Savencia",
+"Vernières Frères",
+"Les Croisés",
+"Fromagerie Papillon",
+"Lactalis"
+]
+},
+"Roquette": {
+"n": 87,
+"m": [
+"Priméale",
+"Florette",
+"Vert frais",
+"Les Crudettes",
+"Oceane"
+]
+},
+"Rosette": {
+"n": 481,
+"m": [
+"Cochonou",
+"Aoste",
+"Saint Alby",
+"Montagne Noire",
+"Henri Raffin",
+"Gourmets de l'Artois",
+"Boucheries André",
+"Berni",
+"Peguet Savoie",
+"L'assiette d'Antoine"
+]
+},
+"Rouge à lèvres": {
+"n": 1
+},
+"Roux": {
+"n": 17
+},
+"Ruban adhésif": {
+"n": 1
+},
+"Rumsteck": {
+"n": 42
+},
+"Râpe": {
+"n": 128,
+"m": [
+"Cité Marine",
+"Les Croisés",
+"Soignon",
+"Chêne d'argent"
+]
+},
+"Règle": {
+"n": 6
+},
+"Réglisse": {
+"n": 94,
+"m": [
+"Antésite"
+]
+},
+"Rôti de bœuf": {
+"n": 88,
+"m": [
+"Charal",
+"Fleury Michon",
+"Tradilège",
+"L'Étal du Boucher"
+]
+},
+"Rôti de dinde": {
+"n": 193,
+"m": [
+"Volaé",
+"Volandry",
+"Maître CoQ",
+"Fleury Michon",
+"Le Gaulois",
+"Ronsard",
+"Père Dodu",
+"Volandrie",
+"L'etal Du Volailler",
+"Bahier"
+]
+},
+"Rôti de porc": {
+"n": 1654,
+"m": [
+"Maître Jacques",
+"L'Étal du Boucher",
+"Fleury Michon",
+"Mainjolle",
+"Boucherie St Clément",
+"Tradilège",
+"Jean Floc'h",
+"Férial",
+"Le Porc Français",
+"Filière Qualité Carrefour"
+]
+},
+"Sablés": {
+"n": 2484,
+"m": [
+"Biscuiterie de l'Abbaye",
+"St Michel",
+"La Mère Poulard",
+"La Sablésienne",
+"Fossier",
+"Le Croquant Chattois",
+"Bonne Maman",
+"McVitie's",
+"Gerblé",
+"Bisson"
+]
+},
+"Sac isotherme": {
+"n": 1
+},
+"Sacs aspirateur": {
+"n": 1
+},
+"Sacs compostables": {
+"n": 2
+},
+"Sacs congélation": {
+"n": 18
+},
+"Sacs de congélation zip": {
+"n": 2
+},
+"Sacs isothermes": {
+"n": 1
+},
+"Sacs poubelle": {
+"n": 12,
+"m": [
+"Elembal"
+]
+},
+"Sacs à dos": {
+"n": 1
+},
+"Safran": {
+"n": 101,
+"m": [
+"Ducros",
+"Sainte Lucie",
+"Eric Bur",
+"Bedros"
+]
+},
+"Saint-Albray": {
+"n": 56,
+"m": [
+"Saint Albray",
+"Savencia",
+"Fromageries des Chaumes"
+]
+},
+"Saint-Jacques surgelées": {
+"n": 1
+},
+"Saint-Marcellin": {
+"n": 114,
+"m": [
+"Étoile du Vercors",
+"Lactalis",
+"Fromagerie De St Just De Claix",
+"Eurial",
+"Granarolo"
+]
+},
+"Saint-Nectaire": {
+"n": 452,
+"m": [
+"Le Fromager Des Halles",
+"Paul Dischamp",
+"Laiterie de la Montagne"
+]
+},
+"Sainte-Maure": {
+"n": 86,
+"m": [
+"Soignon"
+]
+},
+"Salade de pâtes": {
+"n": 184,
+"m": [
+"Daylicious",
+"Dia",
+"Marks And Spencer",
+"L'Esprit Frais"
+]
+},
+"Salade de riz": {
+"n": 119,
+"m": [
+"Seazon",
+"La Cuisine d'Océane",
+"Comme j'aime"
+]
+},
+"Salade en sachet": {
+"n": 4
+},
+"Salade piémontaise": {
+"n": 59,
+"m": [
+"Qualité Traiteur"
+]
+},
+"Salade traiteur": {
+"n": 2
+},
+"Salade verte": {
+"n": 35
+},
+"Saladier": {
+"n": 1
+},
+"Salami": {
+"n": 322,
+"m": [
+"Dulano",
+"Berni",
+"Saint Alby",
+"Herta",
+"L'assiette d'Antoine",
+"Citterio",
+"Gut Bartenhof",
+"Charcupac",
+"Les Provinces"
+]
+},
+"Salers": {
+"n": 47
+},
+"Salsifis": {
+"n": 88,
+"m": [
+"Jean nicolas",
+"Rochambeau",
+"Notre Jardin"
+]
+},
+"Samoussas": {
+"n": 163,
+"m": [
+"Hoa Nam",
+"Les p'tits chefs du bio",
+"Pic'Express",
+"Mei Asia"
+]
+},
+"Samoussas surgelés": {
+"n": 4
+},
+"Sandwichs": {
+"n": 1083,
+"m": [
+"Côté Snack",
+"Sodebo",
+"Entracte",
+"Daunat",
+"Roland Monterrat",
+"Crous Resto'",
+"Mix Buffet",
+"Poulaillon",
+"Le Kiosque à Sandwiches",
+"SNCF"
+]
+},
+"Sangria": {
+"n": 119,
+"m": [
+"Don Simon",
+"Peñasol"
+]
+},
+"Sardines": {
+"n": 1321,
+"m": [
+"Connétable",
+"La belle-iloise",
+"Les Mouettes d'Arvor",
+"La Perle des Dieux",
+"Le Trésor des Dieux",
+"Parmentier",
+"Conserverie Parmentier",
+"Capitaine cook",
+"Jacques Gonidec",
+"La Pointe de Penmarc'h"
+]
+},
+"Sardines à l'huile d'olive vierge bio": {
+"n": 25,
+"m": [
+"Phare d'Eckmühl"
+]
+},
+"Sauce aigre-douce": {
+"n": 82,
+"m": [
+"Asia Green Garden",
+"Heinz"
+]
+},
+"Sauce arrabbiata": {
+"n": 64,
+"m": [
+"Saclà",
+"Florelli"
+]
+},
+"Sauce barbecue": {
+"n": 238,
+"m": [
+"Heinz",
+"Jack Daniel's",
+"Rustica",
+"Nawhal's",
+"Amora",
+"Bénédicta",
+"Colona",
+"Saint Christophe",
+"Anda",
+"Yummys"
+]
+},
+"Sauce bolognaise": {
+"n": 269,
+"m": [
+"Panzani",
+"Danival",
+"Zapetti",
+"Delicato",
+"Louis Martin",
+"Lucien Georgelin",
+"Turini"
+]
+},
+"Sauce burger": {
+"n": 131,
+"m": [
+"Amora",
+"Rustica",
+"Ilou"
+]
+},
+"Sauce béarnaise": {
+"n": 127,
+"m": [
+"Rustica",
+"Knorr",
+"Bénédicta",
+"Colona"
+]
+},
+"Sauce carbonara": {
+"n": 18
+},
+"Sauce chili": {
+"n": 60,
+"m": [
+"Go-Tan"
+]
+},
+"Sauce curry": {
+"n": 210,
+"m": [
+"Le Coq Noir",
+"Patak's",
+"Rustica",
+"Knorr",
+"Uncle Ben's",
+"Colona",
+"Gastromer",
+"Le voyage de mamabe",
+"Suzi Wan",
+"Green Saffron"
+]
+},
+"Sauce frites": {
+"n": 56,
+"m": [
+"Amora",
+"Rustica",
+"Bénédicta",
+"Heinz"
+]
+},
+"Sauce mexicaine hot": {
+"n": 2
+},
+"Sauce moutarde-miel": {
+"n": 24,
+"m": [
+"Bénédicta"
+]
+},
+"Sauce nuoc-mâm": {
+"n": 53,
+"m": [
+"Suzi Wan",
+"Ong Xen"
+]
+},
+"Sauce piquante": {
+"n": 85,
+"m": [
+"Alélor"
+]
+},
+"Sauce piri piri": {
+"n": 4
+},
+"Sauce ranch": {
+"n": 3
+},
+"Sauce salsa": {
+"n": 36
+},
+"Sauce samouraï": {
+"n": 135,
+"m": [
+"Colona",
+"Rustica",
+"Saint Christophe",
+"Bénédicta",
+"Halal Maïza",
+"Manna"
+]
+},
+"Sauce soja": {
+"n": 715,
+"m": [
+"Suzi Wan",
+"Kikkoman",
+"Tanoshi",
+"Sushi Gourmet",
+"Pearl River Bridge",
+"Cock Brand",
+"Mont Asie",
+"Yamasa",
+"Ayam",
+"Clearspring"
+]
+},
+"Sauce teriyaki": {
+"n": 38
+},
+"Sauce tomate": {
+"n": 993,
+"m": [
+"Panzani",
+"Lucien Georgelin",
+"Heinz",
+"Florelli",
+"Jardin Bio étic",
+"Léa Nature",
+"Saclà",
+"Zapetti",
+"Prosain",
+"Solleone"
+]
+},
+"Sauce tomate basilic": {
+"n": 203,
+"m": [
+"Panzani",
+"Jean Martin",
+"Prosain",
+"Karine & Jeff"
+]
+},
+"Saucisse sèche": {
+"n": 1085,
+"m": [
+"Montagne Noire",
+"Oberti",
+"Roches blanches",
+"Maison Milhau",
+"Louis Auvergne",
+"Cochonou",
+"Saint-Azay",
+"Despi",
+"Le Flutiau",
+"Merle"
+]
+},
+"Saucisse sèche d'Auvergne label rouge": {
+"n": 1
+},
+"Saucisse sèche à l'ail": {
+"n": 1
+},
+"Saucisses": {
+"n": 5666,
+"m": [
+"Nature de France",
+"Au Fumé Vosgien",
+"Jean Rozé",
+"Hiruak",
+"Charculor",
+"Socopa",
+"Hénaff",
+"Metzger Muller",
+"Zentz",
+"Thierry Schweitzer"
+]
+},
+"Saucisses cocktail": {
+"n": 205,
+"m": [
+"Jean Caby",
+"Stoeffler",
+"Stéphan",
+"Charles Keller",
+"Tulip",
+"Madrange",
+"P'tit Gourmand",
+"Tokapi",
+"Tradilège",
+"Zwan"
+]
+},
+"Saucisses de Francfort": {
+"n": 350,
+"m": [
+"Despi",
+"Cochonnailles du Haut-Bois",
+"Stoeffler",
+"Stemmelen",
+"Les éleveurs de la Charentonne",
+"Pierre Schmidt"
+]
+},
+"Saucisses de Strasbourg": {
+"n": 261,
+"m": [
+"Stemmelen",
+"Herta",
+"Despi"
+]
+},
+"Saucisses lentilles": {
+"n": 281,
+"m": [
+"La Belle Chaurienne",
+"Larnaudie",
+"William Saurin",
+"Maison Rivière",
+"Raynal et Roquelaure",
+"Claude Vétillard",
+"Stéphan",
+"Toque du Chef",
+"Chez Raynal",
+"Relais Gourmand"
+]
+},
+"Saucisson sec": {
+"n": 2100,
+"m": [
+"Henri Raffin",
+"Saint-Azay",
+"Galibier",
+"Cochonou",
+"Roches blanches",
+"Louis Auvergne",
+"Salaisons du Mâconnais",
+"Montagne Noire",
+"Le Batistou",
+"Terre de l'Alpe"
+]
+},
+"Saucisson à l'ail": {
+"n": 435,
+"m": [
+"Tradilège",
+"Saint Alby",
+"Guyader",
+"Le Porc Français",
+"Rochambeau"
+]
+},
+"Saucisson à la coupe": {
+"n": 1
+},
+"Saumon frais": {
+"n": 41
+},
+"Saumon fumé": {
+"n": 2398,
+"m": [
+"Labeyrie",
+"Delpeyrat",
+"Petit Navire",
+"Delpierre",
+"Kritsen",
+"Ronde des Mers",
+"Guyader",
+"Le Fumet des Dombes",
+"Capitaine cook",
+"Odyssee"
+]
+},
+"Saumon pour carpaccio": {
+"n": 3
+},
+"Sauté d'agneau": {
+"n": 9
+},
+"Sauté de dinde": {
+"n": 38,
+"m": [
+"Le Gaulois"
+]
+},
+"Sauté de porc": {
+"n": 124,
+"m": [
+"L'Étal du Boucher",
+"Fleury Michon"
+]
+},
+"Savon": {
+"n": 73,
+"m": [
+"Le Petit Olivier",
+"Cosmia",
+"Le Petit Marseillais",
+"Najel",
+"Comme avant"
+]
+},
+"Savon de Marseille": {
+"n": 23
+},
+"Savon liquide": {
+"n": 8
+},
+"Savon noir": {
+"n": 11,
+"m": [
+"Better life",
+"Briochin"
+]
+},
+"Seau": {
+"n": 17
+},
+"Sel": {
+"n": 1442,
+"m": [
+"La Baleine",
+"Le Guérandais",
+"Cérébos",
+"Le Natursel",
+"Savor & Sens Tradition",
+"Le Comptoir de Mathilde",
+"Artisans du sel",
+"Notre Terre",
+"Fuchs",
+"Eric Bur"
+]
+},
+"Sel de céleri": {
+"n": 17
+},
+"Sel rose de l'Himalaya": {
+"n": 129,
+"m": [
+"Le Comptoir de Mathilde"
+]
+},
+"Sel régénérant": {
+"n": 3
+},
+"Semelles": {
+"n": 4
+},
+"Semoule": {
+"n": 359,
+"m": [
+"Panzani",
+"Moulin des Moines",
+"Le Renard",
+"Légumor",
+"Markal",
+"Semoulerie de Normandie Rouen",
+"Saveurs des Orients",
+"Grain de frais",
+"Nahil",
+"Lustucru"
+]
+},
+"Serpillière": {
+"n": 1
+},
+"Serviettes de nuit": {
+"n": 2
+},
+"Serviettes hygiéniques": {
+"n": 5
+},
+"Sets de table": {
+"n": 2
+},
+"Shampooing": {
+"n": 142,
+"m": [
+"Dessange",
+"DOP",
+"Le Petit Marseillais",
+"l-oreal",
+"Pétrole Hahn",
+"l-oreal-consumer-products",
+"garnier",
+"Evoluderm",
+"Nature & Moi",
+"Coslys"
+]
+},
+"Shampooing antipelliculaire": {
+"n": 6
+},
+"Shampooing sec": {
+"n": 2
+},
+"Sirop": {
+"n": 3162,
+"m": [
+"Monin",
+"Teisseire",
+"Bigallet",
+"Eyguebelle",
+"Vedrenne",
+"Moulin de Valdonne",
+"Gilbert",
+"La maison guiot",
+"Fruiss",
+"Giffard"
+]
+},
+"Sirop d'orgeat": {
+"n": 81,
+"m": [
+"Teisseire",
+"Bigallet",
+"Monin"
+]
+},
+"Sirop d'érable": {
+"n": 446,
+"m": [
+"Maple Joe",
+"Turkey Hill",
+"Délices Erable & Cie",
+"Délices Etable & CIE",
+"Nokomis",
+"Biodelices",
+"Irrésistibles",
+"Asève",
+"Bernard",
+"Decacer"
+]
+},
+"Sirop de citron": {
+"n": 281,
+"m": [
+"Teisseire",
+"Gilbert",
+"Monin",
+"La maison guiot",
+"Plein Sud",
+"Saxo",
+"Eyguebelle",
+"Frucci",
+"Vedrenne",
+"Meneau"
+]
+},
+"Sirop de grenadine": {
+"n": 314,
+"m": [
+"Teisseire",
+"Monin",
+"Fruiss",
+"La maison guiot",
+"Moulin de Valdonne",
+"Gilbert",
+"Frucci",
+"Eyguebelle",
+"Bigallet",
+"Routin"
+]
+},
+"Sirop de menthe": {
+"n": 379,
+"m": [
+"Teisseire",
+"Monin",
+"Plein Sud",
+"Fruiss",
+"Eyguebelle",
+"Bigallet",
+"Germain",
+"Meneau",
+"Moulin de Valdonne",
+"Frucci"
+]
+},
+"Sirop de mojito": {
+"n": 27
+},
+"Skyr": {
+"n": 832,
+"m": [
+"Ísey",
+"Yoplait",
+"Danone",
+"Siggi's",
+"Arla",
+"Les 2 Vaches",
+"Skyr",
+"Puffy's",
+"Logismose",
+"Le Petit Basque"
+]
+},
+"Slips": {
+"n": 1
+},
+"Smoothie": {
+"n": 614,
+"m": [
+"innocent",
+"Vitamont",
+"Vitabio",
+"Sains et Saufs",
+"Ulti",
+"Nu",
+"Pago",
+"Jafaden",
+"Voelkel",
+"True Fruits"
+]
+},
+"Soda à l'orange": {
+"n": 37,
+"m": [
+"ORANGINA"
+]
+},
+"Sole": {
+"n": 30
+},
+"Son d'avoine": {
+"n": 76,
+"m": [
+"Markal",
+"Gerblé",
+"Celnat",
+"Moulin des Moines",
+"Dukan"
+]
+},
+"Sorbet": {
+"n": 1640,
+"m": [
+"Erhard",
+"Terre Adélice",
+"L'Angélys",
+"La Turbine à Saveurs",
+"Glace de la Ferme",
+"Glaces des Alpes",
+"HDG",
+"Histoires de Glaces",
+"Toupargel",
+"Carte d'Or"
+]
+},
+"Sorbet citron": {
+"n": 254,
+"m": [
+"Erhard",
+"Carte d'Or",
+"Glace de la Ferme",
+"La Belle Aude",
+"Maison de la Glace",
+"Unilever",
+"Histoires de Glaces",
+"Terre Adélice",
+"Altiflore",
+"Philippe Faur"
+]
+},
+"Sorbet fraise": {
+"n": 260,
+"m": [
+"Erhard",
+"Glace de la Ferme",
+"La Manufacture des Belles Glaces",
+"La Belle Aude",
+"Maison de la Glace",
+"La Turbine à Saveurs",
+"Mon Bio gourmand",
+"Maison Alpérel",
+"L'Angélys",
+"Carte d'Or"
+]
+},
+"Soupe de poisson": {
+"n": 833,
+"m": [
+"La Sablaise",
+"Gastromer",
+"La belle-iloise",
+"Liebig",
+"Les Pêcheurs des Calanques",
+"Le Grand Lejon",
+"Coudène",
+"Le Marmiton",
+"Marie-Amélie",
+"Les richesses de la mer"
+]
+},
+"Soupe déshydratée": {
+"n": 11
+},
+"Soupe en brique": {
+"n": 46
+},
+"Soupe miso": {
+"n": 78,
+"m": [
+"Hikari miso",
+"Tanoshi",
+"Marukome",
+"Celnat",
+"Kikkoman",
+"Lima"
+]
+},
+"Sous-vêtements": {
+"n": 1
+},
+"Sparadrap": {
+"n": 4
+},
+"Spasmine": {
+"n": 1
+},
+"Spatule": {
+"n": 1
+},
+"Spray nasal": {
+"n": 2
+},
+"Spritz": {
+"n": 94,
+"m": [
+"Fortwenger",
+"La Biscuiterie de l'Oncle Hansi"
+]
+},
+"Spécialités régionales": {
+"n": 1
+},
+"Spéculoos": {
+"n": 205,
+"m": [
+"Lotus",
+"Maison Dandoy",
+"Moulin des Moines",
+"Ethiquable"
+]
+},
+"Steak haché": {
+"n": 1050,
+"m": [
+"Charal",
+"Jean Rozé",
+"Socopa",
+"Bigard",
+"L'Étal du Boucher",
+"Toupargel",
+"Férial",
+"La Nouvelle Agriculture",
+"Oriental Viandes",
+"Isla Délice"
+]
+},
+"Steaks hachés surgelés": {
+"n": 21
+},
+"Stylos": {
+"n": 61,
+"m": [
+"Scrapcooking",
+"Patisdecor"
+]
+},
+"Sucettes": {
+"n": 712,
+"m": [
+"Chupa Chups",
+"Barnier",
+"Le Comptoir de Mathilde",
+"Pierrot Gourmand",
+"Carambar",
+"La Maison d'Armorine",
+"Little Extra",
+"Patrelle",
+"Rohan",
+"Disneyland Paris"
+]
+},
+"Sucre de canne": {
+"n": 336,
+"m": [
+"Daddy",
+"Markal",
+"Ethiquable",
+"Loiret haentjens",
+"Navarre",
+"Priméal",
+"Destination",
+"Hygiena",
+"Beghin Say",
+"Philia"
+]
+},
+"Sucre en morceaux": {
+"n": 105,
+"m": [
+"Beghin Say",
+"Navarre",
+"Daddy",
+"Tereos",
+"Teva"
+]
+},
+"Sucre en poudre": {
+"n": 121,
+"m": [
+"Daddy",
+"Navarre",
+"Beghin Say",
+"Tereos",
+"Rochambeau"
+]
+},
+"Sucre glace": {
+"n": 104,
+"m": [
+"Daddy",
+"Beghin Say",
+"Giraudon"
+]
+},
+"Sucre roux": {
+"n": 110,
+"m": [
+"Sucreries de Bourbon",
+"Moulin des Moines",
+"Mascarin",
+"Philia",
+"Destination Premium",
+"Bio equitable"
+]
+},
+"Sucre vanillé": {
+"n": 187,
+"m": [
+"Alsa",
+"Vahiné",
+"Sainte Lucie",
+"Dr. Oetker",
+"La pateliere",
+"Beghin Say",
+"Natali"
+]
+},
+"Supions": {
+"n": 4
+},
+"Surimi": {
+"n": 180,
+"m": [
+"Fleury Michon",
+"Coraya",
+"Savencia",
+"Nautica",
+"Compagnie des peches saint malo",
+"L'Apéro du Poissonnier",
+"Pescanova",
+"Viči"
+]
+},
+"Surligneurs": {
+"n": 6
+},
+"Sushis": {
+"n": 536,
+"m": [
+"Sushi Gourmet",
+"Natsu",
+"Asia Green Garden",
+"Sushi Daily",
+"Papylee",
+"Sushi Shop",
+"Comptoir Sushi",
+"Sushi Market",
+"Chef Select to Go",
+"Leroy"
+]
+},
+"Sweats": {
+"n": 34
+},
+"Sérum physiologique": {
+"n": 4
+},
+"T-shirts": {
+"n": 1
+},
+"Tablette de chocolat au lait": {
+"n": 217,
+"m": [
+"Ivoria",
+"Grain de Sail",
+"L'Éclair de Génie",
+"Michel Cluizel",
+"Lindt",
+"Mazet",
+"Valrhona",
+"Weiss",
+"Milka",
+"Belledonne"
+]
+},
+"Tablette de chocolat noir": {
+"n": 259,
+"m": [
+"Ivoria",
+"Les Chocolats d'Augustin",
+"L'Éclair de Génie",
+"Les creations",
+"Valrhona",
+"Weiss",
+"Belledonne",
+"Grain de Sail",
+"Michel Cluizel",
+"Ikalia"
+]
+},
+"Tablettes lave-vaisselle": {
+"n": 18
+},
+"Taboulé": {
+"n": 1186,
+"m": [
+"Pierre Martinet",
+"Mix Buffet",
+"Garbit",
+"Bonduelle",
+"Tipiak",
+"Priméal",
+"Zapetti",
+"Menu Fraîcheur",
+"Qualité Traiteur",
+"Jean Stalaven"
+]
+},
+"Talc": {
+"n": 5
+},
+"Tampons": {
+"n": 3
+},
+"Tapas": {
+"n": 180,
+"m": [
+"Pêcheur de Saveurs",
+"Espuña",
+"Miti",
+"La Perle des Dieux",
+"L'Apéro du Poissonnier",
+"Palais Des Mets",
+"Costa",
+"Noel",
+"La Paimpolaise",
+"Méditerranée Sauvage"
+]
+},
+"Tapenade": {
+"n": 422,
+"m": [
+"Cruscana",
+"L'Oulibo",
+"Saclà",
+"Méditéa",
+"Croc'Frais",
+"Oliveraie Jeanjean",
+"Puget",
+"L'épicurien",
+"Sud'n'sol",
+"Saveurs & Tradition du Midi"
+]
+},
+"Tapenade noire": {
+"n": 368,
+"m": [
+"Les Mets De Provence",
+"Jean Martin",
+"Florelli",
+"Oliveraie Jeanjean",
+"Cruscana",
+"Puget",
+"Méditéa",
+"Huilerie Richard",
+"Marius Bernard",
+"Lucien Georgelin"
+]
+},
+"Tarama": {
+"n": 507,
+"m": [
+"Blini",
+"Le Traiteur Gourmet",
+"L'Atelier Blini",
+"La Grande Epicerie de Paris",
+"Olsen",
+"Fjord King",
+"Ronde des Mers",
+"Comptoir du caviar",
+"L'Apéro du Poissonnier",
+"Kaviari"
+]
+},
+"Tarte au citron": {
+"n": 268,
+"m": [
+"Boncolac",
+"Marie Morin",
+"Bonne Maman",
+"Pasquier",
+"Tartefrais"
+]
+},
+"Tarte aux fruits": {
+"n": 58
+},
+"Tarte glacée": {
+"n": 4
+},
+"Tartelettes": {
+"n": 908,
+"m": [
+"Bonne Maman",
+"Hafner",
+"La Fournée Campanière",
+"Germinal",
+"GIE BPGR",
+"Serebis",
+"Tartefrais",
+"Plaisir Pâtissier",
+"Cyril Pinabel",
+"Nature & Cie"
+]
+},
+"Tartes surgelées": {
+"n": 17
+},
+"Tartines craquantes": {
+"n": 189,
+"m": [
+"Le pain des fleurs",
+"Jardin Bio étic",
+"Céréal Bio",
+"Ekibio",
+"Léa Nature",
+"Emile noel",
+"Terres et Céréales Bio",
+"Pain des fleurs",
+"Moissons De La Terre",
+"Jardin Bio"
+]
+},
+"Tasses": {
+"n": 16
+},
+"Tendrons de veau": {
+"n": 7
+},
+"Tequila": {
+"n": 32
+},
+"Terreau": {
+"n": 3
+},
+"Thermomètre": {
+"n": 2
+},
+"Thon au naturel": {
+"n": 424,
+"m": [
+"Petit Navire",
+"Saupiquet",
+"Connétable",
+"Odyssee",
+"Phare d'Eckmühl",
+"Pêche Océan",
+"Pompon rouge",
+"Ribeira",
+"MWBrands/Ets Paul Paulet",
+"Pêcheurs de France"
+]
+},
+"Thon en boîte": {
+"n": 16
+},
+"Thon frais": {
+"n": 13,
+"m": [
+"Cap Océan"
+]
+},
+"Thym frais": {
+"n": 3
+},
+"Thé": {
+"n": 3070,
+"m": [
+"Palais des Thés",
+"Kusmi Tea",
+"Mariage Frères",
+"Dammann Frères",
+"Lipton",
+"Quai Sud",
+"Twinings",
+"MyProtein",
+"Compagnie Coloniale",
+"Baronny's"
+]
+},
+"Thé earl grey": {
+"n": 141,
+"m": [
+"Lipton",
+"Unilever",
+"Pagès",
+"1336",
+"Ethiquable"
+]
+},
+"Thé glacé": {
+"n": 448,
+"m": [
+"Fuzetea",
+"Lipton",
+"May Tea",
+"Fruima",
+"Honest",
+"Dammann Frères",
+"Nestea",
+"Pure Leaf",
+"Pokka",
+"Le Comptoir de Mathilde"
+]
+},
+"Thé noir": {
+"n": 801,
+"m": [
+"Dammann Frères",
+"Lipton",
+"Terre d'Oc",
+"Les Jardins de Gaïa",
+"Palais des Thés",
+"Pagès",
+"Quai Sud",
+"Baronny's",
+"1336",
+"Maison Taillefer"
+]
+},
+"Thé vert": {
+"n": 1944,
+"m": [
+"Lipton",
+"Palais des Thés",
+"Kusmi Tea",
+"Pagès",
+"Les Jardins de Gaïa",
+"Destination",
+"Terre d'Oc",
+"Twinings",
+"Dammann Frères",
+"La Route des Comptoirs"
+]
+},
+"Thé à la menthe": {
+"n": 383,
+"m": [
+"Lipton",
+"Kusmi Tea",
+"Palais des Thés",
+"Baronny's",
+"Pagès",
+"Twinings",
+"Dammann Frères",
+"Destination",
+"1336",
+"Unilever"
+]
+},
+"Timbres": {
+"n": 4
+},
+"Tiramisu": {
+"n": 463,
+"m": [
+"Bontà Divina",
+"Equador",
+"Nuri",
+"Gildo Rachelli",
+"Solo Italia",
+"LES DESSERTS DU CRÉMIER",
+"Casino Saveurs d'Ailleurs",
+"Les creations",
+"Zaghis",
+"Tiramisu de Jo"
+]
+},
+"Tire-bouchon": {
+"n": 8
+},
+"Tisane verveine": {
+"n": 21,
+"m": [
+"Pagès"
+]
+},
+"Tisane verveine menthe": {
+"n": 5
+},
+"Toasts apéritif": {
+"n": 13,
+"m": [
+"La Chanteracoise"
+]
+},
+"Tofu": {
+"n": 421,
+"m": [
+"Taifun",
+"Tossolia",
+"Céréal Bio",
+"Sojami",
+"Soy",
+"Locadélice",
+"Bjorg",
+"Moulin des Moines",
+"Lakovo",
+"Sojabio"
+]
+},
+"Tomates": {
+"n": 858,
+"m": [
+"Savéol",
+"Azura",
+"Prince de Bretagne",
+"Oceane",
+"Saclà",
+"Panzani",
+"Solarenn",
+"Les Paysans de Rougeline",
+"Cruscana",
+"Terre de BIO"
+]
+},
+"Tomates Marmande": {
+"n": 20,
+"m": [
+"Lucien Georgelin"
+]
+},
+"Tomates cerises": {
+"n": 272,
+"m": [
+"Les Paysans de Rougeline",
+"Azura",
+"Oceane",
+"Solarenn",
+"Bouquet Bio",
+"Savéol",
+"Prince de Bretagne",
+"Kultive",
+"Brio",
+"Les petites cheries"
+]
+},
+"Tomates côtelées": {
+"n": 11
+},
+"Tomates grappes": {
+"n": 120,
+"m": [
+"Bouquet Bio"
+]
+},
+"Tomates noires de Crimée": {
+"n": 2
+},
+"Tomates pelées": {
+"n": 183,
+"m": [
+"Aro",
+"Savino",
+"Del Monte",
+"D'aucy",
+"En Cuisine",
+"Rochefontaine"
+]
+},
+"Tomates pour sauce": {
+"n": 5
+},
+"Tomates séchées": {
+"n": 478,
+"m": [
+"Saclà",
+"Florelli",
+"Philia",
+"Bio Verde",
+"Bio Gustiamo",
+"biorganica nuova",
+"Polli",
+"D'Antelli",
+"Rustica",
+"Savino"
+]
+},
+"Tomme de Savoie": {
+"n": 236
+},
+"Tomme de brebis": {
+"n": 299,
+"m": [
+"Le Fromager Des Halles",
+"Lou Pérac",
+"Chêne d'argent"
+]
+},
+"Tongs": {
+"n": 8,
+"m": [
+"Tong Garden"
+]
+},
+"Tonic": {
+"n": 230,
+"m": [
+"MelTonic",
+"Schweppes",
+"River",
+"Kaskad",
+"Finley",
+"Lorina"
+]
+},
+"Torchons": {
+"n": 44,
+"m": [
+"Fleury Michon",
+"Madrange"
+]
+},
+"Tortellini": {
+"n": 409,
+"m": [
+"Rana",
+"Giovanni Rana",
+"Lustucru",
+"Lustucru selection",
+"Barilla",
+"Buitoni",
+"Pagani",
+"Panzani",
+"Ecochard",
+"Turini"
+]
+},
+"Tortillas": {
+"n": 517,
+"m": [
+"Old El Paso",
+"Poco Loco",
+"Mission",
+"Grafschafter",
+"El Tequito",
+"Palacios",
+"Camarillo",
+"Itza",
+"Vemondo",
+"Les Tortillas de Sonora"
+]
+},
+"Tortillas chips": {
+"n": 300,
+"m": [
+"Old El Paso",
+"Doritos",
+"Mister Free'd",
+"Acapulco",
+"Casino Saveurs d'Ailleurs",
+"Amigos",
+"Tokapi",
+"Poco Loco",
+"Camarillo",
+"K-Classic"
+]
+},
+"Tortillas chips nature": {
+"n": 27
+},
+"Tournedos": {
+"n": 229,
+"m": [
+"Charal"
+]
+},
+"Tourteau": {
+"n": 91,
+"m": [
+"Légendes du Poitou",
+"Les P'tits Amoureux",
+"Maison Baillon",
+"Nautilus"
+]
+},
+"Travers de porc rôtis": {
+"n": 2
+},
+"Tropézienne": {
+"n": 205,
+"m": [
+"Les Délices des 7 Vallées",
+"Erhard"
+]
+},
+"Trousse de toilette": {
+"n": 2
+},
+"Trousses": {
+"n": 10
+},
+"Truffes au chocolat": {
+"n": 85,
+"m": [
+"Vendome",
+"Nestlé",
+"Ikalia"
+]
+},
+"Truite fumée": {
+"n": 697,
+"m": [
+"Ovive",
+"Labeyrie",
+"Guyader",
+"Delpeyrat",
+"Le Petit Fumet",
+"Landvika",
+"Petit Navire",
+"Odyssee",
+"Breizh saveurs",
+"Le Fumet des Dombes"
+]
+},
+"Turrón": {
+"n": 778,
+"m": [
+"Vicens",
+"Picó",
+"Antiu Xixona",
+"El Almendro",
+"El Artesano",
+"Torrons Vicens",
+"La Fama",
+"Lacasa",
+"Virginias",
+"Turrón 25"
+]
+},
+"Tzatziki": {
+"n": 210,
+"m": [
+"Blini",
+"Florette",
+"L'Atelier Blini",
+"Happy Yours",
+"Ifantis"
+]
+},
+"Tétines": {
+"n": 25
+},
+"Tête de veau": {
+"n": 23
+},
+"Tête roulée": {
+"n": 100
+},
+"Vacherin glacé": {
+"n": 11
+},
+"Valises": {
+"n": 1
+},
+"Ventilateur": {
+"n": 1
+},
+"Vermicelles": {
+"n": 309,
+"m": [
+"Suzi Wan",
+"Cock Brand",
+"Longkou",
+"Eric Bur",
+"Vahiné",
+"PSP",
+"Bun Tuoi",
+"Autour du riz",
+"Mont Asie",
+"Ayam"
+]
+},
+"Vermicelles colorés": {
+"n": 2
+},
+"Vernis à ongles": {
+"n": 1
+},
+"Verres": {
+"n": 21
+},
+"Verres en plastique": {
+"n": 2
+},
+"Verres à vin": {
+"n": 1
+},
+"Viande des Grisons": {
+"n": 215,
+"m": [
+"Aoste",
+"Naturaplan",
+"Saint Alby",
+"Coop",
+"Graubunden",
+"Bell"
+]
+},
+"Viande hachée": {
+"n": 376,
+"m": [
+"L'Étal du Boucher",
+"Jean Rozé",
+"Bigard",
+"Socopa",
+"Férial",
+"Charal",
+"La Nouvelle Agriculture",
+"Tradival"
+]
+},
+"Vin blanc": {
+"n": 445,
+"m": [
+"La Villageoise",
+"Club des Sommeliers",
+"Ribaudour"
+]
+},
+"Vin de Bordeaux": {
+"n": 155
+},
+"Vin de Bourgogne": {
+"n": 31
+},
+"Vin en cubi": {
+"n": 3
+},
+"Vin moelleux": {
+"n": 23
+},
+"Vin rosé": {
+"n": 343,
+"m": [
+"Vieux Carion"
+]
+},
+"Vin rouge": {
+"n": 746,
+"m": [
+"Adrien Champaud"
+]
+},
+"Vin sans alcool": {
+"n": 24
+},
+"Vinaigre": {
+"n": 1665,
+"m": [
+"Martin Pouret",
+"Huilerie Beaujolaise",
+"Élise & Félicie",
+"Côteaux Nantais",
+"Rustica",
+"Le Comptoir de Mathilde",
+"Clovis",
+"Maille",
+"Tête Noire",
+"Amora"
+]
+},
+"Vinaigre balsamique": {
+"n": 539,
+"m": [
+"Maille",
+"Monari Federzoni",
+"Ponti",
+"Martin Pouret",
+"Oliviers & Co",
+"Carapelli",
+"Emile noel",
+"Rustica",
+"Toscoro",
+"Collitali"
+]
+},
+"Vinaigre blanc": {
+"n": 109,
+"m": [
+"Edmond Fallot",
+"Martin Pouret",
+"Maille",
+"Bongou"
+]
+},
+"Vinaigre de vin rouge": {
+"n": 132,
+"m": [
+"Edmond Fallot",
+"Ducros",
+"Rochambeau",
+"Amora"
+]
+},
+"Vinaigre de vin vieux": {
+"n": 11
+},
+"Vinaigrette": {
+"n": 654,
+"m": [
+"Puget",
+"Maille",
+"Rustica",
+"Tête Noire",
+"Lesieur",
+"Amora",
+"Kraft",
+"Covinor",
+"La Tourangelle",
+"Auchan Gourmet"
+]
+},
+"Vis": {
+"n": 5
+},
+"Vodka": {
+"n": 179,
+"m": [
+"Smirnoff",
+"Zubrowka",
+"Absolut",
+"Poliakov",
+"Novotna",
+"Eristoff",
+"Grey Goose",
+"Vodka Templar"
+]
+},
+"Wasabi": {
+"n": 140,
+"m": [
+"S&B"
+]
+},
+"Whisky": {
+"n": 161,
+"m": [
+"Jack Daniel's",
+"Grant's",
+"Long John",
+"JAMESON",
+"LABEL 5"
+]
+},
+"Wraps": {
+"n": 621,
+"m": [
+"Daunat",
+"Mix Buffet",
+"Old El Paso",
+"Bistro Vite",
+"Mission",
+"Côté Snack",
+"Mix",
+"Starbucks",
+"Monop'daily",
+"Good Eating"
+]
+},
+"Yaos": {
+"n": 131,
+"m": [
+"Nestlé",
+"Yaos"
+]
+},
+"Yaourts allégés": {
+"n": 6
+},
+"Yaourts au lait de brebis": {
+"n": 287,
+"m": [
+"Mon Berger",
+"Lou Pérac",
+"Lait'Age d'Or",
+"Soignon",
+"Tradi Bergère",
+"Vrai",
+"Biochamps",
+"Yoplait",
+"La Bergerie",
+"Le Petit Basque"
+]
+},
+"Yaourts au soja": {
+"n": 22,
+"m": [
+"Sojasun"
+]
+},
+"Yaourts aux fruits": {
+"n": 686,
+"m": [
+"Yoplait",
+"Panier recette classique",
+"Beillevaire",
+"Danone",
+"Panier 0%",
+"Etrez",
+"Panier de Yoplait",
+"Ferme Adam",
+"Val de Praz",
+"Ferme Durr"
+]
+},
+"Yaourts nature": {
+"n": 1232,
+"m": [
+"Danone",
+"Yoplait",
+"Vrai",
+"Malo",
+"Beillevaire",
+"YOgourmand",
+"Baskalia",
+"Ferme Collet",
+"Bernard Gaborit",
+"Ekia"
+]
+},
+"Yaourts à boire": {
+"n": 381,
+"m": [
+"Yoplait",
+"Yop p'tit yop",
+"YOP",
+"Mamie Nova",
+"Danone",
+"Yop gf",
+"U Mat & Lou",
+"YOgourmand",
+"Petits filous yab",
+"Les Doodingues"
+]
+},
+"Yaourts à la grecque": {
+"n": 389,
+"m": [
+"Nestlé",
+"Campagne de France",
+"Yoplait",
+"Le Petit Basque",
+"Danone",
+"Laiterie du Périgord",
+"Mamie Nova",
+"Luxlait",
+"La Bergerie",
+"Oikos"
+]
+},
+"Échalotes": {
+"n": 249,
+"m": [
+"Condichef",
+"Sainte Lucie",
+"Ducros",
+"Le Geste Saveur",
+"Cigalou"
+]
+},
+"Échine de porc": {
+"n": 120,
+"m": [
+"Tendre & Plus",
+"Hiruak"
+]
+},
+"Éclairs": {
+"n": 574,
+"m": [
+"GIE BPGR",
+"Pasquier",
+"Tartefrais"
+]
+},
+"Épaule cuite": {
+"n": 85,
+"m": [
+"Le prix gagnant",
+"Marion"
+]
+},
+"Épaule d'agneau": {
+"n": 16
+},
+"Épices du monde": {
+"n": 2
+},
+"Épices mexicaines": {
+"n": 7
+},
+"Épices pour couscous": {
+"n": 30
+},
+"Épinards": {
+"n": 399,
+"m": [
+"Notre Jardin",
+"Priméale",
+"Bonduelle",
+"D'aucy",
+"Maingourd",
+"Toupargel",
+"Avril",
+"Blédina",
+"Bio+",
+"M. de Turenne"
+]
+},
+"Épinards en boîte": {
+"n": 5
+},
+"Épinards surgelés": {
+"n": 15
+},
+"Époisses": {
+"n": 60,
+"m": [
+"Berthaut",
+"Germain",
+"Savencia",
+"Gaugry"
+]
+},
+"Éponges": {
+"n": 13,
+"m": [
+"Spontex"
+]
+},
+"Îles flottantes": {
+"n": 64,
+"m": [
+"Rians"
+]
+},
+"Œuf surprise": {
+"n": 30,
+"m": [
+"Zàini"
+]
+},
+"Œufs": {
+"n": 2017,
+"m": [
+"Baby Coque",
+"Matines",
+"L'oeuf de nos villages",
+"Pleine Forme",
+"AviBresse",
+"Loué",
+"Oeufs de Nos Régions",
+"Moisson",
+"Domaine de Sommery",
+"Le Gaulois"
+]
+},
+"Œufs bio": {
+"n": 201,
+"m": [
+"Loué",
+"Fermiers de Loué",
+"Matines",
+"Pleine Forme",
+"Breizh'on egg",
+"Lustucru",
+"Domaine de Sommery"
+]
+},
+"Œufs de caille": {
+"n": 55,
+"m": [
+"Caillor",
+"Le Gaulois"
+]
+},
+"Œufs de lump": {
+"n": 5
+},
+"Œufs en chocolat": {
+"n": 296,
+"m": [
+"Chevaliers d'Argouges",
+"Cémoi",
+"Rohan",
+"Jacquot",
+"Monbana",
+"Riegelein",
+"Bon Bon Buddies",
+"Ikalia"
+]
+},
+"Œufs plein air": {
+"n": 549,
+"m": [
+"Baby Coque",
+"Matines",
+"L'oeuf de nos villages",
+"AviBresse",
+"Pleine Forme",
+"Oeufs de Nos Régions",
+"Cocorette",
+"Les Producteurs de l'Ain",
+"Les Œufs de chez Nous",
+"Val d'Or"
+]
+}
+}
+}

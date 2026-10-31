@@ -1463,6 +1463,10 @@ class Etat extends ChangeNotifier {
         if (q.nom.toLowerCase() == racine || q.nom.toLowerCase().startsWith('$racine ')) ...q.marqueIds,
     };
     final noms = <String>{for (final n in duSecteur) n};
+    // Marques de la nature d'après Open Food Facts (« Pâte à tartiner chocolat » : Nutella, Nocciolata…).
+    for (final n in naturesOff[racine]?.marques ?? const <String>[]) {
+      if (!noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
+    }
     for (final id in ids) {
       final n = marque(id)?.nom;
       if (n != null && !noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
@@ -3425,14 +3429,41 @@ class Etat extends ChangeNotifier {
 
   static const fichierMarquesDistributeur = 'assets/marques_distributeur.json';
 
+  /// Popularité et marques de chaque nature d'après Open Food Facts (outils/off/natures.py, 31/10/2026).
+  static const fichierNaturesOff = 'assets/natures_off.json';
+
   Future<void> chargerMarquesType() async {
     try {
       lireMarquesType(jsonDecode(await rootBundle.loadString(fichierMarques)) as Map<String, dynamic>);
       lireMarquesDistributeur(jsonDecode(await rootBundle.loadString(fichierMarquesDistributeur)) as Map<String, dynamic>);
+      lireNaturesOff(jsonDecode(await rootBundle.loadString(fichierNaturesOff)) as Map<String, dynamic>);
     } catch (e) {
       debugPrint('Catalogue des marques illisible : $e');
     }
   }
+
+  /// Par nature (nom en minuscules) : nombre de produits vendus en France selon Open Food Facts, et les marques
+  /// les plus présentes. Sert à classer les recherches et à proposer des marques ; ne crée aucun produit.
+  Map<String, ({int n, List<String> marques})> naturesOff = {};
+
+  /// Marque (minuscules) → natures qui la portent : « nut » trouve « Pâte à tartiner chocolat · Nutella ».
+  Map<String, List<String>> naturesParMarque = {};
+
+  void lireNaturesOff(Map<String, dynamic> j) {
+    naturesOff = {
+      for (final e in (j['natures'] as Map).entries)
+        (e.key as String).toLowerCase(): (n: ((e.value as Map)['n'] as num).toInt(), marques: _ids((e.value as Map)['m']))
+    };
+    naturesParMarque = {};
+    for (final e in naturesOff.entries) {
+      for (final m in e.value.marques) {
+        naturesParMarque.putIfAbsent(m.toLowerCase(), () => []).add(e.key);
+      }
+    }
+  }
+
+  /// Nombre de produits de cette nature vendus en France (0 : inconnu).
+  int popularite(Produit p) => naturesOff[p.nom.toLowerCase()]?.n ?? 0;
 
   void lireMarquesDistributeur(Map<String, dynamic> j) {
     marquesDistributeur = {

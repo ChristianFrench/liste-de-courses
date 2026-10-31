@@ -472,6 +472,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
               detail: ou,
               aide: 'Ajouter un article (3 lettres ou plus)',
               onChoix: (p) => _ajouter(l, p),
+              // « nut » → Pâte à tartiner chocolat · Nutella : l'article générique, avec sa marque.
+              onMarque: (p, marque) {
+                if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
+                _ajouter(l, etat.changerMarque(l, p, marque));
+              },
               onNouveau: (nom) async {
                 final p = await nouveauProduit(context, nom: nom);
                 if (p == null || !mounted) return;
