@@ -73,191 +73,6 @@
 ],
 "part_marque": 0.0
 },
-"terrine": {
-"n": 5969,
-"noms": [
-"terrine de campagne",
-"terrine de canard",
-"terrine de lapin"
-],
-"categorie": "en:terrines",
-"categories": [
-[
-"en:terrines",
-3677
-],
-[
-"en:meats-and-their-products",
-3214
-],
-[
-"en:prepared-meats",
-3106
-],
-[
-"en:meats",
-2265
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Jean Brunet",
-"Ducs de Gascogne",
-"Comtesse du Barry",
-"Fleurons de Lomagne",
-"Terrines du Morvan",
-"Charles Antona"
-],
-"part_marque": 0.0
-},
-"terrine campagne": {
-"n": 1096,
-"noms": [
-"terrine de campagne",
-"terrine de campagne au",
-"terrine de campagne aux"
-],
-"categorie": "en:country-terrines",
-"categories": [
-[
-"en:meats-and-their-products",
-987
-],
-[
-"en:prepared-meats",
-986
-],
-[
-"en:terrines",
-966
-],
-[
-"en:country-terrines",
-961
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Jean Brunet",
-"Tallec",
-"U",
-"Madrange",
-"Stéphan",
-"U Saveurs"
-],
-"part_marque": 0.0
-},
-"beignet": {
-"n": 1680,
-"noms": [
-"beignets",
-"beignet",
-"beignets à la"
-],
-"categorie": "en:sweet-fritters",
-"categories": [
-[
-"en:snacks",
-945
-],
-[
-"en:sweet-snacks",
-811
-],
-[
-"en:sweet-fritters",
-777
-],
-[
-"en:biscuits-and-cakes",
-304
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Leclerc",
-"E.Leclerc",
-"Intermarché",
-"Pasquier",
-"U",
-"Brioche Pasquier"
-],
-"part_marque": 0.0
-},
-"confit": {
-"n": 1256,
-"noms": [
-"confit de foie",
-"confit de figues",
-"confit d'oignons"
-],
-"categorie": "en:chutneys",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-505
-],
-[
-"en:spreads",
-505
-],
-[
-"en:plant-based-foods",
-504
-],
-[
-"en:plant-based-spreads",
-483
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"U Saveurs",
-"Lucien Georgelin",
-"U",
-"L'épicurien",
-"La Conquête des Saveurs",
-"Larnaudie"
-],
-"part_marque": 0.0
-},
-"confit oignon": {
-"n": 348,
-"noms": [
-"confit d'oignons",
-"confit d oignons",
-"confit d'oignon"
-],
-"categorie": "en:onion-chutneys",
-"categories": [
-[
-"en:plant-based-foods",
-248
-],
-[
-"en:plant-based-foods-and-beverages",
-248
-],
-[
-"en:fruits-and-vegetables-based-foods",
-246
-],
-[
-"en:onions-and-their-products",
-246
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Lucien Georgelin",
-"La Conquête des Saveurs",
-"Les Recettes de Juliette",
-"L'épicurien",
-"Altesse",
-"Larnaudie"
-],
-"part_marque": 0.0
-},
 "mixed": {
 "n": 274,
 "noms": [
@@ -370,76 +185,39 @@
 "part_marque": 0.78
 },
 "confiture": {
-"n": 5891,
+"n": 4684,
 "noms": [
 "confiture",
-"confiture extra de",
-"confiture de lait"
+"confiture de myrtilles",
+"confiture de myrtille"
 ],
 "categorie": "en:jams",
 "categories": [
 [
-"en:spreads",
-3645
-],
-[
-"en:breakfasts",
-3516
-],
-[
-"en:sweet-spreads",
-3516
-],
-[
 "en:plant-based-foods-and-beverages",
-3450
+2740
+],
+[
+"en:plant-based-foods",
+2739
+],
+[
+"en:spreads",
+2735
+],
+[
+"en:plant-based-spreads",
+2731
 ]
 ],
 "secteur": "Fruits et légumes/Fruits",
 "marques": [
 "Bonne Maman",
-"U",
-"Charles Antona",
-"Lucien Georgelin",
 "Les Comtes de Provence",
-"La Cour d'Orgères"
-],
-"part_marque": 0.0
-},
-"ravioli": {
-"n": 1756,
-"noms": [
-"ravioli",
-"ravioli pur boeuf",
-"ravioli à la"
-],
-"categorie": "en:raviolis",
-"categories": [
-[
-"en:meals",
-1174
-],
-[
-"en:pasta-dishes",
-1162
-],
-[
-"en:stuffed-pastas",
-1073
-],
-[
-"en:pastas-and-dumplings",
-663
-]
-],
-"secteur": "Traiteur/Pâtes fraîches et pâtes à tarte",
-"marques": [
-"Panzani",
-"Zapetti",
-"Rana",
 "U",
-"Saint Jean",
-"Carrefour"
+"Lucien Georgelin",
+"La Cour d'Orgères",
+"Charles Antona"
 ],
 "part_marque": 0.0
 },
@@ -481,39 +259,39 @@
 "part_marque": 0.01
 },
 "fondant": {
-"n": 652,
+"n": 373,
 "noms": [
-"fondant au chocolat",
-"fondant chocolat",
-"fondant"
+"fondant",
+"le fondant baulois",
+"fondant pâtissier"
 ],
 "categorie": null,
 "categories": [
 [
 "en:snacks",
-148
+50
 ],
 [
 "en:sweet-snacks",
-148
+50
 ],
 [
 "en:biscuits-and-cakes",
-124
+30
 ],
 [
-"en:cakes",
-111
+"en:dairies",
+26
 ]
 ],
-"secteur": "Biscuits et sucré/Sucre, farine et pâtisserie",
+"secteur": "Biscuits et sucré/Biscuits et gâteaux",
 "marques": [
-"Mamie Nova",
-"Alsa",
 "Thiriet",
-"Carrefour",
-"Picard",
-"Bonne Maman"
+"Mamie Nova",
+"Charal",
+"Maison Bruyère",
+"Le Fondant Baulois",
+"Hamlet"
 ],
 "part_marque": 0.0
 },
@@ -580,7 +358,7 @@
 67
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Simon",
 "Auchan",
@@ -628,104 +406,30 @@
 ],
 "part_marque": 0.0
 },
-"yaourt": {
-"n": 4721,
-"noms": [
-"yaourt au lait",
-"yaourt",
-"yaourt de brebis"
-],
-"categorie": "en:yogurts",
-"categories": [
-[
-"en:dairies",
-2669
-],
-[
-"en:desserts",
-2668
-],
-[
-"en:dairy-desserts",
-2647
-],
-[
-"en:fermented-foods",
-2646
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"Danone",
-"Yoplait",
-"Mamie Nova",
-"Leader Price",
-"Malo",
-"Monoprix"
-],
-"part_marque": 0.0
-},
-"yaourt brebi": {
-"n": 241,
-"noms": [
-"yaourt de brebis",
-"yaourt de brebis bio",
-"yaourt de brebis vanille"
-],
-"categorie": "en:sheep-milk-yogurts",
-"categories": [
-[
-"en:dairies",
-166
-],
-[
-"en:desserts",
-166
-],
-[
-"en:dairy-desserts",
-165
-],
-[
-"en:fermented-dairy-desserts",
-165
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"Baskalia",
-"Le Petit Basque",
-"Tradi Bergère",
-"La Bergerie",
-"Pâturages",
-"Bio Village"
-],
-"part_marque": 0.0
-},
 "mini": {
-"n": 10020,
+"n": 9562,
 "noms": [
-"mini viennoiseries",
 "mini beignets fourrés",
-"mini beignets"
+"mini beignets",
+"mini cookies"
 ],
 "categorie": "en:snacks",
 "categories": [
 [
 "en:snacks",
-3249
+3067
 ],
 [
 "en:sweet-snacks",
-2465
+2284
 ],
 [
 "en:biscuits-and-cakes",
-1615
+1465
 ],
 [
 "en:cakes",
-955
+807
 ]
 ],
 "secteur": "Boulangerie/Pain",
@@ -850,67 +554,30 @@
 ],
 "part_marque": 0.0
 },
-"panettone": {
-"n": 1110,
-"noms": [
-"panettone",
-"panettone classico",
-"panettone pur beurre"
-],
-"categorie": "en:panettone",
-"categories": [
-[
-"en:brioches",
-1022
-],
-[
-"en:panettone",
-1022
-],
-[
-"en:snacks",
-1022
-],
-[
-"en:sweet-pastries-and-pies",
-1022
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Chiostro di Saronno",
-"Valentino",
-"Loison",
-"Maina",
-"Bonifanti",
-"Pasticceria Scarpato"
-],
-"part_marque": 0.0
-},
 "escalope": {
-"n": 1286,
+"n": 1031,
 "noms": [
 "escalope de poulet",
 "escalopes de poulet",
-"escalope milanaise"
+"escalope"
 ],
-"categorie": "en:cooked-poultries",
+"categorie": "en:chickens",
 "categories": [
 [
 "en:meats-and-their-products",
-677
+502
 ],
 [
 "en:meats",
-523
+392
+],
+[
+"en:chicken-and-its-products",
+388
 ],
 [
 "en:poultries",
-501
-],
-[
-"en:cooked-poultries",
-418
+370
 ]
 ],
 "secteur": "Volaille/Volaille libre-service",
@@ -919,35 +586,35 @@
 "Père Dodu",
 "U",
 "Volaé",
-"Volandry",
-"Nature de France"
+"Maître CoQ",
+"Monoprix"
 ],
 "part_marque": 0.0
 },
 "salade": {
-"n": 4589,
+"n": 4199,
 "noms": [
-"salade de fruits",
 "salade de lentilles",
-"salade de thon"
+"salade de thon",
+"salade"
 ],
-"categorie": "en:meals",
+"categorie": "en:prepared-salads",
 "categories": [
 [
 "en:meals",
-1479
+1459
 ],
 [
 "en:prepared-salads",
-1317
+1304
 ],
 [
 "en:salads",
-681
+676
 ],
 [
 "en:plant-based-foods-and-beverages",
-485
+300
 ]
 ],
 "secteur": "Traiteur/Traiteur frais",
@@ -1036,39 +703,39 @@
 "part_marque": 0.0
 },
 "petit": {
-"n": 5376,
+"n": 4754,
 "noms": [
-"petits pains grillés",
 "petits pois",
-"petit salé aux"
+"petit pois",
+"petits pois très"
 ],
 "categorie": null,
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-915
+745
 ],
 [
 "en:plant-based-foods",
-887
+717
 ],
 [
 "en:snacks",
-799
+681
 ],
 [
 "en:sweet-snacks",
-720
+622
 ]
 ],
 "secteur": "Boulangerie/Pain",
 "marques": [
 "Yoplait",
-"Carrefour",
 "LU",
-"U",
+"Carrefour",
 "Casino",
-"Leader Price"
+"Bonne Maman",
+"Coraya"
 ],
 "part_marque": 0.0
 },
@@ -1098,7 +765,7 @@
 97
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
 "Fleury Michon",
 "Le Gaulois",
@@ -1147,38 +814,38 @@
 "part_marque": 0.0
 },
 "puree": {
-"n": 3188,
+"n": 1922,
 "noms": [
-"purée de pommes",
-"purée de pomme",
-"purée de tomates"
+"purée de piment",
+"purée de sésame",
+"purée de noisette"
 ],
 "categorie": "en:plant-based-foods",
 "categories": [
 [
-"en:plant-based-foods",
-1800
-],
-[
 "en:plant-based-foods-and-beverages",
-1799
+1001
 ],
 [
-"en:fruits-and-vegetables-based-foods",
-866
+"en:plant-based-foods",
+1000
 ],
 [
-"en:desserts",
-583
+"en:spreads",
+490
+],
+[
+"en:plant-based-spreads",
+485
 ]
 ],
 "secteur": "Fruits et légumes/Fruits",
 "marques": [
-"U",
-"Côteaux Nantais",
-"La Vie Claire",
 "Perl'Amande",
 "Jean Hervé",
+"U",
+"L'Amandaie",
+"La Vie Claire",
 "Carrefour"
 ],
 "part_marque": 0.0
@@ -1220,80 +887,6 @@
 ],
 "part_marque": 0.0
 },
-"jambonneau": {
-"n": 458,
-"noms": [
-"jambonneau",
-"jambonneau de porc",
-"jambonneau cuit"
-],
-"categorie": "en:knuckle-of-ham-cooked",
-"categories": [
-[
-"en:meats-and-their-products",
-315
-],
-[
-"en:prepared-meats",
-310
-],
-[
-"en:hams",
-275
-],
-[
-"en:braised-hams",
-274
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Tendre & Plus",
-"Le Choix du Charcutier",
-"Tallec",
-"Le porc de nos villages",
-"Maison Torres",
-"Auchan"
-],
-"part_marque": 0.0
-},
-"coquillette": {
-"n": 588,
-"noms": [
-"coquillettes",
-"coquillette",
-"coquillettes au jambon"
-],
-"categorie": "fr:coquillettes",
-"categories": [
-[
-"en:plant-based-foods",
-395
-],
-[
-"en:plant-based-foods-and-beverages",
-395
-],
-[
-"en:pastas",
-393
-],
-[
-"fr:coquillettes",
-348
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"Lustucru",
-"Auchan",
-"Priméal",
-"Casino",
-"Carrefour"
-],
-"part_marque": 0.0
-},
 "extra": {
 "n": 1186,
 "noms": [
@@ -1330,80 +923,6 @@
 "Socopa"
 ],
 "part_marque": 0.01
-},
-"peanut": {
-"n": 1070,
-"noms": [
-"peanut butter",
-"peanut butter crunchy",
-"peanut butter cups"
-],
-"categorie": "en:peanut-butters",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-506
-],
-[
-"en:plant-based-foods",
-503
-],
-[
-"en:legumes-and-their-products",
-439
-],
-[
-"en:spreads",
-413
-]
-],
-"secteur": "Petit-déjeuner/Confitures et pâtes à tartiner",
-"marques": [
-"Reese's",
-"M&M's",
-"Prozis",
-"MYPROTEIN",
-"Menguy's",
-"Skippy"
-],
-"part_marque": 0.0
-},
-"peanut butter": {
-"n": 676,
-"noms": [
-"peanut butter",
-"peanut butter crunchy",
-"peanut butter cups"
-],
-"categorie": "en:peanut-butters",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-419
-],
-[
-"en:plant-based-foods",
-417
-],
-[
-"en:spreads",
-396
-],
-[
-"en:legumes-and-their-products",
-395
-]
-],
-"secteur": "Petit-déjeuner/Confitures et pâtes à tartiner",
-"marques": [
-"Reese's",
-"Prozis",
-"MYPROTEIN",
-"Skippy",
-"Calvé",
-"Häagen-Dazs"
-],
-"part_marque": 0.0
 },
 "lindt": {
 "n": 368,
@@ -1690,7 +1209,7 @@
 34
 ]
 ],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Marks & Spencer",
 "Jules Destrooper",
@@ -1764,7 +1283,7 @@
 175
 ]
 ],
-"secteur": "Surgelés/Viandes et poissons surgelés",
+"secteur": "Volaille/Volaille libre-service",
 "marques": [
 "Marks & Spencer",
 "Tesco",
@@ -1801,7 +1320,7 @@
 78
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Jack Link's",
 "Marks & Spencer",
@@ -1838,7 +1357,7 @@
 33
 ]
 ],
-"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
+"secteur": "Eaux et boissons sans alcool/Jus de fruits",
 "marques": [
 "Pink Lady",
 "Schweppes",
@@ -1883,43 +1402,6 @@
 "Hema",
 "Marks & Spencers",
 "Sweet Switch"
-],
-"part_marque": 0.0
-},
-"porridge": {
-"n": 265,
-"noms": [
-"porridge",
-"porridge oats",
-"porridge pomme cannelle"
-],
-"categorie": "en:porridge",
-"categories": [
-[
-"en:cereals-and-potatoes",
-139
-],
-[
-"en:cereals-and-their-products",
-139
-],
-[
-"en:plant-based-foods",
-139
-],
-[
-"en:plant-based-foods-and-beverages",
-139
-]
-],
-"secteur": "Petit-déjeuner/Céréales",
-"marques": [
-"Mymuesli",
-"Verival",
-"Marks & Spencer",
-"OneDayMore",
-"Grillon d'Or",
-"Stoats"
 ],
 "part_marque": 0.0
 },
@@ -2171,7 +1653,7 @@
 49
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Volaille/Volaille libre-service",
 "marques": [
 "Maître CoQ",
 "L'Étal du Boucher",
@@ -2368,7 +1850,7 @@
 "part_marque": 0.0
 },
 "pur": {
-"n": 3799,
+"n": 2558,
 "noms": [
 "pur jus de",
 "100 pur jus",
@@ -2378,19 +1860,19 @@
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-2560
+1756
 ],
 [
 "en:beverages",
-2560
+1715
 ],
 [
 "en:plant-based-beverages",
-2446
+1642
 ],
 [
 "en:juices-and-nectars",
-2428
+1630
 ]
 ],
 "secteur": "Eaux et boissons sans alcool/Jus de fruits",
@@ -2400,7 +1882,7 @@
 "Carrefour",
 "Marque Repère",
 "Auchan",
-"U Bio"
+"Cora"
 ],
 "part_marque": 0.0
 },
@@ -2430,7 +1912,7 @@
 30
 ]
 ],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
+"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
 "marques": [
 "Marque Repère",
 "Tic Tac",
@@ -2438,43 +1920,6 @@
 "Hollywood",
 "Fresh Tea",
 "Marks & Spencer"
-],
-"part_marque": 0.0
-},
-"spaghetti": {
-"n": 1417,
-"noms": [
-"spaghetti",
-"spaghetti bolognaise",
-"spaghetti à la"
-],
-"categorie": "en:spaghetti",
-"categories": [
-[
-"en:plant-based-foods",
-863
-],
-[
-"en:plant-based-foods-and-beverages",
-863
-],
-[
-"en:pastas",
-820
-],
-[
-"en:spaghetti",
-676
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"Lustucru",
-"Carrefour",
-"Auchan",
-"Casino",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -2504,7 +1949,7 @@
 270
 ]
 ],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Nestlé",
 "Marks & Spencer",
@@ -2549,154 +1994,6 @@
 "Jif",
 "Reese's",
 "Violife"
-],
-"part_marque": 0.0
-},
-"huile": {
-"n": 2739,
-"noms": [
-"huile de noix",
-"huile vierge de",
-"huile de coco"
-],
-"categorie": "en:vegetable-oils",
-"categories": [
-[
-"en:fats",
-1753
-],
-[
-"en:plant-based-foods",
-1636
-],
-[
-"en:plant-based-foods-and-beverages",
-1636
-],
-[
-"en:vegetable-fats",
-1633
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Vigean",
-"Emile noel",
-"Bio planete",
-"Cauvin",
-"La Tourangelle",
-"Lesieur"
-],
-"part_marque": 0.0
-},
-"huile noi": {
-"n": 355,
-"noms": [
-"huile de noix",
-"huile de noix de",
-"huile de noix vierge"
-],
-"categorie": "en:walnut-oils",
-"categories": [
-[
-"en:fats",
-285
-],
-[
-"en:plant-based-foods",
-284
-],
-[
-"en:plant-based-foods-and-beverages",
-284
-],
-[
-"en:vegetable-fats",
-284
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Vigean",
-"Cauvin",
-"La Tourangelle",
-"Huilerie de Lapalisse",
-"Moulin de la gaumerie",
-"Huilerie Richard"
-],
-"part_marque": 0.0
-},
-"jambon": {
-"n": 9268,
-"noms": [
-"jambon cuit supérieur",
-"jambon",
-"jambon à l'ancienne"
-],
-"categorie": "en:white-hams",
-"categories": [
-[
-"en:meats-and-their-products",
-5669
-],
-[
-"en:prepared-meats",
-5609
-],
-[
-"en:hams",
-5522
-],
-[
-"en:meats",
-4477
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Saint Alby",
-"U",
-"Tallec",
-"Domaine Picard",
-"Fleury Michon",
-"Carrefour"
-],
-"part_marque": 0.0
-},
-"jambon fume": {
-"n": 256,
-"noms": [
-"jambon fumé",
-"jambon fumé à l'ancienne",
-"jambon fumé au bois"
-],
-"categorie": "en:white-hams",
-"categories": [
-[
-"en:meats-and-their-products",
-111
-],
-[
-"en:hams",
-110
-],
-[
-"en:prepared-meats",
-110
-],
-[
-"en:white-hams",
-90
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Domaine Picard",
-"Petitgas",
-"Saint Alby",
-"Dulano",
-"Lidl",
-"Charcuterie Vendéenne"
 ],
 "part_marque": 0.0
 },
@@ -3219,39 +2516,39 @@
 "part_marque": 0.0
 },
 "poulet": {
-"n": 6564,
+"n": 4846,
 "noms": [
 "poulet",
 "poulet cuit fumé",
-"poulet fermier"
+"poulet fumé"
 ],
 "categorie": "en:meats-and-their-products",
 "categories": [
 [
 "en:meats-and-their-products",
-2410
+1766
 ],
 [
 "en:chicken-and-its-products",
-1967
+1337
 ],
 [
 "en:meats",
-1966
+1327
 ],
 [
 "en:poultries",
-1946
+1312
 ]
 ],
 "secteur": "Volaille/Volaille libre-service",
 "marques": [
 "Maître CoQ",
 "L'etal Du Volailler",
-"Loué",
 "U",
+"Le Gaulois",
 "La Nouvelle Agriculture",
-"Le Gaulois"
+"Seazon"
 ],
 "part_marque": 0.0
 },
@@ -3318,7 +2615,7 @@
 72
 ]
 ],
-"secteur": "Petit-déjeuner/Thé et chocolat en poudre",
+"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
 "marques": [
 "Marks & Spencer",
 "Lipton",
@@ -3392,7 +2689,7 @@
 55
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Milbona",
 "MYPROTEIN",
@@ -3400,43 +2697,6 @@
 "Carrefour",
 "High5",
 "Lidl"
-],
-"part_marque": 0.0
-},
-"marshmallow": {
-"n": 236,
-"noms": [
-"marshmallows",
-"marshmallow",
-"marshmallow finitronc"
-],
-"categorie": "en:marshmallows",
-"categories": [
-[
-"en:snacks",
-137
-],
-[
-"en:sweet-snacks",
-136
-],
-[
-"en:confectioneries",
-127
-],
-[
-"en:candies",
-118
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Hema",
-"Fini",
-"Carrefour",
-"Truffettes De France",
-"BBQ",
-"Elodie"
 ],
 "part_marque": 0.0
 },
@@ -3503,7 +2763,7 @@
 28
 ]
 ],
-"secteur": "Épicerie salée/Sauces et condiments",
+"secteur": "Volaille/Volaille libre-service",
 "marques": [
 "Marks & Spencer",
 "Coop",
@@ -3511,80 +2771,6 @@
 "Palais des Thés",
 "Sainsbury's",
 "Haribo"
-],
-"part_marque": 0.0
-},
-"penne": {
-"n": 1020,
-"noms": [
-"penne rigate",
-"penne",
-"penne au poulet"
-],
-"categorie": "en:penne",
-"categories": [
-[
-"en:plant-based-foods",
-539
-],
-[
-"en:plant-based-foods-and-beverages",
-539
-],
-[
-"en:pastas",
-525
-],
-[
-"en:penne",
-380
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"Auchan",
-"De Cecco",
-"Carrefour",
-"Casino",
-"Seazon"
-],
-"part_marque": 0.0
-},
-"penne rigate": {
-"n": 276,
-"noms": [
-"penne rigate",
-"penne rigate au blé",
-"penne rigate bio"
-],
-"categorie": "en:penne-rigate",
-"categories": [
-[
-"en:plant-based-foods",
-237
-],
-[
-"en:plant-based-foods-and-beverages",
-237
-],
-[
-"en:pastas",
-235
-],
-[
-"en:penne",
-210
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"De Cecco",
-"Combino",
-"Auchan",
-"Carrefour",
-"Rummo"
 ],
 "part_marque": 0.0
 },
@@ -3662,6 +2848,43 @@
 ],
 "part_marque": 0.0
 },
+"peanut": {
+"n": 389,
+"noms": [
+"peanuts",
+"peanut",
+"peanut cookies"
+],
+"categorie": "en:snacks",
+"categories": [
+[
+"en:snacks",
+117
+],
+[
+"en:sweet-snacks",
+103
+],
+[
+"en:plant-based-foods-and-beverages",
+85
+],
+[
+"en:plant-based-foods",
+84
+]
+],
+"secteur": "Apéritif/Fruits secs salés et olives",
+"marques": [
+"M&M's",
+"Koh-Kae",
+"Milka",
+"Menguy's",
+"Aldi",
+"Weight Watchers"
+],
+"part_marque": 0.0
+},
 "poi": {
 "n": 376,
 "noms": [
@@ -3700,7 +2923,7 @@
 "part_marque": 0.0
 },
 "creme": {
-"n": 7037,
+"n": 7034,
 "noms": [
 "crème glacée vanille",
 "crème de caramel",
@@ -3710,7 +2933,7 @@
 "categories": [
 [
 "en:desserts",
-1448
+1445
 ],
 [
 "en:dairies",
@@ -3718,11 +2941,11 @@
 ],
 [
 "en:frozen-foods",
-1086
+1083
 ],
 [
 "en:frozen-desserts",
-1038
+1035
 ]
 ],
 "secteur": "Glaces/Glaces",
@@ -3762,7 +2985,7 @@
 18
 ]
 ],
-"secteur": "Biscuits et sucré/Sucre, farine et pâtisserie",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Lidl",
 "Whittard",
@@ -3884,43 +3107,6 @@
 ],
 "part_marque": 0.0
 },
-"maple": {
-"n": 254,
-"noms": [
-"maple syrup",
-"maple tea",
-"maple butter"
-],
-"categorie": null,
-"categories": [
-[
-"en:syrups",
-75
-],
-[
-"en:simple-syrups",
-71
-],
-[
-"en:sweeteners",
-71
-],
-[
-"en:maple-syrups",
-70
-]
-],
-"secteur": "Cuisine du monde/Mexique et Amérique",
-"marques": [
-"Turkey Hill",
-"Maple Joe",
-"Canada True",
-"Maple Farm",
-"The Maple Treat",
-"McEnnedy"
-],
-"part_marque": 0.0
-},
 "snack": {
 "n": 710,
 "noms": [
@@ -4033,29 +3219,29 @@
 "part_marque": 0.0
 },
 "sauce": {
-"n": 5584,
+"n": 5136,
 "noms": [
 "sauce tartare",
-"sauce poivre",
-"sauce andalouse"
+"sauce andalouse",
+"sauce à la"
 ],
 "categorie": "en:groceries",
 "categories": [
 [
 "en:condiments",
-3101
+2779
 ],
 [
 "en:sauces",
-3083
+2763
 ],
 [
 "en:groceries",
-1880
+1671
 ],
 [
-"en:salad-dressings",
-340
+"en:plant-based-foods-and-beverages",
+236
 ]
 ],
 "secteur": "Épicerie salée/Sauces et condiments",
@@ -4063,8 +3249,8 @@
 "U",
 "Bénédicta",
 "Colona",
-"Carrefour",
 "Leader Price",
+"Carrefour",
 "Marque Repère"
 ],
 "part_marque": 0.0
@@ -4280,7 +3466,7 @@
 128
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "McCain",
 "Savencia",
@@ -4551,7 +3737,7 @@
 "part_marque": 0.01
 },
 "escalope poulet": {
-"n": 378,
+"n": 365,
 "noms": [
 "escalope de poulet",
 "escalopes de poulet",
@@ -4561,28 +3747,28 @@
 "categories": [
 [
 "en:meats-and-their-products",
-289
+277
 ],
 [
 "en:chicken-and-its-products",
-283
+274
 ],
 [
 "en:meats",
-257
+249
 ],
 [
 "en:poultries",
-257
+249
 ]
 ],
 "secteur": "Volaille/Volaille libre-service",
 "marques": [
 "Le Gaulois",
-"Père Dodu",
 "U",
 "Volaé",
 "Maître CoQ",
+"Père Dodu",
 "Bruno Siebert"
 ],
 "part_marque": 0.0
@@ -4661,67 +3847,30 @@
 ],
 "part_marque": 0.0
 },
-"macaroni": {
-"n": 362,
-"noms": [
-"macaroni",
-"macaroni cheese",
-"macaroni complets"
-],
-"categorie": "en:durum-wheat-pasta",
-"categories": [
-[
-"en:plant-based-foods",
-165
-],
-[
-"en:plant-based-foods-and-beverages",
-165
-],
-[
-"en:pastas",
-163
-],
-[
-"en:cereals-and-potatoes",
-139
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"Auchan",
-"Carrefour",
-"Lustucru",
-"Priméal",
-"Casino"
-],
-"part_marque": 0.0
-},
 "barre": {
-"n": 2039,
+"n": 1787,
 "noms": [
 "barre de chocolat",
-"barre protéinée",
-"barre chocolat"
+"barre chocolat",
+"barre de nougat"
 ],
 "categorie": "en:bars",
 "categories": [
 [
 "en:snacks",
-780
+752
 ],
 [
 "en:sweet-snacks",
-775
+747
 ],
 [
 "en:bars",
-638
+610
 ],
 [
-"en:dietary-supplements",
-304
+"en:cereal-bars",
+205
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
@@ -4732,80 +3881,6 @@
 "Casino",
 "Leader Price",
 "Evernat"
-],
-"part_marque": 0.0
-},
-"spiruline": {
-"n": 639,
-"noms": [
-"spiruline",
-"spiruline bio",
-"spiruline en paillettes"
-],
-"categorie": "en:spirulina",
-"categories": [
-[
-"en:dietary-supplements",
-539
-],
-[
-"en:spirulina",
-393
-],
-[
-"en:spirulina-supplements",
-145
-],
-[
-"en:plant-based-foods",
-5
-]
-],
-"secteur": "Épicerie salée/Sel, épices et aides culinaires",
-"marques": [
-"Gourmet Spiruline",
-"Flamant vert",
-"Akal Food",
-"La Vie Claire",
-"Dietaroma",
-"Gph diffusion"
-],
-"part_marque": 0.0
-},
-"huile coco": {
-"n": 253,
-"noms": [
-"huile de coco",
-"huile de coco vierge",
-"huile de coco bio"
-],
-"categorie": "en:coconut-oils",
-"categories": [
-[
-"en:fats",
-228
-],
-[
-"en:plant-based-foods",
-224
-],
-[
-"en:plant-based-foods-and-beverages",
-224
-],
-[
-"en:vegetable-fats",
-224
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Bio planete",
-"La Fourche",
-"Comptoirs et compagnies",
-"Comptoirs & Compagnies",
-"Carrefour BIO",
-"La maison du coco"
 ],
 "part_marque": 0.0
 },
@@ -4835,7 +3910,7 @@
 52
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Volaille/Volaille libre-service",
 "marques": [
 "M&M's",
 "Marks & Spencer",
@@ -4880,154 +3955,6 @@
 "Wonderful",
 "Blue Diamond",
 "Trader Joe's"
-],
-"part_marque": 0.0
-},
-"buche": {
-"n": 1115,
-"noms": [
-"bûche de chèvre",
-"buche de chevre",
-"buche de chèvre"
-],
-"categorie": null,
-"categories": [
-[
-"en:festive-foods",
-245
-],
-[
-"en:christmas-foods-and-drinks",
-244
-],
-[
-"en:dairies",
-242
-],
-[
-"en:yule-log",
-242
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"U",
-"Soignon",
-"Carrefour",
-"Nestlé",
-"Erhard",
-"Adélie"
-],
-"part_marque": 0.0
-},
-"buche chevre": {
-"n": 243,
-"noms": [
-"bûche de chèvre",
-"buche de chevre",
-"buche de chèvre"
-],
-"categorie": "es:rulo-de-cabra",
-"categories": [
-[
-"en:cheeses",
-179
-],
-[
-"en:dairies",
-179
-],
-[
-"en:fermented-foods",
-179
-],
-[
-"en:fermented-milk-products",
-179
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Soignon",
-"Carrefour",
-"Pâturages",
-"Auchan",
-"E.Leclerc",
-"Lidl"
-],
-"part_marque": 0.0
-},
-"compote": {
-"n": 1991,
-"noms": [
-"compote",
-"compote de pommes",
-"compote de pomme"
-],
-"categorie": "en:apple-compotes",
-"categories": [
-[
-"en:plant-based-foods",
-1162
-],
-[
-"en:plant-based-foods-and-beverages",
-1161
-],
-[
-"en:desserts",
-1158
-],
-[
-"en:fruits-and-vegetables-based-foods",
-1158
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Andros",
-"Materne",
-"Charles & Alice",
-"Lucien Georgelin",
-"Côteaux Nantais",
-"Marque Repère"
-],
-"part_marque": 0.0
-},
-"compote pomme": {
-"n": 1162,
-"noms": [
-"compote de pomme",
-"compote de pommes",
-"compote pomme poire"
-],
-"categorie": "en:apple-compotes",
-"categories": [
-[
-"en:plant-based-foods",
-747
-],
-[
-"en:fruits-and-vegetables-based-foods",
-746
-],
-[
-"en:plant-based-foods-and-beverages",
-746
-],
-[
-"en:desserts",
-745
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Andros",
-"Charles & Alice",
-"Materne",
-"Lucien Georgelin",
-"Marque Repère",
-"Vergers Gourmands"
 ],
 "part_marque": 0.0
 },
@@ -5094,7 +4021,7 @@
 67
 ]
 ],
-"secteur": "Épicerie salée/Sauces et condiments",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "MYPROTEIN",
 "Foodspring",
@@ -5131,7 +4058,7 @@
 38
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "MYPROTEIN",
 "Foodspring",
@@ -5180,39 +4107,39 @@
 "part_marque": 0.0
 },
 "filet": {
-"n": 4788,
+"n": 2921,
 "noms": [
-"filets de maquereaux",
 "filet de canard",
-"filets de sardines"
+"filet mignon fumé",
+"filets de thon"
 ],
-"categorie": "en:fish-fillets",
+"categorie": "en:fishes",
 "categories": [
 [
 "en:seafood",
-2590
+1019
 ],
 [
 "en:fishes-and-their-products",
-2583
+1012
 ],
 [
 "en:fishes",
-2519
+954
 ],
 [
-"en:fish-fillets",
-1979
+"en:meats-and-their-products",
+662
 ]
 ],
-"secteur": "Épicerie salée/Conserves",
+"secteur": "Boucherie/Boucherie libre-service",
 "marques": [
-"Saupiquet",
+"L'etal Du Volailler",
+"Le Gaulois",
 "U",
-"Casino",
-"Carrefour",
-"Petit Navire",
-"Auchan"
+"Cité Marine",
+"Evasion Festive",
+"Carrefour"
 ],
 "part_marque": 0.0
 },
@@ -5254,29 +4181,29 @@
 "part_marque": 0.0
 },
 "melange": {
-"n": 6150,
+"n": 5986,
 "noms": [
-"mélange de fruits",
 "mélange mexicain",
-"mélange japonais"
+"mélange japonais",
+"mélange exotique"
 ],
 "categorie": null,
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-1573
+1511
 ],
 [
 "en:plant-based-foods",
-1547
+1485
 ],
 [
 "en:fruits-and-vegetables-based-foods",
-752
+704
 ],
 [
-"en:dried-products",
-468
+"en:condiments",
+453
 ]
 ],
 "secteur": "Apéritif/Fruits secs salés et olives",
@@ -5328,29 +4255,29 @@
 "part_marque": 0.0
 },
 "tome": {
-"n": 320,
+"n": 284,
 "noms": [
-"tome de savoie",
 "tome des bauges",
-"tome de montagne"
+"tome de montagne",
+"tome fraiche"
 ],
 "categorie": null,
 "categories": [
 [
 "en:cheeses",
-92
+71
 ],
 [
 "en:dairies",
-92
+71
 ],
 [
 "en:fermented-foods",
-92
+71
 ],
 [
 "en:fermented-milk-products",
-92
+71
 ]
 ],
 "secteur": "Fromagerie/Fromages libre-service",
@@ -5538,7 +4465,7 @@
 243
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "MYPROTEIN",
 "Prozis",
@@ -5546,43 +4473,6 @@
 "Women's Best",
 "BiotechUSA",
 "Nature Valley"
-],
-"part_marque": 0.0
-},
-"brownie": {
-"n": 606,
-"noms": [
-"brownies",
-"brownie",
-"brownies chocolat"
-],
-"categorie": "en:brownies",
-"categories": [
-[
-"en:snacks",
-358
-],
-[
-"en:sweet-snacks",
-357
-],
-[
-"en:biscuits-and-cakes",
-356
-],
-[
-"en:cakes",
-350
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"St Michel",
-"E.Leclerc",
-"Brossard",
-"Carrefour",
-"Leclerc",
-"Auchan"
 ],
 "part_marque": 0.0
 },
@@ -5649,7 +4539,7 @@
 532
 ]
 ],
-"secteur": "Poissonnerie/Poissonnerie libre-service",
+"secteur": "Poissonnerie/Poissonnerie traditionnelle",
 "marques": [
 "Delpeyrat",
 "Labeyrie",
@@ -5723,7 +4613,7 @@
 562
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
 "marques": [
 "U",
 "Marque Repère",
@@ -5797,7 +4687,7 @@
 310
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "U",
 "Andros",
@@ -5842,43 +4732,6 @@
 "Bedros",
 "Thiriet",
 "Marque Repère"
-],
-"part_marque": 0.0
-},
-"soupe": {
-"n": 2731,
-"noms": [
-"soupe",
-"soupe de légumes",
-"soupe à l'oignon"
-],
-"categorie": "en:soups",
-"categories": [
-[
-"en:meals",
-1264
-],
-[
-"en:soups",
-1248
-],
-[
-"en:plant-based-foods",
-764
-],
-[
-"en:plant-based-foods-and-beverages",
-764
-]
-],
-"secteur": "Épicerie salée/Soupes et plats préparés",
-"marques": [
-"Knorr",
-"Liebig",
-"Giraudet",
-"Karine & Jeff",
-"Maggi",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -5993,43 +4846,6 @@
 ],
 "part_marque": 0.0
 },
-"tripe": {
-"n": 585,
-"noms": [
-"tripes à la",
-"tripes a la",
-"tripes"
-],
-"categorie": "en:specialty-made-with-tripe",
-"categories": [
-[
-"en:meals",
-423
-],
-[
-"en:fish-and-meat-and-eggs",
-359
-],
-[
-"en:offals",
-359
-],
-[
-"en:tripe-dishes",
-353
-]
-],
-"secteur": "Textile/Vêtements et chaussures",
-"marques": [
-"Tripes Paillard",
-"Bigard",
-"Hiruak",
-"Leader Price",
-"Sans marque",
-"Jean Rozé"
-],
-"part_marque": 0.0
-},
 "american": {
 "n": 239,
 "noms": [
@@ -6104,43 +4920,6 @@
 ],
 "part_marque": 0.0
 },
-"cappuccino": {
-"n": 430,
-"noms": [
-"cappuccino",
-"cappuccino vanille",
-"cappuccino saveur chocolat"
-],
-"categorie": "en:instant-beverages",
-"categories": [
-[
-"en:beverages-and-beverages-preparations",
-158
-],
-[
-"en:beverages",
-146
-],
-[
-"en:coffees",
-141
-],
-[
-"en:plant-based-foods",
-141
-]
-],
-"secteur": "Petit-déjeuner/Café",
-"marques": [
-"Carrefour",
-"Nescafé",
-"Maxwell House",
-"U",
-"Plantation",
-"Mokate"
-],
-"part_marque": 0.01
-},
 "oreo": {
 "n": 292,
 "noms": [
@@ -6177,80 +4956,6 @@
 "Cadbury"
 ],
 "part_marque": 0.68
-},
-"chocolat": {
-"n": 8481,
-"noms": [
-"chocolat au lait",
-"chocolat",
-"chocolat noir"
-],
-"categorie": "en:chocolates",
-"categories": [
-[
-"en:snacks",
-4054
-],
-[
-"en:sweet-snacks",
-4053
-],
-[
-"en:cocoa-and-its-products",
-4052
-],
-[
-"en:chocolates",
-3779
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"U",
-"Bovetti",
-"Lindt",
-"Le Comptoir de Mathilde",
-"Monbana",
-"Chevaliers d'Argouges"
-],
-"part_marque": 0.0
-},
-"chocolat noir": {
-"n": 2882,
-"noms": [
-"chocolat noir",
-"chocolat noir 70",
-"chocolat noir fleur de"
-],
-"categorie": "en:dark-chocolates",
-"categories": [
-[
-"en:snacks",
-1845
-],
-[
-"en:sweet-snacks",
-1844
-],
-[
-"en:cocoa-and-its-products",
-1840
-],
-[
-"en:chocolates",
-1814
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"U",
-"Bovetti",
-"Saveurs & Nature",
-"Lindt",
-"Moulin des Moines",
-"Bonneterre"
-],
-"part_marque": 0.0
 },
 "bbq": {
 "n": 209,
@@ -6400,80 +5105,6 @@
 ],
 "part_marque": 0.0
 },
-"ginger": {
-"n": 656,
-"noms": [
-"ginger beer",
-"ginger",
-"ginger shot"
-],
-"categorie": null,
-"categories": [
-[
-"en:beverages",
-180
-],
-[
-"en:beverages-and-beverages-preparations",
-135
-],
-[
-"en:non-alcoholic-beverages",
-122
-],
-[
-"en:non-alcoholic-beers",
-107
-]
-],
-"secteur": "Cave/Bières et cidres",
-"marques": [
-"Old Jamaica",
-"Karma",
-"gold kili",
-"Fentimans",
-"San Benedetto",
-"Bundaberg"
-],
-"part_marque": 0.0
-},
-"ginger beer": {
-"n": 231,
-"noms": [
-"ginger beer",
-"ginger beer bio",
-"ginger beer soda"
-],
-"categorie": "en:ginger-beer",
-"categories": [
-[
-"en:beverages",
-122
-],
-[
-"en:non-alcoholic-beverages",
-108
-],
-[
-"en:non-alcoholic-beers",
-104
-],
-[
-"en:ginger-beer",
-103
-]
-],
-"secteur": "Cave/Bières et cidres",
-"marques": [
-"Old Jamaica",
-"Karma",
-"Fentimans",
-"Bundaberg",
-"UMÀ",
-"Kombuch'Alpes"
-],
-"part_marque": 0.0
-},
 "sparkling": {
 "n": 272,
 "noms": [
@@ -6512,78 +5143,41 @@
 "part_marque": 0.0
 },
 "ice": {
-"n": 840,
+"n": 353,
 "noms": [
-"ice tea",
-"ice tea peach",
-"ice tea saveur"
+"ice cream",
+"ice coffee",
+"ice fresh"
 ],
 "categorie": null,
 "categories": [
 [
-"en:beverages",
-247
+"en:desserts",
+86
 ],
 [
-"en:beverages-and-beverages-preparations",
-196
+"en:frozen-foods",
+85
 ],
 [
-"en:tea-based-beverages",
-174
+"en:frozen-desserts",
+84
 ],
 [
-"en:iced-teas",
-170
+"en:ice-creams-and-sorbets",
+72
 ]
 ],
-"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
-"Lipton",
-"Migros",
 "Ice Breakers",
-"Freeway",
 "Carrefour",
-"Hollywood"
+"Hollywood",
+"Häagen-Dazs",
+"Gelatelli",
+"Lidl"
 ],
-"part_marque": 0.0
-},
-"financier": {
-"n": 333,
-"noms": [
-"financiers",
-"financiers aux amandes",
-"financier"
-],
-"categorie": "en:financiers",
-"categories": [
-[
-"en:biscuits-and-cakes",
-177
-],
-[
-"en:snacks",
-177
-],
-[
-"en:sweet-snacks",
-177
-],
-[
-"en:cakes",
-174
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Baramel",
-"Bonne Maman",
-"Biscuiterie Jeannette",
-"Astruc Pâtisserie",
-"Louvat",
-"Maison Cotte"
-],
-"part_marque": 0.0
+"part_marque": 0.01
 },
 "petite": {
 "n": 1030,
@@ -6696,77 +5290,114 @@
 ],
 "part_marque": 0.0
 },
-"cheesecake": {
-"n": 242,
+"jambon": {
+"n": 3612,
 "noms": [
-"cheesecake",
-"cheesecake au citron",
-"cheesecake caramel beurre"
+"jambon",
+"jambon supérieur sans",
+"jambon supérieur"
 ],
-"categorie": "en:cheesecakes",
+"categorie": "en:white-hams",
 "categories": [
 [
+"en:meats-and-their-products",
+1713
+],
+[
+"en:prepared-meats",
+1672
+],
+[
+"en:hams",
+1623
+],
+[
+"en:meats",
+1218
+]
+],
+"secteur": "Charcuterie/Charcuterie libre-service",
+"marques": [
+"Saint Alby",
+"U",
+"Fleury Michon",
+"Auchan",
+"Tradilège",
+"Carrefour"
+],
+"part_marque": 0.0
+},
+"chocolat": {
+"n": 3563,
+"noms": [
+"chocolat",
+"chocolats",
+"chocolat chaud"
+],
+"categorie": null,
+"categories": [
+[
+"en:cocoa-and-its-products",
+1048
+],
+[
 "en:snacks",
-134
+1034
 ],
 [
 "en:sweet-snacks",
-134
+1034
 ],
 [
-"en:biscuits-and-cakes",
-133
-],
-[
-"en:cakes",
-132
+"en:chocolates",
+829
 ]
 ],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
-"Gü",
-"Deluxe",
-"Picard",
-"Marie Morin",
-"McEnnedy",
-"Monoprix"
+"Lindt",
+"Chevaliers d'Argouges",
+"Valrhona",
+"Alain Ducasse",
+"Maison Guinguet",
+"Monbana"
 ],
 "part_marque": 0.0
 },
 "thon": {
-"n": 1418,
+"n": 1150,
 "noms": [
 "thon",
-"thon entier à",
-"thon à la"
+"thon à la",
+"thon blanc germon"
 ],
 "categorie": "en:canned-tunas",
 "categories": [
 [
 "en:seafood",
-779
+589
 ],
 [
 "en:fishes-and-their-products",
-777
+587
 ],
 [
 "en:fishes",
-764
+578
 ],
 [
 "en:fatty-fishes",
-758
+572
 ]
 ],
 "secteur": "Épicerie salée/Conserves",
 "marques": [
-"Saupiquet",
 "Carrefour",
+"Saupiquet",
 "Petit Navire",
 "Auchan",
-"Connétable",
-"Nixe"
+"Nixe",
+"Cora"
 ],
 "part_marque": 0.0
 },
@@ -6919,39 +5550,39 @@
 "part_marque": 0.0
 },
 "double": {
-"n": 626,
+"n": 358,
 "noms": [
-"double concentré de",
-"double concentre de",
-"double chocolate"
+"double chocolate",
+"double crème",
+"double decker"
 ],
-"categorie": "en:double-concentrate-tomato-paste",
+"categorie": null,
 "categories": [
 [
-"en:plant-based-foods-and-beverages",
-245
+"en:snacks",
+74
 ],
 [
-"en:plant-based-foods",
-240
+"en:sweet-snacks",
+72
 ],
 [
-"en:fruits-and-vegetables-based-foods",
-230
+"en:biscuits-and-cakes",
+44
 ],
 [
-"en:tomatoes-and-their-products",
-230
+"en:desserts",
+41
 ]
 ],
-"secteur": "Épicerie salée/Conserves",
+"secteur": "Traiteur/Traiteur frais",
 "marques": [
-"Carrefour",
-"Auchan",
 "Magnum",
 "Tesco",
-"Cora",
-"Eco+"
+"Mamie Nova",
+"Marks & Spencer",
+"Burger King",
+"Carrefour"
 ],
 "part_marque": 0.0
 },
@@ -6993,39 +5624,39 @@
 "part_marque": 0.0
 },
 "croquant": {
-"n": 694,
+"n": 545,
 "noms": [
-"croquants aux amandes",
 "croquants",
-"croquant aux amandes"
+"croquants aux noisettes",
+"croquants aux noix"
 ],
 "categorie": null,
 "categories": [
 [
 "en:snacks",
-203
+118
 ],
 [
 "en:sweet-snacks",
-182
+98
 ],
 [
 "en:biscuits-and-cakes",
-173
+90
 ],
 [
 "en:biscuits",
-168
+85
 ]
 ],
-"secteur": "Apéritif/Chips et biscuits apéritif",
+"secteur": "Biscuits et sucré/Biscuits et gâteaux",
 "marques": [
 "U",
 "La Vie Claire",
 "Maison Bruyère",
-"Castellane",
-"Nos Régions ont du Talent",
-"Supersec"
+"Supersec",
+"Les Biscuits de Mél",
+"Nos Régions ont du Talent"
 ],
 "part_marque": 0.0
 },
@@ -7104,150 +5735,39 @@
 "part_marque": 0.0
 },
 "marron": {
-"n": 493,
+"n": 228,
 "noms": [
-"marrons glacés",
 "marrons entiers",
-"marrons glaces"
+"marrons entiers pelés",
+"marrons entiers à"
 ],
-"categorie": "en:marrons-glaces",
+"categorie": "en:chestnuts",
 "categories": [
 [
 "en:plant-based-foods",
-315
+92
 ],
 [
 "en:plant-based-foods-and-beverages",
-315
+92
 ],
 [
 "en:nuts-and-their-products",
-310
+87
 ],
 [
-"en:confectioneries",
-231
+"en:chestnuts",
+74
 ]
 ],
 "secteur": "Fruits et légumes/Fruits secs et graines",
 "marques": [
-"Motta",
-"Sabaton",
-"L'artisan Provençal",
-"Clément Faugier",
+"Ponthier",
 "U",
-"Frutignac"
-],
-"part_marque": 0.0
-},
-"marron glace": {
-"n": 264,
-"noms": [
-"marrons glacés",
-"marrons glaces",
-"marron glacé"
-],
-"categorie": "en:marrons-glaces",
-"categories": [
-[
-"en:confectioneries",
-224
-],
-[
-"en:snacks",
-224
-],
-[
-"en:sweet-snacks",
-224
-],
-[
-"en:marrons-glaces",
-223
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Motta",
-"L'artisan Provençal",
+"Minerve",
 "Sabaton",
-"Clément Faugier",
-"Douceurs Provençales",
-"Frutignac"
-],
-"part_marque": 0.0
-},
-"gaufrette": {
-"n": 602,
-"noms": [
-"gaufrettes",
-"gaufrettes chocolat",
-"gaufrette"
-],
-"categorie": "en:stuffed-wafers",
-"categories": [
-[
-"en:snacks",
-331
-],
-[
-"en:sweet-snacks",
-299
-],
-[
-"en:biscuits-and-cakes",
-293
-],
-[
-"en:biscuits",
-287
-]
-],
-"secteur": "Cuisine et arts de la table/Vaisselle jetable",
-"marques": [
-"Trésors Gourmands",
-"Marque Repère",
-"P'tit Déli",
-"Auchan",
 "Leader Price",
-"Casino"
-],
-"part_marque": 0.0
-},
-"puree tomate": {
-"n": 266,
-"noms": [
-"purée de tomates",
-"purée de tomate",
-"puree de tomates"
-],
-"categorie": "en:tomato-purees",
-"categories": [
-[
-"en:fruits-and-vegetables-based-foods",
-201
-],
-[
-"en:plant-based-foods",
-201
-],
-[
-"en:plant-based-foods-and-beverages",
-201
-],
-[
-"en:vegetables-based-foods",
-201
-]
-],
-"secteur": "Épicerie salée/Sauces et condiments",
-"marques": [
-"Auchan",
-"Carrefour",
-"Turini",
-"Petti",
-"Casino",
-"U"
+"Freshona"
 ],
 "part_marque": 0.0
 },
@@ -7325,80 +5845,6 @@
 ],
 "part_marque": 0.01
 },
-"fusilli": {
-"n": 691,
-"noms": [
-"fusilli",
-"fusilli à la",
-"fusillis"
-],
-"categorie": "en:durum-wheat-pasta",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-401
-],
-[
-"en:plant-based-foods",
-400
-],
-[
-"en:pastas",
-395
-],
-[
-"en:cereals-and-potatoes",
-293
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"De Cecco",
-"Carrefour",
-"Panzani",
-"Rummo",
-"Combino",
-"Monoprix"
-],
-"part_marque": 0.0
-},
-"tagliatelle": {
-"n": 1023,
-"noms": [
-"tagliatelles",
-"tagliatelle",
-"tagliatelles aux oeufs"
-],
-"categorie": "en:tagliatelle",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-486
-],
-[
-"en:plant-based-foods",
-485
-],
-[
-"en:pastas",
-469
-],
-[
-"en:tagliatelle",
-312
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"U",
-"Carrefour",
-"Lazzaretti",
-"Fleury Michon",
-"Marque Repère",
-"Lustucru"
-],
-"part_marque": 0.0
-},
 "rice": {
 "n": 695,
 "noms": [
@@ -7462,7 +5908,7 @@
 21
 ]
 ],
-"secteur": "Parfumerie et soins/Cheveux",
+"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
 "marques": [
 "Aptonia",
 "Socopa",
@@ -7510,43 +5956,6 @@
 ],
 "part_marque": 0.0
 },
-"pop": {
-"n": 866,
-"noms": [
-"pop corn",
-"pop corn sucré",
-"pop corn caramel"
-],
-"categorie": "en:popcorn",
-"categories": [
-[
-"en:snacks",
-314
-],
-[
-"en:popcorn",
-275
-],
-[
-"en:sweet-snacks",
-191
-],
-[
-"en:sugared-popcorn",
-113
-]
-],
-"secteur": "Apéritif/Chips et biscuits apéritif",
-"marques": [
-"Maison de la Glace",
-"Hema",
-"Kellogg's",
-"Carrefour",
-"Menguy's",
-"Jimmy's"
-],
-"part_marque": 0.0
-},
 "nestle": {
 "n": 759,
 "noms": [
@@ -7573,7 +5982,7 @@
 124
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Nestlé",
 "Nestlé Dessert",
@@ -7621,77 +6030,40 @@
 ],
 "part_marque": 0.0
 },
-"grissini": {
-"n": 449,
-"noms": [
-"grissini",
-"grissini torinesi",
-"grissini al sesamo"
-],
-"categorie": "en:breadsticks",
-"categories": [
-[
-"en:plant-based-foods",
-365
-],
-[
-"en:plant-based-foods-and-beverages",
-365
-],
-[
-"en:cereals-and-potatoes",
-364
-],
-[
-"en:breads",
-363
-]
-],
-"secteur": "Boulangerie/Pain",
-"marques": [
-"Florelli",
-"Mario Fongo",
-"GrissinBon",
-"Orazio il Grissinaio",
-"Lema",
-"Artesani"
-],
-"part_marque": 0.0
-},
 "nougat": {
-"n": 1570,
+"n": 1232,
 "noms": [
 "nougat",
-"nougat tendre",
-"nougat au miel"
+"nougat au miel",
+"nougat aux amandes"
 ],
 "categorie": "en:nougats",
 "categories": [
 [
 "en:snacks",
-836
+659
 ],
 [
 "en:sweet-snacks",
-835
+658
 ],
 [
 "en:confectioneries",
-827
+650
 ],
 [
 "en:nougats",
-806
+633
 ]
 ],
 "secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Aitana",
-"Chabert & Guillot",
 "Le Roy René",
+"Chabert & Guillot",
 "Arnaud Soubeyran",
-"Le Chaudron d'Or",
-"Confiserie du Roy René"
+"Confiserie du Roy René",
+"Le Chocolatier Sablais"
 ],
 "part_marque": 0.0
 },
@@ -7803,43 +6175,6 @@
 "Pescanova",
 "Costa",
 "Picard"
-],
-"part_marque": 0.0
-},
-"prosciutto": {
-"n": 369,
-"noms": [
-"prosciutto crudo",
-"prosciutto di parma",
-"prosciutto cotto"
-],
-"categorie": "en:italian-meat-products",
-"categories": [
-[
-"en:meats-and-their-products",
-244
-],
-[
-"en:prepared-meats",
-231
-],
-[
-"en:hams",
-230
-],
-[
-"en:meats",
-154
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Italiamo",
-"Citterio",
-"Negroni",
-"Lidl",
-"Carrefour",
-"Fratelli Beretta"
 ],
 "part_marque": 0.0
 },
@@ -7991,80 +6326,6 @@
 ],
 "part_marque": 0.0
 },
-"earl": {
-"n": 234,
-"noms": [
-"earl grey",
-"earl grey tea",
-"earl grey thé"
-],
-"categorie": "en:beverages",
-"categories": [
-[
-"en:beverages",
-77
-],
-[
-"en:plant-based-foods-and-beverages",
-71
-],
-[
-"en:hot-beverages",
-70
-],
-[
-"en:plant-based-beverages",
-69
-]
-],
-"secteur": "Petit-déjeuner/Thé et chocolat en poudre",
-"marques": [
-"Kusmi Tea",
-"Twinings",
-"Palais des Thés",
-"Whittard",
-"La Route des Comptoirs",
-"Marks & Spencer"
-],
-"part_marque": 0.0
-},
-"earl grey": {
-"n": 218,
-"noms": [
-"earl grey",
-"earl grey tea",
-"earl grey fleurs bleues"
-],
-"categorie": "en:hot-beverages",
-"categories": [
-[
-"en:beverages",
-75
-],
-[
-"en:hot-beverages",
-68
-],
-[
-"en:plant-based-foods-and-beverages",
-68
-],
-[
-"en:plant-based-beverages",
-67
-]
-],
-"secteur": "Petit-déjeuner/Thé et chocolat en poudre",
-"marques": [
-"Kusmi Tea",
-"Twinings",
-"Palais des Thés",
-"Whittard",
-"La Route des Comptoirs",
-"Marks & Spencer"
-],
-"part_marque": 0.0
-},
 "instant": {
 "n": 706,
 "noms": [
@@ -8127,7 +6388,7 @@
 218
 ]
 ],
-"secteur": "Crèmerie/Lait",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Auchan",
 "Lactel",
@@ -8212,6 +6473,43 @@
 ],
 "part_marque": 0.0
 },
+"terrine": {
+"n": 3780,
+"noms": [
+"terrine de sanglier",
+"terrine de foie",
+"terrine de porc"
+],
+"categorie": "en:terrines",
+"categories": [
+[
+"en:terrines",
+1818
+],
+[
+"en:meats-and-their-products",
+1330
+],
+[
+"en:prepared-meats",
+1226
+],
+[
+"en:meats",
+792
+]
+],
+"secteur": "Charcuterie/Charcuterie à la coupe",
+"marques": [
+"Ducs de Gascogne",
+"Charles Antona",
+"Comtesse du Barry",
+"Guyader",
+"Terrines du Morvan",
+"Fleurons de Lomagne"
+],
+"part_marque": 0.0
+},
 "levure": {
 "n": 294,
 "noms": [
@@ -8286,6 +6584,43 @@
 ],
 "part_marque": 0.0
 },
+"huile": {
+"n": 1909,
+"noms": [
+"huile vierge de",
+"huile de noisette",
+"huile de pépins"
+],
+"categorie": "en:vegetable-oils",
+"categories": [
+[
+"en:fats",
+1052
+],
+[
+"en:plant-based-foods",
+941
+],
+[
+"en:plant-based-foods-and-beverages",
+941
+],
+[
+"en:vegetable-fats",
+938
+]
+],
+"secteur": "Cuisine du monde/Italie",
+"marques": [
+"Emile noel",
+"Vigean",
+"Bio planete",
+"Lesieur",
+"Cauvin",
+"La Tourangelle"
+],
+"part_marque": 0.0
+},
 "vitamin": {
 "n": 257,
 "noms": [
@@ -8349,7 +6684,7 @@
 11
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Fruits et légumes/Fruits secs et graines",
 "marques": [
 "Toomaï",
 "Vahiné",
@@ -8423,7 +6758,7 @@
 133
 ]
 ],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Nestlé",
 "KitKat",
@@ -8471,66 +6806,66 @@
 "part_marque": 0.0
 },
 "mousse": {
-"n": 1348,
+"n": 836,
 "noms": [
 "mousse de foie",
-"mousse de canard",
-"mousse pur canard"
+"mousse à la",
+"mousse de saumon"
 ],
-"categorie": "en:savory-mousses",
+"categorie": "fr:mousses-de-foies",
 "categories": [
 [
 "en:spreads",
-590
+309
 ],
 [
 "en:salted-spreads",
-587
-],
-[
-"en:meats-and-their-products",
-577
+306
 ],
 [
 "en:savory-mousses",
-572
+291
+],
+[
+"en:meats-and-their-products",
+285
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Crèmerie/Yaourts et desserts",
 "marques": [
+"Nestlé",
 "Madrange",
 "U",
 "Auchan",
-"Nestlé",
 "Carrefour",
 "Marque Repère"
 ],
 "part_marque": 0.0
 },
 "galette": {
-"n": 4052,
+"n": 3627,
 "noms": [
 "galette frangipane",
-"galettes pur beurre",
-"galettes de blé"
+"galettes de blé",
+"galettes"
 ],
 "categorie": null,
 "categories": [
 [
 "en:snacks",
-896
+794
 ],
 [
 "en:sweet-snacks",
-858
+759
 ],
 [
 "en:biscuits-and-cakes",
-847
+748
 ],
 [
-"en:biscuits",
-476
+"en:galettes",
+439
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
@@ -8538,9 +6873,9 @@
 "St Michel",
 "La Crêpe de Brocéliande",
 "E.Leclerc",
-"Beurlay",
 "BPA",
-"Leclerc"
+"Leclerc",
+"Céréal Bio"
 ],
 "part_marque": 0.0
 },
@@ -8570,7 +6905,7 @@
 24
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Monoprix",
 "Monoprix Gourmet",
@@ -8607,7 +6942,7 @@
 299
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "Materne",
 "POM'POTES",
@@ -8652,6 +6987,43 @@
 "Iswari",
 "Häagen-Dazs",
 "Matcha & Co"
+],
+"part_marque": 0.0
+},
+"pop": {
+"n": 281,
+"noms": [
+"pop fruit",
+"pop",
+"pop tarts frosted"
+],
+"categorie": null,
+"categories": [
+[
+"en:snacks",
+47
+],
+[
+"en:sweet-snacks",
+27
+],
+[
+"en:desserts",
+27
+],
+[
+"en:frozen-foods",
+22
+]
+],
+"secteur": "Apéritif/Chips et biscuits apéritif",
+"marques": [
+"Maison de la Glace",
+"Kellogg's",
+"Carrefour",
+"Prozis",
+"Gateau",
+"Pop-Tarts"
 ],
 "part_marque": 0.0
 },
@@ -8952,39 +7324,39 @@
 "part_marque": 0.0
 },
 "pur jus": {
-"n": 3270,
+"n": 2031,
 "noms": [
-"pur jus de pomme",
-"pur jus de pommes",
-"pur jus de raisin"
+"pur jus de raisin",
+"100 pur jus orange",
+"pur jus d'orange"
 ],
 "categorie": "en:squeezed-fruit-juices",
 "categories": [
 [
 "en:beverages",
-2502
+1659
 ],
 [
 "en:plant-based-beverages",
-2424
+1622
 ],
 [
 "en:plant-based-foods-and-beverages",
-2424
+1622
 ],
 [
 "en:juices-and-nectars",
-2409
+1613
 ]
 ],
 "secteur": "Eaux et boissons sans alcool/Jus de fruits",
 "marques": [
 "U",
 "Casino",
-"Carrefour",
 "Marque Repère",
-"U Bio",
-"Auchan"
+"Carrefour",
+"Auchan",
+"Leader Price"
 ],
 "part_marque": 0.0
 },
@@ -9059,43 +7431,6 @@
 "Snapple",
 "Carrefour",
 "Fitvia"
-],
-"part_marque": 0.0
-},
-"gazpacho": {
-"n": 307,
-"noms": [
-"gazpacho",
-"gazpacho original",
-"gazpacho l'original"
-],
-"categorie": "en:gazpacho",
-"categories": [
-[
-"en:cold-soups",
-227
-],
-[
-"en:meals",
-227
-],
-[
-"en:plant-based-foods-and-beverages",
-227
-],
-[
-"en:soups",
-227
-]
-],
-"secteur": "Fruits et légumes/Jus de fruits frais",
-"marques": [
-"Alvalle",
-"Créaline",
-"Liebig",
-"innocent",
-"U",
-"Chef Select"
 ],
 "part_marque": 0.0
 },
@@ -9421,7 +7756,7 @@
 30
 ]
 ],
-"secteur": "Poissonnerie/Poissonnerie libre-service",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Fleury Michon",
 "Chevaliers d'Argouges",
@@ -9432,114 +7767,151 @@
 ],
 "part_marque": 0.0
 },
-"veloute": {
-"n": 2175,
+"soupe": {
+"n": 2403,
 "noms": [
-"velouté de légumes",
+"soupe",
+"soupe à l'oignon",
+"soupe au pistou"
+],
+"categorie": "en:soups",
+"categories": [
+[
+"en:meals",
+1113
+],
+[
+"en:soups",
+1099
+],
+[
+"en:plant-based-foods",
+646
+],
+[
+"en:plant-based-foods-and-beverages",
+646
+]
+],
+"secteur": "Épicerie salée/Soupes et plats préparés",
+"marques": [
+"Knorr",
+"Giraudet",
+"Liebig",
+"Karine & Jeff",
+"Maggi",
+"Royco"
+],
+"part_marque": 0.0
+},
+"veloute": {
+"n": 1672,
+"noms": [
 "velouté de potiron",
-"velouté de tomates"
+"velouté de tomates",
+"velouté de poireaux"
 ],
 "categorie": "en:cream-of-vegetable-soups",
 "categories": [
 [
 "en:meals",
-1150
+798
 ],
 [
 "en:soups",
-1147
+795
+],
+[
+"en:cream-soups",
+713
 ],
 [
 "en:plant-based-foods",
-1046
-],
-[
-"en:plant-based-foods-and-beverages",
-1046
+711
 ]
 ],
 "secteur": "Épicerie salée/Soupes et plats préparés",
 "marques": [
-"Liebig",
 "Danone",
+"Liebig",
 "Knorr",
 "La Potagère",
-"Carrefour",
-"Leader Price"
+"Picard",
+"Carrefour"
 ],
 "part_marque": 0.0
 },
 "lasagne": {
-"n": 1133,
+"n": 787,
 "noms": [
-"lasagnes à la",
 "lasagne",
-"lasagnes"
+"lasagnes",
+"lasagnes aux légumes"
 ],
-"categorie": "en:bolognese-lasagne",
+"categorie": "en:prepared-lasagne",
 "categories": [
 [
 "en:meals",
-692
+391
 ],
 [
 "en:pasta-dishes",
-676
+378
 ],
 [
 "en:prepared-lasagne",
-672
+374
 ],
 [
-"en:meat-lasagnas",
-362
+"en:vegetarian-lasagne",
+129
 ]
 ],
 "secteur": "Surgelés/Plats et pizzas surgelés",
 "marques": [
-"Carrefour",
-"U",
 "Picard",
-"Thiriet",
 "Panzani",
-"Casino"
+"Thiriet",
+"Come a casa",
+"Casino",
+"Monoprix"
 ],
 "part_marque": 0.0
 },
 "gratin": {
-"n": 852,
+"n": 624,
 "noms": [
-"gratin dauphinois",
 "gratin de courgettes",
-"gratin de pommes"
+"gratin de pommes",
+"gratin de légumes"
 ],
-"categorie": "en:potato-gratin",
+"categorie": "en:gratins",
 "categories": [
 [
 "en:meals",
-549
+340
 ],
 [
 "en:gratins",
-518
+311
 ],
 [
-"en:potato-gratin",
-259
+"en:vegetable-gratins",
+114
 ],
 [
-"en:dauphine-style-creamed-potatoes-au-gratin",
-210
+"en:frozen-foods",
+80
 ]
 ],
-"secteur": "Surgelés/Plats et pizzas surgelés",
+"secteur": "Surgelés/Viandes et poissons surgelés",
 "marques": [
 "Picard",
 "Fleury Michon",
-"U",
 "Thiriet",
+"U",
 "Toupargel",
-"Leader Price"
+"Qualité Traiteur"
 ],
 "part_marque": 0.0
 },
@@ -9580,40 +7952,40 @@
 ],
 "part_marque": 0.0
 },
-"marmelade": {
-"n": 387,
+"ginger": {
+"n": 424,
 "noms": [
-"marmelade",
-"marmelade orange",
-"marmelade de citron"
+"ginger",
+"ginger shot",
+"ginger garlic paste"
 ],
-"categorie": "en:marmalades",
+"categorie": null,
 "categories": [
 [
-"en:spreads",
-210
+"en:beverages",
+57
 ],
 [
-"en:breakfasts",
-208
-],
-[
-"en:sweet-spreads",
-208
+"en:beverages-and-beverages-preparations",
+55
 ],
 [
 "en:plant-based-foods-and-beverages",
-207
+51
+],
+[
+"en:snacks",
+32
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
-"Albert Ménès",
-"Bonne Maman",
-"Agrisicilia",
-"Casino",
-"U",
-"Alain Milliat"
+"gold kili",
+"San Benedetto",
+"Vitamont",
+"The Ginger Party",
+"Carrefour",
+"McVitie's"
 ],
 "part_marque": 0.0
 },
@@ -9685,8 +8057,8 @@
 "Tropicana",
 "Bio+",
 "Pepsico",
-"Hitchcock",
 "Alvalle",
+"Hitchcock",
 "Tropicana Bio"
 ],
 "part_marque": 0.87
@@ -9802,43 +8174,6 @@
 ],
 "part_marque": 0.0
 },
-"edam": {
-"n": 322,
-"noms": [
-"edam",
-"edam jeune",
-"edam holland"
-],
-"categorie": "en:edam",
-"categories": [
-[
-"en:cheeses",
-284
-],
-[
-"en:dairies",
-284
-],
-[
-"en:fermented-foods",
-284
-],
-[
-"en:fermented-milk-products",
-284
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Eco+",
-"Milbona",
-"Leader Price",
-"€co+",
-"Moulin D'or",
-"President"
-],
-"part_marque": 0.01
-},
 "porc": {
 "n": 581,
 "noms": [
@@ -9914,39 +8249,39 @@
 "part_marque": 0.0
 },
 "chair": {
-"n": 454,
+"n": 209,
 "noms": [
-"chair à saucisse",
-"chair a saucisse",
-"chair de tomates"
+"chair de tomates",
+"chair de crabe",
+"chair de tomate"
 ],
-"categorie": "en:sausage-meat",
+"categorie": "fr:chair-de-tomates",
 "categories": [
 [
-"en:meats-and-their-products",
-235
+"en:canned-foods",
+77
 ],
 [
-"en:prepared-meats",
-219
+"en:plant-based-foods-and-beverages",
+75
 ],
 [
-"en:sausage-meat",
-218
+"en:fruits-and-vegetables-based-foods",
+74
 ],
 [
-"en:sausages",
-218
+"en:plant-based-foods",
+74
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Fruits et légumes/Légumes",
 "marques": [
-"U",
 "Nautilus",
 "Louis Martin",
 "Leader Price",
-"Carrefour",
-"Casino"
+"Cora",
+"Casino",
+"Auchan"
 ],
 "part_marque": 0.0
 },
@@ -9988,7 +8323,7 @@
 "part_marque": 0.0
 },
 "gateau": {
-"n": 2037,
+"n": 1766,
 "noms": [
 "gâteau à la",
 "gâteau au chocolat",
@@ -9998,19 +8333,19 @@
 "categories": [
 [
 "en:snacks",
-909
+701
 ],
 [
 "en:sweet-snacks",
-903
+695
 ],
 [
 "en:biscuits-and-cakes",
-888
+680
 ],
 [
 "en:cakes",
-792
+584
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
@@ -10018,9 +8353,9 @@
 "U",
 "Carrefour",
 "Légendes du Poitou",
-"Leader Price",
 "Marque Repère",
-"Bonne Maman"
+"Bonne Maman",
+"Nomandi"
 ],
 "part_marque": 0.0
 },
@@ -10056,8 +8391,8 @@
 "Perle de Lait",
 "Perle de lait non blanc",
 "Tipiak",
-"Savencia",
-"Coraya"
+"Coraya",
+"Savencia"
 ],
 "part_marque": 0.0
 },
@@ -10198,7 +8533,7 @@
 15
 ]
 ],
-"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Cémoi",
 "Sodebo",
@@ -10247,7 +8582,7 @@
 "part_marque": 0.0
 },
 "creme glacee": {
-"n": 1712,
+"n": 1709,
 "noms": [
 "crème glacée",
 "crème glacée à la",
@@ -10257,19 +8592,19 @@
 "categories": [
 [
 "en:frozen-foods",
-1011
+1008
 ],
 [
 "en:desserts",
-1001
+998
 ],
 [
 "en:frozen-desserts",
-1001
+998
 ],
 [
 "en:ice-creams-and-sorbets",
-997
+994
 ]
 ],
 "secteur": "Glaces/Glaces",
@@ -10280,43 +8615,6 @@
 "Picard",
 "Toupargel",
 "La Turbine à Saveurs"
-],
-"part_marque": 0.0
-},
-"colorant": {
-"n": 359,
-"noms": [
-"colorant alimentaire",
-"colorant alimentaire en",
-"colorants alimentaires"
-],
-"categorie": "en:food-colorings",
-"categories": [
-[
-"en:food-additives",
-234
-],
-[
-"en:food-colorings",
-234
-],
-[
-"en:cooking-helpers",
-3
-],
-[
-"en:sugary-cooking-helpers",
-2
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Scrapcooking",
-"La Pateliere",
-"Patisdecor",
-"Sainte Lucie",
-"Déco-Relief",
-"Alice Délice"
 ],
 "part_marque": 0.0
 },
@@ -10457,7 +8755,7 @@
 46
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Alter Nutrition",
 "Iswari",
@@ -10469,7 +8767,7 @@
 "part_marque": 0.0
 },
 "tartinade": {
-"n": 618,
+"n": 617,
 "noms": [
 "tartinade de tomates",
 "tartinade de foie",
@@ -10494,7 +8792,7 @@
 61
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Petit Navire",
 "La Delicieuse",
@@ -10506,39 +8804,39 @@
 "part_marque": 0.0
 },
 "tarte": {
-"n": 2674,
+"n": 2142,
 "noms": [
-"tarte aux pommes",
 "tarte normande",
-"tarte aux fraises"
+"tarte aux fraises",
+"tarte aux poireaux"
 ],
 "categorie": "en:sweet-pies",
 "categories": [
 [
-"en:sweet-pies",
-1081
+"en:pies",
+841
 ],
 [
-"en:pies",
-1054
+"en:sweet-pies",
+711
 ],
 [
 "en:meals",
-469
+465
 ],
 [
 "en:pizzas-pies-and-quiches",
-462
+459
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
 "marques": [
 "E.Leclerc",
-"Leclerc",
 "Marie",
 "Picard",
-"Casino",
-"U"
+"Leclerc",
+"U",
+"Casino"
 ],
 "part_marque": 0.0
 },
@@ -10568,7 +8866,7 @@
 27
 ]
 ],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Pural",
 "Marque Repère",
@@ -10875,43 +9173,6 @@
 ],
 "part_marque": 0.0
 },
-"betterave": {
-"n": 393,
-"noms": [
-"betteraves rouges",
-"betteraves rouges en",
-"betterave"
-],
-"categorie": "en:beetroot",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-237
-],
-[
-"en:plant-based-foods",
-236
-],
-[
-"en:fruits-and-vegetables-based-foods",
-233
-],
-[
-"en:vegetables-based-foods",
-232
-]
-],
-"secteur": "Fruits et légumes/Légumes",
-"marques": [
-"Marque Repère",
-"Carrefour",
-"U",
-"Notre Jardin",
-"Auchan",
-"Allaire"
-],
-"part_marque": 0.0
-},
 "selection": {
 "n": 284,
 "noms": [
@@ -10938,7 +9199,7 @@
 38
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Carrefour",
 "Leader Price",
@@ -11123,7 +9384,7 @@
 47
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Épicerie salée/Conserves",
 "marques": [
 "Kellogg's",
 "Coco Pops",
@@ -11208,43 +9469,6 @@
 ],
 "part_marque": 0.0
 },
-"veloute legume": {
-"n": 475,
-"noms": [
-"velouté de légumes",
-"velouté de légumes verts",
-"velouté de légumes du"
-],
-"categorie": "en:cream-of-vegetable-soups",
-"categories": [
-[
-"en:meals",
-331
-],
-[
-"en:soups",
-331
-],
-[
-"en:fruits-and-vegetables-based-foods",
-318
-],
-[
-"en:plant-based-foods",
-318
-]
-],
-"secteur": "Épicerie salée/Soupes et plats préparés",
-"marques": [
-"Liebig",
-"Knorr",
-"La Potagère",
-"U",
-"Carrefour",
-"Leader Price"
-],
-"part_marque": 0.0
-},
 "light": {
 "n": 318,
 "noms": [
@@ -11279,80 +9503,6 @@
 "Philadelphia",
 "Feed",
 "Light & free fruit"
-],
-"part_marque": 0.0
-},
-"colin": {
-"n": 388,
-"noms": [
-"colin d alaska",
-"colin d'alaska à",
-"colin d'alaska sauce"
-],
-"categorie": "en:meals-with-fish",
-"categories": [
-[
-"en:meals",
-166
-],
-[
-"en:seafood",
-165
-],
-[
-"en:fishes-and-their-products",
-162
-],
-[
-"en:meals-with-fish",
-146
-]
-],
-"secteur": "Surgelés/Viandes et poissons surgelés",
-"marques": [
-"Findus",
-"Thiriet",
-"U",
-"Auchan",
-"Carrefour",
-"Casino"
-],
-"part_marque": 0.0
-},
-"colin alaska": {
-"n": 321,
-"noms": [
-"colin d'alaska à la",
-"colin d'alaska",
-"colin d alaska"
-],
-"categorie": "en:meals-with-fish",
-"categories": [
-[
-"en:seafood",
-152
-],
-[
-"en:fishes-and-their-products",
-149
-],
-[
-"en:meals",
-147
-],
-[
-"en:meals-with-fish",
-129
-]
-],
-"secteur": "Surgelés/Viandes et poissons surgelés",
-"marques": [
-"Findus",
-"Thiriet",
-"Auchan",
-"U",
-"Casino",
-"Carrefour"
 ],
 "part_marque": 0.0
 },
@@ -11393,40 +9543,40 @@
 ],
 "part_marque": 0.0
 },
-"hummu": {
-"n": 230,
+"yaourt": {
+"n": 3257,
 "noms": [
-"hummus",
-"hummus chips",
-"hummus classic"
+"yaourt",
+"yaourt au lait",
+"yaourt de brebis"
 ],
-"categorie": "en:hummus",
+"categorie": "en:yogurts",
 "categories": [
 [
-"en:plant-based-foods",
-153
+"en:desserts",
+1786
 ],
 [
-"en:plant-based-foods-and-beverages",
-153
+"en:dairies",
+1782
 ],
 [
-"en:condiments",
-152
+"en:dairy-desserts",
+1766
 ],
 [
-"en:dips",
-152
+"en:fermented-foods",
+1766
 ]
 ],
-"secteur": "Traiteur/Traiteur frais",
+"secteur": "Crèmerie/Yaourts et desserts",
 "marques": [
-"Père Olive",
-"Chef Select",
-"fontaine santé",
-"Eat Real",
-"Florentin",
-"Delhaize"
+"Danone",
+"Yoplait",
+"Mamie Nova",
+"Leader Price",
+"Malo",
+"Monoprix"
 ],
 "part_marque": 0.0
 },
@@ -11456,7 +9606,7 @@
 92
 ]
 ],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Foodspring",
 "Barebells",
@@ -11464,43 +9614,6 @@
 "Women's Best",
 "KoRo",
 "The Protein Kitchen"
-],
-"part_marque": 0.0
-},
-"baie": {
-"n": 662,
-"noms": [
-"baies de goji",
-"baie de goji",
-"baies roses"
-],
-"categorie": "en:dried-goji",
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-298
-],
-[
-"en:plant-based-foods",
-297
-],
-[
-"en:fruits-and-vegetables-based-foods",
-269
-],
-[
-"en:dried-fruits",
-267
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Ducros",
-"Sainte Lucie",
-"Terre exotique",
-"Ecoidées",
-"Daco Bello",
-"Uberti"
 ],
 "part_marque": 0.0
 },
@@ -11541,77 +9654,40 @@
 ],
 "part_marque": 0.0
 },
-"chocolat lait": {
-"n": 1634,
-"noms": [
-"chocolat au lait",
-"chocolat lait",
-"chocolat au lait et"
-],
-"categorie": "en:milk-chocolates",
-"categories": [
-[
-"en:snacks",
-948
-],
-[
-"en:sweet-snacks",
-948
-],
-[
-"en:cocoa-and-its-products",
-937
-],
-[
-"en:chocolates",
-921
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"U",
-"Bovetti",
-"Hema",
-"Le Comptoir de Mathilde",
-"Lindt",
-"Milka"
-],
-"part_marque": 0.0
-},
 "fromage": {
-"n": 3173,
+"n": 2456,
 "noms": [
 "fromage",
-"fromage frais",
-"fromage au lait"
+"fromage au lait",
+"fromage à raclette"
 ],
 "categorie": "en:cheeses",
 "categories": [
 [
 "en:dairies",
-1816
+1327
 ],
 [
 "en:fermented-foods",
-1806
+1326
 ],
 [
 "en:fermented-milk-products",
-1805
+1326
 ],
 [
 "en:cheeses",
-1622
+1321
 ]
 ],
 "secteur": "Fromagerie/Fromages libre-service",
 "marques": [
 "U",
-"Carrefour",
-"Campagne de France",
 "Savencia",
+"Carrefour",
 "Milbona",
-"Marque Repère"
+"Paysan Breton",
+"Auchan"
 ],
 "part_marque": 0.0
 },
@@ -11678,7 +9754,7 @@
 51
 ]
 ],
-"secteur": "Traiteur/Traiteur frais",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Nestlé",
 "Auchan",
@@ -11826,7 +9902,7 @@
 185
 ]
 ],
-"secteur": "Épicerie salée/Sauces et condiments",
+"secteur": "Épicerie salée/Pâtes, riz et féculents",
 "marques": [
 "Knorr",
 "Auchan",
@@ -11838,39 +9914,39 @@
 "part_marque": 0.0
 },
 "emince": {
-"n": 1265,
+"n": 749,
 "noms": [
-"émincés de poulet",
-"émincé de poulet",
-"emincés de poulet"
+"emincés de saumon",
+"émincés de saumon",
+"émincé de porc"
 ],
-"categorie": "en:meats-and-their-products",
+"categorie": null,
 "categories": [
 [
+"en:fishes-and-their-products",
+147
+],
+[
+"en:seafood",
+147
+],
+[
+"en:fishes",
+144
+],
+[
 "en:meats-and-their-products",
-446
-],
-[
-"en:meats",
-377
-],
-[
-"en:poultries",
-306
-],
-[
-"en:chicken-and-its-products",
-263
+138
 ]
 ],
-"secteur": "Volaille/Volaille libre-service",
+"secteur": "Poissonnerie/Poissonnerie libre-service",
 "marques": [
 "U",
 "Fleury Michon",
-"Père Dodu",
-"Le Gaulois",
 "Carrefour",
-"Auchan"
+"Marque Repère",
+"Auchan",
+"Petit Navire"
 ],
 "part_marque": 0.0
 },
@@ -11948,40 +10024,40 @@
 ],
 "part_marque": 0.0
 },
-"couli": {
-"n": 741,
+"compote": {
+"n": 682,
 "noms": [
-"coulis de tomates",
-"coulis de tomate",
-"coulis de framboise"
+"compote",
+"compotes",
+"compote de rhubarbe"
 ],
-"categorie": "en:fruits-coulis",
+"categorie": "en:compotes",
 "categories": [
 [
+"en:plant-based-foods",
+319
+],
+[
 "en:plant-based-foods-and-beverages",
-446
+319
 ],
 [
 "en:fruits-and-vegetables-based-foods",
-445
+316
 ],
 [
-"en:plant-based-foods",
-445
-],
-[
-"en:condiments",
-368
+"en:desserts",
+314
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
-"Ponthier",
-"Fruits Rouges & Co.",
-"Heinz",
-"U",
-"André Guépratte",
-"Saveurs des Terroirs"
+"Materne",
+"Andros",
+"Charles & Alice",
+"Côteaux Nantais",
+"Les Comtes de Provence",
+"St Mamet"
 ],
 "part_marque": 0.0
 },
@@ -12022,77 +10098,40 @@
 ],
 "part_marque": 0.0
 },
-"taralli": {
-"n": 320,
-"noms": [
-"taralli",
-"taralli pugliesi",
-"taralli al peperoncino"
-],
-"categorie": "en:snacks",
-"categories": [
-[
-"en:snacks",
-140
-],
-[
-"en:salty-snacks",
-81
-],
-[
-"en:plant-based-foods",
-81
-],
-[
-"en:plant-based-foods-and-beverages",
-81
-]
-],
-"secteur": "Apéritif/Chips et biscuits apéritif",
-"marques": [
-"Terre di Puglia",
-"Fiore di Puglia",
-"Danieli",
-"La Spiga",
-"Tentazioni Pugliesi",
-"Tesori d'Apulia"
-],
-"part_marque": 0.01
-},
 "haricot": {
-"n": 1456,
+"n": 779,
 "noms": [
-"haricots blancs",
-"haricots blancs à",
-"haricots beurre"
+"haricots beurre",
+"haricots cuisinés",
+"haricots cuisinés à"
 ],
-"categorie": "en:common-beans",
+"categorie": "en:legumes",
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-802
+353
 ],
 [
 "en:plant-based-foods",
-801
+352
 ],
 [
 "en:legumes",
-729
+314
 ],
 [
 "en:legumes-and-their-products",
-729
+314
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Épicerie salée/Conserves",
 "marques": [
 "U",
+"Larnaudie",
 "Auchan",
 "Carrefour",
 "Notre Jardin",
-"D'aucy",
-"Casino"
+"D'aucy"
 ],
 "part_marque": 0.0
 },
@@ -12208,39 +10247,39 @@
 "part_marque": 0.0
 },
 "nectar": {
-"n": 1579,
+"n": 1364,
 "noms": [
-"nectar de pêche",
 "nectar de poire",
-"nectar multifruits"
+"nectar multifruits",
+"nectar de fraise"
 ],
 "categorie": "en:fruit-nectars",
 "categories": [
 [
 "en:beverages",
-1143
+983
 ],
 [
 "en:plant-based-beverages",
-1100
+940
 ],
 [
 "en:plant-based-foods-and-beverages",
-1100
+940
 ],
 [
 "en:juices-and-nectars",
-1088
+928
 ]
 ],
 "secteur": "Fruits et légumes/Fruits",
 "marques": [
 "U",
-"Alain Milliat",
 "Leader Price",
 "Solevita",
 "Carrefour",
-"U Bio"
+"U Bio",
+"Auchan"
 ],
 "part_marque": 0.0
 },
@@ -12352,43 +10391,6 @@
 "Naturéo",
 "Ancel",
 "Aline & Olivier"
-],
-"part_marque": 0.0
-},
-"quenelle": {
-"n": 574,
-"noms": [
-"quenelles de brochet",
-"quenelles de volaille",
-"quenelles de veau"
-],
-"categorie": "fr:quenelles",
-"categories": [
-[
-"en:meals",
-418
-],
-[
-"fr:quenelles",
-410
-],
-[
-"en:meals-with-fish",
-161
-],
-[
-"en:fish-quenelles",
-159
-]
-],
-"secteur": "Textile/Vêtements et chaussures",
-"marques": [
-"Giraudet",
-"Maison Malartre",
-"Saint Jean",
-"Petitjean",
-"Ecochard",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -12677,7 +10679,7 @@
 92
 ]
 ],
-"secteur": "Petit-déjeuner/Thé et chocolat en poudre",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Quai Sud",
 "Lindt",
@@ -12725,67 +10727,30 @@
 ],
 "part_marque": 0.0
 },
-"haricot blanc": {
-"n": 642,
-"noms": [
-"haricots blancs",
-"haricots blancs à la",
-"haricot blanc"
-],
-"categorie": "en:white-beans",
-"categories": [
-[
-"en:plant-based-foods",
-424
-],
-[
-"en:plant-based-foods-and-beverages",
-424
-],
-[
-"en:legumes",
-391
-],
-[
-"en:legumes-and-their-products",
-391
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Auchan",
-"U",
-"Carrefour",
-"Casino",
-"Notre Jardin",
-"D'aucy"
-],
-"part_marque": 0.0
-},
 "grain": {
-"n": 264,
+"n": 211,
 "noms": [
-"grains de café",
 "grains de chocolat",
-"grains de blé"
+"grains de blé",
+"grain de muscat"
 ],
-"categorie": "en:plant-based-foods-and-beverages",
+"categorie": null,
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-81
+54
 ],
 [
 "en:plant-based-foods",
-79
+52
 ],
 [
-"en:coffees",
-38
+"en:cereals-and-potatoes",
+32
 ],
 [
-"en:coffee-beans",
-37
+"en:cereals-and-their-products",
+31
 ]
 ],
 "secteur": "Petit-déjeuner/Café",
@@ -12796,6 +10761,43 @@
 "Carte Noire",
 "Nestlé",
 "Mizkan"
+],
+"part_marque": 0.0
+},
+"couli": {
+"n": 563,
+"noms": [
+"coulis de framboise",
+"coulis de caramel",
+"coulis de fruits"
+],
+"categorie": "en:fruits-coulis",
+"categories": [
+[
+"en:condiments",
+338
+],
+[
+"en:sauces",
+338
+],
+[
+"en:fruits-and-vegetables-based-foods",
+337
+],
+[
+"en:plant-based-foods",
+337
+]
+],
+"secteur": "Fruits et légumes/Fruits",
+"marques": [
+"Ponthier",
+"Fruits Rouges & Co.",
+"André Guépratte",
+"Saveurs des Terroirs",
+"Sainte Lucie",
+"U"
 ],
 "part_marque": 0.0
 },
@@ -12825,7 +10827,7 @@
 118
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Charcuterie Cosme",
 "Mix Buffet",
@@ -13057,43 +11059,6 @@
 ],
 "part_marque": 0.0
 },
-"mini muffin": {
-"n": 212,
-"noms": [
-"mini muffins",
-"mini muffins coeur fondant",
-"mini muffins cœur fondant"
-],
-"categorie": "en:muffins",
-"categories": [
-[
-"en:snacks",
-147
-],
-[
-"en:sweet-snacks",
-146
-],
-[
-"en:biscuits-and-cakes",
-145
-],
-[
-"en:cakes",
-144
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Les Délices des 7 Vallées",
-"Celiane",
-"Milka",
-"Escale Gourmande",
-"Biothentic",
-"Montes Lara"
-],
-"part_marque": 0.0
-},
 "joghurt": {
 "n": 213,
 "noms": [
@@ -13194,7 +11159,7 @@
 54
 ]
 ],
-"secteur": "Petit-déjeuner/Céréales",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Milbona",
 "MYPROTEIN",
@@ -13316,40 +11281,40 @@
 ],
 "part_marque": 0.0
 },
-"filet maquereau": {
-"n": 1081,
+"confit": {
+"n": 897,
 "noms": [
-"filets de maquereaux à",
-"filets de maquereaux",
-"filets de maquereaux au"
+"confit de foie",
+"confit de figues",
+"confit de porc"
 ],
-"categorie": "en:tinned-mackerels",
+"categorie": null,
 "categories": [
 [
-"en:fishes-and-their-products",
-940
+"en:spreads",
+252
 ],
 [
-"en:seafood",
-940
+"en:plant-based-foods-and-beverages",
+249
 ],
 [
-"en:fishes",
-936
+"en:plant-based-foods",
+248
 ],
 [
-"en:fatty-fishes",
-920
+"en:plant-based-spreads",
+231
 ]
 ],
-"secteur": "Épicerie salée/Conserves",
+"secteur": "Fruits et légumes/Fruits",
 "marques": [
-"Saupiquet",
-"Petit Navire",
-"La belle-iloise",
-"Carrefour",
-"Casino",
-"U"
+"U Saveurs",
+"U",
+"Lucien Georgelin",
+"L'épicurien",
+"Favols",
+"Larnaudie"
 ],
 "part_marque": 0.0
 },
@@ -13379,7 +11344,7 @@
 172
 ]
 ],
-"secteur": "Épicerie salée/Sel, épices et aides culinaires",
+"secteur": "Épicerie salée/Soupes et plats préparés",
 "marques": [
 "Knorr",
 "Unilever",
@@ -13416,7 +11381,7 @@
 73
 ]
 ],
-"secteur": "Fruits et légumes/Légumes",
+"secteur": "Épicerie salée/Soupes et plats préparés",
 "marques": [
 "Picard",
 "CAP Traiteur",
@@ -13502,76 +11467,39 @@
 "part_marque": 0.0
 },
 "boulette": {
-"n": 879,
+"n": 571,
 "noms": [
-"boulettes au boeuf",
-"boulettes au bœuf",
-"boulettes de boeuf"
+"boulettes de viande",
+"boulettes de porc",
+"boulettes de poulet"
 ],
-"categorie": "en:meats-and-their-products",
+"categorie": null,
 "categories": [
 [
 "en:meats-and-their-products",
-271
+129
 ],
 [
 "en:meat-preparations",
-208
+101
 ],
 [
-"en:meats",
-154
+"en:meat-alternatives",
+81
 ],
 [
 "en:meat-balls",
-145
+78
 ]
 ],
 "secteur": "Boucherie/Boucherie libre-service",
 "marques": [
 "Picard",
 "Carrefour",
-"Charal",
 "Thiriet",
-"Bigard",
+"Hari&Co",
+"Auchan",
 "Férial"
-],
-"part_marque": 0.0
-},
-"salade fruit": {
-"n": 370,
-"noms": [
-"salade de fruits",
-"salade de fruit",
-"salade de fruits de"
-],
-"categorie": "en:fruit-salads",
-"categories": [
-[
-"en:fruits-and-vegetables-based-foods",
-181
-],
-[
-"en:plant-based-foods",
-181
-],
-[
-"en:plant-based-foods-and-beverages",
-181
-],
-[
-"en:fruit-salads",
-171
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"E.Leclerc",
-"L'atelier des fruits et légumes",
-"Florette",
-"Royal Bourbon",
-"St Mamet",
-"Cora"
 ],
 "part_marque": 0.0
 },
@@ -13723,43 +11651,6 @@
 ],
 "part_marque": 0.0
 },
-"gyoza": {
-"n": 311,
-"noms": [
-"gyoza",
-"gyoza au poulet",
-"gyoza poulet"
-],
-"categorie": "en:stuffed-pastas",
-"categories": [
-[
-"en:meals",
-136
-],
-[
-"en:pasta-dishes",
-131
-],
-[
-"en:stuffed-pastas",
-131
-],
-[
-"en:pastas-and-dumplings",
-93
-]
-],
-"secteur": "Traiteur/Pâtes fraîches et pâtes à tarte",
-"marques": [
-"Ajinomoto",
-"Bibigo",
-"Maison de Corée",
-"Viči",
-"Picard",
-"Mei Asia"
-],
-"part_marque": 0.0
-},
 "biere": {
 "n": 1498,
 "noms": [
@@ -13863,48 +11754,11 @@
 "secteur": "Fruits et légumes/Fruits",
 "marques": [
 "Picard",
-"Ecoidées",
 "ETHNOSCIENCE",
+"Ecoidées",
 "Grain de frais",
 "Auchan",
 "Casino"
-],
-"part_marque": 0.0
-},
-"falafel": {
-"n": 334,
-"noms": [
-"falafel",
-"falafels",
-"falafels pois chiches"
-],
-"categorie": "en:falafels",
-"categories": [
-[
-"en:meat-alternatives",
-168
-],
-[
-"en:vegetarian-balls",
-164
-],
-[
-"en:falafels",
-160
-],
-[
-"en:plant-based-foods-and-beverages",
-136
-]
-],
-"secteur": "Boulangerie/Pain",
-"marques": [
-"Vemondo",
-"Soto",
-"Lidl",
-"Marque Repère",
-"Seazon",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -13981,117 +11835,6 @@
 "Dia"
 ],
 "part_marque": 0.01
-},
-"cerneau": {
-"n": 551,
-"noms": [
-"cerneaux de noix",
-"cerneau de noix",
-"cerneaux de noux"
-],
-"categorie": "en:walnut-kernels",
-"categories": [
-[
-"en:plant-based-foods",
-392
-],
-[
-"en:plant-based-foods-and-beverages",
-392
-],
-[
-"en:nuts-and-their-products",
-390
-],
-[
-"en:nuts",
-381
-]
-],
-"secteur": "Fruits et légumes/Fruits secs et graines",
-"marques": [
-"U",
-"Alesto",
-"Daco Bello",
-"Grand Frais",
-"Sun",
-"Des trucs à la noix"
-],
-"part_marque": 0.0
-},
-"cerneau noi": {
-"n": 528,
-"noms": [
-"cerneaux de noix",
-"cerneaux de noix extra",
-"cerneau de noix"
-],
-"categorie": "en:walnut-kernels",
-"categories": [
-[
-"en:plant-based-foods",
-383
-],
-[
-"en:plant-based-foods-and-beverages",
-383
-],
-[
-"en:nuts-and-their-products",
-381
-],
-[
-"en:nuts",
-372
-]
-],
-"secteur": "Fruits et légumes/Fruits secs et graines",
-"marques": [
-"U",
-"Alesto",
-"Grand Frais",
-"Sun",
-"Des trucs à la noix",
-"Carrefour"
-],
-"part_marque": 0.0
-},
-"grana": {
-"n": 343,
-"noms": [
-"grana padano",
-"grana padano aop",
-"grana padano dop"
-],
-"categorie": "en:grana-padano",
-"categories": [
-[
-"en:dairies",
-286
-],
-[
-"en:cheeses",
-284
-],
-[
-"en:fermented-foods",
-284
-],
-[
-"en:fermented-milk-products",
-284
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Monoprix",
-"Lovilio",
-"Auchan",
-"Tavola in Italia",
-"Casa Azzurra",
-"Giovanni Ferrari"
-],
-"part_marque": 0.0
 },
 "jus fruit": {
 "n": 227,
@@ -14200,7 +11943,7 @@
 "Alnatura",
 "Norma",
 "DmBio",
-"Favorina"
+"Lidl"
 ],
 "part_marque": 0.0
 },
@@ -14230,7 +11973,7 @@
 35
 ]
 ],
-"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
+"secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
 "BiotechUSA",
 "Eric Favre",
@@ -14241,151 +11984,40 @@
 ],
 "part_marque": 0.0
 },
-"parmigiano": {
-"n": 772,
-"noms": [
-"parmigiano reggiano",
-"parmigiano reggiano aop",
-"parmigiano reggiano dop"
-],
-"categorie": "en:parmigiano-reggiano",
-"categories": [
-[
-"en:cheeses",
-583
-],
-[
-"en:dairies",
-583
-],
-[
-"en:fermented-foods",
-583
-],
-[
-"en:fermented-milk-products",
-583
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Lovilio",
-"Monoprix Gourmet",
-"Monoprix",
-"Parmareggio",
-"U",
-"Carrefour"
-],
-"part_marque": 0.0
-},
-"parmigiano reggiano": {
-"n": 679,
-"noms": [
-"parmigiano reggiano",
-"parmigiano reggiano aop",
-"parmigiano reggiano dop"
-],
-"categorie": "en:parmigiano-reggiano",
-"categories": [
-[
-"en:cheeses",
-544
-],
-[
-"en:dairies",
-544
-],
-[
-"en:fermented-foods",
-544
-],
-[
-"en:fermented-milk-products",
-544
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Lovilio",
-"Monoprix Gourmet",
-"Monoprix",
-"Carrefour",
-"U",
-"Casa Azzurra"
-],
-"part_marque": 0.01
-},
 "melange fruit": {
-"n": 357,
+"n": 234,
 "noms": [
-"mélange de fruits secs",
 "mélange de fruits rouges",
-"mélange de fruits déshydratés"
+"mélange de fruits déshydratés",
+"mélange fruits rouges"
 ],
 "categorie": "en:fruits-and-vegetables-based-foods",
 "categories": [
 [
 "en:plant-based-foods-and-beverages",
-128
+81
 ],
 [
 "en:plant-based-foods",
-127
+80
 ],
 [
 "en:fruits-and-vegetables-based-foods",
-109
+73
 ],
 [
 "en:fruit-based-foods-and-beverages",
-70
+51
 ]
 ],
 "secteur": "Fruits et légumes/Fruits",
 "marques": [
-"Alesto",
 "U",
-"Trader Joe's",
 "Casino",
-"U Bio",
-"Thiriet"
-],
-"part_marque": 0.0
-},
-"betterave rouge": {
-"n": 241,
-"noms": [
-"betteraves rouges",
-"betteraves rouges en dés",
-"betterave rouge"
-],
-"categorie": "en:beetroot",
-"categories": [
-[
-"en:plant-based-foods",
-171
-],
-[
-"en:plant-based-foods-and-beverages",
-171
-],
-[
-"en:fruits-and-vegetables-based-foods",
-169
-],
-[
-"en:vegetables-based-foods",
-169
-]
-],
-"secteur": "Fruits et légumes/Légumes",
-"marques": [
-"Auchan",
+"Thiriet",
 "Carrefour",
-"Notre Jardin",
-"U",
-"Marque Repère",
-"D'aucy"
+"Alesto",
+"Bouton d'or"
 ],
 "part_marque": 0.0
 },
@@ -14497,43 +12129,6 @@
 "Milkana",
 "Andros",
 "Savencia"
-],
-"part_marque": 0.0
-},
-"bisque": {
-"n": 214,
-"noms": [
-"bisque de homard",
-"bisque de langoustines",
-"bisque de langoustine"
-],
-"categorie": "en:lobster-bisque",
-"categories": [
-[
-"en:seafood",
-161
-],
-[
-"en:lobster-bisque",
-139
-],
-[
-"en:meals",
-37
-],
-[
-"en:soups",
-37
-]
-],
-"secteur": "Épicerie salée/Soupes et plats préparés",
-"marques": [
-"Liebig",
-"La belle-iloise",
-"U",
-"Conserverie Courtin",
-"Maison Malartre",
-"Deluxe"
 ],
 "part_marque": 0.0
 },
@@ -14722,117 +12317,6 @@
 ],
 "part_marque": 0.0
 },
-"grana padano": {
-"n": 314,
-"noms": [
-"grana padano",
-"grana padano aop",
-"grana padano dop"
-],
-"categorie": "en:grana-padano",
-"categories": [
-[
-"en:dairies",
-279
-],
-[
-"en:cheeses",
-277
-],
-[
-"en:fermented-foods",
-277
-],
-[
-"en:fermented-milk-products",
-277
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Monoprix",
-"Casa Azzurra",
-"Lovilio",
-"Auchan",
-"Tavola in Italia",
-"Giovanni Ferrari"
-],
-"part_marque": 0.01
-},
-"beignet pomme": {
-"n": 236,
-"noms": [
-"beignet pomme",
-"beignets pomme",
-"beignets aux pommes"
-],
-"categorie": "en:jam-doughnuts",
-"categories": [
-[
-"en:snacks",
-125
-],
-[
-"en:sweet-snacks",
-123
-],
-[
-"en:sweet-fritters",
-120
-],
-[
-"en:biscuits-and-cakes",
-74
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Pasquier",
-"E.Leclerc",
-"Leclerc",
-"Carrefour",
-"Brioche Pasquier",
-"Cora"
-],
-"part_marque": 0.0
-},
-"cervela": {
-"n": 414,
-"noms": [
-"cervelas",
-"cervelas sauce vinaigrette",
-"cervelas pur porc"
-],
-"categorie": "en:cervelat",
-"categories": [
-[
-"en:meats-and-their-products",
-273
-],
-[
-"en:prepared-meats",
-270
-],
-[
-"en:sausages",
-267
-],
-[
-"en:cervelat",
-266
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Herta",
-"Auchan",
-"Saint Alby",
-"Stemmelen",
-"Iller",
-"Au Fumé Vosgien"
-],
-"part_marque": 0.0
-},
 "cannelloni": {
 "n": 268,
 "noms": [
@@ -14859,7 +12343,7 @@
 178
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Épicerie salée/Pâtes, riz et féculents",
 "marques": [
 "Carrefour",
 "Zapetti",
@@ -14871,29 +12355,29 @@
 "part_marque": 0.0
 },
 "tomme": {
-"n": 1216,
+"n": 899,
 "noms": [
-"tomme des pyrénées",
 "tomme de montagne",
-"tomme blanche"
+"tomme blanche",
+"tomme de chèvre"
 ],
-"categorie": "en:tomme-cheese-from-cow-s-milk",
+"categorie": "en:cheeses",
 "categories": [
 [
 "en:dairies",
-505
+272
 ],
 [
 "en:cheeses",
-503
+270
 ],
 [
 "en:fermented-foods",
-503
+270
 ],
 [
 "en:fermented-milk-products",
-503
+270
 ]
 ],
 "secteur": "Fromagerie/Fromages libre-service",
@@ -14901,8 +12385,8 @@
 "Monoprix",
 "Le Fromager Des Halles",
 "E.Leclerc",
-"Fromapac",
 "Leclerc",
+"Fromapac",
 "Leader Price"
 ],
 "part_marque": 0.0
@@ -14945,29 +12429,29 @@
 "part_marque": 0.0
 },
 "moelleu": {
-"n": 1102,
+"n": 675,
 "noms": [
-"moelleux au chocolat",
 "le moelleux",
-"moelleux chocolat"
+"moelleux citron",
+"moelleux nature"
 ],
-"categorie": "en:cakes",
+"categorie": null,
 "categories": [
 [
 "en:snacks",
-431
+165
 ],
 [
 "en:sweet-snacks",
-430
+164
 ],
 [
 "en:biscuits-and-cakes",
-428
+162
 ],
 [
 "en:cakes",
-403
+142
 ]
 ],
 "secteur": "Poissonnerie/Poissonnerie libre-service",
@@ -14975,9 +12459,9 @@
 "Fleury Michon",
 "Ker Cadélac",
 "Alsa",
+"Sondey",
 "Mistral",
-"Le Ster",
-"E.Leclerc"
+"LU"
 ],
 "part_marque": 0.0
 },
@@ -15015,80 +12499,6 @@
 "Leclerc",
 "Cora",
 "Jean Rozé"
-],
-"part_marque": 0.0
-},
-"rouleau": {
-"n": 203,
-"noms": [
-"rouleaux de printemps",
-"rouleau de printemps",
-"rouleau de surimi"
-],
-"categorie": null,
-"categories": [
-[
-"en:meals",
-33
-],
-[
-"en:spring-rolls",
-31
-],
-[
-"en:snacks",
-18
-],
-[
-"en:sweet-snacks",
-17
-]
-],
-"secteur": "Biscuits et sucré/Sucre, farine et pâtisserie",
-"marques": [
-"Agis",
-"Scrapcooking",
-"Soto",
-"Sushi Shop",
-"Wei Ming",
-"Wasabi"
-],
-"part_marque": 0.0
-},
-"tarte pomme": {
-"n": 421,
-"noms": [
-"tarte aux pommes",
-"tarte pommes",
-"tarte au pomme"
-],
-"categorie": "en:apple-pies",
-"categories": [
-[
-"en:sweet-pies",
-300
-],
-[
-"en:apple-pies",
-267
-],
-[
-"en:pies",
-164
-],
-[
-"en:snacks",
-13
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Pâtisserie",
-"marques": [
-"E.Leclerc",
-"Leclerc",
-"Casino",
-"Pasquier",
-"Boncolac",
-"Tartefrais"
 ],
 "part_marque": 0.0
 },
@@ -15163,43 +12573,6 @@
 "Les Brasérades",
 "Leclerc",
 "Bigard"
-],
-"part_marque": 0.0
-},
-"beignet chocolat": {
-"n": 305,
-"noms": [
-"beignets chocolat noisette",
-"beignet chocolat",
-"beignets chocolat"
-],
-"categorie": "en:sweet-fritters",
-"categories": [
-[
-"en:snacks",
-205
-],
-[
-"en:sweet-snacks",
-204
-],
-[
-"en:sweet-fritters",
-201
-],
-[
-"fr:beignets-au-chocolat",
-63
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"E.Leclerc",
-"Leclerc",
-"U",
-"Cora",
-"Intermarché",
-"Brioche Pasquier"
 ],
 "part_marque": 0.0
 },
@@ -15303,7 +12676,7 @@
 172
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Isla Délice",
 "Liebig",
@@ -15315,29 +12688,29 @@
 "part_marque": 0.0
 },
 "saucisson": {
-"n": 2682,
+"n": 2451,
 "noms": [
 "saucisson",
-"saucisson pur porc",
-"saucisson à cuire"
+"saucisson à cuire",
+"saucisson de cheval"
 ],
 "categorie": null,
 "categories": [
 [
 "en:meats-and-their-products",
-767
+722
 ],
 [
 "en:prepared-meats",
-731
+687
 ],
 [
 "en:cured-sausages",
-688
+645
 ],
 [
 "en:meats",
-420
+399
 ]
 ],
 "secteur": "Charcuterie/Charcuterie libre-service",
@@ -15351,104 +12724,30 @@
 ],
 "part_marque": 0.0
 },
-"jambon cuit": {
-"n": 2460,
-"noms": [
-"jambon cuit supérieur",
-"jambon cuit",
-"jambon cuit superieur"
-],
-"categorie": "en:white-hams",
-"categories": [
-[
-"en:meats-and-their-products",
-1787
-],
-[
-"en:prepared-meats",
-1779
-],
-[
-"en:hams",
-1768
-],
-[
-"en:white-hams",
-1748
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"U",
-"Carrefour",
-"Saint Alby",
-"U Saveurs",
-"Domaine Picard",
-"Madrange"
-],
-"part_marque": 0.0
-},
-"dinde": {
-"n": 561,
-"noms": [
-"dinde",
-"dinde farcie aux",
-"dinde fermière"
-],
-"categorie": "en:turkeys",
-"categories": [
-[
-"en:meats-and-their-products",
-247
-],
-[
-"en:meats",
-226
-],
-[
-"en:poultries",
-220
-],
-[
-"en:turkey-and-its-products",
-220
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Maître CoQ",
-"La Nouvelle Agriculture",
-"Les Fermiers de Loué",
-"Loué",
-"Le Gaulois",
-"Comme j'aime"
-],
-"part_marque": 0.0
-},
 "melange exotique": {
-"n": 250,
+"n": 244,
 "noms": [
 "mélange exotique",
 "melange exotique",
-"mélange exotique fruits secs"
+"mélange exotiques"
 ],
 "categorie": "en:dried-fruits",
 "categories": [
 [
 "en:plant-based-foods",
-110
+108
 ],
 [
 "en:plant-based-foods-and-beverages",
-110
+108
 ],
 [
 "en:fruits-and-vegetables-based-foods",
-109
+107
 ],
 [
 "en:dried-fruits",
-108
+106
 ]
 ],
 "secteur": "Apéritif/Fruits secs salés et olives",
@@ -15459,43 +12758,6 @@
 "Leader Price",
 "Daco Bello",
 "Festifruits"
-],
-"part_marque": 0.0
-},
-"jambon ancienne": {
-"n": 1068,
-"noms": [
-"jambon à l'ancienne",
-"jambon à l ancienne",
-"jambon a l ancienne"
-],
-"categorie": "fr:jambons-cuits-a-l-ancienne",
-"categories": [
-[
-"en:meats-and-their-products",
-686
-],
-[
-"en:prepared-meats",
-684
-],
-[
-"en:hams",
-683
-],
-[
-"en:meats",
-633
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Tallec",
-"Domaine Picard",
-"U Saveurs",
-"U",
-"Le porc de nos villages",
-"Le Porc Français"
 ],
 "part_marque": 0.0
 },
@@ -15562,7 +12824,7 @@
 19
 ]
 ],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "E.Leclerc",
 "Leclerc",
@@ -15647,40 +12909,40 @@
 ],
 "part_marque": 0.0
 },
-"poulet jaune": {
-"n": 316,
+"buche": {
+"n": 851,
 "noms": [
-"poulet jaune",
-"poulet jaune fermier",
-"poulet jaune fermier du"
+"buche du pilat",
+"bûche",
+"buche"
 ],
-"categorie": "en:chickens",
+"categorie": null,
 "categories": [
 [
-"en:meats-and-their-products",
-107
+"en:festive-foods",
+245
 ],
 [
-"en:meats",
-106
+"en:christmas-foods-and-drinks",
+244
 ],
 [
-"en:chicken-and-its-products",
-105
+"en:yule-log",
+242
 ],
 [
-"en:chickens",
-105
+"en:desserts",
+231
 ]
 ],
-"secteur": "Volaille/Volaille libre-service",
+"secteur": "Glaces/Desserts glacés",
 "marques": [
-"Volaé",
-"Casino",
-"La Nouvelle Agriculture",
-"Volandry",
-"Maître CoQ",
-"Marque Repère"
+"U",
+"Nestlé",
+"Erhard",
+"Adélie",
+"Picard",
+"Soignon"
 ],
 "part_marque": 0.0
 },
@@ -15710,7 +12972,7 @@
 157
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
 "Côte d'Or",
 "Marque Repère",
@@ -15906,82 +13168,8 @@
 ],
 "part_marque": 0.0
 },
-"baie goji": {
-"n": 468,
-"noms": [
-"baies de goji",
-"baies de goji séchées",
-"baie de goji"
-],
-"categorie": "en:dried-goji",
-"categories": [
-[
-"en:plant-based-foods",
-247
-],
-[
-"en:plant-based-foods-and-beverages",
-247
-],
-[
-"en:dried-fruits",
-245
-],
-[
-"en:dried-plant-based-foods",
-245
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Daco Bello",
-"Ecoidées",
-"Uberti",
-"Comptoirs et compagnies",
-"Juventis",
-"ETHNOSCIENCE"
-],
-"part_marque": 0.0
-},
-"boulette boeuf": {
-"n": 272,
-"noms": [
-"boulettes au boeuf",
-"boulettes au bœuf",
-"boulettes de boeuf"
-],
-"categorie": "en:beef-preparations",
-"categories": [
-[
-"en:meats-and-their-products",
-131
-],
-[
-"en:beef-and-its-products",
-102
-],
-[
-"en:meat-preparations",
-99
-],
-[
-"en:beef-preparations",
-94
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Charal",
-"Carrefour",
-"L'Étal du Boucher",
-"Jean Rozé",
-"Picard",
-"Bigard"
-],
-"part_marque": 0.0
-},
 "jambon superieur": {
-"n": 1222,
+"n": 1030,
 "noms": [
 "jambon supérieur sans couenne",
 "jambon supérieur",
@@ -15991,27 +13179,27 @@
 "categories": [
 [
 "en:meats-and-their-products",
-886
+743
 ],
 [
 "en:prepared-meats",
-876
+733
 ],
 [
 "en:hams",
-856
+714
 ],
 [
 "en:white-hams",
-847
+705
 ]
 ],
 "secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
 "U",
+"Auchan",
 "Tradilège",
 "Marque Repère",
-"Auchan",
 "Casino",
 "Fleury Michon"
 ],
@@ -16128,45 +13316,8 @@
 ],
 "part_marque": 0.0
 },
-"chair saucisse": {
-"n": 245,
-"noms": [
-"chair à saucisse",
-"chair a saucisse",
-"chair à saucisse aux"
-],
-"categorie": "en:sausage-meat",
-"categories": [
-[
-"en:meats-and-their-products",
-213
-],
-[
-"en:prepared-meats",
-212
-],
-[
-"en:sausage-meat",
-212
-],
-[
-"en:sausages",
-212
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"U",
-"L'Étal du Boucher",
-"Carrefour",
-"Jean Rozé",
-"Vallégrain",
-"Marque Repère"
-],
-"part_marque": 0.0
-},
 "melange sportif": {
-"n": 204,
+"n": 203,
 "noms": [
 "mélange sportif",
 "melange sportif",
@@ -16176,19 +13327,19 @@
 "categories": [
 [
 "en:plant-based-foods",
-85
+84
 ],
 [
 "en:plant-based-foods-and-beverages",
-85
+84
 ],
 [
 "en:dried-fruits",
-83
+82
 ],
 [
 "en:dried-plant-based-foods",
-83
+82
 ]
 ],
 "secteur": "Apéritif/Fruits secs salés et olives",
@@ -16232,47 +13383,10 @@
 "marques": [
 "E.Leclerc",
 "Leclerc",
-"Euraffair B.V",
 "Sans marque",
+"Euraffair B.V",
 "Super U",
-"Aldi"
-],
-"part_marque": 0.0
-},
-"briochette": {
-"n": 247,
-"noms": [
-"briochettes",
-"briochettes aux pépites",
-"briochette"
-],
-"categorie": "en:small-brioches",
-"categories": [
-[
-"en:snacks",
-141
-],
-[
-"en:sweet-snacks",
-140
-],
-[
-"en:sweet-pastries-and-pies",
-139
-],
-[
-"en:viennoiseries",
-139
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"Pasquier",
-"U",
-"Leclerc",
-"Maître Jean Pierre",
-"Auchan",
-"Cora"
+"Petit Furet"
 ],
 "part_marque": 0.0
 },
@@ -16387,119 +13501,45 @@
 ],
 "part_marque": 0.0
 },
-"mini viennoiserie": {
-"n": 241,
-"noms": [
-"mini viennoiseries",
-"mini viennoiserie",
-"mini viennoiseries x12"
-],
-"categorie": null,
-"categories": [
-[
-"en:snacks",
-31
-],
-[
-"en:sweet-pastries-and-pies",
-31
-],
-[
-"en:sweet-snacks",
-31
-],
-[
-"en:viennoiseries",
-31
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"E.Leclerc",
-"Leclerc",
-"Les 3 Meuniers",
-"U",
-"Leader Price",
-"Epi d'Or"
-],
-"part_marque": 0.0
-},
 "petit pain": {
-"n": 719,
+"n": 478,
 "noms": [
-"petits pains grillés au",
-"petits pains grillés",
-"petit pain"
+"petit pain",
+"petits pains",
+"petits pains au lait"
 ],
 "categorie": "en:breads",
 "categories": [
 [
 "en:plant-based-foods",
-324
+158
 ],
 [
 "en:plant-based-foods-and-beverages",
-324
+158
 ],
 [
 "en:breads",
-322
+156
 ],
 [
 "en:cereals-and-potatoes",
-322
+156
 ]
 ],
 "secteur": "Boulangerie/Pain",
 "marques": [
-"U",
-"Maître Jean Pierre",
 "Krisprolls",
-"Auchan",
-"Epi d'Or",
-"Chabrior"
-],
-"part_marque": 0.0
-},
-"knack": {
-"n": 473,
-"noms": [
-"knacks",
-"knack",
-"knacks pur porc"
-],
-"categorie": "en:sausages",
-"categories": [
-[
-"en:meats-and-their-products",
-181
-],
-[
-"en:prepared-meats",
-179
-],
-[
-"en:sausages",
-171
-],
-[
-"en:french-sausages",
-141
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Au Fumé Vosgien",
-"Stoeffler",
-"Carrefour",
-"Casino",
-"Monique ranou",
-"Auchan"
+"Thiriet",
+"Leclerc",
+"E.Leclerc",
+"Cora",
+"Pågen"
 ],
 "part_marque": 0.0
 },
 "galette frangipane": {
-"n": 472,
+"n": 456,
 "noms": [
 "galette frangipane",
 "galette frangipane bio",
@@ -16509,68 +13549,31 @@
 "categories": [
 [
 "en:biscuits-and-cakes",
-224
+215
 ],
 [
 "en:pastries",
-224
+215
 ],
 [
 "en:snacks",
-224
+215
 ],
 [
 "en:sweet-snacks",
-224
+215
 ]
 ],
 "secteur": "Viennoiserie et pâtisserie/Viennoiserie",
 "marques": [
 "E.Leclerc",
 "Leclerc",
-"Sans marque",
 "Intermarché",
+"Sans marque",
 "Carrefour",
 "Leader Price"
 ],
 "part_marque": 0.0
-},
-"ice tea": {
-"n": 475,
-"noms": [
-"ice tea",
-"ice tea pêche",
-"ice tea peach"
-],
-"categorie": "en:iced-teas",
-"categories": [
-[
-"en:beverages",
-208
-],
-[
-"en:beverages-and-beverages-preparations",
-164
-],
-[
-"en:tea-based-beverages",
-164
-],
-[
-"en:iced-teas",
-160
-]
-],
-"secteur": "Eaux et boissons sans alcool/Sodas et sirops",
-"marques": [
-"Lipton",
-"Freeway",
-"Migros",
-"Ice Tea",
-"Pfanner",
-"Unilever"
-],
-"part_marque": 0.02
 },
 "plateau": {
 "n": 629,
@@ -16646,80 +13649,6 @@
 ],
 "part_marque": 0.0
 },
-"souri": {
-"n": 637,
-"noms": [
-"souris d'agneau confite",
-"souris d agneau",
-"souris d'agneau"
-],
-"categorie": "fr:souris-d-agneau",
-"categories": [
-[
-"en:meats-and-their-products",
-487
-],
-[
-"en:meats",
-484
-],
-[
-"en:lamb-meat",
-483
-],
-[
-"fr:souris-d-agneau",
-466
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Tendre & Plus",
-"Jean Rozé",
-"Picard",
-"Tendre Et Plus",
-"Intermarché",
-"Lechef"
-],
-"part_marque": 0.0
-},
-"souri agneau": {
-"n": 606,
-"noms": [
-"souris d'agneau confite",
-"souris d'agneau",
-"souris d agneau confite"
-],
-"categorie": "fr:souris-d-agneau",
-"categories": [
-[
-"en:meats-and-their-products",
-484
-],
-[
-"en:meats",
-482
-],
-[
-"en:lamb-meat",
-481
-],
-[
-"fr:souris-d-agneau",
-465
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Tendre & Plus",
-"Jean Rozé",
-"Picard",
-"Tendre Et Plus",
-"Intermarché",
-"Lechef"
-],
-"part_marque": 0.0
-},
 "lot": {
 "n": 526,
 "noms": [
@@ -16758,76 +13687,39 @@
 "part_marque": 0.0
 },
 "langue": {
-"n": 551,
+"n": 317,
 "noms": [
-"langue de boeuf",
 "langue de porc",
-"langue de bœuf"
+"langues de chat",
+"langues de porc"
 ],
-"categorie": "en:beef-tongues",
+"categorie": "en:pork-tongue",
 "categories": [
 [
 "en:meats-and-their-products",
-357
+131
 ],
 [
 "en:meats",
-356
+130
 ],
 [
-"en:fish-and-meat-and-eggs",
-269
+"en:pork",
+125
 ],
 [
-"en:offals",
-269
+"en:pork-and-its-products",
+125
 ]
 ],
 "secteur": "Boucherie/Boucherie libre-service",
 "marques": [
-"Tendre & Plus",
-"Maison Larzul",
-"Stéphan",
-"Hénaff",
+"U",
+"Cora",
+"Lutti",
+"Bahier",
 "Auchan",
-"U"
-],
-"part_marque": 0.0
-},
-"kouign": {
-"n": 203,
-"noms": [
-"kouign amann",
-"kouign-amann",
-"kouign amann pur"
-],
-"categorie": "en:kouign-amann",
-"categories": [
-[
-"en:snacks",
-181
-],
-[
-"en:sweet-snacks",
-181
-],
-[
-"en:biscuits-and-cakes",
-179
-],
-[
-"en:pastries",
-179
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"Yann de Bretagne",
-"Berrou",
-"Biscuit d'Ys",
-"Crêperie Colas",
-"Leclerc",
-"Intermarché"
+"Fortwenger"
 ],
 "part_marque": 0.0
 },
@@ -16869,13 +13761,13 @@
 "part_marque": 0.0
 },
 "gro": {
-"n": 562,
+"n": 332,
 "noms": [
-"gros sel de",
 "6 gros oeufs",
-"gros sel"
+"6 gros œufs",
+"gros flocons d'avoine"
 ],
-"categorie": null,
+"categorie": "en:chicken-eggs",
 "categories": [
 [
 "en:eggs",
@@ -16886,59 +13778,22 @@
 133
 ],
 [
-"en:condiments",
-119
+"en:chicken-eggs",
+105
 ],
 [
-"en:salts",
-118
+"en:eggs-and-their-products",
+83
 ]
 ],
-"secteur": "Épicerie salée/Sel, épices et aides culinaires",
+"secteur": "Crèmerie/Beurre, œufs, crème",
 "marques": [
-"U",
-"Le Guérandais",
 "Lustucru",
-"Cérébos",
 "Matines",
-"Baby Coque"
-],
-"part_marque": 0.0
-},
-"moelleu chocolat": {
-"n": 361,
-"noms": [
-"moelleux au chocolat",
-"moelleux chocolat",
-"moelleux au chocolat bio"
-],
-"categorie": "en:molten-chocolate-cakes",
-"categories": [
-[
-"en:biscuits-and-cakes",
-238
-],
-[
-"en:snacks",
-238
-],
-[
-"en:sweet-snacks",
-238
-],
-[
-"en:cakes",
-234
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"E.Leclerc",
-"Leader Price",
-"Alsa",
-"Leclerc",
 "U",
-"Picard"
+"Baby Coque",
+"Celnat",
+"L'oeuf de nos villages"
 ],
 "part_marque": 0.0
 },
@@ -16976,43 +13831,6 @@
 "Tendriade",
 "Auchan",
 "Iglo"
-],
-"part_marque": 0.0
-},
-"bruschetta": {
-"n": 367,
-"noms": [
-"bruschetta",
-"bruschetta saumon",
-"bruschetta savoyarde"
-],
-"categorie": null,
-"categories": [
-[
-"en:plant-based-foods-and-beverages",
-53
-],
-[
-"en:plant-based-foods",
-52
-],
-[
-"en:spreads",
-52
-],
-[
-"en:condiments",
-50
-]
-],
-"secteur": "Boulangerie/Pain",
-"marques": [
-"U",
-"Lombardo sott'oli",
-"Pralina",
-"Tenuta Fragassi",
-"Carrefour",
-"Ciro"
 ],
 "part_marque": 0.0
 },
@@ -17091,44 +13909,44 @@
 "part_marque": 0.0
 },
 "cuisse": {
-"n": 571,
+"n": 295,
 "noms": [
-"cuisse de dinde",
 "cuisses de grenouilles",
-"cuisse de lapin"
+"cuisse de lapin",
+"cuisses de lapin"
 ],
-"categorie": "en:turkey-thighs",
+"categorie": "en:meats",
 "categories": [
 [
 "en:meats-and-their-products",
-445
+199
 ],
 [
 "en:meats",
-436
+190
 ],
 [
-"en:poultries",
-307
+"en:frog-legs",
+72
 ],
 [
-"en:turkey-and-its-products",
-245
+"en:frogs",
+72
 ]
 ],
 "secteur": "Volaille/Volaille libre-service",
 "marques": [
-"L'etal Du Volailler",
-"Le Gaulois",
 "U",
+"Le Gaulois",
+"LOEUL ET PIRIOT",
 "Maître CoQ",
-"Loué",
-"Marque Repère"
+"Thiriet",
+"Maison Malartre"
 ],
 "part_marque": 0.0
 },
 "poulet cuit": {
-"n": 860,
+"n": 856,
 "noms": [
 "poulet cuit fumé",
 "poulet cuit fumé au",
@@ -17138,19 +13956,19 @@
 "categories": [
 [
 "en:meats",
-446
-],
-[
-"en:meats-and-their-products",
-446
-],
-[
-"en:poultries",
 442
 ],
 [
+"en:meats-and-their-products",
+442
+],
+[
+"en:poultries",
+438
+],
+[
 "en:chicken-and-its-products",
-440
+436
 ]
 ],
 "secteur": "Volaille/Rôtisserie",
@@ -17165,76 +13983,39 @@
 "part_marque": 0.0
 },
 "mousse foie": {
-"n": 319,
+"n": 254,
 "noms": [
-"mousse de foie de",
 "mousse de foie",
+"mousse de foie de",
 "mousse de foie forestière"
 ],
 "categorie": "fr:mousses-de-foies",
 "categories": [
 [
 "en:meats-and-their-products",
-298
+239
 ],
 [
 "en:salted-spreads",
-295
+237
 ],
 [
 "en:savory-mousses",
-295
+237
 ],
 [
 "en:spreads",
-295
+237
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Madrange",
 "Auchan",
 "U",
-"Marque Repère",
 "Le Fleuron de la Réunion",
-"L'assiette d'Antoine"
-],
-"part_marque": 0.0
-},
-"jambon sec": {
-"n": 885,
-"noms": [
-"jambon sec",
-"jambon sec supérieur",
-"jambon sec de pays"
-],
-"categorie": "en:dried-hams",
-"categories": [
-[
-"en:meats-and-their-products",
-677
-],
-[
-"en:prepared-meats",
-674
-],
-[
-"en:hams",
-662
-],
-[
-"en:cured-hams",
-647
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"U",
-"Maison Milhau",
-"Oberti",
-"U Saveurs",
-"Carrefour",
-"Montagne Noire"
+"L'assiette d'Antoine",
+"Le Porc Français"
 ],
 "part_marque": 0.0
 },
@@ -17312,43 +14093,6 @@
 ],
 "part_marque": 0.0
 },
-"bloc": {
-"n": 1410,
-"noms": [
-"bloc de foie",
-"bloc foie gras",
-"le bloc de"
-],
-"categorie": "en:block-of-foie-gras",
-"categories": [
-[
-"en:fish-and-meat-and-eggs",
-1075
-],
-[
-"en:foies-gras",
-1074
-],
-[
-"en:foies-gras-from-ducks",
-968
-],
-[
-"en:block-of-foie-gras",
-805
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Larnaudie",
-"Delpeyrat",
-"Labeyrie",
-"Maison Montfort",
-"Rougié",
-"U"
-],
-"part_marque": 0.0
-},
 "brochette": {
 "n": 736,
 "noms": [
@@ -17383,80 +14127,6 @@
 "Carrefour",
 "U",
 "Picard"
-],
-"part_marque": 0.0
-},
-"poulet fermier": {
-"n": 1296,
-"noms": [
-"poulet fermier",
-"poulet fermier bio",
-"poulet fermier jaune"
-],
-"categorie": "en:chickens",
-"categories": [
-[
-"en:meats-and-their-products",
-496
-],
-[
-"en:meats",
-492
-],
-[
-"en:poultries",
-488
-],
-[
-"en:chicken-and-its-products",
-485
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"L'etal Du Volailler",
-"Loué",
-"Nature de France",
-"Les Fermiers de Loué",
-"Maître CoQ",
-"U Bio"
-],
-"part_marque": 0.0
-},
-"saucisson pur": {
-"n": 241,
-"noms": [
-"saucisson pur porc",
-"saucisson pur porc vpf",
-"saucisson pur porc aux"
-],
-"categorie": null,
-"categories": [
-[
-"en:cured-sausages",
-45
-],
-[
-"en:meats-and-their-products",
-45
-],
-[
-"en:prepared-meats",
-45
-],
-[
-"en:dry-sausages",
-34
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Le Batistou",
-"Despi",
-"Grand Lou",
-"grand loup",
-"Salaisons de la Brèche",
-"Rostain"
 ],
 "part_marque": 0.0
 },
@@ -17497,49 +14167,12 @@
 ],
 "part_marque": 0.0
 },
-"queue": {
-"n": 544,
-"noms": [
-"queues de crevettes",
-"queue de crevettes",
-"queues de langouste"
-],
-"categorie": "en:shrimps-tails",
-"categories": [
-[
-"en:seafood",
-425
-],
-[
-"en:crustaceans",
-412
-],
-[
-"en:shrimps",
-335
-],
-[
-"en:shrimps-tails",
-278
-]
-],
-"secteur": "Poissonnerie/Poissonnerie libre-service",
-"marques": [
-"Carrefour",
-"Picard",
-"Delpierre",
-"Casino",
-"Escal",
-"Grand Frais"
-],
-"part_marque": 0.0
-},
 "buchette": {
-"n": 426,
+"n": 378,
 "noms": [
-"bûchette de chèvre",
-"buchette de chevre",
-"buchette"
+"buchette",
+"buchette cendrée",
+"la buchette"
 ],
 "categorie": null,
 "categories": [
@@ -17566,82 +14199,8 @@
 "Monoprix Gourmet",
 "Carrefour",
 "Monoprix",
-"Soignon",
-"Pierre Schmidt"
-],
-"part_marque": 0.0
-},
-"macedoine": {
-"n": 402,
-"noms": [
-"macédoine de légumes",
-"macedoine de legumes",
-"macédoine"
-],
-"categorie": "en:vegetables-macedoines",
-"categories": [
-[
-"en:plant-based-foods",
-291
-],
-[
-"en:plant-based-foods-and-beverages",
-291
-],
-[
-"en:snacks",
-227
-],
-[
-"en:appetizers",
-217
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Auchan",
-"U",
-"Carrefour",
-"Leader Price",
-"Marque Repère",
-"Casino"
-],
-"part_marque": 0.0
-},
-"macedoine legume": {
-"n": 286,
-"noms": [
-"macédoine de légumes",
-"macedoine de legumes",
-"macédoine de légumes -"
-],
-"categorie": "en:vegetables-macedoines",
-"categories": [
-[
-"en:plant-based-foods",
-232
-],
-[
-"en:plant-based-foods-and-beverages",
-232
-],
-[
-"en:appetizers",
-188
-],
-[
-"en:salty-snacks",
-188
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Auchan",
-"U",
-"Carrefour",
-"Marque Repère",
-"Casino",
-"Leader Price"
+"Pierre Schmidt",
+"E.Leclerc"
 ],
 "part_marque": 0.0
 },
@@ -17720,7 +14279,7 @@
 "part_marque": 0.0
 },
 "confiture myrtille": {
-"n": 401,
+"n": 398,
 "noms": [
 "confiture myrtille",
 "confiture de myrtilles",
@@ -17730,19 +14289,19 @@
 "categories": [
 [
 "en:breakfasts",
-329
+326
 ],
 [
 "en:fruit-and-vegetable-preserves",
-329
+326
 ],
 [
 "en:plant-based-foods",
-329
+326
 ],
 [
 "en:plant-based-foods-and-beverages",
-329
+326
 ]
 ],
 "secteur": "Fruits et légumes/Fruits",
@@ -17756,114 +14315,40 @@
 ],
 "part_marque": 0.0
 },
-"lard": {
-"n": 201,
-"noms": [
-"lard paysan",
-"lard fumé",
-"lard paysan d'alsace"
-],
-"categorie": "en:pork-fat",
-"categories": [
-[
-"en:meats-and-their-products",
-169
-],
-[
-"en:pork-and-its-products",
-168
-],
-[
-"en:bacon",
-167
-],
-[
-"en:meats",
-167
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Migros",
-"Philippe Wagner",
-"Cora",
-"Carrefour",
-"Cher Mignon",
-"Coop Prix Garantie"
-],
-"part_marque": 0.0
-},
-"coq": {
-"n": 233,
-"noms": [
-"coq au vin",
-"coq en box",
-"le coq au"
-],
-"categorie": "en:cockerel-in-red-wine-sauce",
-"categories": [
-[
-"en:meats-and-their-products",
-127
-],
-[
-"en:meals",
-117
-],
-[
-"en:meals-with-meat",
-109
-],
-[
-"en:poultry-meals",
-106
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Maître CoQ",
-"Larnaudie",
-"La Belle Chaurienne",
-"Les Bories",
-"U",
-"Jean Larnaudie"
-],
-"part_marque": 0.0
-},
 "palet": {
-"n": 1367,
+"n": 998,
 "noms": [
-"palets bretons",
-"palets bretons pur",
-"palets pur beurre"
+"palets pur beurre",
+"palets de bretagne",
+"palets"
 ],
-"categorie": "en:shortbread-cookies",
+"categorie": "en:sweet-snacks",
 "categories": [
 [
 "en:snacks",
-633
+323
 ],
 [
 "en:sweet-snacks",
-628
+318
 ],
 [
 "en:biscuits-and-cakes",
-590
+280
 ],
 [
 "en:biscuits",
-579
+271
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
 "marques": [
 "La Mère Poulard",
-"U",
 "Biscuiterie de Chambord",
+"U",
 "Jacques Menou",
-"Marque Repère",
-"Auchan"
+"La Fourche",
+"Louvat"
 ],
 "part_marque": 0.0
 },
@@ -17941,43 +14426,6 @@
 ],
 "part_marque": 0.0
 },
-"gateau breton": {
-"n": 271,
-"noms": [
-"gâteau breton",
-"gateau breton",
-"gâteau breton framboise"
-],
-"categorie": "en:breton-cakes",
-"categories": [
-[
-"en:biscuits-and-cakes",
-208
-],
-[
-"en:cakes",
-208
-],
-[
-"en:snacks",
-208
-],
-[
-"en:sweet-snacks",
-208
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"Berrou",
-"Le Guillou",
-"Louis Le Goff",
-"Le Floch",
-"La Quimperloise",
-"Terre et Soleil"
-],
-"part_marque": 0.0
-},
 "fondue": {
 "n": 267,
 "noms": [
@@ -18007,8 +14455,8 @@
 "secteur": "Fruits et légumes/Légumes",
 "marques": [
 "Liebig",
-"RichesMonts",
 "CF&R",
+"RichesMonts",
 "Savencia",
 "Coop",
 "President"
@@ -18201,7 +14649,7 @@
 "part_marque": 0.0
 },
 "galette ble": {
-"n": 385,
+"n": 379,
 "noms": [
 "galettes de blé noir",
 "galette de blé noir",
@@ -18211,19 +14659,19 @@
 "categories": [
 [
 "en:galettes",
-247
+243
 ],
 [
 "en:plain-buckwheat-crepes",
-235
+232
 ],
 [
 "en:crepes-and-galettes",
-160
+157
 ],
 [
 "en:crepes-and-pancakes",
-99
+98
 ]
 ],
 "secteur": "Biscuits et sucré/Biscuits et gâteaux",
@@ -18232,8 +14680,8 @@
 "Bernard Jarnoux",
 "Moulin des Moines",
 "Marque Repère",
-"Casino",
-"Catel-Roc"
+"Catel-Roc",
+"Bertel"
 ],
 "part_marque": 0.0
 },
@@ -18263,7 +14711,7 @@
 81
 ]
 ],
-"secteur": "Volaille/Volaille libre-service",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
 "Guyader",
 "Mix Buffet",
@@ -18344,7 +14792,7 @@
 "U",
 "Le Comptoir de Mathilde",
 "Moulin de Valdonne",
-"Marque Repère"
+"Rustica"
 ],
 "part_marque": 0.0
 },
@@ -18422,80 +14870,6 @@
 ],
 "part_marque": 0.0
 },
-"aiguillette": {
-"n": 568,
-"noms": [
-"aiguillettes de canard",
-"aiguillettes de dinde",
-"aiguillette de canard"
-],
-"categorie": "fr:aiguillettes-de-canard",
-"categories": [
-[
-"en:meats-and-their-products",
-331
-],
-[
-"en:meats",
-328
-],
-[
-"en:poultries",
-317
-],
-[
-"en:ducks",
-275
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Maître CoQ",
-"Monoprix",
-"Le Gaulois",
-"Delpeyrat",
-"Maison Montfort",
-"U"
-],
-"part_marque": 0.0
-},
-"aiguillette canard": {
-"n": 334,
-"noms": [
-"aiguillettes de canard",
-"aiguillettes de canard du",
-"aiguillette de canard"
-],
-"categorie": "fr:aiguillettes-de-canard",
-"categories": [
-[
-"en:meats-and-their-products",
-277
-],
-[
-"en:meats",
-276
-],
-[
-"en:poultries",
-275
-],
-[
-"en:ducks",
-273
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Delpeyrat",
-"Le Gaulois",
-"Maison Montfort",
-"Monoprix",
-"U",
-"Saveurs de nos Régions"
-],
-"part_marque": 0.0
-},
 "mini cake": {
 "n": 268,
 "noms": [
@@ -18533,92 +14907,18 @@
 ],
 "part_marque": 0.0
 },
-"mousse canard": {
-"n": 318,
-"noms": [
-"mousse de canard",
-"mousse de canard au",
-"mousse de canard aux"
-],
-"categorie": "en:duck-mousse",
-"categories": [
-[
-"en:meats-and-their-products",
-196
-],
-[
-"en:salted-spreads",
-189
-],
-[
-"en:savory-mousses",
-189
-],
-[
-"en:spreads",
-189
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Madrange",
-"Tradilège",
-"Carrefour",
-"Marque Repère",
-"U",
-"Saint Alby"
-],
-"part_marque": 0.0
-},
-"confiture extra": {
-"n": 895,
-"noms": [
-"confiture extra",
-"confiture extra de myrtilles",
-"confiture extra myrtille"
-],
-"categorie": "en:fruit-jams",
-"categories": [
-[
-"en:spreads",
-647
-],
-[
-"en:plant-based-foods",
-646
-],
-[
-"en:plant-based-foods-and-beverages",
-646
-],
-[
-"en:plant-based-spreads",
-646
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Charles Antona",
-"Beyer",
-"Biolo'Klock",
-"Maison Jougla",
-"J.M. Chatelain",
-"U"
-],
-"part_marque": 0.0
-},
 "tuile": {
-"n": 532,
+"n": 451,
 "noms": [
-"tuiles aux amandes",
 "tuiles",
-"tuiles goût paprika"
+"tuiles goût paprika",
+"tuiles goût crème"
 ],
-"categorie": "en:snacks",
+"categorie": "en:crisps",
 "categories": [
 [
 "en:snacks",
-280
+208
 ],
 [
 "en:salty-snacks",
@@ -18633,10 +14933,10 @@
 140
 ]
 ],
-"secteur": "Apéritif/Chips et biscuits apéritif",
+"secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
-"U",
 "Chevaliers d'Argouges",
+"U",
 "Casino",
 "Leader Price",
 "Marque Repère",
@@ -18644,96 +14944,18 @@
 ],
 "part_marque": 0.0
 },
-"galette pomme": {
-"n": 219,
-"noms": [
-"galettes de pommes de",
-"galette pomme",
-"galettes de pomme de"
-],
-"categorie": null,
-"categories": [
-[
-"en:snacks",
-31
-],
-[
-"en:biscuits-and-cakes",
-29
-],
-[
-"en:sweet-snacks",
-29
-],
-[
-"en:pastries",
-27
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"E.Leclerc",
-"Sans marque",
-"Produits de la Cigogne",
-"Schneider",
-"U",
-"La Crêpe de Brocéliande"
-],
-"part_marque": 0.0
-},
-"gratin dauphinoi": {
-"n": 228,
-"noms": [
-"gratin dauphinois",
-"gratin dauphinois au jambon",
-"gratin dauphinois à la"
-],
-"categorie": "en:dauphine-style-creamed-potatoes-au-gratin",
-"categories": [
-[
-"en:meals",
-209
-],
-[
-"en:gratins",
-207
-],
-[
-"en:potato-gratin",
-207
-],
-[
-"en:dauphine-style-creamed-potatoes-au-gratin",
-206
-]
-],
-"secteur": "Surgelés/Plats et pizzas surgelés",
-"marques": [
-"Carrefour",
-"U",
-"Leader Price",
-"Auchan",
-"Thiriet",
-"Marie"
-],
-"part_marque": 0.0
-},
 "supreme": {
-"n": 318,
+"n": 295,
 "noms": [
-"suprême de poulet",
 "suprême de volaille",
-"suprême de saumon"
+"suprême de saumon",
+"suprême de pintade"
 ],
 "categorie": null,
 "categories": [
 [
 "en:meals",
-37
-],
-[
-"en:meats-and-their-products",
-35
+36
 ],
 [
 "en:plant-based-foods-and-beverages",
@@ -18742,9 +14964,13 @@
 [
 "en:plant-based-foods",
 30
+],
+[
+"en:meats-and-their-products",
+26
 ]
 ],
-"secteur": "Volaille/Volaille libre-service",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
 "Saint Jean",
 "Frey",
@@ -18789,228 +15015,6 @@
 "Ronsard",
 "La Table Du Fermier",
 "Lyré"
-],
-"part_marque": 0.0
-},
-"yaourt fermier": {
-"n": 378,
-"noms": [
-"yaourt fermier",
-"yaourt fermier au lait",
-"yaourt fermier à la"
-],
-"categorie": "en:yogurts",
-"categories": [
-[
-"en:dairies",
-178
-],
-[
-"en:desserts",
-178
-],
-[
-"en:dairy-desserts",
-177
-],
-[
-"en:fermented-foods",
-177
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"La Ferme Saint Ulrich",
-"La Ferme de la Vieille Abbaye",
-"La Vache Occitane",
-"Les P'tits Fermiers",
-"La Ferme de Viltain",
-"Coeur de Fermier"
-],
-"part_marque": 0.0
-},
-"rib": {
-"n": 769,
-"noms": [
-"ribs de porc",
-"ribs",
-"ribs de boeuf"
-],
-"categorie": null,
-"categories": [
-[
-"en:meats-and-their-products",
-84
-],
-[
-"en:meats",
-80
-],
-[
-"en:pork-and-its-products",
-59
-],
-[
-"en:pork",
-58
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Férial",
-"Jean Rozé",
-"Madrange",
-"Bigard",
-"Marque Repère",
-"U"
-],
-"part_marque": 0.0
-},
-"rib porc": {
-"n": 345,
-"noms": [
-"ribs de porc",
-"ribs de porc à",
-"ribs de porc barbecue"
-],
-"categorie": null,
-"categories": [
-[
-"en:meats-and-their-products",
-29
-],
-[
-"en:meats",
-27
-],
-[
-"en:pork-and-its-products",
-26
-],
-[
-"en:pork",
-25
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Férial",
-"Jean Rozé",
-"Marque Repère",
-"Bigard",
-"Maître Jacques",
-"Kirkland"
-],
-"part_marque": 0.0
-},
-"aligot": {
-"n": 200,
-"noms": [
-"aligot",
-"aligot de l'aubrac",
-"aligot de l"
-],
-"categorie": "en:aligots",
-"categories": [
-[
-"en:aligots",
-184
-],
-[
-"en:meals",
-184
-],
-[
-"en:fresh-foods",
-8
-],
-[
-"en:fresh-meals",
-8
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Jeune Montagne",
-"Maison Carrier",
-"Saveurs de nos Régions",
-"Coeur d'Aveyron",
-"L'assiette d'Antoine",
-"Thiriet"
-],
-"part_marque": 0.01
-},
-"petit sale": {
-"n": 258,
-"noms": [
-"petit salé aux lentilles",
-"petit salé",
-"petit salé cuit"
-],
-"categorie": "en:salt-cured-pork-belly-with-lentils",
-"categories": [
-[
-"en:meals",
-136
-],
-[
-"en:meals-with-meat",
-127
-],
-[
-"en:meats-and-their-products",
-126
-],
-[
-"en:lentil-dishes",
-123
-]
-],
-"secteur": "Épicerie salée/Soupes et plats préparés",
-"marques": [
-"Larnaudie",
-"Carrefour",
-"U",
-"Maison Rivière",
-"La Belle Chaurienne",
-"William Saurin"
-],
-"part_marque": 0.0
-},
-"terrine lapin": {
-"n": 229,
-"noms": [
-"terrine de lapin",
-"terrine de lapin aux",
-"terrine de lapin au"
-],
-"categorie": "en:rabbit-terrines",
-"categories": [
-[
-"en:meats-and-their-products",
-199
-],
-[
-"en:prepared-meats",
-199
-],
-[
-"en:rabbit-terrines",
-198
-],
-[
-"en:terrines",
-198
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Carrefour",
-"U",
-"Arnaud",
-"Cora",
-"Jean Brunet",
-"Paul Larédy"
 ],
 "part_marque": 0.0
 },
@@ -19088,40 +15092,40 @@
 ],
 "part_marque": 0.0
 },
-"yaourt vanille": {
-"n": 216,
+"rib": {
+"n": 391,
 "noms": [
-"yaourt vanille",
-"yaourt à la vanille",
-"yaourt vanille de madagascar"
+"ribs",
+"ribs de boeuf",
+"ribs à la"
 ],
-"categorie": "en:vanilla-yogurt",
+"categorie": null,
 "categories": [
 [
-"en:dairies",
-125
+"en:meats-and-their-products",
+50
 ],
 [
-"en:dairy-desserts",
-124
+"en:meats",
+48
 ],
 [
-"en:desserts",
-124
+"en:pork",
+28
 ],
 [
-"en:fermented-dairy-desserts",
-124
+"en:pork-and-its-products",
+28
 ]
 ],
-"secteur": "Crèmerie/Yaourts et desserts",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
-"Nestlé",
-"La Laitière",
-"Envia",
-"Yoplait",
-"Ferme Collet",
-"Bonne Maman"
+"Madrange",
+"Bigard",
+"Tendre & Plus",
+"U",
+"Jean Floc'h",
+"Maître Jacques"
 ],
 "part_marque": 0.0
 },
@@ -19151,7 +15155,7 @@
 153
 ]
 ],
-"secteur": "Volaille/Volaille libre-service",
+"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
 "marques": [
 "Douce France",
 "U",
@@ -19162,40 +15166,40 @@
 ],
 "part_marque": 0.0
 },
-"cuisse dinde": {
-"n": 276,
+"aiguillette": {
+"n": 233,
 "noms": [
-"cuisse de dinde",
-"cuisse de dinde fermière",
-"1 cuisse de dinde"
+"aiguillettes de dinde",
+"aiguillettes",
+"aiguillettes de cabillaud"
 ],
-"categorie": "en:turkey-thighs",
+"categorie": null,
 "categories": [
 [
-"en:meats",
-246
+"en:meats-and-their-products",
+54
 ],
 [
-"en:meats-and-their-products",
-246
+"en:meats",
+52
 ],
 [
 "en:poultries",
-245
+42
 ],
 [
-"en:turkey-and-its-products",
-245
+"en:breaded-products",
+27
 ]
 ],
-"secteur": "Boucherie/Boucherie libre-service",
+"secteur": "Volaille/Volaille libre-service",
 "marques": [
-"L'etal Du Volailler",
-"Le Gaulois",
-"Loué",
-"Marque Repère",
-"Eco+",
-"Corril"
+"Maître CoQ",
+"Monoprix",
+"Cité Marine",
+"Charal",
+"HappyVore",
+"Le Gaulois"
 ],
 "part_marque": 0.0
 },
@@ -19233,80 +15237,6 @@
 "Père Dodu",
 "Old El Paso",
 "Toupargel"
-],
-"part_marque": 0.0
-},
-"escalope milanaise": {
-"n": 241,
-"noms": [
-"escalope milanaise",
-"escalopes milanaises",
-"escalopes milanaise"
-],
-"categorie": "en:breaded-turkey-cutlets",
-"categories": [
-[
-"en:meats-and-their-products",
-162
-],
-[
-"en:breaded-products",
-153
-],
-[
-"en:meat-preparations",
-153
-],
-[
-"en:breaded-meat-cutlets",
-150
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Le Gaulois",
-"Volandry",
-"Père Dodu",
-"Aia",
-"Royal Bernard",
-"Marque Repère"
-],
-"part_marque": 0.0
-},
-"petit sable": {
-"n": 216,
-"noms": [
-"petits sablés",
-"petits sablés à la",
-"petits sablés bretons au"
-],
-"categorie": "en:shortbread-cookies",
-"categories": [
-[
-"en:snacks",
-116
-],
-[
-"en:biscuits",
-96
-],
-[
-"en:biscuits-and-cakes",
-96
-],
-[
-"en:sweet-snacks",
-96
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"La Sablésienne",
-"La Vie Claire",
-"La Bien Nommée",
-"Michel et Augustin",
-"Bio Soleil",
-"Bonneterre"
 ],
 "part_marque": 0.0
 },
@@ -19379,43 +15309,6 @@
 ],
 "part_marque": 0.0
 },
-"manchon": {
-"n": 238,
-"noms": [
-"manchons de canard",
-"manchons de poulet",
-"manchon de poulet"
-],
-"categorie": "en:poultries",
-"categories": [
-[
-"en:meats-and-their-products",
-104
-],
-[
-"en:meats",
-100
-],
-[
-"en:poultries",
-99
-],
-[
-"en:chicken-and-its-products",
-58
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Larnaudie",
-"Cora",
-"Jean Larnaudie",
-"Maître CoQ",
-"Monoprix",
-"Marque Repère"
-],
-"part_marque": 0.0
-},
 "pom pote": {
 "n": 456,
 "noms": [
@@ -19442,7 +15335,7 @@
 274
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "Materne",
 "POM'POTES",
@@ -19450,80 +15343,6 @@
 "Bio+",
 "Classique",
 "5 Fruits"
-],
-"part_marque": 0.0
-},
-"dos": {
-"n": 449,
-"noms": [
-"dos de cabillaud",
-"dos de colin",
-"dos de lieu"
-],
-"categorie": "en:cods",
-"categories": [
-[
-"en:fishes-and-their-products",
-291
-],
-[
-"en:seafood",
-291
-],
-[
-"en:fishes",
-290
-],
-[
-"en:lean-fishes",
-211
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"Picard",
-"Findus",
-"U",
-"Toupargel",
-"Delpierre",
-"Compagnie des Pêches Saint-Malo"
-],
-"part_marque": 0.0
-},
-"dos cabillaud": {
-"n": 287,
-"noms": [
-"dos de cabillaud",
-"dos de cabillaud msc",
-"dos de cabillaud sans"
-],
-"categorie": "fr:dos-de-cabillaud",
-"categories": [
-[
-"en:fishes-and-their-products",
-190
-],
-[
-"en:seafood",
-190
-],
-[
-"en:fishes",
-189
-],
-[
-"en:cods",
-173
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"Picard",
-"Findus",
-"Delpierre",
-"U",
-"Compagnie des Pêches Saint-Malo",
-"Monoprix"
 ],
 "part_marque": 0.0
 },
@@ -19553,7 +15372,7 @@
 27
 ]
 ],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
+"secteur": "Poissonnerie/Poissonnerie libre-service",
 "marques": [
 "France Kebab",
 "Maître CoQ",
@@ -19561,43 +15380,6 @@
 "Vilmas",
 "Maître Prunille",
 "Sans marque"
-],
-"part_marque": 0.0
-},
-"mogette": {
-"n": 244,
-"noms": [
-"mogette de vendée",
-"mogettes de vendée",
-"mogettes"
-],
-"categorie": "fr:mogette-de-vendee",
-"categories": [
-[
-"en:plant-based-foods",
-154
-],
-[
-"en:plant-based-foods-and-beverages",
-154
-],
-[
-"en:fruits-and-vegetables-based-foods",
-148
-],
-[
-"en:vegetables-based-foods",
-148
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Gastromer",
-"Olvac",
-"Nos Régions ont du Talent",
-"Pinson",
-"U",
-"U de nos Régions"
 ],
 "part_marque": 0.0
 },
@@ -19672,80 +15454,6 @@
 "L'Étal du Boucher",
 "Socopa",
 "Les Brasérades"
-],
-"part_marque": 0.0
-},
-"palette": {
-"n": 958,
-"noms": [
-"palette à la",
-"palette de porc",
-"palette a la"
-],
-"categorie": "en:pork",
-"categories": [
-[
-"en:meats-and-their-products",
-310
-],
-[
-"en:meats",
-308
-],
-[
-"en:pork",
-304
-],
-[
-"en:pork-and-its-products",
-304
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Moritz",
-"Tendre & Plus",
-"Jeannette",
-"Iller",
-"Jean Rozé",
-"Férial"
-],
-"part_marque": 0.0
-},
-"palette porc": {
-"n": 220,
-"noms": [
-"palette de porc cuite",
-"palette de porc",
-"palette de porc à"
-],
-"categorie": null,
-"categories": [
-[
-"en:meats",
-39
-],
-[
-"en:meats-and-their-products",
-39
-],
-[
-"en:pork",
-39
-],
-[
-"en:pork-and-its-products",
-39
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Tendre & Plus",
-"Maître Jacques",
-"Les Brasérades",
-"Férial",
-"Socopa",
-"Moritz"
 ],
 "part_marque": 0.0
 },
@@ -19897,6 +15605,43 @@
 ],
 "part_marque": 0.0
 },
+"palette": {
+"n": 737,
+"noms": [
+"palette à la",
+"palette a la",
+"palette fumée"
+],
+"categorie": "en:devilled-pork-shoulder-in-mustard-sauce",
+"categories": [
+[
+"en:meats-and-their-products",
+271
+],
+[
+"en:meats",
+269
+],
+[
+"en:pork",
+265
+],
+[
+"en:pork-and-its-products",
+265
+]
+],
+"secteur": "Boucherie/Boucherie libre-service",
+"marques": [
+"Moritz",
+"Jeannette",
+"Iller",
+"Jean Rozé",
+"Clermont",
+"Zentz"
+],
+"part_marque": 0.0
+},
 "petale": {
 "n": 401,
 "noms": [
@@ -19934,43 +15679,6 @@
 ],
 "part_marque": 0.0
 },
-"chiffonnade": {
-"n": 364,
-"noms": [
-"chiffonnade de jambon",
-"chiffonnade de viande",
-"chiffonnade de rosette"
-],
-"categorie": "en:prepared-meats",
-"categories": [
-[
-"en:meats-and-their-products",
-206
-],
-[
-"en:prepared-meats",
-184
-],
-[
-"en:meats",
-135
-],
-[
-"en:hams",
-93
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"U Saveurs",
-"U",
-"Auchan",
-"Corte del Gusto",
-"Peguet Savoie",
-"Casa Ramon"
-],
-"part_marque": 0.0
-},
 "specialite": {
 "n": 1010,
 "noms": [
@@ -19997,7 +15705,7 @@
 159
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "Yoplait",
 "U",
@@ -20042,80 +15750,6 @@
 "Bjorg",
 "Evernat",
 "Carrefour"
-],
-"part_marque": 0.0
-},
-"navette": {
-"n": 273,
-"noms": [
-"navettes",
-"navettes de provence",
-"navettes fleur d'oranger"
-],
-"categorie": "en:biscuits",
-"categories": [
-[
-"en:snacks",
-96
-],
-[
-"en:sweet-snacks",
-96
-],
-[
-"en:biscuits-and-cakes",
-85
-],
-[
-"en:biscuits",
-84
-]
-],
-"secteur": "Viennoiserie et pâtisserie/Viennoiserie",
-"marques": [
-"La Fournée Dorée",
-"Castellane",
-"Les Délices des 7 Vallées",
-"Biscuiterie de provence",
-"La Roumanière",
-"La Cure Gourmande"
-],
-"part_marque": 0.0
-},
-"jambon pari": {
-"n": 331,
-"noms": [
-"jambon de paris",
-"jambon de paris sans",
-"jambon de paris découenné"
-],
-"categorie": "en:prepared-pork-meats",
-"categories": [
-[
-"en:meats-and-their-products",
-268
-],
-[
-"en:prepared-meats",
-265
-],
-[
-"en:hams",
-256
-],
-[
-"en:white-hams",
-256
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"U",
-"Fleury Michon",
-"Tradilège",
-"Saint Alby",
-"Marque Repère",
-"Charles Keller"
 ],
 "part_marque": 0.0
 },
@@ -20182,7 +15816,7 @@
 47
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Justin Bridou",
 "Galler",
@@ -20190,43 +15824,6 @@
 "Bâton de Berger Mini",
 "Lindt",
 "Cémoi"
-],
-"part_marque": 0.0
-},
-"emiette": {
-"n": 260,
-"noms": [
-"emietté de thon",
-"émietté de thon",
-"emietté de maquereau"
-],
-"categorie": "en:canned-fishes",
-"categories": [
-[
-"en:seafood",
-133
-],
-[
-"en:fishes-and-their-products",
-128
-],
-[
-"en:fishes",
-123
-],
-[
-"en:fatty-fishes",
-118
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"La belle-iloise",
-"Gastromer",
-"Petit Navire",
-"La Perle des Dieux",
-"Connétable",
-"La Paimpolaise"
 ],
 "part_marque": 0.0
 },
@@ -20267,80 +15864,6 @@
 ],
 "part_marque": 0.0
 },
-"filet hareng": {
-"n": 278,
-"noms": [
-"filets de harengs fumés",
-"filets de harengs doux",
-"filets de hareng fumés"
-],
-"categorie": "en:smoked-herrings",
-"categories": [
-[
-"en:fishes-and-their-products",
-247
-],
-[
-"en:seafood",
-247
-],
-[
-"en:fishes",
-246
-],
-[
-"en:fatty-fishes",
-225
-]
-],
-"secteur": "Poissonnerie/Poissonnerie libre-service",
-"marques": [
-"J.C.David",
-"Delpierre",
-"Carrefour",
-"Baltic",
-"Casino",
-"Simon"
-],
-"part_marque": 0.0
-},
-"queue crevette": {
-"n": 375,
-"noms": [
-"queues de crevettes cuites",
-"queues de crevettes décortiquées",
-"queues de crevettes"
-],
-"categorie": "en:shrimps-tails",
-"categories": [
-[
-"en:seafood",
-330
-],
-[
-"en:crustaceans",
-326
-],
-[
-"en:shrimps",
-324
-],
-[
-"en:shrimps-tails",
-272
-]
-],
-"secteur": "Poissonnerie/Poissonnerie libre-service",
-"marques": [
-"Carrefour",
-"Delpierre",
-"Grand Frais",
-"Casino",
-"Escal",
-"Picard"
-],
-"part_marque": 0.0
-},
 "tendre": {
 "n": 399,
 "noms": [
@@ -20367,7 +15890,7 @@
 70
 ]
 ],
-"secteur": "Traiteur/Traiteur frais",
+"secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
 "Herta",
 "Tendre Noix",
@@ -20489,43 +16012,6 @@
 ],
 "part_marque": 0.0
 },
-"diot": {
-"n": 231,
-"noms": [
-"diots de savoie",
-"diot de savoie",
-"diots"
-],
-"categorie": "en:sausage-from-savoy",
-"categories": [
-[
-"en:meats-and-their-products",
-164
-],
-[
-"en:prepared-meats",
-164
-],
-[
-"en:sausages",
-161
-],
-[
-"en:french-sausages",
-160
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Henri Raffin",
-"Clavière",
-"Saveurs de nos Régions",
-"U",
-"Reflets de France",
-"Bell"
-],
-"part_marque": 0.0
-},
 "creatine": {
 "n": 234,
 "noms": [
@@ -20563,154 +16049,6 @@
 ],
 "part_marque": 0.0
 },
-"tomme pyrenee": {
-"n": 238,
-"noms": [
-"tomme des pyrénées",
-"tomme des pyrénées igp",
-"tomme des pyrenees"
-],
-"categorie": "fr:tomme-des-pyrenees",
-"categories": [
-[
-"en:cheeses",
-189
-],
-[
-"en:dairies",
-189
-],
-[
-"en:fermented-foods",
-189
-],
-[
-"en:fermented-milk-products",
-189
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"Monoprix",
-"U",
-"Le Fromager Des Halles",
-"Ets Schoepfer",
-"Pays Gourmand",
-"Monoprix Gourmet"
-],
-"part_marque": 0.0
-},
-"papillote": {
-"n": 314,
-"noms": [
-"papillotes",
-"les papillotes",
-"les papillotes lait"
-],
-"categorie": "fr:papillotes-en-chocolat",
-"categories": [
-[
-"en:snacks",
-179
-],
-[
-"en:sweet-snacks",
-178
-],
-[
-"en:confectioneries",
-177
-],
-[
-"en:chocolate-candies",
-174
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Révillon",
-"Maggi",
-"L'assiette Bleue",
-"Révillon Chocolatier",
-"Carrefour",
-"Vendome"
-],
-"part_marque": 0.0
-},
-"lasagne bolognaise": {
-"n": 334,
-"noms": [
-"lasagnes à la bolognaise",
-"lasagne bolognaise",
-"lasagnes bolognaise"
-],
-"categorie": "en:bolognese-lasagne",
-"categories": [
-[
-"en:meals",
-295
-],
-[
-"en:pasta-dishes",
-292
-],
-[
-"en:prepared-lasagne",
-292
-],
-[
-"en:meat-lasagnas",
-291
-]
-],
-"secteur": "Surgelés/Plats et pizzas surgelés",
-"marques": [
-"U",
-"Carrefour",
-"Cora",
-"Sans marque",
-"Auchan",
-"Toque du Chef"
-],
-"part_marque": 0.0
-},
-"galette pur": {
-"n": 204,
-"noms": [
-"galettes pur beurre",
-"galette pur beurre",
-"galettes pur beurre à"
-],
-"categorie": null,
-"categories": [
-[
-"en:biscuits-and-cakes",
-57
-],
-[
-"en:snacks",
-57
-],
-[
-"en:sweet-snacks",
-57
-],
-[
-"en:biscuits",
-53
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"DV SAS",
-"Bertel",
-"Beurlay",
-"St Michel",
-"Bonne Maman",
-"Goulibeur"
-],
-"part_marque": 0.0
-},
 "collagen": {
 "n": 207,
 "noms": [
@@ -20737,7 +16075,7 @@
 5
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Vital Proteins",
 "Prozis",
@@ -20745,43 +16083,6 @@
 "Great Lakes Wellness",
 "Epaplus",
 "Garden of Life"
-],
-"part_marque": 0.0
-},
-"puree pomme": {
-"n": 917,
-"noms": [
-"purée de pommes",
-"purée de pommes de",
-"purée de pomme"
-],
-"categorie": "en:apple-compotes",
-"categories": [
-[
-"en:plant-based-foods",
-553
-],
-[
-"en:plant-based-foods-and-beverages",
-551
-],
-[
-"en:desserts",
-453
-],
-[
-"en:fruits-and-vegetables-based-foods",
-453
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Côteaux Nantais",
-"U",
-"La Vie Claire",
-"U Bio",
-"Casino",
-"Casino Bio"
 ],
 "part_marque": 0.0
 },
@@ -20897,39 +16198,39 @@
 "part_marque": 0.0
 },
 "truffe": {
-"n": 793,
+"n": 325,
 "noms": [
-"truffes fantaisie",
 "truffes",
-"truffes fantaisies"
+"truffe",
+"truffes au cacao"
 ],
-"categorie": "en:chocolate-truffles",
+"categorie": null,
 "categories": [
 [
 "en:snacks",
-323
-],
-[
-"en:sweet-snacks",
-320
+89
 ],
 [
 "en:cocoa-and-its-products",
-318
+86
 ],
 [
-"en:confectioneries",
-316
+"en:sweet-snacks",
+86
+],
+[
+"en:chocolate-candies",
+85
 ]
 ],
 "secteur": "Biscuits et sucré/Chocolat et confiserie",
 "marques": [
 "Mathez",
 "Truffettes De France",
-"Guyaux",
-"Favorina",
-"Chocolat Mathez",
-"Cémoi"
+"Cémoi",
+"La Maison Du Chocolat",
+"Lanvin",
+"Frey"
 ],
 "part_marque": 0.0
 },
@@ -20963,8 +16264,8 @@
 "marques": [
 "Listel",
 "Thomas Le Prince",
-"Marque Repère",
 "Festalie",
+"Marque Repère",
 "La Reinette Verte",
 "La Source du Verger"
 ],
@@ -21070,7 +16371,7 @@
 146
 ]
 ],
-"secteur": "Épicerie salée/Sauces et condiments",
+"secteur": "Épicerie salée/Conserves",
 "marques": [
 "Mutti",
 "Conserve Italia",
@@ -21081,45 +16382,8 @@
 ],
 "part_marque": 0.0
 },
-"berlingot": {
-"n": 215,
-"noms": [
-"berlingots",
-"berlingots de carpentras",
-"berlingot"
-],
-"categorie": null,
-"categories": [
-[
-"en:snacks",
-46
-],
-[
-"en:sweet-snacks",
-46
-],
-[
-"en:confectioneries",
-45
-],
-[
-"en:candies",
-41
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Pinson",
-"St Mamet",
-"So Shape",
-"Hema",
-"DV SAS",
-"Lucien Georgelin"
-],
-"part_marque": 0.0
-},
 "yaourt lait": {
-"n": 443,
+"n": 344,
 "noms": [
 "yaourt au lait entier",
 "yaourt au lait de",
@@ -21129,19 +16393,19 @@
 "categories": [
 [
 "en:dairies",
-276
+205
 ],
 [
 "en:desserts",
-270
+200
 ],
 [
 "en:dairy-desserts",
-269
+199
 ],
 [
 "en:fermented-dairy-desserts",
-268
+198
 ]
 ],
 "secteur": "Crèmerie/Yaourts et desserts",
@@ -21149,46 +16413,9 @@
 "Malo",
 "Leader Price",
 "Ker Ronan",
-"U",
 "Casino",
-"Soignon"
-],
-"part_marque": 0.0
-},
-"tender": {
-"n": 232,
-"noms": [
-"tenders de poulet",
-"tenders",
-"tender de poulet"
-],
-"categorie": "en:chicken-and-its-products",
-"categories": [
-[
-"en:meats-and-their-products",
-112
-],
-[
-"en:chicken-and-its-products",
-105
-],
-[
-"en:meat-preparations",
-69
-],
-[
-"en:chicken-preparations",
-67
-]
-],
-"secteur": "Surgelés/Viandes et poissons surgelés",
-"marques": [
-"Milka",
-"Isla Délice",
-"Carrefour",
-"KFC",
-"HappyVore",
-"Hünkar"
+"Soignon",
+"Envia"
 ],
 "part_marque": 0.0
 },
@@ -21229,43 +16456,6 @@
 ],
 "part_marque": 0.0
 },
-"praline": {
-"n": 687,
-"noms": [
-"pralines",
-"pralines aux amandes",
-"praliné"
-],
-"categorie": "en:sweet-snacks",
-"categories": [
-[
-"en:snacks",
-225
-],
-[
-"en:sweet-snacks",
-225
-],
-[
-"en:confectioneries",
-195
-],
-[
-"en:cocoa-and-its-products",
-113
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Lindt",
-"Côte d'Or",
-"Frey",
-"Comptoir du Cacao",
-"Milka",
-"Tresors De Chefs"
-],
-"part_marque": 0.0
-},
 "whey": {
 "n": 1428,
 "noms": [
@@ -21292,7 +16482,7 @@
 26
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Scitec nutrition",
 "Prozis",
@@ -21300,80 +16490,6 @@
 "Body&fit",
 "Decathlon",
 "Fitness Boutique"
-],
-"part_marque": 0.0
-},
-"barre proteinee": {
-"n": 240,
-"noms": [
-"barre protéinée",
-"barre proteinée",
-"barre proteinee"
-],
-"categorie": "en:protein-bars",
-"categories": [
-[
-"en:bodybuilding-supplements",
-124
-],
-[
-"en:dietary-supplements",
-124
-],
-[
-"en:protein-bars",
-121
-],
-[
-"en:bars",
-26
-]
-],
-"secteur": "Fruits et légumes/Fruits secs et graines",
-"marques": [
-"Eafit",
-"H3RO",
-"Fulfil",
-"Lumber Jack",
-"Nutripure",
-"Sync"
-],
-"part_marque": 0.0
-},
-"nougat tendre": {
-"n": 287,
-"noms": [
-"nougat tendre",
-"nougat tendre aux amandes",
-"nougat tendre au miel"
-],
-"categorie": "en:nougats",
-"categories": [
-[
-"en:confectioneries",
-157
-],
-[
-"en:snacks",
-157
-],
-[
-"en:sweet-snacks",
-157
-],
-[
-"en:nougats",
-154
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Chabert & Guillot",
-"Les Trois Abeilles",
-"Aitana",
-"Confiserie Stanislas",
-"Suprem'Nougat",
-"L'Ami Provençal"
 ],
 "part_marque": 0.0
 },
@@ -21440,7 +16556,7 @@
 11
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "Scitec nutrition",
 "Foodspring",
@@ -21488,43 +16604,6 @@
 ],
 "part_marque": 0.0
 },
-"pop corn": {
-"n": 582,
-"noms": [
-"pop corn",
-"pop corn sucré",
-"pop corn caramel"
-],
-"categorie": "en:popcorn",
-"categories": [
-[
-"en:snacks",
-264
-],
-[
-"en:popcorn",
-260
-],
-[
-"en:sweet-snacks",
-163
-],
-[
-"en:sugared-popcorn",
-110
-]
-],
-"secteur": "Apéritif/Chips et biscuits apéritif",
-"marques": [
-"Hema",
-"Menguy's",
-"Jimmy's",
-"Netto",
-"Tokapi",
-"Bouton d'or"
-],
-"part_marque": 0.0
-},
 "douceur": {
 "n": 535,
 "noms": [
@@ -21554,8 +16633,8 @@
 "secteur": "Épicerie salée/Sauces et condiments",
 "marques": [
 "Knorr",
-"Marque Repère",
 "Douceur du Verger",
+"Marque Repère",
 "Le Petit Basque",
 "Oliviers & Co",
 "Evernat"
@@ -21633,80 +16712,6 @@
 "Sainte Lucie",
 "Cook",
 "Fuchs"
-],
-"part_marque": 0.0
-},
-"fondant chocolat": {
-"n": 256,
-"noms": [
-"fondant au chocolat",
-"fondant chocolat",
-"fondant au chocolat noir"
-],
-"categorie": "en:cakes",
-"categories": [
-[
-"en:snacks",
-90
-],
-[
-"en:sweet-snacks",
-90
-],
-[
-"en:biscuits-and-cakes",
-88
-],
-[
-"en:cakes",
-86
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"Carrefour",
-"Alsa",
-"Mamie Nova",
-"Rians",
-"Casino",
-"U"
-],
-"part_marque": 0.0
-},
-"soupe legume": {
-"n": 204,
-"noms": [
-"soupe de légumes",
-"soupe de légumes verts",
-"soupe de legumes"
-],
-"categorie": "en:vegetable-soups",
-"categories": [
-[
-"en:meals",
-95
-],
-[
-"en:soups",
-95
-],
-[
-"en:plant-based-foods",
-80
-],
-[
-"en:plant-based-foods-and-beverages",
-80
-]
-],
-"secteur": "Fruits et légumes/Légumes",
-"marques": [
-"Knorr",
-"La Vie Claire",
-"Ferme d'Anchin",
-"Liebig",
-"Danival",
-"Karine & Jeff"
 ],
 "part_marque": 0.0
 },
@@ -21858,43 +16863,6 @@
 ],
 "part_marque": 0.0
 },
-"mendiant": {
-"n": 222,
-"noms": [
-"mendiants",
-"mendiants chocolat noir",
-"les mendiants"
-],
-"categorie": null,
-"categories": [
-[
-"en:snacks",
-33
-],
-[
-"en:sweet-snacks",
-26
-],
-[
-"en:cocoa-and-its-products",
-23
-],
-[
-"en:chocolates",
-18
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"U",
-"Mercier",
-"U Saveurs",
-"Le Comptoir de Mathilde",
-"Seeberger",
-"Delhaize"
-],
-"part_marque": 0.0
-},
 "pure whey": {
 "n": 353,
 "noms": [
@@ -22003,80 +16971,6 @@
 "Bionaturae",
 "Moulin des Moines",
 "Destination"
-],
-"part_marque": 0.0
-},
-"filet anchoi": {
-"n": 359,
-"noms": [
-"filets d'anchois",
-"filets d'anchois à l'huile",
-"filets d'anchois marinés à"
-],
-"categorie": "en:marinated-anchovy-fillets-with-vegetable-oil",
-"categories": [
-[
-"en:fishes-and-their-products",
-290
-],
-[
-"en:seafood",
-290
-],
-[
-"en:fishes",
-289
-],
-[
-"en:anchovy",
-288
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Micéli",
-"Belmonte",
-"Delicemer",
-"Casino",
-"La Sablaise",
-"La Monégasque"
-],
-"part_marque": 0.0
-},
-"confiture lait": {
-"n": 241,
-"noms": [
-"confiture de lait",
-"confiture de lait au",
-"confiture de lait de"
-],
-"categorie": "en:milk-jams",
-"categories": [
-[
-"en:breakfasts",
-208
-],
-[
-"en:spreads",
-208
-],
-[
-"en:sweet-spreads",
-208
-],
-[
-"en:milk-jams",
-204
-]
-],
-"secteur": "Petit-déjeuner/Confitures et pâtes à tartiner",
-"marques": [
-"Confiture de lait",
-"Le Bois Jumel",
-"Raffolé",
-"André Guépratte",
-"Au Faisan Doré",
-"La Ferme de L'Isle"
 ],
 "part_marque": 0.0
 },
@@ -22265,43 +17159,6 @@
 ],
 "part_marque": 0.0
 },
-"baba": {
-"n": 274,
-"noms": [
-"baba au rhum",
-"babas au rhum",
-"baba ganoush"
-],
-"categorie": "en:pastries",
-"categories": [
-[
-"en:snacks",
-154
-],
-[
-"en:sweet-snacks",
-154
-],
-[
-"en:biscuits-and-cakes",
-153
-],
-[
-"en:pastries",
-153
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"Le Comptoir de Mathilde",
-"Bonne Maman",
-"Lidl",
-"Lemarie patissier",
-"Comtesse du Barry",
-"Piemme"
-],
-"part_marque": 0.0
-},
 "cone": {
 "n": 334,
 "noms": [
@@ -22487,80 +17344,6 @@
 ],
 "part_marque": 0.01
 },
-"sauce vinaigrette": {
-"n": 203,
-"noms": [
-"sauce vinaigrette",
-"sauce vinaigrette au vinaigre",
-"sauce vinaigrette balsamique"
-],
-"categorie": "en:vinaigrettes",
-"categories": [
-[
-"en:condiments",
-130
-],
-[
-"en:sauces",
-128
-],
-[
-"en:salad-dressings",
-126
-],
-[
-"en:vinaigrettes",
-126
-]
-],
-"secteur": "Épicerie salée/Sauces et condiments",
-"marques": [
-"Delouis",
-"U",
-"Jean d'Audignac",
-"Carrefour",
-"Tête Noire",
-"Clovis"
-],
-"part_marque": 0.0
-},
-"fromage frai": {
-"n": 711,
-"noms": [
-"fromage frais",
-"fromage frais aux fruits",
-"fromage frais nature"
-],
-"categorie": "fr:fromages-blancs",
-"categories": [
-[
-"en:dairies",
-485
-],
-[
-"en:fermented-foods",
-476
-],
-[
-"en:fermented-milk-products",
-475
-],
-[
-"en:desserts",
-325
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"Campagne de France",
-"Malo",
-"Isigny Ste Mère",
-"U",
-"Marque Repère",
-"Carrefour"
-],
-"part_marque": 0.0
-},
 "vin": {
 "n": 1784,
 "noms": [
@@ -22632,43 +17415,6 @@
 "Kookabarra",
 "Clipper",
 "Gayelord Hauser"
-],
-"part_marque": 0.0
-},
-"gro sel": {
-"n": 230,
-"noms": [
-"gros sel de guérande",
-"gros sel",
-"gros sel de mer"
-],
-"categorie": "en:sea-salts",
-"categories": [
-[
-"en:condiments",
-119
-],
-[
-"en:salts",
-118
-],
-[
-"en:groceries",
-84
-],
-[
-"en:sea-salts",
-73
-]
-],
-"secteur": "Épicerie salée/Sel, épices et aides culinaires",
-"marques": [
-"Le Guérandais",
-"Cérébos",
-"Les Sauniers de l'Île de Ré",
-"La Baleine",
-"Soléou",
-"Le Saunier De Camargue"
 ],
 "part_marque": 0.0
 },
@@ -22931,43 +17677,6 @@
 ],
 "part_marque": 0.04
 },
-"terrine canard": {
-"n": 673,
-"noms": [
-"terrine de canard au",
-"terrine de canard",
-"terrine de canard aux"
-],
-"categorie": "en:duck-terrines",
-"categories": [
-[
-"en:meats-and-their-products",
-562
-],
-[
-"en:prepared-meats",
-562
-],
-[
-"en:terrines",
-560
-],
-[
-"en:duck-terrines",
-559
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Comtesse du Barry",
-"Ducs de Gascogne",
-"U",
-"Valette",
-"Maison Papillon",
-"Hénaff"
-],
-"part_marque": 0.0
-},
 "test": {
 "n": 224,
 "noms": [
@@ -22994,7 +17703,7 @@
 4
 ]
 ],
-"secteur": "Boulangerie/Pain",
+"secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
 "La Laitière",
 "Funky Veggie",
@@ -23031,7 +17740,7 @@
 30
 ]
 ],
-"secteur": "Boulangerie/Pain",
+"secteur": "Apéritif/Chips et biscuits apéritif",
 "marques": [
 "Cerreto",
 "Select",
@@ -23039,43 +17748,6 @@
 "Tedesco",
 "Carrefour",
 "Danone"
-],
-"part_marque": 0.0
-},
-"cepe": {
-"n": 235,
-"noms": [
-"cèpes extra",
-"cèpes",
-"cèpes séchés"
-],
-"categorie": "en:mushrooms-and-their-products",
-"categories": [
-[
-"en:plant-based-foods",
-102
-],
-[
-"en:plant-based-foods-and-beverages",
-102
-],
-[
-"en:fruits-and-vegetables-based-foods",
-100
-],
-[
-"en:vegetables-based-foods",
-100
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Sabarot",
-"Borde",
-"Carrefour",
-"Magda",
-"Liebig",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -23179,7 +17851,7 @@
 32
 ]
 ],
-"secteur": "Cuisine et arts de la table/Vaisselle",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "Blédina",
 "Les recoltes bio",
@@ -23227,43 +17899,6 @@
 ],
 "part_marque": 0.0
 },
-"double concentre": {
-"n": 272,
-"noms": [
-"double concentré de tomates",
-"double concentré de tomate",
-"double concentre de tomate"
-],
-"categorie": "en:double-concentrate-tomato-paste",
-"categories": [
-[
-"en:fruits-and-vegetables-based-foods",
-220
-],
-[
-"en:plant-based-foods",
-220
-],
-[
-"en:plant-based-foods-and-beverages",
-220
-],
-[
-"en:tomatoes-and-their-products",
-220
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Carrefour",
-"Auchan",
-"Eco+",
-"Louis Martin",
-"Petti",
-"U"
-],
-"part_marque": 0.0
-},
 "frite": {
 "n": 569,
 "noms": [
@@ -23301,43 +17936,6 @@
 ],
 "part_marque": 0.0
 },
-"cancoillotte": {
-"n": 330,
-"noms": [
-"cancoillotte",
-"cancoillotte nature",
-"cancoillotte à l'ail"
-],
-"categorie": "en:cancoillottes",
-"categories": [
-[
-"en:cheeses",
-271
-],
-[
-"en:dairies",
-271
-],
-[
-"en:fermented-foods",
-271
-],
-[
-"en:fermented-milk-products",
-271
-]
-],
-"secteur": "Fromagerie/Fromages libre-service",
-"marques": [
-"La belle étoile",
-"Maison Raguin",
-"Le Francomtois",
-"Lehmann",
-"Badoz",
-"Fromagerie Milleret"
-],
-"part_marque": 0.01
-},
 "terrine sanglier": {
 "n": 217,
 "noms": [
@@ -23364,7 +17962,7 @@
 201
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Jean Brunet",
 "Charles Antona",
@@ -23372,43 +17970,6 @@
 "Le Bois Jumel",
 "La Belle Chaurienne",
 "U"
-],
-"part_marque": 0.0
-},
-"sauce poivre": {
-"n": 214,
-"noms": [
-"sauce poivre",
-"sauce au poivre",
-"sauce poivre vert"
-],
-"categorie": "en:pepper-sauces",
-"categories": [
-[
-"en:condiments",
-175
-],
-[
-"en:sauces",
-175
-],
-[
-"en:pepper-sauces",
-171
-],
-[
-"en:groceries",
-97
-]
-],
-"secteur": "Fruits et légumes/Salades et herbes",
-"marques": [
-"Bénédicta",
-"Rustica",
-"Marque Repère",
-"Auchan",
-"Casino",
-"Knorr"
 ],
 "part_marque": 0.0
 },
@@ -23512,7 +18073,7 @@
 167
 ]
 ],
-"secteur": "Fruits et légumes/Légumes",
+"secteur": "Épicerie salée/Soupes et plats préparés",
 "marques": [
 "Liebig",
 "La Potagère",
@@ -23557,43 +18118,6 @@
 "Club des Sommeliers",
 "Bordeau Chesnel",
 "La Cave d'Augustin Florent"
-],
-"part_marque": 0.0
-},
-"palet breton": {
-"n": 364,
-"noms": [
-"palets bretons",
-"palets bretons pur beurre",
-"palet breton"
-],
-"categorie": "fr:palets",
-"categories": [
-[
-"en:biscuits-and-cakes",
-306
-],
-[
-"en:snacks",
-306
-],
-[
-"en:sweet-snacks",
-306
-],
-[
-"en:biscuits",
-304
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"U",
-"La Trinitaine",
-"Marque Repère",
-"Ty Délice",
-"Auchan",
-"Ker Cadélac"
 ],
 "part_marque": 0.0
 },
@@ -23671,117 +18195,6 @@
 ],
 "part_marque": 0.0
 },
-"filet sardine": {
-"n": 269,
-"noms": [
-"filets de sardines à",
-"filets de sardines",
-"filets de sardines sans"
-],
-"categorie": "en:sardine-fillets",
-"categories": [
-[
-"en:fishes",
-193
-],
-[
-"en:fishes-and-their-products",
-193
-],
-[
-"en:seafood",
-193
-],
-[
-"en:fatty-fishes",
-192
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Saupiquet",
-"U",
-"Connétable",
-"Casino",
-"Leader Price",
-"Pêche Océan"
-],
-"part_marque": 0.0
-},
-"miette": {
-"n": 299,
-"noms": [
-"miettes de thon",
-"miette de thon",
-"miettes de morue"
-],
-"categorie": "en:tuna-chunks",
-"categories": [
-[
-"en:seafood",
-200
-],
-[
-"en:fishes-and-their-products",
-199
-],
-[
-"en:fishes",
-196
-],
-[
-"en:fatty-fishes",
-182
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Petit Navire",
-"U",
-"Carrefour",
-"Leader Price",
-"Auchan",
-"Pêche Océan"
-],
-"part_marque": 0.0
-},
-"miette thon": {
-"n": 225,
-"noms": [
-"miettes de thon à",
-"miettes de thon",
-"miettes de thon a"
-],
-"categorie": "en:tuna-chunks",
-"categories": [
-[
-"en:fishes-and-their-products",
-182
-],
-[
-"en:seafood",
-182
-],
-[
-"en:fishes",
-180
-],
-[
-"en:fatty-fishes",
-179
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Petit Navire",
-"U",
-"Carrefour",
-"Auchan",
-"Leader Price",
-"Saupiquet"
-],
-"part_marque": 0.0
-},
 "maison": {
 "n": 214,
 "noms": [
@@ -23808,7 +18221,7 @@
 11
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Maison Taillefer",
 "Maison Montfort",
@@ -23816,43 +18229,6 @@
 "Maison de la Glace",
 "La Maison Du Chocolat",
 "La maison guiot"
-],
-"part_marque": 0.0
-},
-"canistrelli": {
-"n": 444,
-"noms": [
-"canistrelli",
-"canistrelli de corse",
-"canistrelli aux amandes"
-],
-"categorie": "en:biscuits",
-"categories": [
-[
-"en:snacks",
-138
-],
-[
-"en:biscuits-and-cakes",
-135
-],
-[
-"en:sweet-snacks",
-135
-],
-[
-"en:biscuits",
-134
-]
-],
-"secteur": "Biscuits et sucré/Biscuits et gâteaux",
-"marques": [
-"Afa Biscuiterie",
-"Biscuiterie d'Afa",
-"Charles Antona",
-"Tamburini",
-"Biscuiterie Maniccia",
-"Jean-Paul Vincensini et fils"
 ],
 "part_marque": 0.0
 },
@@ -24078,117 +18454,6 @@
 ],
 "part_marque": 0.0
 },
-"jamon": {
-"n": 319,
-"noms": [
-"jamón serrano",
-"jamon serrano",
-"jamón de cebo"
-],
-"categorie": "en:serrano-ham",
-"categories": [
-[
-"en:meats-and-their-products",
-192
-],
-[
-"en:prepared-meats",
-189
-],
-[
-"en:hams",
-184
-],
-[
-"en:cured-hams",
-145
-]
-],
-"secteur": "Cuisine du monde/Espagne",
-"marques": [
-"Noel",
-"Espuña",
-"Argal",
-"Elpozo",
-"Auchan",
-"Navidul"
-],
-"part_marque": 0.0
-},
-"fuet": {
-"n": 546,
-"noms": [
-"fuet extra",
-"fuet",
-"fuet catalan"
-],
-"categorie": "en:sausages-from-spain",
-"categories": [
-[
-"en:meats-and-their-products",
-254
-],
-[
-"en:prepared-meats",
-254
-],
-[
-"en:sausages",
-210
-],
-[
-"en:french-sausages",
-207
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Espuña",
-"Argal",
-"Del Pais",
-"Elpozo",
-"Soélia",
-"Justin Bridou"
-],
-"part_marque": 0.0
-},
-"fuet extra": {
-"n": 207,
-"noms": [
-"fuet extra",
-"fuet extra poivre noir",
-"fuet extra au poivre"
-],
-"categorie": "fr:fouets-catalans",
-"categories": [
-[
-"en:meats-and-their-products",
-144
-],
-[
-"en:prepared-meats",
-144
-],
-[
-"en:sausages",
-128
-],
-[
-"en:french-sausages",
-126
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Soélia",
-"El Andaluz",
-"Revilla",
-"L'Espagne des Saveurs",
-"Montperal",
-"Navidul"
-],
-"part_marque": 0.0
-},
 "aceite oliva": {
 "n": 373,
 "noms": [
@@ -24223,43 +18488,6 @@
 "Urzante",
 "La Chinata",
 "Abaco"
-],
-"part_marque": 0.0
-},
-"thon entier": {
-"n": 249,
-"noms": [
-"thon entier à l'huile",
-"thon entier",
-"thon entier albacore"
-],
-"categorie": "en:tunas-in-oil",
-"categories": [
-[
-"en:fishes-and-their-products",
-173
-],
-[
-"en:seafood",
-173
-],
-[
-"en:fatty-fishes",
-169
-],
-[
-"en:fishes",
-169
-]
-],
-"secteur": "Épicerie salée/Conserves",
-"marques": [
-"Saupiquet",
-"Petit Navire",
-"Carrefour",
-"Connétable",
-"Marque Repère",
-"Pêche Océan"
 ],
 "part_marque": 0.0
 },
@@ -24437,7 +18665,7 @@
 139
 ]
 ],
-"secteur": "Fruits et légumes/Légumes",
+"secteur": "Épicerie salée/Soupes et plats préparés",
 "marques": [
 "Liebig",
 "Knorr",
@@ -24448,144 +18676,33 @@
 ],
 "part_marque": 0.0
 },
-"bloc foie": {
-"n": 1277,
-"noms": [
-"bloc de foie gras",
-"le bloc de foie",
-"bloc foie gras de"
-],
-"categorie": "en:block-of-foie-gras",
-"categories": [
-[
-"en:fish-and-meat-and-eggs",
-1060
-],
-[
-"en:foies-gras",
-1059
-],
-[
-"en:foies-gras-from-ducks",
-955
-],
-[
-"en:block-of-foie-gras",
-795
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Larnaudie",
-"Delpeyrat",
-"Labeyrie",
-"Maison Montfort",
-"Rougié",
-"U"
-],
-"part_marque": 0.0
-},
-"farfalle": {
-"n": 306,
-"noms": [
-"farfalle",
-"farfalles",
-"farfalle au blé"
-],
-"categorie": "fr:farfalles",
-"categories": [
-[
-"en:pastas",
-192
-],
-[
-"en:plant-based-foods",
-192
-],
-[
-"en:plant-based-foods-and-beverages",
-192
-],
-[
-"en:dry-pastas",
-142
-]
-],
-"secteur": "Épicerie salée/Pâtes, riz et féculents",
-"marques": [
-"Panzani",
-"Lustucru",
-"Casino",
-"Monoprix",
-"Carrefour",
-"Auchan"
-],
-"part_marque": 0.0
-},
-"nonnette": {
-"n": 279,
-"noms": [
-"nonnettes au miel",
-"nonnettes de dijon",
-"nonnettes"
-],
-"categorie": "fr:nonnettes",
-"categories": [
-[
-"en:biscuits-and-cakes",
-224
-],
-[
-"en:snacks",
-224
-],
-[
-"en:sweet-snacks",
-224
-],
-[
-"en:cakes",
-222
-]
-],
-"secteur": "Poissonnerie/Poissonnerie traditionnelle",
-"marques": [
-"Mulot & Petitjean",
-"Culture Miel",
-"Miels Villeneuve",
-"Famille Mary",
-"Apidis",
-"Auger"
-],
-"part_marque": 0.0
-},
 "terrine foie": {
-"n": 246,
+"n": 210,
 "noms": [
 "terrine de foie de",
-"terrine au foie de",
-"terrine de foie"
+"terrine de foie",
+"terrine de foies de"
 ],
 "categorie": "fr:terrines-de-foie-de-volaille",
 "categories": [
 [
 "en:meats-and-their-products",
-183
+158
 ],
 [
 "en:prepared-meats",
-180
+155
 ],
 [
 "en:terrines",
-180
+155
 ],
 [
 "en:liver-terrines",
-156
+144
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Jean Brunet",
 "Fleurons de Lomagne",
@@ -24593,43 +18710,6 @@
 "Comtesse du Barry",
 "Maison Papillon",
 "Toque du Chef"
-],
-"part_marque": 0.0
-},
-"emince poulet": {
-"n": 370,
-"noms": [
-"émincés de poulet",
-"emincés de poulet",
-"émincé de poulet"
-],
-"categorie": "en:chickens",
-"categories": [
-[
-"en:meats-and-their-products",
-196
-],
-[
-"en:chicken-and-its-products",
-157
-],
-[
-"en:meats",
-157
-],
-[
-"en:poultries",
-149
-]
-],
-"secteur": "Volaille/Volaille libre-service",
-"marques": [
-"Fleury Michon",
-"L'etal Du Volailler",
-"Père Dodu",
-"U",
-"Le Gaulois",
-"Lidl"
 ],
 "part_marque": 0.0
 },
@@ -24659,7 +18739,7 @@
 44
 ]
 ],
-"secteur": "Apéritif/Chips et biscuits apéritif",
+"secteur": "Traiteur/Traiteur frais",
 "marques": [
 "Menguy's",
 "Cora",
@@ -24855,43 +18935,6 @@
 ],
 "part_marque": 0.0
 },
-"calisson": {
-"n": 342,
-"noms": [
-"calissons d'aix",
-"calissons",
-"calissons de provence"
-],
-"categorie": "en:calissons-d-aix",
-"categories": [
-[
-"en:confectioneries",
-263
-],
-[
-"en:snacks",
-263
-],
-[
-"en:sweet-snacks",
-263
-],
-[
-"en:calissons",
-259
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Le Roy René",
-"Confiserie du Roy René",
-"Confiserie d'Entrecasteaux",
-"Léonard Parli",
-"Fruidoraix",
-"Le Petit Duc"
-],
-"part_marque": 0.0
-},
 "cassolette": {
 "n": 224,
 "noms": [
@@ -24926,117 +18969,6 @@
 "Thiriet",
 "U",
 "U Saveurs"
-],
-"part_marque": 0.0
-},
-"truffe fantaisie": {
-"n": 466,
-"noms": [
-"truffes fantaisie",
-"truffes fantaisies",
-"truffe fantaisie"
-],
-"categorie": "en:chocolate-truffles",
-"categories": [
-[
-"en:snacks",
-233
-],
-[
-"en:sweet-snacks",
-233
-],
-[
-"en:cocoa-and-its-products",
-231
-],
-[
-"en:confectioneries",
-230
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Mathez",
-"Truffettes De France",
-"Guyaux",
-"Chocolat Mathez",
-"Favorina",
-"Carrefour"
-],
-"part_marque": 0.0
-},
-"yaourt brasse": {
-"n": 470,
-"noms": [
-"yaourt brassé",
-"yaourt brassé sur lit",
-"yaourt brassé au lait"
-],
-"categorie": "en:stirred-yogurts",
-"categories": [
-[
-"en:dairies",
-327
-],
-[
-"en:dairy-desserts",
-327
-],
-[
-"en:desserts",
-327
-],
-[
-"en:fermented-dairy-desserts",
-327
-]
-],
-"secteur": "Crèmerie/Yaourts et desserts",
-"marques": [
-"La Fermière",
-"Yoplait",
-"Casino",
-"Monoprix Gourmet",
-"Ferme Des Peupliers",
-"Ferme Collet"
-],
-"part_marque": 0.0
-},
-"tajine": {
-"n": 255,
-"noms": [
-"tajine de poulet",
-"tajine de légumes",
-"tajine de boeuf"
-],
-"categorie": "en:chicken-tajine",
-"categories": [
-[
-"en:meals",
-204
-],
-[
-"en:tajine",
-199
-],
-[
-"en:meals-with-meat",
-129
-],
-[
-"en:meals-with-chicken",
-94
-]
-],
-"secteur": "Textile/Vêtements et chaussures",
-"marques": [
-"Fleury Michon",
-"Picard",
-"Toque du Chef",
-"Marque Repère",
-"Seazon",
-"U"
 ],
 "part_marque": 0.0
 },
@@ -25077,80 +19009,6 @@
 ],
 "part_marque": 0.0
 },
-"jambon traditionnel": {
-"n": 448,
-"noms": [
-"jambon traditionnel fumé au",
-"jambon traditionnel",
-"jambon traditionnel fume au"
-],
-"categorie": "en:white-smoked-hams",
-"categories": [
-[
-"en:meats-and-their-products",
-266
-],
-[
-"en:prepared-meats",
-266
-],
-[
-"en:hams",
-263
-],
-[
-"en:white-hams",
-256
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Saint Alby",
-"Lidl",
-"Lidl St Alby",
-"Philippe Wagner",
-"saint albi",
-"Saint alby- lidl"
-],
-"part_marque": 0.0
-},
-"caillette": {
-"n": 216,
-"noms": [
-"caillette",
-"caillettes aux herbes",
-"caillettes"
-],
-"categorie": "fr:caillettes",
-"categories": [
-[
-"fr:caillettes",
-76
-],
-[
-"en:meals",
-37
-],
-[
-"en:meals-with-meat",
-36
-],
-[
-"fr:caillettes-ardechoises",
-26
-]
-],
-"secteur": "Charcuterie/Charcuterie libre-service",
-"marques": [
-"Gueze",
-"Drôme Salaisons",
-"Chabert",
-"Charcuterie de Charpey",
-"Salaisons Massardier",
-"Limouches"
-],
-"part_marque": 0.0
-},
 "plaisir": {
 "n": 241,
 "noms": [
@@ -25188,40 +19046,40 @@
 ],
 "part_marque": 0.0
 },
-"dragee": {
-"n": 557,
+"chiffonnade": {
+"n": 220,
 "noms": [
-"dragées",
-"dragées aux amandes",
-"dragées au chocolat"
+"chiffonnade de viande",
+"chiffonnade de rosette",
+"chiffonnade de saucisson"
 ],
-"categorie": "en:dragees",
+"categorie": "en:prepared-meats",
 "categories": [
 [
-"en:snacks",
-448
+"en:meats-and-their-products",
+118
 ],
 [
-"en:sweet-snacks",
-448
+"en:prepared-meats",
+97
 ],
 [
-"en:confectioneries",
-446
+"en:meats",
+73
 ],
 [
-"en:dragees",
-434
+"en:cured-sausages",
+45
 ]
 ],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
+"secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
-"Medicis",
-"Jeff de Bruges",
-"Confiserie Adam",
-"Motta",
-"Crispo",
-"Cémoi"
+"U Saveurs",
+"U",
+"Auchan",
+"Corte del Gusto",
+"Peguet Savoie",
+"Peguet"
 ],
 "part_marque": 0.0
 },
@@ -25259,43 +19117,6 @@
 "Les Jardins de Gaïa",
 "Jardin Bio",
 "Dammann Frères"
-],
-"part_marque": 0.0
-},
-"langue boeuf": {
-"n": 234,
-"noms": [
-"langue de boeuf sauce",
-"langue de bœuf sauce",
-"langue de boeuf"
-],
-"categorie": "en:tongue-of-beef-with-hot-sauce",
-"categories": [
-[
-"en:beef",
-226
-],
-[
-"en:beef-and-its-products",
-226
-],
-[
-"en:beef-tongues",
-226
-],
-[
-"en:meats",
-226
-]
-],
-"secteur": "Boucherie/Boucherie libre-service",
-"marques": [
-"Tendre & Plus",
-"Maison Larzul",
-"Stéphan",
-"Hénaff",
-"Lechef",
-"Relais Gourmand"
 ],
 "part_marque": 0.0
 },
@@ -25447,43 +19268,6 @@
 ],
 "part_marque": 0.0
 },
-"ourson": {
-"n": 278,
-"noms": [
-"ourson guimauve",
-"oursons guimauve",
-"oursons"
-],
-"categorie": "en:confectioneries",
-"categories": [
-[
-"en:snacks",
-109
-],
-[
-"en:sweet-snacks",
-107
-],
-[
-"en:confectioneries",
-98
-],
-[
-"en:cocoa-and-its-products",
-52
-]
-],
-"secteur": "Biscuits et sucré/Chocolat et confiserie",
-"marques": [
-"Cora",
-"Les Gourmandises De Sophie",
-"Haribo",
-"LU",
-"Cémoi",
-"Auchan"
-],
-"part_marque": 0.0
-},
 "superieur": {
 "n": 230,
 "noms": [
@@ -25547,7 +19331,7 @@
 166
 ]
 ],
-"secteur": "Petit-déjeuner/Confitures et pâtes à tartiner",
+"secteur": "Cuisine du monde/Mexique et Amérique",
 "marques": [
 "Perl'Amande",
 "L'Amandaie",
@@ -25555,43 +19339,6 @@
 "La Vie Claire",
 "Naturalia",
 "La Fourche"
-],
-"part_marque": 0.0
-},
-"mate": {
-"n": 230,
-"noms": [
-"maté",
-"maté vert",
-"mate"
-],
-"categorie": null,
-"categories": [
-[
-"en:beverages",
-51
-],
-[
-"en:plant-based-foods-and-beverages",
-43
-],
-[
-"en:plant-based-beverages",
-42
-],
-[
-"en:beverages-and-beverages-preparations",
-41
-]
-],
-"secteur": "Petit-déjeuner/Thé et chocolat en poudre",
-"marques": [
-"Palais des Thés",
-"Sol à Sol",
-"Les Jardins de Gaïa",
-"Yogi Tea",
-"ChariTea",
-"La Vie Claire"
 ],
 "part_marque": 0.0
 },
@@ -25621,7 +19368,7 @@
 59
 ]
 ],
-"secteur": "Boucherie/Boucherie traditionnelle et Volailles",
+"secteur": "Boucherie/Boucherie libre-service",
 "marques": [
 "Bixente Ibarra",
 "Accoceberry",
@@ -25629,43 +19376,6 @@
 "Pascal Massonde",
 "Baionade",
 "Biraben"
-],
-"part_marque": 0.0
-},
-"nectar peche": {
-"n": 208,
-"noms": [
-"nectar de pêche",
-"nectar de pêche de",
-"nectar de peche"
-],
-"categorie": "en:peach-nectars",
-"categories": [
-[
-"en:beverages",
-154
-],
-[
-"en:juices-and-nectars",
-154
-],
-[
-"en:plant-based-beverages",
-154
-],
-[
-"en:plant-based-foods-and-beverages",
-154
-]
-],
-"secteur": "Fruits et légumes/Fruits",
-"marques": [
-"Alain Milliat",
-"U",
-"Sibio!",
-"Emile Vergeois",
-"La Grande Epicerie de Paris",
-"Emmanuelle Baillard"
 ],
 "part_marque": 0.0
 },
@@ -25695,7 +19405,7 @@
 28
 ]
 ],
-"secteur": "Apéritif/Chips et biscuits apéritif",
+"secteur": "Charcuterie/Charcuterie libre-service",
 "marques": [
 "Labeyrie",
 "Biscuiterie de l abbaye",
@@ -25732,7 +19442,7 @@
 168
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Biscuits et sucré/Compotes et fruits au sirop",
 "marques": [
 "U",
 "U Mat & Lou",
@@ -25744,38 +19454,38 @@
 "part_marque": 0.0
 },
 "huile vierge": {
-"n": 428,
+"n": 230,
 "noms": [
-"huile vierge de noix",
-"huile vierge de coco",
-"huile vierge de noisette"
+"huile vierge de noisette",
+"huile vierge de lin",
+"huile vierge de chanvre"
 ],
-"categorie": "en:nut-oils",
+"categorie": "en:vegetable-oils",
 "categories": [
 [
 "en:fats",
-341
+171
 ],
 [
 "en:plant-based-foods",
-336
+167
 ],
 [
 "en:plant-based-foods-and-beverages",
-336
+167
 ],
 [
 "en:vegetable-fats",
-336
+167
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Cuisine du monde/Italie",
 "marques": [
-"La Vie Claire",
 "Emile noel",
+"La Vie Claire",
 "Vigean",
-"Huilerie de Lapalisse",
 "Huilerie Beaujolaise",
+"Huilerie de Lapalisse",
 "Cauvin"
 ],
 "part_marque": 0.0
@@ -25888,43 +19598,6 @@
 "Pepsico",
 "Fritelle",
 "MixUps"
-],
-"part_marque": 0.0
-},
-"colorant alimentaire": {
-"n": 206,
-"noms": [
-"colorant alimentaire",
-"colorant alimentaire en poudre",
-"colorants alimentaires"
-],
-"categorie": "en:food-colorings",
-"categories": [
-[
-"en:food-additives",
-165
-],
-[
-"en:food-colorings",
-165
-],
-[
-"en:food-decorations",
-2
-],
-[
-"en:frozen-foods",
-1
-]
-],
-"secteur": "Entretien / Droguerie",
-"marques": [
-"Scrapcooking",
-"Sainte Lucie",
-"Déco-Relief",
-"Alice Délice",
-"Vahiné",
-"Walima"
 ],
 "part_marque": 0.0
 },
@@ -26065,7 +19738,7 @@
 253
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Carrefour",
 "Carrefour BIO",
@@ -26176,7 +19849,7 @@
 51
 ]
 ],
-"secteur": "Charcuterie/Charcuterie libre-service",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Carrefour",
 "Carrefour Classic",
@@ -26213,7 +19886,7 @@
 11
 ]
 ],
-"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"secteur": "Bio, vrac et terroir/Diététique et bio",
 "marques": [
 "MYPROTEIN",
 "MyVegan",
@@ -26283,7 +19956,7 @@
 106
 ]
 ],
-"secteur": "Fruits et légumes/Fruits",
+"secteur": "Charcuterie/Charcuterie à la coupe",
 "marques": [
 "Carrefour",
 "Carrefour filiere qualite",

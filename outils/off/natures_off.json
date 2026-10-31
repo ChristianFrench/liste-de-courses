@@ -1,5 +1,5 @@
 {
-"_description": "Open Food Facts, 2026-10-31 : 1293287 produits vendus en France, 406688 rangés sous 1373 natures du catalogue sur 1673",
+"_description": "Open Food Facts, 2026-10-31 : 1293287 produits vendus en France, 480329 rangés sous 1641 natures du catalogue sur 1784",
 "natures": {
 "Fruits et légumes/Fruits/Pommes": {
 "n": 1989,
@@ -2216,11 +2216,11 @@
 4
 ],
 [
-"Monoprix Bio",
+"Terre de BIO",
 4
 ],
 [
-"Terre de BIO",
+"Monoprix Bio",
 4
 ],
 [
@@ -2326,11 +2326,11 @@
 4
 ],
 [
-"Saint Eloi",
+"Intermarché",
 4
 ],
 [
-"Intermarché",
+"Saint Eloi",
 4
 ],
 [
@@ -2990,19 +2990,59 @@
 ]
 },
 "Fruits et légumes/Légumes/Betteraves cuites": {
-"n": 52,
-"categorie": "en:cooked-beetroots",
+"n": 209,
+"categorie": "en:beetroot",
 "marques": [
 [
 "Carrefour",
-6
+15
 ],
 [
 "U",
-4
+10
 ],
 [
 "Auchan",
+9
+],
+[
+"Saint Eloi",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Kultive",
+4
+],
+[
+"Ferrari",
+4
+],
+[
+"Notre Jardin",
+4
+],
+[
+"Freshona",
+3
+],
+[
+"D'aucy",
+3
+],
+[
+"Betty Loire",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Rocal",
 3
 ]
 ]
@@ -6013,15 +6053,35 @@
 ]
 },
 "Fruits et légumes/Fruits secs et graines/Mélange étudiant": {
-"n": 24,
-"categorie": "en:mixed-dried-fruits",
+"n": 174,
+"categorie": "en:dried-fruits",
 "marques": [
+[
+"Alesto",
+15
+],
+[
+"Trader Joe's",
+4
+],
+[
+"U",
+4
+],
+[
+"Les accents du soleil",
+4
+],
 [
 "La Fourche",
 4
 ],
 [
 "Bioday",
+3
+],
+[
+"Lidl",
 3
 ]
 ]
@@ -6090,6 +6150,150 @@
 ],
 [
 "Carrefour",
+3
+]
+]
+},
+"Fruits et légumes/Fruits secs et graines/Cerneaux de noix": {
+"n": 497,
+"categorie": "en:walnut-kernels",
+"marques": [
+[
+"Alesto",
+7
+],
+[
+"Grand Frais",
+7
+],
+[
+"Sun",
+7
+],
+[
+"Carrefour",
+6
+],
+[
+"U",
+6
+],
+[
+"Daco Bello",
+6
+],
+[
+"Des trucs à la noix",
+6
+],
+[
+"Holy Fruits",
+5
+],
+[
+"JusteBio",
+5
+],
+[
+"Meyva",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Seeberger",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"La Fourche",
+4
+],
+[
+"Trader Joe's",
+3
+],
+[
+"Vahiné",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Domino",
+3
+],
+[
+"Maître Prunille",
+3
+],
+[
+"Alp'noix",
+3
+]
+]
+},
+"Fruits et légumes/Fruits secs et graines/Baies de goji": {
+"n": 459,
+"categorie": "en:dried-goji",
+"marques": [
+[
+"Daco Bello",
+6
+],
+[
+"Ecoidées",
+6
+],
+[
+"Uberti",
+5
+],
+[
+"Comptoirs et compagnies",
+5
+],
+[
+"Juventis",
+4
+],
+[
+"ETHNOSCIENCE",
+4
+],
+[
+"Moulin des Moines",
+3
+],
+[
+"Philia",
+3
+],
+[
+"Nat & Form",
+3
+],
+[
+"Natur Attitud",
+3
+],
+[
+"Comptoir des Saveurs",
+3
+],
+[
+"Greenweez",
 3
 ]
 ]
@@ -6293,11 +6497,11 @@
 12
 ],
 [
-"Férial",
+"Marque Repère",
 11
 ],
 [
-"Marque Repère",
+"Férial",
 11
 ],
 [
@@ -6669,11 +6873,11 @@
 3
 ],
 [
-"Marque Repère",
+"Côté Table",
 3
 ],
 [
-"Côté Table",
+"Marque Repère",
 3
 ],
 [
@@ -7420,11 +7624,11 @@
 5
 ],
 [
-"Férial",
+"Marque Repère",
 5
 ],
 [
-"Marque Repère",
+"Férial",
 5
 ],
 [
@@ -7481,11 +7685,11 @@
 11
 ],
 [
-"Férial",
+"Marque Repère",
 7
 ],
 [
-"Marque Repère",
+"Férial",
 7
 ],
 [
@@ -7879,14 +8083,396 @@
 ]
 },
 "Boucherie/Boucherie libre-service/Ribs à griller": {
-"n": 74,
-"categorie": "en:pork-spare-ribs",
+"n": 447,
+"categorie": "en:pork",
 "marques": [
 [
+"Férial",
+45
+],
+[
 "Maître Jacques",
-23
+28
+],
+[
+"Jean Rozé",
+11
+],
+[
+"Marque Repère",
+8
+],
+[
+"Bigard",
+3
 ]
 ]
+},
+"Boucherie/Boucherie libre-service/Palette de porc": {
+"n": 199,
+"categorie": "en:devilled-pork-shoulder-in-mustard-sauce",
+"marques": [
+[
+"Tendre & Plus",
+21
+],
+[
+"Maître Jacques",
+8
+],
+[
+"Les Brasérades",
+6
+],
+[
+"Férial",
+6
+],
+[
+"Moritz",
+4
+],
+[
+"Socopa",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Souris d'agneau": {
+"n": 584,
+"categorie": "fr:souris-d-agneau",
+"marques": [
+[
+"Tendre & Plus",
+222
+],
+[
+"Jean Rozé",
+25
+],
+[
+"Picard",
+12
+],
+[
+"Tendre Et Plus",
+10
+],
+[
+"Intermarché",
+9
+],
+[
+"Lechef",
+5
+]
+]
+},
+"Boucherie/Boucherie libre-service/Langue de bœuf": {
+"n": 232,
+"categorie": "en:beef-tongues",
+"marques": [
+[
+"Tendre & Plus",
+64
+],
+[
+"Maison Larzul",
+18
+],
+[
+"Stéphan",
+9
+],
+[
+"Hénaff",
+6
+],
+[
+"Lechef",
+4
+],
+[
+"Relais Gourmand",
+3
+],
+[
+"Toupargel",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Boulettes de bœuf": {
+"n": 215,
+"categorie": "en:meat-balls",
+"marques": [
+[
+"Carrefour",
+11
+],
+[
+"Charal",
+10
+],
+[
+"L'Étal du Boucher",
+7
+],
+[
+"Jean Rozé",
+7
+],
+[
+"Bigard",
+6
+],
+[
+"Férial",
+5
+],
+[
+"Picard",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Leader Price",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Chair à saucisse": {
+"n": 244,
+"categorie": "en:sausage-meat",
+"marques": [
+[
+"U",
+16
+],
+[
+"L'Étal du Boucher",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Jean Rozé",
+4
+],
+[
+"Vallégrain",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"U Bio",
+4
+],
+[
+"Socopa",
+3
+],
+[
+"Maison Milhau",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Férial",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Entrecôte": {
+"n": 235,
+"categorie": "en:beef-rib-steak",
+"marques": [
+[
+"Charal",
+71
+],
+[
+"L'Étal du Boucher",
+6
+],
+[
+"Jean Rozé",
+5
+],
+[
+"U",
+5
+],
+[
+"U Bio",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Faux-filet": {
+"n": 285,
+"categorie": "en:beef-sirloin-steak",
+"marques": [
+[
+"Charal",
+121
+],
+[
+"L'Étal du Boucher",
+7
+],
+[
+"Marque Repère",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Côte de bœuf": {
+"n": 29,
+"categorie": "en:beef-ribs",
+"marques": []
+},
+"Boucherie/Boucherie libre-service/Blanquette de veau": {
+"n": 163,
+"categorie": "en:meals-with-veal-meat",
+"marques": [
+[
+"Tendre & Plus",
+21
+],
+[
+"Tendre Et Plus",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Gigot d'agneau": {
+"n": 92,
+"categorie": "en:lamb-leg",
+"marques": [
+[
+"L'Étal du Boucher",
+15
+],
+[
+"+33 IMPORT EXPORT",
+6
+],
+[
+"E.Leclerc",
+6
+]
+]
+},
+"Boucherie/Boucherie libre-service/Épaule d'agneau": {
+"n": 16,
+"categorie": "en:lamb-shoulder",
+"marques": []
+},
+"Boucherie/Boucherie libre-service/Jarret de veau": {
+"n": 4,
+"categorie": "en:meat-for-osso-buco",
+"marques": []
+},
+"Boucherie/Boucherie libre-service/Osso-buco": {
+"n": 42,
+"categorie": "en:osso-buco",
+"marques": [
+[
+"Tendre & Plus",
+20
+]
+]
+},
+"Boucherie/Boucherie libre-service/Foie de veau": {
+"n": 126,
+"categorie": "en:calf-liver",
+"marques": [
+[
+"Socopa",
+6
+],
+[
+"Jean Rozé",
+4
+],
+[
+"Tendriade",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Joues de bœuf": {
+"n": 37,
+"categorie": "en:beef-cheek",
+"marques": [
+[
+"Bigard",
+20
+]
+]
+},
+"Boucherie/Boucherie libre-service/Plat de côtes": {
+"n": 33,
+"categorie": "en:pork-ribs",
+"marques": []
+},
+"Boucherie/Boucherie libre-service/Paleron": {
+"n": 59,
+"categorie": "en:beef-chuck",
+"marques": [
+[
+"Bigard",
+38
+]
+]
+},
+"Boucherie/Boucherie libre-service/Côtes de veau": {
+"n": 50,
+"categorie": "en:veal-chop",
+"marques": [
+[
+"U",
+10
+],
+[
+"Les éleveurs de chez nous",
+3
+]
+]
+},
+"Boucherie/Boucherie libre-service/Queue de bœuf": {
+"n": 4,
+"categorie": "en:beef-oxtail",
+"marques": []
+},
+"Boucherie/Boucherie libre-service/Sauté d'agneau": {
+"n": 9,
+"categorie": "en:lamb-meat",
+"marques": []
 },
 "Boucherie/Boucherie traditionnelle et Volailles/Entrecôte": {
 "n": 235,
@@ -8115,6 +8701,2234 @@
 "n": 9,
 "categorie": "en:lamb-meat",
 "marques": []
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Steak haché": {
+"n": 1050,
+"categorie": "en:ground-beef-steaks",
+"marques": [
+[
+"Charal",
+54
+],
+[
+"Carrefour",
+37
+],
+[
+"U",
+35
+],
+[
+"Jean Rozé",
+33
+],
+[
+"Leader Price",
+30
+],
+[
+"Socopa",
+30
+],
+[
+"Auchan",
+29
+],
+[
+"Bigard",
+27
+],
+[
+"Casino",
+25
+],
+[
+"Monoprix",
+24
+],
+[
+"L'Étal du Boucher",
+23
+],
+[
+"Cora",
+22
+],
+[
+"Marque Repère",
+17
+],
+[
+"Thiriet",
+16
+],
+[
+"Toupargel",
+14
+],
+[
+"Férial",
+14
+],
+[
+"Lidl",
+11
+],
+[
+"U Bio",
+9
+],
+[
+"Franprix",
+9
+],
+[
+"La Nouvelle Agriculture",
+9
+],
+[
+"Sans marque",
+8
+],
+[
+"Netto",
+7
+],
+[
+"Monoprix Gourmet",
+7
+],
+[
+"Oriental Viandes",
+7
+],
+[
+"Aldi",
+6
+],
+[
+"Biocoop",
+6
+],
+[
+"Isla Délice",
+6
+],
+[
+"Carrefour BIO",
+5
+],
+[
+"Reflets de France",
+5
+],
+[
+"Intermarché",
+5
+],
+[
+"Monoprix Bio",
+5
+],
+[
+"Chiron",
+5
+],
+[
+"C'est qui le patron ?!",
+5
+],
+[
+"Bio Village",
+5
+],
+[
+"Naturalia",
+5
+],
+[
+"Casino Bio",
+4
+],
+[
+"Cora Dégustation",
+4
+],
+[
+"Sourires de Campagne",
+4
+],
+[
+"Tradival",
+4
+],
+[
+"La marque du consommateur",
+4
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Viande hachée": {
+"n": 376,
+"categorie": "en:beef",
+"marques": [
+[
+"L'Étal du Boucher",
+19
+],
+[
+"Jean Rozé",
+18
+],
+[
+"Carrefour",
+16
+],
+[
+"Bigard",
+16
+],
+[
+"U",
+14
+],
+[
+"Socopa",
+13
+],
+[
+"Lidl",
+12
+],
+[
+"Marque Repère",
+11
+],
+[
+"Férial",
+11
+],
+[
+"Leader Price",
+8
+],
+[
+"Charal",
+8
+],
+[
+"Monoprix",
+8
+],
+[
+"Casino",
+6
+],
+[
+"Cora",
+6
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Netto",
+3
+],
+[
+"La Nouvelle Agriculture",
+3
+],
+[
+"Bio Village",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Tradival",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Rôti de porc": {
+"n": 1654,
+"categorie": "en:pork-roasts",
+"marques": [
+[
+"Maître Jacques",
+136
+],
+[
+"L'Étal du Boucher",
+127
+],
+[
+"Fleury Michon",
+72
+],
+[
+"Mainjolle",
+28
+],
+[
+"U",
+18
+],
+[
+"Marque Repère",
+18
+],
+[
+"Boucherie St Clément",
+15
+],
+[
+"Tradilège",
+14
+],
+[
+"Jean Floc'h",
+13
+],
+[
+"Carrefour",
+12
+],
+[
+"Monique ranou",
+12
+],
+[
+"Auchan",
+10
+],
+[
+"Férial",
+10
+],
+[
+"Le Porc Français",
+8
+],
+[
+"Filière Qualité Carrefour",
+7
+],
+[
+"Biocoop",
+7
+],
+[
+"Leclerc",
+6
+],
+[
+"Saint Alby",
+6
+],
+[
+"U Bio",
+6
+],
+[
+"Saveurs En Or",
+5
+],
+[
+"Lidl",
+5
+],
+[
+"Rostain",
+5
+],
+[
+"Sans marque",
+5
+],
+[
+"Maison Prunier",
+5
+],
+[
+"Bahier",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Bio Village",
+5
+],
+[
+"Carrefour BIO",
+5
+],
+[
+"U Saveurs",
+4
+],
+[
+"Jean Rozé",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Kermené",
+4
+],
+[
+"L'Atelier Charcuterie",
+4
+],
+[
+"E.Leclerc",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Salaison Du Terroir",
+3
+],
+[
+"Guyader",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Petitgas",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Côtes de porc": {
+"n": 516,
+"categorie": "en:pork-ribs",
+"marques": [
+[
+"L'Étal du Boucher",
+20
+],
+[
+"Charcuterie Ruel",
+16
+],
+[
+"U",
+9
+],
+[
+"Socopa",
+9
+],
+[
+"Jean Rozé",
+7
+],
+[
+"Férial",
+7
+],
+[
+"Belle France",
+6
+],
+[
+"Thiriet",
+6
+],
+[
+"Maison Prunier",
+5
+],
+[
+"Boucherie St Clément",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Cooperl",
+5
+],
+[
+"Sans marque",
+4
+],
+[
+"Jean Floc'h",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"L'Ardoise du Boucher",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Aldi",
+3
+],
+[
+"Intermarché",
+3
+],
+[
+"Picard",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Escalopes de veau": {
+"n": 106,
+"categorie": "en:veal-escalopes",
+"marques": [
+[
+"Tendriade",
+13
+],
+[
+"U",
+8
+],
+[
+"Charal",
+7
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Bœuf bourguignon": {
+"n": 215,
+"categorie": "en:boeufs-bourguignons",
+"marques": [
+[
+"Tendre & Plus",
+25
+],
+[
+"Jean Rozé",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"William Saurin",
+5
+],
+[
+"Toque du Chef",
+4
+],
+[
+"Charal",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Tendre Et Plus",
+3
+],
+[
+"Intermarché",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Côté Table",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Leclerc",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Saucisses": {
+"n": 5666,
+"categorie": "en:sausages",
+"marques": [
+[
+"Nature de France",
+64
+],
+[
+"U",
+41
+],
+[
+"Au Fumé Vosgien",
+41
+],
+[
+"Carrefour",
+38
+],
+[
+"Jean Rozé",
+37
+],
+[
+"Hiruak",
+35
+],
+[
+"Charculor",
+35
+],
+[
+"Socopa",
+33
+],
+[
+"Hénaff",
+33
+],
+[
+"Metzger Muller",
+32
+],
+[
+"Zentz",
+30
+],
+[
+"Thierry Schweitzer",
+26
+],
+[
+"Bigard",
+24
+],
+[
+"Iller",
+23
+],
+[
+"La Table Du Fermier",
+23
+],
+[
+"Les Brasérades",
+21
+],
+[
+"Leader Price",
+19
+],
+[
+"Marque Repère",
+19
+],
+[
+"Auchan",
+19
+],
+[
+"Saint Alby",
+18
+],
+[
+"L'Étal du Boucher",
+18
+],
+[
+"Lionor",
+18
+],
+[
+"Oberti",
+17
+],
+[
+"Tradival",
+17
+],
+[
+"Pedelhez",
+16
+],
+[
+"Reflets de France",
+16
+],
+[
+"Le Gaulois",
+16
+],
+[
+"Cora",
+15
+],
+[
+"Maison Milhau",
+15
+],
+[
+"Casino",
+14
+],
+[
+"Férial",
+14
+],
+[
+"Despi",
+14
+],
+[
+"Stoeffler",
+14
+],
+[
+"Clavière",
+14
+],
+[
+"Secrets Du Val D'argent",
+14
+],
+[
+"Maître CoQ",
+13
+],
+[
+"Tempé",
+13
+],
+[
+"Festein d'Alsace",
+13
+],
+[
+"Royal HALAL",
+13
+],
+[
+"Pierre Schmidt",
+11
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Merguez": {
+"n": 1288,
+"categorie": "fr:merguez",
+"marques": [
+[
+"Socopa",
+25
+],
+[
+"U",
+16
+],
+[
+"Hiruak",
+13
+],
+[
+"Jean Rozé",
+10
+],
+[
+"Bigard",
+10
+],
+[
+"Leader Price",
+9
+],
+[
+"Cora",
+8
+],
+[
+"Carrefour",
+8
+],
+[
+"E.Leclerc",
+7
+],
+[
+"Férial",
+6
+],
+[
+"Nature de France",
+6
+],
+[
+"Maître CoQ",
+5
+],
+[
+"Le Gaulois",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Au Fumé Vosgien",
+5
+],
+[
+"Leclerc",
+4
+],
+[
+"L'Étal du Boucher",
+4
+],
+[
+"Prim'Grill",
+4
+],
+[
+"Royal Bernard",
+4
+],
+[
+"Tendriade",
+4
+],
+[
+"Maître Jacques",
+4
+],
+[
+"Oriental Viandes",
+4
+],
+[
+"La Nouvelle Agriculture",
+4
+],
+[
+"Bio Village",
+3
+],
+[
+"Emile Charotain",
+3
+],
+[
+"Thierry Schweitzer",
+3
+],
+[
+"Les Occitanes",
+3
+],
+[
+"Lionor",
+3
+],
+[
+"Petit prix",
+3
+],
+[
+"Royal HALAL",
+3
+],
+[
+"Maison Milhau",
+3
+],
+[
+"Festein d'Alsace",
+3
+],
+[
+"Les Brasérades",
+3
+],
+[
+"Tradival",
+3
+],
+[
+"Charcuterie Cosme",
+3
+],
+[
+"André Krief",
+3
+],
+[
+"Madrange",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Chipolatas": {
+"n": 1871,
+"categorie": "en:chipolatas",
+"marques": [
+[
+"Jean Rozé",
+40
+],
+[
+"Hiruak",
+38
+],
+[
+"U",
+33
+],
+[
+"Socopa",
+29
+],
+[
+"L'Étal du Boucher",
+16
+],
+[
+"Auchan",
+16
+],
+[
+"Madrange",
+12
+],
+[
+"Au Fumé Vosgien",
+11
+],
+[
+"Vallégrain",
+11
+],
+[
+"Leader Price",
+11
+],
+[
+"Carrefour",
+11
+],
+[
+"Saveurs des mauges",
+11
+],
+[
+"Marque Repère",
+11
+],
+[
+"Tradival",
+10
+],
+[
+"Férial",
+10
+],
+[
+"Bigard",
+9
+],
+[
+"Leclerc",
+8
+],
+[
+"Clermont",
+8
+],
+[
+"Maître Jacques",
+7
+],
+[
+"Charcuterie du Blavet",
+6
+],
+[
+"Les Occitanes",
+6
+],
+[
+"Petit prix",
+6
+],
+[
+"Porcidou",
+6
+],
+[
+"Boucherie St Clément",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Maître CoQ",
+5
+],
+[
+"Cora",
+5
+],
+[
+"La Nouvelle Agriculture",
+5
+],
+[
+"Festein d'Alsace",
+5
+],
+[
+"Jean Floc'h",
+5
+],
+[
+"André Loussouarn",
+5
+],
+[
+"Biocoop",
+5
+],
+[
+"Maître Cochon",
+5
+],
+[
+"Charcuterie Carrel",
+4
+],
+[
+"Cooperl",
+4
+],
+[
+"Maison Milhau",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Lidl",
+4
+],
+[
+"Despi",
+3
+],
+[
+"Sans marque",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Pavés de bœuf": {
+"n": 131,
+"categorie": "en:beef",
+"marques": [
+[
+"Charal",
+18
+],
+[
+"U",
+10
+],
+[
+"Férial",
+7
+],
+[
+"Tendre Et Plus",
+6
+],
+[
+"L'Étal du Boucher",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"U Bio",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Socopa",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Bavette": {
+"n": 380,
+"categorie": "en:beef-flank-steak",
+"marques": [
+[
+"Charal",
+160
+],
+[
+"L'Étal du Boucher",
+6
+],
+[
+"Leclerc",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Rumsteck": {
+"n": 42,
+"categorie": "en:beef",
+"marques": []
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Rôti de bœuf": {
+"n": 88,
+"categorie": "en:beef",
+"marques": [
+[
+"Charal",
+5
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Tradilège",
+3
+],
+[
+"L'Étal du Boucher",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Filet mignon de porc": {
+"n": 508,
+"categorie": "en:pork-filet-mignon",
+"marques": [
+[
+"L'Étal du Boucher",
+111
+],
+[
+"Boucherie St Clément",
+16
+],
+[
+"Picard",
+13
+],
+[
+"Lidl",
+8
+],
+[
+"Madrange",
+7
+],
+[
+"Secrets Du Val D'argent",
+6
+],
+[
+"U",
+4
+],
+[
+"Saveurs des mauges",
+3
+],
+[
+"La Cuisine d'Océane",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Échine de porc": {
+"n": 120,
+"categorie": "fr:echine-de-porc",
+"marques": [
+[
+"E.Leclerc",
+9
+],
+[
+"Tendre & Plus",
+3
+],
+[
+"Hiruak",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Poitrine de porc": {
+"n": 352,
+"categorie": "en:pork-belly",
+"marques": [
+[
+"Socopa",
+13
+],
+[
+"Les Brasérades",
+11
+],
+[
+"Hiruak",
+10
+],
+[
+"Carrefour",
+7
+],
+[
+"E.Leclerc",
+7
+],
+[
+"Férial",
+5
+],
+[
+"L'Étal du Boucher",
+4
+],
+[
+"Cooperl",
+4
+],
+[
+"U",
+4
+],
+[
+"Jean Rozé",
+4
+],
+[
+"Sans marque",
+3
+],
+[
+"En Cuisine",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Sauté de porc": {
+"n": 124,
+"categorie": "en:pork",
+"marques": [
+[
+"L'Étal du Boucher",
+8
+],
+[
+"Fleury Michon",
+5
+],
+[
+"Lidl",
+4
+],
+[
+"U",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Brochettes de bœuf": {
+"n": 143,
+"categorie": "en:beef-skewers",
+"marques": [
+[
+"U",
+7
+],
+[
+"Socopa",
+5
+],
+[
+"Bigard",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Férial",
+5
+],
+[
+"Jean Rozé",
+4
+],
+[
+"L'Étal du Boucher",
+3
+],
+[
+"Picard",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Paupiettes de veau": {
+"n": 183,
+"categorie": "en:olive-veal",
+"marques": [
+[
+"Tendriade",
+30
+],
+[
+"Toupargel",
+5
+],
+[
+"Thiriet",
+3
+],
+[
+"Comtesse du Barry",
+3
+],
+[
+"Agis",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Côtelettes d'agneau": {
+"n": 11,
+"categorie": "en:lamb-cutlet",
+"marques": []
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Filet de porc": {
+"n": 223,
+"categorie": "en:pork",
+"marques": [
+[
+"Bigard",
+39
+],
+[
+"Tendre & Plus",
+8
+],
+[
+"Socopa",
+4
+],
+[
+"Nobles",
+4
+],
+[
+"L'Étal du Boucher",
+3
+],
+[
+"Maître Jacques",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Langue de bœuf": {
+"n": 232,
+"categorie": "en:beef-tongues",
+"marques": [
+[
+"Tendre & Plus",
+64
+],
+[
+"Maison Larzul",
+18
+],
+[
+"Stéphan",
+9
+],
+[
+"Hénaff",
+6
+],
+[
+"Lechef",
+4
+],
+[
+"Relais Gourmand",
+3
+],
+[
+"Toupargel",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Souris d'agneau": {
+"n": 584,
+"categorie": "fr:souris-d-agneau",
+"marques": [
+[
+"Tendre & Plus",
+222
+],
+[
+"Jean Rozé",
+25
+],
+[
+"Picard",
+12
+],
+[
+"Tendre Et Plus",
+10
+],
+[
+"Intermarché",
+9
+],
+[
+"Lechef",
+5
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Chair à saucisse": {
+"n": 244,
+"categorie": "en:sausage-meat",
+"marques": [
+[
+"U",
+16
+],
+[
+"L'Étal du Boucher",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Jean Rozé",
+4
+],
+[
+"Vallégrain",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"U Bio",
+4
+],
+[
+"Socopa",
+3
+],
+[
+"Maison Milhau",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Férial",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Palette de porc": {
+"n": 199,
+"categorie": "en:devilled-pork-shoulder-in-mustard-sauce",
+"marques": [
+[
+"Tendre & Plus",
+21
+],
+[
+"Maître Jacques",
+8
+],
+[
+"Les Brasérades",
+6
+],
+[
+"Férial",
+6
+],
+[
+"Moritz",
+4
+],
+[
+"Socopa",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Poulet entier": {
+"n": 1914,
+"categorie": "en:chickens",
+"marques": [
+[
+"L'etal Du Volailler",
+151
+],
+[
+"Loué",
+106
+],
+[
+"U",
+78
+],
+[
+"Nature de France",
+74
+],
+[
+"Maître CoQ",
+38
+],
+[
+"Les Fermiers de Loué",
+33
+],
+[
+"Volaé",
+31
+],
+[
+"La Nouvelle Agriculture",
+29
+],
+[
+"Marque Repère",
+26
+],
+[
+"Leader Price",
+24
+],
+[
+"U Bio",
+23
+],
+[
+"Saint Charmin",
+17
+],
+[
+"Casino",
+16
+],
+[
+"Volandry",
+14
+],
+[
+"Carrefour",
+10
+],
+[
+"Lidl",
+9
+],
+[
+"Casino Bio",
+9
+],
+[
+"Bio Village",
+7
+],
+[
+"St Sever",
+6
+],
+[
+"Piquebroche",
+4
+],
+[
+"Label Rouge",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Simplement Bon Et Bio",
+3
+],
+[
+"Ronsard",
+3
+],
+[
+"Paysan Breton",
+3
+],
+[
+"Le Janzé",
+3
+],
+[
+"Terre d'Oc",
+3
+],
+[
+"Monoprix Gourmet",
+3
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Le Paysan Bio",
+3
+],
+[
+"Pays Gourmand",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Blancs de poulet": {
+"n": 499,
+"categorie": "en:prepared-chicken-meats",
+"marques": [
+[
+"Fleury Michon",
+79
+],
+[
+"Monique ranou",
+21
+],
+[
+"Carrefour",
+17
+],
+[
+"Auchan",
+17
+],
+[
+"Saint Alby",
+16
+],
+[
+"Casino",
+15
+],
+[
+"Tradilège",
+15
+],
+[
+"Le Gaulois",
+12
+],
+[
+"Herta",
+12
+],
+[
+"Réghalal",
+8
+],
+[
+"Monoprix",
+8
+],
+[
+"Isla Mondial",
+8
+],
+[
+"Netto",
+7
+],
+[
+"Cora",
+7
+],
+[
+"U",
+6
+],
+[
+"Marque Repère",
+6
+],
+[
+"Leader Price",
+4
+],
+[
+"Auchan Bio",
+4
+],
+[
+"Volibon",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Halal",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Madrange",
+3
+],
+[
+"Carrefour Extra",
+3
+],
+[
+"Groupe Carrefour",
+3
+],
+[
+"Id Halal",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Lagrange",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Cuisses de poulet": {
+"n": 1598,
+"categorie": "en:chicken-thighs",
+"marques": [
+[
+"Le Gaulois",
+307
+],
+[
+"La Nouvelle Agriculture",
+177
+],
+[
+"Maître CoQ",
+65
+],
+[
+"Loué",
+43
+],
+[
+"Volaé",
+34
+],
+[
+"Marque Repère",
+33
+],
+[
+"U",
+29
+],
+[
+"Carrefour",
+27
+],
+[
+"L'etal Du Volailler",
+26
+],
+[
+"Saint Charmin",
+24
+],
+[
+"Monoprix",
+14
+],
+[
+"Simplement Bon Et Bio",
+12
+],
+[
+"Nature de France",
+11
+],
+[
+"Leader Price",
+10
+],
+[
+"Volandry",
+10
+],
+[
+"Picard",
+9
+],
+[
+"Lidl",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"Le gaulois (ocb) oui c'est bon",
+7
+],
+[
+"Père Dodu",
+7
+],
+[
+"Carrefour BIO",
+7
+],
+[
+"Bio Village",
+7
+],
+[
+"Toupargel",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Casino",
+4
+],
+[
+"Biocoop",
+4
+],
+[
+"Volandrie",
+4
+],
+[
+"Le Paysan Bio",
+4
+],
+[
+"Corril",
+3
+],
+[
+"Ronsard",
+3
+],
+[
+"Eco+",
+3
+],
+[
+"Simpl",
+3
+],
+[
+"Reflets de France",
+3
+],
+[
+"Réghalal",
+3
+],
+[
+"Carrefour Classic",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Pintade": {
+"n": 223,
+"categorie": "en:guinea-fowl",
+"marques": [
+[
+"Maître CoQ",
+59
+],
+[
+"Deluxe",
+16
+],
+[
+"Père Dodu",
+5
+],
+[
+"U",
+4
+],
+[
+"Picard",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Casino Délices",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Coquelet": {
+"n": 46,
+"categorie": "fr:coquelets",
+"marques": [
+[
+"L'etal Du Volailler",
+3
+],
+[
+"Maître CoQ",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Canard": {
+"n": 291,
+"categorie": "en:ducks",
+"marques": [
+[
+"Esprit Gourmet",
+4
+],
+[
+"Lechef",
+4
+],
+[
+"Saveur d'Auge",
+4
+],
+[
+"Nature de France",
+4
+],
+[
+"Le Gaulois",
+3
+],
+[
+"La Truffe",
+3
+],
+[
+"Delpeyrat",
+3
+],
+[
+"Les Bories",
+3
+],
+[
+"Pierre Champion",
+3
+],
+[
+"Père Dodu",
+3
+],
+[
+"Jean Larnaudie",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Lapin": {
+"n": 380,
+"categorie": "en:rabbit-meat",
+"marques": [
+[
+"L'etal Du Volailler",
+56
+],
+[
+"LOEUL ET PIRIOT",
+29
+],
+[
+"U",
+10
+],
+[
+"Lindt",
+5
+],
+[
+"Cora",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Ets Ribot",
+4
+],
+[
+"LOEUL & PIRIOT",
+4
+],
+[
+"Auchan",
+3
+],
+[
+"Volaé",
+3
+]
+]
+},
+"Boucherie/Boucherie traditionnelle et Volailles/Magret de canard": {
+"n": 1337,
+"categorie": "en:duck-breasts",
+"marques": [
+[
+"Saveurs de nos Régions",
+109
+],
+[
+"Delpeyrat",
+67
+],
+[
+"L'etal Du Volailler",
+51
+],
+[
+"Reflets de France",
+44
+],
+[
+"Maison Montfort",
+35
+],
+[
+"Labeyrie",
+34
+],
+[
+"Monoprix Gourmet",
+28
+],
+[
+"Lidl",
+14
+],
+[
+"Secret d eleveurs",
+11
+],
+[
+"Montfort",
+9
+],
+[
+"Maistres Occitans",
+9
+],
+[
+"Carrefour",
+8
+],
+[
+"Les Brasérades",
+8
+],
+[
+"Picard",
+7
+],
+[
+"Delmond",
+6
+],
+[
+"Diamant Noir",
+6
+],
+[
+"La Truffe",
+6
+],
+[
+"Nos Régions ont du Talent",
+5
+],
+[
+"Terres Paysannes",
+5
+],
+[
+"Larnaudie",
+5
+],
+[
+"Monoprix",
+4
+],
+[
+"Maison Monfort",
+4
+],
+[
+"Feyel",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Bongou",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Comtesse du Barry",
+3
+],
+[
+"Les Thomasines",
+3
+],
+[
+"Le Gaulois",
+3
+],
+[
+"Maison Occitane",
+3
+],
+[
+"Jean Larnaudie",
+3
+]
+]
 },
 "Boucherie/Produits du terroir/Foie gras": {
 "n": 2038,
@@ -8371,11 +11185,11 @@
 4
 ],
 [
-"Auchan Gourmet",
+"Auchan",
 4
 ],
 [
-"Auchan",
+"Auchan Gourmet",
 4
 ],
 [
@@ -8688,19 +11502,29 @@
 ]
 },
 "Boucherie/Produits du terroir/Andouille": {
-"n": 373,
+"n": 249,
+"categorie": "en:chitterling-sausage",
+"marques": [
+[
+"Atelier de l'Argoat",
+3
+],
+[
+"Amand Terroir",
+3
+],
+[
+"Guyader",
+3
+]
+]
+},
+"Boucherie/Produits du terroir/Andouille de Guémené": {
+"n": 170,
 "categorie": "en:chitterling-sausage-from-guemene",
 "marques": [
 [
 "Itinéraire des Saveurs",
-4
-],
-[
-"Kerandou",
-4
-],
-[
-"Guyader",
 4
 ],
 [
@@ -8716,7 +11540,63 @@
 3
 ],
 [
+"Kerandou",
+3
+],
+[
+"Guyader",
+3
+],
+[
 "Saveurs de nos Régions",
+3
+]
+]
+},
+"Boucherie/Produits du terroir/Diots de Savoie": {
+"n": 146,
+"categorie": "en:sausage-from-savoy",
+"marques": [
+[
+"Henri Raffin",
+9
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Reflets de France",
+3
+],
+[
+"Galibier",
+3
+],
+[
+"U",
+3
+]
+]
+},
+"Boucherie/Produits du terroir/Caillettes": {
+"n": 188,
+"categorie": "fr:caillettes",
+"marques": [
+[
+"Gueze",
+24
+],
+[
+"Drôme Salaisons",
+6
+],
+[
+"Chabert",
+4
+],
+[
+"Charcuterie de Charpey",
 3
 ]
 ]
@@ -8986,46 +11866,158 @@
 ]
 },
 "Volaille/Volaille libre-service/Poulet entier": {
-"n": 191,
+"n": 1914,
 "categorie": "en:chickens",
 "marques": [
 [
+"L'etal Du Volailler",
+151
+],
+[
+"Loué",
+106
+],
+[
 "U",
-64
+78
 ],
 [
-"Leader Price",
-16
+"Nature de France",
+74
 ],
 [
-"U Bio",
-8
+"Maître CoQ",
+38
 ],
 [
 "Les Fermiers de Loué",
-4
+33
+],
+[
+"Volaé",
+31
+],
+[
+"La Nouvelle Agriculture",
+29
 ],
 [
 "Marque Repère",
+26
+],
+[
+"Leader Price",
+24
+],
+[
+"U Bio",
+23
+],
+[
+"Saint Charmin",
+17
+],
+[
+"Casino",
+16
+],
+[
+"Volandry",
+14
+],
+[
+"Carrefour",
+10
+],
+[
+"Lidl",
+9
+],
+[
+"Casino Bio",
+9
+],
+[
+"Bio Village",
+7
+],
+[
+"St Sever",
+6
+],
+[
+"Piquebroche",
+4
+],
+[
+"Label Rouge",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Simplement Bon Et Bio",
+3
+],
+[
+"Ronsard",
+3
+],
+[
+"Paysan Breton",
+3
+],
+[
+"Le Janzé",
+3
+],
+[
+"Terre d'Oc",
+3
+],
+[
+"Monoprix Gourmet",
+3
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Le Paysan Bio",
+3
+],
+[
+"Pays Gourmand",
 3
 ]
 ]
 },
 "Volaille/Volaille libre-service/Escalopes de dinde": {
-"n": 2142,
+"n": 2527,
 "categorie": "en:turkey-cutlets",
 "marques": [
 [
 "Le Gaulois",
-453
+463
+],
+[
+"Maître CoQ",
+146
 ],
 [
 "Volaé",
 120
 ],
 [
-"Maître CoQ",
-120
+"Loué",
+79
 ],
 [
 "Carrefour",
@@ -9033,43 +12025,39 @@
 ],
 [
 "Monoprix",
-70
-],
-[
-"Loué",
-69
+71
 ],
 [
 "Marque Repère",
-63
+65
 ],
 [
 "Volandrie",
-62
+64
 ],
 [
 "Père Dodu",
 59
 ],
 [
-"Volandry",
-49
-],
-[
 "Les Fermiers de Loué",
-48
-],
-[
-"Auchan",
-30
+57
 ],
 [
 "La Nouvelle Agriculture",
-20
+54
+],
+[
+"Volandry",
+53
+],
+[
+"Auchan",
+32
 ],
 [
 "Casino",
-16
+20
 ],
 [
 "Réghalal",
@@ -9084,16 +12072,16 @@
 14
 ],
 [
+"Leader Price",
+13
+],
+[
 "Cora",
 13
 ],
 [
 "L'etal Du Volailler",
 12
-],
-[
-"Leader Price",
-11
 ],
 [
 "Simpl",
@@ -9105,7 +12093,7 @@
 ],
 [
 "Douce France",
-7
+8
 ],
 [
 "Corril",
@@ -9121,6 +12109,10 @@
 ],
 [
 "Aldi",
+4
+],
+[
+"Fermiers de Loué",
 4
 ],
 [
@@ -10239,6 +13231,312 @@
 ]
 ]
 },
+"Volaille/Volaille libre-service/Émincés de poulet": {
+"n": 415,
+"categorie": "en:chickens",
+"marques": [
+[
+"Fleury Michon",
+22
+],
+[
+"Père Dodu",
+19
+],
+[
+"L'etal Du Volailler",
+17
+],
+[
+"Le Gaulois",
+17
+],
+[
+"U",
+11
+],
+[
+"Lidl",
+6
+],
+[
+"Monoprix",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"Carrefour",
+5
+],
+[
+"Maître CoQ",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Tradilège",
+4
+],
+[
+"Les éleveurs de la Charentonne",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Réghalal",
+3
+],
+[
+"Douce France",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"Metro Chef",
+3
+],
+[
+"Grand Frais",
+3
+],
+[
+"Volandrie",
+3
+]
+]
+},
+"Volaille/Volaille libre-service/Aiguillettes de canard": {
+"n": 328,
+"categorie": "fr:aiguillettes-de-canard",
+"marques": [
+[
+"Delpeyrat",
+18
+],
+[
+"Le Gaulois",
+16
+],
+[
+"Maison Montfort",
+15
+],
+[
+"Monoprix",
+11
+],
+[
+"Saveurs de nos Régions",
+7
+],
+[
+"U",
+6
+],
+[
+"Labeyrie",
+5
+],
+[
+"Maistres Occitans",
+5
+],
+[
+"L'etal Du Volailler",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"Le Domaine d'Ernest",
+3
+],
+[
+"Douce France",
+3
+],
+[
+"Corril",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Thiriet",
+3
+],
+[
+"Hiruak",
+3
+]
+]
+},
+"Volaille/Volaille libre-service/Suprêmes de poulet": {
+"n": 18,
+"categorie": "en:hen-meat-and-skin",
+"marques": [
+[
+"Le Paysan Bio",
+3
+]
+]
+},
+"Volaille/Volaille libre-service/Cuisses de dinde": {
+"n": 269,
+"categorie": "en:turkey-thighs",
+"marques": [
+[
+"L'etal Du Volailler",
+74
+],
+[
+"Le Gaulois",
+27
+],
+[
+"Loué",
+16
+],
+[
+"Marque Repère",
+11
+],
+[
+"Eco+",
+11
+],
+[
+"Corril",
+10
+],
+[
+"Volandrie",
+10
+],
+[
+"Maître CoQ",
+7
+],
+[
+"Adrien Labrouche",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"U",
+4
+],
+[
+"Leader Price",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Père Dodu",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Simpl",
+3
+]
+]
+},
+"Volaille/Volaille libre-service/Escalopes milanaises": {
+"n": 386,
+"categorie": "en:breaded-turkey-cutlets",
+"marques": [
+[
+"Le Gaulois",
+180
+],
+[
+"Volandrie",
+28
+],
+[
+"Volandry",
+22
+],
+[
+"Marque Repère",
+16
+],
+[
+"L'etal Du Volailler",
+7
+],
+[
+"Royal Bernard",
+7
+],
+[
+"Aia",
+6
+],
+[
+"Monoprix",
+6
+],
+[
+"Père Dodu",
+5
+],
+[
+"Loué",
+3
+]
+]
+},
+"Volaille/Volaille libre-service/Manchons de canard": {
+"n": 99,
+"categorie": "fr:manchons-de-canard",
+"marques": [
+[
+"Larnaudie",
+14
+],
+[
+"Jean Larnaudie",
+7
+]
+]
+},
+"Volaille/Volaille libre-service/Tenders de poulet": {
+"n": 72,
+"categorie": "en:breaded-chicken",
+"marques": [
+[
+"Carrefour",
+5
+]
+]
+},
 "Volaille/Rôtisserie/Poulet rôti": {
 "n": 784,
 "categorie": "en:roast-chicken",
@@ -10918,11 +14216,11 @@
 "categorie": "fr:filets-de-lieu-noir",
 "marques": [
 [
-"Mericq",
+"Sans marque",
 3
 ],
 [
-"Sans marque",
+"Mericq",
 3
 ],
 [
@@ -11405,11 +14703,11 @@
 3
 ],
 [
-"Marque Repère",
+"Pêche Océan",
 3
 ],
 [
-"Pêche Océan",
+"Marque Repère",
 3
 ],
 [
@@ -11429,6 +14727,454 @@
 "Poissonnerie/Poissonnerie libre-service/Saumon frais": {
 "n": 41,
 "categorie": "en:salmons",
+"marques": []
+},
+"Poissonnerie/Poissonnerie libre-service/Queues de crevettes": {
+"n": 315,
+"categorie": "en:shrimps-tails",
+"marques": [
+[
+"Carrefour",
+14
+],
+[
+"Grand Frais",
+8
+],
+[
+"Delpierre",
+8
+],
+[
+"Mericq",
+5
+],
+[
+"Escal",
+5
+],
+[
+"Picard",
+5
+],
+[
+"Gfm",
+4
+],
+[
+"Odyssee",
+4
+],
+[
+"Gineys",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Casino",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Delicemer",
+3
+],
+[
+"Miti",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Dos de cabillaud": {
+"n": 195,
+"categorie": "fr:dos-de-cabillaud",
+"marques": [
+[
+"Compagnie des Pêches Saint-Malo",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Filets de harengs fumés": {
+"n": 151,
+"categorie": "en:smoked-herrings",
+"marques": [
+[
+"Delpierre",
+10
+],
+[
+"Casino",
+7
+],
+[
+"Simon",
+6
+],
+[
+"La Mère Angot",
+6
+],
+[
+"Bourgain et Fils",
+6
+],
+[
+"Carrefour",
+5
+],
+[
+"Leader Price",
+4
+],
+[
+"Pêche Océan",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Viči",
+4
+],
+[
+"Belle France",
+3
+],
+[
+"J.C.David",
+3
+],
+[
+"Ronde des Mers",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Huîtres": {
+"n": 96,
+"categorie": "en:oysters",
+"marques": [
+[
+"Carrefour",
+8
+],
+[
+"U",
+6
+],
+[
+"Cultimer",
+4
+],
+[
+"Chevaliers d'Argouges",
+4
+],
+[
+"Mytilimer",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Bar": {
+"n": 136,
+"categorie": "en:sweet-snacks",
+"marques": [
+[
+"Pural",
+7
+],
+[
+"Teisseire",
+3
+],
+[
+"9bar",
+3
+],
+[
+"Le Comptoir de Mathilde",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Daurade": {
+"n": 18,
+"categorie": "en:breams",
+"marques": [
+[
+"U",
+4
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Sole": {
+"n": 30,
+"categorie": "en:common-sole",
+"marques": [
+[
+"Carrefour",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Thon frais": {
+"n": 13,
+"categorie": "en:fish-preparations",
+"marques": [
+[
+"Cap Océan",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Langoustines": {
+"n": 51,
+"categorie": "en:jumbo-shrimps",
+"marques": [
+[
+"Carrefour",
+4
+],
+[
+"Errigal Bay",
+3
+],
+[
+"Delpierre",
+3
+],
+[
+"La Paimpolaise",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Bulots": {
+"n": 35,
+"categorie": "en:cooked-whelk",
+"marques": [
+[
+"U",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Mer et Terroirs",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Noix de Saint-Jacques": {
+"n": 214,
+"categorie": "en:scallop",
+"marques": [
+[
+"Picard",
+14
+],
+[
+"Thiriet",
+9
+],
+[
+"Carrefour",
+9
+],
+[
+"Casino",
+5
+],
+[
+"Hubco",
+5
+],
+[
+"Gineys",
+4
+],
+[
+"Nautilus",
+4
+],
+[
+"U",
+4
+],
+[
+"Pescanova",
+4
+],
+[
+"Nos Régions ont du Talent",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Escal",
+3
+],
+[
+"Deluxe",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Encornets": {
+"n": 127,
+"categorie": "en:seafood",
+"marques": [
+[
+"Briau",
+7
+],
+[
+"U",
+4
+],
+[
+"Agis",
+3
+],
+[
+"Bon Appetit",
+3
+],
+[
+"Spaña Sol",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Calamars": {
+"n": 138,
+"categorie": "en:calamari",
+"marques": [
+[
+"Escal",
+4
+],
+[
+"Esmeralda",
+4
+],
+[
+"Spanico",
+4
+],
+[
+"Ederki",
+3
+],
+[
+"Delpierre",
+3
+],
+[
+"Pêcheur de Saveurs",
+3
+],
+[
+"Palais Des Mets",
+3
+],
+[
+"Palacio de Oriente",
+3
+],
+[
+"La Coca",
+3
+],
+[
+"Casa Ramon",
+3
+],
+[
+"Spaña Sol",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Merlan": {
+"n": 12,
+"categorie": "en:fishes",
+"marques": []
+},
+"Poissonnerie/Poissonnerie libre-service/Filets de morue": {
+"n": 33,
+"categorie": "en:cod-fillets",
+"marques": [
+[
+"Delpierre",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Poulpe": {
+"n": 129,
+"categorie": "en:common-octopus",
+"marques": [
+[
+"Pêcheur de Saveurs",
+11
+],
+[
+"L'Apéro du Poissonnier",
+6
+],
+[
+"Sans marque",
+3
+],
+[
+"Spanico",
+3
+],
+[
+"Azais polito",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie libre-service/Palourdes": {
+"n": 15,
+"categorie": "en:clam",
 "marques": []
 },
 "Poissonnerie/Poissonnerie traditionnelle/Huîtres": {
@@ -11962,6 +15708,903 @@
 "n": 4,
 "categorie": null,
 "marques": []
+},
+"Poissonnerie/Poissonnerie traditionnelle/Filets de saumon": {
+"n": 234,
+"categorie": "en:salmon-fillets",
+"marques": [
+[
+"Ocean Sea",
+10
+],
+[
+"Findus",
+8
+],
+[
+"Golden Seafood",
+6
+],
+[
+"U",
+6
+],
+[
+"Frais Embal",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Loc Marée",
+3
+],
+[
+"Nouvelle Vague",
+3
+],
+[
+"Costa",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Filets de cabillaud": {
+"n": 220,
+"categorie": "en:cod-fillets",
+"marques": [
+[
+"Cité Marine",
+23
+],
+[
+"Findus",
+9
+],
+[
+"Picard",
+8
+],
+[
+"Carrefour",
+8
+],
+[
+"Thiriet",
+7
+],
+[
+"Toupargel",
+5
+],
+[
+"U",
+4
+],
+[
+"Sacrebleu",
+4
+],
+[
+"L'assiette Bleue",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"La Cuisine du Poissonnier",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Pêche Océan",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Crevettes cuites": {
+"n": 473,
+"categorie": "en:shrimps",
+"marques": [
+[
+"U",
+37
+],
+[
+"Sans marque",
+9
+],
+[
+"Auchan",
+9
+],
+[
+"Casino",
+8
+],
+[
+"Odyssee",
+8
+],
+[
+"Intermarché",
+8
+],
+[
+"U Bio",
+7
+],
+[
+"Pescanova",
+7
+],
+[
+"Grand Frais",
+5
+],
+[
+"Delpierre",
+5
+],
+[
+"Maison Mer",
+5
+],
+[
+"Miti",
+5
+],
+[
+"Leclerc",
+4
+],
+[
+"Krustanord",
+4
+],
+[
+"Casino Bio",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"L'Atelier Poissonnerie",
+4
+],
+[
+"Crusta C",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Trad p&c",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Bleu Vert",
+3
+],
+[
+"Tous les jours",
+3
+],
+[
+"E.Leclerc",
+3
+],
+[
+"ASC",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Moules": {
+"n": 586,
+"categorie": "en:mussels",
+"marques": [
+[
+"U",
+24
+],
+[
+"Carrefour",
+21
+],
+[
+"La Cancalaise",
+12
+],
+[
+"U Bio",
+12
+],
+[
+"Casino",
+11
+],
+[
+"Cora",
+11
+],
+[
+"Sans marque",
+10
+],
+[
+"Thiriet",
+10
+],
+[
+"Delicemer",
+10
+],
+[
+"Odyssee",
+9
+],
+[
+"Angulas Aguinaga",
+9
+],
+[
+"Picard",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Auchan",
+7
+],
+[
+"Miti",
+7
+],
+[
+"Premier",
+7
+],
+[
+"Mytilimer",
+6
+],
+[
+"Leader Price",
+5
+],
+[
+"Cultimer",
+4
+],
+[
+"Ronde des Mers",
+4
+],
+[
+"Française de Gastronomie",
+4
+],
+[
+"Pay Pay",
+4
+],
+[
+"Sar'Océan",
+4
+],
+[
+"Pyrex",
+4
+],
+[
+"Intermarché",
+3
+],
+[
+"Escal",
+3
+],
+[
+"Pêcheries Sétoises",
+3
+],
+[
+"Pêche Océan",
+3
+],
+[
+"Producteurs associés",
+3
+],
+[
+"Qualimer",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Filets de lieu": {
+"n": 77,
+"categorie": "fr:filets-de-lieu-noir",
+"marques": [
+[
+"Sans marque",
+3
+],
+[
+"Mericq",
+3
+],
+[
+"Intermarché",
+3
+],
+[
+"U",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Filets de merlu": {
+"n": 95,
+"categorie": "en:hake-fillet",
+"marques": [
+[
+"U",
+10
+],
+[
+"Cité Marine",
+9
+],
+[
+"Auchan",
+6
+],
+[
+"Thiriet",
+4
+],
+[
+"Carrefour",
+4
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Filets de truite": {
+"n": 130,
+"categorie": "fr:filets-de-truite",
+"marques": [
+[
+"U",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Gambas": {
+"n": 213,
+"categorie": "en:prawns",
+"marques": [
+[
+"Pacific West",
+11
+],
+[
+"Delpierre",
+8
+],
+[
+"Carrefour",
+7
+],
+[
+"Oso",
+6
+],
+[
+"Pescanova",
+6
+],
+[
+"U",
+5
+],
+[
+"Gel-Pêche",
+5
+],
+[
+"Gimbert Océan",
+5
+],
+[
+"Costa",
+5
+],
+[
+"Odyssee",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Casino",
+3
+],
+[
+"La Table des Pêcheurs",
+3
+],
+[
+"Instant Traiteur",
+3
+],
+[
+"Ronde des Mers",
+3
+],
+[
+"Delfin",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Crevettes grises": {
+"n": 52,
+"categorie": "en:brown-shrimp",
+"marques": [
+[
+"Heiploeg",
+5
+],
+[
+"Klaas Puul",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Crevettes roses": {
+"n": 67,
+"categorie": "en:deep-water-pink-shrimps",
+"marques": [
+[
+"Pescanova",
+5
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Pavés de saumon": {
+"n": 602,
+"categorie": "en:salmon-steaks",
+"marques": [
+[
+"U",
+30
+],
+[
+"Carrefour",
+18
+],
+[
+"Casino",
+12
+],
+[
+"Picard",
+11
+],
+[
+"Monoprix",
+11
+],
+[
+"Auchan",
+10
+],
+[
+"U Bio",
+9
+],
+[
+"Mericq",
+9
+],
+[
+"Thiriet",
+7
+],
+[
+"Sans marque",
+6
+],
+[
+"Grand Frais",
+6
+],
+[
+"Franprix",
+6
+],
+[
+"L'Atelier Poissonnerie",
+6
+],
+[
+"U Saveurs",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"Loc Marée",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Sacrebleu",
+5
+],
+[
+"Leclerc",
+4
+],
+[
+"Intermarché",
+4
+],
+[
+"Pescanova",
+4
+],
+[
+"Herens",
+3
+],
+[
+"Petit Navire",
+3
+],
+[
+"Delpierre",
+3
+],
+[
+"Casino Bio",
+3
+],
+[
+"Odyssee",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"La Table des Pêcheurs",
+3
+],
+[
+"Monoprix Gourmet",
+3
+],
+[
+"Pêche Océan",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Findus",
+3
+],
+[
+"Marès",
+3
+],
+[
+"Armement des Mascareignes",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Saumon frais": {
+"n": 41,
+"categorie": "en:salmons",
+"marques": []
+},
+"Poissonnerie/Poissonnerie traditionnelle/Saumon fumé": {
+"n": 2398,
+"categorie": "en:smoked-salmons",
+"marques": [
+[
+"Labeyrie",
+257
+],
+[
+"Delpeyrat",
+133
+],
+[
+"Petit Navire",
+106
+],
+[
+"Delpierre",
+103
+],
+[
+"U",
+66
+],
+[
+"Auchan",
+49
+],
+[
+"Carrefour",
+42
+],
+[
+"Cora",
+34
+],
+[
+"Kritsen",
+32
+],
+[
+"Monoprix",
+32
+],
+[
+"Ronde des Mers",
+31
+],
+[
+"Marque Repère",
+28
+],
+[
+"Guyader",
+26
+],
+[
+"Le Fumet des Dombes",
+22
+],
+[
+"Casino",
+21
+],
+[
+"Capitaine cook",
+19
+],
+[
+"Odyssee",
+18
+],
+[
+"Leader Price",
+14
+],
+[
+"Metro Chef",
+14
+],
+[
+"Lidl",
+13
+],
+[
+"Belle France",
+13
+],
+[
+"MOWI",
+13
+],
+[
+"Monoprix Gourmet",
+12
+],
+[
+"Dom Petroff",
+11
+],
+[
+"Fauchon",
+11
+],
+[
+"William & James",
+11
+],
+[
+"Auchan Collection",
+11
+],
+[
+"Le Fumoir du Poissonnier",
+10
+],
+[
+"Claude Traiteur",
+10
+],
+[
+"Auchan Premium",
+10
+],
+[
+"Ocean Sea",
+9
+],
+[
+"Fjord King",
+9
+],
+[
+"Viči",
+9
+],
+[
+"Franprix",
+8
+],
+[
+"U Saveurs",
+8
+],
+[
+"Petrossian",
+8
+],
+[
+"Netto",
+7
+],
+[
+"U Bio",
+7
+],
+[
+"Kaviari",
+7
+],
+[
+"Armoric",
+6
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Dos de cabillaud": {
+"n": 195,
+"categorie": "fr:dos-de-cabillaud",
+"marques": [
+[
+"Compagnie des Pêches Saint-Malo",
+3
+]
+]
+},
+"Poissonnerie/Poissonnerie traditionnelle/Queues de crevettes": {
+"n": 315,
+"categorie": "en:shrimps-tails",
+"marques": [
+[
+"Carrefour",
+14
+],
+[
+"Grand Frais",
+8
+],
+[
+"Delpierre",
+8
+],
+[
+"Mericq",
+5
+],
+[
+"Escal",
+5
+],
+[
+"Picard",
+5
+],
+[
+"Gfm",
+4
+],
+[
+"Odyssee",
+4
+],
+[
+"Gineys",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Casino",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Delicemer",
+3
+],
+[
+"Miti",
+3
+],
+[
+"Auchan",
+3
+]
+]
 },
 "Crèmerie/Lait/Lait demi-écrémé": {
 "n": 629,
@@ -12500,11 +17143,11 @@
 6
 ],
 [
-"U Bio",
+"U",
 4
 ],
 [
-"U",
+"U Bio",
 4
 ]
 ]
@@ -12670,11 +17313,11 @@
 3
 ],
 [
-"Monoprix",
+"Monoprix Gourmet",
 3
 ],
 [
-"Monoprix Gourmet",
+"Monoprix",
 3
 ]
 ]
@@ -13854,96 +18497,96 @@
 ]
 },
 "Crèmerie/Yaourts et desserts/Yaourts nature": {
-"n": 1232,
+"n": 1900,
 "categorie": "en:plain-yogurts",
 "marques": [
 [
 "U",
-48
+69
+],
+[
+"Danone",
+34
+],
+[
+"Yoplait",
+34
+],
+[
+"Leader Price",
+34
 ],
 [
 "Auchan",
 33
 ],
 [
-"Danone",
-32
-],
-[
-"Leader Price",
-32
-],
-[
 "Carrefour",
-31
-],
-[
-"Yoplait",
-24
-],
-[
-"Casino",
-21
-],
-[
-"Vrai",
-18
-],
-[
-"Malo",
-17
-],
-[
-"Monoprix",
-17
-],
-[
-"Pâturages",
-17
+32
 ],
 [
 "U Bio",
-15
+25
+],
+[
+"Malo",
+22
+],
+[
+"Casino",
+22
+],
+[
+"Vrai",
+20
+],
+[
+"Pâturages",
+19
+],
+[
+"Monoprix",
+18
 ],
 [
 "Marque Repère",
+16
+],
+[
+"Beillevaire",
 15
 ],
 [
 "Franprix",
-14
+15
 ],
 [
 "Biocoop",
-14
+15
 ],
 [
 "Délisse",
+15
+],
+[
+"Bio Village",
 14
 ],
 [
 "Cora",
-13
-],
-[
-"Beillevaire",
-13
+14
 ],
 [
 "Belle France",
 12
 ],
 [
-"Netto",
+"Envia",
 11
 ],
 [
-"Envia",
-10
-],
-[
-"Bio Village",
-10
+"Netto",
+11
 ],
 [
 "Milbona",
@@ -13954,6 +18597,18 @@
 9
 ],
 [
+"YOgourmand",
+9
+],
+[
+"Baskalia",
+9
+],
+[
+"Milsani",
+8
+],
+[
 "Groupe Casino",
 8
 ],
@@ -13962,11 +18617,11 @@
 8
 ],
 [
-"YOgourmand",
+"Coeur de Fermier",
 8
 ],
 [
-"Milsani",
+"Milsa",
 7
 ],
 [
@@ -13974,48 +18629,36 @@
 7
 ],
 [
-"Baskalia",
+"Le Petit Basque",
 7
+],
+[
+"Ferme Collet",
+7
+],
+[
+"La Ferme Saint Ulrich",
+7
+],
+[
+"Ferme Des Peupliers",
+7
+],
+[
+"Nestlé",
+6
 ],
 [
 "DLP (Distribution Leader Price)",
 6
 ],
 [
-"Ferme Collet",
-6
-],
-[
-"Bernard Gaborit",
-6
-],
-[
-"Eco+",
-6
-],
-[
-"Auchan Bio",
-6
-],
-[
-"Ekia",
-6
-],
-[
-"Milsa",
-5
-],
-[
-"Nestlé",
-5
-],
-[
-"Lactel",
-5
-],
-[
 "Savoie Yaourt",
-5
+6
+],
+[
+"Les 4 Pis",
+6
 ]
 ]
 },
@@ -14673,7 +19316,7 @@
 3
 ],
 [
-"Pur & Pur",
+"Terre Bio",
 3
 ],
 [
@@ -14681,7 +19324,7 @@
 3
 ],
 [
-"Terre Bio",
+"Pur & Pur",
 3
 ],
 [
@@ -14739,11 +19382,11 @@
 12
 ],
 [
-"Délisse",
+"Marque Repère",
 12
 ],
 [
-"Marque Repère",
+"Délisse",
 12
 ],
 [
@@ -15167,11 +19810,11 @@
 6
 ],
 [
-"Nestlé",
+"La Laitière",
 5
 ],
 [
-"La Laitière",
+"Nestlé",
 5
 ],
 [
@@ -15481,11 +20124,11 @@
 "categorie": "en:floating-island",
 "marques": [
 [
-"Délisse",
+"Marque Repère",
 6
 ],
 [
-"Marque Repère",
+"Délisse",
 6
 ],
 [
@@ -15519,11 +20162,11 @@
 8
 ],
 [
-"Délisse",
+"Marque Repère",
 8
 ],
 [
-"Marque Repère",
+"Délisse",
 8
 ],
 [
@@ -16250,11 +20893,11 @@
 4
 ],
 [
-"Vaubernier",
+"Bons mayennais",
 4
 ],
 [
-"Bons mayennais",
+"Vaubernier",
 4
 ],
 [
@@ -16628,9 +21271,18 @@
 ]
 },
 "Fromagerie/Fromages libre-service/Chèvre bûche": {
-"n": 26,
+"n": 72,
 "categorie": "en:goat-cheeses",
-"marques": []
+"marques": [
+[
+"Soignon",
+7
+],
+[
+"P. Jacquin & Fils",
+5
+]
+]
 },
 "Fromagerie/Fromages libre-service/Raclette": {
 "n": 677,
@@ -16681,11 +21333,11 @@
 12
 ],
 [
-"Marque Repère",
+"Les Croisés",
 10
 ],
 [
-"Les Croisés",
+"Marque Repère",
 10
 ],
 [
@@ -16859,11 +21511,11 @@
 5
 ],
 [
-"Marque Repère",
+"Les Croisés",
 5
 ],
 [
-"Les Croisés",
+"Marque Repère",
 5
 ],
 [
@@ -17085,19 +21737,167 @@
 ]
 },
 "Fromagerie/Fromages libre-service/Parmesan": {
-"n": 150,
+"n": 818,
 "categorie": "en:parmigiano-reggiano",
 "marques": [
 [
 "Lovilio",
-5
+56
+],
+[
+"Monoprix Gourmet",
+37
 ],
 [
 "Carrefour",
-4
+19
+],
+[
+"Monoprix",
+18
+],
+[
+"Casa Azzurra",
+15
+],
+[
+"Parmareggio",
+14
+],
+[
+"Giovanni Ferrari",
+13
+],
+[
+"U",
+13
 ],
 [
 "Castelli",
+13
+],
+[
+"Galbani",
+12
+],
+[
+"U Saveurs",
+10
+],
+[
+"Lidl",
+9
+],
+[
+"Ambrosi",
+9
+],
+[
+"Parmigiano Reggiano",
+8
+],
+[
+"Milbona",
+7
+],
+[
+"Bio Hombre",
+7
+],
+[
+"Auchan",
+7
+],
+[
+"Le Fromager Des Halles",
+6
+],
+[
+"Treo",
+6
+],
+[
+"La Vie Claire",
+5
+],
+[
+"Tavola in Italia",
+5
+],
+[
+"Nuova Castelli",
+4
+],
+[
+"Les Délices de Belle France",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Michelangelo",
+4
+],
+[
+"Granarolo",
+4
+],
+[
+"Kirkland",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Bonneterre",
+3
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Tradizioni D'italia",
+3
+],
+[
+"Virgilio",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Aldi",
+3
+],
+[
+"Colla",
+3
+],
+[
+"En Cuisine",
+3
+],
+[
+"Rossi F.lli",
 3
 ]
 ]
@@ -17213,11 +22013,11 @@
 7
 ],
 [
-"CF&R",
+"Coeur de Lion",
 6
 ],
 [
-"Coeur de Lion",
+"CF&R",
 6
 ],
 [
@@ -17351,11 +22151,11 @@
 3
 ],
 [
-"Auchan",
+"Terroir",
 3
 ],
 [
-"Terroir",
+"Auchan",
 3
 ],
 [
@@ -17643,12 +22443,16 @@
 ]
 },
 "Fromagerie/Fromages libre-service/Tomme de Savoie": {
-"n": 236,
+"n": 270,
 "categorie": "en:tomme-cheese-from-savoy",
 "marques": [
 [
 "Reflets de France",
-10
+11
+],
+[
+"Le Fromager Des Halles",
+4
 ],
 [
 "Casino",
@@ -17807,11 +22611,11 @@
 3
 ],
 [
-"Marque Repère",
+"Les Croisés",
 3
 ],
 [
-"Les Croisés",
+"Marque Repère",
 3
 ],
 [
@@ -18069,11 +22873,11 @@
 3
 ],
 [
-"Aldi",
+"Cucina",
 3
 ],
 [
-"Cucina",
+"Aldi",
 3
 ]
 ]
@@ -18318,11 +23122,11 @@
 6
 ],
 [
-"Marque Repère",
+"Les Croisés",
 3
 ],
 [
-"Les Croisés",
+"Marque Repère",
 3
 ]
 ]
@@ -18360,11 +23164,11 @@
 "categorie": "en:cheese-appetizers",
 "marques": [
 [
-"Apérivrais",
+"Savencia",
 8
 ],
 [
-"Savencia",
+"Apérivrais",
 8
 ]
 ]
@@ -18450,11 +23254,11 @@
 5
 ],
 [
-"Pré Saint-Jean",
+"Fromagerie du val de Sienne",
 4
 ],
 [
-"Fromagerie du val de Sienne",
+"Pré Saint-Jean",
 4
 ],
 [
@@ -18826,11 +23630,11 @@
 5
 ],
 [
-"Marque Repère",
+"Les Croisés",
 5
 ],
 [
-"Les Croisés",
+"Marque Repère",
 5
 ],
 [
@@ -19122,6 +23926,956 @@
 [
 "Nos Régions ont du Talent",
 4
+]
+]
+},
+"Fromagerie/Fromages libre-service/Fromage frais": {
+"n": 503,
+"categorie": "en:fromages-blancs-petit-suisses-and-skyr",
+"marques": [
+[
+"Campagne de France",
+36
+],
+[
+"Malo",
+34
+],
+[
+"U",
+26
+],
+[
+"Marque Repère",
+17
+],
+[
+"Isigny Ste Mère",
+15
+],
+[
+"Délisse",
+15
+],
+[
+"Carrefour",
+13
+],
+[
+"Yoplait",
+12
+],
+[
+"Bio Village",
+12
+],
+[
+"U Bio",
+10
+],
+[
+"Pâturages",
+9
+],
+[
+"La Ferme de L'Isle",
+9
+],
+[
+"Cora",
+8
+],
+[
+"Maîtres Laitiers en Normandie",
+7
+],
+[
+"Beillevaire",
+7
+],
+[
+"Isigny Sainte-Mère",
+6
+],
+[
+"U Mat & Lou",
+6
+],
+[
+"Etrez",
+6
+],
+[
+"Carrefour BIO",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Petits filous pots",
+5
+],
+[
+"Belle France",
+4
+],
+[
+"Biocoop",
+4
+],
+[
+"Milbona",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Carrefour Kids",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Cancoillotte": {
+"n": 328,
+"categorie": "en:cancoillottes",
+"marques": [
+[
+"La belle étoile",
+27
+],
+[
+"Maison Raguin",
+26
+],
+[
+"Le Francomtois",
+25
+],
+[
+"Lehmann",
+23
+],
+[
+"Badoz",
+13
+],
+[
+"Fromagerie Milleret",
+8
+],
+[
+"Nos Régions ont du Talent",
+7
+],
+[
+"Saveurs de nos Régions",
+6
+],
+[
+"Raguin",
+6
+],
+[
+"U",
+6
+],
+[
+"Fleuron des gourmets",
+6
+],
+[
+"Casino",
+5
+],
+[
+"Les pots de Thierry",
+5
+],
+[
+"Fruitières de vallon de Sancey",
+5
+],
+[
+"Reflets de France",
+4
+],
+[
+"U de nos Régions",
+4
+],
+[
+"Fromagerie Poitrey",
+4
+],
+[
+"Fromagerie Mauron",
+4
+],
+[
+"Luxlait",
+4
+],
+[
+"Leader Price",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Itineraire de nos regions",
+3
+],
+[
+"CANCOILLOTTE",
+3
+],
+[
+"Poitrey",
+3
+],
+[
+"Mauron",
+3
+],
+[
+"Rochambeau",
+3
+],
+[
+"Maison Maugain",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Schneiter",
+3
+],
+[
+"Chansereaux",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Edam": {
+"n": 317,
+"categorie": "en:edam",
+"marques": [
+[
+"Eco+",
+9
+],
+[
+"Milbona",
+7
+],
+[
+"Leader Price",
+7
+],
+[
+"€co+",
+7
+],
+[
+"Moulin D'or",
+5
+],
+[
+"President",
+5
+],
+[
+"Pâturages",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Leclerc",
+3
+],
+[
+"Edam",
+3
+],
+[
+"Casino",
+3
+],
+[
+"U",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Fromapac",
+3
+],
+[
+"Bayernland",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Grana Padano": {
+"n": 308,
+"categorie": "en:grana-padano",
+"marques": [
+[
+"Monoprix",
+21
+],
+[
+"Casa Azzurra",
+9
+],
+[
+"Lovilio",
+8
+],
+[
+"Tavola in Italia",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"Giovanni Ferrari",
+8
+],
+[
+"Ambrosi",
+8
+],
+[
+"Galbani",
+7
+],
+[
+"Latteria Soresina",
+6
+],
+[
+"Italiamo",
+5
+],
+[
+"Milbona",
+5
+],
+[
+"Trentin",
+4
+],
+[
+"Latteria Sociale mantova",
+4
+],
+[
+"Grana Padano",
+3
+],
+[
+"Zanetti",
+3
+],
+[
+"San Fabio",
+3
+],
+[
+"Casino Saveurs d'Ailleurs",
+3
+],
+[
+"U",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Mantova",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Agriform",
+3
+],
+[
+"Virgilio",
+3
+],
+[
+"Conad",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Kirkland",
+3
+],
+[
+"Colla",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Bûche de chèvre": {
+"n": 244,
+"categorie": "es:rulo-de-cabra",
+"marques": [
+[
+"Soignon",
+23
+],
+[
+"Carrefour",
+8
+],
+[
+"Chêne d'argent",
+5
+],
+[
+"Pâturages",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Lidl",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Chavroux",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Tomme des Pyrénées": {
+"n": 313,
+"categorie": "fr:tomme-des-pyrenees",
+"marques": [
+[
+"Monoprix",
+20
+],
+[
+"E.Leclerc",
+6
+],
+[
+"U",
+5
+],
+[
+"Le Fromager Des Halles",
+4
+],
+[
+"Ets Schoepfer",
+4
+],
+[
+"Pays Gourmand",
+4
+],
+[
+"Monoprix Gourmet",
+4
+],
+[
+"Fromapac",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Beaufort": {
+"n": 342,
+"categorie": "en:beaufort",
+"marques": [
+[
+"Reflets de France",
+22
+],
+[
+"Nos Régions ont du Talent",
+21
+],
+[
+"Monoprix Gourmet",
+18
+],
+[
+"Leclerc",
+14
+],
+[
+"Franprix",
+9
+],
+[
+"Le Fromager Des Halles",
+7
+],
+[
+"U",
+5
+],
+[
+"Monoprix",
+4
+],
+[
+"Verdannet",
+4
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Les Délices de Belle France",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"La Coop",
+3
+],
+[
+"Sélection du fromager",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Chaource": {
+"n": 63,
+"categorie": "en:chaource",
+"marques": [
+[
+"Lincet",
+4
+],
+[
+"Didier lincet",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Pont-l'évêque": {
+"n": 143,
+"categorie": "en:pont-l-eveque",
+"marques": [
+[
+"Graindorge",
+6
+],
+[
+"E. Graindorge",
+6
+],
+[
+"Gillot",
+4
+],
+[
+"Fleuron du Plessis",
+3
+],
+[
+"Domaine du Plessis",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Abondance": {
+"n": 231,
+"categorie": "en:abondance",
+"marques": [
+[
+"Nos Régions ont du Talent",
+24
+],
+[
+"Leclerc",
+16
+],
+[
+"Leader Price",
+5
+],
+[
+"Le Fromager Des Halles",
+5
+],
+[
+"U",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Ossau-iraty": {
+"n": 315,
+"categorie": "en:ossau-iraty-cheeses",
+"marques": [
+[
+"Le Fromager Des Halles",
+11
+],
+[
+"Reflets de France",
+7
+],
+[
+"Carrefour",
+5
+],
+[
+"Istara",
+5
+],
+[
+"Sélection du fromager",
+4
+],
+[
+"Monoprix Gourmet",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Époisses": {
+"n": 60,
+"categorie": "en:epoisses-de-bourgogne",
+"marques": [
+[
+"Berthaut",
+7
+],
+[
+"Germain",
+6
+],
+[
+"Savencia",
+5
+],
+[
+"Gaugry",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Livarot": {
+"n": 60,
+"categorie": "en:livarot",
+"marques": [
+[
+"E. Graindorge",
+7
+],
+[
+"Graindorge",
+4
+]
+]
+},
+"Fromagerie/Fromages libre-service/Salers": {
+"n": 47,
+"categorie": "en:salers-cheese",
+"marques": [
+[
+"Monoprix",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Fourme d'Ambert": {
+"n": 347,
+"categorie": "en:fourme-d-ambert-cheese-from-cow-s-milk",
+"marques": [
+[
+"Nos Régions ont du Talent",
+20
+],
+[
+"Leclerc",
+16
+],
+[
+"Monoprix",
+14
+],
+[
+"Le Fromager Des Halles",
+7
+],
+[
+"Carrefour",
+7
+],
+[
+"E.Leclerc",
+6
+],
+[
+"U",
+5
+],
+[
+"Sans marque",
+3
+],
+[
+"Les Délices de Belle France",
+3
+],
+[
+"Sélection du fromager",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Tomme de brebis": {
+"n": 299,
+"categorie": "fr:tomme-de-brebis",
+"marques": [
+[
+"Le Fromager Des Halles",
+28
+],
+[
+"Monoprix",
+19
+],
+[
+"Lou Pérac",
+7
+],
+[
+"Carrefour",
+4
+],
+[
+"Chêne d'argent",
+3
+],
+[
+"U",
+3
+],
+[
+"Biocoop",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Gorgonzola": {
+"n": 570,
+"categorie": "en:gorgonzolas",
+"marques": [
+[
+"Le Fromager Des Halles",
+15
+],
+[
+"Monoprix",
+13
+],
+[
+"E.Leclerc",
+6
+],
+[
+"U",
+5
+],
+[
+"Carrefour",
+5
+],
+[
+"Auchan",
+4
+],
+[
+"Vivaldi",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Intermarché",
+3
+],
+[
+"Monoprix Gourmet",
+3
+],
+[
+"U Saveurs",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Tavola in Italia",
+3
+],
+[
+"Galbani",
+3
+],
+[
+"Ambrosi",
+3
+],
+[
+"IGOR",
+3
+],
+[
+"L'Italie des Fromages",
+3
+],
+[
+"Super U",
+3
+],
+[
+"bonta della tradizione",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Mont d'or": {
+"n": 97,
+"categorie": "en:mont-d-or",
+"marques": [
+[
+"Fromageries Arnaud",
+5
+],
+[
+"Les Monts De Joux",
+4
+],
+[
+"Nos Régions ont du Talent",
+4
+],
+[
+"Patrimoine Gourmand",
+3
+],
+[
+"Badoz",
+3
+]
+]
+},
+"Fromagerie/Fromages libre-service/Pecorino": {
+"n": 163,
+"categorie": "en:pecorino",
+"marques": [
+[
+"Casa Azzurra",
+4
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Ambrosi",
+3
+],
+[
+"Zanetti",
+3
 ]
 ]
 },
@@ -19558,66 +25312,738 @@
 ]
 ]
 },
-"Charcuterie/Charcuterie libre-service/Jambon blanc": {
-"n": 672,
-"categorie": "en:white-hams",
+"Fromagerie/Fromages à la coupe/Comté": {
+"n": 2066,
+"categorie": "en:aoc-cheeses",
 "marques": [
 [
+"JuraFlore",
+152
+],
+[
+"Le Berger Comtois",
+132
+],
+[
+"Nos Régions ont du Talent",
+89
+],
+[
+"Leclerc",
+83
+],
+[
+"Marcel Petite",
+57
+],
+[
+"Comté",
+48
+],
+[
+"Bio Village",
+40
+],
+[
+"Monoprix",
+39
+],
+[
+"Le Fromager Des Halles",
+25
+],
+[
+"Entremont",
+19
+],
+[
 "U",
+16
+],
+[
+"Marque Repère",
+15
+],
+[
+"Itinéraire des Saveurs",
+14
+],
+[
+"Pâturages",
+12
+],
+[
+"Rivoire jacquemin",
+12
+],
+[
+"Fromageries Arnaud",
+11
+],
+[
+"Jean Perrin",
+10
+],
+[
+"Carrefour",
+10
+],
+[
+"Intermarché",
 9
 ],
 [
-"Fleury Michon",
+"E.Leclerc",
 8
 ],
 [
-"Charcuterie Cosme",
-7
-],
-[
 "La Vie Claire",
+8
+],
+[
+"U Saveurs",
 7
 ],
 [
-"Saint Alby",
+"Auchan",
+7
+],
+[
+"Les Croisés",
 6
+],
+[
+"Reflets de France",
+5
+],
+[
+"Cora",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Grand Frais",
+4
+],
+[
+"President",
+4
+],
+[
+"Casino",
+3
+],
+[
+"Fromagerie Vagne",
+3
+],
+[
+"Centurion",
+3
+],
+[
+"Le Fromager",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Badoz",
+3
+],
+[
+"Patrimoine Gourmand",
+3
+],
+[
+"Belle France",
+3
 ],
 [
 "Biocoop",
-6
-],
-[
-"Bioporc",
-6
-],
-[
-"Cochonnailles du Haut-Bois",
-5
-],
-[
-"Les éleveurs de la Charentonne",
-5
-],
-[
-"Madrange",
-4
-],
-[
-"Bonneterre",
-4
-],
-[
-"Ensemble",
 3
 ]
 ]
 },
-"Charcuterie/Charcuterie libre-service/Jambon cru": {
-"n": 394,
-"categorie": "en:raw-cured-ham",
+"Fromagerie/Fromages à la coupe/Raclette": {
+"n": 677,
+"categorie": "en:raclette",
 "marques": [
 [
-"Aoste",
+"RichesMonts",
+38
+],
+[
+"Jean Perrin",
+34
+],
+[
+"Carrefour",
+27
+],
+[
+"Entremont",
+23
+],
+[
+"Auchan",
+23
+],
+[
+"Ermitage",
+22
+],
+[
+"Savencia",
+19
+],
+[
+"Pâturages",
+15
+],
+[
+"Le Cavalier",
+14
+],
+[
+"Chêne d'argent",
+12
+],
+[
+"CF&R",
+12
+],
+[
+"Les Croisés",
+10
+],
+[
+"Marque Repère",
+10
+],
+[
+"Le Fromager Des Halles",
+9
+],
+[
+"Reflets de France",
+8
+],
+[
+"Leader Price",
+8
+],
+[
+"Etoile d'Or",
+7
+],
+[
+"Cora",
+7
+],
+[
+"Monoprix",
+7
+],
+[
+"Intermarché",
+7
+],
+[
+"Casino",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"U",
+5
+],
+[
+"Emmi",
+5
+],
+[
+"Pouce",
+5
+],
+[
+"Le Rustique",
+4
+],
+[
+"Grand Frais",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Chabert",
+4
+],
+[
+"Centurion",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Terroirs",
+3
+],
+[
+"Maîtres Laitiers du Cotentin",
+3
+],
+[
+"Pochat et fils",
+3
+],
+[
+"Pochat & fils",
+3
+],
+[
+"Société Fromagère du Livradois",
+3
+],
+[
+"SFL",
+3
+],
+[
+"Biocoop",
+3
+],
+[
+"Mifroma",
+3
+],
+[
+"En Cuisine",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Roquefort": {
+"n": 715,
+"categorie": "en:roquefort-cheeses",
+"marques": [
+[
+"Société",
+46
+],
+[
+"Gabriel Coulet",
+42
+],
+[
+"Papillon",
+30
+],
+[
+"Le Fromager Des Halles",
+21
+],
+[
+"U",
+16
+],
+[
+"Carrefour",
+11
+],
+[
+"Roquefort",
+9
+],
+[
+"U Saveurs",
+8
+],
+[
+"Pâturages",
+7
+],
+[
+"Leader Price",
+6
+],
+[
+"Casino",
+6
+],
+[
+"Savencia",
+5
+],
+[
+"Vernières Frères",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Les Croisés",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Monoprix",
+4
+],
+[
+"Fromagerie Papillon",
+3
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Lactalis",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Eco+",
+3
+],
+[
+"Bio Village",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Brie": {
+"n": 503,
+"categorie": "en:bries",
+"marques": [
+[
+"Le Roitelet",
+11
+],
+[
+"Le Fromager Des Halles",
+10
+],
+[
+"President",
+8
+],
+[
+"Savencia",
+8
+],
+[
+"Fromapac",
+8
+],
+[
+"Paysan Breton",
+7
+],
+[
+"Coeur de Lion",
+6
+],
+[
+"CF&R",
+6
+],
+[
+"Sans marque",
+5
+],
+[
+"Lactalis",
+5
+],
+[
+"Pâturages Comtois",
+4
+],
+[
+"Ile de France",
+4
+],
+[
+"E.Leclerc",
+4
+],
+[
+"Ermitage",
+3
+],
+[
+"Bridel",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Edeka",
+3
+],
+[
+"Isigny Ste Mère",
+3
+],
+[
+"Roitelet",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Brie de Meaux": {
+"n": 364,
+"categorie": "en:brie-de-meaux-cheeses",
+"marques": [
+[
+"Reflets de France",
+23
+],
+[
+"Le Fromager Des Halles",
+11
+],
+[
+"Monoprix Gourmet",
+10
+],
+[
+"Carrefour",
+6
+],
+[
+"Leclerc",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Super U",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Reblochon": {
+"n": 845,
+"categorie": "en:reblochon",
+"marques": [
+[
+"Saveurs de nos Régions",
+189
+],
+[
+"Lidl",
+22
+],
+[
+"Nos Régions ont du Talent",
+16
+],
+[
+"Reflets de France",
+11
+],
+[
+"Le Fromager Des Halles",
+10
+],
+[
+"Monoprix",
+8
+],
+[
+"Pochat & fils",
+8
+],
+[
+"Saveur De Nos Regions",
+7
+],
+[
+"Monoprix Gourmet",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"U",
+5
+],
+[
+"Reblochon De Savoie",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"U de nos Régions",
+4
+],
+[
+"U Saveurs",
+4
+],
+[
+"Pochat et fils",
+4
+],
+[
+"Fromagerie Chabert",
+3
+],
+[
+"Verdannet",
+3
+],
+[
+"Masson",
+3
+],
+[
+"Fromagerie Masson",
+3
+],
+[
+"Terroir",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Terre de l'Alpe",
+3
+],
+[
+"Metro Chef",
+3
+],
+[
+"Reflet de France",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Saint-Nectaire": {
+"n": 452,
+"categorie": "en:saint-nectaire",
+"marques": [
+[
+"Le Fromager Des Halles",
+11
+],
+[
+"Carrefour",
+10
+],
+[
+"Paul Dischamp",
+9
+],
+[
+"Monoprix",
+7
+],
+[
+"U",
+5
+],
+[
+"Reflets de France",
+4
+],
+[
+"Intermarché",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Laiterie de la Montagne",
+3
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+],
+[
+"E.Leclerc",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Cantal": {
+"n": 639,
+"categorie": "en:cantal",
+"marques": [
+[
+"Saveurs de nos Régions",
+25
+],
+[
+"Monoprix",
+16
+],
+[
+"Ets Schoepfer",
+11
+],
+[
+"Monoprix Gourmet",
+11
+],
+[
+"Le Fromager Des Halles",
+9
+],
+[
+"U",
 9
 ],
 [
@@ -19625,19 +26051,1103 @@
 8
 ],
 [
-"Fleury Michon",
+"Leclerc",
+7
+],
+[
+"E.Leclerc",
+7
+],
+[
+"Saveur De Nos Regions",
 6
 ],
 [
-"Bell",
+"Sans marque",
+6
+],
+[
+"Intermarché",
 5
 ],
 [
-"Sans marque",
+"La Vie Claire",
 4
 ],
 [
-"Aoste SNC",
+"Nos Régions ont du Talent",
+4
+],
+[
+"Franprix",
+3
+],
+[
+"Les fromageries occitanes",
+3
+],
+[
+"Société Fromagère de Riom",
+3
+],
+[
+"Entremont",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Les Délices de Belle France",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Morbier": {
+"n": 754,
+"categorie": "en:morbier",
+"marques": [
+[
+"JuraFlore",
+71
+],
+[
+"Jean Perrin",
+15
+],
+[
+"Le Fromager Des Halles",
+12
+],
+[
+"E.Leclerc",
+9
+],
+[
+"Leclerc",
+7
+],
+[
+"Monoprix Gourmet",
+6
+],
+[
+"U",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Le Montagnon",
+5
+],
+[
+"Les Délices de Belle France",
+5
+],
+[
+"Nos Régions ont du Talent",
+4
+],
+[
+"Saveurs de nos Régions",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Casino",
+4
+],
+[
+"U Saveurs",
+4
+],
+[
+"Ets Schoepfer",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Grand Frais",
+3
+],
+[
+"Super U",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Munster": {
+"n": 149,
+"categorie": "en:soft-cheeses-with-a-red-rind",
+"marques": [
+[
+"Ermitage",
+6
+],
+[
+"Haxaire",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"Maison Dodin",
+4
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Le Fromager Des Halles",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Tomme de Savoie": {
+"n": 270,
+"categorie": "en:tomme-cheese-from-savoy",
+"marques": [
+[
+"Reflets de France",
+11
+],
+[
+"Le Fromager Des Halles",
+4
+],
+[
+"Casino",
+3
+],
+[
+"U",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Bleu d'Auvergne": {
+"n": 213,
+"categorie": "en:auvergne-blue-cheese-from-cow-s-milk",
+"marques": [
+[
+"U",
+9
+],
+[
+"Carrefour",
+4
+],
+[
+"Sans marque",
+3
+],
+[
+"Laiterie de la Montagne",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Fromapac",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Mimolette": {
+"n": 1031,
+"categorie": "en:mimolette-cheese",
+"marques": [
+[
+"€co+",
+41
+],
+[
+"Isigny Ste Mère",
+26
+],
+[
+"Le Fromager Des Halles",
+17
+],
+[
+"Leader Price",
+14
+],
+[
+"Moulin D'or",
+10
+],
+[
+"Isigny Sainte-Mère",
+10
+],
+[
+"E.Leclerc",
+9
+],
+[
+"Monoprix Gourmet",
+9
+],
+[
+"Eco+",
+9
+],
+[
+"Carrefour",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"Pâturages",
+7
+],
+[
+"Leclerc",
+6
+],
+[
+"Centurion",
+6
+],
+[
+"Intermarché",
+5
+],
+[
+"U",
+5
+],
+[
+"Fromapac",
+4
+],
+[
+"Milbona",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Boule D’or",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Cartry",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Ets Schoepfer",
+3
+],
+[
+"Aldi",
+3
+],
+[
+"President",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+],
+[
+"Le Cavalier",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Emmental": {
+"n": 1624,
+"categorie": "en:french-emmentaler",
+"marques": [
+[
+"Etoile d'Or",
+110
+],
+[
+"Reflets de France",
+39
+],
+[
+"Biocoop",
+39
+],
+[
+"Entremont",
+36
+],
+[
+"Casino",
+29
+],
+[
+"Le Cavalier",
+24
+],
+[
+"Carrefour",
+23
+],
+[
+"Le Fromager Des Halles",
+20
+],
+[
+"U",
+19
+],
+[
+"President",
+16
+],
+[
+"Les Croisés",
+15
+],
+[
+"Leclerc",
+14
+],
+[
+"Monoprix Gourmet",
+14
+],
+[
+"Carrefour BIO",
+14
+],
+[
+"Tendre Pré",
+13
+],
+[
+"Paysan Breton",
+13
+],
+[
+"Monoprix Bio",
+11
+],
+[
+"Leader Price",
+11
+],
+[
+"Pâturages",
+11
+],
+[
+"Itinéraire des Saveurs",
+9
+],
+[
+"E.Leclerc",
+8
+],
+[
+"Monoprix",
+8
+],
+[
+"Chêne d'argent",
+8
+],
+[
+"La Vie Claire",
+8
+],
+[
+"Marque Repère",
+8
+],
+[
+"Lis D’or",
+7
+],
+[
+"Auchan",
+6
+],
+[
+"Centurion",
+5
+],
+[
+"Casino Bio",
+4
+],
+[
+"Tous les jours",
+4
+],
+[
+"Grand Frais",
+4
+],
+[
+"Nos Régions ont du Talent",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Ma Crémière",
+4
+],
+[
+"Eco+",
+4
+],
+[
+"Intermarché",
+3
+],
+[
+"Tous A Table",
+3
+],
+[
+"Grand Cru",
+3
+],
+[
+"Carrefour Discount",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Fromage de brebis": {
+"n": 376,
+"categorie": "en:sheep-s-milk-cheeses",
+"marques": [
+[
+"U",
+9
+],
+[
+"Salakis",
+8
+],
+[
+"Carrefour",
+6
+],
+[
+"E.Leclerc",
+5
+],
+[
+"Istara",
+5
+],
+[
+"Les Croisés",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Leclerc",
+4
+],
+[
+"Casino",
+4
+],
+[
+"La Bergerie",
+4
+],
+[
+"Bio Village",
+4
+],
+[
+"Metro Chef",
+3
+],
+[
+"Corsica",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Savencia",
+3
+],
+[
+"Etorki",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Agour",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Fromage de chèvre": {
+"n": 744,
+"categorie": "en:goat-cheeses",
+"marques": [
+[
+"Soignon",
+30
+],
+[
+"U",
+22
+],
+[
+"Casino",
+15
+],
+[
+"Chêne d'argent",
+11
+],
+[
+"Monoprix",
+8
+],
+[
+"Les Croisés",
+8
+],
+[
+"Lidl",
+7
+],
+[
+"Saint-Loup",
+6
+],
+[
+"Marque Repère",
+6
+],
+[
+"U Bio",
+5
+],
+[
+"Savencia",
+5
+],
+[
+"Vrai",
+5
+],
+[
+"Casino Bio",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Bio Verde",
+4
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Chèvrefin",
+3
+],
+[
+"Rians",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Chavroux",
+3
+],
+[
+"Cavet",
+3
+],
+[
+"Bonneterre",
+3
+],
+[
+"Chêne Vert",
+3
+],
+[
+"Eurial",
+3
+],
+[
+"P'tit Montmenot",
+3
+],
+[
+"Gazi",
+3
+],
+[
+"Bio Village",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Maroilles": {
+"n": 138,
+"categorie": "en:maroilles",
+"marques": [
+[
+"Savencia",
+15
+],
+[
+"Fauquet",
+12
+],
+[
+"Lesire",
+9
+],
+[
+"Leduc",
+8
+],
+[
+"Les fromagers de Thiérache",
+4
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Lebeau",
+3
+],
+[
+"Claire Halleux",
+3
+],
+[
+"La Ferme du Pont des Loups",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Parmesan": {
+"n": 818,
+"categorie": "en:parmigiano-reggiano",
+"marques": [
+[
+"Lovilio",
+56
+],
+[
+"Monoprix Gourmet",
+37
+],
+[
+"Carrefour",
+19
+],
+[
+"Monoprix",
+18
+],
+[
+"Casa Azzurra",
+15
+],
+[
+"Parmareggio",
+14
+],
+[
+"Giovanni Ferrari",
+13
+],
+[
+"U",
+13
+],
+[
+"Castelli",
+13
+],
+[
+"Galbani",
+12
+],
+[
+"U Saveurs",
+10
+],
+[
+"Lidl",
+9
+],
+[
+"Ambrosi",
+9
+],
+[
+"Parmigiano Reggiano",
+8
+],
+[
+"Milbona",
+7
+],
+[
+"Bio Hombre",
+7
+],
+[
+"Auchan",
+7
+],
+[
+"Le Fromager Des Halles",
+6
+],
+[
+"Treo",
+6
+],
+[
+"La Vie Claire",
+5
+],
+[
+"Tavola in Italia",
+5
+],
+[
+"Nuova Castelli",
+4
+],
+[
+"Les Délices de Belle France",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Michelangelo",
+4
+],
+[
+"Granarolo",
+4
+],
+[
+"Kirkland",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Bonneterre",
+3
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Tradizioni D'italia",
+3
+],
+[
+"Virgilio",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Aldi",
+3
+],
+[
+"Colla",
+3
+],
+[
+"En Cuisine",
+3
+],
+[
+"Rossi F.lli",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Sainte-Maure": {
+"n": 86,
+"categorie": "en:sainte-maure-de-touraine",
+"marques": [
+[
+"Soignon",
+8
+],
+[
+"Nos Régions ont du Talent",
+4
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Gouda": {
+"n": 1287,
+"categorie": "en:gouda",
+"marques": [
+[
+"Milbona",
+36
+],
+[
+"Monoprix",
+29
+],
+[
+"€co+",
+29
+],
+[
+"Carrefour",
+26
+],
+[
+"Moulin D'or",
+21
+],
+[
+"Le Fromager Des Halles",
+18
+],
+[
+"Leader Price",
+13
+],
+[
+"Eco+",
+13
+],
+[
+"Holland Master",
+12
+],
+[
+"Delhaize",
+11
+],
+[
+"Sans marque",
+9
+],
+[
+"Fromapac",
+9
+],
+[
+"U",
+8
+],
+[
+"Molenland",
+7
+],
+[
+"Casino",
+7
+],
+[
+"La Vie Claire",
+7
+],
+[
+"Les Croisés",
+6
+],
+[
+"Ets Schoepfer",
+6
+],
+[
+"Pâturages",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"Vergeer Holland",
+5
+],
+[
+"Intermarché",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Bonneterre",
+5
+],
+[
+"Paysan Breton",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Miraflores",
+5
+],
+[
+"E.Leclerc",
+4
+],
+[
+"Linessa",
+4
+],
+[
+"Netto",
+4
+],
+[
+"Savencia",
+4
+],
+[
+"Yörem",
+4
+],
+[
+"Buiteman",
+4
+],
+[
+"Monoprix Gourmet",
+4
+],
+[
+"Franprix",
 3
 ],
 [
@@ -19645,17 +27155,723 @@
 3
 ],
 [
-"Cochonou",
+"Leclerc",
+3
+],
+[
+"Bio Nature",
+3
+],
+[
+"Flor De Burgos",
+3
+],
+[
+"Dia",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Coulommiers": {
+"n": 217,
+"categorie": "en:coulommiers",
+"marques": [
+[
+"Coeur de Lion",
+18
+],
+[
+"CF&R",
+12
+],
+[
+"President",
+10
+],
+[
+"Savencia",
+8
+],
+[
+"U",
+8
+],
+[
+"E. Graindorge",
+6
+],
+[
+"Les Croisés",
+6
+],
+[
+"Carrefour",
+5
+],
+[
+"Chêne d'argent",
+4
+],
+[
+"Lactalis",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Bons mayennais",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Le Paturon",
+3
+],
+[
+"Pâturages",
+3
+],
+[
+"Renard Gillard",
+3
+],
+[
+"Gillot",
+3
+],
+[
+"Agrial",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Tomme des Pyrénées": {
+"n": 313,
+"categorie": "fr:tomme-des-pyrenees",
+"marques": [
+[
+"Monoprix",
+20
+],
+[
+"E.Leclerc",
+6
+],
+[
+"U",
+5
+],
+[
+"Le Fromager Des Halles",
+4
+],
+[
+"Ets Schoepfer",
+4
+],
+[
+"Pays Gourmand",
+4
+],
+[
+"Monoprix Gourmet",
+4
+],
+[
+"Fromapac",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Grana Padano": {
+"n": 308,
+"categorie": "en:grana-padano",
+"marques": [
+[
+"Monoprix",
+21
+],
+[
+"Casa Azzurra",
+9
+],
+[
+"Lovilio",
+8
+],
+[
+"Tavola in Italia",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"Giovanni Ferrari",
+8
+],
+[
+"Ambrosi",
+8
+],
+[
+"Galbani",
+7
+],
+[
+"Latteria Soresina",
+6
+],
+[
+"Italiamo",
+5
+],
+[
+"Milbona",
+5
+],
+[
+"Trentin",
+4
+],
+[
+"Latteria Sociale mantova",
+4
+],
+[
+"Grana Padano",
+3
+],
+[
+"Zanetti",
+3
+],
+[
+"San Fabio",
+3
+],
+[
+"Casino Saveurs d'Ailleurs",
+3
+],
+[
+"U",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Les Croisés",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Mantova",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Agriform",
+3
+],
+[
+"Virgilio",
+3
+],
+[
+"Conad",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Kirkland",
+3
+],
+[
+"Colla",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Edam": {
+"n": 317,
+"categorie": "en:edam",
+"marques": [
+[
+"Eco+",
+9
+],
+[
+"Milbona",
+7
+],
+[
+"Leader Price",
+7
+],
+[
+"€co+",
+7
+],
+[
+"Moulin D'or",
+5
+],
+[
+"President",
+5
+],
+[
+"Pâturages",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Leclerc",
+3
+],
+[
+"Edam",
+3
+],
+[
+"Casino",
+3
+],
+[
+"U",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Fromapac",
+3
+],
+[
+"Bayernland",
+3
+]
+]
+},
+"Fromagerie/Fromages à la coupe/Bûche de chèvre": {
+"n": 244,
+"categorie": "es:rulo-de-cabra",
+"marques": [
+[
+"Soignon",
+23
+],
+[
+"Carrefour",
+8
+],
+[
+"Chêne d'argent",
+5
+],
+[
+"Pâturages",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Lidl",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Le Fromager Des Halles",
+3
+],
+[
+"Chavroux",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon blanc": {
+"n": 4817,
+"categorie": "en:white-hams",
+"marques": [
+[
+"Domaine Picard",
+151
+],
+[
+"Tallec",
+139
+],
+[
+"U",
+134
+],
+[
+"U Saveurs",
+65
+],
+[
+"Saint Alby",
+58
+],
+[
+"Carrefour",
+51
+],
+[
+"Fleury Michon",
+42
+],
+[
+"Tradilège",
+36
+],
+[
+"Madrange",
+28
+],
+[
+"Auchan",
+27
+],
+[
+"Herta",
+27
+],
+[
+"Marque Repère",
+23
+],
+[
+"Casino",
+23
+],
+[
+"Aoste",
+21
+],
+[
+"Sans marque",
+19
+],
+[
+"Le Porc Français",
+19
+],
+[
+"Le porc de nos villages",
+19
+],
+[
+"Leader Price",
+19
+],
+[
+"Monoprix",
+19
+],
+[
+"Intermarché",
+17
+],
+[
+"Porc de l'Aveyron",
+17
+],
+[
+"Lidl",
+16
+],
+[
+"Brocéliande",
+16
+],
+[
+"Monique ranou",
+15
+],
+[
+"Despi",
+14
+],
+[
+"Belle France",
+14
+],
+[
+"Charles Keller",
+12
+],
+[
+"Cora",
+12
+],
+[
+"Dulano",
+11
+],
+[
+"Rostain",
+10
+],
+[
+"Eco+",
+10
+],
+[
+"Rovagnati",
+10
+],
+[
+"Leclerc",
+9
+],
+[
+"Boucherie André",
+9
+],
+[
+"La Vie Claire",
+9
+],
+[
+"Noixfine",
+8
+],
+[
+"Monoprix Gourmet",
+8
+],
+[
+"Bioporc",
+8
+],
+[
+"Naturalia",
+8
+],
+[
+"Le Bon Paris",
+8
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon cru": {
+"n": 842,
+"categorie": "en:cured-hams",
+"marques": [
+[
+"Italiamo",
+24
+],
+[
+"Citterio",
+19
+],
+[
+"Lidl",
+14
+],
+[
+"Carrefour",
+14
+],
+[
+"Auchan",
+12
+],
+[
+"Bell",
+11
+],
+[
+"Aoste",
+10
+],
+[
+"Fratelli Beretta",
+9
+],
+[
+"Parma",
+8
+],
+[
+"Dulano",
+8
+],
+[
+"Negroni",
+8
+],
+[
+"Villani",
+6
+],
+[
+"Rovagnati",
+6
+],
+[
+"Montorsi",
+5
+],
+[
+"Fleury Michon",
+5
+],
+[
+"Rosa dell'Angelo",
+5
+],
+[
+"Argal",
+5
+],
+[
+"Tavola in Italia",
+4
+],
+[
+"Sans marque",
+4
+],
+[
+"Saint-Azay",
+4
+],
+[
+"Auchan Gourmet",
+4
+],
+[
+"Aia",
+4
+],
+[
+"Beretta",
+4
+],
+[
+"Veronesi",
+4
+],
+[
+"Noel",
+4
+],
+[
+"Devodier",
+4
+],
+[
+"Saint Alby",
+3
+],
+[
+"Le Flutiau",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Les écofines",
 3
 ],
 [
 "Jeca",
 3
+],
+[
+"U",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Mmm!",
+3
+],
+[
+"Treo",
+3
+],
+[
+"Bio Verde",
+3
+],
+[
+"Fratelli Parmigiani",
+3
+],
+[
+"Grandi Salumifici Italiani",
+3
+],
+[
+"Espuña",
+3
 ]
 ]
 },
 "Charcuterie/Charcuterie libre-service/Saucisson sec": {
-"n": 2100,
+"n": 2313,
 "categorie": "en:dry-sausages",
 "marques": [
 [
@@ -19679,6 +27895,10 @@
 20
 ],
 [
+"Le Batistou",
+20
+],
+[
 "Marque Repère",
 20
 ],
@@ -19695,12 +27915,12 @@
 15
 ],
 [
-"Roches blanches",
+"Louis Auvergne",
 15
 ],
 [
-"Louis Auvergne",
-14
+"Roches blanches",
+15
 ],
 [
 "Salaisons du Mâconnais",
@@ -19709,10 +27929,6 @@
 [
 "Montagne Noire",
 13
-],
-[
-"Le Batistou",
-12
 ],
 [
 "Terre de l'Alpe",
@@ -19815,7 +28031,7 @@
 4
 ],
 [
-"Biocoop",
+"Grand Lou",
 4
 ]
 ]
@@ -20637,11 +28853,11 @@
 4
 ],
 [
-"Tradilège",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Tradilège",
 4
 ],
 [
@@ -20683,12 +28899,72 @@
 ]
 },
 "Charcuterie/Charcuterie libre-service/Saucisses de Strasbourg": {
-"n": 261,
+"n": 678,
 "categorie": "en:strasbourg-sausages",
 "marques": [
 [
+"Carrefour",
+18
+],
+[
+"Au Fumé Vosgien",
+17
+],
+[
+"Leader Price",
+12
+],
+[
+"Casino",
+12
+],
+[
 "U",
+12
+],
+[
+"Charculor",
+12
+],
+[
+"Stoeffler",
+11
+],
+[
+"Monique ranou",
+10
+],
+[
+"Auchan",
+10
+],
+[
+"Marque Repère",
 8
+],
+[
+"Tradilège",
+8
+],
+[
+"Jean Caby",
+7
+],
+[
+"Festein d'Alsace",
+6
+],
+[
+"Thierry Schweitzer",
+6
+],
+[
+"Pierre Schmidt",
+6
+],
+[
+"Belle France",
+6
 ],
 [
 "Stemmelen",
@@ -20696,14 +28972,18 @@
 ],
 [
 "Herta",
-5
+6
 ],
 [
-"Leader Price",
+"Cora",
 4
 ],
 [
 "Bio Village",
+3
+],
+[
+"Metzger Muller",
 3
 ],
 [
@@ -20715,19 +28995,19 @@
 3
 ],
 [
-"Cora",
+"Netto",
 3
 ],
 [
-"Belle France",
+"Aubret",
 3
 ],
 [
-"Marque Repère",
+"Rochambeau",
 3
 ],
 [
-"Carrefour",
+"Saint Alby",
 3
 ]
 ]
@@ -21567,7 +29847,7 @@
 ]
 },
 "Charcuterie/Charcuterie libre-service/Saucisson à l'ail": {
-"n": 435,
+"n": 424,
 "categorie": "en:garlic-sausage",
 "marques": [
 [
@@ -21584,10 +29864,6 @@
 ],
 [
 "Tradilège",
-6
-],
-[
-"Casino",
 5
 ],
 [
@@ -21635,6 +29911,1379 @@
 3
 ]
 ]
+},
+"Charcuterie/Charcuterie libre-service/Bloc de foie gras": {
+"n": 981,
+"categorie": "en:block-of-foie-gras",
+"marques": [
+[
+"Larnaudie",
+134
+],
+[
+"Delpeyrat",
+76
+],
+[
+"Labeyrie",
+69
+],
+[
+"Maison Montfort",
+37
+],
+[
+"Rougié",
+19
+],
+[
+"Larnaudie Prestige",
+18
+],
+[
+"Clos Saint Sozy",
+16
+],
+[
+"La Maison du Foie Gras",
+12
+],
+[
+"Auchan",
+12
+],
+[
+"Montfort",
+11
+],
+[
+"U",
+11
+],
+[
+"Ducs de Gascogne",
+11
+],
+[
+"Maistres Occitans",
+11
+],
+[
+"Pierre Champion",
+11
+],
+[
+"Valette",
+11
+],
+[
+"Carrefour",
+10
+],
+[
+"Cellier Sarlat",
+10
+],
+[
+"Diamant Noir",
+9
+],
+[
+"Jean Larnaudie",
+9
+],
+[
+"Cora",
+9
+],
+[
+"Monoprix",
+9
+],
+[
+"Comtesse du Barry",
+9
+],
+[
+"Guillaume Dunoy",
+8
+],
+[
+"Deluxe",
+7
+],
+[
+"Ernest Soulard",
+7
+],
+[
+"Lafitte",
+7
+],
+[
+"Euralis Gastronomie",
+6
+],
+[
+"Casino",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Marque Repère",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"Sans marque",
+5
+],
+[
+"Casino Délices",
+5
+],
+[
+"Monoprix Gourmet",
+5
+],
+[
+"Panache des landes",
+5
+],
+[
+"Pierre de Chaumeyrac",
+5
+],
+[
+"Fleurons de Lomagne",
+5
+],
+[
+"Esprit Gourmet",
+5
+],
+[
+"Feyel",
+4
+],
+[
+"Secret d eleveurs",
+4
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Terrine de campagne": {
+"n": 1073,
+"categorie": "en:country-terrines",
+"marques": [
+[
+"Jean Brunet",
+39
+],
+[
+"Tallec",
+34
+],
+[
+"Madrange",
+18
+],
+[
+"Stéphan",
+15
+],
+[
+"U",
+14
+],
+[
+"Pierre Laguilhon",
+13
+],
+[
+"Carrefour",
+10
+],
+[
+"Mère Lalie",
+10
+],
+[
+"Hénaff",
+10
+],
+[
+"U Saveurs",
+8
+],
+[
+"Le Bois Jumel",
+8
+],
+[
+"Fleurons de Lomagne",
+8
+],
+[
+"La Table d'Antan",
+8
+],
+[
+"Belle France",
+7
+],
+[
+"Arnaud",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Monoprix",
+6
+],
+[
+"Cora",
+6
+],
+[
+"Monoprix Gourmet",
+6
+],
+[
+"Les Bories",
+6
+],
+[
+"Esprit Gourmet",
+6
+],
+[
+"La Belle Chaurienne",
+6
+],
+[
+"Toque du Chef",
+5
+],
+[
+"Chez Carrefour",
+5
+],
+[
+"Larnaudie",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Le Pré aux Canards",
+5
+],
+[
+"Lou Gascoun",
+5
+],
+[
+"Maison Robert",
+5
+],
+[
+"Jean Floc'h",
+5
+],
+[
+"Clos Saint Sozy",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Les Délices de Belle France",
+4
+],
+[
+"Les Recettes Gourmandes",
+4
+],
+[
+"Biocoop",
+4
+],
+[
+"Le Domaine des Tuilières",
+4
+],
+[
+"Petitgas",
+4
+],
+[
+"Secret d eleveurs",
+4
+],
+[
+"Terrines du Morvan",
+4
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon sec": {
+"n": 893,
+"categorie": "en:dried-hams",
+"marques": [
+[
+"Maison Milhau",
+18
+],
+[
+"U",
+15
+],
+[
+"Carrefour",
+15
+],
+[
+"Montagne Noire",
+14
+],
+[
+"Oberti",
+14
+],
+[
+"U Saveurs",
+13
+],
+[
+"Le saloir du Périgord",
+12
+],
+[
+"Casino",
+10
+],
+[
+"Saint-Azay",
+10
+],
+[
+"Marque Repère",
+9
+],
+[
+"Delpeyrat",
+7
+],
+[
+"Auchan",
+7
+],
+[
+"Despi",
+7
+],
+[
+"Cora",
+6
+],
+[
+"Monique ranou",
+5
+],
+[
+"Oberti & fils",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Michel Dupuy",
+5
+],
+[
+"Henri Raffin",
+5
+],
+[
+"Aoste",
+5
+],
+[
+"Bell",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Saveur & Passion",
+4
+],
+[
+"Calixte",
+3
+],
+[
+"Saint Alby",
+3
+],
+[
+"Peguet Savoie",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Biocoop",
+3
+],
+[
+"Itinéraire des Saveurs",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"La Jasse",
+3
+],
+[
+"Frais Devant",
+3
+],
+[
+"Argal",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Terrine de canard": {
+"n": 803,
+"categorie": "en:duck-terrines",
+"marques": [
+[
+"Ducs de Gascogne",
+25
+],
+[
+"Comtesse du Barry",
+21
+],
+[
+"Valette",
+14
+],
+[
+"Maison Papillon",
+9
+],
+[
+"Pierre Champion",
+9
+],
+[
+"Hénaff",
+9
+],
+[
+"Delpeyrat",
+8
+],
+[
+"Sudreau",
+8
+],
+[
+"U",
+7
+],
+[
+"Roger Vidal",
+7
+],
+[
+"Le Volvestre",
+7
+],
+[
+"Panache des landes",
+7
+],
+[
+"Comte De La Seynie",
+7
+],
+[
+"Maison Montfort",
+7
+],
+[
+"Secret d eleveurs",
+6
+],
+[
+"Le Pré aux Canards",
+6
+],
+[
+"Les Bories",
+6
+],
+[
+"Saveur d'Auge",
+6
+],
+[
+"Maison Sauveterre",
+6
+],
+[
+"La Table d'Antan",
+6
+],
+[
+"Labeyrie",
+5
+],
+[
+"Carrefour",
+5
+],
+[
+"Jean Brunet",
+5
+],
+[
+"Arnaud",
+5
+],
+[
+"Jean de Veyrac",
+5
+],
+[
+"U Saveurs",
+4
+],
+[
+"Les Trois Chefs",
+4
+],
+[
+"Le Vieux Chêne",
+4
+],
+[
+"Les Mille Sources",
+4
+],
+[
+"Le Manoir Alexandre",
+4
+],
+[
+"Leader Price",
+3
+],
+[
+"Tallec",
+3
+],
+[
+"M. de Turenne",
+3
+],
+[
+"Le Père Jean",
+3
+],
+[
+"Les Saveurs De Bourdette",
+3
+],
+[
+"Maison Torres",
+3
+],
+[
+"Duc de Pressac",
+3
+],
+[
+"Parole Gourmande",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Jean d'Audignac",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Fuet": {
+"n": 420,
+"categorie": "fr:fouets-catalans",
+"marques": [
+[
+"Espuña",
+6
+],
+[
+"Argal",
+4
+],
+[
+"Noel",
+3
+],
+[
+"Elpozo",
+3
+],
+[
+"Saveur & Passion",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambonneau": {
+"n": 372,
+"categorie": "en:knuckle-of-ham-cooked",
+"marques": [
+[
+"Tendre & Plus",
+8
+],
+[
+"Le Choix du Charcutier",
+7
+],
+[
+"Tallec",
+4
+],
+[
+"Leforgeais",
+4
+],
+[
+"Comte de Bellou",
+3
+],
+[
+"Le porc de nos villages",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Carrefour",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Cervelas": {
+"n": 401,
+"categorie": "en:cervelat",
+"marques": [
+[
+"Herta",
+11
+],
+[
+"Auchan",
+10
+],
+[
+"Saint Alby",
+9
+],
+[
+"Stemmelen",
+7
+],
+[
+"Au Fumé Vosgien",
+6
+],
+[
+"Sans marque",
+6
+],
+[
+"Iller",
+6
+],
+[
+"Carrefour",
+5
+],
+[
+"Tradilège",
+5
+],
+[
+"Pierre Schmidt",
+4
+],
+[
+"Monique ranou",
+4
+],
+[
+"Festein d'Alsace",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Stoeffler",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Terroir",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Chiffonnade de jambon": {
+"n": 113,
+"categorie": "en:dried-hams",
+"marques": [
+[
+"U",
+11
+],
+[
+"U Saveurs",
+10
+],
+[
+"Galibier",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Mousse de canard": {
+"n": 482,
+"categorie": "en:duck-mousse",
+"marques": [
+[
+"Madrange",
+19
+],
+[
+"Tradilège",
+8
+],
+[
+"Marque Repère",
+7
+],
+[
+"Intermarché",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Hénaff",
+6
+],
+[
+"Feyel",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Prunier",
+4
+],
+[
+"Brocéliande",
+4
+],
+[
+"Deluxe",
+3
+],
+[
+"U",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Maison Prunier",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon fumé": {
+"n": 835,
+"categorie": "en:white-hams",
+"marques": [
+[
+"Saint Alby",
+235
+],
+[
+"Lidl",
+55
+],
+[
+"Domaine Picard",
+29
+],
+[
+"Petitgas",
+11
+],
+[
+"Dulano",
+8
+],
+[
+"Cora",
+8
+],
+[
+"Madrange",
+5
+],
+[
+"Herta",
+5
+],
+[
+"Fleury Michon",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Le Porc Français",
+3
+],
+[
+"Tradilège",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Terrine de lapin": {
+"n": 229,
+"categorie": "en:rabbit-terrines",
+"marques": [
+[
+"Carrefour",
+6
+],
+[
+"Jean Brunet",
+4
+],
+[
+"Arnaud",
+4
+],
+[
+"U",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Paul Larédy",
+3
+],
+[
+"Hénaff",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Lard paysan": {
+"n": 65,
+"categorie": "en:pork-fat",
+"marques": [
+[
+"Philippe Wagner",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon de Bayonne": {
+"n": 270,
+"categorie": "en:bayonne-ham",
+"marques": [
+[
+"Delpeyrat",
+34
+],
+[
+"Aoste",
+11
+],
+[
+"Michel Dupuy",
+10
+],
+[
+"Carrefour",
+6
+],
+[
+"U",
+5
+],
+[
+"Saint-Azay",
+5
+],
+[
+"Bayonne",
+4
+],
+[
+"U Saveurs",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Despi",
+4
+],
+[
+"Labeyrie",
+4
+],
+[
+"Intermarché",
+3
+],
+[
+"Saint Alby",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Patrimoine Gourmand",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+],
+[
+"Terroir",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Jambon de Parme": {
+"n": 55,
+"categorie": "en:parma-ham",
+"marques": [
+[
+"Parma",
+4
+],
+[
+"U",
+3
+],
+[
+"U Saveurs",
+3
+],
+[
+"Citterio",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Lomo": {
+"n": 515,
+"categorie": "en:cured-pork-loin",
+"marques": [
+[
+"Hiruak",
+30
+],
+[
+"Les Brasérades",
+4
+],
+[
+"Aoste",
+3
+],
+[
+"Boadas",
+3
+],
+[
+"Maison Milhau",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Saucisse sèche": {
+"n": 1085,
+"categorie": "fr:saucisses-seches",
+"marques": [
+[
+"Montagne Noire",
+17
+],
+[
+"Oberti",
+17
+],
+[
+"Roches blanches",
+15
+],
+[
+"Maison Milhau",
+14
+],
+[
+"U",
+12
+],
+[
+"Louis Auvergne",
+10
+],
+[
+"Carrefour",
+10
+],
+[
+"Casino",
+9
+],
+[
+"Cora",
+9
+],
+[
+"Cochonou",
+8
+],
+[
+"Monique ranou",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"Leader Price",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Saint-Azay",
+7
+],
+[
+"Nos Régions ont du Talent",
+6
+],
+[
+"Despi",
+5
+],
+[
+"Le Flutiau",
+4
+],
+[
+"Aldi",
+4
+],
+[
+"Merle",
+4
+],
+[
+"Sans marque",
+4
+],
+[
+"Leclerc",
+4
+],
+[
+"Salaisons du Mâconnais",
+4
+],
+[
+"Bell",
+4
+],
+[
+"Môssieur Polette",
+4
+],
+[
+"U Saveurs",
+4
+],
+[
+"Henri Raffin",
+4
+],
+[
+"André Cazaux",
+3
+],
+[
+"Reflets de France",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"France Salaisons",
+3
+],
+[
+"Maison Colombo",
+3
+],
+[
+"Isla Mondial",
+3
+],
+[
+"Terroir",
+3
+],
+[
+"Le Fleuron de la Réunion",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Pâté en croûte": {
+"n": 515,
+"categorie": "en:pate-in-crust",
+"marques": [
+[
+"Roland Monterrat",
+12
+],
+[
+"Deluxe",
+12
+],
+[
+"Michel Bolard",
+11
+],
+[
+"Tempé",
+10
+],
+[
+"Despi",
+8
+],
+[
+"Maison Monterrat",
+7
+],
+[
+"Maison Bolard",
+6
+],
+[
+"Secrets Du Val D'argent",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"L'assiette d'Antoine",
+6
+],
+[
+"Leclerc",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Metzger Muller",
+4
+],
+[
+"Intermarché",
+4
+],
+[
+"Cora",
+4
+],
+[
+"U",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Le Bistronome",
+3
+],
+[
+"U Saveurs",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Thierry Schweitzer",
+3
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Galantine": {
+"n": 72,
+"categorie": "en:galantine",
+"marques": [
+[
+"Fleurons de Lomagne",
+5
+],
+[
+"Prunier",
+4
+]
+]
+},
+"Charcuterie/Charcuterie libre-service/Finocchiona": {
+"n": 3,
+"categorie": "it:finocchiona",
+"marques": []
 },
 "Charcuterie/Charcuterie à la coupe/Jambon à la coupe": {
 "n": 11,
@@ -22052,11 +31701,11 @@
 6
 ],
 [
-"Monoprix",
+"Monoprix Gourmet",
 4
 ],
 [
-"Monoprix Gourmet",
+"Monoprix",
 4
 ],
 [
@@ -22120,6 +31769,1767 @@
 ],
 [
 "Tous les jours",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Saucisson sec": {
+"n": 2313,
+"categorie": "en:dry-sausages",
+"marques": [
+[
+"Auchan",
+29
+],
+[
+"Henri Raffin",
+24
+],
+[
+"U",
+22
+],
+[
+"Saint-Azay",
+21
+],
+[
+"Galibier",
+20
+],
+[
+"Le Batistou",
+20
+],
+[
+"Marque Repère",
+20
+],
+[
+"Cochonou",
+17
+],
+[
+"Carrefour",
+16
+],
+[
+"U Saveurs",
+15
+],
+[
+"Louis Auvergne",
+15
+],
+[
+"Roches blanches",
+15
+],
+[
+"Salaisons du Mâconnais",
+13
+],
+[
+"Montagne Noire",
+13
+],
+[
+"Terre de l'Alpe",
+10
+],
+[
+"Saint Alby",
+9
+],
+[
+"Casino",
+9
+],
+[
+"Terroir",
+9
+],
+[
+"Cora",
+9
+],
+[
+"Oberti",
+9
+],
+[
+"Leader Price",
+8
+],
+[
+"Bell",
+8
+],
+[
+"Aoste",
+8
+],
+[
+"Le Césarin",
+7
+],
+[
+"Maison Milhau",
+7
+],
+[
+"Sans marque",
+7
+],
+[
+"Frédéric Buchinger",
+6
+],
+[
+"Aldi",
+6
+],
+[
+"Brocéliande",
+6
+],
+[
+"Isla Délice",
+6
+],
+[
+"Berni",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"Le Porc Français",
+5
+],
+[
+"Les Délices de Clobert",
+5
+],
+[
+"Belle France",
+5
+],
+[
+"Bioporc",
+5
+],
+[
+"Le Petit Savoyard",
+5
+],
+[
+"Nos Régions ont du Talent",
+5
+],
+[
+"Gueze",
+4
+],
+[
+"Grand Lou",
+4
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Pâté": {
+"n": 6851,
+"categorie": "en:prepared-meats",
+"marques": [
+[
+"Hénaff",
+55
+],
+[
+"Lucien Georgelin",
+54
+],
+[
+"Maison Torres",
+34
+],
+[
+"U",
+33
+],
+[
+"Carrefour",
+33
+],
+[
+"Stéphan",
+31
+],
+[
+"Orocbat",
+29
+],
+[
+"Jean Brunet",
+29
+],
+[
+"Casino",
+25
+],
+[
+"Mainjolle",
+24
+],
+[
+"Leader Price",
+22
+],
+[
+"Panzani",
+21
+],
+[
+"Mère Lalie",
+21
+],
+[
+"Le Comptoir de Mathilde",
+20
+],
+[
+"Mercadier",
+19
+],
+[
+"Domaine Picard",
+19
+],
+[
+"Lafitte",
+19
+],
+[
+"U Saveurs",
+18
+],
+[
+"Conserverie St Christophe",
+18
+],
+[
+"Biraben",
+16
+],
+[
+"Lartigue",
+15
+],
+[
+"William Saurin",
+14
+],
+[
+"Auchan",
+14
+],
+[
+"Pierre Laguilhon",
+14
+],
+[
+"Accoceberry",
+14
+],
+[
+"Jean Floc'h",
+13
+],
+[
+"Le Patureur",
+13
+],
+[
+"Charles Antona",
+12
+],
+[
+"Le Vieux Chêne",
+12
+],
+[
+"Cora",
+11
+],
+[
+"Brient",
+11
+],
+[
+"Charcuterie Cosme",
+10
+],
+[
+"Lou Gascoun",
+10
+],
+[
+"Maison Dubernet",
+10
+],
+[
+"Secrets de Famille",
+10
+],
+[
+"Monique ranou",
+9
+],
+[
+"Le Choix du Charcutier",
+9
+],
+[
+"Maistres Occitans",
+9
+],
+[
+"Hoa Nam",
+9
+],
+[
+"Bixente Ibarra",
+9
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Rillettes": {
+"n": 2397,
+"categorie": "en:fish-rillettes",
+"marques": [
+[
+"Petit Navire",
+42
+],
+[
+"Groix & Nature",
+35
+],
+[
+"Guyader",
+32
+],
+[
+"Le Grand Lejon",
+29
+],
+[
+"U",
+28
+],
+[
+"L'Atelier du Poissonnier",
+28
+],
+[
+"Le Père Eugène",
+21
+],
+[
+"Cap Océan",
+20
+],
+[
+"Casino",
+18
+],
+[
+"Algoplus",
+18
+],
+[
+"La Cancalaise",
+18
+],
+[
+"Carrefour",
+17
+],
+[
+"Marque Repère",
+17
+],
+[
+"La Chikolodenn",
+17
+],
+[
+"Crustarmor",
+15
+],
+[
+"La Sablaise",
+15
+],
+[
+"Ronde des Mers",
+15
+],
+[
+"Auchan",
+15
+],
+[
+"Leader Price",
+14
+],
+[
+"Gastromer",
+14
+],
+[
+"Conserverie des Saveurs",
+14
+],
+[
+"Hénaff",
+13
+],
+[
+"Comtesse du Barry",
+12
+],
+[
+"Saupiquet",
+11
+],
+[
+"Jacques Gonidec",
+11
+],
+[
+"Les Mouettes d'Arvor",
+11
+],
+[
+"Hennequin",
+11
+],
+[
+"Connétable",
+10
+],
+[
+"Ty-Gwenn",
+10
+],
+[
+"Sainte Barbe",
+10
+],
+[
+"La Pointe de Penmarc'h",
+10
+],
+[
+"Maison Liatout",
+10
+],
+[
+"Phare d'Eckmühl",
+9
+],
+[
+"L'Ile Bleue",
+9
+],
+[
+"La belle-iloise",
+9
+],
+[
+"La compagnie bretonne du poisson",
+9
+],
+[
+"La Perle des Dieux",
+9
+],
+[
+"Odyssee",
+8
+],
+[
+"Les P'tites Cabines",
+8
+],
+[
+"Nixe",
+7
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Chorizo": {
+"n": 1448,
+"categorie": "en:chorizos",
+"marques": [
+[
+"Hiruak",
+33
+],
+[
+"César Moroni",
+13
+],
+[
+"Revilla",
+12
+],
+[
+"Argal",
+10
+],
+[
+"Elpozo",
+10
+],
+[
+"Berni",
+9
+],
+[
+"Maison Milhau",
+9
+],
+[
+"Boadas",
+8
+],
+[
+"L'assiette d'Antoine",
+7
+],
+[
+"Espuña",
+7
+],
+[
+"Saveur & Passion",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"Itinéraire des Saveurs",
+4
+],
+[
+"Oberti",
+4
+],
+[
+"Oriental Viandes",
+4
+],
+[
+"Rochambeau",
+4
+],
+[
+"Metro Chef",
+4
+],
+[
+"Saint-Azay",
+4
+],
+[
+"Noel",
+4
+],
+[
+"La Alegria",
+4
+],
+[
+"Despi",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Roches blanches",
+3
+],
+[
+"Montagne Noire",
+3
+],
+[
+"Jean Floc'h",
+3
+],
+[
+"Isla Délice",
+3
+],
+[
+"Navidul",
+3
+],
+[
+"Casademont",
+3
+],
+[
+"Alejandro",
+3
+],
+[
+"Delpeyrat",
+3
+],
+[
+"Vallégrain",
+3
+],
+[
+"Palais Des Mets",
+3
+],
+[
+"Saint Alby",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Mortadelle": {
+"n": 262,
+"categorie": "en:mortadella",
+"marques": [
+[
+"Despi",
+10
+],
+[
+"Carrefour",
+6
+],
+[
+"Rovagnati",
+6
+],
+[
+"Berni",
+5
+],
+[
+"Réghalal",
+4
+],
+[
+"La Jasse",
+4
+],
+[
+"Citterio",
+4
+],
+[
+"Montorsi",
+3
+],
+[
+"L'assiette d'Antoine",
+3
+],
+[
+"Al Jadid",
+3
+],
+[
+"Negroni",
+3
+],
+[
+"Kerets",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Coppa": {
+"n": 436,
+"categorie": "en:coppa",
+"marques": [
+[
+"Despi",
+11
+],
+[
+"Montorsi",
+8
+],
+[
+"Negroni",
+7
+],
+[
+"La Jasse",
+5
+],
+[
+"Veronesi",
+5
+],
+[
+"Boadas",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Sans marque",
+4
+],
+[
+"Berni",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"L'assiette d'Antoine",
+4
+],
+[
+"Casa Modena",
+4
+],
+[
+"Belle France",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Montagne Noire",
+3
+],
+[
+"Henri Raffin",
+3
+],
+[
+"Aoste",
+3
+],
+[
+"Gourmets de l'Artois",
+3
+],
+[
+"Villani",
+3
+],
+[
+"Aia",
+3
+],
+[
+"Citterio",
+3
+],
+[
+"Parmacotto",
+3
+],
+[
+"Fratelli Beretta",
+3
+],
+[
+"Italiamo",
+3
+],
+[
+"Lidl",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Rosette": {
+"n": 481,
+"categorie": "en:rosette-dry-sausage",
+"marques": [
+[
+"Carrefour",
+15
+],
+[
+"Cochonou",
+11
+],
+[
+"Aoste",
+10
+],
+[
+"Saint Alby",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"Montagne Noire",
+6
+],
+[
+"Cora",
+5
+],
+[
+"Sans marque",
+5
+],
+[
+"Henri Raffin",
+5
+],
+[
+"Gourmets de l'Artois",
+5
+],
+[
+"Boucheries André",
+4
+],
+[
+"Berni",
+4
+],
+[
+"Peguet Savoie",
+3
+],
+[
+"U",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"L'assiette d'Antoine",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Salami": {
+"n": 322,
+"categorie": "en:pork-salami",
+"marques": [
+[
+"Dulano",
+6
+],
+[
+"Berni",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Herta",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"L'assiette d'Antoine",
+4
+],
+[
+"Citterio",
+4
+],
+[
+"Gut Bartenhof",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Charcupac",
+3
+],
+[
+"Les Provinces",
+3
+],
+[
+"Delhaize",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Jambon persillé": {
+"n": 96,
+"categorie": "fr:jambon-persille-de-bourgogne",
+"marques": []
+},
+"Charcuterie/Charcuterie à la coupe/Boudin noir": {
+"n": 412,
+"categorie": "en:sauteed-black-pudding",
+"marques": [
+[
+"Mainjolle",
+9
+],
+[
+"Carrefour",
+8
+],
+[
+"Le Père Benoît",
+6
+],
+[
+"U Saveurs",
+6
+],
+[
+"Maison Prunier",
+5
+],
+[
+"Bahier",
+4
+],
+[
+"U",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Boudin blanc": {
+"n": 651,
+"categorie": "en:sauteed-black-pudding",
+"marques": [
+[
+"Carrefour",
+18
+],
+[
+"Bahier",
+15
+],
+[
+"U",
+13
+],
+[
+"Maison Prunier",
+12
+],
+[
+"Auchan",
+11
+],
+[
+"U Saveurs",
+10
+],
+[
+"Le Gaulois",
+10
+],
+[
+"Demoizet",
+10
+],
+[
+"Les Brasérades",
+7
+],
+[
+"Charcuteries bahier",
+7
+],
+[
+"Tallec",
+7
+],
+[
+"Deluxe",
+6
+],
+[
+"Brient",
+6
+],
+[
+"Casino",
+5
+],
+[
+"Maître CoQ",
+5
+],
+[
+"Thiriet",
+5
+],
+[
+"Despi",
+4
+],
+[
+"Monique ranou",
+4
+],
+[
+"Saveurs des mauges",
+4
+],
+[
+"Tradival",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Tradilège",
+4
+],
+[
+"Lartigue",
+4
+],
+[
+"Clermont",
+4
+],
+[
+"Charcuterie Cosme",
+3
+],
+[
+"Cochonnailles du Haut-Bois",
+3
+],
+[
+"Les creations",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Bonjour Campagne",
+3
+],
+[
+"Bioporc",
+3
+],
+[
+"Maître Jacques",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Fromage de tête": {
+"n": 188,
+"categorie": "en:head-cheese",
+"marques": [
+[
+"Bahier",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Charcuterie des Papes",
+3
+],
+[
+"Aux Saveurs d'Ardennes",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Viande des Grisons": {
+"n": 215,
+"categorie": "en:meat-of-the-grisons",
+"marques": [
+[
+"Aoste",
+7
+],
+[
+"Carrefour",
+5
+],
+[
+"Naturaplan",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Migros",
+4
+],
+[
+"Saint Alby",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Graubunden",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Bell",
+3
+],
+[
+"Monoprix",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Pancetta": {
+"n": 135,
+"categorie": "en:pancetta",
+"marques": [
+[
+"Berni",
+5
+],
+[
+"L'assiette d'Antoine",
+5
+],
+[
+"Negroni",
+4
+],
+[
+"Fratelli Beretta",
+4
+],
+[
+"Villani",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Terrine de campagne": {
+"n": 1073,
+"categorie": "en:country-terrines",
+"marques": [
+[
+"Jean Brunet",
+39
+],
+[
+"Tallec",
+34
+],
+[
+"Madrange",
+18
+],
+[
+"Stéphan",
+15
+],
+[
+"U",
+14
+],
+[
+"Pierre Laguilhon",
+13
+],
+[
+"Carrefour",
+10
+],
+[
+"Mère Lalie",
+10
+],
+[
+"Hénaff",
+10
+],
+[
+"U Saveurs",
+8
+],
+[
+"Le Bois Jumel",
+8
+],
+[
+"Fleurons de Lomagne",
+8
+],
+[
+"La Table d'Antan",
+8
+],
+[
+"Belle France",
+7
+],
+[
+"Arnaud",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Monoprix",
+6
+],
+[
+"Cora",
+6
+],
+[
+"Monoprix Gourmet",
+6
+],
+[
+"Les Bories",
+6
+],
+[
+"Esprit Gourmet",
+6
+],
+[
+"La Belle Chaurienne",
+6
+],
+[
+"Toque du Chef",
+5
+],
+[
+"Chez Carrefour",
+5
+],
+[
+"Larnaudie",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Le Pré aux Canards",
+5
+],
+[
+"Lou Gascoun",
+5
+],
+[
+"Maison Robert",
+5
+],
+[
+"Jean Floc'h",
+5
+],
+[
+"Clos Saint Sozy",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Les Délices de Belle France",
+4
+],
+[
+"Les Recettes Gourmandes",
+4
+],
+[
+"Biocoop",
+4
+],
+[
+"Le Domaine des Tuilières",
+4
+],
+[
+"Petitgas",
+4
+],
+[
+"Secret d eleveurs",
+4
+],
+[
+"Terrines du Morvan",
+4
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Terrine de canard": {
+"n": 803,
+"categorie": "en:duck-terrines",
+"marques": [
+[
+"Ducs de Gascogne",
+25
+],
+[
+"Comtesse du Barry",
+21
+],
+[
+"Valette",
+14
+],
+[
+"Maison Papillon",
+9
+],
+[
+"Pierre Champion",
+9
+],
+[
+"Hénaff",
+9
+],
+[
+"Delpeyrat",
+8
+],
+[
+"Sudreau",
+8
+],
+[
+"U",
+7
+],
+[
+"Roger Vidal",
+7
+],
+[
+"Le Volvestre",
+7
+],
+[
+"Panache des landes",
+7
+],
+[
+"Comte De La Seynie",
+7
+],
+[
+"Maison Montfort",
+7
+],
+[
+"Secret d eleveurs",
+6
+],
+[
+"Le Pré aux Canards",
+6
+],
+[
+"Les Bories",
+6
+],
+[
+"Saveur d'Auge",
+6
+],
+[
+"Maison Sauveterre",
+6
+],
+[
+"La Table d'Antan",
+6
+],
+[
+"Labeyrie",
+5
+],
+[
+"Carrefour",
+5
+],
+[
+"Jean Brunet",
+5
+],
+[
+"Arnaud",
+5
+],
+[
+"Jean de Veyrac",
+5
+],
+[
+"U Saveurs",
+4
+],
+[
+"Les Trois Chefs",
+4
+],
+[
+"Le Vieux Chêne",
+4
+],
+[
+"Les Mille Sources",
+4
+],
+[
+"Le Manoir Alexandre",
+4
+],
+[
+"Leader Price",
+3
+],
+[
+"Tallec",
+3
+],
+[
+"M. de Turenne",
+3
+],
+[
+"Le Père Jean",
+3
+],
+[
+"Les Saveurs De Bourdette",
+3
+],
+[
+"Maison Torres",
+3
+],
+[
+"Duc de Pressac",
+3
+],
+[
+"Parole Gourmande",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Jean d'Audignac",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Cervelas": {
+"n": 401,
+"categorie": "en:cervelat",
+"marques": [
+[
+"Herta",
+11
+],
+[
+"Auchan",
+10
+],
+[
+"Saint Alby",
+9
+],
+[
+"Stemmelen",
+7
+],
+[
+"Au Fumé Vosgien",
+6
+],
+[
+"Sans marque",
+6
+],
+[
+"Iller",
+6
+],
+[
+"Carrefour",
+5
+],
+[
+"Tradilège",
+5
+],
+[
+"Pierre Schmidt",
+4
+],
+[
+"Monique ranou",
+4
+],
+[
+"Festein d'Alsace",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Stoeffler",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Terroir",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Fuet": {
+"n": 420,
+"categorie": "fr:fouets-catalans",
+"marques": [
+[
+"Espuña",
+6
+],
+[
+"Argal",
+4
+],
+[
+"Noel",
+3
+],
+[
+"Elpozo",
+3
+],
+[
+"Saveur & Passion",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Jambonneau": {
+"n": 372,
+"categorie": "en:knuckle-of-ham-cooked",
+"marques": [
+[
+"Tendre & Plus",
+8
+],
+[
+"Le Choix du Charcutier",
+7
+],
+[
+"Tallec",
+4
+],
+[
+"Leforgeais",
+4
+],
+[
+"Comte de Bellou",
+3
+],
+[
+"Le porc de nos villages",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Carrefour",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Mousse de canard": {
+"n": 482,
+"categorie": "en:duck-mousse",
+"marques": [
+[
+"Madrange",
+19
+],
+[
+"Tradilège",
+8
+],
+[
+"Marque Repère",
+7
+],
+[
+"Intermarché",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Hénaff",
+6
+],
+[
+"Feyel",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Saint Alby",
+4
+],
+[
+"Prunier",
+4
+],
+[
+"Brocéliande",
+4
+],
+[
+"Deluxe",
+3
+],
+[
+"U",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Maison Prunier",
+3
+]
+]
+},
+"Charcuterie/Charcuterie à la coupe/Lard paysan": {
+"n": 65,
+"categorie": "en:pork-fat",
+"marques": [
+[
+"Philippe Wagner",
 3
 ]
 ]
@@ -22245,11 +33655,11 @@
 6
 ],
 [
-"Jardin Bio étic",
+"Léa Nature",
 6
 ],
 [
-"Léa Nature",
+"Jardin Bio étic",
 6
 ],
 [
@@ -22384,7 +33794,7 @@
 ]
 },
 "Traiteur/Traiteur frais/Houmous": {
-"n": 999,
+"n": 1211,
 "categorie": "en:hummus",
 "marques": [
 [
@@ -22408,12 +33818,24 @@
 19
 ],
 [
+"Père Olive",
+17
+],
+[
 "Carrefour",
 16
 ],
 [
 "Yarden",
 15
+],
+[
+"Florette",
+11
+],
+[
+"Chef Select",
+10
 ],
 [
 "U",
@@ -22424,16 +33846,24 @@
 10
 ],
 [
-"Florette",
+"Ifantis",
+10
+],
+[
+"Delhaize",
 9
 ],
 [
-"Ifantis",
+"Lidl",
 8
 ],
 [
 "Auchan",
 8
+],
+[
+"fontaine santé",
+7
 ],
 [
 "Monoprix Gourmet",
@@ -22472,7 +33902,7 @@
 6
 ],
 [
-"Delhaize",
+"Florentin",
 6
 ],
 [
@@ -22489,10 +33919,6 @@
 ],
 [
 "Marque Repère",
-5
-],
-[
-"Lidl",
 5
 ],
 [
@@ -22516,7 +33942,7 @@
 4
 ],
 [
-"Père Olive",
+"La Vie Claire",
 4
 ],
 [
@@ -22529,22 +33955,6 @@
 ],
 [
 "Mieux Manger",
-4
-],
-[
-"Auchan Collection",
-4
-],
-[
-"La Grande Epicerie de Paris",
-4
-],
-[
-"Le Comptoir de Mathilde",
-4
-],
-[
-"Les P'tits Apéros",
 4
 ]
 ]
@@ -22586,11 +33996,11 @@
 3
 ],
 [
-"Groupe Carrefour",
+"CMI (Carrefour Marchandises Internationales)",
 3
 ],
 [
-"CMI (Carrefour Marchandises Internationales)",
+"Groupe Carrefour",
 3
 ],
 [
@@ -22614,11 +34024,11 @@
 3
 ],
 [
-"Brédial",
+"Tout feu tout frais",
 3
 ],
 [
-"Tout feu tout frais",
+"Brédial",
 3
 ]
 ]
@@ -22860,11 +34270,11 @@
 3
 ],
 [
-"Aldi",
+"Gourmet Finest Cuisine",
 3
 ],
 [
-"Gourmet Finest Cuisine",
+"Aldi",
 3
 ]
 ]
@@ -23622,6 +35032,664 @@
 ]
 ]
 },
+"Traiteur/Traiteur frais/Quenelles": {
+"n": 562,
+"categorie": "fr:quenelles",
+"marques": [
+[
+"Giraudet",
+42
+],
+[
+"Maison Malartre",
+32
+],
+[
+"Saint Jean",
+28
+],
+[
+"Petitjean",
+20
+],
+[
+"Ecochard",
+20
+],
+[
+"Desmaris",
+15
+],
+[
+"Julien Mack",
+14
+],
+[
+"Royans",
+13
+],
+[
+"U",
+12
+],
+[
+"Casino",
+11
+],
+[
+"Sans marque",
+9
+],
+[
+"La Royale",
+9
+],
+[
+"Thiriet",
+9
+],
+[
+"Carrefour",
+7
+],
+[
+"Côté Table",
+7
+],
+[
+"Auchan",
+7
+],
+[
+"Chez Élodie",
+7
+],
+[
+"Toque du Chef",
+6
+],
+[
+"Marque Repère",
+6
+],
+[
+"Maison Rivière",
+6
+],
+[
+"Toupargel",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Saveurs de nos Régions",
+5
+],
+[
+"Tradition Traiteur",
+4
+],
+[
+"La Vie Claire",
+4
+],
+[
+"Nolo Frères",
+4
+],
+[
+"U de nos Régions",
+4
+],
+[
+"J.C.David",
+4
+],
+[
+"Raynal et Roquelaure",
+3
+],
+[
+"Lustucru",
+3
+],
+[
+"Reflets de France",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Voisin",
+3
+],
+[
+"Le Tripier Alsacien",
+3
+],
+[
+"Bio Village",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+],
+[
+"Dia",
+3
+],
+[
+"Verrière Traiteur",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Falafels": {
+"n": 280,
+"categorie": "en:falafels",
+"marques": [
+[
+"Vemondo",
+7
+],
+[
+"Soto",
+7
+],
+[
+"Lidl",
+6
+],
+[
+"Monoprix",
+5
+],
+[
+"U",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Dessaint",
+4
+],
+[
+"Garden Gourmet",
+4
+],
+[
+"Vivera",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Céréal Bio",
+3
+],
+[
+"Bjorg",
+3
+],
+[
+"Soy",
+3
+],
+[
+"Maayane",
+3
+],
+[
+"Alnatura",
+3
+],
+[
+"La Vie Claire",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Gratin dauphinois": {
+"n": 228,
+"categorie": "en:dauphine-style-creamed-potatoes-au-gratin",
+"marques": [
+[
+"Carrefour",
+8
+],
+[
+"Leader Price",
+8
+],
+[
+"Auchan",
+6
+],
+[
+"Thiriet",
+6
+],
+[
+"Marie",
+5
+],
+[
+"Monique ranou",
+5
+],
+[
+"U",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Toupargel",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Netto",
+4
+],
+[
+"Toque du Chef",
+3
+],
+[
+"Qualité Traiteur",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Côté Table",
+3
+],
+[
+"Marque Repère",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Aligot": {
+"n": 200,
+"categorie": "en:aligots",
+"marques": [
+[
+"Jeune Montagne",
+26
+],
+[
+"Maison Carrier",
+7
+],
+[
+"Saveurs de nos Régions",
+6
+],
+[
+"Coeur d'Aveyron",
+4
+],
+[
+"L'assiette d'Antoine",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"coopérative fromagère jeune montagne",
+3
+],
+[
+"Bistrot 12",
+3
+],
+[
+"Miquel",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Paella": {
+"n": 381,
+"categorie": "en:paella",
+"marques": [
+[
+"U",
+13
+],
+[
+"Auchan",
+10
+],
+[
+"Carrefour",
+9
+],
+[
+"Toque du Chef",
+8
+],
+[
+"Lidl",
+8
+],
+[
+"Casino",
+7
+],
+[
+"Thiriet",
+7
+],
+[
+"Leader Price",
+6
+],
+[
+"Fleury Michon",
+6
+],
+[
+"Côté Table",
+6
+],
+[
+"Aldi",
+5
+],
+[
+"Garbit",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"La cuisine des Saveurs",
+5
+],
+[
+"Zapetti",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Toupargel",
+4
+],
+[
+"Picard",
+4
+],
+[
+"Agis",
+4
+],
+[
+"Briau",
+4
+],
+[
+"Lechef",
+4
+],
+[
+"Marie",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Netto",
+3
+],
+[
+"William Saurin",
+3
+],
+[
+"Moulin des Moines",
+3
+],
+[
+"Lou Traiteur",
+3
+],
+[
+"Paul & Louise",
+3
+],
+[
+"L'assiette d'Antoine",
+3
+],
+[
+"Costa",
+3
+],
+[
+"Comme j'aime",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Choucroute garnie": {
+"n": 291,
+"categorie": "en:sauerkraut-with-garnish",
+"marques": [
+[
+"Carrefour",
+12
+],
+[
+"Stoeffler",
+11
+],
+[
+"Auchan",
+9
+],
+[
+"Casino",
+6
+],
+[
+"Pierre Schmidt",
+6
+],
+[
+"Produits de la Cigogne",
+6
+],
+[
+"William Saurin",
+5
+],
+[
+"Sans marque",
+5
+],
+[
+"U",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Terroir",
+5
+],
+[
+"Monique ranou",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Stemmelen",
+3
+],
+[
+"La Ronde des Gourmands",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Côté Table",
+3
+],
+[
+"Cochonnailles du Haut-Bois",
+3
+]
+]
+},
+"Traiteur/Traiteur frais/Brandade de morue": {
+"n": 327,
+"categorie": "fr:brandades-de-morue-parmentiere",
+"marques": [
+[
+"Briau",
+60
+],
+[
+"Tipiak",
+11
+],
+[
+"U",
+11
+],
+[
+"Coudène",
+7
+],
+[
+"Thiriet",
+7
+],
+[
+"Sar'Océan",
+7
+],
+[
+"Maison Briau",
+7
+],
+[
+"Pecheries Basques",
+6
+],
+[
+"Delpierre",
+5
+],
+[
+"Le Grand Lejon",
+5
+],
+[
+"Toupargel",
+4
+],
+[
+"La Cuisine du Poissonnier",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Nos Régions ont du Talent",
+4
+],
+[
+"Toque du Chef",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Gastromer",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Etxe berri",
+3
+],
+[
+"Mer & Saveur",
+3
+],
+[
+"Qualité Traiteur",
+3
+]
+]
+},
 "Traiteur/Pâtes fraîches et pâtes à tarte/Pâtes fraîches": {
 "n": 108,
 "categorie": "en:fresh-pasta",
@@ -23731,11 +35799,11 @@
 8
 ],
 [
-"Il pastaio",
+"Patarò",
 8
 ],
 [
-"Patarò",
+"Il pastaio",
 8
 ],
 [
@@ -24105,11 +36173,11 @@
 3
 ],
 [
-"Raviolificio Lombardini",
+"Mamma Gaia",
 3
 ],
 [
-"Mamma Gaia",
+"Raviolificio Lombardini",
 3
 ],
 [
@@ -24149,7 +36217,7 @@
 ]
 },
 "Traiteur/Pâtes fraîches et pâtes à tarte/Galettes de sarrasin": {
-"n": 150,
+"n": 148,
 "categorie": null,
 "marques": [
 [
@@ -24670,6 +36738,746 @@
 ],
 [
 "Les Jarres Crues",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Taboulé": {
+"n": 1186,
+"categorie": "en:tabbouleh",
+"marques": [
+[
+"Pierre Martinet",
+49
+],
+[
+"Mix Buffet",
+35
+],
+[
+"Garbit",
+28
+],
+[
+"Carrefour",
+25
+],
+[
+"U",
+25
+],
+[
+"Bonduelle",
+24
+],
+[
+"Casino",
+20
+],
+[
+"Tipiak",
+17
+],
+[
+"Priméal",
+17
+],
+[
+"Auchan",
+15
+],
+[
+"Leader Price",
+14
+],
+[
+"Marque Repère",
+12
+],
+[
+"Cora",
+12
+],
+[
+"Franprix",
+11
+],
+[
+"Leclerc",
+10
+],
+[
+"Zapetti",
+10
+],
+[
+"Monoprix",
+10
+],
+[
+"Menu Fraîcheur",
+9
+],
+[
+"Qualité Traiteur",
+9
+],
+[
+"E.Leclerc",
+8
+],
+[
+"Jean Stalaven",
+8
+],
+[
+"Monique ranou",
+8
+],
+[
+"Tout feu tout frais",
+8
+],
+[
+"Jean Martin",
+7
+],
+[
+"Déli'Salades",
+6
+],
+[
+"Sans marque",
+6
+],
+[
+"La Vie Claire",
+6
+],
+[
+"Danival",
+6
+],
+[
+"Naturalia",
+6
+],
+[
+"Léa Nature",
+6
+],
+[
+"Jardin Bio étic",
+6
+],
+[
+"Lidl",
+6
+],
+[
+"Saladinettes",
+5
+],
+[
+"La Fraîcherie",
+5
+],
+[
+"Netto",
+5
+],
+[
+"Belle France",
+5
+],
+[
+"Carte Nature",
+5
+],
+[
+"Biocoop",
+5
+],
+[
+"Groupe Carrefour",
+4
+],
+[
+"Groupe Casino",
+4
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Salade piémontaise": {
+"n": 59,
+"categorie": "en:piemontese-salads-with-ham",
+"marques": [
+[
+"Qualité Traiteur",
+4
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Céleri rémoulade": {
+"n": 191,
+"categorie": "en:celeriac-in-remoulade-sauce",
+"marques": [
+[
+"U",
+13
+],
+[
+"Cora",
+7
+],
+[
+"Casino",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Qualité Traiteur",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Saladinettes",
+3
+],
+[
+"CMI (Carrefour Marchandises Internationales)",
+3
+],
+[
+"Groupe Carrefour",
+3
+],
+[
+"Monique ranou",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Pierre Martinet",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Tout feu tout frais",
+3
+],
+[
+"Brédial",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Salade de pâtes": {
+"n": 184,
+"categorie": "en:pasta-salads",
+"marques": [
+[
+"Monoprix",
+9
+],
+[
+"Daylicious",
+8
+],
+[
+"Aldi",
+8
+],
+[
+"Casino",
+7
+],
+[
+"U",
+6
+],
+[
+"Leader Price",
+4
+],
+[
+"Dia",
+4
+],
+[
+"Marks And Spencer",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"L'Esprit Frais",
+3
+],
+[
+"Delhaize",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Salade de riz": {
+"n": 119,
+"categorie": "en:rice-salads",
+"marques": [
+[
+"U",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Seazon",
+4
+],
+[
+"Marks & Spencer",
+3
+],
+[
+"Casino",
+3
+],
+[
+"La Cuisine d'Océane",
+3
+],
+[
+"Comme j'aime",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Hachis parmentier": {
+"n": 280,
+"categorie": "en:beef-cottage-pies",
+"marques": [
+[
+"Auchan",
+14
+],
+[
+"Carrefour",
+12
+],
+[
+"U",
+10
+],
+[
+"Monique ranou",
+8
+],
+[
+"Marque Repère",
+8
+],
+[
+"Toque du Chef",
+7
+],
+[
+"Belle France",
+7
+],
+[
+"Côté Table",
+7
+],
+[
+"Lidl",
+6
+],
+[
+"La cuisine des Saveurs",
+6
+],
+[
+"Casino",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Fleury Michon",
+6
+],
+[
+"William Saurin",
+5
+],
+[
+"Marie",
+5
+],
+[
+"Netto",
+5
+],
+[
+"Thiriet",
+4
+],
+[
+"Toupargel",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Picard",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Findus",
+4
+],
+[
+"Isla Délice",
+3
+],
+[
+"Voyager",
+3
+],
+[
+"Tout feu tout frais",
+3
+],
+[
+"Comme j'aime",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Tarama": {
+"n": 507,
+"categorie": "en:taramasalata",
+"marques": [
+[
+"Blini",
+35
+],
+[
+"U",
+11
+],
+[
+"Le Traiteur Gourmet",
+11
+],
+[
+"L'Atelier Blini",
+10
+],
+[
+"Monoprix",
+9
+],
+[
+"La Grande Epicerie de Paris",
+9
+],
+[
+"Olsen",
+9
+],
+[
+"Fjord King",
+8
+],
+[
+"Ronde des Mers",
+8
+],
+[
+"Comptoir Du Caviar",
+8
+],
+[
+"Casino",
+7
+],
+[
+"Deluxe",
+7
+],
+[
+"Carrefour",
+7
+],
+[
+"L'Apéro du Poissonnier",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Kaviari",
+7
+],
+[
+"Petrossian",
+6
+],
+[
+"Dom Petroff",
+6
+],
+[
+"Monoprix Gourmet",
+6
+],
+[
+"Comtesse du Barry",
+6
+],
+[
+"K-YAM",
+6
+],
+[
+"La Barre",
+5
+],
+[
+"Odyssee",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Palais Des Mets",
+5
+],
+[
+"Franprix",
+4
+],
+[
+"La Maison Du Blini",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Maison St Geours",
+4
+],
+[
+"Petrovskaya",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"U Saveurs",
+3
+],
+[
+"Yvelines saumon fumé",
+3
+],
+[
+"Mille Olives",
+3
+],
+[
+"Gourmet Finest Cuisine",
+3
+],
+[
+"Aldi",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Accras de morue": {
+"n": 57,
+"categorie": "en:acras",
+"marques": [
+[
+"Cité Marine",
+10
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Gratin dauphinois": {
+"n": 228,
+"categorie": "en:dauphine-style-creamed-potatoes-au-gratin",
+"marques": [
+[
+"Carrefour",
+8
+],
+[
+"Leader Price",
+8
+],
+[
+"Auchan",
+6
+],
+[
+"Thiriet",
+6
+],
+[
+"Marie",
+5
+],
+[
+"Monique ranou",
+5
+],
+[
+"U",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Toupargel",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Netto",
+4
+],
+[
+"Toque du Chef",
+3
+],
+[
+"Qualité Traiteur",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Côté Table",
+3
+],
+[
+"Marque Repère",
+3
+]
+]
+},
+"Traiteur/Traiteur à la coupe/Aligot": {
+"n": 200,
+"categorie": "en:aligots",
+"marques": [
+[
+"Jeune Montagne",
+26
+],
+[
+"Maison Carrier",
+7
+],
+[
+"Saveurs de nos Régions",
+6
+],
+[
+"Coeur d'Aveyron",
+4
+],
+[
+"L'assiette d'Antoine",
+4
+],
+[
+"Thiriet",
+4
+],
+[
+"coopérative fromagère jeune montagne",
+3
+],
+[
+"Bistrot 12",
+3
+],
+[
+"Miquel",
 3
 ]
 ]
@@ -25633,11 +38441,11 @@
 3
 ],
 [
-"Monoprix",
+"Monoprix Gourmet",
 3
 ],
 [
-"Monoprix Gourmet",
+"Monoprix",
 3
 ],
 [
@@ -25743,11 +38551,11 @@
 5
 ],
 [
-"Auchan",
+"Santé",
 5
 ],
 [
-"Santé",
+"Auchan",
 5
 ],
 [
@@ -27349,12 +40157,12 @@
 ]
 },
 "Viennoiserie et pâtisserie/Viennoiserie/Galette des rois": {
-"n": 253,
+"n": 245,
 "categorie": "en:king-cakes",
 "marques": [
 [
 "Galettes des rois",
-6
+5
 ],
 [
 "U",
@@ -27366,10 +40174,6 @@
 ],
 [
 "La Campanière",
-3
-],
-[
-"Cora",
 3
 ]
 ]
@@ -27388,6 +40192,394 @@
 "n": 1,
 "categorie": null,
 "marques": []
+},
+"Viennoiserie et pâtisserie/Viennoiserie/Beignets": {
+"n": 1477,
+"categorie": "en:sweet-fritters",
+"marques": [
+[
+"Leclerc",
+44
+],
+[
+"E.Leclerc",
+33
+],
+[
+"Pasquier",
+15
+],
+[
+"Intermarché",
+14
+],
+[
+"Brioche Pasquier",
+13
+],
+[
+"U",
+12
+],
+[
+"Cora",
+10
+],
+[
+"Carrefour",
+9
+],
+[
+"Casino",
+7
+],
+[
+"Sans marque",
+6
+],
+[
+"Thiriet",
+6
+],
+[
+"Leader Price",
+5
+],
+[
+"Erhard",
+5
+],
+[
+"Les Délices des 7 Vallées",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"GIE BPGR",
+3
+],
+[
+"Pitch",
+3
+],
+[
+"Super U",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Sicard",
+3
+]
+]
+},
+"Viennoiserie et pâtisserie/Viennoiserie/Panettone": {
+"n": 1108,
+"categorie": "en:panettone",
+"marques": [
+[
+"Chiostro di Saronno",
+64
+],
+[
+"Valentino",
+50
+],
+[
+"Loison",
+31
+],
+[
+"Maina",
+26
+],
+[
+"Bonifanti",
+25
+],
+[
+"Pasticceria Scarpato",
+21
+],
+[
+"Balocco",
+20
+],
+[
+"Galup",
+18
+],
+[
+"Fiasconaro",
+18
+],
+[
+"Granducale",
+17
+],
+[
+"Gilber",
+16
+],
+[
+"Flamigni",
+15
+],
+[
+"Motta",
+14
+],
+[
+"Bauli",
+14
+],
+[
+"Zaghis",
+13
+],
+[
+"Muzzi",
+12
+],
+[
+"Dolciaria Casa",
+11
+],
+[
+"Paluani",
+10
+],
+[
+"Borsari",
+10
+],
+[
+"Pasticceria Fraccaro",
+10
+],
+[
+"Fraccaro",
+10
+],
+[
+"Pasticceria alla Torre",
+10
+],
+[
+"La Vie Claire",
+9
+],
+[
+"Monoprix",
+9
+],
+[
+"Artigiani d'Italia",
+9
+],
+[
+"Vergani",
+9
+],
+[
+"Pasticceria Del Casato",
+9
+],
+[
+"Tre Marie",
+9
+],
+[
+"Monoprix Gourmet",
+8
+],
+[
+"Virginia",
+8
+],
+[
+"Melegatti",
+8
+],
+[
+"Pasticceria del Castello",
+8
+],
+[
+"Spumadoro 1932",
+8
+],
+[
+"Favorina",
+7
+],
+[
+"Ciro",
+7
+],
+[
+"Dolcioso",
+7
+],
+[
+"Augusta",
+7
+],
+[
+"Muzzi Tommaso",
+7
+],
+[
+"Albertengo",
+6
+],
+[
+"Il Vecchio Forno",
+6
+]
+]
+},
+"Viennoiserie et pâtisserie/Viennoiserie/Briochettes": {
+"n": 237,
+"categorie": "en:small-brioches",
+"marques": [
+[
+"Pasquier",
+13
+],
+[
+"U",
+12
+],
+[
+"Leclerc",
+9
+],
+[
+"Maître Jean Pierre",
+6
+],
+[
+"Cora",
+6
+],
+[
+"Casino",
+6
+],
+[
+"Auchan",
+6
+],
+[
+"U Mat & Lou",
+5
+],
+[
+"Brioche Pasquier",
+5
+],
+[
+"E.Leclerc",
+4
+],
+[
+"Le Floch",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Les Pâtissades",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Thiriet",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Epi d'Or",
+3
+]
+]
+},
+"Viennoiserie et pâtisserie/Viennoiserie/Kouign-amann": {
+"n": 190,
+"categorie": "en:kouign-amann",
+"marques": [
+[
+"Yann de Bretagne",
+11
+],
+[
+"Berrou",
+6
+],
+[
+"Biscuit d'Ys",
+5
+],
+[
+"Crêperie Colas",
+5
+],
+[
+"Leclerc",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Pays Gourmand",
+3
+],
+[
+"Le Guillou",
+3
+],
+[
+"Crêperie du Vieux Moulin",
+3
+],
+[
+"Pat'Fondines",
+3
+],
+[
+"Marie Morin",
+3
+],
+[
+"Baramel",
+3
+],
+[
+"Ty Délice",
+3
+],
+[
+"Marin Coathalem",
+3
+]
+]
 },
 "Viennoiserie et pâtisserie/Pâtisserie/Tarte aux fruits": {
 "n": 58,
@@ -27693,11 +40885,11 @@
 5
 ],
 [
-"Monoprix",
+"Monoprix Gourmet",
 5
 ],
 [
-"Monoprix Gourmet",
+"Monoprix",
 5
 ],
 [
@@ -27824,64 +41016,638 @@
 ]
 ]
 },
-"Épicerie salée/Pâtes, riz et féculents/Pâtes spaghetti": {
-"n": 33,
-"categorie": "en:spaghetti",
+"Viennoiserie et pâtisserie/Pâtisserie/Tarte aux pommes": {
+"n": 454,
+"categorie": "en:apple-pies",
 "marques": [
 [
-"U",
+"E.Leclerc",
+29
+],
+[
+"Leclerc",
+13
+],
+[
+"Casino",
+10
+],
+[
+"Pasquier",
+7
+],
+[
+"Bonne Maman",
+7
+],
+[
+"Tartefrais",
 6
 ],
 [
-"U Bio",
+"Intermarché",
+5
+],
+[
+"Carrefour",
+5
+],
+[
+"U",
 4
 ],
 [
-"Panzani",
+"La Campanière",
 4
+],
+[
+"Brioche Pasquier",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Boncolac",
+3
+],
+[
+"Super U",
+3
+]
+]
+},
+"Viennoiserie et pâtisserie/Pâtisserie/Baba au rhum": {
+"n": 94,
+"categorie": "en:rum-babas",
+"marques": [
+[
+"Lidl",
+5
+],
+[
+"Lemarie patissier",
+5
+],
+[
+"Le Comptoir de Mathilde",
+5
+],
+[
+"Bonne Maman",
+4
+],
+[
+"Leader Price",
+3
+]
+]
+},
+"Viennoiserie et pâtisserie/Pâtisserie/Cheesecake": {
+"n": 230,
+"categorie": "en:cheesecakes",
+"marques": [
+[
+"Gü",
+35
+],
+[
+"Deluxe",
+9
+],
+[
+"Picard",
+8
+],
+[
+"Marie Morin",
+8
+],
+[
+"McEnnedy",
+6
+],
+[
+"Monoprix",
+6
+],
+[
+"Marks & Spencer",
+5
+],
+[
+"Lidl",
+5
+],
+[
+"Dr. Oetker",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Leader Price",
+3
+]
+]
+},
+"Épicerie salée/Pâtes, riz et féculents/Pâtes spaghetti": {
+"n": 1117,
+"categorie": "en:spaghetti",
+"marques": [
+[
+"Panzani",
+43
+],
+[
+"Lustucru",
+22
+],
+[
+"Carrefour",
+20
+],
+[
+"U",
+16
+],
+[
+"Auchan",
+16
+],
+[
+"Barilla",
+15
+],
+[
+"Combino",
+15
+],
+[
+"Casino",
+15
+],
+[
+"Priméal",
+15
+],
+[
+"Marque Repère",
+11
+],
+[
+"De Cecco",
+11
+],
+[
+"Montebello",
+10
+],
+[
+"La Vie Claire",
+9
+],
+[
+"Markal",
+9
+],
+[
+"Casino Bio",
+8
+],
+[
+"Jardin Bio étic",
+8
+],
+[
+"Rummo",
+8
+],
+[
+"Pastacorp",
+7
+],
+[
+"U Bio",
+7
+],
+[
+"Belle France",
+7
+],
+[
+"Moulin des Moines",
+7
+],
+[
+"Léa Nature",
+7
+],
+[
+"Turini",
+7
+],
+[
+"Naturalia",
+7
+],
+[
+"Granoro",
+7
+],
+[
+"Jardin Bio",
+7
+],
+[
+"Ebro Foods",
+6
+],
+[
+"Monoprix",
+6
+],
+[
+"Fiorini",
+6
+],
+[
+"Cora",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Ma vie sans gluten",
+6
+],
+[
+"La Molisana",
+6
+],
+[
+"Divella",
+6
+],
+[
+"Élibio",
+6
+],
+[
+"Auchan Bio",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"Franprix",
+5
+],
+[
+"Schär",
+5
+],
+[
+"Randa",
+5
 ]
 ]
 },
 "Épicerie salée/Pâtes, riz et féculents/Pâtes coquillettes": {
-"n": 41,
+"n": 539,
 "categorie": "fr:coquillettes",
 "marques": [
 [
-"U",
-11
+"Panzani",
+39
 ],
 [
-"Panzani",
+"Lustucru",
+20
+],
+[
+"U",
+20
+],
+[
+"Priméal",
+17
+],
+[
+"Casino",
+17
+],
+[
+"Auchan",
+17
+],
+[
+"Carrefour",
+10
+],
+[
+"Marque Repère",
+10
+],
+[
+"Lazzaretti",
+9
+],
+[
+"Montebello",
+9
+],
+[
+"Belle France",
+8
+],
+[
+"La Vie Claire",
+8
+],
+[
+"Turini",
+8
+],
+[
+"Combino",
+7
+],
+[
+"Fiorini",
+7
+],
+[
+"Leader Price",
+7
+],
+[
+"Casino Bio",
+6
+],
+[
+"Monoprix",
 6
 ],
 [
 "U Bio",
+6
+],
+[
+"Limited Edition",
+6
+],
+[
+"Markal",
+6
+],
+[
+"Groupe Casino",
+5
+],
+[
+"Valfleuri",
+5
+],
+[
+"Naturalia",
+5
+],
+[
+"Lidl",
 4
 ],
 [
-"Auchan",
+"Ebro Foods",
+4
+],
+[
+"Netto",
+4
+],
+[
+"Intermarché",
+4
+],
+[
+"Alpina",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Sans marque",
+4
+],
+[
+"Monoprix Bio",
+4
+],
+[
+"Bio Village",
+4
+],
+[
+"Auchan Bio",
+4
+],
+[
+"Pastacorp",
+3
+],
+[
+"Monoprix Exploitation",
+3
+],
+[
+"Alpina Savoie",
+3
+],
+[
+"Valpibio",
+3
+],
+[
+"Pouce",
+3
+],
+[
+"Alce nero",
 3
 ]
 ]
 },
 "Épicerie salée/Pâtes, riz et féculents/Pâtes penne": {
-"n": 28,
-"categorie": "en:penne",
+"n": 619,
+"categorie": "en:penne-rigate",
 "marques": [
 [
-"U",
-7
-],
-[
-"U Bio",
-4
-],
-[
 "Panzani",
-3
+17
+],
+[
+"De Cecco",
+15
+],
+[
+"Combino",
+14
+],
+[
+"Auchan",
+13
+],
+[
+"Casino",
+11
 ],
 [
 "Carrefour",
+11
+],
+[
+"U",
+9
+],
+[
+"Garofalo",
+8
+],
+[
+"Alce nero",
+8
+],
+[
+"Agnesi",
+7
+],
+[
+"Granoro",
+7
+],
+[
+"Lustucru",
+6
+],
+[
+"Monoprix",
+6
+],
+[
+"Turini",
+6
+],
+[
+"Rummo",
+6
+],
+[
+"Seazon",
+6
+],
+[
+"Lidl",
+5
+],
+[
+"Lazzaretti",
+5
+],
+[
+"Delverde",
+5
+],
+[
+"Divella",
+5
+],
+[
+"Montebello",
+5
+],
+[
+"Auchan Bio",
+5
+],
+[
+"Fiorini",
+4
+],
+[
+"Priméal",
+4
+],
+[
+"Carrefour BIO",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Liguori",
+4
+],
+[
+"Iris",
+4
+],
+[
+"Barilla",
+4
+],
+[
+"Pasta Zara",
+4
+],
+[
+"Boni",
+4
+],
+[
+"Intermarché",
+3
+],
+[
+"Alpina Savoie",
+3
+],
+[
+"U Bio",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Bio Village",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"Italpasta",
+3
+],
+[
+"Sgambaro",
+3
+],
+[
+"Le Bio pour Tous",
 3
 ]
 ]
@@ -28591,11 +42357,11 @@
 4
 ],
 [
-"Casino Bio",
+"Casino",
 4
 ],
 [
-"Casino",
+"Casino Bio",
 4
 ],
 [
@@ -28793,34 +42559,319 @@
 ]
 },
 "Épicerie salée/Pâtes, riz et féculents/Pâtes tagliatelles": {
-"n": 14,
-"categorie": "en:egg-tagliatelle",
-"marques": []
-},
-"Épicerie salée/Pâtes, riz et féculents/Pâtes fusilli": {
-"n": 17,
-"categorie": "en:cereal-pastas",
+"n": 749,
+"categorie": "en:tagliatelle",
 "marques": [
 [
+"U",
+16
+],
+[
+"Lazzaretti",
+15
+],
+[
+"Lustucru",
+14
+],
+[
+"Panzani",
+11
+],
+[
+"U Bio",
+11
+],
+[
+"Marque Repère",
+10
+],
+[
+"Pâtes Fabre",
+10
+],
+[
+"Carrefour",
+8
+],
+[
+"La Vie Claire",
+8
+],
+[
+"Les Moulins De Provence",
+8
+],
+[
 "Auchan",
+8
+],
+[
+"Casino",
+7
+],
+[
+"Lustucru selection",
+7
+],
+[
+"Saint Jean",
+7
+],
+[
+"Bio Village",
+7
+],
+[
+"Fleury Michon",
+7
+],
+[
+"Deluxe",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Groupe Casino",
+6
+],
+[
+"Turini",
+6
+],
+[
+"Maison Hermine",
+6
+],
+[
+"Combino",
+5
+],
+[
+"Toque du Chef",
+5
+],
+[
+"Fiorini",
+5
+],
+[
+"Royans",
+5
+],
+[
+"Priméal",
+5
+],
+[
+"Lidl",
+5
+],
+[
+"E.Leclerc",
 4
+],
+[
+"La Cancalaise",
+4
+],
+[
+"Mariella Berro",
+4
+],
+[
+"De Cecco",
+4
+],
+[
+"Barilla",
+4
+],
+[
+"Weight Watchers",
+3
+],
+[
+"Pural",
+3
+],
+[
+"Casino Bio",
+3
+],
+[
+"Netto",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Belle France",
+3
+],
+[
+"DLP (Distribution Leader Price)",
+3
+],
+[
+"Miss Algae",
+3
+]
+]
+},
+"Épicerie salée/Pâtes, riz et féculents/Pâtes fusilli": {
+"n": 444,
+"categorie": "en:durum-wheat-pasta",
+"marques": [
+[
+"De Cecco",
+16
+],
+[
+"Auchan",
+12
+],
+[
+"Carrefour",
+11
+],
+[
+"Combino",
+8
+],
+[
+"La Ferm' Meaux Pâtes",
+8
+],
+[
+"Rummo",
+7
+],
+[
+"Panzani",
+6
+],
+[
+"Italiamo",
+5
+],
+[
+"Garofalo",
+5
+],
+[
+"La Molisana",
+5
+],
+[
+"Les JuJu Pasta",
+5
+],
+[
+"Cora",
+4
+],
+[
+"Lustucru",
+4
+],
+[
+"Coop",
+4
+],
+[
+"Divella",
+4
+],
+[
+"Liguori",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Agnesi",
+3
+],
+[
+"Granoro",
+3
+],
+[
+"La Bio Idea",
+3
+],
+[
+"La Finestra sul Cielo",
+3
+],
+[
+"Barilla",
+3
+],
+[
+"Auchan Bio",
+3
 ]
 ]
 },
 "Épicerie salée/Pâtes, riz et féculents/Pâtes macaroni": {
-"n": 19,
-"categorie": "en:durum-wheat-pasta",
+"n": 257,
+"categorie": "en:durum-wheat-macaroni",
 "marques": [
 [
-"Auchan",
-6
+"Panzani",
+21
 ],
 [
-"Panzani",
+"Lustucru",
+9
+],
+[
+"Priméal",
+9
+],
+[
+"Carrefour",
+9
+],
+[
+"Casino",
+5
+],
+[
+"Combino",
+4
+],
+[
+"Auchan",
 4
 ],
 [
 "U",
+3
+],
+[
+"Cora",
+3
+],
+[
+"La Vie Claire",
+3
+],
+[
+"Kraft",
+3
+],
+[
+"Lidl",
 3
 ]
 ]
@@ -28893,11 +42944,11 @@
 9
 ],
 [
-"U Bio",
+"U",
 4
 ],
 [
-"U",
+"U Bio",
 4
 ],
 [
@@ -29127,11 +43178,11 @@
 3
 ],
 [
-"Auchan Bio",
+"Auchan",
 3
 ],
 [
-"Auchan",
+"Auchan Bio",
 3
 ],
 [
@@ -29403,15 +43454,59 @@
 ]
 },
 "Épicerie salée/Pâtes, riz et féculents/Pâtes farfalle": {
-"n": 22,
-"categorie": "en:durum-wheat-pasta",
+"n": 224,
+"categorie": "fr:farfalles",
 "marques": [
 [
+"Panzani",
+16
+],
+[
+"Lustucru",
+8
+],
+[
+"Casino",
+6
+],
+[
 "Auchan",
+6
+],
+[
+"Combino",
 5
 ],
 [
 "U",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Franprix",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Barilla",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Granoro",
+3
+],
+[
+"La Vie Claire",
 3
 ]
 ]
@@ -29422,22 +43517,158 @@
 "marques": []
 },
 "Épicerie salée/Conserves/Thon en boîte": {
-"n": 16,
+"n": 701,
 "categorie": "en:canned-tunas",
 "marques": [
 [
+"Petit Navire",
+96
+],
+[
+"Saupiquet",
+55
+],
+[
 "U",
+37
+],
+[
+"Carrefour",
+34
+],
+[
+"Connétable",
+26
+],
+[
+"Pêche Océan",
+25
+],
+[
+"Marque Repère",
+22
+],
+[
+"La belle-iloise",
+18
+],
+[
+"Auchan",
+17
+],
+[
+"Casino",
 13
+],
+[
+"Nixe",
+11
+],
+[
+"Leader Price",
+11
+],
+[
+"Pompon rouge",
+10
+],
+[
+"Odyssee",
+10
+],
+[
+"Belle France",
+8
+],
+[
+"Princes",
+8
+],
+[
+"El Manar",
+8
+],
+[
+"Cora",
+7
+],
+[
+"Monoprix",
+6
+],
+[
+"Ribeira",
+6
+],
+[
+"MWBrands/Ets Paul Paulet",
+5
+],
+[
+"Netto",
+5
+],
+[
+"Le Savoureux",
+5
+],
+[
+"Lidl",
+4
+],
+[
+"Phare d'Eckmühl",
+4
+],
+[
+"Rochambeau",
+4
+],
+[
+"Rio Mare",
+4
+],
+[
+"Gastromer",
+3
+],
+[
+"Eco+",
+3
+],
+[
+"Carrefour Classic",
+3
+],
+[
+"Tous les jours",
+3
+],
+[
+"Melis",
+3
+],
+[
+"LA GOULETTE",
+3
+],
+[
+"BK FOOD",
+3
+],
+[
+"Golden Seafood",
+3
 ]
 ]
 },
 "Épicerie salée/Conserves/Sardines": {
-"n": 1321,
+"n": 1450,
 "categorie": "en:sardines-in-olive-oil",
 "marques": [
 [
 "Connétable",
-126
+130
 ],
 [
 "La belle-iloise",
@@ -29445,7 +43676,7 @@
 ],
 [
 "Les Mouettes d'Arvor",
-30
+32
 ],
 [
 "La Perle des Dieux",
@@ -29460,8 +43691,12 @@
 22
 ],
 [
+"Saupiquet",
+21
+],
+[
 "Conserverie Parmentier",
-17
+18
 ],
 [
 "Capitaine cook",
@@ -29469,66 +43704,86 @@
 ],
 [
 "Carrefour",
+14
+],
+[
+"La Pointe de Penmarc'h",
+14
+],
+[
+"Leader Price",
 12
+],
+[
+"Phare d'Eckmühl",
+12
+],
+[
+"Casino",
+11
+],
+[
+"Conserverie Courtin",
+11
 ],
 [
 "Jacques Gonidec",
 11
 ],
 [
-"La Pointe de Penmarc'h",
+"Pêche Océan",
 11
 ],
 [
-"Leader Price",
+"Nixe",
 10
 ],
 [
-"Nixe",
+"U",
 9
 ],
 [
-"Casino",
+"Auchan",
 9
 ],
 [
-"Phare d'Eckmühl",
-9
-],
-[
-"Conserverie Courtin",
-9
-],
-[
-"Pêche Océan",
-9
+"Belle France",
+8
 ],
 [
 "La Quiberonnaise",
 8
 ],
 [
-"Auchan",
-8
-],
-[
 "Monoprix",
-6
+7
 ],
 [
 "La Sablaise",
-6
+7
+],
+[
+"Marque Repère",
+7
 ],
 [
 "Pointe de Penmarc'h",
-6
-],
-[
-"Saupiquet",
-5
+7
 ],
 [
 "Cap Dinec",
+6
+],
+[
+"Agidra",
+6
+],
+[
+"Hyacinthe Parmentier",
+5
+],
+[
+"Rödel",
 5
 ],
 [
@@ -29540,19 +43795,15 @@
 5
 ],
 [
-"Belle France",
-5
-],
-[
 "Conserverie gonidec",
 5
 ],
 [
-"Marque Repère",
+"Capitaine Nat'",
 5
 ],
 [
-"Agidra",
+"La compagnie bretonne du poisson",
 5
 ],
 [
@@ -29560,39 +43811,19 @@
 5
 ],
 [
-"Hyacinthe Parmentier",
+"Lidl",
 4
 ],
 [
-"Rödel",
+"Les Doris",
+4
+],
+[
+"Odyssee",
 4
 ],
 [
 "Ferrigno",
-4
-],
-[
-"U",
-4
-],
-[
-"La Mère Poulard",
-4
-],
-[
-"Comtesse du Barry",
-4
-],
-[
-"La compagnie bretonne du poisson",
-4
-],
-[
-"Comptoir De Belle Ile En Mer",
-4
-],
-[
-"Ramirez",
 4
 ]
 ]
@@ -29929,27 +44160,103 @@
 ]
 },
 "Épicerie salée/Conserves/Concentré de tomate": {
-"n": 81,
-"categorie": "en:tomato-pastes",
+"n": 259,
+"categorie": "en:double-concentrate-tomato-paste",
 "marques": [
 [
+"Carrefour",
+17
+],
+[
+"Auchan",
+16
+],
+[
+"Eco+",
+8
+],
+[
+"U",
+7
+],
+[
+"Pouce",
+7
+],
+[
+"Giaguaro",
+6
+],
+[
+"Petti",
+6
+],
+[
+"Prix Mini",
+6
+],
+[
+"Casino",
+5
+],
+[
+"Bien vu",
+5
+],
+[
+"Victoria",
+5
+],
+[
+"Delicato",
+4
+],
+[
+"Louis Martin",
+4
+],
+[
+"Jardin Bio étic",
+4
+],
+[
 "Mutti",
+4
+],
+[
+"Aicha",
+4
+],
+[
+"Le Phare du Cap Bon",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Florenti",
 3
 ],
 [
-"Danival",
+"Cora",
 3
 ],
 [
-"Rochambeau",
+"Top budget",
 3
 ],
 [
-"Aro",
+"U Bio",
 3
 ],
 [
-"Freshona",
+"Belfiori",
+3
+],
+[
+"Panzani",
 3
 ]
 ]
@@ -30263,12 +44570,168 @@
 ]
 },
 "Épicerie salée/Conserves/Raviolis en boîte": {
-"n": 9,
-"categorie": "en:canned-raviolis",
+"n": 1158,
+"categorie": "en:raviolis",
 "marques": [
 [
+"Zapetti",
+33
+],
+[
+"Panzani",
+33
+],
+[
+"Saint Jean",
+29
+],
+[
+"Giovanni Rana",
+23
+],
+[
 "U",
+22
+],
+[
+"Carrefour",
+21
+],
+[
+"Marque Repère",
+21
+],
+[
+"Rana",
+21
+],
+[
+"Auchan",
+17
+],
+[
+"Casino",
+16
+],
+[
+"Leader Price",
+16
+],
+[
+"Robert Esposito",
+16
+],
+[
+"Danival",
+15
+],
+[
+"Lustucru",
+14
+],
+[
+"Fiorini",
+13
+],
+[
+"Royans",
+12
+],
+[
+"Colomba",
+12
+],
+[
+"Turini",
+11
+],
+[
+"Toque du Chef",
+9
+],
+[
+"Lidl",
+8
+],
+[
+"Cora",
+8
+],
+[
+"La Vie Claire",
+8
+],
+[
+"Cock Brand",
+8
+],
+[
+"Rochambeau",
+8
+],
+[
+"Perrin",
+8
+],
+[
+"Issimo",
+8
+],
+[
+"Auchan Bio",
 7
+],
+[
+"Netto",
+6
+],
+[
+"Milliat Frères",
+6
+],
+[
+"SFPA",
+6
+],
+[
+"Côté Table",
+6
+],
+[
+"Le bonheur est dans le pot",
+6
+],
+[
+"Karine & Jeff",
+6
+],
+[
+"Michelis",
+6
+],
+[
+"Maison Rivière",
+6
+],
+[
+"Casino Bio",
+5
+],
+[
+"Léa Nature",
+5
+],
+[
+"Monoprix Bio",
+5
+],
+[
+"Jardin Bio étic",
+5
+],
+[
+"Maison Bonini",
+5
 ]
 ]
 },
@@ -30564,39 +45027,79 @@
 ]
 },
 "Épicerie salée/Conserves/Anchois": {
-"n": 229,
+"n": 520,
 "categorie": "en:marinated-anchovy-fillets-with-vegetable-oil",
 "marques": [
 [
+"Micéli",
+25
+],
+[
 "La Sablaise",
+21
+],
+[
+"Belmonte",
+15
+],
+[
+"Palais Des Mets",
+14
+],
+[
+"La Monégasque",
 11
+],
+[
+"Delicemer",
+11
+],
+[
+"Carrefour",
+10
 ],
 [
 "Le Grand Lejon",
 10
 ],
 [
-"Palais Des Mets",
+"Casino",
 9
+],
+[
+"Conserveries provencales",
+8
+],
+[
+"Sans marque",
+7
+],
+[
+"Pêche Océan",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"L'Apéro du Poissonnier",
+6
 ],
 [
 "Pêcheries Sétoises",
 6
 ],
 [
-"La Monégasque",
+"Auchan",
+6
+],
+[
+"La Monégasque Vanelli",
 5
 ],
 [
-"Sans marque",
-5
-],
-[
-"Micéli",
-5
-],
-[
-"L'Apéro du Poissonnier",
+"Les Mouettes d'Arvor",
 5
 ],
 [
@@ -30604,19 +45107,39 @@
 5
 ],
 [
-"Carrefour",
-4
-],
-[
-"La Monégasque Vanelli",
-3
+"Ronde des Mers",
+5
 ],
 [
 "La Barre",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Roque",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Lidl",
 3
 ],
 [
-"Les Mouettes d'Arvor",
+"Sol&Mar",
+3
+],
+[
+"Est Friture",
+3
+],
+[
+"Pecheries Basques",
 3
 ],
 [
@@ -30904,11 +45427,11 @@
 3
 ],
 [
-"Jardin Bio étic",
+"Léa Nature",
 3
 ],
 [
-"Léa Nature",
+"Jardin Bio étic",
 3
 ],
 [
@@ -31077,6 +45600,668 @@
 ],
 [
 "Princes",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Filets de maquereaux": {
+"n": 1043,
+"categorie": "en:mackerel-fillets",
+"marques": [
+[
+"Saupiquet",
+96
+],
+[
+"Petit Navire",
+67
+],
+[
+"Carrefour",
+30
+],
+[
+"La belle-iloise",
+29
+],
+[
+"Casino",
+27
+],
+[
+"Pêche Océan",
+22
+],
+[
+"Auchan",
+19
+],
+[
+"U",
+19
+],
+[
+"Marque Repère",
+19
+],
+[
+"Connétable",
+18
+],
+[
+"Odyssee",
+18
+],
+[
+"Phare d'Eckmühl",
+18
+],
+[
+"Le Trésor des Dieux",
+14
+],
+[
+"Leader Price",
+13
+],
+[
+"Capitaine cook",
+12
+],
+[
+"La Perle des Dieux",
+12
+],
+[
+"Nixe",
+11
+],
+[
+"Les Mouettes d'Arvor",
+10
+],
+[
+"Monoprix",
+9
+],
+[
+"Jacques Gonidec",
+9
+],
+[
+"Fjord King",
+8
+],
+[
+"Rochambeau",
+8
+],
+[
+"Les Dieux",
+7
+],
+[
+"Cap Dinec",
+7
+],
+[
+"Cora",
+7
+],
+[
+"Belle France",
+7
+],
+[
+"Herens",
+7
+],
+[
+"Carrefour Extra",
+7
+],
+[
+"Pointe de Penmarc'h",
+7
+],
+[
+"Les Doris",
+6
+],
+[
+"La Vie Claire",
+6
+],
+[
+"Bourgain et Fils",
+6
+],
+[
+"Franprix",
+6
+],
+[
+"Netto",
+5
+],
+[
+"Conserverie Courtin",
+5
+],
+[
+"J.C.David",
+5
+],
+[
+"Capitaine Nat'",
+5
+],
+[
+"La compagnie bretonne du poisson",
+5
+],
+[
+"Aldi",
+4
+],
+[
+"Grand Jury",
+4
+]
+]
+},
+"Épicerie salée/Conserves/Coulis de tomates": {
+"n": 170,
+"categorie": "en:strained-tomatoes",
+"marques": [
+[
+"Heinz",
+13
+],
+[
+"Auchan",
+5
+],
+[
+"Monoprix",
+4
+],
+[
+"Léa Nature",
+4
+],
+[
+"Jardin Bio étic",
+4
+],
+[
+"Alro",
+4
+],
+[
+"Louis Martin",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Grandeur Nature",
+3
+],
+[
+"Cirio",
+3
+],
+[
+"J'aime Boc'oh",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Haricots blancs": {
+"n": 597,
+"categorie": "en:white-beans",
+"marques": [
+[
+"Auchan",
+18
+],
+[
+"Carrefour",
+16
+],
+[
+"U",
+11
+],
+[
+"Notre Jardin",
+11
+],
+[
+"Casino",
+10
+],
+[
+"D'aucy",
+8
+],
+[
+"Monoprix",
+8
+],
+[
+"Saint Eloi",
+8
+],
+[
+"Marque Repère",
+8
+],
+[
+"Leader Price",
+7
+],
+[
+"Biocoop",
+6
+],
+[
+"Sabarot",
+5
+],
+[
+"Netto",
+5
+],
+[
+"Priméal",
+5
+],
+[
+"Rochambeau",
+5
+],
+[
+"Olabe",
+5
+],
+[
+"Freshona",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Royal Bourbon",
+4
+],
+[
+"Carrefour BIO",
+4
+],
+[
+"Les Saveurs du Clavon",
+4
+],
+[
+"Bonduelle",
+4
+],
+[
+"Pouce",
+4
+],
+[
+"Raynal & Roquelaure",
+3
+],
+[
+"Cassegrain",
+3
+],
+[
+"Maingourd",
+3
+],
+[
+"La Vie Claire",
+3
+],
+[
+"Markal",
+3
+],
+[
+"Prosain",
+3
+],
+[
+"M. de Turenne",
+3
+],
+[
+"Monoprix Bio",
+3
+],
+[
+"La Maison Rivière",
+3
+],
+[
+"Bonjour Campagne",
+3
+],
+[
+"Grain de frais",
+3
+],
+[
+"Les Impeccables",
+3
+],
+[
+"Baionade",
+3
+],
+[
+"Spanico",
+3
+],
+[
+"Boni",
+3
+],
+[
+"Zalea",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Macédoine de légumes": {
+"n": 235,
+"categorie": "en:vegetables-macedoines",
+"marques": [
+[
+"Auchan",
+17
+],
+[
+"Carrefour",
+10
+],
+[
+"Marque Repère",
+8
+],
+[
+"Notre Jardin",
+8
+],
+[
+"U",
+7
+],
+[
+"Casino",
+7
+],
+[
+"Saint Eloi",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Tout feu tout frais",
+5
+],
+[
+"Netto",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Qualité Traiteur",
+3
+],
+[
+"Sans marque",
+3
+],
+[
+"Avril",
+3
+],
+[
+"Rochambeau",
+3
+],
+[
+"Mix Buffet",
+3
+],
+[
+"Brédial",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Purée de tomates": {
+"n": 264,
+"categorie": "en:tomato-purees",
+"marques": [
+[
+"Auchan",
+13
+],
+[
+"Carrefour",
+11
+],
+[
+"Turini",
+9
+],
+[
+"Petti",
+7
+],
+[
+"Casino",
+6
+],
+[
+"U",
+6
+],
+[
+"Marque Repère",
+6
+],
+[
+"Salamita",
+6
+],
+[
+"Panzani",
+5
+],
+[
+"Savino",
+5
+],
+[
+"Baresa",
+5
+],
+[
+"Freshona",
+4
+],
+[
+"Victoria",
+4
+],
+[
+"Saclà",
+4
+],
+[
+"Cirio",
+4
+],
+[
+"Conserve Italia",
+4
+],
+[
+"Auchan Bio",
+4
+],
+[
+"Del Monte",
+3
+],
+[
+"Bjorg",
+3
+],
+[
+"Saint Eloi",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Priméal",
+3
+],
+[
+"Jardin Bio",
+3
+],
+[
+"Mutti",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Mogettes": {
+"n": 221,
+"categorie": "fr:mogette-de-vendee",
+"marques": [
+[
+"Gastromer",
+14
+],
+[
+"Nos Régions ont du Talent",
+11
+],
+[
+"Pinson",
+9
+],
+[
+"Olvac",
+9
+],
+[
+"Délices de l'Arceau",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"Parole Gourmande",
+4
+],
+[
+"Reflets de France",
+3
+],
+[
+"Patrimoine Gourmand",
+3
+],
+[
+"Alain Martin",
+3
+],
+[
+"Les Recettes d'Autrefois",
+3
+],
+[
+"Grain de Vitalité",
+3
+]
+]
+},
+"Épicerie salée/Conserves/Cèpes": {
+"n": 196,
+"categorie": "en:mushrooms",
+"marques": [
+[
+"Sabarot",
+11
+],
+[
+"Borde",
+11
+],
+[
+"Carrefour",
+9
+],
+[
+"Magda",
+9
+],
+[
+"Liebig",
+5
+],
+[
+"Bontout",
+5
+],
+[
+"En Cuisine",
+3
+],
+[
+"Pierre Laguilhon",
+3
+],
+[
+"Biraben",
+3
+],
+[
+"Chamsyl",
+3
+],
+[
+"Cook",
 3
 ]
 ]
@@ -32772,7 +47957,7 @@
 ]
 },
 "Épicerie salée/Sauces et condiments/Vinaigrette": {
-"n": 654,
+"n": 899,
 "categorie": "en:vinaigrettes",
 "marques": [
 [
@@ -32780,43 +47965,71 @@
 44
 ],
 [
-"Maille",
-35
-],
-[
 "U",
-20
+37
 ],
 [
-"Rustica",
-20
+"Maille",
+36
 ],
 [
 "Tête Noire",
-18
+28
+],
+[
+"Delouis",
+23
+],
+[
+"Rustica",
+21
+],
+[
+"Carrefour",
+16
 ],
 [
 "Auchan",
-15
+16
 ],
 [
 "Marque Repère",
+16
+],
+[
+"Casino",
 15
+],
+[
+"Kania",
+13
+],
+[
+"Lesieur",
+13
 ],
 [
 "Cora",
 13
 ],
 [
-"Lesieur",
+"Clovis",
 12
 ],
 [
-"Kania",
-10
+"Jean d'Audignac",
+12
 ],
 [
 "Bouton d'or",
+9
+],
+[
+"Leader Price",
+9
+],
+[
+"Franprix",
 9
 ],
 [
@@ -32832,10 +48045,6 @@
 8
 ],
 [
-"Casino",
-8
-],
-[
 "La Tourangelle",
 8
 ],
@@ -32848,11 +48057,19 @@
 8
 ],
 [
+"Monoprix",
+7
+],
+[
+"Shneider's",
+6
+],
+[
 "Belle France",
 6
 ],
 [
-"Carrefour",
+"Marcel Recorbet",
 6
 ],
 [
@@ -32880,11 +48097,15 @@
 5
 ],
 [
+"Delouis France",
+4
+],
+[
 "A L'Olivier",
 4
 ],
 [
-"Monoprix",
+"U Saveurs",
 4
 ],
 [
@@ -32898,38 +48119,6 @@
 [
 "Sweet Chef",
 4
-],
-[
-"Melfor",
-3
-],
-[
-"Delouis",
-3
-],
-[
-"Leader Price",
-3
-],
-[
-"Les Saveurs du Clavon",
-3
-],
-[
-"L'Indispensable",
-3
-],
-[
-"Natura",
-3
-],
-[
-"Borges",
-3
-],
-[
-"nod",
-3
 ]
 ]
 },
@@ -33368,11 +48557,11 @@
 5
 ],
 [
-"Tradco France",
+"Walima",
 4
 ],
 [
-"Walima",
+"Tradco France",
 4
 ],
 [
@@ -33926,25 +49115,405 @@
 "categorie": "en:wine-vinegars",
 "marques": []
 },
+"Épicerie salée/Sauces et condiments/Huile de noix": {
+"n": 414,
+"categorie": "en:walnut-oils",
+"marques": [
+[
+"Vigean",
+18
+],
+[
+"Cauvin",
+11
+],
+[
+"La Tourangelle",
+9
+],
+[
+"Huilerie de Lapalisse",
+8
+],
+[
+"Moulin de la gaumerie",
+6
+],
+[
+"La Vie Claire",
+6
+],
+[
+"Huilerie Richard",
+5
+],
+[
+"U",
+5
+],
+[
+"Guénard",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Emile noel",
+4
+],
+[
+"Huilerie de Neuville",
+4
+],
+[
+"Moulin du Val",
+4
+],
+[
+"Huilerie de Blot",
+4
+],
+[
+"Lesieur",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Huilerie Croix Verte",
+3
+],
+[
+"La Quotidienne",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Bio planete",
+3
+],
+[
+"Huilerie d'Auron",
+3
+],
+[
+"Huilerie Vernoilaise",
+3
+],
+[
+"Moulin de la Veyssière",
+3
+],
+[
+"La Moulinière",
+3
+],
+[
+"U Bio",
+3
+]
+]
+},
+"Épicerie salée/Sauces et condiments/Confit d'oignons": {
+"n": 349,
+"categorie": "en:onion-chutneys",
+"marques": [
+[
+"Lucien Georgelin",
+10
+],
+[
+"La Conquête des Saveurs",
+8
+],
+[
+"Les Recettes de Juliette",
+7
+],
+[
+"Carrefour",
+5
+],
+[
+"L'épicurien",
+5
+],
+[
+"Altesse",
+5
+],
+[
+"Larnaudie",
+4
+],
+[
+"Eric Bur",
+4
+],
+[
+"Les Saveurs de Mamie",
+4
+],
+[
+"Labeyrie",
+3
+],
+[
+"Marius Bernard",
+3
+],
+[
+"Le voyage de mamabe",
+3
+],
+[
+"Jean Martin",
+3
+],
+[
+"Monoprix Gourmet",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Collines en Limousin",
+3
+],
+[
+"La belle-iloise",
+3
+]
+]
+},
+"Épicerie salée/Sauces et condiments/Huile de coco": {
+"n": 411,
+"categorie": "en:coconut-oils",
+"marques": [
+[
+"Bio planete",
+12
+],
+[
+"Emile noel",
+9
+],
+[
+"Huilerie de Lapalisse",
+8
+],
+[
+"Jardin Bio",
+8
+],
+[
+"Vigean",
+7
+],
+[
+"Léa Nature",
+7
+],
+[
+"La maison du coco",
+7
+],
+[
+"La Fourche",
+6
+],
+[
+"La Tourangelle",
+5
+],
+[
+"Simplement Bon Et Bio",
+4
+],
+[
+"Lapalisse",
+4
+],
+[
+"La Vie Claire",
+4
+],
+[
+"Jardin Bio étic",
+4
+],
+[
+"Comptoirs & Compagnies",
+4
+],
+[
+"Carrefour BIO",
+4
+],
+[
+"Vita d'Or",
+4
+],
+[
+"Coconut Merchant",
+3
+],
+[
+"U Bio",
+3
+],
+[
+"Bio Village",
+3
+],
+[
+"1.2.3 Bio",
+3
+],
+[
+"Ethiquable",
+3
+],
+[
+"Comptoirs et compagnies",
+3
+],
+[
+"La Bio & Moi",
+3
+],
+[
+"Ethicolibri",
+3
+],
+[
+"Vaïvaï",
+3
+],
+[
+"Vitaquell",
+3
+],
+[
+"Priméal",
+3
+],
+[
+"Le Bio pour Tous",
+3
+],
+[
+"Carrefour",
+3
+],
+[
+"Greenweez",
+3
+]
+]
+},
+"Épicerie salée/Sauces et condiments/Sauce au poivre": {
+"n": 234,
+"categorie": "en:pepper-sauces",
+"marques": [
+[
+"U",
+8
+],
+[
+"Bénédicta",
+8
+],
+[
+"Rustica",
+8
+],
+[
+"Auchan",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Casino",
+6
+],
+[
+"Knorr",
+5
+],
+[
+"Carrefour",
+4
+],
+[
+"Bouton d'or",
+4
+],
+[
+"Christian Potier",
+4
+],
+[
+"Colona",
+4
+],
+[
+"Nawhal's",
+4
+],
+[
+"Cora",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Saint Christophe",
+3
+],
+[
+"Heinz",
+3
+],
+[
+"Netto",
+3
+]
+]
+},
 "Épicerie salée/Sel, épices et aides culinaires/Sel": {
-"n": 1442,
+"n": 1625,
 "categorie": "en:sea-salts",
 "marques": [
 [
 "La Baleine",
-58
+62
 ],
 [
 "Le Guérandais",
-27
+37
 ],
 [
 "Cérébos",
-22
+24
 ],
 [
 "Le Natursel",
-22
+23
 ],
 [
 "Savor & Sens Tradition",
@@ -33959,15 +49528,19 @@
 10
 ],
 [
+"Nos Régions ont du Talent",
+10
+],
+[
 "Artisans du sel",
 10
 ],
 [
 "Carrefour",
-8
+9
 ],
 [
-"Nos Régions ont du Talent",
+"Le Saunier De Camargue",
 8
 ],
 [
@@ -33979,6 +49552,10 @@
 8
 ],
 [
+"Portland",
+7
+],
+[
 "Eric Bur",
 7
 ],
@@ -33987,11 +49564,19 @@
 7
 ],
 [
+"Leader Price",
+7
+],
+[
 "Ty-Gwenn",
 7
 ],
 [
-"Portland",
+"Tradysel",
+7
+],
+[
+"Saveurs de nos Régions",
 6
 ],
 [
@@ -33999,7 +49584,15 @@
 6
 ],
 [
-"Leader Price",
+"Les Sauniers de l'Île de Ré",
+6
+],
+[
+"Terroir",
+6
+],
+[
+"Auchan",
 6
 ],
 [
@@ -34007,11 +49600,7 @@
 6
 ],
 [
-"Saveurs de nos Régions",
-5
-],
-[
-"Le Saunier De Camargue",
+"Soléou",
 5
 ],
 [
@@ -34019,7 +49608,7 @@
 5
 ],
 [
-"Tradysel",
+"U",
 5
 ],
 [
@@ -34027,8 +49616,16 @@
 5
 ],
 [
+"Rivesaline",
+5
+],
+[
 "La Trinitaine",
 5
+],
+[
+"U de nos Régions",
+4
 ],
 [
 "Quai Sud",
@@ -34039,55 +49636,27 @@
 4
 ],
 [
-"Rivesaline",
-4
-],
-[
 "La compagnie des épices",
 4
 ],
 [
-"Les Sauniers de l'Île de Ré",
+"Kania",
 3
 ],
 [
-"U",
+"ChanteSel",
 3
 ],
 [
-"Danival",
+"Pays Gourmand",
 3
 ],
 [
-"Sel Marin Île De Noirmoutier",
+"Itinéraire des Saveurs",
 3
 ],
 [
-"Oliviers & Co",
-3
-],
-[
-"Provence d'Antan",
-3
-],
-[
-"Auchan",
-3
-],
-[
-"Terroir",
-3
-],
-[
-"Delhaize",
-3
-],
-[
-"Grand Fermage",
-3
-],
-[
-"Sainte Lucie",
+"Franprix",
 3
 ]
 ]
@@ -34149,11 +49718,11 @@
 9
 ],
 [
-"ETHNOSCIENCE",
+"Ecoidées",
 9
 ],
 [
-"Ecoidées",
+"ETHNOSCIENCE",
 9
 ],
 [
@@ -34471,11 +50040,11 @@
 3
 ],
 [
-"ETHNOSCIENCE",
+"Ecoidées",
 3
 ],
 [
-"Ecoidées",
+"ETHNOSCIENCE",
 3
 ],
 [
@@ -34759,11 +50328,11 @@
 4
 ],
 [
-"Cook",
+"Arcadie",
 4
 ],
 [
-"Arcadie",
+"Cook",
 4
 ],
 [
@@ -34955,11 +50524,11 @@
 3
 ],
 [
-"ETHNOSCIENCE",
+"Ecoidées",
 3
 ],
 [
-"Ecoidées",
+"ETHNOSCIENCE",
 3
 ],
 [
@@ -35205,16 +50774,68 @@
 ]
 },
 "Épicerie salée/Soupes et plats préparés/Soupe en brique": {
-"n": 46,
-"categorie": "en:cream-of-vegetable-soups",
+"n": 339,
+"categorie": "en:vegetable-soups",
 "marques": [
 [
 "U",
-45
+63
+],
+[
+"Knorr",
+15
+],
+[
+"Liebig",
+14
 ],
 [
 "U Bio",
-9
+14
+],
+[
+"La Vie Claire",
+8
+],
+[
+"Ferme d'Anchin",
+8
+],
+[
+"Dietbon",
+7
+],
+[
+"Danival",
+5
+],
+[
+"Giraudet",
+4
+],
+[
+"Maggi",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Karine & Jeff",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"Parole Gourmande",
+3
+],
+[
+"Naturalia",
+3
 ]
 ]
 },
@@ -35879,6 +51500,464 @@
 ]
 ]
 },
+"Épicerie salée/Soupes et plats préparés/Velouté de légumes": {
+"n": 469,
+"categorie": "en:cream-of-vegetable-soups",
+"marques": [
+[
+"Liebig",
+65
+],
+[
+"Knorr",
+24
+],
+[
+"La Potagère",
+21
+],
+[
+"Carrefour",
+13
+],
+[
+"Auchan",
+13
+],
+[
+"Casino",
+12
+],
+[
+"U",
+12
+],
+[
+"Leader Price",
+12
+],
+[
+"Créaline",
+10
+],
+[
+"Franprix",
+9
+],
+[
+"Biocoop",
+9
+],
+[
+"Saint Eloi",
+8
+],
+[
+"Marque Repère",
+8
+],
+[
+"Les Printanières",
+7
+],
+[
+"Priméal",
+7
+],
+[
+"Cora",
+7
+],
+[
+"CARREFOUR FRANCE",
+7
+],
+[
+"Régal Soupe",
+6
+],
+[
+"Bio Village",
+6
+],
+[
+"Jardin Bio étic",
+5
+],
+[
+"Casino Bio",
+5
+],
+[
+"Grandeur Nature",
+5
+],
+[
+"Green Shoot",
+5
+],
+[
+"Agidra",
+5
+],
+[
+"Toque du Chef",
+4
+],
+[
+"Soup'idéale",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Moment gourmand",
+4
+],
+[
+"Carrefour BIO",
+4
+],
+[
+"Auchan Bio",
+4
+],
+[
+"Royco",
+3
+],
+[
+"Grand Jury",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Léa Nature",
+3
+],
+[
+"Maggi",
+3
+],
+[
+"Thiriet",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Tripes": {
+"n": 344,
+"categorie": "en:specialty-made-with-tripe",
+"marques": [
+[
+"Tripes Paillard",
+17
+],
+[
+"Bigard",
+10
+],
+[
+"Leader Price",
+8
+],
+[
+"Sans marque",
+7
+],
+[
+"Jean Rozé",
+6
+],
+[
+"Paul & Louise",
+6
+],
+[
+"Paillard",
+5
+],
+[
+"Sébire",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Férial",
+4
+],
+[
+"Saveurs des mauges",
+3
+],
+[
+"Saveur d'Auge",
+3
+],
+[
+"Nos Régions ont du Talent",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Gazpacho": {
+"n": 304,
+"categorie": "en:gazpacho",
+"marques": [
+[
+"Alvalle",
+62
+],
+[
+"Créaline",
+14
+],
+[
+"Liebig",
+12
+],
+[
+"innocent",
+8
+],
+[
+"U",
+5
+],
+[
+"Chef Select",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"U Bio",
+4
+],
+[
+"Pepsico",
+4
+],
+[
+"Florette",
+4
+],
+[
+"Pierre Martinet",
+3
+],
+[
+"Montperal",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Naturaplan",
+3
+],
+[
+"Ferrer",
+3
+],
+[
+"Bio Sabor",
+3
+],
+[
+"Dia",
+3
+],
+[
+"Maison Wurfel",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Petit salé aux lentilles": {
+"n": 152,
+"categorie": "en:salt-cured-pork-belly-with-lentils",
+"marques": [
+[
+"Larnaudie",
+13
+],
+[
+"Carrefour",
+8
+],
+[
+"Maison Rivière",
+6
+],
+[
+"William Saurin",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Auchan",
+5
+],
+[
+"Raynal et Roquelaure",
+4
+],
+[
+"La Belle Chaurienne",
+4
+],
+[
+"Monique ranou",
+4
+],
+[
+"U",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Fleury Michon",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Toque du Chef",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Tajine": {
+"n": 133,
+"categorie": "en:chicken-tajine",
+"marques": [
+[
+"Fleury Michon",
+5
+],
+[
+"Picard",
+4
+],
+[
+"Thiriet",
+3
+],
+[
+"Seazon",
+3
+],
+[
+"Lechef",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Coq au vin": {
+"n": 134,
+"categorie": "en:cockerel-in-red-wine-sauce",
+"marques": [
+[
+"Larnaudie",
+8
+],
+[
+"La Belle Chaurienne",
+6
+],
+[
+"Les Bories",
+5
+],
+[
+"U",
+4
+],
+[
+"Jean Larnaudie",
+3
+],
+[
+"Les Chaumes d'Allias",
+3
+],
+[
+"Valette",
+3
+],
+[
+"Biraben",
+3
+],
+[
+"Les Légendaires",
+3
+]
+]
+},
+"Épicerie salée/Soupes et plats préparés/Bisque de homard": {
+"n": 155,
+"categorie": "en:lobster-bisque",
+"marques": [
+[
+"Liebig",
+12
+],
+[
+"La belle-iloise",
+8
+],
+[
+"U",
+6
+],
+[
+"Deluxe",
+4
+],
+[
+"Conserverie Courtin",
+4
+],
+[
+"Continental Foods",
+3
+],
+[
+"Les Pêcheurs des Calanques",
+3
+],
+[
+"Gastromer",
+3
+],
+[
+"Carrefour",
+3
+]
+]
+},
 "Bio, vrac et terroir/Diététique et bio/Galettes de riz": {
 "n": 496,
 "categorie": "en:puffed-rice-cakes",
@@ -36499,11 +52578,11 @@
 4
 ],
 [
-"Marque Repère",
+"Edulcorel",
 3
 ],
 [
-"Edulcorel",
+"Marque Repère",
 3
 ],
 [
@@ -36526,6 +52605,94 @@
 ],
 [
 "Arthur et Marguerite",
+3
+]
+]
+},
+"Bio, vrac et terroir/Diététique et bio/Spiruline": {
+"n": 492,
+"categorie": "en:spirulina",
+"marques": [
+[
+"Gourmet Spiruline",
+16
+],
+[
+"Flamant vert",
+9
+],
+[
+"Dietaroma",
+4
+],
+[
+"Nat & Form",
+4
+],
+[
+"Akal Food",
+4
+],
+[
+"Marinoë",
+3
+],
+[
+"Iswari",
+3
+],
+[
+"Rue Des Plantes",
+3
+]
+]
+},
+"Bio, vrac et terroir/Diététique et bio/Barres protéinées": {
+"n": 245,
+"categorie": "en:protein-bars",
+"marques": [
+[
+"Eafit",
+7
+],
+[
+"Nutripure",
+4
+],
+[
+"Sync",
+4
+],
+[
+"H3RO",
+4
+],
+[
+"Fulfil",
+4
+],
+[
+"Vit'All +",
+3
+],
+[
+"Jimini's",
+3
+],
+[
+"Joyfuel",
+3
+],
+[
+"Papa Chiche",
+3
+],
+[
+"Fitclem",
+3
+],
+[
+"NXT Level",
 3
 ]
 ]
@@ -37206,35 +53373,91 @@
 ]
 },
 "Apéritif/Chips et biscuits apéritif/Popcorn": {
-"n": 388,
+"n": 961,
 "categorie": "en:popcorn",
 "marques": [
 [
 "Hema",
-8
+19
 ],
 [
 "Jimmy's",
-8
-],
-[
-"U",
-5
+16
 ],
 [
 "Menguy's",
-5
+13
 ],
 [
 "Movies Pop",
+10
+],
+[
+"Tokapi",
+7
+],
+[
+"Netto",
+6
+],
+[
+"U",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Togolo",
+6
+],
+[
+"Bouton d'or",
 5
+],
+[
+"Belle France",
+5
+],
+[
+"Marque Repère",
+5
+],
+[
+"Easypop",
+5
+],
+[
+"McEnnedy",
+4
+],
+[
+"Serebis",
+4
 ],
 [
 "M Classic",
 4
 ],
 [
-"Easypop",
+"Fizzy",
+4
+],
+[
+"Sibell",
+4
+],
+[
+"Rigopop",
+4
+],
+[
+"Deluxe",
+4
+],
+[
+"Zweifel",
 4
 ],
 [
@@ -37246,15 +53469,47 @@
 3
 ],
 [
-"McEnnedy",
+"Trader Joe's",
 3
 ],
 [
-"Belle France",
+"Bénénuts",
 3
 ],
 [
-"Deluxe",
+"The Popcorn Factory",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Leader Price",
+3
+],
+[
+"Stenger",
+3
+],
+[
+"Maître Prunille",
+3
+],
+[
+"Family Chips",
+3
+],
+[
+"Auchan",
+3
+],
+[
+"Pop Mania",
 3
 ],
 [
@@ -37262,11 +53517,23 @@
 3
 ],
 [
-"Zweifel",
+"Zweifel Popcorn",
 3
 ],
 [
-"PAPApéro !",
+"BEDO",
+3
+],
+[
+"Olive & Marius",
+3
+],
+[
+"Meray",
+3
+],
+[
+"Chupa Chups",
 3
 ]
 ]
@@ -37476,6 +53743,235 @@
 ],
 [
 "Auchan",
+3
+]
+]
+},
+"Apéritif/Chips et biscuits apéritif/Tartinade apéritive": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Apéritif/Chips et biscuits apéritif/Grissini": {
+"n": 442,
+"categorie": "en:breadsticks",
+"marques": [
+[
+"Florelli",
+19
+],
+[
+"Mario Fongo",
+13
+],
+[
+"Orazio il Grissinaio",
+11
+],
+[
+"Lema",
+11
+],
+[
+"GrissinBon",
+10
+],
+[
+"Artesani",
+9
+],
+[
+"La Buona Terra",
+9
+],
+[
+"Panealba",
+9
+],
+[
+"La Fattoria delle cose buone",
+9
+],
+[
+"Ciro",
+8
+],
+[
+"Granforno",
+7
+],
+[
+"Brusa",
+7
+],
+[
+"Buon Piemontesi",
+7
+],
+[
+"De Mori",
+7
+],
+[
+"Les Saveurs du Clavon",
+6
+],
+[
+"Italiamo",
+5
+],
+[
+"Carrefour",
+5
+],
+[
+"Ital Passion",
+5
+],
+[
+"Roberto",
+5
+],
+[
+"Michelis",
+5
+],
+[
+"Locanda La Posta",
+5
+],
+[
+"Stiratini",
+4
+],
+[
+"VitaVigor",
+4
+],
+[
+"Derby",
+4
+],
+[
+"Valledoro",
+4
+],
+[
+"Sarandrea",
+4
+],
+[
+"Krini",
+3
+],
+[
+"L'Épicerie d'Italie",
+3
+],
+[
+"Gustosi",
+3
+],
+[
+"Qualità Gourmet",
+3
+],
+[
+"Qualitalia",
+3
+],
+[
+"Casa Rinaldi",
+3
+],
+[
+"Tre Mulini",
+3
+],
+[
+"Eurospin",
+3
+],
+[
+"Uniongriss",
+3
+],
+[
+"TD Grissini",
+3
+],
+[
+"Gunz",
+3
+],
+[
+"Selex",
+3
+],
+[
+"BUONO!",
+3
+]
+]
+},
+"Apéritif/Chips et biscuits apéritif/Taralli": {
+"n": 200,
+"categorie": "en:taralli",
+"marques": [
+[
+"Terre di Puglia",
+12
+],
+[
+"La Spiga",
+10
+],
+[
+"Fiore di Puglia",
+8
+],
+[
+"Danieli",
+7
+],
+[
+"Tarall'Oro",
+6
+],
+[
+"Il Grano d'Oro",
+6
+],
+[
+"Lekkerland",
+3
+],
+[
+"Crai",
+3
+],
+[
+"Casa Rinaldi",
+3
+],
+[
+"Apulia Food",
+3
+],
+[
+"DANIÉ",
+3
+],
+[
+"Dolce Bontà",
+3
+],
+[
+"Puglia Sapori",
+3
+],
+[
+"Tesori d'Apulia",
 3
 ]
 ]
@@ -37758,7 +54254,7 @@
 "marques": []
 },
 "Apéritif/Fruits secs salés et olives/Mélange apéritif": {
-"n": 175,
+"n": 174,
 "categorie": "en:dried-mixed-fruits",
 "marques": [
 [
@@ -38623,6 +55119,70 @@
 "categorie": "en:teriyaki-sauces",
 "marques": []
 },
+"Cuisine du monde/Asie/Gyozas": {
+"n": 217,
+"categorie": "en:gyoza",
+"marques": [
+[
+"Ajinomoto",
+17
+],
+[
+"Bibigo",
+12
+],
+[
+"Picard",
+4
+],
+[
+"Mei Asia",
+4
+],
+[
+"Lidl",
+4
+],
+[
+"Vitasia",
+4
+],
+[
+"Viči",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Coquelicot Provence",
+3
+],
+[
+"Yomia",
+3
+]
+]
+},
+"Cuisine du monde/Asie/Rouleaux de printemps": {
+"n": 76,
+"categorie": "en:spring-rolls",
+"marques": [
+[
+"Sushi Shop",
+5
+],
+[
+"Agis",
+4
+],
+[
+"Wasabi",
+3
+]
+]
+},
 "Cuisine du monde/Mexique et Amérique/Tortillas": {
 "n": 517,
 "categorie": "en:flatbreads",
@@ -38648,11 +55208,11 @@
 6
 ],
 [
-"El Tequito",
+"Grafschafter",
 5
 ],
 [
-"Grafschafter",
+"El Tequito",
 5
 ],
 [
@@ -38870,19 +55430,23 @@
 ]
 },
 "Cuisine du monde/Mexique et Amérique/Sirop d'érable": {
-"n": 446,
+"n": 549,
 "categorie": "en:maple-syrups",
 "marques": [
 [
 "Maple Joe",
-14
+19
 ],
 [
 "Turkey Hill",
-9
+13
 ],
 [
 "Délices Erable & Cie",
+7
+],
+[
+"Irrésistibles",
 7
 ],
 [
@@ -38898,7 +55462,19 @@
 5
 ],
 [
-"Irrésistibles",
+"McEnnedy",
+5
+],
+[
+"Shady Maple Farms",
+4
+],
+[
+"The Maple Treat",
+4
+],
+[
+"Selection",
 4
 ],
 [
@@ -38906,15 +55482,27 @@
 4
 ],
 [
+"Decacer",
+4
+],
+[
+"Maple Farm",
+4
+],
+[
 "Carrefour",
 4
+],
+[
+"Spring Tree",
+3
 ],
 [
 "Bernard",
 3
 ],
 [
-"Decacer",
+"Jakeman's",
 3
 ],
 [
@@ -39386,6 +55974,56 @@
 "n": 9,
 "categorie": "en:pasta-stuffed-with-vegetables",
 "marques": []
+},
+"Cuisine du monde/Italie/Bruschetta": {
+"n": 288,
+"categorie": "en:plant-based-foods-and-beverages",
+"marques": [
+[
+"U",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Leclerc",
+3
+],
+[
+"Les Saveurs du Clavon",
+3
+],
+[
+"Polli",
+3
+],
+[
+"Di Vita",
+3
+],
+[
+"Montalbano",
+3
+],
+[
+"Bottoli",
+3
+],
+[
+"Il Piccolo Pane",
+3
+],
+[
+"Zuccato",
+3
+],
+[
+"E.Leclerc",
+3
+]
+]
 },
 "Cuisine du monde/Espagne/Riz pour paella": {
 "n": 16,
@@ -40016,7 +56654,7 @@
 ]
 },
 "Petit-déjeuner/Café/Café en grains": {
-"n": 451,
+"n": 490,
 "categorie": "en:coffee-beans",
 "marques": [
 [
@@ -40040,15 +56678,15 @@
 9
 ],
 [
+"Naturela",
+9
+],
+[
 "Lavazza",
 9
 ],
 [
 "U Saveurs",
-8
-],
-[
-"Naturela",
 8
 ],
 [
@@ -40084,6 +56722,10 @@
 5
 ],
 [
+"Gilbert",
+5
+],
+[
 "Sati",
 4
 ],
@@ -40092,15 +56734,19 @@
 4
 ],
 [
+"Destination",
+4
+],
+[
 "Cafés Dagobert",
 4
 ],
 [
-"Folliet",
+"Segafredo",
 4
 ],
 [
-"Gilbert",
+"Folliet",
 4
 ],
 [
@@ -40117,14 +56763,6 @@
 ],
 [
 "Plantation",
-3
-],
-[
-"Destination",
-3
-],
-[
-"Segafredo",
 3
 ],
 [
@@ -40337,44 +56975,138 @@
 "categorie": "en:coffee-filters",
 "marques": []
 },
+"Petit-déjeuner/Café/Cappuccino": {
+"n": 317,
+"categorie": "en:instant-coffees",
+"marques": [
+[
+"Carrefour",
+18
+],
+[
+"Nescafé",
+16
+],
+[
+"Maxwell House",
+15
+],
+[
+"Plantation",
+11
+],
+[
+"Bellarom",
+9
+],
+[
+"U",
+9
+],
+[
+"Marque Repère",
+9
+],
+[
+"Auchan",
+6
+],
+[
+"Summa",
+5
+],
+[
+"Cora",
+5
+],
+[
+"Krüger",
+5
+],
+[
+"Mokate",
+5
+],
+[
+"Lidl",
+4
+],
+[
+"Casino",
+4
+],
+[
+"Senseo",
+4
+],
+[
+"Douwe Egberts",
+4
+],
+[
+"Jacobs",
+4
+],
+[
+"Carte Noire",
+4
+],
+[
+"Ristora",
+4
+],
+[
+"Melitta",
+3
+]
+]
+},
 "Petit-déjeuner/Thé et chocolat en poudre/Thé": {
-"n": 3070,
+"n": 3228,
 "categorie": "en:teas",
 "marques": [
 [
 "Palais des Thés",
-257
+268
 ],
 [
 "Kusmi Tea",
-64
+76
 ],
 [
 "Mariage Frères",
-61
+65
 ],
 [
 "Dammann Frères",
-49
+52
 ],
 [
 "Lipton",
-48
+49
+],
+[
+"Twinings",
+43
 ],
 [
 "Quai Sud",
 35
 ],
 [
-"Twinings",
-32
+"Compagnie Coloniale",
+29
 ],
 [
 "MYPROTEIN",
 29
 ],
 [
-"Compagnie Coloniale",
+"Terre d'Oc",
+26
+],
+[
+"Whittard",
 25
 ],
 [
@@ -40382,27 +57114,23 @@
 24
 ],
 [
-"Terre d'Oc",
+"Les Jardins de Gaïa",
 24
 ],
 [
-"Les Jardins de Gaïa",
+"La Route des Comptoirs",
 22
 ],
 [
-"La Route des Comptoirs",
-17
+"Thés de la Pagode",
+16
 ],
 [
 "Comptoir français du Thé",
 16
 ],
 [
-"Whittard",
-16
-],
-[
-"Thés de la Pagode",
+"Carrefour",
 15
 ],
 [
@@ -40414,15 +57142,19 @@
 13
 ],
 [
-"Carrefour",
+"Destination",
 13
 ],
 [
 "Pagès",
-11
+12
 ],
 [
-"Destination",
+"Tetley",
+12
+],
+[
+"Marks & Spencer",
 11
 ],
 [
@@ -40438,11 +57170,11 @@
 10
 ],
 [
-"Tetley",
-10
+"Casino",
+9
 ],
 [
-"Casino",
+"Cotterley",
 9
 ],
 [
@@ -40454,7 +57186,7 @@
 9
 ],
 [
-"Léa Nature",
+"Fauchon",
 9
 ],
 [
@@ -40462,8 +57194,16 @@
 9
 ],
 [
-"Cotterley",
-8
+"Le Comptoir de Mathilde",
+9
+],
+[
+"Fortnum & Mason",
+9
+],
+[
+"Le palais des thés",
+9
 ],
 [
 "Leader Price",
@@ -40474,32 +57214,16 @@
 8
 ],
 [
-"Fauchon",
+"Léa Nature",
 8
 ],
 [
-"Le Comptoir de Mathilde",
-8
-],
-[
-"Le palais des thés",
+"Clipper",
 8
 ],
 [
 "Bibal",
 8
-],
-[
-"Touch Organic",
-7
-],
-[
-"Fitvia",
-7
-],
-[
-"Clipper",
-7
 ]
 ]
 },
@@ -41266,11 +57990,11 @@
 3
 ],
 [
-"Auchan Bio",
+"Auchan",
 3
 ],
 [
-"Auchan",
+"Auchan Bio",
 3
 ],
 [
@@ -41302,6 +58026,50 @@
 "n": 5,
 "categorie": "en:herbal-teas",
 "marques": []
+},
+"Petit-déjeuner/Thé et chocolat en poudre/Thé matcha": {
+"n": 104,
+"categorie": "en:teas",
+"marques": [
+[
+"Touch Organic",
+3
+],
+[
+"Pukka",
+3
+]
+]
+},
+"Petit-déjeuner/Thé et chocolat en poudre/Maté": {
+"n": 198,
+"categorie": "en:herbal-teas",
+"marques": [
+[
+"Palais des Thés",
+13
+],
+[
+"Sol à Sol",
+5
+],
+[
+"Les Jardins de Gaïa",
+3
+],
+[
+"Bad Heilbrunner",
+3
+],
+[
+"ChariTea",
+3
+],
+[
+"La Route des Comptoirs",
+3
+]
+]
 },
 "Petit-déjeuner/Céréales/Céréales": {
 "n": 630,
@@ -41590,11 +58358,11 @@
 9
 ],
 [
-"Jardin Bio étic",
+"Léa Nature",
 9
 ],
 [
-"Léa Nature",
+"Jardin Bio étic",
 9
 ],
 [
@@ -41704,11 +58472,11 @@
 3
 ],
 [
-"auguste bloch",
+"Bloch",
 3
 ],
 [
-"Bloch",
+"auguste bloch",
 3
 ],
 [
@@ -41903,11 +58671,11 @@
 5
 ],
 [
-"Supernature",
+"Catherine Kluger",
 5
 ],
 [
-"Catherine Kluger",
+"Supernature",
 5
 ],
 [
@@ -42103,6 +58871,84 @@
 [
 "Kellogg's",
 8
+]
+]
+},
+"Petit-déjeuner/Céréales/Porridge": {
+"n": 231,
+"categorie": "en:porridge",
+"marques": [
+[
+"Mymuesli",
+13
+],
+[
+"Verival",
+9
+],
+[
+"Grillon d'Or",
+6
+],
+[
+"Stoats",
+6
+],
+[
+"OneDayMore",
+6
+],
+[
+"Marks & Spencer",
+5
+],
+[
+"Turtle",
+5
+],
+[
+"U",
+3
+],
+[
+"Davert",
+3
+],
+[
+"Foodspring",
+3
+],
+[
+"Rude health",
+3
+],
+[
+"Lima",
+3
+],
+[
+"Coop",
+3
+],
+[
+"Ruf",
+3
+],
+[
+"Dukan",
+3
+],
+[
+"Gerlinéa",
+3
+],
+[
+"Yabon",
+3
+],
+[
+"Activia",
+3
 ]
 ]
 },
@@ -42569,44 +59415,146 @@
 ]
 ]
 },
+"Petit-déjeuner/Biscottes et tartines/Petits pains grillés": {
+"n": 229,
+"categorie": "en:toasted-bread-rolls",
+"marques": [
+[
+"U",
+20
+],
+[
+"Maître Jean Pierre",
+16
+],
+[
+"Marque Repère",
+12
+],
+[
+"Epi d'Or",
+12
+],
+[
+"Chabrior",
+10
+],
+[
+"Leader Price",
+9
+],
+[
+"Carrefour",
+9
+],
+[
+"Auchan",
+9
+],
+[
+"Lidl",
+8
+],
+[
+"Borsa",
+7
+],
+[
+"Netto",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Belle France",
+4
+],
+[
+"Le Moulin du Pivert",
+4
+],
+[
+"Carrefour BIO",
+4
+],
+[
+"Bio Village",
+4
+],
+[
+"Super U",
+4
+],
+[
+"Casino",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Franprix",
+3
+],
+[
+"Rochambeau",
+3
+],
+[
+"Auchan Bio",
+3
+],
+[
+"Mannapain",
+3
+]
+]
+},
 "Petit-déjeuner/Confitures et pâtes à tartiner/Confiture de fraises": {
-"n": 1339,
+"n": 1700,
 "categorie": "en:strawberry-jams",
 "marques": [
 [
 "Bonne Maman",
-42
+43
 ],
 [
 "U",
-23
+32
+],
+[
+"Charles Antona",
+20
 ],
 [
 "Lucien Georgelin",
-15
+17
+],
+[
+"Carrefour",
+14
+],
+[
+"Côteaux Nantais",
+14
 ],
 [
 "Mocitos",
 14
 ],
 [
-"Carrefour",
+"Andros",
 13
 ],
 [
-"Andros",
-12
-],
-[
-"Côteaux Nantais",
-12
-],
-[
-"Charles Antona",
-12
-],
-[
 "Casino",
+11
+],
+[
+"U Bio",
 11
 ],
 [
@@ -42614,16 +59562,40 @@
 11
 ],
 [
+"Biolo'Klock",
+11
+],
+[
+"Eric Bur",
+10
+],
+[
+"Maison Jougla",
+10
+],
+[
+"Auchan",
+10
+],
+[
 "Leader Price",
 9
 ],
 [
-"Biolo'Klock",
+"Beyer",
 9
 ],
 [
-"Auchan",
+"Favols",
 9
+],
+[
+"Domaine de Baudry",
+9
+],
+[
+"Maribel",
+8
 ],
 [
 "Le Bois Jumel",
@@ -42634,16 +59606,8 @@
 8
 ],
 [
-"Maison Jougla",
+"Materne",
 8
-],
-[
-"Maribel",
-7
-],
-[
-"Eric Bur",
-7
 ],
 [
 "Paquito",
@@ -42655,6 +59619,10 @@
 ],
 [
 "Monoprix",
+7
+],
+[
+"Matin des Pyrénées",
 7
 ],
 [
@@ -42674,31 +59642,27 @@
 6
 ],
 [
-"U Bio",
-6
-],
-[
 "Vergers des Alpilles",
 6
 ],
 [
-"Beyer",
+"Confit de Provence",
 6
 ],
 [
-"Matin des Pyrénées",
+"Alain Milliat",
 6
 ],
 [
-"Favols",
+"Naturalia",
+6
+],
+[
+"La Roumanière",
 6
 ],
 [
 "Les Confitures de Haute Soule",
-6
-],
-[
-"Materne",
 6
 ],
 [
@@ -42711,26 +59675,6 @@
 ],
 [
 "Albert Ménès",
-5
-],
-[
-"Intermarché",
-5
-],
-[
-"Cora",
-5
-],
-[
-"Belle France",
-5
-],
-[
-"La Vie Claire",
-5
-],
-[
-"Pure Via",
 5
 ]
 ]
@@ -43116,11 +60060,11 @@
 3
 ],
 [
-"Monoprix",
+"Monoprix Gourmet",
 3
 ],
 [
-"Monoprix Gourmet",
+"Monoprix",
 3
 ],
 [
@@ -43130,23 +60074,115 @@
 ]
 },
 "Petit-déjeuner/Confitures et pâtes à tartiner/Beurre de cacahuète": {
-"n": 190,
-"categorie": "en:nut-butters",
+"n": 882,
+"categorie": "en:peanut-butters",
 "marques": [
 [
-"Go Nuts",
-8
-],
-[
-"Ethiquable",
-7
+"Prozis",
+27
 ],
 [
 "Skippy",
-5
+18
+],
+[
+"Go Nuts",
+16
 ],
 [
 "Whole Earth",
+15
+],
+[
+"Reese's",
+14
+],
+[
+"Ethiquable",
+13
+],
+[
+"MYPROTEIN",
+13
+],
+[
+"Calvé",
+13
+],
+[
+"Nu3",
+10
+],
+[
+"Menguy's",
+10
+],
+[
+"Trader Joe's",
+9
+],
+[
+"McEnnedy",
+7
+],
+[
+"Rapunzel",
+7
+],
+[
+"Lidl",
+6
+],
+[
+"Kernel King",
+6
+],
+[
+"Maribel",
+6
+],
+[
+"Dakatine",
+5
+],
+[
+"Crown",
+4
+],
+[
+"Hershey's",
+4
+],
+[
+"Mamie Bio",
+4
+],
+[
+"KoRo",
+4
+],
+[
+"Duerr's",
+4
+],
+[
+"Olimp",
+4
+],
+[
+"Bega",
+4
+],
+[
+"Weider",
+4
+],
+[
+"BiotechUSA",
+4
+],
+[
+"Mandy",
 4
 ],
 [
@@ -43154,19 +60190,51 @@
 4
 ],
 [
-"Dakatine",
+"M&M's",
 3
 ],
 [
-"Nu3",
+"Peter Pan",
 3
 ],
 [
-"Menguy's",
+"Jif",
 3
 ],
 [
-"Mandy",
+"Kind",
+3
+],
+[
+"Shneider's",
+3
+],
+[
+"Alter Eco",
+3
+],
+[
+"Biona Organic",
+3
+],
+[
+"Urtekram",
+3
+],
+[
+"JUMBO",
+3
+],
+[
+"Body&fit",
+3
+],
+[
+"Women's Best",
+3
+],
+[
+"Kraft",
 3
 ]
 ]
@@ -43494,11 +60562,11 @@
 3
 ],
 [
-"Vergers des Alpilles",
+"Confit de Provence",
 3
 ],
 [
-"Confit de Provence",
+"Vergers des Alpilles",
 3
 ],
 [
@@ -44212,6 +61280,114 @@
 ],
 [
 "Nutella b-ready",
+3
+]
+]
+},
+"Petit-déjeuner/Confitures et pâtes à tartiner/Marmelade": {
+"n": 280,
+"categorie": "en:orange-jams",
+"marques": [
+[
+"Albert Ménès",
+11
+],
+[
+"Bonne Maman",
+7
+],
+[
+"U",
+6
+],
+[
+"Casino",
+5
+],
+[
+"Alain Milliat",
+5
+],
+[
+"Leader Price",
+4
+],
+[
+"Prosain",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Eric Bur",
+3
+],
+[
+"Paquito",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Helios",
+3
+]
+]
+},
+"Petit-déjeuner/Confitures et pâtes à tartiner/Confiture de lait": {
+"n": 239,
+"categorie": "en:milk-jams",
+"marques": [
+[
+"Confiture de lait",
+26
+],
+[
+"Le Bois Jumel",
+17
+],
+[
+"Raffolé",
+10
+],
+[
+"André Guépratte",
+6
+],
+[
+"Au Faisan Doré",
+6
+],
+[
+"La Ferme de L'Isle",
+5
+],
+[
+"Rians",
+4
+],
+[
+"Les Comtes de Provence",
+4
+],
+[
+"Lait douceur de Normandie",
+4
+],
+[
+"Lucien Georgelin",
+3
+],
+[
+"SoChèvre",
 3
 ]
 ]
@@ -45026,36 +62202,36 @@
 ]
 },
 "Biscuits et sucré/Biscuits et gâteaux/Sablés": {
-"n": 2484,
+"n": 2685,
 "categorie": "en:shortbread-cookies",
 "marques": [
 [
 "Biscuiterie de l abbaye",
-53
+55
+],
+[
+"La Sablésienne",
+47
 ],
 [
 "St Michel",
-45
+46
 ],
 [
 "La Mère Poulard",
 39
 ],
 [
-"La Sablésienne",
-37
+"U",
+34
 ],
 [
-"U",
-32
+"La Vie Claire",
+28
 ],
 [
 "Fossier",
 28
-],
-[
-"La Vie Claire",
-23
 ],
 [
 "Le Croquant Chattois",
@@ -45063,6 +62239,18 @@
 ],
 [
 "Bonne Maman",
+20
+],
+[
+"Goulibeur",
+20
+],
+[
+"Marque Repère",
+20
+],
+[
+"Gerblé",
 19
 ],
 [
@@ -45070,23 +62258,11 @@
 18
 ],
 [
-"Marque Repère",
-18
-],
-[
-"Gerblé",
-17
-],
-[
 "Casino",
 17
 ],
 [
 "Bisson",
-17
-],
-[
-"Goulibeur",
 17
 ],
 [
@@ -45103,26 +62279,38 @@
 ],
 [
 "Auchan",
-14
+16
+],
+[
+"Bonneterre",
+15
+],
+[
+"Bio Soleil",
+15
+],
+[
+"Michel et Augustin",
+15
 ],
 [
 "Leader Price",
-13
+14
 ],
 [
 "Les Petits Cagniotes",
 13
 ],
 [
+"L'Atelier St Michel",
+12
+],
+[
 "Belle France",
 12
 ],
 [
-"Bonneterre",
-12
-],
-[
-"L'Atelier St Michel",
+"Bjorg",
 11
 ],
 [
@@ -45131,10 +62319,6 @@
 ],
 [
 "Pleniday",
-11
-],
-[
-"Bio Soleil",
 11
 ],
 [
@@ -45151,6 +62335,10 @@
 ],
 [
 "Mercier",
+10
+],
+[
+"Filet Bleu",
 10
 ],
 [
@@ -45174,20 +62362,8 @@
 9
 ],
 [
-"Filet Bleu",
+"La Bien Nommée",
 9
-],
-[
-"Céréal Bio",
-8
-],
-[
-"Bjorg",
-8
-],
-[
-"DV SAS",
-8
 ]
 ]
 },
@@ -45418,11 +62594,11 @@
 3
 ],
 [
-"Auchan Bio",
+"Auchan",
 3
 ],
 [
-"Auchan",
+"Auchan Bio",
 3
 ],
 [
@@ -45448,31 +62624,135 @@
 ]
 },
 "Biscuits et sucré/Biscuits et gâteaux/Galettes bretonnes": {
-"n": 209,
-"categorie": "en:shortbread-cookies-from-brittany",
+"n": 621,
+"categorie": "en:shortbread-cookies",
 "marques": [
 [
 "La Trinitaine",
+25
+],
+[
+"Beurlay",
+10
+],
+[
+"DV SAS",
+10
+],
+[
+"Delaunay Léveillé",
+8
+],
+[
+"Ker Cadélac",
+8
+],
+[
+"Le Guillou",
+8
+],
+[
+"P'tit Déli",
+8
+],
+[
+"Ty Délice",
+8
+],
+[
+"Les Recettes de Marcel",
+8
+],
+[
+"Kergrist",
+7
+],
+[
+"Carrefour",
+7
+],
+[
+"Leader Price",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Joubard",
 6
 ],
 [
 "Sondey",
-4
+6
 ],
 [
-"Ker Cadélac",
-3
+"Casino",
+5
 ],
 [
-"Ty Délice",
-3
-],
-[
-"P'tit Déli",
-3
+"Chabrior",
+5
 ],
 [
 "Maison Le Goff",
+5
+],
+[
+"La Mère Poulard",
+4
+],
+[
+"Bonne Maman",
+4
+],
+[
+"St Michel",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"U",
+4
+],
+[
+"Belle France",
+4
+],
+[
+"Saveurs de nos Régions",
+3
+],
+[
+"Reflets de France",
+3
+],
+[
+"Cora",
+3
+],
+[
+"Patisseries gourmandes",
+3
+],
+[
+"Carrefour BIO",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Les Delices De Josephine",
+3
+],
+[
+"Biscuiterie Brieuc",
 3
 ]
 ]
@@ -45750,11 +63030,11 @@
 3
 ],
 [
-"Chabrior",
+"Intermarché",
 3
 ],
 [
-"Intermarché",
+"Chabrior",
 3
 ],
 [
@@ -46088,6 +63368,819 @@
 "n": 2,
 "categorie": "en:biscuit-with-a-dark-chocolate-bar-covering",
 "marques": []
+},
+"Biscuits et sucré/Biscuits et gâteaux/Croquants aux amandes": {
+"n": 140,
+"categorie": "en:almond-cookies",
+"marques": []
+},
+"Biscuits et sucré/Biscuits et gâteaux/Brownies": {
+"n": 567,
+"categorie": "en:brownies",
+"marques": [
+[
+"St Michel",
+27
+],
+[
+"Brossard",
+14
+],
+[
+"E.Leclerc",
+13
+],
+[
+"Carrefour",
+11
+],
+[
+"Leclerc",
+10
+],
+[
+"Auchan",
+8
+],
+[
+"Casino",
+6
+],
+[
+"Forchy",
+6
+],
+[
+"U",
+5
+],
+[
+"Franprix",
+5
+],
+[
+"P'tit Déli",
+5
+],
+[
+"Prozis",
+5
+],
+[
+"Cora",
+4
+],
+[
+"Leader Price",
+4
+],
+[
+"Marque Repère",
+4
+],
+[
+"Chabrior",
+3
+],
+[
+"Whaou!",
+3
+],
+[
+"Forchy patissier",
+3
+],
+[
+"Rochambeau",
+3
+],
+[
+"Lili's Brownies",
+3
+],
+[
+"The Protein Works",
+3
+],
+[
+"Delhaize",
+3
+],
+[
+"LU",
+3
+],
+[
+"Granola",
+3
+],
+[
+"Matatie",
+3
+],
+[
+"Dr. Oetker",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Gaufrettes": {
+"n": 467,
+"categorie": "en:stuffed-wafers",
+"marques": [
+[
+"Trésors Gourmands",
+15
+],
+[
+"Marque Repère",
+14
+],
+[
+"P'tit Déli",
+12
+],
+[
+"Casino",
+9
+],
+[
+"Eugène Blond",
+9
+],
+[
+"Auchan",
+9
+],
+[
+"Leader Price",
+8
+],
+[
+"Sondey",
+7
+],
+[
+"Cora",
+7
+],
+[
+"Netto",
+6
+],
+[
+"U",
+6
+],
+[
+"Pural",
+5
+],
+[
+"Monoprix",
+5
+],
+[
+"Chabrior",
+5
+],
+[
+"CARREFOUR FRANCE",
+5
+],
+[
+"Belle France",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Jours Heureux",
+4
+],
+[
+"Biscuiterie eugene blond",
+4
+],
+[
+"LU",
+4
+],
+[
+"Helwa",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"Doucelune",
+3
+],
+[
+"Biscuiterie Védère",
+3
+],
+[
+"Bisson",
+3
+],
+[
+"Magnolia",
+3
+],
+[
+"Saïda",
+3
+],
+[
+"Nestlé",
+3
+],
+[
+"Crich",
+3
+],
+[
+"De rit",
+3
+],
+[
+"LINGOT",
+3
+],
+[
+"Canderel",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Tuiles aux amandes": {
+"n": 79,
+"categorie": "fr:tuile-aux-amandes",
+"marques": [
+[
+"Réauté Chocolat",
+3
+],
+[
+"Louvat",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Canistrelli": {
+"n": 410,
+"categorie": "en:canistrelli",
+"marques": [
+[
+"Afa Biscuiterie",
+20
+],
+[
+"Biscuiterie d'Afa",
+16
+],
+[
+"Charles Antona",
+9
+],
+[
+"Tamburini",
+6
+],
+[
+"Biscuiterie Maniccia",
+6
+],
+[
+"Le Père Gatounet",
+5
+],
+[
+"Jean-Paul Vincensini et fils",
+5
+],
+[
+"Afa",
+4
+],
+[
+"I Biscuttini Corsi",
+4
+],
+[
+"Biscuiterie Cherchi",
+4
+],
+[
+"La Belle Boulange",
+4
+],
+[
+"Huilerie Richard",
+3
+],
+[
+"Biscuiterie Afa",
+3
+],
+[
+"Maniccia",
+3
+],
+[
+"Castellane",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Palets bretons": {
+"n": 198,
+"categorie": "fr:palets",
+"marques": [
+[
+"Maison Le Goff",
+6
+],
+[
+"Marque Repère",
+4
+],
+[
+"P'tit Déli",
+4
+],
+[
+"Ty Délice",
+4
+],
+[
+"Cora",
+3
+],
+[
+"La Bien Nommée",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Moelleux au chocolat": {
+"n": 358,
+"categorie": "en:molten-chocolate-cakes",
+"marques": [
+[
+"E.Leclerc",
+11
+],
+[
+"Mistral",
+7
+],
+[
+"Tartefrais",
+7
+],
+[
+"Le Ster",
+6
+],
+[
+"Leader Price",
+6
+],
+[
+"Picard",
+6
+],
+[
+"Carrefour",
+6
+],
+[
+"Leclerc",
+5
+],
+[
+"Gerblé",
+5
+],
+[
+"Marie Morin",
+5
+],
+[
+"Alsa",
+5
+],
+[
+"Bijou",
+5
+],
+[
+"Auchan",
+4
+],
+[
+"Casino",
+3
+],
+[
+"Ker Cadélac",
+3
+],
+[
+"Marque Repère",
+3
+],
+[
+"Fossier",
+3
+],
+[
+"Dessert Factory",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Hafner",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Financiers": {
+"n": 325,
+"categorie": "en:financiers",
+"marques": [
+[
+"Baramel",
+13
+],
+[
+"Bonne Maman",
+9
+],
+[
+"Biscuiterie Jeannette",
+7
+],
+[
+"Astruc Pâtisserie",
+6
+],
+[
+"Louvat",
+6
+],
+[
+"Maison Cotte",
+6
+],
+[
+"Maison Taillefer",
+5
+],
+[
+"Bijou",
+5
+],
+[
+"Le Guillou",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Bonneterre",
+4
+],
+[
+"Carrefour",
+4
+],
+[
+"E.Leclerc",
+3
+],
+[
+"Jours Heureux",
+3
+],
+[
+"Maison Colibri",
+3
+],
+[
+"Sondey",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Nonnettes": {
+"n": 274,
+"categorie": "fr:nonnettes",
+"marques": [
+[
+"Mulot & Petitjean",
+38
+],
+[
+"Culture Miel",
+15
+],
+[
+"Miels Villeneuve",
+13
+],
+[
+"Famille Mary",
+8
+],
+[
+"Apidis",
+7
+],
+[
+"Auger",
+7
+],
+[
+"Painsol",
+6
+],
+[
+"Finabeil",
+6
+],
+[
+"Le Manoir des Abeilles",
+5
+],
+[
+"L'Abeille Délicieuse",
+5
+],
+[
+"La Vie Claire",
+4
+],
+[
+"L'Abeille Royale",
+4
+],
+[
+"Fortwenger",
+3
+],
+[
+"Fossier",
+3
+],
+[
+"Parole Gourmande",
+3
+],
+[
+"Maison Peltier",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Navettes": {
+"n": 257,
+"categorie": "en:biscuits",
+"marques": [
+[
+"Castellane",
+9
+],
+[
+"Les Délices des 7 Vallées",
+7
+],
+[
+"La Fournée Dorée",
+5
+],
+[
+"Biscuiterie de provence",
+4
+],
+[
+"La Roumanière",
+4
+],
+[
+"La Cure Gourmande",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Biscuiterie de la Sainte Victoire",
+3
+],
+[
+"Les Comtes de Provence",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Gâteau breton": {
+"n": 265,
+"categorie": "en:breton-cakes",
+"marques": [
+[
+"Le Guillou",
+9
+],
+[
+"Berrou",
+9
+],
+[
+"Louis Le Goff",
+8
+],
+[
+"Le Floch",
+6
+],
+[
+"La Quimperloise",
+6
+],
+[
+"Terre et Soleil",
+5
+],
+[
+"Biscuit d'Ys",
+5
+],
+[
+"Ty Délice",
+5
+],
+[
+"La Ronde Bretonne",
+5
+],
+[
+"Brieuc",
+4
+],
+[
+"Tremven",
+4
+],
+[
+"Crêperie Colas",
+4
+],
+[
+"Catel-Roc",
+4
+],
+[
+"Crêperie Lohéac",
+4
+],
+[
+"Biscuiterie Brieuc",
+3
+],
+[
+"La Trinitaine",
+3
+],
+[
+"Pat'Fondines",
+3
+],
+[
+"La Bien Nommée",
+3
+],
+[
+"Marin Coathalem",
+3
+],
+[
+"Graine d'enVie",
+3
+],
+[
+"Crêperie Le Masson",
+3
+],
+[
+"Maison Le Goff",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Fondant au chocolat": {
+"n": 240,
+"categorie": "en:chocolate-cakes",
+"marques": [
+[
+"Alsa",
+8
+],
+[
+"Carrefour",
+7
+],
+[
+"Bonne Maman",
+6
+],
+[
+"Casino",
+4
+],
+[
+"Cora",
+4
+],
+[
+"Franprix",
+4
+],
+[
+"Picard",
+4
+],
+[
+"Monoprix",
+4
+],
+[
+"Auchan",
+4
+],
+[
+"Rians",
+3
+],
+[
+"Marie",
+3
+],
+[
+"U",
+3
+],
+[
+"Marie Morin",
+3
+],
+[
+"Envia",
+3
+]
+]
+},
+"Biscuits et sucré/Biscuits et gâteaux/Mini muffins": {
+"n": 213,
+"categorie": "en:muffins",
+"marques": [
+[
+"Les Délices des 7 Vallées",
+18
+],
+[
+"Celiane",
+4
+],
+[
+"Milka",
+3
+],
+[
+"Biothentic",
+3
+],
+[
+"Montes Lara",
+3
+],
+[
+"Prozis",
+3
+]
+]
 },
 "Biscuits et sucré/Chocolat et confiserie/Tablette de chocolat noir": {
 "n": 259,
@@ -46809,38 +64902,50 @@
 5
 ],
 [
-"Confiséo",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Confiséo",
 4
 ]
 ]
 },
 "Biscuits et sucré/Chocolat et confiserie/Guimauves": {
-"n": 918,
+"n": 1116,
 "categorie": "en:marshmallows",
 "marques": [
 [
+"Hema",
+14
+],
+[
 "Les Gourmandises De Sophie",
-11
+12
 ],
 [
 "Le Comptoir de Mathilde",
 9
 ],
 [
-"Little Extra",
-7
+"Fini",
+8
 ],
 [
-"Hema",
+"Truffettes De France",
+8
+],
+[
+"Little Extra",
 7
 ],
 [
 "Maison Taillefer",
 7
+],
+[
+"Carrefour",
+6
 ],
 [
 "Auzier Chabernac",
@@ -46852,10 +64957,6 @@
 ],
 [
 "DV SAS",
-5
-],
-[
-"Truffettes De France",
 5
 ],
 [
@@ -46875,11 +64976,19 @@
 4
 ],
 [
+"BBQ",
+4
+],
+[
 "Sucralys",
 4
 ],
 [
 "La Grande Epicerie de Paris",
+3
+],
+[
+"Monoprix",
 3
 ],
 [
@@ -47189,23 +65298,95 @@
 ]
 },
 "Biscuits et sucré/Chocolat et confiserie/Truffes au chocolat": {
-"n": 85,
+"n": 542,
 "categorie": "en:chocolate-truffles",
 "marques": [
 [
+"Mathez",
+114
+],
+[
+"Truffettes De France",
+28
+],
+[
+"Guyaux",
+17
+],
+[
+"Chocolat Mathez",
+14
+],
+[
+"Favorina",
+13
+],
+[
+"Cémoi",
+8
+],
+[
+"Carrefour",
+8
+],
+[
+"Jacquot",
+7
+],
+[
 "Vendome",
 6
+],
+[
+"Esprit de Fête",
+5
+],
+[
+"U",
+4
+],
+[
+"Auteuil",
+4
+],
+[
+"Chevaliers d'Argouges",
+4
+],
+[
+"Chocmod",
+4
+],
+[
+"La Vie Claire",
+4
+],
+[
+"Esprit Gourmet",
+4
 ],
 [
 "Nestlé",
 4
 ],
 [
-"U",
+"Ikalia",
 3
 ],
 [
-"Ikalia",
+"Palais D'Ébène",
+3
+],
+[
+"Lidl",
+3
+],
+[
+"Gourmet Finest Cuisine",
+3
+],
+[
+"Aldi",
 3
 ]
 ]
@@ -47317,11 +65498,11 @@
 3
 ],
 [
-"Nos Régions ont du Talent",
+"Leclerc",
 3
 ],
 [
-"Leclerc",
+"Nos Régions ont du Talent",
 3
 ],
 [
@@ -47505,15 +65686,19 @@
 ]
 },
 "Biscuits et sucré/Chocolat et confiserie/Nougat de Montélimar": {
-"n": 214,
+"n": 378,
 "categorie": "en:nougats-from-montelimar",
 "marques": [
 [
 "Chabert & Guillot",
-10
+13
 ],
 [
 "Arnaud Soubeyran",
+10
+],
+[
+"Le Chaudron d'Or",
 10
 ],
 [
@@ -47521,11 +65706,11 @@
 9
 ],
 [
-"Le Chaudron d'Or",
-7
+"Suprem'Nougat",
+6
 ],
 [
-"Suprem'Nougat",
+"Les Trois Abeilles",
 5
 ],
 [
@@ -47545,15 +65730,15 @@
 3
 ],
 [
-"Les Trois Abeilles",
-3
-],
-[
 "U",
 3
 ],
 [
 "Motta",
+3
+],
+[
+"Aitana",
 3
 ]
 ]
@@ -47637,6 +65822,774 @@
 ],
 [
 "Monbana",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Chocolat noir": {
+"n": 3267,
+"categorie": "en:dark-chocolates",
+"marques": [
+[
+"U",
+101
+],
+[
+"Bovetti",
+76
+],
+[
+"Lindt",
+47
+],
+[
+"Saveurs & Nature",
+44
+],
+[
+"Côte d'Or",
+44
+],
+[
+"Le Comptoir de Mathilde",
+40
+],
+[
+"Ethiquable",
+39
+],
+[
+"Moulin des Moines",
+38
+],
+[
+"Nestlé",
+36
+],
+[
+"Bonneterre",
+36
+],
+[
+"Chocolaterie Castelain",
+32
+],
+[
+"Monbana",
+31
+],
+[
+"Kaoka",
+31
+],
+[
+"Leader Price",
+30
+],
+[
+"Casino",
+29
+],
+[
+"Cémoi",
+26
+],
+[
+"Terra Etica",
+26
+],
+[
+"Poulain",
+25
+],
+[
+"Marque Repère",
+25
+],
+[
+"Cora",
+23
+],
+[
+"Alter Eco",
+22
+],
+[
+"Carré Suisse",
+22
+],
+[
+"Dolfin",
+22
+],
+[
+"U Bio",
+21
+],
+[
+"Weiss",
+21
+],
+[
+"Mascarin",
+20
+],
+[
+"Monoprix",
+19
+],
+[
+"Valrhona",
+19
+],
+[
+"La Vie Claire",
+17
+],
+[
+"Ikalia",
+17
+],
+[
+"Tablette d'Or",
+17
+],
+[
+"Le Chocolat des Français",
+17
+],
+[
+"J.D. Gross",
+16
+],
+[
+"Carrefour",
+16
+],
+[
+"Le Clos de l'Arche",
+16
+],
+[
+"Biocoop",
+16
+],
+[
+"Klaus",
+15
+],
+[
+"Chapon",
+15
+],
+[
+"Artisans du Monde",
+15
+],
+[
+"Léa Nature",
+15
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Chocolat au lait": {
+"n": 2041,
+"categorie": "en:milk-chocolates",
+"marques": [
+[
+"U",
+75
+],
+[
+"Bovetti",
+40
+],
+[
+"Hema",
+38
+],
+[
+"Le Comptoir de Mathilde",
+36
+],
+[
+"Lindt",
+35
+],
+[
+"Milka",
+27
+],
+[
+"Monbana",
+26
+],
+[
+"Marque Repère",
+26
+],
+[
+"Cora",
+24
+],
+[
+"Leader Price",
+24
+],
+[
+"Carrefour",
+23
+],
+[
+"Ethiquable",
+22
+],
+[
+"Villars",
+21
+],
+[
+"Nestlé",
+18
+],
+[
+"Tablette d'Or",
+18
+],
+[
+"Côte d'Or",
+18
+],
+[
+"Monoprix",
+17
+],
+[
+"Cémoi",
+16
+],
+[
+"Chevaliers d'Argouges",
+15
+],
+[
+"Chocolaterie Castelain",
+15
+],
+[
+"Weiss",
+15
+],
+[
+"Casino",
+14
+],
+[
+"Maison Taillefer",
+14
+],
+[
+"Saveurs & Nature",
+14
+],
+[
+"Le Chocolat des Français",
+14
+],
+[
+"Dolfin",
+14
+],
+[
+"Jacquot",
+13
+],
+[
+"Carré Suisse",
+13
+],
+[
+"Lindt & Sprüngli",
+12
+],
+[
+"U Bio",
+12
+],
+[
+"Daniel Stoffel",
+12
+],
+[
+"La Vie Claire",
+11
+],
+[
+"La Cure Gourmande",
+11
+],
+[
+"Lidl",
+10
+],
+[
+"Poulain",
+10
+],
+[
+"Coop",
+10
+],
+[
+"Terra Etica",
+9
+],
+[
+"Orset",
+9
+],
+[
+"Cailler",
+9
+],
+[
+"Fin Carré",
+8
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Pralines": {
+"n": 547,
+"categorie": "en:cocoa-and-its-products",
+"marques": [
+[
+"Lindt",
+13
+],
+[
+"Côte d'Or",
+12
+],
+[
+"Frey",
+10
+],
+[
+"Comptoir du Cacao",
+9
+],
+[
+"Tresors De Chefs",
+8
+],
+[
+"Milka",
+8
+],
+[
+"Favorina",
+6
+],
+[
+"Le Comptoir de Mathilde",
+6
+],
+[
+"Monbana",
+5
+],
+[
+"Vendome",
+5
+],
+[
+"Witor's",
+5
+],
+[
+"Isaura",
+4
+],
+[
+"Nestlé",
+4
+],
+[
+"Aldi",
+4
+],
+[
+"Cacao Barry",
+3
+],
+[
+"Cémoi",
+3
+],
+[
+"Maison Guinguet",
+3
+],
+[
+"Hamlet",
+3
+],
+[
+"Galler",
+3
+],
+[
+"Maitre Truffout",
+3
+],
+[
+"Tentation Cacao",
+3
+],
+[
+"Lidl",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Dragées": {
+"n": 543,
+"categorie": "en:dragees",
+"marques": [
+[
+"Medicis",
+27
+],
+[
+"Jeff de Bruges",
+26
+],
+[
+"Confiserie Adam",
+22
+],
+[
+"Motta",
+7
+],
+[
+"Crispo",
+7
+],
+[
+"Cémoi",
+6
+],
+[
+"Reynaud",
+5
+],
+[
+"Alain Ducasse",
+5
+],
+[
+"regence",
+3
+],
+[
+"Hollywood",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Calissons": {
+"n": 214,
+"categorie": "en:calissons-d-aix",
+"marques": [
+[
+"Le Roy René",
+37
+],
+[
+"Confiserie du Roy René",
+16
+],
+[
+"Confiserie d'Entrecasteaux",
+12
+],
+[
+"Léonard Parli",
+9
+],
+[
+"Fruidoraix",
+7
+],
+[
+"L'Ami Provençal",
+7
+],
+[
+"Roy René",
+6
+],
+[
+"Maurel",
+5
+],
+[
+"Du Roy René",
+3
+],
+[
+"Calissons du Roy René",
+3
+],
+[
+"Brémond Fils",
+3
+],
+[
+"Calissoun",
+3
+],
+[
+"La Cure Gourmande",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Papillotes": {
+"n": 258,
+"categorie": "fr:papillotes-en-chocolat",
+"marques": [
+[
+"Révillon",
+62
+],
+[
+"Maggi",
+19
+],
+[
+"Révillon Chocolatier",
+10
+],
+[
+"Carrefour",
+10
+],
+[
+"L'assiette Bleue",
+8
+],
+[
+"Favorina",
+6
+],
+[
+"Cémoi",
+6
+],
+[
+"Vendome",
+6
+],
+[
+"Jacquot",
+5
+],
+[
+"Knorr",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Chocolaterie du Forez",
+3
+],
+[
+"Trocadero",
+3
+],
+[
+"Esprit de Fête",
+3
+],
+[
+"Equador",
+3
+],
+[
+"Beaumesnil",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Oursons guimauve": {
+"n": 112,
+"categorie": "en:marshmallows-coated-with-chocolate",
+"marques": [
+[
+"Cémoi",
+5
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Marrons glacés": {
+"n": 263,
+"categorie": "en:marrons-glaces",
+"marques": [
+[
+"Motta",
+21
+],
+[
+"Sabaton",
+17
+],
+[
+"L'artisan Provençal",
+17
+],
+[
+"Clément Faugier",
+13
+],
+[
+"Douceurs Provençales",
+7
+],
+[
+"Frutignac",
+6
+],
+[
+"Nestlé",
+6
+],
+[
+"U",
+5
+],
+[
+"Confiserie Azuréenne",
+5
+],
+[
+"Favorina",
+4
+],
+[
+"Baby Délice",
+4
+],
+[
+"Vendome",
+4
+],
+[
+"Italcanditi",
+4
+],
+[
+"Cuevas",
+4
+],
+[
+"Carrefour",
+3
+],
+[
+"Auteuil",
+3
+],
+[
+"Cruzilles",
+3
+],
+[
+"La Grande Epicerie de Paris",
+3
+],
+[
+"Lindt & Sprüngli",
+3
+],
+[
+"Raffael",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Mendiants": {
+"n": 200,
+"categorie": "en:chocolates",
+"marques": [
+[
+"Mercier",
+8
+],
+[
+"U",
+7
+],
+[
+"Le Comptoir de Mathilde",
+7
+],
+[
+"U Saveurs",
+6
+],
+[
+"Le Chocolatier Sablais",
+5
+],
+[
+"Chevaliers d'Argouges",
+4
+],
+[
+"Alain Ducasse",
+4
+],
+[
+"Favorina",
+3
+],
+[
+"Antton",
+3
+]
+]
+},
+"Biscuits et sucré/Chocolat et confiserie/Berlingots": {
+"n": 199,
+"categorie": "en:candies",
+"marques": [
+[
+"Pinson",
+18
+],
+[
+"Hema",
+4
+],
+[
+"Lucien Georgelin",
+3
+],
+[
+"Ty-Gwenn",
+3
+],
+[
+"DV SAS",
+3
+],
+[
+"So Shape",
 3
 ]
 ]
@@ -48474,13 +67427,203 @@
 "categorie": "en:cocoa-powders",
 "marques": []
 },
-"Biscuits et sucré/Compotes et fruits au sirop/Compote en gourdes": {
-"n": 19,
-"categorie": "en:compotes-to-drink",
+"Biscuits et sucré/Sucre, farine et pâtisserie/Colorant alimentaire": {
+"n": 210,
+"categorie": "en:food-colorings",
 "marques": [
 [
-"Marque Repère",
+"Scrapcooking",
+19
+],
+[
+"Sainte Lucie",
+8
+],
+[
+"Déco-Relief",
+6
+],
+[
+"Alice Délice",
+4
+],
+[
+"Vahiné",
 3
+],
+[
+"Walima",
+3
+],
+[
+"Framboiselle",
+3
+]
+]
+},
+"Biscuits et sucré/Compotes et fruits au sirop/Compote en gourdes": {
+"n": 2159,
+"categorie": "en:apple-compotes",
+"marques": [
+[
+"Andros",
+127
+],
+[
+"Côteaux Nantais",
+81
+],
+[
+"Charles & Alice",
+80
+],
+[
+"U",
+66
+],
+[
+"Materne",
+53
+],
+[
+"Casino",
+45
+],
+[
+"Lucien Georgelin",
+45
+],
+[
+"Marque Repère",
+41
+],
+[
+"U Bio",
+41
+],
+[
+"La Vie Claire",
+41
+],
+[
+"Leader Price",
+36
+],
+[
+"Planet Bio",
+32
+],
+[
+"Vergers Gourmands",
+31
+],
+[
+"Biocoop",
+29
+],
+[
+"Cora",
+26
+],
+[
+"Carrefour",
+26
+],
+[
+"Casino Bio",
+25
+],
+[
+"Franprix",
+25
+],
+[
+"Danival",
+24
+],
+[
+"Douceur du Verger",
+23
+],
+[
+"St Mamet",
+23
+],
+[
+"Bio Village",
+23
+],
+[
+"Lidl",
+22
+],
+[
+"Monoprix",
+21
+],
+[
+"Auchan",
+21
+],
+[
+"Valade",
+19
+],
+[
+"Paquito",
+18
+],
+[
+"Charles et Alice",
+16
+],
+[
+"Prosain",
+15
+],
+[
+"Carrefour BIO",
+15
+],
+[
+"Belle France",
+14
+],
+[
+"Ethiquable",
+14
+],
+[
+"Auchan Bio",
+14
+],
+[
+"Les Vergers de Cousancelles",
+13
+],
+[
+"POM'POTES",
+12
+],
+[
+"Blédina",
+12
+],
+[
+"Thomas Le Prince",
+12
+],
+[
+"Freshona",
+11
+],
+[
+"La Fourche",
+11
+],
+[
+"Babybio",
+10
 ]
 ]
 },
@@ -48753,6 +67896,76 @@
 ]
 ]
 },
+"Biscuits et sucré/Compotes et fruits au sirop/Salade de fruits": {
+"n": 339,
+"categorie": "en:fruit-salads",
+"marques": [
+[
+"E.Leclerc",
+8
+],
+[
+"L'atelier des fruits et légumes",
+7
+],
+[
+"Florette",
+6
+],
+[
+"Cora",
+4
+],
+[
+"Bharlev",
+4
+],
+[
+"St Mamet",
+4
+],
+[
+"La Fraîcherie",
+3
+],
+[
+"Grand Frais",
+3
+],
+[
+"Picard",
+3
+],
+[
+"Thiriet",
+3
+],
+[
+"Starbucks",
+3
+],
+[
+"Fruity Pack",
+3
+],
+[
+"Voie verte",
+3
+],
+[
+"Metro",
+3
+],
+[
+"Metro Chef",
+3
+],
+[
+"Royal Bourbon",
+3
+]
+]
+},
 "Surgelés/Légumes surgelés/Petits pois surgelés": {
 "n": 10,
 "categorie": "en:frozen-green-peas",
@@ -48947,6 +68160,20 @@
 "categorie": "en:frozen-duchesse-potatoes",
 "marques": []
 },
+"Surgelés/Légumes surgelés/Galettes de pommes de terre": {
+"n": 100,
+"categorie": "en:cereals-and-potatoes",
+"marques": [
+[
+"Thiriet",
+6
+],
+[
+"Produits de la Cigogne",
+3
+]
+]
+},
 "Surgelés/Viandes et poissons surgelés/Poisson pané": {
 "n": 21,
 "categorie": "en:breaded-fish",
@@ -49089,11 +68316,123 @@
 "marques": []
 },
 "Surgelés/Viandes et poissons surgelés/Colin surgelé": {
-"n": 11,
-"categorie": "fr:Colins préparés",
+"n": 235,
+"categorie": "en:meals-with-fish",
 "marques": [
 [
+"Findus",
+26
+],
+[
+"Thiriet",
+15
+],
+[
+"Carrefour",
+14
+],
+[
 "Marie",
+9
+],
+[
+"Picard",
+9
+],
+[
+"Pêche Océan",
+9
+],
+[
+"Marque Repère",
+9
+],
+[
+"Odyssee",
+8
+],
+[
+"Auchan",
+8
+],
+[
+"U",
+7
+],
+[
+"Cora",
+6
+],
+[
+"Côté Table",
+6
+],
+[
+"Aldi",
+5
+],
+[
+"Casino",
+5
+],
+[
+"Groupe Carrefour",
+5
+],
+[
+"Sélection des Mousquetaires",
+5
+],
+[
+"Les Mousquetaires",
+5
+],
+[
+"Toupargel",
+5
+],
+[
+"Golden Seafood",
+4
+],
+[
+"Grand Jury",
+4
+],
+[
+"CMI (Carrefour Marchandises Internationales)",
+4
+],
+[
+"Argel",
+4
+],
+[
+"Aldi Einkauf GmbH & Compagnie-oHG",
+3
+],
+[
+"Cité Marine",
+3
+],
+[
+"Claude Léger",
+3
+],
+[
+"Netto",
+3
+],
+[
+"William Saurin",
+3
+],
+[
+"Monoprix",
+3
+],
+[
+"Scamark (Filiale E. Leclerc)",
 3
 ]
 ]
@@ -49156,9 +68495,134 @@
 "marques": []
 },
 "Surgelés/Plats et pizzas surgelés/Lasagnes surgelées": {
-"n": 20,
+"n": 361,
 "categorie": "en:bolognese-lasagne",
-"marques": []
+"marques": [
+[
+"U",
+13
+],
+[
+"Carrefour",
+13
+],
+[
+"Cora",
+10
+],
+[
+"Sans marque",
+10
+],
+[
+"Auchan",
+8
+],
+[
+"Toupargel",
+7
+],
+[
+"Toque du Chef",
+7
+],
+[
+"Stefano Toselli",
+7
+],
+[
+"Casino",
+7
+],
+[
+"Monoprix",
+7
+],
+[
+"Côté Table",
+7
+],
+[
+"Marque Repère",
+7
+],
+[
+"Monique ranou",
+6
+],
+[
+"Netto",
+5
+],
+[
+"Intermarché",
+5
+],
+[
+"Belle France",
+5
+],
+[
+"Leader Price",
+5
+],
+[
+"Thiriet",
+5
+],
+[
+"Findus",
+5
+],
+[
+"Marie",
+4
+],
+[
+"Panzani",
+4
+],
+[
+"Celtigel",
+4
+],
+[
+"Picard",
+4
+],
+[
+"Terbeke",
+4
+],
+[
+"Comme j'aime",
+4
+],
+[
+"Lidl",
+3
+],
+[
+"Aldi",
+3
+],
+[
+"Groupe Casino",
+3
+],
+[
+"Saveur & Passion",
+3
+],
+[
+"Isla Délice",
+3
+],
+[
+"Chef a casa",
+3
+]
+]
 },
 "Surgelés/Plats et pizzas surgelés/Feuilletés": {
 "n": 607,
@@ -49197,11 +68661,11 @@
 8
 ],
 [
-"Marque Repère",
+"Côté Table",
 8
 ],
 [
-"Côté Table",
+"Marque Repère",
 8
 ],
 [
@@ -49322,6 +68786,24 @@
 "n": 2,
 "categorie": "en:raw-puff-pastry",
 "marques": []
+},
+"Surgelés/Plats et pizzas surgelés/Viennoiseries surgelées": {
+"n": 238,
+"categorie": "en:viennoiseries",
+"marques": [
+[
+"E.Leclerc",
+15
+],
+[
+"Leclerc",
+11
+],
+[
+"Les 3 Meuniers",
+7
+]
+]
 },
 "Surgelés/Plats et pizzas surgelés/Pain surgelé": {
 "n": 13,
@@ -49894,6 +69376,11 @@
 3
 ]
 ]
+},
+"Glaces/Glaces/Crème glacée en bac": {
+"n": 2,
+"categorie": "en:ice-cream-tubs",
+"marques": []
 },
 "Glaces/Desserts glacés/Bûche glacée": {
 "n": 205,
@@ -50684,32 +70171,80 @@
 ]
 },
 "Eaux et boissons sans alcool/Jus de fruits/Jus de pomme": {
-"n": 2167,
+"n": 3131,
 "categorie": "en:apple-juices",
 "marques": [
 [
-"Solevita",
-19
+"U",
+36
 ],
 [
-"Jafaden",
-19
+"Casino",
+35
 ],
 [
 "Carrefour",
-15
+33
+],
+[
+"Solevita",
+28
+],
+[
+"Jafaden",
+24
 ],
 [
 "Marque Repère",
-14
+23
 ],
 [
 "Leader Price",
-13
+20
+],
+[
+"Thomas Le Prince",
+20
+],
+[
+"Cora",
+17
+],
+[
+"Auchan",
+17
+],
+[
+"Coeur de Pom'",
+17
+],
+[
+"Mas Daussan",
+16
+],
+[
+"Vitamont",
+15
+],
+[
+"U Bio",
+15
 ],
 [
 "Pressade",
-12
+14
+],
+[
+"Franprix",
+14
+],
+[
+"Monoprix",
+14
+],
+[
+"Bio Village",
+13
 ],
 [
 "Tropicana",
@@ -50720,15 +70255,11 @@
 11
 ],
 [
-"Casino",
+"Casino Bio",
 11
 ],
 [
-"U",
-11
-],
-[
-"Monoprix",
+"Jacoby",
 11
 ],
 [
@@ -50736,19 +70267,31 @@
 10
 ],
 [
-"Thomas Le Prince",
-10
-],
-[
-"Jacoby",
-10
-],
-[
-"Cora",
+"Delhaize",
 9
 ],
 [
-"Delhaize",
+"Lidl",
+8
+],
+[
+"Domaine de Moismont",
+8
+],
+[
+"Finesse des Vergers",
+8
+],
+[
+"Le Coq Toqué",
+8
+],
+[
+"Emile Vergeois",
+8
+],
+[
+"Cidou",
 8
 ],
 [
@@ -50756,11 +70299,27 @@
 7
 ],
 [
-"Auchan",
+"La Vie Claire",
 7
 ],
 [
-"Le Coq Toqué",
+"Sautter",
+7
+],
+[
+"Alain Milliat",
+7
+],
+[
+"Nature de pommes",
+7
+],
+[
+"Vergers de Vendée",
+7
+],
+[
+"Terre de l'Alpe",
 7
 ],
 [
@@ -50768,84 +70327,12 @@
 7
 ],
 [
-"Franprix",
-7
-],
-[
 "innocent",
-6
-],
-[
-"Lidl",
 6
 ],
 [
 "Réa",
 6
-],
-[
-"Alain Milliat",
-6
-],
-[
-"Bio Village",
-6
-],
-[
-"Mas Daussan",
-6
-],
-[
-"Nature de pommes",
-6
-],
-[
-"Gargouil",
-6
-],
-[
-"Vergers de Vendée",
-6
-],
-[
-"Joker",
-5
-],
-[
-"Kerisac",
-5
-],
-[
-"Saxo",
-5
-],
-[
-"Fruits Des Weppes",
-5
-],
-[
-"Aldi",
-5
-],
-[
-"U Bio",
-5
-],
-[
-"Coeur de Pom'",
-5
-],
-[
-"Planet Bio",
-4
-],
-[
-"Sautter",
-4
-],
-[
-"Rochambeau",
-4
 ]
 ]
 },
@@ -50978,11 +70465,11 @@
 4
 ],
 [
-"Jafaden",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Jafaden",
 4
 ],
 [
@@ -51240,6 +70727,40 @@
 "n": 3,
 "categorie": "en:apple-juices-from-concentrate",
 "marques": []
+},
+"Eaux et boissons sans alcool/Jus de fruits/Nectar de pêche": {
+"n": 207,
+"categorie": "en:peach-nectars",
+"marques": [
+[
+"Alain Milliat",
+10
+],
+[
+"Sibio!",
+6
+],
+[
+"Emile Vergeois",
+5
+],
+[
+"U",
+4
+],
+[
+"La Grande Epicerie de Paris",
+3
+],
+[
+"Emmanuelle Baillard",
+3
+],
+[
+"Finesse des Vergers",
+3
+]
+]
 },
 "Eaux et boissons sans alcool/Sodas et sirops/Cola": {
 "n": 403,
@@ -51588,24 +71109,28 @@
 ]
 },
 "Eaux et boissons sans alcool/Sodas et sirops/Thé glacé": {
-"n": 448,
+"n": 882,
 "categorie": "en:iced-teas",
 "marques": [
+[
+"Lipton",
+158
+],
 [
 "Fuzetea",
 22
 ],
 [
-"Lipton",
-18
-],
-[
 "May Tea",
-14
+15
 ],
 [
 "Casino",
 14
+],
+[
+"Freeway",
+13
 ],
 [
 "Auchan",
@@ -51613,7 +71138,11 @@
 ],
 [
 "Fruima",
-9
+10
+],
+[
+"Migros",
+10
 ],
 [
 "Cora",
@@ -51621,6 +71150,18 @@
 ],
 [
 "Leader Price",
+9
+],
+[
+"Ice Tea",
+9
+],
+[
+"Pokka",
+9
+],
+[
+"Pfanner",
 9
 ],
 [
@@ -51633,6 +71174,10 @@
 ],
 [
 "Nestea",
+7
+],
+[
+"Pure Leaf",
 6
 ],
 [
@@ -51640,11 +71185,7 @@
 5
 ],
 [
-"Pure Leaf",
-5
-],
-[
-"Pokka",
+"Unilever",
 5
 ],
 [
@@ -51652,11 +71193,19 @@
 5
 ],
 [
-"Terre d'Oc",
+"Sun",
 4
 ],
 [
-"Freeway",
+"Fresh Tea",
+4
+],
+[
+"Coop",
+4
+],
+[
+"Terre d'Oc",
 4
 ],
 [
@@ -51676,11 +71225,35 @@
 3
 ],
 [
-"Fresh Tea",
+"Banga",
+3
+],
+[
+"Bolero",
+3
+],
+[
+"Denner",
+3
+],
+[
+"Rauch",
+3
+],
+[
+"Super U",
+3
+],
+[
+"Tetley",
 3
 ],
 [
 "Columbus",
+3
+],
+[
+"Waterdrop",
 3
 ]
 ]
@@ -51690,11 +71263,11 @@
 "categorie": "en:energy-drinks",
 "marques": [
 [
-"X-Tense",
+"Marque Repère",
 10
 ],
 [
-"Marque Repère",
+"X-Tense",
 10
 ],
 [
@@ -52346,6 +71919,44 @@
 "categorie": "en:mojito-syrups",
 "marques": []
 },
+"Eaux et boissons sans alcool/Sodas et sirops/Ginger beer": {
+"n": 210,
+"categorie": "en:ginger-beer",
+"marques": [
+[
+"Old Jamaica",
+10
+],
+[
+"Karma",
+5
+],
+[
+"Fentimans",
+4
+],
+[
+"Bundaberg",
+4
+],
+[
+"UMÀ",
+4
+],
+[
+"Schweppes",
+3
+],
+[
+"Fever-Tree",
+3
+],
+[
+"Kombuch'Alpes",
+3
+]
+]
+},
 "Cave/Bières et cidres/Bière blonde": {
 "n": 451,
 "categorie": "en:lagers",
@@ -52611,11 +72222,11 @@
 4
 ],
 [
-"Hilborg",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Hilborg",
 4
 ],
 [
@@ -52793,19 +72404,19 @@
 5
 ],
 [
-"Les Goelleries",
-4
-],
-[
 "Marque Repère",
 4
 ],
 [
-"La Fauconnerie",
-3
+"Les Goelleries",
+4
 ],
 [
 "Expert club",
+3
+],
+[
+"La Fauconnerie",
 3
 ],
 [
@@ -52843,11 +72454,11 @@
 6
 ],
 [
-"Les Goelleries",
+"Marque Repère",
 6
 ],
 [
-"Marque Repère",
+"Les Goelleries",
 6
 ],
 [
@@ -53126,11 +72737,11 @@
 "categorie": "en:champagnes",
 "marques": [
 [
-"Danremont",
+"U",
 18
 ],
 [
-"U",
+"Danremont",
 18
 ],
 [
@@ -53325,11 +72936,11 @@
 3
 ],
 [
-"Belanis",
+"Auchan",
 3
 ],
 [
-"Auchan",
+"Belanis",
 3
 ],
 [
@@ -53425,11 +73036,11 @@
 4
 ],
 [
-"Lagoa",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Lagoa",
 4
 ],
 [
@@ -53513,11 +73124,11 @@
 4
 ],
 [
-"Novotna",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"Novotna",
 4
 ],
 [
@@ -54281,11 +73892,11 @@
 5
 ],
 [
-"Unilever",
+"Signal",
 5
 ],
 [
-"Signal",
+"Unilever",
 5
 ],
 [
@@ -54363,11 +73974,11 @@
 10
 ],
 [
-"New'R",
+"Marque Repère",
 4
 ],
 [
-"Marque Repère",
+"New'R",
 4
 ],
 [
@@ -54962,11 +74573,11 @@
 "categorie": "en:non-open-products-facts",
 "marques": [
 [
-"Better life",
+"Auchan",
 3
 ],
 [
-"Auchan",
+"Better life",
 3
 ],
 [
