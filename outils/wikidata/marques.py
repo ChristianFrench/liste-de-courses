@@ -45,13 +45,13 @@ NOTIONS = {
 
 
 def get(url):
-    for essai in range(4):
+    for essai in range(2):
         try:
-            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=120) as r:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=60) as r:
                 return json.load(r)
         except Exception as e:
             print("nouvel essai", e, flush=True)
-            time.sleep(10 * (essai + 1))
+            time.sleep(5)
     return None
 
 
@@ -63,7 +63,7 @@ def qid(libelle):
 
 REQUETE = """SELECT DISTINCT ?m ?nom (COUNT(DISTINCT ?lien) AS ?liens) WHERE {
   VALUES ?notion { %s }
-  ?classe wdt:P279* ?notion .
+  ?classe wdt:P279? ?notion .
   { ?m wdt:P1056 ?classe } UNION { ?m wdt:P452 ?classe } UNION { ?classe wdt:P1716 ?m }
   ?m rdfs:label ?nom . FILTER(LANG(?nom) = "fr")
   ?article schema:about ?m ; schema:isPartOf <https://fr.wikipedia.org/> .
@@ -86,6 +86,8 @@ for secteur, libelles in NOTIONS.items():
     lignes = (d or {}).get("results", {}).get("bindings", [])
     res[secteur] = [[b["nom"]["value"], int(b["liens"]["value"])] for b in lignes]
     print(f"{secteur} : {len(res[secteur])} marques", flush=True)
+    json.dump({"_notions": notions, "secteurs": res}, open("outils/wikidata/marques_wikidata.json", "w", encoding="utf-8"),
+              ensure_ascii=False, indent=1)
     time.sleep(2)
 json.dump({"_notions": notions, "secteurs": res}, open("outils/wikidata/marques_wikidata.json", "w", encoding="utf-8"),
           ensure_ascii=False, indent=1)

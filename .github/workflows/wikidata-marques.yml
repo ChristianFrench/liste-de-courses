@@ -11,10 +11,12 @@ permissions:
 jobs:
   extraire:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - name: Interroger Wikidata
+        timeout-minutes: 35
+        continue-on-error: true
         run: python3 outils/wikidata/marques.py
       - name: Déposer le résultat
         run: |
