@@ -55,6 +55,12 @@ for i, (_, m, _) in enumerate(natures):
 ranges_par_nature = collections.defaultdict(list)  # nature → [(catégories, marques)]
 frequence_categories = collections.Counter()  # catégorie → nombre de produits vendus en France
 graphies = collections.defaultdict(collections.Counter)  # clé de marque → graphies
+# Produits sans nature : regroupés par leurs 1 et 2 premiers mots, pour proposer des natures nouvelles.
+orphelins = collections.Counter()  # préfixe → nombre de produits
+orph_cats = collections.defaultdict(collections.Counter)  # préfixe → catégories
+orph_marques = collections.defaultdict(collections.Counter)  # préfixe → marques
+orph_graphies = collections.defaultdict(collections.Counter)  # préfixe → noms tels qu'écrits
+orph_debut_marque = collections.Counter()  # préfixe → produits dont le nom commence par la marque
 lus = francais = ranges = 0
 debut = time.time()
 csv.field_size_limit(1 << 30)
@@ -86,6 +92,22 @@ with urllib.request.urlopen(req, timeout=300) as flux:
                 elif len(m) == taille:
                     meilleurs.append(j)
         if not meilleurs:
+            ms = {x.strip() for x in ligne[i_marques].split(",") if x.strip()}
+            cles_m = {cle_marque(m) for m in ms}
+            brut = [m for m in re.split(r"[^\w'-]+", ligne[i_nom].lower()) if m]
+            for k in (1, 2):
+                if len(lp) < k:
+                    break
+                pre = " ".join(lp[:k])
+                orphelins[pre] += 1
+                orph_cats[pre].update(cats)
+                orph_marques[pre].update(cle_marque(m) for m in ms)
+                if cle_marque(" ".join(lp[:k])) in cles_m or cle_marque(lp[0]) in cles_m:
+                    orph_debut_marque[pre] += 1
+                if len(orph_graphies[pre]) < 200 or " ".join(brut[:k + 2]) in orph_graphies[pre]:
+                    orph_graphies[pre][" ".join(brut[:k + 2])] += 1
+            for m in ms:
+                graphies[cle_marque(m)][m] += 1
             continue
         ranges += 1
         ms = {x.strip() for x in ligne[i_marques].split(",") if x.strip()}
@@ -118,5 +140,33 @@ for j, (cle, _, _) in enumerate(natures):
 json.dump({"_description": f"Open Food Facts, {time.strftime('%Y-%m-%d')} : {francais} produits vendus en France, "
                            f"{ranges} rangés sous {len(res)} natures du catalogue sur {len(natures)}",
            "natures": res}, open("outils/off/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+# Catégorie de chaque nature rangée, pour proposer un rayon et un secteur aux natures nouvelles.
+secteur_par_categorie = collections.defaultdict(collections.Counter)
+for cle, v in res.items():
+    if v["categorie"]:
+        secteur_par_categorie[v["categorie"]]["/".join(cle.split("/")[:2])] += v["n"]
+candidats = {}
+for pre, n in orphelins.items():
+    if n < 200:
+        continue
+    cats = orph_cats[pre]
+    # catégorie la plus précise portée par au moins 30 % des produits
+    dom = [c for c, k in cats.items() if k >= 0.3 * n]
+    categorie = min(dom, key=lambda c: frequence_categories[c]) if dom else None
+    secteurs = collections.Counter()
+    for c, k in cats.most_common(30):
+        for sec, w in secteur_par_categorie.get(c, {}).items():
+            secteurs[sec] += k * w / max(1, frequence_categories[c])
+    candidats[pre] = {
+        "n": n,
+        "noms": [g for g, _ in orph_graphies[pre].most_common(3)],
+        "categorie": categorie,
+        "categories": [[c, k] for c, k in cats.most_common(4)],
+        "secteur": secteurs.most_common(1)[0][0] if secteurs else None,
+        "marques": [graphies[k].most_common(1)[0][0] for k, _ in orph_marques[pre].most_common(6) if k and graphies[k]],
+        "part_marque": round(orph_debut_marque[pre] / n, 2),
+    }
+json.dump(candidats, open("outils/off/candidats_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+print(f"::notice title=Natures candidates::{len(candidats)} groupes d'au moins 200 produits sans nature")
 print(f"Fini : {lus} lignes, {francais} en France, {ranges} rangées, {len(res)} natures, {time.time() - debut:.0f} s")
 print(f"::notice title=Extraction Open Food Facts::{francais} produits en France, {ranges} rangés sous {len(res)} natures sur {len(natures)}")
