@@ -318,8 +318,22 @@ class CatalogueCommun extends ChangeNotifier {
     final b = Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
     // Seulement ce qui passe les règles (ni foyer bloqué, ni nom refusé, ni produit signalé).
     final f = Moderation.filtrer(apportsRecus, bloques: b.bloques, signales: Etat.instance.signalements);
-    b.absorber([...f.lots, Etat.instance.apports()]);
+    b.absorber([...f.lots, Etat.instance.apports(), await _nouveautesLivrees(b)]);
     return b;
+  }
+
+  /// Produits du catalogue livré avec l'application absents du dernier catalogue publié (ajoutés au catalogue
+  /// livré depuis : natures d'Open Food Facts, 31/10/2026). L'éditeur les publie ensuite pour tous les foyers.
+  Future<Map<String, dynamic>> _nouveautesLivrees(Brouillon b) async {
+    final livre = jsonDecode(await rootBundle.loadString(CatalogueType.fichierLivre)) as Map<String, dynamic>;
+    return {
+      'produits': [
+        for (final r in (livre['rayons'] as List).cast<Map>())
+          for (final s in (r['secteurs'] as List).cast<Map>())
+            for (final p in (s['produits'] as List).cast<Map>())
+              {'nom': p['nom'], 'rayon': r['nom'], 'secteur': s['nom'], if (p['formats'] is List) 'formats': p['formats']}
+      ],
+    };
   }
 
   /// Apports des autres foyers reçus au dernier lancement (avec leur identifiant « id »).

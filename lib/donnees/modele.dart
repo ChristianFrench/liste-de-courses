@@ -2052,7 +2052,18 @@ class Etat extends ChangeNotifier {
         for (final p in (s['produits'] as List).cast<Map>()) {
           if ((p['taille'] as num) > taille) continue;
           final nom = p['nom'] as String;
-          final produit = parNom[nom.toLowerCase()] ??= (Produit(nouvelId('p'), nom, [], [], 0)..let(produits.add));
+          // Une même nature peut être dans deux secteurs (libre-service et à la coupe) : un produit par secteur.
+          Produit? connu = parNom[nom.toLowerCase()];
+          if (connu != null) {
+            final ici = _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == connu!.id);
+            if (ici != null && ici.secteurId != secteur.id) {
+              connu = _trouve(produits, (x) =>
+                  x.nom.toLowerCase() == nom.toLowerCase() &&
+                  _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == x.id && e.secteurId != secteur.id) == null);
+            }
+          }
+          final produit = connu ?? (Produit(nouvelId('p'), nom, [], [], 0)..let(produits.add));
+          parNom.putIfAbsent(nom.toLowerCase(), () => produit);
           if (produit.packagingIds.isEmpty) {
             for (final f in (p['formats'] as List? ?? const []).cast<String>()) {
               produit.packagingIds.add(_packagingNomme(f).id);

@@ -154,6 +154,21 @@ void main() {
     expect(e.produits.where((p) => p.nom.toLowerCase() == 'lait demi-écrémé').length, lessThanOrEqualTo(1));
   });
 
+  test('une nature à la coupe et en libre-service est rangée dans les deux secteurs', () async {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final catalogue = jsonDecode(File(Etat.fichierCatalogueType).readAsStringSync()) as Map<String, dynamic>;
+    final m = e.creerMagasin('Hyper essai');
+    await e.appliquerModele(m, 3, catalogue: catalogue);
+    final langues = e.produits.where((p) => p.nom == 'Langue de bœuf').toList();
+    expect(langues, hasLength(2));
+    final secteurs = {for (final p in langues) e.secteurDe(m.id, p.id)?.nom};
+    expect(secteurs, {'Boucherie libre-service', 'Boucherie traditionnelle et Volailles'});
+    // Une seconde application ne crée rien de plus.
+    expect(await e.appliquerModele(m, 3, catalogue: catalogue), 0);
+    expect(e.produits.where((p) => p.nom == 'Langue de bœuf'), hasLength(2));
+  });
+
   test('un magasin supprimé va dans la corbeille et se restaure, même après relecture', () {
     final chemin = '${dossier.path}/essai.db';
     final e = Etat.instance..enregistrementActif = false;
