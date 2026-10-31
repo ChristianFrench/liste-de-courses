@@ -1,0 +1,136 @@
+{
+"_description": "openpetfoodfacts, 2026-10-31 : 5289 produits vendus en France, 339 rangés sous 18 natures du catalogue sur 44",
+"natures": {
+"Animaux/Chiens/Croquettes pour chien": {
+"n": 85,
+"categorie": "en:dog-food",
+"marques": [
+[
+"Atavik",
+14
+],
+[
+"Auchan",
+4
+],
+[
+"Empreintes",
+4
+]
+]
+},
+"Animaux/Chiens/Pâtée pour chien": {
+"n": 22,
+"categorie": "en:wet-dog-food",
+"marques": [
+[
+"Atavik",
+19
+]
+]
+},
+"Animaux/Chiens/Friandises pour chien": {
+"n": 23,
+"categorie": "fr:friandises-pour-chiens",
+"marques": [
+[
+"Atavik",
+19
+]
+]
+},
+"Animaux/Chiens/Croquettes pour chiot": {
+"n": 8,
+"categorie": "fr:chiot-petite-race",
+"marques": []
+},
+"Animaux/Chiens/Os à mâcher": {
+"n": 7,
+"categorie": "en:dog-food",
+"marques": []
+},
+"Animaux/Chiens/Shampooing pour chien": {
+"n": 1,
+"categorie": "fr:produits-chiens",
+"marques": []
+},
+"Animaux/Chats/Croquettes pour chat": {
+"n": 44,
+"categorie": "en:dog-and-cat-food",
+"marques": []
+},
+"Animaux/Chats/Pâtée pour chat": {
+"n": 13,
+"categorie": "en:dog-and-cat-food",
+"marques": []
+},
+"Animaux/Chats/Friandises pour chat": {
+"n": 6,
+"categorie": "en:cat-biscuits",
+"marques": []
+},
+"Animaux/Chats/Croquettes pour chaton": {
+"n": 11,
+"categorie": "fr:chaton",
+"marques": [
+[
+"Empreintes",
+5
+]
+]
+},
+"Animaux/Chats/Croquettes pour chat stérilisé": {
+"n": 23,
+"categorie": "en:dry-cat-food",
+"marques": [
+[
+"Perfect Fit",
+7
+],
+[
+"Purina One",
+4
+],
+[
+"Empreintes",
+3
+]
+]
+},
+"Animaux/Chats/Lait pour chat": {
+"n": 4,
+"categorie": "en:milks",
+"marques": []
+},
+"Animaux/Chats/Litière végétale": {
+"n": 1,
+"categorie": "en:non-open-products-facts",
+"marques": []
+},
+"Animaux/Chats/Herbe à chat": {
+"n": 1,
+"categorie": "en:dog-and-cat-food",
+"marques": []
+},
+"Animaux/Chats/Croquettes pour chat senior": {
+"n": 4,
+"categorie": "en:dog-and-cat-food",
+"marques": []
+},
+"Animaux/Autres animaux/Graines pour oiseaux": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Animaux/Autres animaux/Nourriture pour poissons": {
+"n": 11,
+"categorie": null,
+"marques": []
+},
+"Animaux/Autres animaux/Boules de graisse pour oiseaux": {
+"n": 1,
+"categorie": "en:bird-food",
+"marques": []
+}
+}
+}

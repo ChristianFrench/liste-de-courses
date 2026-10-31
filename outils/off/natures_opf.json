@@ -1,0 +1,2427 @@
+{
+"_description": "openproductsfacts, 2026-10-31 : 41133 produits vendus en France, 2849 rangés sous 374 natures du catalogue sur 772",
+"natures": {
+"Bébé/Hygiène bébé/Couches": {
+"n": 27,
+"categorie": "en:diapering",
+"marques": [
+[
+"Auchan Baby",
+20
+]
+]
+},
+"Bébé/Hygiène bébé/Lingettes bébé": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bébé/Hygiène bébé/Couches-culottes": {
+"n": 1,
+"categorie": "fr:bebe",
+"marques": []
+},
+"Bébé/Hygiène bébé/Lingettes à l'eau": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bébé/Puériculture/Biberons": {
+"n": 3,
+"categorie": "en:baby-bottles",
+"marques": []
+},
+"Bébé/Puériculture/Tétines": {
+"n": 3,
+"categorie": "en:hydration-pack",
+"marques": []
+},
+"Bébé/Puériculture/Thermomètre de bain": {
+"n": 1,
+"categorie": "en:household-thermometers",
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Gel douche": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Savon": {
+"n": 17,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Déodorant": {
+"n": 9,
+"categorie": "en:open-beauty-facts",
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Coton": {
+"n": 5,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Cotons-tiges": {
+"n": 4,
+"categorie": "en:cotton-swabs",
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Savon liquide": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Gel hydroalcoolique": {
+"n": 3,
+"categorie": "fr:gel-hydroalcoolique",
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Gant de toilette": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Toilette et soins du corps/Talc": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cheveux/Shampooing": {
+"n": 6,
+"categorie": "en:cosmetics",
+"marques": []
+},
+"Parfumerie et soins/Cheveux/Gel coiffant": {
+"n": 1,
+"categorie": "en:from-12-months-old",
+"marques": []
+},
+"Parfumerie et soins/Cheveux/Shampooing sec": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cheveux/Shampooing antipelliculaire": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cheveux/Élastiques à cheveux": {
+"n": 30,
+"categorie": "en:ponytail-holders",
+"marques": [
+[
+"Cosmia",
+30
+],
+[
+"Kids",
+15
+],
+[
+"Auchan",
+14
+]
+]
+},
+"Parfumerie et soins/Cheveux/Brosse à cheveux": {
+"n": 21,
+"categorie": "en:combs-brushes",
+"marques": [
+[
+"Cosmia",
+20
+]
+]
+},
+"Parfumerie et soins/Cheveux/Peigne": {
+"n": 8,
+"categorie": null,
+"marques": [
+[
+"Cosmia",
+8
+]
+]
+},
+"Parfumerie et soins/Cheveux/Barrettes": {
+"n": 15,
+"categorie": "en:hair-clips",
+"marques": [
+[
+"Cosmia",
+14
+],
+[
+"Kids",
+7
+],
+[
+"Auchan",
+6
+]
+]
+},
+"Parfumerie et soins/Santé dentaire/Dentifrice": {
+"n": 6,
+"categorie": "en:mouthwash",
+"marques": []
+},
+"Parfumerie et soins/Santé dentaire/Brosse à dents": {
+"n": 44,
+"categorie": "en:toothbrushes",
+"marques": [
+[
+"Auchan",
+23
+],
+[
+"Colgate",
+6
+]
+]
+},
+"Parfumerie et soins/Santé dentaire/Bain de bouche": {
+"n": 2,
+"categorie": "en:mouthwash",
+"marques": []
+},
+"Parfumerie et soins/Santé dentaire/Fil dentaire": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Santé dentaire/Brossettes interdentaires": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Santé dentaire/Brosse à dents enfant": {
+"n": 7,
+"categorie": "en:toothbrushes",
+"marques": [
+[
+"Kids",
+6
+],
+[
+"Auchan",
+6
+]
+]
+},
+"Parfumerie et soins/Santé dentaire/Crème fixative pour appareil dentaire": {
+"n": 2,
+"categorie": "fr:creme-fixative-pour-appareils-dentaires",
+"marques": []
+},
+"Parfumerie et soins/Santé dentaire/Brosse à dents électrique": {
+"n": 1,
+"categorie": "en:toothbrushes",
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Parfum": {
+"n": 8,
+"categorie": "en:home-fragrances",
+"marques": [
+[
+"Durance",
+4
+]
+]
+},
+"Parfumerie et soins/Cosmétiques et parfums/Mascara": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Rouge à lèvres": {
+"n": 1,
+"categorie": "en:halloween-supplies",
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Dissolvant": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Eau micellaire": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Masque visage": {
+"n": 1,
+"categorie": "fr:masque-visage",
+"marques": []
+},
+"Parfumerie et soins/Cosmétiques et parfums/Lime à ongles": {
+"n": 6,
+"categorie": null,
+"marques": [
+[
+"Cosmia",
+6
+]
+]
+},
+"Parfumerie et soins/Cosmétiques et parfums/Pince à épiler": {
+"n": 4,
+"categorie": null,
+"marques": [
+[
+"Cosmia",
+4
+]
+]
+},
+"Hygiène/Hygiène féminine/Serviettes hygiéniques": {
+"n": 11,
+"categorie": "en:sanitary-napkins",
+"marques": [
+[
+"Auchan",
+7
+]
+]
+},
+"Hygiène/Hygiène féminine/Tampons": {
+"n": 41,
+"categorie": "fr:produits-menstruels",
+"marques": [
+[
+"Auchan",
+15
+],
+[
+"Jessa",
+5
+]
+]
+},
+"Hygiène/Hygiène féminine/Protège-slips": {
+"n": 5,
+"categorie": "fr:protege-slips",
+"marques": []
+},
+"Hygiène/Hygiène féminine/Serviettes de nuit": {
+"n": 3,
+"categorie": "fr:produits-menstruels",
+"marques": []
+},
+"Hygiène/Hygiène féminine/Culotte menstruelle": {
+"n": 1,
+"categorie": "fr:culotte-menstruelle",
+"marques": []
+},
+"Hygiène/Hygiène féminine/Lingettes intimes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Hygiène/Hygiène féminine/Test de grossesse": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Hygiène/Rasage/Rasoirs": {
+"n": 4,
+"categorie": "fr:rasoirs-jetables",
+"marques": [
+[
+"Cosmia",
+3
+]
+]
+},
+"Hygiène/Rasage/Mousse à raser": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Hygiène/Rasage/Lames de rasoir": {
+"n": 4,
+"categorie": "en:razor-blades",
+"marques": []
+},
+"Hygiène/Rasage/Gel à raser": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Hygiène/Rasage/Rasoirs jetables": {
+"n": 10,
+"categorie": "fr:rasoirs-jetables",
+"marques": [
+[
+"Cosmia",
+8
+]
+]
+},
+"Hygiène/Rasage/Rasoirs femme": {
+"n": 3,
+"categorie": "en:razors-razor-blades",
+"marques": [
+[
+"Cosmia",
+3
+]
+]
+},
+"Hygiène/Rasage/Blaireau": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Pansements": {
+"n": 17,
+"categorie": "en:non-food-products",
+"marques": [
+[
+"Auchan",
+8
+]
+]
+},
+"Parapharmacie/Soins et premiers secours/Sérum physiologique": {
+"n": 2,
+"categorie": "fr:serum-physiologique",
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Compresses": {
+"n": 4,
+"categorie": "en:medical-tape-bandages",
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Sparadrap": {
+"n": 2,
+"categorie": "fr:sparadrap-microporeux",
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Pansements ampoules": {
+"n": 4,
+"categorie": "fr:pansements-pour-ampoules",
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Alcool à 70°": {
+"n": 14,
+"categorie": null,
+"marques": [
+[
+"Onyx",
+3
+]
+]
+},
+"Parapharmacie/Soins et premiers secours/Eau oxygénée": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Parapharmacie/Soins et premiers secours/Tensiomètre": {
+"n": 4,
+"categorie": "en:medical-products",
+"marques": []
+},
+"Parapharmacie/Solaires et soins spécifiques/Crème mains": {
+"n": 7,
+"categorie": null,
+"marques": [
+[
+"Cosmia",
+7
+]
+]
+},
+"Parapharmacie/Solaires et soins spécifiques/Anti-moustiques": {
+"n": 5,
+"categorie": null,
+"marques": []
+},
+"Parapharmacie/Solaires et soins spécifiques/Huiles essentielles": {
+"n": 4,
+"categorie": "fr:huiles-essentielles",
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Lessive liquide": {
+"n": 52,
+"categorie": "en:liquid-detergent",
+"marques": [
+[
+"Auchan",
+11
+],
+[
+"U",
+6
+],
+[
+"Le Chat",
+3
+],
+[
+"L'arbre vert",
+3
+],
+[
+"Rainett",
+3
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Lessive en poudre": {
+"n": 9,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Lessive en capsules": {
+"n": 9,
+"categorie": "en:laundry-supplies",
+"marques": [
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Adoucissant": {
+"n": 25,
+"categorie": "fr:adoucissants",
+"marques": [
+[
+"Auchan",
+12
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Détachant": {
+"n": 8,
+"categorie": "fr:produit-entretien",
+"marques": [
+[
+"K2R",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Désinfectant linge": {
+"n": 6,
+"categorie": "en:liquide-desinfectant-du-linge",
+"marques": [
+[
+"Sanytol",
+4
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Parfum de linge": {
+"n": 5,
+"categorie": null,
+"marques": [
+[
+"Lenor",
+3
+]
+]
+},
+"Entretien / Droguerie/Lessives et soin du linge/Eau déminéralisée": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Lingettes anti-décoloration": {
+"n": 3,
+"categorie": "en:open-products-facts",
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Nettoyant lave-linge": {
+"n": 2,
+"categorie": "fr:nettoyant",
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Teinture textile": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Savon de Marseille": {
+"n": 8,
+"categorie": "en:liquid-detergent",
+"marques": []
+},
+"Entretien / Droguerie/Lessives et soin du linge/Pinces à linge": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Produits Vaisselle/Liquide vaisselle": {
+"n": 104,
+"categorie": "fr:liquide-vaisselle",
+"marques": [
+[
+"Auchan",
+18
+],
+[
+"W5",
+3
+],
+[
+"Casino",
+3
+],
+[
+"Carrefour",
+3
+]
+]
+},
+"Entretien / Droguerie/Produits Vaisselle/Tablettes lave-vaisselle": {
+"n": 21,
+"categorie": "en:tablettes-pour-lave-vaisselle",
+"marques": [
+[
+"Auchan",
+12
+]
+]
+},
+"Entretien / Droguerie/Produits Vaisselle/Sel régénérant": {
+"n": 12,
+"categorie": "fr:sel-regenerant",
+"marques": []
+},
+"Entretien / Droguerie/Produits Vaisselle/Liquide de rinçage": {
+"n": 8,
+"categorie": "fr:liquide-vaisselle",
+"marques": []
+},
+"Entretien / Droguerie/Produits Vaisselle/Éponges": {
+"n": 44,
+"categorie": "en:household-sponges",
+"marques": [
+[
+"Auchan",
+11
+],
+[
+"Cosmia",
+9
+],
+[
+"Spontex",
+3
+]
+]
+},
+"Entretien / Droguerie/Produits Vaisselle/Liquide vaisselle main": {
+"n": 1,
+"categorie": "fr:produit-vaisselle-ecologique-labellisee",
+"marques": []
+},
+"Entretien / Droguerie/Produits Vaisselle/Nettoyant lave-vaisselle": {
+"n": 4,
+"categorie": "fr:nettoyant",
+"marques": []
+},
+"Entretien / Droguerie/Produits Vaisselle/Brosse vaisselle": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant multi-usages": {
+"n": 6,
+"categorie": "fr:produit-menager",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant sol": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant vitres": {
+"n": 10,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Détartrant": {
+"n": 3,
+"categorie": "en:descalers-decalcifiers",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Désinfectant": {
+"n": 15,
+"categorie": null,
+"marques": [
+[
+"Sanytol",
+8
+]
+]
+},
+"Entretien / Droguerie/Nettoyants ménagers/Javel": {
+"n": 24,
+"categorie": "en:bleach",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant WC": {
+"n": 2,
+"categorie": "en:household-chemicals",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Lingettes nettoyantes": {
+"n": 7,
+"categorie": "en:open-products-facts",
+"marques": [
+[
+"Auchan",
+6
+]
+]
+},
+"Entretien / Droguerie/Nettoyants ménagers/Dégraissant cuisine": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Vinaigre blanc": {
+"n": 1,
+"categorie": "en:hazelnut-based-drinks",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Bicarbonate de soude": {
+"n": 5,
+"categorie": "en:anticaking-agents",
+"marques": [
+[
+"Better life",
+3
+],
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Nettoyants ménagers/Cristaux de soude": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Savon noir": {
+"n": 13,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Blocs WC": {
+"n": 29,
+"categorie": "fr:blocs-wc",
+"marques": [
+[
+"Auchan",
+22
+]
+]
+},
+"Entretien / Droguerie/Nettoyants ménagers/Désodorisant": {
+"n": 38,
+"categorie": "en:non-food-products",
+"marques": [
+[
+"Auchan",
+12
+],
+[
+"Febreze",
+5
+],
+[
+"Carrefour",
+3
+]
+]
+},
+"Entretien / Droguerie/Nettoyants ménagers/Insecticide": {
+"n": 5,
+"categorie": "en:insecticides",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Acide citrique": {
+"n": 3,
+"categorie": "fr:acide-citrique",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Détartrant WC": {
+"n": 1,
+"categorie": "en:descalers-decalcifiers",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant parquet": {
+"n": 2,
+"categorie": "fr:nettoyant",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Crème à récurer": {
+"n": 6,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Nettoyant vitrocéramique": {
+"n": 3,
+"categorie": "fr:nettoyants-pour-vitroceramique",
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Dépoussiérant meubles": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Nettoyants ménagers/Terre de Sommières": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Serpillière": {
+"n": 5,
+"categorie": "fr:serpillieres",
+"marques": [
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Accessoires de ménage/Balai": {
+"n": 4,
+"categorie": "fr:domestique",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Seau": {
+"n": 2,
+"categorie": "en:buckets",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Gants de ménage": {
+"n": 3,
+"categorie": "fr:gants-de-menage-reutilisables",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Chiffons microfibre": {
+"n": 1,
+"categorie": "fr:entretien",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Plumeau": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Brosse WC": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Lingettes sol": {
+"n": 2,
+"categorie": "en:open-products-facts",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Bassine": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Sacs aspirateur": {
+"n": 3,
+"categorie": "fr:sacs-pour-aspirateurs",
+"marques": []
+},
+"Entretien / Droguerie/Accessoires de ménage/Étendoir à linge": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Nettoyant salle de bain": {
+"n": 7,
+"categorie": "en:non-food-products",
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Anticalcaire": {
+"n": 1,
+"categorie": "en:open-products-facts",
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Cirage": {
+"n": 3,
+"categorie": "en:shoe-cleaning-or-polishing-products",
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Anti-moisissures": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Imperméabilisant chaussures": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Lacets": {
+"n": 2,
+"categorie": "en:footwear",
+"marques": []
+},
+"Entretien / Droguerie/Salle de bain et cirage/Semelles": {
+"n": 1,
+"categorie": "en:health-care",
+"marques": []
+},
+"Entretien / Droguerie/Papier/Papier toilette": {
+"n": 56,
+"categorie": "en:toilet-papers",
+"marques": [
+[
+"Auchan",
+16
+],
+[
+"Lotus",
+7
+],
+[
+"Carrefour",
+6
+],
+[
+"Monoprix",
+3
+]
+]
+},
+"Entretien / Droguerie/Papier/Essuie-tout": {
+"n": 30,
+"categorie": "en:shop-towels-general-purpose-cleaning-cloths",
+"marques": [
+[
+"Auchan",
+10
+],
+[
+"Marque Repère",
+4
+],
+[
+"Mimosa",
+4
+]
+]
+},
+"Entretien / Droguerie/Papier/Mouchoirs": {
+"n": 37,
+"categorie": "fr:mouchoirs",
+"marques": [
+[
+"U",
+3
+]
+]
+},
+"Entretien / Droguerie/Papier/Serviettes en papier": {
+"n": 3,
+"categorie": "en:towels",
+"marques": []
+},
+"Entretien / Droguerie/Papier/Papier toilette humide": {
+"n": 4,
+"categorie": "en:toilet-papers",
+"marques": [
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Papier/Mouchoirs en boîte": {
+"n": 1,
+"categorie": "fr:mouchoirs",
+"marques": []
+},
+"Entretien / Droguerie/Papier/Paquets de mouchoirs": {
+"n": 2,
+"categorie": "fr:mouchoirs",
+"marques": []
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Sacs poubelle": {
+"n": 62,
+"categorie": "en:garbage-bags",
+"marques": [
+[
+"Auchan",
+28
+],
+[
+"Elembal",
+5
+],
+[
+"Marque Repère",
+4
+],
+[
+"Alfapac",
+3
+],
+[
+"handy bag",
+3
+],
+[
+"Pouce",
+3
+]
+]
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Papier aluminium": {
+"n": 9,
+"categorie": "en:aluminium-kitchen-foil",
+"marques": []
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Papier cuisson": {
+"n": 19,
+"categorie": "en:parchment-paper",
+"marques": [
+[
+"Auchan",
+3
+]
+]
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Film étirable": {
+"n": 8,
+"categorie": "fr:film-etirable",
+"marques": []
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Sacs congélation": {
+"n": 21,
+"categorie": "en:non-food-products",
+"marques": [
+[
+"Auchan",
+4
+]
+]
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Barquettes aluminium": {
+"n": 5,
+"categorie": null,
+"marques": [
+[
+"Auchan",
+5
+]
+]
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Sacs de congélation zip": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Sacs isothermes": {
+"n": 2,
+"categorie": "fr:sac",
+"marques": []
+},
+"Entretien / Droguerie/Emballages et Aluminium etc/Sacs compostables": {
+"n": 1,
+"categorie": "en:garbage-bags",
+"marques": []
+},
+"Entretien / Droguerie/Insecticides et antiparasites/Diffuseur électrique anti-moustiques": {
+"n": 1,
+"categorie": "en:open-products-facts",
+"marques": []
+},
+"Entretien / Droguerie/Insecticides et antiparasites/Ruban attrape-mouches": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Entretien / Droguerie/Insecticides et antiparasites/Anti-mites": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Poêle": {
+"n": 5,
+"categorie": "fr:poeles",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Casserole": {
+"n": 1,
+"categorie": "en:saucepans",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Couteaux": {
+"n": 6,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Spatule": {
+"n": 1,
+"categorie": "en:printed-media",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Louche": {
+"n": 2,
+"categorie": "en:ladles",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Plat à four": {
+"n": 2,
+"categorie": "en:cookware-bakeware",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Faitout": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Râpe": {
+"n": 3,
+"categorie": "en:books",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Tire-bouchon": {
+"n": 2,
+"categorie": "en:barware",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Couverts": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Hachoir": {
+"n": 1,
+"categorie": "en:domestic-meat-grinder",
+"marques": []
+},
+"Cuisine et arts de la table/Arts de la table et cuisine/Balance de cuisine": {
+"n": 4,
+"categorie": "en:measuring-scales",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle jetable/Gobelets": {
+"n": 14,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle jetable/Gobelets en carton": {
+"n": 2,
+"categorie": "en:tumblers",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle jetable/Pailles": {
+"n": 4,
+"categorie": "en:drinking-straws-stirrers",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle jetable/Bougies d'anniversaire": {
+"n": 1,
+"categorie": "en:birthday-candles",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Assiette": {
+"n": 2,
+"categorie": "en:seasonal-holiday-decorations",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Verres": {
+"n": 9,
+"categorie": "en:building-materials",
+"marques": [
+[
+"Duralex",
+4
+]
+]
+},
+"Cuisine et arts de la table/Vaisselle/Tasses": {
+"n": 5,
+"categorie": "en:coffee-tea-cups",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Mugs": {
+"n": 3,
+"categorie": "en:mug",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Assiettes creuses": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Carafe": {
+"n": 2,
+"categorie": "fr:carafes-filtrantes",
+"marques": []
+},
+"Cuisine et arts de la table/Vaisselle/Fourchettes": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Piles": {
+"n": 43,
+"categorie": "en:batteries",
+"marques": [
+[
+"Energizer",
+9
+],
+[
+"Foxter",
+6
+],
+[
+"Duracell",
+4
+],
+[
+"Varta",
+4
+],
+[
+"Panasonic",
+3
+]
+]
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Ampoules": {
+"n": 4,
+"categorie": "fr:eclairage",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Colle": {
+"n": 21,
+"categorie": null,
+"marques": [
+[
+"Uhu",
+4
+]
+]
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Multiprise": {
+"n": 6,
+"categorie": "fr:multiprise",
+"marques": [
+[
+"Inventiv",
+5
+]
+]
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Piles bouton": {
+"n": 1,
+"categorie": "en:batteries",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Ampoules LED": {
+"n": 12,
+"categorie": "en:light-bulbs",
+"marques": [
+[
+"Lexman",
+3
+]
+]
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Clous": {
+"n": 1,
+"categorie": "en:nails",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Vis": {
+"n": 5,
+"categorie": "en:reinigungsmittel",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Chevilles": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Crochets adhésifs": {
+"n": 2,
+"categorie": "en:crochet-hooks",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Lampe de poche": {
+"n": 1,
+"categorie": "en:flashlights",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Tournevis": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Allume-feu": {
+"n": 11,
+"categorie": "fr:allume-feu",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Allumettes": {
+"n": 11,
+"categorie": "en:matches",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Briquet": {
+"n": 10,
+"categorie": "en:lighters-matches",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Rondelles": {
+"n": 3,
+"categorie": "en:washers",
+"marques": []
+},
+"Bricolage, auto et jardin/Bricolage et quincaillerie/Équerres": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Terreau": {
+"n": 1,
+"categorie": "fr:terreau",
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Engrais": {
+"n": 4,
+"categorie": "fr:engrais-pour-orchidees",
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Plants": {
+"n": 4,
+"categorie": "en:household-chemicals",
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Gants de jardin": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Pots de fleurs": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Charbon de bois": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Jardinage et extérieur/Anti-limaces": {
+"n": 1,
+"categorie": "fr:produits-anti-limaces",
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Huile moteur": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Liquide de refroidissement": {
+"n": 4,
+"categorie": "en:vehicle-cooling-system-additives",
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Désodorisant voiture": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Balais d'essuie-glace": {
+"n": 1,
+"categorie": "en:motor-vehicle-window-parts-accessories",
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Nettoyant jantes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Accessoires automobiles/Gilet jaune": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Outillage/Pince": {
+"n": 34,
+"categorie": "en:hair-claws-clips",
+"marques": [
+[
+"Cosmia",
+29
+]
+]
+},
+"Bricolage, auto et jardin/Outillage/Clés": {
+"n": 9,
+"categorie": "en:wrenches",
+"marques": [
+[
+"Foxter",
+7
+]
+]
+},
+"Bricolage, auto et jardin/Outillage/Cutter": {
+"n": 1,
+"categorie": "en:cutters",
+"marques": []
+},
+"Bricolage, auto et jardin/Outillage/Meuleuse": {
+"n": 1,
+"categorie": "fr:meuleuse-angulaire",
+"marques": []
+},
+"Bricolage, auto et jardin/Outillage/Scie sauteuse": {
+"n": 1,
+"categorie": "en:jigsaws",
+"marques": []
+},
+"Bricolage, auto et jardin/Outillage/Agrafeuse": {
+"n": 1,
+"categorie": "en:non-food-products",
+"marques": []
+},
+"Bricolage, auto et jardin/Outillage/Embouts de vissage": {
+"n": 5,
+"categorie": "fr:embouts-de-tournevis",
+"marques": [
+[
+"Tivoly",
+4
+]
+]
+},
+"Bricolage, auto et jardin/Outillage/Escabeau": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Électricité et éclairage/Projecteur LED": {
+"n": 2,
+"categorie": "en:seasonal-holiday-decorations",
+"marques": []
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/Enduit de rebouchage": {
+"n": 2,
+"categorie": "fr:enduits",
+"marques": []
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/Pinceaux": {
+"n": 9,
+"categorie": "en:non-food-products",
+"marques": [
+[
+"Cosmia",
+7
+]
+]
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/Colle à bois": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/Acétone": {
+"n": 1,
+"categorie": "fr:acetone",
+"marques": []
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/White-spirit": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Peinture, colles et mastics/Alcool à brûler": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Bricolage, auto et jardin/Plomberie/Flexible de douche": {
+"n": 1,
+"categorie": "fr:flexible-de-douche",
+"marques": []
+},
+"Bricolage, auto et jardin/Plomberie/Mécanisme de chasse d'eau": {
+"n": 2,
+"categorie": "en:ballcocks-flappers",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Cahiers": {
+"n": 96,
+"categorie": "en:notebooks",
+"marques": [
+[
+"Clairefontaine",
+8
+],
+[
+"Oxford",
+7
+],
+[
+"Esquisse",
+3
+]
+]
+},
+"Loisirs/Papeterie et librairie/Stylos": {
+"n": 30,
+"categorie": "en:office-supplies",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Ruban adhésif": {
+"n": 3,
+"categorie": "fr:ruban-adhesif-magnetique",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Livres": {
+"n": 101,
+"categorie": "en:printed-media",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Magazines": {
+"n": 11,
+"categorie": "en:media",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Crayons de couleur": {
+"n": 7,
+"categorie": "fr:crayons-de-couleur",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Crayons à papier": {
+"n": 5,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Feutres": {
+"n": 16,
+"categorie": "fr:feutres",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Gomme": {
+"n": 12,
+"categorie": "en:office-supplies",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Taille-crayon": {
+"n": 6,
+"categorie": "en:office-supplies",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Ramettes de papier": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Enveloppes": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Timbres": {
+"n": 1,
+"categorie": "fr:timbres-poste-autocollants",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Post-it": {
+"n": 7,
+"categorie": "de:узкие-клейкие-закладки",
+"marques": [
+[
+"Post-it",
+5
+]
+]
+},
+"Loisirs/Papeterie et librairie/Classeurs": {
+"n": 18,
+"categorie": "en:binders",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Bâton de colle": {
+"n": 2,
+"categorie": "en:craft-office-glue",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Ciseaux": {
+"n": 11,
+"categorie": "en:hairdressing-cosmetology",
+"marques": [
+[
+"Cosmia",
+8
+]
+]
+},
+"Loisirs/Papeterie et librairie/Règle": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Surligneurs": {
+"n": 11,
+"categorie": "en:highlighters",
+"marques": [
+[
+"Stabilo",
+4
+]
+]
+},
+"Loisirs/Papeterie et librairie/Agenda": {
+"n": 34,
+"categorie": "en:printed-media",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Cartes d'anniversaire": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Papier cadeau": {
+"n": 4,
+"categorie": "en:gift-wrapping",
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Cartes à collectionner": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Papeterie et librairie/Chemises à élastiques": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Jouets/Jeux de société": {
+"n": 1,
+"categorie": "fr:jeu-de-societe",
+"marques": []
+},
+"Loisirs/Jouets/Puzzle": {
+"n": 11,
+"categorie": "en:jigsaw-puzzles",
+"marques": []
+},
+"Loisirs/Jouets/Jeux de cartes": {
+"n": 17,
+"categorie": "en:toys-games",
+"marques": []
+},
+"Loisirs/Jouets/Peluches": {
+"n": 9,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Jouets/Poupées": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Jouets/Jeux de construction": {
+"n": 2,
+"categorie": "en:childrens-blocks-and-building-systems",
+"marques": []
+},
+"Loisirs/Jouets/Pâte à modeler": {
+"n": 1,
+"categorie": "en:games",
+"marques": []
+},
+"Loisirs/Jouets/Ballons": {
+"n": 27,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Jouets/Bulles de savon": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Loisirs/Bagagerie/Valises": {
+"n": 4,
+"categorie": "en:suitcases",
+"marques": []
+},
+"Loisirs/Bagagerie/Sacs à dos": {
+"n": 3,
+"categorie": "fr:sac",
+"marques": []
+},
+"Loisirs/Bagagerie/Cartables": {
+"n": 1,
+"categorie": "fr:cartable",
+"marques": []
+},
+"Loisirs/Bagagerie/Trousses": {
+"n": 5,
+"categorie": null,
+"marques": [
+[
+"Cosmia",
+3
+]
+]
+},
+"Loisirs/Bagagerie/Trousse de toilette": {
+"n": 6,
+"categorie": "en:cosmetic-toiletry-bags",
+"marques": [
+[
+"Cosmia",
+6
+]
+]
+},
+"Loisirs/Bagagerie/Sac isotherme": {
+"n": 2,
+"categorie": "fr:sac",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Bouilloire": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Grille-pain": {
+"n": 4,
+"categorie": "en:toasters",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Cafetière": {
+"n": 4,
+"categorie": "fr:cafetieres",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Mixeur": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Fer à repasser": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Aspirateur": {
+"n": 35,
+"categorie": "en:aspirateurs",
+"marques": [
+[
+"Groupe SEB France",
+24
+],
+[
+"Bosch",
+7
+],
+[
+"Polti",
+3
+]
+]
+},
+"Électroménager et décoration/Petit électroménager/Blender": {
+"n": 2,
+"categorie": "en:open-products-facts",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Presse-agrumes": {
+"n": 1,
+"categorie": "fr:presse-agrume",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Gaufrier": {
+"n": 2,
+"categorie": "en:waffle-irons",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Appareil à raclette": {
+"n": 1,
+"categorie": "en:domestic-raclette",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Friteuse sans huile": {
+"n": 3,
+"categorie": "en:deep-fryers",
+"marques": [
+[
+"Moulinex",
+3
+]
+]
+},
+"Électroménager et décoration/Petit électroménager/Ventilateur": {
+"n": 1,
+"categorie": "fr:ventilateur-solaire",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Aspirateur balai": {
+"n": 3,
+"categorie": "en:vacuums",
+"marques": []
+},
+"Électroménager et décoration/Petit électroménager/Pèse-personne": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Décoration/Bougies": {
+"n": 27,
+"categorie": "en:candles",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Cadres": {
+"n": 1,
+"categorie": "en:cadre-photo-numerique",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Bougies parfumées": {
+"n": 10,
+"categorie": "en:scented-candles",
+"marques": [
+[
+"Auchan",
+5
+]
+]
+},
+"Électroménager et décoration/Décoration/Vases": {
+"n": 1,
+"categorie": "en:vases",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Coussins": {
+"n": 3,
+"categorie": "en:doughnuts",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Plaids": {
+"n": 1,
+"categorie": "en:seasonal-holiday-decorations",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Miroirs": {
+"n": 6,
+"categorie": "en:mirrors",
+"marques": [
+[
+"Cosmia",
+5
+]
+]
+},
+"Électroménager et décoration/Décoration/Horloge": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Décoration/Cintres": {
+"n": 1,
+"categorie": "en:hangers",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Boules de Noël": {
+"n": 1,
+"categorie": "en:snow-globes",
+"marques": []
+},
+"Électroménager et décoration/Décoration/Tapis": {
+"n": 8,
+"categorie": null,
+"marques": []
+},
+"Électroménager et décoration/Rangement/Étagère": {
+"n": 4,
+"categorie": "fr:furniture",
+"marques": []
+},
+"Textile/Vêtements femme/T-shirts": {
+"n": 26,
+"categorie": "en:t-shirts",
+"marques": [
+[
+"kiabi",
+5
+],
+[
+"Van|Rysel",
+3
+]
+]
+},
+"Textile/Vêtements femme/Pyjamas": {
+"n": 4,
+"categorie": "en:pajamas",
+"marques": [
+[
+"Tchibo",
+3
+]
+]
+},
+"Textile/Vêtements femme/Pulls": {
+"n": 5,
+"categorie": "en:pull-over",
+"marques": []
+},
+"Textile/Vêtements femme/Jeans": {
+"n": 10,
+"categorie": "xx:jeans",
+"marques": [
+[
+"Up2Fashion",
+5
+]
+]
+},
+"Textile/Vêtements femme/Pantalons": {
+"n": 5,
+"categorie": "en:clothing",
+"marques": []
+},
+"Textile/Vêtements femme/Sweats": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements femme/Maillots de bain": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements femme/Tops": {
+"n": 6,
+"categorie": "en:collectibles",
+"marques": []
+},
+"Textile/Vêtements femme/Gilets": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements femme/Robes": {
+"n": 1,
+"categorie": "en:dresses",
+"marques": []
+},
+"Textile/Vêtements femme/Shorts": {
+"n": 5,
+"categorie": "en:shorts",
+"marques": []
+},
+"Textile/Vêtements femme/Bermudas": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements femme/Chemises": {
+"n": 6,
+"categorie": "en:shirts-tops",
+"marques": []
+},
+"Textile/Vêtements femme/Vestes": {
+"n": 5,
+"categorie": "fr:veste",
+"marques": []
+},
+"Textile/Vêtements femme/Manteaux": {
+"n": 1,
+"categorie": "en:coats-and-jackets",
+"marques": []
+},
+"Textile/Vêtements femme/Doudounes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements homme/Polos": {
+"n": 4,
+"categorie": "en:polo-shirt",
+"marques": []
+},
+"Textile/Vêtements homme/T-shirts": {
+"n": 26,
+"categorie": "en:t-shirts",
+"marques": [
+[
+"kiabi",
+5
+],
+[
+"Van|Rysel",
+3
+]
+]
+},
+"Textile/Vêtements homme/Chemises": {
+"n": 6,
+"categorie": "en:shirts-tops",
+"marques": []
+},
+"Textile/Vêtements homme/Pulls": {
+"n": 5,
+"categorie": "en:pull-over",
+"marques": []
+},
+"Textile/Vêtements homme/Gilets": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements homme/Sweats": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements homme/Jeans": {
+"n": 10,
+"categorie": "xx:jeans",
+"marques": [
+[
+"Up2Fashion",
+5
+]
+]
+},
+"Textile/Vêtements homme/Pantalons": {
+"n": 5,
+"categorie": "en:clothing",
+"marques": []
+},
+"Textile/Vêtements homme/Shorts": {
+"n": 5,
+"categorie": "en:shorts",
+"marques": []
+},
+"Textile/Vêtements homme/Bermudas": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements homme/Vestes": {
+"n": 5,
+"categorie": "fr:veste",
+"marques": []
+},
+"Textile/Vêtements homme/Doudounes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements homme/Manteaux": {
+"n": 1,
+"categorie": "en:coats-and-jackets",
+"marques": []
+},
+"Textile/Vêtements homme/Pyjamas": {
+"n": 4,
+"categorie": "en:pajamas",
+"marques": [
+[
+"Tchibo",
+3
+]
+]
+},
+"Textile/Vêtements homme/Maillots de bain": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/T-shirts": {
+"n": 26,
+"categorie": "en:t-shirts",
+"marques": [
+[
+"kiabi",
+5
+],
+[
+"Van|Rysel",
+3
+]
+]
+},
+"Textile/Vêtements enfant et bébé/Chemises": {
+"n": 6,
+"categorie": "en:shirts-tops",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Pulls": {
+"n": 5,
+"categorie": "en:pull-over",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Sweats": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Jeans": {
+"n": 10,
+"categorie": "xx:jeans",
+"marques": [
+[
+"Up2Fashion",
+5
+]
+]
+},
+"Textile/Vêtements enfant et bébé/Pantalons": {
+"n": 5,
+"categorie": "en:clothing",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Robes": {
+"n": 1,
+"categorie": "en:dresses",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Shorts": {
+"n": 5,
+"categorie": "en:shorts",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Manteaux": {
+"n": 1,
+"categorie": "en:coats-and-jackets",
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Doudounes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Vêtements enfant et bébé/Pyjamas": {
+"n": 4,
+"categorie": "en:pajamas",
+"marques": [
+[
+"Tchibo",
+3
+]
+]
+},
+"Textile/Vêtements enfant et bébé/Maillots de bain": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Chaussures/Baskets": {
+"n": 4,
+"categorie": "en:shoes",
+"marques": []
+},
+"Textile/Chaussures/Sandales": {
+"n": 1,
+"categorie": "fr:sandales",
+"marques": []
+},
+"Textile/Lingerie/Sous-vêtements": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Lingerie/Collants": {
+"n": 4,
+"categorie": "en:hosiery",
+"marques": [
+[
+"Odlo",
+3
+]
+]
+},
+"Textile/Lingerie/Culottes": {
+"n": 29,
+"categorie": "fr:culottes-de-regles",
+"marques": [
+[
+"Auchan",
+16
+],
+[
+"Auchan Baby",
+12
+]
+]
+},
+"Textile/Lingerie/Boxers": {
+"n": 8,
+"categorie": "en:underwear",
+"marques": [
+[
+"DIM",
+4
+]
+]
+},
+"Textile/Lingerie/Slips": {
+"n": 7,
+"categorie": "en:briefs",
+"marques": []
+},
+"Textile/Lingerie/Caleçons": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Textile/Lingerie/Débardeurs": {
+"n": 2,
+"categorie": "fr:debardeurs",
+"marques": []
+},
+"Textile/Lingerie/Chaussettes de sport": {
+"n": 1,
+"categorie": "fr:chaussettes-de-sport",
+"marques": []
+},
+"Textile/Lingerie/Chaussettes": {
+"n": 14,
+"categorie": "en:socks",
+"marques": []
+},
+"Textile/Accessoires de mode/Chapeaux": {
+"n": 1,
+"categorie": "fr:chapeaux-de-paille",
+"marques": []
+},
+"Textile/Accessoires de mode/Casquettes": {
+"n": 1,
+"categorie": "fr:casquette",
+"marques": []
+},
+"Textile/Accessoires de mode/Ceintures": {
+"n": 2,
+"categorie": "fr:ceinture-de-massage",
+"marques": []
+},
+"Textile/Accessoires de mode/Portefeuilles": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Accessoires de mode/Bracelets": {
+"n": 3,
+"categorie": null,
+"marques": []
+},
+"Textile/Accessoires de mode/Boucles d'oreilles": {
+"n": 4,
+"categorie": null,
+"marques": []
+},
+"Textile/Accessoires de mode/Gants": {
+"n": 29,
+"categorie": "en:cleaning-gloves",
+"marques": [
+[
+"Auchan",
+14
+]
+]
+},
+"Textile/Accessoires de mode/Bonnets": {
+"n": 3,
+"categorie": "en:seasonal-holiday-decorations",
+"marques": []
+},
+"Textile/Linge de maison/Torchons": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Rideaux": {
+"n": 3,
+"categorie": "en:curtains-drapes",
+"marques": []
+},
+"Textile/Linge de maison/Draps housse": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Taies d'oreiller": {
+"n": 1,
+"categorie": "fr:linge-de-maison",
+"marques": []
+},
+"Textile/Linge de maison/Oreillers": {
+"n": 1,
+"categorie": "en:pillows",
+"marques": []
+},
+"Textile/Linge de maison/Couettes": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Protège-matelas": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Serviettes de toilette": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Nappe": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Textile/Linge de maison/Sets de table": {
+"n": 1,
+"categorie": "en:placemats",
+"marques": []
+},
+"Textile/Linge de maison/Draps": {
+"n": 3,
+"categorie": "en:towels",
+"marques": [
+[
+"Monoprix",
+3
+]
+]
+},
+"Textile/Linge de maison/Couvertures": {
+"n": 1,
+"categorie": "fr:couvertures-anti-feu",
+"marques": []
+},
+"Textile/Linge de maison/Serviettes de table": {
+"n": 2,
+"categorie": "fr:emballage",
+"marques": []
+},
+"Animaux/Chiens/Pâtée pour chien": {
+"n": 1,
+"categorie": "en:dog-food",
+"marques": []
+},
+"Animaux/Chiens/Shampooing pour chien": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Animaux/Chats/Croquettes pour chat": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Animaux/Chats/Litière": {
+"n": 29,
+"categorie": "en:pet-litter",
+"marques": [
+[
+"Auchan",
+6
+],
+[
+"Carrefour",
+4
+]
+]
+},
+"Animaux/Chats/Litière végétale": {
+"n": 7,
+"categorie": "en:pet-litter",
+"marques": [
+[
+"Auchan",
+3
+]
+]
+},
+"Animaux/Chats/Litière silice": {
+"n": 1,
+"categorie": "en:pet-litter",
+"marques": []
+},
+"Animaux/Chats/Jouets pour chat": {
+"n": 1,
+"categorie": "en:pet-toys",
+"marques": []
+},
+"Animaux/Chats/Herbe à chat": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Plein air et camping/Parasol": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Plein air et camping/Tonnelle": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Plein air et camping/Barbecue": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Plein air et camping/Plancha": {
+"n": 2,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Chauffage et combustibles/Granulés de bois": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Chauffage et combustibles/Bûches de bois": {
+"n": 1,
+"categorie": null,
+"marques": []
+},
+"Saisonnier/Halloween/Déguisement enfant": {
+"n": 1,
+"categorie": "en:halloween-supplies",
+"marques": []
+},
+"Saisonnier/Halloween/Masque d'Halloween": {
+"n": 1,
+"categorie": "en:halloween-supplies",
+"marques": []
+},
+"Saisonnier/Halloween/Chapeau de sorcière": {
+"n": 1,
+"categorie": "en:costume-hats",
+"marques": []
+},
+"Saisonnier/Halloween/Serre-tête d'Halloween": {
+"n": 1,
+"categorie": "fr:serre-tetes",
+"marques": []
+}
+}
+}
