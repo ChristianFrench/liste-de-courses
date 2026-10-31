@@ -1,0 +1,164 @@
+{
+ "_notions": {
+  "outil électroportatif": "Q117710711",
+  "outil à main": "Q2578402",
+  "perceuse": "Q58964",
+  "lampe électrique": "Q1318740",
+  "ampoule électrique": "Q1326621",
+  "pile électrique": "Q267298",
+  "peinture": "Q3305213",
+  "colle": "Q16865682",
+  "mastic": "Q318367",
+  "robinetterie": "Q182612",
+  "plomberie": "Q182612",
+  "tondeuse à gazon": "Q260521",
+  "engrais": "Q83323",
+  "outil de jardinage": "Q1494647",
+  "huile moteur": "Q193784",
+  "pneumatique": "Q169545",
+  "essuie-glace": "Q13692",
+  "batterie automobile": "Q902054",
+  "quincaillerie": "Q15496340",
+  "ustensile de cuisine": "Q154038",
+  "batterie de cuisine": "Q154038",
+  "poêle à frire": "Q127666",
+  "coutellerie": "Q81944",
+  "vaisselle": "Q851782",
+  "verrerie": "Q1179791",
+  "porcelaine": "Q130693",
+  "petit électroménager": "Q212920",
+  "cafetière": "Q1721055",
+  "aspirateur": "Q101674",
+  "sèche-cheveux": "Q15004",
+  "bougie": "Q59975",
+  "décoration intérieure": "Q5875045",
+  "boîte de rangement": null,
+  "mobilier de rangement": null,
+  "insecticide": "Q181322",
+  "répulsif": "Q1340459",
+  "éponge": "Q18960",
+  "balai": "Q12473667",
+  "serpillière": "Q828361",
+  "cirage": "Q913617",
+  "désodorisant": "Q2419566",
+  "lessive": "Q2188362",
+  "adoucissant": "Q901832",
+  "produit d'entretien": null,
+  "détergent": "Q334637",
+  "jouet": "Q1422718",
+  "jeu de société": "Q131436"
+ },
+ "secteurs": {
+  "Bricolage, auto et jardin/Outillage": [],
+  "Bricolage, auto et jardin/Électricité et éclairage": [],
+  "Bricolage, auto et jardin/Peinture, colles et mastics": [],
+  "Bricolage, auto et jardin/Plomberie": [
+   [
+    "Curtiss-Wright Corporation",
+    27
+   ],
+   [
+    "Toto",
+    24
+   ],
+   [
+    "Grohe",
+    20
+   ],
+   [
+    "Festo",
+    18
+   ],
+   [
+    "usine de Votkinsk",
+    10
+   ],
+   [
+    "Oras",
+    9
+   ],
+   [
+    "Neles",
+    7
+   ],
+   [
+    "Saut du Tarn",
+    3
+   ],
+   [
+    "GIVA Group",
+    2
+   ]
+  ],
+  "Bricolage, auto et jardin/Jardinage et extérieur": [],
+  "Bricolage, auto et jardin/Accessoires automobiles": [],
+  "Bricolage, auto et jardin/Bricolage et quincaillerie": [],
+  "Cuisine et arts de la table/Arts de la table et cuisine": [],
+  "Cuisine et arts de la table/Vaisselle": [],
+  "Électroménager et décoration/Petit électroménager": [],
+  "Électroménager et décoration/Décoration": [],
+  "Entretien / Droguerie/Insecticides et antiparasites": [],
+  "Entretien / Droguerie/Accessoires de ménage": [],
+  "Entretien / Droguerie/Salle de bain et cirage": [],
+  "Entretien / Droguerie/Lessives et soin du linge": [],
+  "Entretien / Droguerie/Nettoyants ménagers": [
+   [
+    "Unilever",
+    65
+   ],
+   [
+    "Procter & Gamble",
+    63
+   ],
+   [
+    "saponification",
+    48
+   ],
+   [
+    "Henkel",
+    38
+   ],
+   [
+    "Neutrogena",
+    18
+   ],
+   [
+    "L'Occitane en Provence",
+    16
+   ],
+   [
+    "Kiehl's",
+    12
+   ],
+   [
+    "Acqua di Parma",
+    12
+   ],
+   [
+    "Church & Dwight",
+    9
+   ],
+   [
+    "Bath & Body Works",
+    8
+   ],
+   [
+    "Le Chat",
+    1
+   ],
+   [
+    "Albus Novi Sad",
+    1
+   ],
+   [
+    "savonnerie",
+    1
+   ],
+   [
+    "Paredes",
+    1
+   ]
+  ],
+  "Loisirs/Jouets": []
+ }
+}
