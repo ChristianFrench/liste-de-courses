@@ -26,11 +26,13 @@ exclues |= {cle(x) for x in [
     "Freshona", "Cien", "Kania", "Belbake", "Gelatelli", "Chef Select", "Deluxe", "Pilos", "Snack Day", "Sondey",
     "Fin Carré", "Lupilu", "W5", "Solent", "Ocean Sea", "Nixe", "Alesto", "Vitasia", "Italiamo", "Duc de Coeur",
 ]}
+# Graphies accentuées perdues par l'extraction du 31/10/2026 (corrigé depuis dans extraire.py).
+accents = {"President": "Président", "Cote d'Or": "Côte d'Or", "Nestle": "Nestlé", "Herta": "Herta"}
 ext = json.load(open("outils/off/natures_off.json", encoding="utf-8"))
 res = {}
 for chemin, v in ext["natures"].items():
     nom = chemin.split("/")[-1]
-    marques = [m for m, c in v["marques"] if c >= 3 and cle(m) not in exclues][:10]
+    marques = [accents.get(m, m) for m, c in v["marques"] if c >= 3 and cle(m) not in exclues][:10]
     res[nom] = {"n": v["n"], **({"m": marques} if marques else {})}
 json.dump({"_description": ext["_description"] + " ; marques d'enseigne retirées (outils/off/natures.py)",
            "natures": dict(sorted(res.items()))}, open("assets/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)

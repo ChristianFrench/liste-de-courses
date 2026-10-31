@@ -128,6 +128,13 @@ with urllib.request.urlopen(req, timeout=300) as flux:
         if lus % 500000 == 0:
             print(f"{lus} lignes, {francais} en France, {ranges} rangées, {time.time() - debut:.0f} s", flush=True)
 
+def graphie(k):
+    """Graphie d'une marque : la plus fréquente, sauf si une graphie accentuée est aussi courante (« Président »)."""
+    g = graphies[k].most_common()
+    accent = [(x, c) for x, c in g if sans_accents(x) != x]
+    return accent[0][0] if accent and accent[0][1] >= g[0][1] / 3 else g[0][0]
+
+
 res = {}
 for cle in dict.fromkeys(n[0] for n in natures):
     produits = ranges_par_nature.get(cle)
@@ -144,7 +151,7 @@ for cle in dict.fromkeys(n[0] for n in natures):
     res[cle] = {
         "n": len(produits),
         "categorie": categorie,
-        "marques": [[graphies[k].most_common(1)[0][0], c] for k, c in marques.most_common(40) if c >= 3],
+        "marques": [[graphie(k), c] for k, c in marques.most_common(40) if c >= 3],
     }
 json.dump({"_description": f"Open Food Facts, {time.strftime('%Y-%m-%d')} : {francais} produits vendus en France, "
                            f"{ranges} rangés sous {len(res)} natures du catalogue sur {len(cles_du_nom)}",
