@@ -1,8 +1,8 @@
 {
-"_description": "Open Food Facts, 2026-10-31 : 1293287 produits vendus en France, 480329 rangés sous 1641 natures du catalogue sur 1784 ; marques d'enseigne retirées (outils/off/natures.py)",
+"_description": "Open Food Facts, 2026-10-31 : 1293287 produits vendus en France, 480329 rangés sous 1641 natures du catalogue sur 1784 ; plus Open Beauty, Products et Pet Food Facts ; marques d'enseigne retirées (outils/off/natures.py)",
 "natures": {
 "Abondance": {
-"n": 231,
+"n": 462,
 "m": [
 "Le Fromager Des Halles"
 ]
@@ -44,19 +44,28 @@
 ]
 },
 "Accras de morue": {
-"n": 57,
+"n": 114,
 "m": [
 "Cité Marine"
 ]
 },
 "Acide citrique": {
-"n": 19
+"n": 24
+},
+"Acétone": {
+"n": 1
 },
 "Adoucissant": {
-"n": 12
+"n": 48,
+"m": [
+"Cajoline"
+]
 },
 "Agenda": {
-"n": 14
+"n": 49
+},
+"Agrafeuse": {
+"n": 1
 },
 "Aiguillettes de canard": {
 "n": 328,
@@ -123,16 +132,20 @@
 ]
 },
 "Alcool à 70°": {
-"n": 83,
+"n": 101,
 "m": [
-"Ricqles"
+"Ricqles",
+"Onyx"
 ]
+},
+"Alcool à brûler": {
+"n": 1
 },
 "Algues nori": {
 "n": 29
 },
 "Aligot": {
-"n": 200,
+"n": 400,
 "m": [
 "Jeune Montagne",
 "Maison Carrier",
@@ -144,10 +157,10 @@
 ]
 },
 "Allume-feu": {
-"n": 3
+"n": 16
 },
 "Allumettes": {
-"n": 313,
+"n": 324,
 "m": [
 "Herta",
 "Fleury Michon",
@@ -197,7 +210,13 @@
 ]
 },
 "Ampoules": {
-"n": 14
+"n": 18
+},
+"Ampoules LED": {
+"n": 12,
+"m": [
+"Lexman"
+]
 },
 "Ananas": {
 "n": 1165,
@@ -270,8 +289,20 @@
 "Ducros"
 ]
 },
+"Anti-limaces": {
+"n": 1
+},
+"Anti-mites": {
+"n": 1
+},
+"Anti-moisissures": {
+"n": 1
+},
 "Anti-moustiques": {
-"n": 6
+"n": 12
+},
+"Anticalcaire": {
+"n": 1
 },
 "Antipasti": {
 "n": 66,
@@ -279,14 +310,23 @@
 "Delicemer"
 ]
 },
+"Appareil à raclette": {
+"n": 1
+},
 "Après-rasage": {
-"n": 2
+"n": 6
 },
 "Après-shampooing": {
-"n": 7
+"n": 55,
+"m": [
+"Garnier",
+"L'Oréal",
+"Timotei",
+"Head & Shoulders"
+]
 },
 "Après-soleil": {
-"n": 2
+"n": 9
 },
 "Apéricube": {
 "n": 31,
@@ -347,7 +387,14 @@
 ]
 },
 "Aspirateur": {
-"n": 2
+"n": 37,
+"m": [
+"Bosch",
+"Polti"
+]
+},
+"Aspirateur balai": {
+"n": 3
 },
 "Assaisonnement pour paella": {
 "n": 6,
@@ -356,7 +403,7 @@
 ]
 },
 "Assiette": {
-"n": 163,
+"n": 165,
 "m": [
 "Montagne Noire",
 "Saint-Azay",
@@ -364,6 +411,9 @@
 "Charculor",
 "Fratelli Beretta"
 ]
+},
+"Assiettes creuses": {
+"n": 1
 },
 "Assiettes en carton": {
 "n": 1
@@ -387,7 +437,7 @@
 ]
 },
 "Autobronzant": {
-"n": 6
+"n": 7
 },
 "Avocats": {
 "n": 302,
@@ -480,16 +530,23 @@
 ]
 },
 "Bain de bouche": {
-"n": 21,
+"n": 78,
 "m": [
+"Signal",
 "Listerine"
 ]
 },
 "Balai": {
+"n": 5
+},
+"Balais d'essuie-glace": {
 "n": 1
 },
+"Balance de cuisine": {
+"n": 4
+},
 "Ballons": {
-"n": 10
+"n": 37
 },
 "Bananes": {
 "n": 1567,
@@ -507,16 +564,26 @@
 ]
 },
 "Bandes de cire": {
-"n": 3
+"n": 15,
+"m": [
+"Laurence Dumont",
+"Loua"
+]
 },
 "Bar": {
-"n": 136,
+"n": 272,
 "m": [
 "Pural",
 "Teisseire",
 "9bar",
 "Le Comptoir de Mathilde"
 ]
+},
+"Barbecue": {
+"n": 1
+},
+"Barquettes aluminium": {
+"n": 5
 },
 "Barres chocolatées": {
 "n": 39,
@@ -563,7 +630,7 @@
 ]
 },
 "Barrettes": {
-"n": 17
+"n": 32
 },
 "Bas": {
 "n": 9
@@ -581,10 +648,13 @@
 ]
 },
 "Baskets": {
-"n": 8
+"n": 12
 },
 "Basse côte": {
 "n": 25
+},
+"Bassine": {
+"n": 1
 },
 "Batavia": {
 "n": 37,
@@ -596,14 +666,14 @@
 "n": 2
 },
 "Baume à lèvres": {
-"n": 15,
+"n": 45,
 "m": [
 "Le Petit Olivier",
 "Yves Rocher"
 ]
 },
 "Bavette": {
-"n": 380,
+"n": 760,
 "m": [
 "Charal",
 "L'Étal du Boucher"
@@ -613,7 +683,7 @@
 "n": 1
 },
 "Beaufort": {
-"n": 342,
+"n": 684,
 "m": [
 "Le Fromager Des Halles",
 "Verdannet",
@@ -651,6 +721,9 @@
 "DV SAS",
 "So Shape"
 ]
+},
+"Bermudas": {
+"n": 6
 },
 "Betteraves cuites": {
 "n": 209,
@@ -748,10 +821,10 @@
 ]
 },
 "Biberons": {
-"n": 5
+"n": 8
 },
 "Bicarbonate de soude": {
-"n": 47
+"n": 52
 },
 "Biscottes": {
 "n": 489,
@@ -922,6 +995,9 @@
 "Bavaria"
 ]
 },
+"Blaireau": {
+"n": 1
+},
 "Blanc de dinde": {
 "n": 163,
 "m": [
@@ -946,7 +1022,7 @@
 "n": 9
 },
 "Blancs de poulet": {
-"n": 499,
+"n": 998,
 "m": [
 "Fleury Michon",
 "Saint Alby",
@@ -964,17 +1040,17 @@
 "n": 3
 },
 "Blanquette de veau": {
-"n": 163,
+"n": 326,
 "m": [
 "Tendre & Plus",
 "Tendre Et Plus"
 ]
 },
 "Blender": {
-"n": 4
+"n": 6
 },
 "Bleu d'Auvergne": {
-"n": 213,
+"n": 426,
 "m": [
 "Laiterie de la Montagne",
 "Fromapac"
@@ -996,7 +1072,7 @@
 ]
 },
 "Blocs WC": {
-"n": 6
+"n": 35
 },
 "Boisson amande": {
 "n": 94,
@@ -1111,13 +1187,16 @@
 ]
 },
 "Bonnets": {
-"n": 6
+"n": 9
 },
 "Bouchées à la reine": {
 "n": 69
 },
+"Boucles d'oreilles": {
+"n": 4
+},
 "Boudin blanc": {
-"n": 651,
+"n": 1302,
 "m": [
 "Bahier",
 "Maison Prunier",
@@ -1132,7 +1211,7 @@
 ]
 },
 "Boudin noir": {
-"n": 412,
+"n": 824,
 "m": [
 "Mainjolle",
 "Le Père Benoît",
@@ -1155,10 +1234,16 @@
 ]
 },
 "Bougies": {
-"n": 9
+"n": 39
+},
+"Bougies d'anniversaire": {
+"n": 1
 },
 "Bougies parfumées": {
-"n": 1
+"n": 11
+},
+"Bouilloire": {
+"n": 2
 },
 "Bouillon cube": {
 "n": 105,
@@ -1174,10 +1259,10 @@
 ]
 },
 "Boules de Noël": {
-"n": 22
+"n": 23
 },
 "Boules de graisse pour oiseaux": {
-"n": 2
+"n": 3
 },
 "Boulettes de bœuf": {
 "n": 215,
@@ -1213,7 +1298,10 @@
 ]
 },
 "Boxers": {
-"n": 2
+"n": 10,
+"m": [
+"DIM"
+]
 },
 "Boîtes alimentaires": {
 "n": 1
@@ -1221,8 +1309,11 @@
 "Boîtes de rangement": {
 "n": 2
 },
+"Bracelets": {
+"n": 3
+},
 "Brandade de morue": {
-"n": 327,
+"n": 654,
 "m": [
 "Briau",
 "Tipiak",
@@ -1247,7 +1338,7 @@
 ]
 },
 "Brie": {
-"n": 503,
+"n": 1006,
 "m": [
 "Le Roitelet",
 "Le Fromager Des Halles",
@@ -1262,7 +1353,7 @@
 ]
 },
 "Brie de Meaux": {
-"n": 364,
+"n": 728,
 "m": [
 "Le Fromager Des Halles"
 ]
@@ -1312,11 +1403,14 @@
 "Epi d'Or"
 ]
 },
+"Briquet": {
+"n": 10
+},
 "Briquettes de jus": {
 "n": 3
 },
 "Brochettes de bœuf": {
-"n": 143,
+"n": 286,
 "m": [
 "Socopa",
 "Bigard",
@@ -1344,14 +1438,30 @@
 "Brocolis surgelés": {
 "n": 14
 },
+"Brosse WC": {
+"n": 1
+},
+"Brosse vaisselle": {
+"n": 1
+},
+"Brosse à cheveux": {
+"n": 21
+},
 "Brosse à dents": {
-"n": 7
+"n": 99,
+"m": [
+"Signal",
+"Colgate"
+]
 },
 "Brosse à dents enfant": {
-"n": 1
+"n": 10
+},
+"Brosse à dents électrique": {
+"n": 2
 },
 "Brossettes interdentaires": {
-"n": 1
+"n": 18
 },
 "Brownies": {
 "n": 567,
@@ -1386,8 +1496,11 @@
 "Bulbes": {
 "n": 2
 },
+"Bulles de savon": {
+"n": 3
+},
 "Bulots": {
-"n": 35,
+"n": 70,
 "m": [
 "Mer et Terroirs"
 ]
@@ -1411,7 +1524,7 @@
 ]
 },
 "Bâton de colle": {
-"n": 3
+"n": 5
 },
 "Bâtonnets glacés": {
 "n": 66
@@ -1420,7 +1533,7 @@
 "n": 19
 },
 "Bûche de chèvre": {
-"n": 244,
+"n": 488,
 "m": [
 "Soignon",
 "Chêne d'argent",
@@ -1442,8 +1555,11 @@
 "Jampi"
 ]
 },
+"Bûches de bois": {
+"n": 1
+},
 "Bœuf bourguignon": {
-"n": 215,
+"n": 430,
 "m": [
 "Tendre & Plus",
 "Jean Rozé",
@@ -1477,6 +1593,12 @@
 "m": [
 "Van Houten"
 ]
+},
+"Cadres": {
+"n": 1
+},
+"Cafetière": {
+"n": 4
 },
 "Café décaféiné": {
 "n": 113,
@@ -1547,7 +1669,12 @@
 ]
 },
 "Cahiers": {
-"n": 18
+"n": 116,
+"m": [
+"Clairefontaine",
+"Oxford",
+"Esquisse"
+]
 },
 "Caillettes": {
 "n": 188,
@@ -1574,7 +1701,7 @@
 ]
 },
 "Calamars": {
-"n": 138,
+"n": 276,
 "m": [
 "Escal",
 "Esmeralda",
@@ -1608,6 +1735,9 @@
 "Mondelez",
 "Mazet"
 ]
+},
+"Caleçons": {
+"n": 2
 },
 "Calissons": {
 "n": 214,
@@ -1664,7 +1794,7 @@
 ]
 },
 "Canard": {
-"n": 291,
+"n": 582,
 "m": [
 "Esprit Gourmet",
 "Lechef",
@@ -1724,7 +1854,7 @@
 ]
 },
 "Cantal": {
-"n": 639,
+"n": 1278,
 "m": [
 "Ets Schoepfer",
 "Le Fromager Des Halles",
@@ -1766,7 +1896,7 @@
 ]
 },
 "Carafe": {
-"n": 5
+"n": 7
 },
 "Caramels": {
 "n": 1805,
@@ -1834,11 +1964,20 @@
 "Carré d'agneau": {
 "n": 6
 },
+"Cartables": {
+"n": 1
+},
 "Cartes d'anniversaire": {
+"n": 4
+},
+"Cartes à collectionner": {
+"n": 1
+},
+"Casquettes": {
 "n": 1
 },
 "Casserole": {
-"n": 7
+"n": 8
 },
 "Cassis": {
 "n": 114,
@@ -1890,6 +2029,9 @@
 "L'Apéro du Poissonnier"
 ]
 },
+"Ceintures": {
+"n": 2
+},
 "Cerfeuil": {
 "n": 16
 },
@@ -1921,7 +2063,7 @@
 ]
 },
 "Cervelas": {
-"n": 401,
+"n": 802,
 "m": [
 "Herta",
 "Saint Alby",
@@ -1939,7 +2081,7 @@
 "n": 4
 },
 "Chair à saucisse": {
-"n": 244,
+"n": 488,
 "m": [
 "L'Étal du Boucher",
 "Jean Rozé",
@@ -1995,11 +2137,17 @@
 ]
 },
 "Chaource": {
-"n": 63,
+"n": 126,
 "m": [
 "Lincet",
 "Didier lincet"
 ]
+},
+"Chapeau de sorcière": {
+"n": 1
+},
+"Chapeaux": {
+"n": 1
 },
 "Chapelure": {
 "n": 118,
@@ -2013,7 +2161,7 @@
 ]
 },
 "Charbon de bois": {
-"n": 1
+"n": 3
 },
 "Chaumes": {
 "n": 45,
@@ -2023,7 +2171,10 @@
 ]
 },
 "Chaussettes": {
-"n": 2
+"n": 16
+},
+"Chaussettes de sport": {
+"n": 1
 },
 "Chaussons": {
 "n": 118,
@@ -2072,8 +2223,14 @@
 "Dr. Oetker"
 ]
 },
-"Chevilles": {
+"Chemises": {
+"n": 18
+},
+"Chemises à élastiques": {
 "n": 1
+},
+"Chevilles": {
+"n": 2
 },
 "Chewing-gums": {
 "n": 364,
@@ -2119,6 +2276,9 @@
 "Galibier"
 ]
 },
+"Chiffons microfibre": {
+"n": 1
+},
 "Chili con carne": {
 "n": 233,
 "m": [
@@ -2135,7 +2295,7 @@
 ]
 },
 "Chipolatas": {
-"n": 1871,
+"n": 3742,
 "m": [
 "Jean Rozé",
 "Hiruak",
@@ -2326,7 +2486,7 @@
 ]
 },
 "Chorizo": {
-"n": 1448,
+"n": 2896,
 "m": [
 "Hiruak",
 "César Moroni",
@@ -2384,7 +2544,7 @@
 ]
 },
 "Choucroute garnie": {
-"n": 291,
+"n": 582,
 "m": [
 "Stoeffler",
 "Pierre Schmidt",
@@ -2487,14 +2647,17 @@
 "La Fauconnerie"
 ]
 },
+"Cintres": {
+"n": 1
+},
 "Cirage": {
-"n": 2
+"n": 5
 },
 "Cire coiffante": {
-"n": 1
+"n": 3
 },
 "Ciseaux": {
-"n": 1
+"n": 14
 },
 "Citronnade": {
 "n": 294,
@@ -2538,10 +2701,10 @@
 ]
 },
 "Classeurs": {
-"n": 4
+"n": 22
 },
 "Clous": {
-"n": 118,
+"n": 119,
 "m": [
 "Ducros",
 "Rustica",
@@ -2556,6 +2719,12 @@
 "AGRUCORSE",
 "Corsica Comptoir",
 "Bouquet"
+]
+},
+"Clés": {
+"n": 9,
+"m": [
+"Foxter"
 ]
 },
 "Coca-Cola light": {
@@ -2619,10 +2788,19 @@
 ]
 },
 "Collants": {
-"n": 1
+"n": 5,
+"m": [
+"Odlo"
+]
 },
 "Colle": {
-"n": 22
+"n": 44,
+"m": [
+"Uhu"
+]
+},
+"Colle à bois": {
+"n": 2
 },
 "Colorant alimentaire": {
 "n": 210,
@@ -2637,9 +2815,10 @@
 ]
 },
 "Coloration": {
-"n": 4,
+"n": 21,
 "m": [
-"henkel"
+"Palette",
+"Saint Algue"
 ]
 },
 "Compote en gourdes": {
@@ -2677,10 +2856,13 @@
 "n": 1
 },
 "Compresses": {
-"n": 6
+"n": 14,
+"m": [
+"Rexona"
+]
 },
 "Comté": {
-"n": 2066,
+"n": 4132,
 "m": [
 "JuraFlore",
 "Le Berger Comtois",
@@ -2895,7 +3077,7 @@
 ]
 },
 "Coppa": {
-"n": 436,
+"n": 872,
 "m": [
 "Despi",
 "Montorsi",
@@ -2923,7 +3105,7 @@
 ]
 },
 "Coquelet": {
-"n": 46,
+"n": 92,
 "m": [
 "L'etal Du Volailler",
 "Maître CoQ"
@@ -3005,19 +3187,22 @@
 "n": 1
 },
 "Coton": {
-"n": 8
+"n": 16
 },
 "Cotons-tiges": {
-"n": 9
+"n": 21
 },
 "Couches": {
-"n": 12,
+"n": 66,
 "m": [
-"Auchan Baby"
+"Pampers"
 ]
 },
+"Couches-culottes": {
+"n": 2
+},
 "Couettes": {
-"n": 3
+"n": 4
 },
 "Coulis de tomates": {
 "n": 170,
@@ -3033,7 +3218,7 @@
 ]
 },
 "Coulommiers": {
-"n": 217,
+"n": 434,
 "m": [
 "Coeur de Lion",
 "CF&R",
@@ -3084,13 +3269,16 @@
 ]
 },
 "Coussins": {
-"n": 17
+"n": 20
 },
 "Couteaux": {
-"n": 22
+"n": 28
 },
 "Couverts": {
-"n": 3
+"n": 4
+},
+"Couvertures": {
+"n": 1
 },
 "Crackers": {
 "n": 993,
@@ -3113,14 +3301,20 @@
 "Sun"
 ]
 },
+"Crayon pour les yeux": {
+"n": 1
+},
 "Crayons de couleur": {
-"n": 3
+"n": 11
+},
+"Crayons à papier": {
+"n": 5
 },
 "Crevettes crues": {
 "n": 96
 },
 "Crevettes cuites": {
-"n": 473,
+"n": 946,
 "m": [
 "Odyssee",
 "Pescanova",
@@ -3135,14 +3329,14 @@
 ]
 },
 "Crevettes grises": {
-"n": 52,
+"n": 104,
 "m": [
 "Heiploeg",
 "Klaas Puul"
 ]
 },
 "Crevettes roses": {
-"n": 67,
+"n": 134,
 "m": [
 "Pescanova"
 ]
@@ -3151,10 +3345,10 @@
 "n": 31
 },
 "Cristaux de soude": {
-"n": 2
+"n": 6
 },
 "Crochets adhésifs": {
-"n": 1
+"n": 3
 },
 "Croissants": {
 "n": 1594,
@@ -3187,29 +3381,37 @@
 ]
 },
 "Croquettes pour chat": {
-"n": 13
+"n": 61,
+"m": [
+"Royal Canin"
+]
 },
 "Croquettes pour chat senior": {
-"n": 2
+"n": 6
 },
 "Croquettes pour chat stérilisé": {
-"n": 6,
+"n": 29,
 "m": [
 "Purina One",
+"Perfect Fit",
 "Empreintes"
 ]
 },
 "Croquettes pour chaton": {
-"n": 5
-},
-"Croquettes pour chien": {
-"n": 24,
+"n": 16,
 "m": [
 "Empreintes"
 ]
 },
+"Croquettes pour chien": {
+"n": 110,
+"m": [
+"Atavik",
+"Empreintes"
+]
+},
 "Croquettes pour chiot": {
-"n": 2
+"n": 10
 },
 "Croustibat": {
 "n": 22,
@@ -3233,13 +3435,17 @@
 ]
 },
 "Crème anti-âge": {
-"n": 10
+"n": 35,
+"m": [
+"L'Oréal Paris",
+"Cosmia Bio"
+]
 },
 "Crème catalane": {
 "n": 8
 },
 "Crème change": {
-"n": 4
+"n": 9
 },
 "Crème chantilly": {
 "n": 18
@@ -3256,7 +3462,7 @@
 ]
 },
 "Crème de jour": {
-"n": 9
+"n": 42
 },
 "Crème de marrons": {
 "n": 465,
@@ -3274,13 +3480,19 @@
 ]
 },
 "Crème de nuit": {
-"n": 6,
+"n": 20,
 "m": [
 "Avril"
 ]
 },
 "Crème dépilatoire": {
-"n": 7
+"n": 24,
+"m": [
+"Veet"
+]
+},
+"Crème fixative pour appareil dentaire": {
+"n": 2
 },
 "Crème fraîche légère": {
 "n": 73,
@@ -3309,7 +3521,11 @@
 "n": 2
 },
 "Crème hydratante": {
-"n": 24
+"n": 93,
+"m": [
+"L'Oréal",
+"Sephora"
+]
 },
 "Crème liquide": {
 "n": 140,
@@ -3320,33 +3536,48 @@
 ]
 },
 "Crème mains": {
-"n": 60,
+"n": 251,
 "m": [
 "Yves Rocher",
-"Cosmia",
-"Caudalie"
+"Caudalie",
+"L'Occitane",
+"Neutrogena",
+"Dermophil",
+"Le Petit Olivier",
+"Lavera",
+"L'Oréal",
+"Melvita",
+"Roger & Gallet"
 ]
 },
 "Crème pieds secs": {
-"n": 3
+"n": 8
 },
 "Crème pour les pieds": {
-"n": 1
+"n": 8
 },
 "Crème solaire": {
-"n": 13,
+"n": 32,
 "m": [
-"Nivea sun"
+"Nivea sun",
+"Nivea Sun"
 ]
 },
 "Crème solaire SPF 50": {
-"n": 3
+"n": 18,
+"m": [
+"Nivea",
+"Eco Cosmetics"
+]
 },
 "Crème solaire enfant": {
-"n": 1
+"n": 6
 },
 "Crème végétale": {
 "n": 7
+},
+"Crème à récurer": {
+"n": 6
 },
 "Crèmes desserts": {
 "n": 919,
@@ -3406,7 +3637,7 @@
 ]
 },
 "Cuisses de poulet": {
-"n": 1598,
+"n": 3196,
 "m": [
 "Le Gaulois",
 "La Nouvelle Agriculture",
@@ -3437,8 +3668,11 @@
 "Le Gaulois"
 ]
 },
+"Culotte menstruelle": {
+"n": 2
+},
 "Culottes": {
-"n": 9
+"n": 40
 },
 "Cumin": {
 "n": 135,
@@ -3484,6 +3718,9 @@
 "Albert Ménès"
 ]
 },
+"Cutter": {
+"n": 1
+},
 "Câpres": {
 "n": 189,
 "m": [
@@ -3519,7 +3756,7 @@
 ]
 },
 "Céleri rémoulade": {
-"n": 191,
+"n": 382,
 "m": [
 "Qualité Traiteur",
 "Saladinettes",
@@ -3573,13 +3810,13 @@
 "n": 22
 },
 "Côte de bœuf": {
-"n": 29
+"n": 58
 },
 "Côtelettes d'agneau": {
-"n": 11
+"n": 22
 },
 "Côtes de porc": {
-"n": 516,
+"n": 1032,
 "m": [
 "L'Étal du Boucher",
 "Charcuterie Ruel",
@@ -3594,7 +3831,7 @@
 ]
 },
 "Côtes de veau": {
-"n": 50,
+"n": 100,
 "m": [
 "Les éleveurs de chez nous"
 ]
@@ -3645,31 +3882,43 @@
 ]
 },
 "Daurade": {
-"n": 18
+"n": 36
 },
 "Dentifrice": {
-"n": 83,
+"n": 396,
 "m": [
-"Elmex",
-"Sensodyne",
 "Signal",
-"Unilever",
+"Sensodyne",
 "Coslys",
+"Elmex",
+"Melvita",
+"Zendium",
+"Centifolia",
 "Parodontax",
-"Centifolia"
+"Oral-B",
+"Comme avant"
 ]
 },
 "Dentifrice blancheur": {
-"n": 17
+"n": 58,
+"m": [
+"Signal"
+]
 },
 "Dentifrice enfant": {
-"n": 3
+"n": 14
 },
 "Desserts lactés bébé": {
 "n": 10,
 "m": [
 "U Tout Petits Bio"
 ]
+},
+"Diffuseur de parfum": {
+"n": 2
+},
+"Diffuseur électrique anti-moustiques": {
+"n": 1
 },
 "Diots de Savoie": {
 "n": 146,
@@ -3679,10 +3928,10 @@
 ]
 },
 "Dissolvant": {
-"n": 11,
+"n": 43,
 "m": [
-"henkel",
-"diadermine"
+"diadermine",
+"Diadermine"
 ]
 },
 "Donuts": {
@@ -3701,13 +3950,16 @@
 ]
 },
 "Dos de cabillaud": {
-"n": 195,
+"n": 390,
 "m": [
 "Compagnie des Pêches Saint-Malo"
 ]
 },
 "Dosettes souples": {
 "n": 14
+},
+"Doudounes": {
+"n": 3
 },
 "Dragées": {
 "n": 543,
@@ -3724,56 +3976,77 @@
 "Hollywood"
 ]
 },
+"Draps": {
+"n": 3
+},
 "Draps housse": {
-"n": 1
+"n": 3
 },
 "Débardeurs": {
-"n": 2
+"n": 4
 },
 "Dégivrant": {
 "n": 1
 },
 "Dégraissant cuisine": {
+"n": 3
+},
+"Déguisement enfant": {
 "n": 1
 },
 "Démaquillant": {
-"n": 5
+"n": 32
 },
 "Déodorant": {
-"n": 103,
+"n": 534,
 "m": [
-"Narta",
-"Respire",
-"Ushuaïa",
-"Unilever",
-"Cosmia",
-"Sanex",
-"Weleda",
-"Mennen",
+"Axe",
+"Rexona",
 "Dove",
-"endro"
+"Monsavon",
+"Narta",
+"Ushuaïa",
+"Respire",
+"Le Petit Marseillais",
+"Weleda",
+"Cadum"
 ]
 },
+"Dépoussiérant meubles": {
+"n": 1
+},
 "Désinfectant": {
-"n": 12,
+"n": 27,
 "m": [
 "Sanytol"
 ]
 },
 "Désinfectant linge": {
-"n": 4
+"n": 12,
+"m": [
+"Sanytol"
+]
 },
 "Désodorisant": {
-"n": 14,
+"n": 53,
 "m": [
 "Febreze"
 ]
 },
+"Désodorisant voiture": {
+"n": 1
+},
 "Détachant": {
-"n": 2
+"n": 10,
+"m": [
+"K2R"
+]
 },
 "Détartrant": {
-"n": 2
+"n": 5
+},
+"Détartrant WC": {
+"n": 1
 },
 "Eau aromatisée": {
 "n": 107,
@@ -3801,10 +4074,14 @@
 ]
 },
 "Eau de toilette": {
-"n": 6
+"n": 43,
+"m": [
+"Alix de Faure",
+"Axe"
+]
 },
 "Eau déminéralisée": {
-"n": 7
+"n": 11
 },
 "Eau gazeuse": {
 "n": 174,
@@ -3820,7 +4097,12 @@
 ]
 },
 "Eau micellaire": {
-"n": 22
+"n": 84,
+"m": [
+"Mixa",
+"Uriage",
+"Barbara Gould"
+]
 },
 "Eau minérale": {
 "n": 526,
@@ -3838,16 +4120,19 @@
 ]
 },
 "Eau oxygénée": {
-"n": 4
+"n": 13
 },
 "Eau plate": {
 "n": 15
+},
+"Eau pour bébé": {
+"n": 5
 },
 "Eau riche en magnésium": {
 "n": 1
 },
 "Edam": {
-"n": 317,
+"n": 634,
 "m": [
 "€co+",
 "Moulin D'or",
@@ -3866,8 +4151,14 @@
 "Edulcorel"
 ]
 },
+"Embouts de vissage": {
+"n": 5,
+"m": [
+"Tivoly"
+]
+},
 "Emmental": {
-"n": 1624,
+"n": 3248,
 "m": [
 "Etoile d'Or",
 "Entremont",
@@ -3900,7 +4191,7 @@
 ]
 },
 "Encornets": {
-"n": 127,
+"n": 254,
 "m": [
 "Briau",
 "Agis",
@@ -3917,11 +4208,14 @@
 "En'Diva"
 ]
 },
+"Enduit de rebouchage": {
+"n": 2
+},
 "Engrais": {
-"n": 7
+"n": 11
 },
 "Entrecôte": {
-"n": 235,
+"n": 470,
 "m": [
 "Charal",
 "L'Étal du Boucher",
@@ -3929,7 +4223,10 @@
 ]
 },
 "Enveloppes": {
-"n": 8
+"n": 10
+},
+"Escabeau": {
+"n": 2
 },
 "Escalopes de dinde": {
 "n": 2527,
@@ -3950,7 +4247,7 @@
 "n": 1
 },
 "Escalopes de veau": {
-"n": 106,
+"n": 212,
 "m": [
 "Tendriade",
 "Charal"
@@ -3988,7 +4285,10 @@
 "n": 8
 },
 "Essuie-tout": {
-"n": 17
+"n": 47,
+"m": [
+"Mimosa"
+]
 },
 "Estragon": {
 "n": 50,
@@ -4010,7 +4310,7 @@
 ]
 },
 "Faitout": {
-"n": 2
+"n": 3
 },
 "Falafels": {
 "n": 280,
@@ -4065,7 +4365,7 @@
 "n": 23
 },
 "Faux-filet": {
-"n": 285,
+"n": 570,
 "m": [
 "Charal",
 "L'Étal du Boucher"
@@ -4078,7 +4378,7 @@
 ]
 },
 "Fer à repasser": {
-"n": 1
+"n": 2
 },
 "Feta": {
 "n": 355,
@@ -4128,7 +4428,7 @@
 ]
 },
 "Feutres": {
-"n": 15,
+"n": 32,
 "m": [
 "Scrapcooking"
 ]
@@ -4170,13 +4470,13 @@
 "n": 1
 },
 "Fil dentaire": {
-"n": 1
+"n": 7
 },
 "Filet de bœuf": {
 "n": 15
 },
 "Filet de porc": {
-"n": 223,
+"n": 446,
 "m": [
 "Bigard",
 "Tendre & Plus",
@@ -4187,7 +4487,7 @@
 ]
 },
 "Filet mignon de porc": {
-"n": 508,
+"n": 1016,
 "m": [
 "L'Étal du Boucher",
 "Boucherie St Clément",
@@ -4198,7 +4498,7 @@
 ]
 },
 "Filets de cabillaud": {
-"n": 220,
+"n": 440,
 "m": [
 "Cité Marine",
 "Findus",
@@ -4238,7 +4538,7 @@
 ]
 },
 "Filets de lieu": {
-"n": 77,
+"n": 154,
 "m": [
 "Mericq"
 ]
@@ -4259,13 +4559,13 @@
 ]
 },
 "Filets de merlu": {
-"n": 95,
+"n": 190,
 "m": [
 "Cité Marine"
 ]
 },
 "Filets de morue": {
-"n": 33,
+"n": 66,
 "m": [
 "Delpierre"
 ]
@@ -4286,7 +4586,7 @@
 ]
 },
 "Filets de saumon": {
-"n": 234,
+"n": 468,
 "m": [
 "Findus",
 "Golden Seafood",
@@ -4300,10 +4600,10 @@
 "n": 1
 },
 "Filets de truite": {
-"n": 130
+"n": 260
 },
 "Film étirable": {
-"n": 6
+"n": 14
 },
 "Filtres à café": {
 "n": 14
@@ -4324,7 +4624,7 @@
 ]
 },
 "Finocchiona": {
-"n": 3
+"n": 6
 },
 "Flageolets": {
 "n": 313,
@@ -4376,6 +4676,9 @@
 "U de nos Régions"
 ]
 },
+"Flexible de douche": {
+"n": 1
+},
 "Flocons d'avoine": {
 "n": 398,
 "m": [
@@ -4395,7 +4698,7 @@
 "n": 5
 },
 "Foie de veau": {
-"n": 126,
+"n": 252,
 "m": [
 "Socopa",
 "Jean Rozé",
@@ -4423,6 +4726,12 @@
 "Le Gaulois",
 "Maître CoQ",
 "La Table Du Fermier"
+]
+},
+"Fond de teint": {
+"n": 12,
+"m": [
+"L'Oréal"
 ]
 },
 "Fond de veau": {
@@ -4459,8 +4768,11 @@
 "Les Délices de Mendès"
 ]
 },
+"Fourchettes": {
+"n": 4
+},
 "Fourme d'Ambert": {
-"n": 347,
+"n": 694,
 "m": [
 "Le Fromager Des Halles",
 "Les Délices de Belle France",
@@ -4508,10 +4820,13 @@
 ]
 },
 "Friandises pour chat": {
-"n": 2
+"n": 8
 },
 "Friandises pour chien": {
-"n": 1
+"n": 24,
+"m": [
+"Atavik"
+]
 },
 "Frisée": {
 "n": 9,
@@ -4523,7 +4838,10 @@
 "n": 12
 },
 "Friteuse sans huile": {
-"n": 1
+"n": 4,
+"m": [
+"Moulinex"
+]
 },
 "Fromage blanc": {
 "n": 919,
@@ -4541,7 +4859,7 @@
 ]
 },
 "Fromage de brebis": {
-"n": 376,
+"n": 752,
 "m": [
 "Salakis",
 "Istara",
@@ -4555,7 +4873,7 @@
 ]
 },
 "Fromage de chèvre": {
-"n": 744,
+"n": 1488,
 "m": [
 "Soignon",
 "Chêne d'argent",
@@ -4570,7 +4888,7 @@
 ]
 },
 "Fromage de tête": {
-"n": 188,
+"n": 376,
 "m": [
 "Bahier",
 "Charcuterie des Papes",
@@ -4638,7 +4956,7 @@
 "n": 7
 },
 "Fuet": {
-"n": 420,
+"n": 840,
 "m": [
 "Espuña",
 "Argal",
@@ -4663,7 +4981,7 @@
 "n": 2
 },
 "Galantine": {
-"n": 72,
+"n": 144,
 "m": [
 "Fleurons de Lomagne",
 "Prunier"
@@ -4735,7 +5053,7 @@
 ]
 },
 "Gambas": {
-"n": 213,
+"n": 426,
 "m": [
 "Pacific West",
 "Delpierre",
@@ -4749,11 +5067,17 @@
 "Instant Traiteur"
 ]
 },
+"Gant de toilette": {
+"n": 2
+},
 "Gants": {
-"n": 5
+"n": 34
+},
+"Gants de jardin": {
+"n": 1
 },
 "Gants de ménage": {
-"n": 1
+"n": 4
 },
 "Gaspacho": {
 "n": 393,
@@ -4801,7 +5125,7 @@
 ]
 },
 "Gaufrier": {
-"n": 2
+"n": 4
 },
 "Gazpacho": {
 "n": 304,
@@ -4819,24 +5143,46 @@
 ]
 },
 "Gel coiffant": {
-"n": 6
-},
-"Gel douche": {
-"n": 85,
+"n": 33,
 "m": [
-"Cosmia",
-"Le Petit Marseillais",
-"Ushuaïa"
+"Vivelle Dop"
 ]
 },
+"Gel douche": {
+"n": 544,
+"m": [
+"Axe",
+"Dove",
+"Monsavon",
+"Le Petit Marseillais",
+"Yves Rocher",
+"Ushuaïa",
+"Palmolive",
+"L'Oréal",
+"Naturé Moi",
+"Rogé Cavaillès"
+]
+},
+"Gel douche enfant": {
+"n": 1
+},
 "Gel hydroalcoolique": {
+"n": 17,
+"m": [
+"Lifebuoy"
+]
+},
+"Gel lavant bébé": {
 "n": 3
 },
 "Gel toilette intime": {
-"n": 2
+"n": 13,
+"m": [
+"Intima"
+]
 },
 "Gel à raser": {
-"n": 3
+"n": 21
 },
 "Gelée de groseilles": {
 "n": 109,
@@ -4854,11 +5200,17 @@
 ]
 },
 "Gigot d'agneau": {
-"n": 92,
+"n": 184,
 "m": [
 "L'Étal du Boucher",
 "+33 IMPORT EXPORT"
 ]
+},
+"Gilet jaune": {
+"n": 1
+},
+"Gilets": {
+"n": 2
 },
 "Gin": {
 "n": 82,
@@ -4977,16 +5329,19 @@
 ]
 },
 "Gobelets": {
-"n": 9,
+"n": 23,
 "m": [
 "Movies Pop"
 ]
 },
+"Gobelets en carton": {
+"n": 2
+},
 "Gommage corps": {
-"n": 3
+"n": 11
 },
 "Gomme": {
-"n": 308,
+"n": 323,
 "m": [
 "Valda",
 "Famille Mary",
@@ -4994,14 +5349,14 @@
 "Fleurance nature",
 "Ballot-Flurin",
 "Biofloral",
+"Maped",
 "Auzier Chabernac",
 "Propos Nature",
-"La Confiserie Bressaude",
-"HerbalGem"
+"La Confiserie Bressaude"
 ]
 },
 "Gorgonzola": {
-"n": 570,
+"n": 1140,
 "m": [
 "Le Fromager Des Halles",
 "Vivaldi",
@@ -5015,7 +5370,7 @@
 ]
 },
 "Gouda": {
-"n": 1287,
+"n": 2574,
 "m": [
 "€co+",
 "Moulin D'or",
@@ -5108,7 +5463,7 @@
 "n": 7
 },
 "Graines pour oiseaux": {
-"n": 1
+"n": 5
 },
 "Graisse de canard": {
 "n": 121,
@@ -5119,7 +5474,7 @@
 ]
 },
 "Grana Padano": {
-"n": 308,
+"n": 616,
 "m": [
 "Casa Azzurra",
 "Lovilio",
@@ -5148,8 +5503,11 @@
 "Bjorg"
 ]
 },
+"Granulés de bois": {
+"n": 1
+},
 "Gratin dauphinois": {
-"n": 228,
+"n": 456,
 "m": [
 "Marie",
 "Toupargel",
@@ -5196,7 +5554,7 @@
 ]
 },
 "Grille-pain": {
-"n": 1
+"n": 5
 },
 "Grissini": {
 "n": 442,
@@ -5314,7 +5672,7 @@
 ]
 },
 "Hachis parmentier": {
-"n": 280,
+"n": 560,
 "m": [
 "Toque du Chef",
 "Côté Table",
@@ -5330,6 +5688,9 @@
 },
 "Hachis parmentier surgelé": {
 "n": 6
+},
+"Hachoir": {
+"n": 1
 },
 "Haché 15 %": {
 "n": 486,
@@ -5476,6 +5837,9 @@
 "Père Dodu"
 ]
 },
+"Herbe à chat": {
+"n": 3
+},
 "Herbes de Provence": {
 "n": 301,
 "m": [
@@ -5495,7 +5859,7 @@
 "n": 12
 },
 "Horloge": {
-"n": 1
+"n": 3
 },
 "Houmous": {
 "n": 1211,
@@ -5604,19 +5968,19 @@
 ]
 },
 "Huile essentielle de ravintsara": {
-"n": 7
+"n": 9
 },
 "Huile moteur": {
-"n": 1
+"n": 2
 },
 "Huile pour le corps": {
-"n": 5
+"n": 17
 },
 "Huile solaire": {
-"n": 3
+"n": 7
 },
 "Huiles essentielles": {
-"n": 159,
+"n": 192,
 "m": [
 "Rue Des Plantes",
 "Messegue",
@@ -5630,7 +5994,7 @@
 ]
 },
 "Huîtres": {
-"n": 96,
+"n": 192,
 "m": [
 "Cultimer",
 "Chevaliers d'Argouges",
@@ -5639,6 +6003,9 @@
 },
 "Huîtres fines de claire": {
 "n": 9
+},
+"Imperméabilisant chaussures": {
+"n": 1
 },
 "Infusion": {
 "n": 1995,
@@ -5670,7 +6037,7 @@
 ]
 },
 "Insecticide": {
-"n": 6
+"n": 11
 },
 "Jambon blanc": {
 "n": 4817,
@@ -5706,7 +6073,7 @@
 ]
 },
 "Jambon de Bayonne": {
-"n": 270,
+"n": 540,
 "m": [
 "Delpeyrat",
 "Aoste",
@@ -5721,7 +6088,7 @@
 ]
 },
 "Jambon de Parme": {
-"n": 55,
+"n": 110,
 "m": [
 "Parma",
 "Citterio"
@@ -5751,7 +6118,7 @@
 ]
 },
 "Jambon persillé": {
-"n": 96
+"n": 192
 },
 "Jambon rôti aux herbes": {
 "n": 111,
@@ -5800,7 +6167,7 @@
 "n": 11
 },
 "Jambonneau": {
-"n": 372,
+"n": 744,
 "m": [
 "Tendre & Plus",
 "Le Choix du Charcutier",
@@ -5812,13 +6179,13 @@
 ]
 },
 "Jarret de veau": {
-"n": 4
+"n": 8
 },
 "Javel": {
-"n": 5
+"n": 33
 },
 "Jeans": {
-"n": 101,
+"n": 134,
 "m": [
 "Jean Rozé",
 "Jean Floc'h",
@@ -5832,16 +6199,22 @@
 ]
 },
 "Jeux de cartes": {
+"n": 19
+},
+"Jeux de construction": {
 "n": 2
 },
 "Jeux de société": {
-"n": 2
+"n": 3
 },
 "Joues de bœuf": {
-"n": 37,
+"n": 74,
 "m": [
 "Bigard"
 ]
+},
+"Jouets pour chat": {
+"n": 1
 },
 "Jus bébé": {
 "n": 1
@@ -6067,7 +6440,7 @@
 ]
 },
 "Lacets": {
-"n": 23
+"n": 25
 },
 "Laisse": {
 "n": 1
@@ -6080,7 +6453,10 @@
 ]
 },
 "Lait corporel": {
-"n": 7
+"n": 30,
+"m": [
+"Avril"
+]
 },
 "Lait d'amande": {
 "n": 154,
@@ -6096,7 +6472,6 @@
 "Lait d'avoine": {
 "n": 45,
 "m": [
-"Cosmia",
 "Bjorg",
 "Oatly"
 ]
@@ -6135,7 +6510,7 @@
 "n": 35
 },
 "Lait de toilette bébé": {
-"n": 2
+"n": 6
 },
 "Lait demi-écrémé": {
 "n": 629,
@@ -6186,7 +6561,7 @@
 ]
 },
 "Lait pour chat": {
-"n": 2
+"n": 6
 },
 "Lait sans lactose": {
 "n": 47,
@@ -6218,8 +6593,14 @@
 "Laitue iceberg en sachet": {
 "n": 3
 },
+"Lames de rasoir": {
+"n": 4
+},
+"Lampe de poche": {
+"n": 1
+},
 "Langoustines": {
-"n": 51,
+"n": 102,
 "m": [
 "Errigal Bay",
 "Delpierre",
@@ -6227,7 +6608,7 @@
 ]
 },
 "Langue de bœuf": {
-"n": 232,
+"n": 464,
 "m": [
 "Tendre & Plus",
 "Maison Larzul",
@@ -6239,7 +6620,7 @@
 ]
 },
 "Lapin": {
-"n": 380,
+"n": 760,
 "m": [
 "L'etal Du Volailler",
 "LOEUL ET PIRIOT",
@@ -6260,10 +6641,10 @@
 ]
 },
 "Laque": {
-"n": 4
+"n": 24
 },
 "Lard paysan": {
-"n": 65,
+"n": 130,
 "m": [
 "Philippe Wagner"
 ]
@@ -6370,14 +6751,26 @@
 ]
 },
 "Lessive en capsules": {
-"n": 7
+"n": 28,
+"m": [
+"Omo",
+"Skip",
+"Persil"
+]
 },
 "Lessive en poudre": {
-"n": 7
+"n": 25,
+"m": [
+"Persil",
+"Skip"
+]
 },
 "Lessive liquide": {
-"n": 35,
+"n": 120,
 "m": [
+"Skip",
+"Persil",
+"Omo",
 "L'arbre vert",
 "Epsil"
 ]
@@ -6399,7 +6792,7 @@
 ]
 },
 "Lime à ongles": {
-"n": 2
+"n": 9
 },
 "Limonade": {
 "n": 935,
@@ -6417,22 +6810,30 @@
 ]
 },
 "Lingettes anti-décoloration": {
-"n": 1
+"n": 4
 },
 "Lingettes bébé": {
-"n": 13
+"n": 40
 },
 "Lingettes intimes": {
-"n": 6
+"n": 17
 },
 "Lingettes nettoyantes": {
-"n": 3
+"n": 11
+},
+"Lingettes sol": {
+"n": 2
 },
 "Lingettes à l'eau": {
-"n": 3
+"n": 12
 },
 "Liniment": {
-"n": 10
+"n": 56,
+"m": [
+"Gifrer",
+"Mustela",
+"Léa Nature"
+]
 },
 "Liqueur": {
 "n": 281,
@@ -6449,37 +6850,39 @@
 "Giffard"
 ]
 },
+"Liquide de refroidissement": {
+"n": 4
+},
 "Liquide de rinçage": {
-"n": 9
+"n": 19
 },
 "Liquide vaisselle": {
-"n": 50,
+"n": 157,
 "m": [
-"Better life",
 "Rainett"
 ]
 },
 "Liquide vaisselle main": {
-"n": 1
-},
-"Litière": {
-"n": 10
-},
-"Litière silice": {
-"n": 1
-},
-"Litière végétale": {
 "n": 2
 },
+"Litière": {
+"n": 39
+},
+"Litière silice": {
+"n": 2
+},
+"Litière végétale": {
+"n": 10
+},
 "Livarot": {
-"n": 60,
+"n": 120,
 "m": [
 "E. Graindorge",
 "Graindorge"
 ]
 },
 "Livres": {
-"n": 7
+"n": 108
 },
 "Liégeois": {
 "n": 183,
@@ -6497,7 +6900,7 @@
 ]
 },
 "Lomo": {
-"n": 515,
+"n": 1030,
 "m": [
 "Hiruak",
 "Les Brasérades",
@@ -6505,6 +6908,9 @@
 "Boadas",
 "Maison Milhau"
 ]
+},
+"Lotion anti-poux": {
+"n": 1
 },
 "Lotte": {
 "n": 43,
@@ -6514,7 +6920,7 @@
 ]
 },
 "Louche": {
-"n": 1
+"n": 3
 },
 "Légumes pour couscous surgelés": {
 "n": 2
@@ -6571,7 +6977,7 @@
 ]
 },
 "Magazines": {
-"n": 2
+"n": 15
 },
 "Magnum Classic": {
 "n": 9,
@@ -6580,7 +6986,7 @@
 ]
 },
 "Magret de canard": {
-"n": 1337,
+"n": 2674,
 "m": [
 "Delpeyrat",
 "L'etal Du Volailler",
@@ -6603,7 +7009,7 @@
 ]
 },
 "Maillots de bain": {
-"n": 2
+"n": 5
 },
 "Manchons de canard": {
 "n": 99,
@@ -6624,6 +7030,9 @@
 "Mangue": {
 "n": 556
 },
+"Manteaux": {
+"n": 3
+},
 "Maquereau fumé": {
 "n": 51,
 "m": [
@@ -6642,7 +7051,7 @@
 ]
 },
 "Maquillage": {
-"n": 3
+"n": 4
 },
 "Margarine": {
 "n": 122,
@@ -6652,8 +7061,7 @@
 "Planta Fin",
 "Fruit d'Or",
 "Becel",
-"NAT&vie",
-"Unilever"
+"NAT&vie"
 ]
 },
 "Marmelade": {
@@ -6668,7 +7076,7 @@
 ]
 },
 "Maroilles": {
-"n": 138,
+"n": 276,
 "m": [
 "Savencia",
 "Fauquet",
@@ -6700,7 +7108,10 @@
 "n": 1
 },
 "Mascara": {
-"n": 2
+"n": 22,
+"m": [
+"Bourjois"
+]
 },
 "Mascarpone": {
 "n": 213,
@@ -6717,8 +7128,14 @@
 "Zanetti"
 ]
 },
+"Masque capillaire": {
+"n": 3
+},
+"Masque d'Halloween": {
+"n": 1
+},
 "Masque visage": {
-"n": 4
+"n": 16
 },
 "Maté": {
 "n": 198,
@@ -6792,7 +7209,7 @@
 ]
 },
 "Merguez": {
-"n": 1288,
+"n": 2576,
 "m": [
 "Socopa",
 "Hiruak",
@@ -6822,7 +7239,10 @@
 ]
 },
 "Merlan": {
-"n": 12
+"n": 24
+},
+"Meuleuse": {
+"n": 1
 },
 "Mexicain": {
 "n": 15
@@ -6878,7 +7298,7 @@
 ]
 },
 "Mimolette": {
-"n": 1031,
+"n": 2062,
 "m": [
 "€co+",
 "Isigny Ste Mère",
@@ -6919,10 +7339,10 @@
 "n": 21
 },
 "Miroirs": {
-"n": 12
+"n": 19
 },
 "Mixeur": {
-"n": 1
+"n": 5
 },
 "Mochis glacés": {
 "n": 148,
@@ -6981,7 +7401,7 @@
 ]
 },
 "Mont d'or": {
-"n": 97,
+"n": 194,
 "m": [
 "Fromageries Arnaud",
 "Les Monts De Joux",
@@ -6990,7 +7410,7 @@
 ]
 },
 "Morbier": {
-"n": 754,
+"n": 1508,
 "m": [
 "JuraFlore",
 "Jean Perrin",
@@ -7001,7 +7421,7 @@
 ]
 },
 "Mortadelle": {
-"n": 262,
+"n": 524,
 "m": [
 "Despi",
 "Rovagnati",
@@ -7022,16 +7442,16 @@
 ]
 },
 "Mouchoirs": {
-"n": 32
+"n": 71
 },
 "Mouchoirs en boîte": {
-"n": 4
+"n": 10
 },
 "Moule à gâteau": {
 "n": 1
 },
 "Moules": {
-"n": 586,
+"n": 1172,
 "m": [
 "La Cancalaise",
 "Delicemer",
@@ -7073,10 +7493,10 @@
 ]
 },
 "Mousse coiffante": {
-"n": 1
+"n": 3
 },
 "Mousse de canard": {
-"n": 482,
+"n": 964,
 "m": [
 "Madrange",
 "Tradilège",
@@ -7089,7 +7509,7 @@
 ]
 },
 "Mousse à raser": {
-"n": 9
+"n": 38
 },
 "Mousseux": {
 "n": 7
@@ -7155,13 +7575,16 @@
 ]
 },
 "Mugs": {
-"n": 43,
+"n": 46,
 "m": [
 "Dr. Oetker"
 ]
 },
+"Multiprise": {
+"n": 6
+},
 "Munster": {
-"n": 149,
+"n": 298,
 "m": [
 "Ermitage",
 "Haxaire",
@@ -7204,6 +7627,12 @@
 "Cuisine et Potager"
 ]
 },
+"Mètre ruban": {
+"n": 1
+},
+"Mécanisme de chasse d'eau": {
+"n": 2
+},
 "Mélange apéritif": {
 "n": 174,
 "m": [
@@ -7234,7 +7663,7 @@
 ]
 },
 "Nappe": {
-"n": 20,
+"n": 21,
 "m": [
 "Bisson"
 ]
@@ -7321,26 +7750,38 @@
 "Nesquik"
 ]
 },
+"Nettoyant WC": {
+"n": 2
+},
 "Nettoyant four": {
 "n": 1
 },
-"Nettoyant lave-linge": {
+"Nettoyant jantes": {
 "n": 1
+},
+"Nettoyant lave-linge": {
+"n": 3
 },
 "Nettoyant lave-vaisselle": {
-"n": 1
+"n": 6
 },
 "Nettoyant multi-usages": {
-"n": 1
+"n": 7
+},
+"Nettoyant parquet": {
+"n": 2
 },
 "Nettoyant salle de bain": {
-"n": 2
+"n": 9
 },
 "Nettoyant sol": {
-"n": 2
+"n": 5
 },
 "Nettoyant vitres": {
-"n": 8
+"n": 19
+},
+"Nettoyant vitrocéramique": {
+"n": 3
 },
 "Noisettes": {
 "n": 799,
@@ -7373,7 +7814,7 @@
 ]
 },
 "Noix de Saint-Jacques": {
-"n": 214,
+"n": 428,
 "m": [
 "Hubco",
 "Gineys",
@@ -7489,7 +7930,7 @@
 ]
 },
 "Nourriture pour poissons": {
-"n": 1
+"n": 13
 },
 "Nuggets de poulet": {
 "n": 294,
@@ -7642,7 +8083,7 @@
 "n": 1
 },
 "Oreillers": {
-"n": 2
+"n": 3
 },
 "Origan": {
 "n": 139,
@@ -7661,10 +8102,10 @@
 "n": 12
 },
 "Os à mâcher": {
-"n": 4
+"n": 11
 },
 "Ossau-iraty": {
-"n": 315,
+"n": 630,
 "m": [
 "Le Fromager Des Halles",
 "Istara",
@@ -7672,7 +8113,7 @@
 ]
 },
 "Osso-buco": {
-"n": 42,
+"n": 84,
 "m": [
 "Tendre & Plus"
 ]
@@ -7684,7 +8125,7 @@
 ]
 },
 "Paella": {
-"n": 381,
+"n": 762,
 "m": [
 "Toque du Chef",
 "Fleury Michon",
@@ -7702,7 +8143,7 @@
 "n": 7
 },
 "Pailles": {
-"n": 80,
+"n": 84,
 "m": [
 "LU"
 ]
@@ -7911,7 +8352,7 @@
 "n": 20
 },
 "Paleron": {
-"n": 59,
+"n": 118,
 "m": [
 "Bigard"
 ]
@@ -7926,7 +8367,7 @@
 ]
 },
 "Palette de porc": {
-"n": 199,
+"n": 398,
 "m": [
 "Tendre & Plus",
 "Maître Jacques",
@@ -7952,7 +8393,7 @@
 ]
 },
 "Palourdes": {
-"n": 15
+"n": 30
 },
 "Pamplemousse": {
 "n": 79,
@@ -7996,7 +8437,7 @@
 ]
 },
 "Pancetta": {
-"n": 135,
+"n": 270,
 "m": [
 "Berni",
 "L'assiette d'Antoine",
@@ -8036,13 +8477,13 @@
 ]
 },
 "Pansements": {
-"n": 13
+"n": 32
 },
 "Pansements ampoules": {
-"n": 4
+"n": 8
 },
 "Pantalons": {
-"n": 3
+"n": 18
 },
 "Papaye": {
 "n": 193,
@@ -8050,18 +8491,24 @@
 "O'Régal"
 ]
 },
+"Papier aluminium": {
+"n": 10
+},
+"Papier cadeau": {
+"n": 4
+},
 "Papier cuisson": {
-"n": 20
+"n": 40
 },
 "Papier toilette": {
-"n": 35,
+"n": 91,
 "m": [
 "Lotus",
 "Floralys"
 ]
 },
 "Papier toilette humide": {
-"n": 4
+"n": 8
 },
 "Papillotes": {
 "n": 258,
@@ -8097,16 +8544,23 @@
 "n": 4
 },
 "Paquets de mouchoirs": {
+"n": 3
+},
+"Parasol": {
 "n": 1
 },
 "Parfum": {
-"n": 36,
+"n": 57,
 "m": [
-"Les Jardins de Gaïa"
+"Les Jardins de Gaïa",
+"Durance"
 ]
 },
 "Parfum de linge": {
-"n": 2
+"n": 7,
+"m": [
+"Lenor"
+]
 },
 "Paris-brest": {
 "n": 168,
@@ -8115,7 +8569,7 @@
 ]
 },
 "Parmesan": {
-"n": 818,
+"n": 1636,
 "m": [
 "Lovilio",
 "Casa Azzurra",
@@ -8176,7 +8630,7 @@
 "n": 128
 },
 "Paupiettes de veau": {
-"n": 183,
+"n": 366,
 "m": [
 "Tendriade",
 "Toupargel",
@@ -8185,7 +8639,7 @@
 ]
 },
 "Pavés de bœuf": {
-"n": 131,
+"n": 262,
 "m": [
 "Charal",
 "Férial",
@@ -8198,7 +8652,7 @@
 "n": 2
 },
 "Pavés de saumon": {
-"n": 602,
+"n": 1204,
 "m": [
 "Mericq",
 "L'Atelier Poissonnerie",
@@ -8213,7 +8667,7 @@
 ]
 },
 "Pecorino": {
-"n": 163,
+"n": 326,
 "m": [
 "Casa Azzurra",
 "Le Fromager Des Halles",
@@ -8221,8 +8675,11 @@
 "Zanetti"
 ]
 },
+"Peigne": {
+"n": 8
+},
 "Peluches": {
-"n": 5
+"n": 14
 },
 "Persil": {
 "n": 245,
@@ -8367,7 +8824,17 @@
 ]
 },
 "Piles": {
-"n": 6
+"n": 50,
+"m": [
+"Energizer",
+"Foxter",
+"Duracell",
+"Varta",
+"Panasonic"
+]
+},
+"Piles bouton": {
+"n": 1
 },
 "Pilons de poulet": {
 "n": 366,
@@ -8407,8 +8874,20 @@
 "La Odalisca"
 ]
 },
+"Pince": {
+"n": 34
+},
+"Pince à épiler": {
+"n": 4
+},
+"Pinceaux": {
+"n": 14
+},
+"Pinces à linge": {
+"n": 3
+},
 "Pintade": {
-"n": 223,
+"n": 446,
 "m": [
 "Maître CoQ",
 "Père Dodu"
@@ -8450,11 +8929,17 @@
 "Pizza à la part": {
 "n": 1
 },
+"Plaids": {
+"n": 1
+},
+"Plancha": {
+"n": 2
+},
 "Planche à découper": {
 "n": 1
 },
 "Plants": {
-"n": 112,
+"n": 116,
 "m": [
 "Gardein",
 "alpro",
@@ -8468,10 +8953,10 @@
 "n": 1
 },
 "Plat de côtes": {
-"n": 33
+"n": 66
 },
 "Plat à four": {
-"n": 1
+"n": 3
 },
 "Plats bébé": {
 "n": 90,
@@ -8484,7 +8969,7 @@
 "n": 26
 },
 "Plumeau": {
-"n": 1
+"n": 2
 },
 "Poireaux": {
 "n": 169,
@@ -8532,7 +9017,7 @@
 ]
 },
 "Poitrine de porc": {
-"n": 352,
+"n": 704,
 "m": [
 "Socopa",
 "Les Brasérades",
@@ -8614,6 +9099,9 @@
 "Castello"
 ]
 },
+"Polos": {
+"n": 4
+},
 "Pommes": {
 "n": 1989,
 "m": [
@@ -8664,7 +9152,7 @@
 ]
 },
 "Pont-l'évêque": {
-"n": 143,
+"n": 286,
 "m": [
 "Graindorge",
 "E. Graindorge",
@@ -8703,12 +9191,21 @@
 "Lima"
 ]
 },
+"Portefeuilles": {
+"n": 1
+},
 "Porto": {
 "n": 96,
 "m": [
 "Cruz",
 "Dorrao",
 "Porto Cruz"
+]
+},
+"Post-it": {
+"n": 6,
+"m": [
+"Post-it"
 ]
 },
 "Potiron": {
@@ -8719,7 +9216,7 @@
 ]
 },
 "Pots de fleurs": {
-"n": 3
+"n": 4
 },
 "Pots en verre": {
 "n": 1
@@ -8731,7 +9228,7 @@
 ]
 },
 "Poulet entier": {
-"n": 1914,
+"n": 3828,
 "m": [
 "L'etal Du Volailler",
 "Loué",
@@ -8759,7 +9256,7 @@
 ]
 },
 "Poulpe": {
-"n": 129,
+"n": 258,
 "m": [
 "Pêcheur de Saveurs",
 "L'Apéro du Poissonnier",
@@ -8768,10 +9265,10 @@
 ]
 },
 "Poupées": {
-"n": 2
+"n": 3
 },
 "Poêle": {
-"n": 52
+"n": 57
 },
 "Poêlée de légumes": {
 "n": 154,
@@ -8797,12 +9294,18 @@
 "Vendome"
 ]
 },
+"Presse-agrumes": {
+"n": 1
+},
 "Profiteroles": {
 "n": 120,
 "m": [
 "Bontà Divina",
 "Solo Italia"
 ]
+},
+"Projecteur LED": {
+"n": 2
 },
 "Prosecco": {
 "n": 78,
@@ -8811,10 +9314,10 @@
 ]
 },
 "Protège-matelas": {
-"n": 1
+"n": 2
 },
 "Protège-slips": {
-"n": 4
+"n": 12
 },
 "Pruneaux": {
 "n": 906,
@@ -8846,8 +9349,11 @@
 "Tablier Blanc"
 ]
 },
+"Préservatifs": {
+"n": 8
+},
 "Pulls": {
-"n": 5
+"n": 20
 },
 "Pulpe de tomate": {
 "n": 204,
@@ -8900,13 +9406,16 @@
 ]
 },
 "Puzzle": {
-"n": 16,
+"n": 29,
 "m": [
 "Ravensburger"
 ]
 },
 "Pyjamas": {
-"n": 1
+"n": 13,
+"m": [
+"Tchibo"
+]
 },
 "Pâte brisée": {
 "n": 129,
@@ -8952,6 +9461,9 @@
 },
 "Pâte sablée": {
 "n": 50
+},
+"Pâte à modeler": {
+"n": 1
 },
 "Pâte à pain": {
 "n": 26
@@ -9166,7 +9678,7 @@
 "n": 14
 },
 "Pâté": {
-"n": 6851,
+"n": 13702,
 "m": [
 "Hénaff",
 "Lucien Georgelin",
@@ -9181,7 +9693,7 @@
 ]
 },
 "Pâté en croûte": {
-"n": 515,
+"n": 1030,
 "m": [
 "Roland Monterrat",
 "Michel Bolard",
@@ -9196,10 +9708,16 @@
 ]
 },
 "Pâtée pour chat": {
-"n": 2
+"n": 15
 },
 "Pâtée pour chien": {
-"n": 2
+"n": 25,
+"m": [
+"Atavik"
+]
+},
+"Pèse-personne": {
+"n": 1
 },
 "Pépites de chocolat": {
 "n": 247,
@@ -9275,7 +9793,7 @@
 ]
 },
 "Queue de bœuf": {
-"n": 4
+"n": 8
 },
 "Queue de lotte": {
 "n": 13
@@ -9287,7 +9805,7 @@
 ]
 },
 "Queues de crevettes": {
-"n": 315,
+"n": 630,
 "m": [
 "Delpierre",
 "Mericq",
@@ -9327,7 +9845,7 @@
 ]
 },
 "Raclette": {
-"n": 677,
+"n": 1354,
 "m": [
 "RichesMonts",
 "Jean Perrin",
@@ -9389,6 +9907,9 @@
 "Melissa"
 ]
 },
+"Ramettes de papier": {
+"n": 1
+},
 "Ras el hanout": {
 "n": 87,
 "m": [
@@ -9398,10 +9919,13 @@
 ]
 },
 "Rasoirs": {
+"n": 11
+},
+"Rasoirs femme": {
 "n": 3
 },
 "Rasoirs jetables": {
-"n": 1
+"n": 13
 },
 "Ratatouille": {
 "n": 533,
@@ -9453,7 +9977,7 @@
 ]
 },
 "Reblochon": {
-"n": 845,
+"n": 1690,
 "m": [
 "Le Fromager Des Halles",
 "Pochat & fils",
@@ -9516,10 +10040,10 @@
 "n": 1
 },
 "Rideaux": {
-"n": 2
+"n": 5
 },
 "Rillettes": {
-"n": 2397,
+"n": 4794,
 "m": [
 "Petit Navire",
 "Groix & Nature",
@@ -9659,11 +10183,17 @@
 "Taureau Ailé"
 ]
 },
+"Robes": {
+"n": 2
+},
 "Rochers au chocolat": {
 "n": 38
 },
 "Rochers au chocolat noir": {
 "n": 18
+},
+"Rondelles": {
+"n": 3
 },
 "Rooibos": {
 "n": 439,
@@ -9681,7 +10211,7 @@
 ]
 },
 "Roquefort": {
-"n": 715,
+"n": 1430,
 "m": [
 "Société",
 "Gabriel Coulet",
@@ -9706,7 +10236,7 @@
 ]
 },
 "Rosette": {
-"n": 481,
+"n": 962,
 "m": [
 "Cochonou",
 "Aoste",
@@ -9721,7 +10251,7 @@
 ]
 },
 "Rouge à lèvres": {
-"n": 1
+"n": 12
 },
 "Rouleaux de printemps": {
 "n": 76,
@@ -9735,13 +10265,16 @@
 "n": 17
 },
 "Ruban adhésif": {
+"n": 4
+},
+"Ruban attrape-mouches": {
 "n": 1
 },
 "Rumsteck": {
-"n": 42
+"n": 84
 },
 "Râpe": {
-"n": 128,
+"n": 131,
 "m": [
 "Cité Marine",
 "Les Croisés",
@@ -9750,7 +10283,7 @@
 ]
 },
 "Règle": {
-"n": 6
+"n": 8
 },
 "Réglisse": {
 "n": 94,
@@ -9759,7 +10292,7 @@
 ]
 },
 "Rôti de bœuf": {
-"n": 88,
+"n": 176,
 "m": [
 "Charal",
 "Fleury Michon",
@@ -9783,7 +10316,7 @@
 ]
 },
 "Rôti de porc": {
-"n": 1654,
+"n": 3308,
 "m": [
 "Maître Jacques",
 "L'Étal du Boucher",
@@ -9813,31 +10346,36 @@
 ]
 },
 "Sac isotherme": {
+"n": 3
+},
+"Sachets en gelée pour chat": {
 "n": 1
 },
 "Sacs aspirateur": {
-"n": 1
+"n": 4
 },
 "Sacs compostables": {
-"n": 2
+"n": 3
 },
 "Sacs congélation": {
-"n": 18
+"n": 39
 },
 "Sacs de congélation zip": {
-"n": 2
+"n": 5
 },
 "Sacs isothermes": {
-"n": 1
+"n": 3
 },
 "Sacs poubelle": {
-"n": 12,
+"n": 88,
 "m": [
-"Elembal"
+"Elembal",
+"Alfapac",
+"Handy Bag"
 ]
 },
 "Sacs à dos": {
-"n": 1
+"n": 4
 },
 "Safran": {
 "n": 101,
@@ -9870,7 +10408,7 @@
 ]
 },
 "Saint-Nectaire": {
-"n": 452,
+"n": 904,
 "m": [
 "Le Fromager Des Halles",
 "Paul Dischamp",
@@ -9878,7 +10416,7 @@
 ]
 },
 "Sainte-Maure": {
-"n": 86,
+"n": 172,
 "m": [
 "Soignon"
 ]
@@ -9899,7 +10437,7 @@
 ]
 },
 "Salade de pâtes": {
-"n": 184,
+"n": 368,
 "m": [
 "Daylicious",
 "Dia",
@@ -9908,7 +10446,7 @@
 ]
 },
 "Salade de riz": {
-"n": 119,
+"n": 238,
 "m": [
 "Seazon",
 "La Cuisine d'Océane",
@@ -9919,7 +10457,7 @@
 "n": 4
 },
 "Salade piémontaise": {
-"n": 59,
+"n": 118,
 "m": [
 "Qualité Traiteur"
 ]
@@ -9934,7 +10472,7 @@
 "n": 1
 },
 "Salami": {
-"n": 322,
+"n": 644,
 "m": [
 "Dulano",
 "Berni",
@@ -9948,7 +10486,7 @@
 ]
 },
 "Salers": {
-"n": 47
+"n": 94
 },
 "Salsifis": {
 "n": 88,
@@ -9969,6 +10507,9 @@
 },
 "Samoussas surgelés": {
 "n": 4
+},
+"Sandales": {
+"n": 1
 },
 "Sandwichs": {
 "n": 1083,
@@ -10202,7 +10743,7 @@
 ]
 },
 "Saucisse sèche": {
-"n": 1085,
+"n": 2170,
 "m": [
 "Montagne Noire",
 "Oberti",
@@ -10223,7 +10764,7 @@
 "n": 1
 },
 "Saucisses": {
-"n": 5666,
+"n": 11332,
 "m": [
 "Nature de France",
 "Au Fumé Vosgien",
@@ -10294,7 +10835,7 @@
 ]
 },
 "Saucisson sec": {
-"n": 2313,
+"n": 4626,
 "m": [
 "Henri Raffin",
 "Saint-Azay",
@@ -10322,10 +10863,10 @@
 "n": 1
 },
 "Saumon frais": {
-"n": 41
+"n": 82
 },
 "Saumon fumé": {
-"n": 2398,
+"n": 4796,
 "m": [
 "Labeyrie",
 "Delpeyrat",
@@ -10343,7 +10884,7 @@
 "n": 3
 },
 "Sauté d'agneau": {
-"n": 9
+"n": 18
 },
 "Sauté de dinde": {
 "n": 38,
@@ -10352,37 +10893,48 @@
 ]
 },
 "Sauté de porc": {
-"n": 124,
+"n": 248,
 "m": [
 "L'Étal du Boucher",
 "Fleury Michon"
 ]
 },
 "Savon": {
-"n": 73,
+"n": 487,
 "m": [
-"Le Petit Olivier",
-"Cosmia",
 "Le Petit Marseillais",
+"Le Petit Olivier",
+"Marius Fabre",
+"Aleyria Cosmétiques",
+"Rogé Cavaillès",
 "Najel",
-"Comme avant"
+"Comme avant",
+"Le comptoir du bain",
+"Gravier",
+"Savon le naturel"
 ]
 },
 "Savon de Marseille": {
-"n": 23
+"n": 31
 },
 "Savon liquide": {
-"n": 8
+"n": 69,
+"m": [
+"Cosmia Bio",
+"Centifolia"
+]
 },
 "Savon noir": {
-"n": 11,
+"n": 24,
 "m": [
-"Better life",
 "Briochin"
 ]
 },
+"Scie sauteuse": {
+"n": 1
+},
 "Seau": {
-"n": 17
+"n": 19
 },
 "Sel": {
 "n": 1625,
@@ -10409,10 +10961,10 @@
 ]
 },
 "Sel régénérant": {
-"n": 3
+"n": 15
 },
 "Semelles": {
-"n": 4
+"n": 5
 },
 "Semoule": {
 "n": 359,
@@ -10430,37 +10982,62 @@
 ]
 },
 "Serpillière": {
+"n": 9
+},
+"Serre-tête d'Halloween": {
 "n": 1
 },
 "Serviettes de nuit": {
+"n": 8
+},
+"Serviettes de table": {
 "n": 2
+},
+"Serviettes de toilette": {
+"n": 1
+},
+"Serviettes en papier": {
+"n": 3
 },
 "Serviettes hygiéniques": {
-"n": 5
+"n": 31
 },
 "Sets de table": {
-"n": 2
+"n": 3
 },
 "Shampooing": {
-"n": 142,
+"n": 586,
 "m": [
-"Dessange",
 "Dop",
 "Le Petit Marseillais",
-"l-oreal",
 "Pétrole Hahn",
-"l-oreal-consumer-products",
-"garnier",
+"Dessange",
+"L'Oréal",
+"Garnier",
 "Evoluderm",
-"Nature & Moi",
-"Coslys"
+"Coslys",
+"Eugène Perma",
+"Logona"
 ]
 },
 "Shampooing antipelliculaire": {
-"n": 6
+"n": 57,
+"m": [
+"Head & Shoulders",
+"Dop"
+]
+},
+"Shampooing enfant": {
+"n": 1
+},
+"Shampooing pour chien": {
+"n": 2
 },
 "Shampooing sec": {
-"n": 2
+"n": 14
+},
+"Shorts": {
+"n": 15
 },
 "Sirop": {
 "n": 3162,
@@ -10564,7 +11141,7 @@
 ]
 },
 "Slips": {
-"n": 1
+"n": 8
 },
 "Smoothie": {
 "n": 614,
@@ -10588,7 +11165,7 @@
 ]
 },
 "Sole": {
-"n": 30
+"n": 60
 },
 "Son d'avoine": {
 "n": 76,
@@ -10623,11 +11200,11 @@
 "Glace de la Ferme",
 "La Belle Aude",
 "Maison de la Glace",
-"Unilever",
 "Histoires de Glaces",
 "Terre Adélice",
 "Altiflore",
-"Philippe Faur"
+"Philippe Faur",
+"La Turbine à Saveurs"
 ]
 },
 "Sorbet fraise": {
@@ -10689,7 +11266,7 @@
 ]
 },
 "Souris d'agneau": {
-"n": 584,
+"n": 1168,
 "m": [
 "Tendre & Plus",
 "Jean Rozé",
@@ -10698,16 +11275,16 @@
 ]
 },
 "Sous-vêtements": {
-"n": 1
+"n": 2
 },
 "Sparadrap": {
-"n": 4
+"n": 7
 },
 "Spasmine": {
 "n": 1
 },
 "Spatule": {
-"n": 1
+"n": 2
 },
 "Spiruline": {
 "n": 492,
@@ -10723,7 +11300,7 @@
 ]
 },
 "Spray nasal": {
-"n": 2
+"n": 5
 },
 "Spritz": {
 "n": 94,
@@ -10745,7 +11322,7 @@
 ]
 },
 "Steak haché": {
-"n": 1050,
+"n": 2100,
 "m": [
 "Charal",
 "Jean Rozé",
@@ -10763,7 +11340,7 @@
 "n": 21
 },
 "Stylos": {
-"n": 61,
+"n": 91,
 "m": [
 "Scrapcooking",
 "Patisdecor"
@@ -10873,7 +11450,10 @@
 ]
 },
 "Surligneurs": {
-"n": 6
+"n": 19,
+"m": [
+"Stabilo"
+]
 },
 "Sushis": {
 "n": 536,
@@ -10891,13 +11471,17 @@
 ]
 },
 "Sweats": {
-"n": 34
+"n": 37
 },
 "Sérum physiologique": {
-"n": 4
+"n": 11
 },
 "T-shirts": {
-"n": 1
+"n": 82,
+"m": [
+"Kiabi",
+"Van Rysel"
+]
 },
 "Tablette de chocolat au lait": {
 "n": 217,
@@ -10930,10 +11514,10 @@
 ]
 },
 "Tablettes lave-vaisselle": {
-"n": 18
+"n": 39
 },
 "Taboulé": {
-"n": 1186,
+"n": 2372,
 "m": [
 "Pierre Martinet",
 "Mix Buffet",
@@ -10947,6 +11531,12 @@
 "Jean Stalaven"
 ]
 },
+"Taies d'oreiller": {
+"n": 1
+},
+"Taille-crayon": {
+"n": 5
+},
 "Tajine": {
 "n": 133,
 "m": [
@@ -10956,10 +11546,13 @@
 ]
 },
 "Talc": {
-"n": 5
+"n": 15
 },
 "Tampons": {
-"n": 3
+"n": 47,
+"m": [
+"Jessa"
+]
 },
 "Tapas": {
 "n": 180,
@@ -11006,6 +11599,9 @@
 "Lucien Georgelin"
 ]
 },
+"Tapis": {
+"n": 8
+},
 "Taralli": {
 "n": 200,
 "m": [
@@ -11022,7 +11618,7 @@
 ]
 },
 "Tarama": {
-"n": 507,
+"n": 1014,
 "m": [
 "Blini",
 "Le Traiteur Gourmet",
@@ -11100,7 +11696,10 @@
 ]
 },
 "Tasses": {
-"n": 16
+"n": 21
+},
+"Teinture textile": {
+"n": 1
 },
 "Tenders de poulet": {
 "n": 72
@@ -11108,14 +11707,20 @@
 "Tendrons de veau": {
 "n": 7
 },
+"Tensiomètre": {
+"n": 4
+},
 "Tequila": {
 "n": 32
 },
+"Terre de Sommières": {
+"n": 1
+},
 "Terreau": {
-"n": 3
+"n": 4
 },
 "Terrine de campagne": {
-"n": 1073,
+"n": 2146,
 "m": [
 "Jean Brunet",
 "Tallec",
@@ -11130,7 +11735,7 @@
 ]
 },
 "Terrine de canard": {
-"n": 803,
+"n": 1606,
 "m": [
 "Ducs de Gascogne",
 "Comtesse du Barry",
@@ -11153,8 +11758,14 @@
 "Hénaff"
 ]
 },
-"Thermomètre": {
+"Test de grossesse": {
 "n": 2
+},
+"Thermomètre": {
+"n": 3
+},
+"Thermomètre de bain": {
+"n": 1
 },
 "Thon au naturel": {
 "n": 424,
@@ -11187,7 +11798,7 @@
 ]
 },
 "Thon frais": {
-"n": 13,
+"n": 26,
 "m": [
 "Cap Océan"
 ]
@@ -11214,7 +11825,6 @@
 "n": 141,
 "m": [
 "Lipton",
-"Unilever",
 "Pagès",
 "1336",
 "Ethiquable"
@@ -11284,11 +11894,11 @@
 "Dammann Frères",
 "Destination",
 "1336",
-"Unilever"
+"Angelina"
 ]
 },
 "Timbres": {
-"n": 4
+"n": 5
 },
 "Tiramisu": {
 "n": 463,
@@ -11306,7 +11916,7 @@
 ]
 },
 "Tire-bouchon": {
-"n": 8
+"n": 10
 },
 "Tisane verveine": {
 "n": 21,
@@ -11416,13 +12026,13 @@
 ]
 },
 "Tomme de Savoie": {
-"n": 270,
+"n": 540,
 "m": [
 "Le Fromager Des Halles"
 ]
 },
 "Tomme de brebis": {
-"n": 299,
+"n": 598,
 "m": [
 "Le Fromager Des Halles",
 "Lou Pérac",
@@ -11430,7 +12040,7 @@
 ]
 },
 "Tomme des Pyrénées": {
-"n": 313,
+"n": 626,
 "m": [
 "Le Fromager Des Halles",
 "Ets Schoepfer",
@@ -11455,8 +12065,14 @@
 "Lorina"
 ]
 },
+"Tonnelle": {
+"n": 1
+},
+"Tops": {
+"n": 7
+},
 "Torchons": {
-"n": 44,
+"n": 45,
 "m": [
 "Fleury Michon",
 "Madrange"
@@ -11516,6 +12132,9 @@
 "Charal"
 ]
 },
+"Tournevis": {
+"n": 2
+},
 "Tourteau": {
 "n": 91,
 "m": [
@@ -11550,10 +12169,10 @@
 ]
 },
 "Trousse de toilette": {
-"n": 2
+"n": 8
 },
 "Trousses": {
-"n": 10
+"n": 17
 },
 "Truffes au chocolat": {
 "n": 542,
@@ -11618,7 +12237,7 @@
 ]
 },
 "Tétines": {
-"n": 25
+"n": 28
 },
 "Tête de veau": {
 "n": 23
@@ -11630,6 +12249,9 @@
 "n": 11
 },
 "Valises": {
+"n": 5
+},
+"Vases": {
 "n": 1
 },
 "Velouté de légumes": {
@@ -11648,7 +12270,7 @@
 ]
 },
 "Ventilateur": {
-"n": 1
+"n": 2
 },
 "Vermicelles": {
 "n": 309,
@@ -11669,10 +12291,16 @@
 "n": 2
 },
 "Vernis à ongles": {
-"n": 1
+"n": 37,
+"m": [
+"Sephora"
+]
 },
 "Verres": {
-"n": 21
+"n": 30,
+"m": [
+"Duralex"
+]
 },
 "Verres en plastique": {
 "n": 2
@@ -11680,8 +12308,11 @@
 "Verres à vin": {
 "n": 1
 },
+"Vestes": {
+"n": 10
+},
 "Viande des Grisons": {
-"n": 215,
+"n": 430,
 "m": [
 "Aoste",
 "Naturaplan",
@@ -11692,7 +12323,7 @@
 ]
 },
 "Viande hachée": {
-"n": 376,
+"n": 752,
 "m": [
 "L'Étal du Boucher",
 "Jean Rozé",
@@ -11776,7 +12407,7 @@
 ]
 },
 "Vinaigre blanc": {
-"n": 109,
+"n": 110,
 "m": [
 "Edmond Fallot",
 "Martin Pouret",
@@ -11812,7 +12443,7 @@
 ]
 },
 "Vis": {
-"n": 5
+"n": 10
 },
 "Vodka": {
 "n": 179,
@@ -11842,6 +12473,9 @@
 "JAMESON",
 "Label 5"
 ]
+},
+"White-spirit": {
+"n": 3
 },
 "Wraps": {
 "n": 621,
@@ -11960,7 +12594,7 @@
 ]
 },
 "Échine de porc": {
-"n": 120,
+"n": 240,
 "m": [
 "Tendre & Plus",
 "Hiruak"
@@ -11973,6 +12607,9 @@
 "Pasquier",
 "Tartefrais"
 ]
+},
+"Élastiques à cheveux": {
+"n": 31
 },
 "Émincés de poulet": {
 "n": 415,
@@ -11997,7 +12634,7 @@
 ]
 },
 "Épaule d'agneau": {
-"n": 16
+"n": 32
 },
 "Épices du monde": {
 "n": 2
@@ -12030,7 +12667,7 @@
 "n": 15
 },
 "Époisses": {
-"n": 60,
+"n": 120,
 "m": [
 "Berthaut",
 "Germain",
@@ -12039,10 +12676,19 @@
 ]
 },
 "Éponges": {
-"n": 13,
+"n": 58,
 "m": [
 "Spontex"
 ]
+},
+"Équerres": {
+"n": 2
+},
+"Étagère": {
+"n": 4
+},
+"Étendoir à linge": {
+"n": 1
 },
 "Îles flottantes": {
 "n": 64,

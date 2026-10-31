@@ -25,16 +25,35 @@ exclues |= {cle(x) for x in [
     "Casino Délices", "Leader Price Bio", "Cora Bio", "Netto Bio", "Lidl Bio", "Bio Organic", "Combino", "Crownfield",
     "Freshona", "Cien", "Kania", "Belbake", "Gelatelli", "Chef Select", "Deluxe", "Pilos", "Snack Day", "Sondey",
     "Fin Carré", "Lupilu", "W5", "Solent", "Ocean Sea", "Nixe", "Alesto", "Vitasia", "Italiamo", "Duc de Coeur",
+    # hors alimentaire (Open Beauty, Products et Pet Food Facts) : marques d'enseigne et groupes industriels
+    "Cosmia", "Auchan Baby", "Kids", "Unilever", "Henkel", "Groupe SEB France", "L'Oreal Consumer products", "Up2Fashion",
+    "Les Cosmétiques Design Paris", "Better life", "Inventiv", "Nectar of Beauty", "Bio naïa",
 ]}
 # Graphies accentuées perdues par l'extraction du 31/10/2026 (corrigé depuis dans extraire.py).
-accents = {"President": "Président", "Cote d'Or": "Côte d'Or", "Nestle": "Nestlé", "Herta": "Herta"}
+accents = {"President": "Président", "Cote d'Or": "Côte d'Or", "Nestle": "Nestlé", "Herta": "Herta",
+           "kiabi": "Kiabi", "Van|Rysel": "Van Rysel", "royal canin": "Royal Canin", "handy bag": "Handy Bag"}
 ext = json.load(open("outils/off/natures_off.json", encoding="utf-8"))
+# Bases non alimentaires (extraire.py avec BASE=obf, opf, opff), ajoutées à Open Food Facts.
+sources = [ext["natures"]]
+for b in ("obf", "opf", "opff"):
+    try:
+        sources.append(json.load(open(f"outils/off/natures_{b}.json", encoding="utf-8"))["natures"])
+    except FileNotFoundError:
+        pass
+nombres, comptes = {}, {}
+for natures in sources:
+    for chemin, v in natures.items():
+        nom = chemin.split("/")[-1]
+        nombres[nom] = nombres.get(nom, 0) + v["n"]
+        c = comptes.setdefault(nom, {})
+        for m, k in v["marques"]:
+            m = accents.get(m, m)
+            c[m] = c.get(m, 0) + k
 res = {}
-for chemin, v in ext["natures"].items():
-    nom = chemin.split("/")[-1]
-    marques = [accents.get(m, m) for m, c in v["marques"] if c >= 3 and cle(m) not in exclues][:10]
-    res[nom] = {"n": v["n"], **({"m": marques} if marques else {})}
-json.dump({"_description": ext["_description"] + " ; marques d'enseigne retirées (outils/off/natures.py)",
+for nom, n in nombres.items():
+    marques = [m for m, k in sorted(comptes[nom].items(), key=lambda x: -x[1]) if k >= 3 and cle(m) not in exclues][:10]
+    res[nom] = {"n": n, **({"m": marques} if marques else {})}
+json.dump({"_description": ext["_description"] + " ; plus Open Beauty, Products et Pet Food Facts ; marques d'enseigne retirées (outils/off/natures.py)",
            "natures": dict(sorted(res.items()))}, open("assets/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
 print(len(res), "natures,", sum(1 for x in res.values() if "m" in x), "avec des marques,",
       sum(len(x.get("m", [])) for x in res.values()), "marques en tout")
