@@ -8,9 +8,20 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
+import 'package:liste_de_courses/donnees/moderation.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/signature.dart';
 import 'package:liste_de_courses/donnees/stockage.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
+
+/// Courses terminées où [produits] ont été cochés (la preuve d'usage du catalogue partagé).
+void acheter(Etat e, List<Produit> produits) {
+  final l = e.creerListe(e.magasins.first.id, [for (final p in produits) LigneListe(produitId: p.id)]);
+  for (final g in l.lignes) {
+    g.cocheLe = DateTime.now();
+  }
+  l.statut = StatutListe.terminee;
+}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -213,10 +224,12 @@ void main() {
     final chats = e.ajouterSecteurCatalogue(r, 'Chats')!;
     e.enregistrerProduitAjoute(libelle: 'Croquettes', marqueNom: 'Félix', secteur: chats);
     e.ajouterMarqueSecteur(chats, 'Whiskas');
-    e.creerProduit('Non placé du foyer A');
+    final nonPlace = e.creerProduit('Non placé du foyer A');
+    expect(e.apports()['produits'], isEmpty, reason: 'rien ne part avant d\'avoir été acheté');
+    acheter(e, [e.produits.firstWhere((p) => p.nom == 'Croquettes Félix'), nonPlace]);
     final apportsA = jsonDecode(jsonEncode(e.apports())) as Map<String, dynamic>;
     expect(apportsA['rayons'], ['Animalerie']);
-    expect(apportsA['secteurs'], containsAll(['Animalerie/Animalerie', 'Animalerie/Chats']));
+    expect(apportsA['secteurs'], ['Animalerie/Chats'], reason: 'seulement ce qui range un produit qui part');
     expect([for (final p in apportsA['produits'] as List) p['nom']], ['Croquettes Félix'], reason: 'un non placé reste au foyer');
     expect(jsonEncode(e.apports()), jsonEncode(apportsA), reason: 'le même texte tant que rien ne change');
 
@@ -230,7 +243,7 @@ void main() {
     expect(croquettes.nom, 'Croquettes Félix');
     expect(e.estRecu(croquettes), isTrue);
     expect(e.marque(croquettes.marqueIds.first)?.nom, 'Félix');
-    expect(e.marquesDuSecteur(chatsB), contains('Whiskas'));
+    expect(e.marquesDuSecteur(chatsB), isNot(contains('Whiskas')), reason: 'aucun produit Whiskas acheté');
     for (final m in e.magasins) {
       expect(e.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
     }
@@ -243,7 +256,6 @@ void main() {
     expect(e.produitsDuSecteur(chatsB), isEmpty);
     expect(e.produitsVisibles.contains(croquettes), isFalse);
     expect(e.rayonsVisibles.any((x) => x.nom == 'Animalerie'), isFalse);
-    expect(e.marquesDuSecteur(chatsB), isNot(contains('Whiskas')));
     e.isolerCatalogue(false);
     expect(e.produitsDuSecteur(chatsB), [croquettes]);
 
@@ -259,6 +271,8 @@ void main() {
     expect(l.lignes.first.quantite, g.quantite);
     expect(e.secteurCatalogue(q.id)?.id, autre.id);
     expect(e.estAjoute(q), isTrue);
+    expect([for (final p in e.apports()['produits'] as List) p['nom']], isNot(contains('Noix de cajou')));
+    acheter(e, [q]);
     expect([for (final p in e.apports()['produits'] as List) p['nom']], contains('Noix de cajou'));
     expect(e.remplacerArticle(l, q, 'Noix de cajou', autre).id, q.id, reason: 'rien ne change');
   });
@@ -270,7 +284,10 @@ void main() {
     final chats = e.ajouterSecteurCatalogue(r, 'Chats')!;
     e.enregistrerProduitAjoute(libelle: 'Croquettes', marqueNom: 'Félix', secteur: chats);
     e.enregistrerProduitAjoute(libelle: 'Croquetes', secteur: chats); // une faute de frappe
+    acheter(e, [for (final p in e.produits) if (p.nom.startsWith('Croquet')) p]);
     final apportsA = jsonDecode(jsonEncode(e.apports())) as Map<String, dynamic>;
+    // (les courses passent aux archives : plus aucune liste ne retient les produits)
+    e.listes.removeWhere((l) => l.statut == StatutListe.terminee);
 
     // L'éditeur reprend les ajouts, retire la faute, publie.
     final b = Brouillon.lire({'rayons': [], 'version': 1});
@@ -293,6 +310,93 @@ void main() {
     e.appliquerApports([apportsA]);
     expect(e.produits.any((p) => p.nom == 'Croquetes'), isFalse);
     expect(e.produits.where((p) => p.nom == 'Croquettes Félix'), hasLength(1));
+  });
+
+  test('mauvais usages : noms refusés, doublons, plafond, signalements, foyer bloqué', () {
+    // E : noms refusés
+    for (final n in ['x', 'A' * 41, '1234', 'Promo sur www.arnaque.fr', 'moi@exemple.fr', 'Appelez 06 12 34 56 78',
+      'TOMATES GÉANTES', 'Coooooool', 'Gros connard', 'Merde']) {
+      expect(Moderation.nomRefuse(n), isNotNull, reason: n);
+    }
+    for (final n in ['Tomates', 'Chili con carne', 'Yaourts 0 %', 'Lait 1/2 écrémé', 'IGP', 'Œufs x12']) {
+      expect(Moderation.nomRefuse(n), isNull, reason: n);
+    }
+    expect(Moderation.nomRefuse('HARIBO', marque: true), isNull);
+    // F : doublons
+    expect(Moderation.normaliser('TOMATES Cerises'), Moderation.normaliser('tomate cerise'));
+    expect(Moderation.normaliser('Pâtés'), Moderation.normaliser('pate'));
+    expect(Moderation.presque('Croquettes', 'Croquetes'), isTrue);
+    expect(Moderation.presque('Croquettes', 'Croquettes'), isFalse);
+    expect(Moderation.presque('Riz', 'Ris'), isFalse, reason: 'trop court pour juger');
+
+    Map<String, dynamic> lot(String id, List<String> noms, {List<String> signales = const []}) => {
+          'id': id,
+          'rayons': <String>[],
+          'secteurs': <String>[],
+          'produits': [for (final n in noms) {'nom': n, 'rayon': 'Épicerie salée', 'secteur': 'Conserves'}],
+          'marques': <String, dynamic>{},
+          if (signales.isNotEmpty) 'signales': signales,
+        };
+    // C : plafond
+    final gros = lot('gros', [for (var i = 0; i < 301; i++) 'Produit numéro $i']);
+    expect(Moderation.filtrer([gros]).ecartes, {'gros'});
+    // E et F à la réception
+    final f = Moderation.filtrer([lot('a', ['Haricots verts fins', 'Bonbons de www.truc.com', 'Merde en boîte'])]);
+    expect([for (final p in f.lots.single['produits'] as List) p['nom']], ['Haricots verts fins']);
+    // I : 3 foyers signalent → retiré ; un foyer dont 3 produits le sont → écarté en entier
+    final cle = Moderation.cleProduit('Conserves', 'Pâté douteux');
+    final f2 = Moderation.filtrer([
+      lot('a', ['Pâté douteux', 'Thon']),
+      lot('b', [], signales: [cle]),
+      lot('c', [], signales: [cle]),
+      lot('d', [], signales: [cle]),
+    ]);
+    expect([for (final p in f2.lots.first['produits'] as List) p['nom']], ['Thon']);
+    final cles = [for (final n in ['Un', 'Deux', 'Trois']) Moderation.cleProduit('Conserves', 'Faux $n')];
+    final f3 = Moderation.filtrer([
+      lot('a', ['Faux Un', 'Faux Deux', 'Faux Trois', 'Thon']),
+      for (final x in ['b', 'c', 'd']) lot(x, [], signales: cles),
+    ]);
+    expect(f3.ecartes, {'a'});
+    // B : foyer bloqué par l'éditeur
+    expect(Moderation.filtrer([lot('a', ['Thon'])], bloques: {'a'}).lots, isEmpty);
+
+    // Dans le foyer : reçu, puis bloqué → disparaît (sauf s'il sert à une liste) ; signalé → disparaît.
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(demo()));
+    final ry = e.ajouterRayonCatalogue('Épicerie salée') ?? e.rayonsCatalogue.firstWhere((r) => r.nom == 'Épicerie salée');
+    e.ajouterSecteurCatalogue(ry, 'Conserves');
+    final recus = [lot('a', ['Sardines au citron', 'Maquereaux au vin blanc', 'Maquereau au vin blanc'])];
+    e.appliquerApports(recus);
+    expect(e.produits.where((p) => p.nom.startsWith('Maquereau')), hasLength(1), reason: 'doublon au pluriel près');
+    final sardines = e.produits.firstWhere((p) => p.nom == 'Sardines au citron');
+    expect(e.estRecu(sardines), isTrue);
+    e.signalerProduit(sardines);
+    expect(e.produit(sardines.id), isNull);
+    expect(e.apports()['signales'], [Moderation.cleProduit('Conserves', 'Sardines au citron')]);
+    e.appliquerApports(recus);
+    expect(e.produits.any((p) => p.nom == 'Sardines au citron'), isFalse, reason: 'signalé, il ne revient pas');
+    final maquereaux = e.produits.firstWhere((p) => p.nom.startsWith('Maquereau'));
+    e.creerListe(e.magasins.first.id, [LigneListe(produitId: maquereaux.id)]);
+    e.appliquerCatalogueCommun({'rayons': [], 'version': 60, 'bloques': ['a']});
+    e.appliquerApports(recus);
+    expect(e.foyersEcartes, {'a'});
+    expect(e.produit(maquereaux.id), isNotNull, reason: 'il sert à une liste');
+  });
+
+  test('catalogue commun signé par l\'éditeur : un faux est refusé', () async {
+    final graine = await SignatureEditeur.graine('ma phrase de signature');
+    final cle = await SignatureEditeur.clePublique(graine);
+    final texte = CatalogueCommun.emballer({'rayons': [], 'version': 7});
+    final publie = await SignatureEditeur.signer(texte, graine);
+    expect(await SignatureEditeur.verifie(publie, cle: cle), isTrue);
+    expect(CatalogueCommun.deballer(publie)['version'], 7);
+    expect(await SignatureEditeur.verifie(texte, cle: cle), isFalse, reason: 'non signé');
+    final faux = await SignatureEditeur.signer(CatalogueCommun.emballer({'rayons': [], 'version': 8}), await SignatureEditeur.graine('autre phrase'));
+    expect(await SignatureEditeur.verifie(faux, cle: cle), isFalse, reason: 'signé par un autre');
+    final modifie = publie.replaceFirst(texte, CatalogueCommun.emballer({'rayons': [], 'version': 9}));
+    expect(await SignatureEditeur.verifie(modifie, cle: cle), isFalse, reason: 'contenu changé');
+    expect(await SignatureEditeur.verifie(texte, cle: ''), isTrue, reason: 'sans clé dans l\'application, tout passe');
   });
 
   test('ajout au catalogue commun depuis un texte : titres de secteur, puis produits', () {

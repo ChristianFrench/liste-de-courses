@@ -6,7 +6,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'catalogue_type.dart';
+import 'moderation.dart';
 import 'modele.dart';
+import 'signature.dart';
 import 'synchro.dart';
 
 // Catalogue commun à tous les foyers (26/10/2026).
@@ -23,6 +25,9 @@ import 'synchro.dart';
 // Catalogue ouvert à tous les foyers (30/10/2026) : chaque foyer dépose aussi ses propres ajouts, en message
 // retenu sous « ldc/catalogue-commun/apports/<identifiant du foyer> » (Etat.apports) ; au lancement, chaque
 // application lit le catalogue commun et tous les apports, et ajoute au foyer ce qui lui manque.
+//
+// Contre les mauvais usages (31/10/2026) : le catalogue commun est signé par l'éditeur (signature.dart), il
+// liste les foyers bloqués (« bloques ») ; les apports reçus passent les règles de moderation.dart.
 
 class CatalogueCommun extends ChangeNotifier {
   CatalogueCommun._();
@@ -85,6 +90,7 @@ class CatalogueCommun extends ChangeNotifier {
   Future<Map<String, dynamic>?> recuperer() => _avecServeur((t, messages) async {
         try {
           final m = await messages.firstWhere((m) => m.$1 == sujet && m.$2.isNotEmpty).timeout(const Duration(seconds: 8));
+          if (!await SignatureEditeur.verifie(m.$2)) return null;
           return deballer(m.$2);
         } on TimeoutException {
           return null;
@@ -94,19 +100,44 @@ class CatalogueCommun extends ChangeNotifier {
   /// Le catalogue part compressé (« gz: » + gzip en base 64) : environ 30 ko au lieu de 160.
   static String emballer(Map<String, dynamic> j) => 'gz:${base64Encode(GZipEncoder().encode(utf8.encode(jsonEncode(j)))!)}';
 
-  static Map<String, dynamic> deballer(String t) =>
-      jsonDecode(t.startsWith('gz:') ? utf8.decode(GZipDecoder().decodeBytes(base64Decode(t.substring(3)))) : t) as Map<String, dynamic>;
+  static Map<String, dynamic> deballer(String publie) {
+    final t = SignatureEditeur.contenu(publie);
+    return jsonDecode(t.startsWith('gz:') ? utf8.decode(GZipDecoder().decodeBytes(base64Decode(t.substring(3)))) : t) as Map<String, dynamic>;
+  }
 
   /// Pourquoi la dernière publication a échoué (montré à l'éditeur).
   String? erreur;
 
-  /// Publie le catalogue commun (message retenu) ; rend vrai si le serveur l'a renvoyé.
+  // ------------------------------------------------------------ Signature de l'éditeur
+
+  /// Graine de la clé de signature, gardée sur l'appareil de l'éditeur après la saisie de sa phrase.
+  String? get graineSignature => _reglage('signature_editeur');
+
+  /// Enregistre la phrase de signature ; rend la clé publique, ou null si la phrase ne correspond pas à la
+  /// clé publique de l'application.
+  Future<String?> definirPhrase(String phrase) async {
+    if (phrase.trim().length < 8) return null;
+    final g = await SignatureEditeur.graine(phrase);
+    final cle = await SignatureEditeur.clePublique(g);
+    if (clePubliqueEditeur.isNotEmpty && cle != clePubliqueEditeur) return null;
+    _definir('signature_editeur', g);
+    return cle;
+  }
+
+  Future<String?> clePublique() async => graineSignature == null ? null : SignatureEditeur.clePublique(graineSignature!);
+
+  /// Publie le catalogue commun (message retenu, signé) ; rend vrai si le serveur l'a renvoyé.
   /// Ne lève jamais d'erreur : en cas d'échec, [erreur] dit pourquoi.
   Future<bool> publier(Map<String, dynamic> j) async {
     erreur = null;
     bool? ok;
     try {
-      final texte = emballer(j);
+      final graine = graineSignature;
+      if (graine == null) {
+        erreur = 'phrase de signature non saisie';
+        return false;
+      }
+      final texte = await SignatureEditeur.signer(emballer(j), graine);
       ok = await _avecServeur((t, messages) async {
         final retour = Completer<bool>();
         final sub = messages.listen((m) {
@@ -192,7 +223,7 @@ class CatalogueCommun extends ChangeNotifier {
         await fini.future.timeout(const Duration(seconds: 12), onTimeout: () {});
         silence?.cancel();
         await sub.cancel();
-        _appliquerRecus(recus);
+        await _appliquerRecus(recus);
         // Puis les apports du foyer, s'ils ont changé (le catalogue commun a pu en reprendre).
         _deposes = _texte(recus[sujetApports(etat.identifiantApports())]);
         if (_deposer(t)) await Future<void>.delayed(const Duration(seconds: 2));
@@ -206,10 +237,11 @@ class CatalogueCommun extends ChangeNotifier {
     }
   }
 
-  void _appliquerRecus(Map<String, String> recus) {
+  Future<void> _appliquerRecus(Map<String, String> recus) async {
     final etat = Etat.instance;
     final commun = recus[sujet];
-    if (commun != null && commun.isNotEmpty) {
+    // Un catalogue mal signé (déposé par un autre que l'éditeur) est ignoré : le dernier bon reste.
+    if (commun != null && commun.isNotEmpty && await SignatureEditeur.verifie(commun)) {
       final j = deballer(commun);
       _definir('catalogue_commun', jsonEncode(j));
       etat.appliquerCatalogueCommun(j);
@@ -218,7 +250,7 @@ class CatalogueCommun extends ChangeNotifier {
     final apports = [
       for (final e in recus.entries)
         if (e.key.startsWith('$sujet/apports/') && e.key != moi && e.value.isNotEmpty)
-          if (_lire(e.value) case final j?) j
+          if (_lire(e.value) case final j?) {...j, 'id': e.key.substring('$sujet/apports/'.length)}
     ];
     // Gardés sur l'appareil : l'éditeur les reprend dans son brouillon.
     _definir('apports_recus', jsonEncode(apports));
@@ -242,7 +274,11 @@ class CatalogueCommun extends ChangeNotifier {
     final a = etat.apports();
     final texte = jsonEncode(a);
     if (texte == _deposes) return false;
-    final vide = (a['rayons'] as List).isEmpty && (a['secteurs'] as List).isEmpty && (a['produits'] as List).isEmpty && (a['marques'] as Map).isEmpty;
+    final vide = (a['rayons'] as List).isEmpty &&
+        (a['secteurs'] as List).isEmpty &&
+        (a['produits'] as List).isEmpty &&
+        (a['marques'] as Map).isEmpty &&
+        a['signales'] == null;
     if (vide && _deposes == null) return false;
     t.publier(sujetApports(etat.identifiantApports()), emballer(a), retenu: true);
     _deposes = texte;
@@ -280,12 +316,40 @@ class CatalogueCommun extends ChangeNotifier {
   Future<Brouillon> brouillon() async {
     final t = _reglage('catalogue_brouillon');
     final b = Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
-    final recus = _reglage('apports_recus');
-    b.absorber([
-      if (recus != null) ...(jsonDecode(recus) as List).cast<Map<String, dynamic>>(),
-      Etat.instance.apports(),
-    ]);
+    // Seulement ce qui passe les règles (ni foyer bloqué, ni nom refusé, ni produit signalé).
+    final f = Moderation.filtrer(apportsRecus, bloques: b.bloques, signales: Etat.instance.signalements);
+    b.absorber([...f.lots, Etat.instance.apports()]);
     return b;
+  }
+
+  /// Apports des autres foyers reçus au dernier lancement (avec leur identifiant « id »).
+  List<Map<String, dynamic>> get apportsRecus {
+    final recus = _reglage('apports_recus');
+    return recus == null ? const [] : (jsonDecode(recus) as List).cast<Map<String, dynamic>>();
+  }
+
+  /// Pour l'éditeur : chaque foyer contributeur (anonyme), avec ce qu'il a déposé et ce qu'en disent les règles.
+  List<({String id, int produits, int refuses, int signales, bool bloque, bool ecarte})> contributeurs(Brouillon b) {
+    final f = Moderation.filtrer(apportsRecus, signales: Etat.instance.signalements);
+    final res = [
+      for (final j in apportsRecus)
+        (() {
+          final id = '${j['id'] ?? ''}';
+          final produits = (j['produits'] as List? ?? const []).cast<Map>();
+          final propres = Moderation.nettoyer(j, const {})['produits'] as List;
+          final signales = produits.where((p) => f.signales.contains(Moderation.cleProduit('${p['secteur']}', '${p['nom']}'))).length;
+          return (
+            id: id,
+            produits: produits.length,
+            refuses: produits.length - propres.length,
+            signales: signales,
+            bloque: b.bloques.contains(id),
+            ecarte: f.ecartes.contains(id),
+          );
+        })()
+    ];
+    res.sort((x, y) => (y.refuses + y.signales * 3).compareTo(x.refuses + x.signales * 3));
+    return res;
   }
 
   void enregistrerBrouillon(Brouillon b) => _definir('catalogue_brouillon', jsonEncode(b.versJson()));
@@ -305,11 +369,15 @@ class CatalogueCommun extends ChangeNotifier {
 
 /// Le catalogue commun en cours de modification par l'éditeur.
 class Brouillon {
-  Brouillon(this.catalogue, this.images, this.renommes, this.retires, this.version, this.modifications);
+  Brouillon(this.catalogue, this.images, this.renommes, this.retires, this.version, this.modifications, {Set<String>? bloques})
+      : bloques = bloques ?? {};
   final CatalogueType catalogue;
   final Map<String, String> images;
   final List<Map<String, dynamic>> renommes, retires;
   final int version;
+
+  /// Foyers (identifiants d'apports) dont les ajouts sont bloqués pour tous.
+  final Set<String> bloques;
 
   /// Nombre de modifications depuis la dernière publication.
   int modifications;
@@ -321,6 +389,7 @@ class Brouillon {
         [for (final o in (j['retires'] as List? ?? const [])) Map<String, dynamic>.from(o as Map)],
         (j['version'] as num? ?? 0).toInt(),
         (j['modifications'] as num? ?? 0).toInt(),
+        bloques: {for (final x in (j['bloques'] as List? ?? const [])) '$x'},
       );
 
   Map<String, dynamic> versJson() => {
@@ -329,6 +398,7 @@ class Brouillon {
         if (images.isNotEmpty) 'images': images,
         if (renommes.isNotEmpty) 'renommes': renommes,
         if (retires.isNotEmpty) 'retires': retires,
+        if (bloques.isNotEmpty) 'bloques': bloques.toList()..sort(),
         if (modifications > 0) 'modifications': modifications,
       };
 

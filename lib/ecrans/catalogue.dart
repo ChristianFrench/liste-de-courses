@@ -778,7 +778,8 @@ class EcranProduitsPerso extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Text(
-                    'Vos produits ajoutés rejoignent le catalogue de tous les foyers. Touchez-en un pour le modifier. '
+                    'Vos produits ajoutés rejoignent le catalogue de tous les foyers dès qu\'ils ont été achetés '
+                    '(cochés dans des courses terminées). Touchez-en un pour le modifier. '
                     'Seul l\'éditeur du catalogue commun supprime un produit.',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),

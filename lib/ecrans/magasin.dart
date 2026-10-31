@@ -69,6 +69,28 @@ class EcranFicheProduit extends StatelessWidget {
                         MaterialPageRoute<void>(builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
                   }
                 }),
+              // Ajouté par un autre foyer : nom fantaisiste, grossier ou faux → signalé (31/10/2026).
+              if (etat.estRecu(p))
+                ActionLigne(Icons.flag_outlined, 'Signaler ce produit', () async {
+                  final ok = await confirmer(
+                    context,
+                    titre: 'Signaler « ${p.nom} » ?',
+                    icone: Icons.flag_outlined,
+                    contenu: Text(
+                      'Ce produit vient d\'un autre foyer. Signalé, il disparaît de votre catalogue'
+                      '${utilise ? ' (il reste dans vos listes)' : ''}. Signalé par trois foyers, il disparaît pour tous.',
+                      style: Charte.texte(16),
+                    ),
+                    plein: 'Annuler',
+                    contour: 'Signaler',
+                  );
+                  if (ok != true) return;
+                  etat.signalerProduit(p);
+                  if (context.mounted) {
+                    if (!utilise) Navigator.of(context).pop();
+                    Nav.message(context, 'Produit signalé');
+                  }
+                }, danger: true),
             ],
           ),
           corps: ListView(

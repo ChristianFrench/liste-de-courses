@@ -6,6 +6,7 @@ import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
 import '../donnees/modele.dart';
+import '../donnees/signature.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
@@ -56,6 +57,11 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
             ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
               if (await ajouterDepuisTexte(context, b)) _modifie();
             }),
+            ActionLigne(Icons.groups_outlined, 'Foyers contributeurs', () async {
+              await Nav.aller<void>(context, EcranContributeurs(b: b, modifie: _modifie));
+              if (mounted) setState(() {});
+            }),
+            ActionLigne(Icons.key_outlined, 'Clé de signature', () => _cleSignature(b)),
           ],
         ],
       ),
@@ -164,6 +170,9 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
       contour: 'Publier',
     );
     if (ok != true || !mounted) return;
+    // Le catalogue part signé : la phrase est demandée une fois sur cet appareil.
+    if (CatalogueCommun.instance.graineSignature == null && await _demanderPhrase() == null) return;
+    if (!mounted) return;
     setState(() => _publication = true);
     var fait = false;
     try {
@@ -185,6 +194,104 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
       Nav.message(context,
           'Rien n\'est publié (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : le brouillon est gardé, réessayez');
     }
+  }
+
+  /// Demande la phrase de signature de l'éditeur ; rend la clé publique, ou null.
+  Future<String?> _demanderPhrase() async {
+    final phrase = await demanderTexte(
+      context,
+      titre: 'Phrase de signature',
+      libelle: 'Phrase',
+      aide: 'Au moins 8 caractères, connue de vous seul',
+      valider: 'Valider',
+    );
+    if (phrase == null || !mounted) return null;
+    final cle = await CatalogueCommun.instance.definirPhrase(phrase);
+    if (cle == null && mounted) {
+      Nav.message(context, phrase.trim().length < 8 ? 'Phrase trop courte (8 caractères au moins)' : 'Ce n\'est pas la phrase de l\'éditeur');
+    }
+    return cle;
+  }
+
+  Future<void> _cleSignature(Brouillon b) async {
+    final cle = await CatalogueCommun.instance.clePublique() ?? await _demanderPhrase();
+    if (cle == null || !mounted) return;
+    final copier = await confirmer(
+      context,
+      titre: 'Clé de signature',
+      icone: Icons.key_outlined,
+      contenu: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+          clePubliqueEditeur.isEmpty
+              ? 'Envoyez cette clé à Claude : elle n\'est pas secrète. Une fois dans l\'application, seuls les catalogues '
+                  'signés par votre phrase seront acceptés.'
+              : 'Cette clé est celle de l\'application : vos publications sont reconnues par tous les foyers.',
+          style: Charte.texte(15),
+        ),
+        const SizedBox(height: 10),
+        SelectableText(cle, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      ]),
+      plein: 'Fermer',
+      contour: 'Copier',
+    );
+    if (copier == true) await Clipboard.setData(ClipboardData(text: cle));
+  }
+}
+
+/// Les foyers qui ajoutent au catalogue (anonymes), du plus suspect au moins suspect ; l'éditeur bloque
+/// ou débloque un foyer (effet à la prochaine publication).
+class EcranContributeurs extends StatefulWidget {
+  const EcranContributeurs({super.key, required this.b, required this.modifie});
+  final Brouillon b;
+  final VoidCallback modifie;
+
+  @override
+  State<EcranContributeurs> createState() => _EcranContributeursState();
+}
+
+class _EcranContributeursState extends State<EcranContributeurs> {
+  @override
+  Widget build(BuildContext context) {
+    final b = widget.b;
+    final liste = CatalogueCommun.instance.contributeurs(b);
+    return PageBase(
+      entete: const EnTeteFenetre(retour: true, icone: Icons.groups_outlined, sousTitre: 'Catalogue commun', titre: 'Foyers contributeurs'),
+      corps: liste.isEmpty
+          ? Center(child: Text('Aucun ajout reçu des foyers.', style: Charte.texte(16)))
+          : ListView(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                  child: Text(
+                    'Les plus suspects en tête. Bloquer un foyer retire tous ses ajouts chez tous les foyers, '
+                    'à la prochaine publication.',
+                    style: Charte.texte(14, couleur: Charte.texteSecondaire),
+                  ),
+                ),
+                for (final c in liste)
+                  LigneMenu(
+                    titre: 'Foyer ${c.id.length > 4 ? c.id.substring(0, 4) : c.id}${c.bloque ? ' · bloqué' : c.ecarte ? ' · écarté' : ''}',
+                    icone: c.bloque ? Icons.block : Icons.home_outlined,
+                    sousTitre: '${_pluriel(c.produits, 'produit')}'
+                        '${c.refuses > 0 ? ', ${_pluriel(c.refuses, 'nom')} refusé${c.refuses > 1 ? 's' : ''}' : ''}'
+                        '${c.signales > 0 ? ', ${_pluriel(c.signales, 'produit')} signalé${c.signales > 1 ? 's' : ''}' : ''}',
+                    onTap: () => menuActions(context, titre: 'Foyer ${c.id.length > 4 ? c.id.substring(0, 4) : c.id}', actions: [
+                      if (c.bloque)
+                        ActionLigne(Icons.check_circle_outline, 'Débloquer', () => _bloquer(c.id, false))
+                      else
+                        ActionLigne(Icons.block, 'Bloquer ce foyer', () => _bloquer(c.id, true), danger: true),
+                    ]),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  void _bloquer(String id, bool oui) {
+    if (oui ? !widget.b.bloques.add(id) : !widget.b.bloques.remove(id)) return;
+    widget.b.modifications++;
+    widget.modifie();
+    setState(() {});
   }
 }
 

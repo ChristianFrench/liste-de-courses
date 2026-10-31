@@ -24,6 +24,7 @@ dependencies:
   window_manager: ^0.5.2
   crypto: ^3.0.7
   http: ^1.2.2
+  cryptography: ^2.9.0
 
 dev_dependencies:
   basic_utils: ^5.7.0

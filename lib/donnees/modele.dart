@@ -9,6 +9,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
+import 'moderation.dart';
 import 'images_choisies.dart';
 import 'stockage.dart';
 
@@ -535,6 +536,13 @@ class Etat extends ChangeNotifier {
   /// repris des autres foyers.
   Set<String> exclusCommun = {};
 
+  /// Produits reçus que ce foyer a signalés (clés « secteur|nom » de Moderation.cleProduit) : cachés chez
+  /// lui, et comptés chez les autres (3 foyers : le produit disparaît partout).
+  Set<String> signalements = {};
+
+  /// Foyers (identifiants d'apports) dont l'éditeur a bloqué les ajouts (catalogue commun « bloques »).
+  Set<String> foyersBloques = {};
+
   /// Version du catalogue commun déjà ajoutée au foyer (0 : catalogue livré avec l'application),
   /// et ses nouveautés, montrées une fois sur chaque appareil.
   int versionCatalogueCommun = 0;
@@ -1010,6 +1018,8 @@ class Etat extends ChangeNotifier {
     structureRecue = {for (final x in (options?['structureRecue'] as List? ?? const [])) x as String};
     marquesRecues = {for (final e in (options?['marquesRecues'] as Map? ?? {}).entries) e.key as String: _ids(e.value)};
     exclusCommun = _ids(options?['exclusCommun']).toSet();
+    signalements = _ids(options?['signalements']).toSet();
+    foyersBloques = _ids(options?['foyersBloques']).toSet();
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
@@ -1133,6 +1143,8 @@ class Etat extends ChangeNotifier {
             if (structureRecue.isNotEmpty) 'structureRecue': structureRecue.toList()..sort(),
             if (marquesRecues.isNotEmpty) 'marquesRecues': marquesRecues,
             if (exclusCommun.isNotEmpty) 'exclusCommun': exclusCommun.toList()..sort(),
+            if (signalements.isNotEmpty) 'signalements': signalements.toList()..sort(),
+            if (foyersBloques.isNotEmpty) 'foyersBloques': foyersBloques.toList()..sort(),
             'typesPackaging': typesPackaging,
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
@@ -2805,6 +2817,7 @@ class Etat extends ChangeNotifier {
     }
     final pris = <String>{};
     exclusCommun = exclusDu(j);
+    foyersBloques = {for (final x in (j['bloques'] as List? ?? const [])) '$x'};
 
     // 1. Noms changés par l'éditeur.
     var renommes = 0;
@@ -3008,15 +3021,32 @@ class Etat extends ChangeNotifier {
       return i < 0 ? estExclu(exclusCommun, rayon: c) : estExclu(exclusCommun, rayon: c.substring(0, i), secteur: c.substring(i + 1));
     }
 
-    final rayonsA = [for (final c in structurePerso) if (!c.contains('/') && !exclu(c)) c]..sort();
-    final secteursA = [for (final c in structurePerso) if (c.contains('/') && !exclu(c)) c]..sort();
+    // Preuve d'usage (31/10/2026) : seul part ce qui a été acheté (coché dans des courses terminées).
+    final achetes = <String>{}, marquesAchetees = <String>{};
+    for (final l in listes) {
+      if (l.statut != StatutListe.terminee) continue;
+      for (final g in l.lignes) {
+        if (!g.coche) continue;
+        achetes.add(g.produitId);
+        if (marque(g.marqueId)?.nom case final m?) marquesAchetees.add(m.toLowerCase());
+      }
+    }
     final prods = <Map<String, dynamic>>[];
+    final structureUtile = <String>{};
     for (final p in produitsAjoutes) {
+      if (!achetes.contains(p.id) || Moderation.nomRefuse(p.nom) != null) continue;
       final s = secteurCatalogue(p.id);
       final r = s == null ? null : rayon(s.rayonId);
       if (s == null || r == null) continue; // un non placé reste dans le foyer
       if (estExclu(exclusCommun, rayon: r.nom, secteur: s.nom, produit: p.nom)) continue;
-      final mq = p.marqueIds.isEmpty ? null : marque(p.marqueIds.first)?.nom;
+      if (Moderation.nomRefuse(r.nom) != null || Moderation.nomRefuse(s.nom) != null) continue;
+      if (prods.length >= Moderation.plafondProduits) break;
+      structureUtile..add(r.nom)..add('${r.nom}/${s.nom}');
+      for (final m in p.marqueIds) {
+        if (marque(m)?.nom case final n?) marquesAchetees.add(n.toLowerCase());
+      }
+      final mq0 = p.marqueIds.isEmpty ? null : marque(p.marqueIds.first)?.nom;
+      final mq = mq0 != null && Moderation.nomRefuse(mq0, marque: true) == null ? mq0 : null;
       final formats = [for (final id in p.packagingIds) if (packaging(id)?.libelle case final l?) l];
       prods.add({
         'nom': p.nom,
@@ -3027,18 +3057,38 @@ class Etat extends ChangeNotifier {
       });
     }
     prods.sort((a, b) => '${a['rayon']}/${a['secteur']}/${a['nom']}'.compareTo('${b['rayon']}/${b['secteur']}/${b['nom']}'));
-    final mqs = <String, List<String>>{
-      for (final e in (marquesSecteurs.entries.toList()..sort((a, b) => a.key.compareTo(b.key))))
-        if ((e.value['+'] ?? const []).isNotEmpty) e.key: [...e.value['+']!]..sort(),
+    // Rayons et secteurs créés par le foyer : seulement s'ils rangent un produit qui part.
+    final rayonsA = [for (final c in structurePerso) if (!c.contains('/') && !exclu(c) && structureUtile.contains(c)) c]..sort();
+    final secteursA = [for (final c in structurePerso) if (c.contains('/') && !exclu(c) && structureUtile.contains(c)) c]..sort();
+    final mqs = <String, List<String>>{};
+    for (final e in (marquesSecteurs.entries.toList()..sort((a, b) => a.key.compareTo(b.key)))) {
+      final l = [
+        for (final m in e.value['+'] ?? const <String>[])
+          if (marquesAchetees.contains(m.toLowerCase()) && Moderation.nomRefuse(m, marque: true) == null) m
+      ]..sort();
+      if (l.isNotEmpty) mqs[e.key] = l;
+    }
+    return {
+      'rayons': rayonsA,
+      'secteurs': secteursA,
+      'produits': prods,
+      'marques': mqs,
+      if (signalements.isNotEmpty) 'signales': signalements.toList()..sort(),
     };
-    return {'rayons': rayonsA, 'secteurs': secteursA, 'produits': prods, 'marques': mqs};
   }
 
-  /// Ajoute au foyer ce que les autres foyers ont déposé ; rend le nombre d'éléments ajoutés.
-  int appliquerApports(Iterable<Map<String, dynamic>> lots) {
+  /// Foyers dont les dépôts ont été écartés à la dernière réception (bloqués, trop gros, trop signalés).
+  Set<String> foyersEcartes = {};
+
+  /// Ajoute au foyer ce que les autres foyers ont déposé, après les règles contre les mauvais usages
+  /// (Moderation) ; rend le nombre d'éléments ajoutés. Un produit reçu qui n'est plus proposé (foyer bloqué
+  /// ou écarté, produit signalé, retiré par son foyer) disparaît, sauf s'il sert à une liste.
+  int appliquerApports(Iterable<Map<String, dynamic>> recus) {
     if (magasins.isEmpty) return 0;
+    final f = Moderation.filtrer(recus, bloques: foyersBloques, signales: signalements);
+    foyersEcartes = f.ecartes;
     var n = 0;
-    String bas(String t) => t.trim().toLowerCase();
+    String bas(String t) => Moderation.normaliser(t);
     Rayon rayonNomme(String rn) {
       final ref = _trouve(rayonsCatalogue, (r) => bas(r.nom) == bas(rn));
       if (ref != null) return ref;
@@ -3064,7 +3114,8 @@ class Etat extends ChangeNotifier {
       return _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
     }
 
-    for (final j in lots) {
+    final gardes = <String>{};
+    for (final j in f.lots) {
       for (final rn in (j['rayons'] as List? ?? const []).cast<String>()) {
         if (rn.trim().isNotEmpty && !estExclu(exclusCommun, rayon: rn)) rayonNomme(rn);
       }
@@ -3079,8 +3130,11 @@ class Etat extends ChangeNotifier {
         if (nom == null || rn == null || sn == null || nom.trim().isEmpty) continue;
         if (estExclu(exclusCommun, rayon: rn, secteur: sn, produit: nom)) continue;
         final s = secteurNomme(rayonNomme(rn), sn);
-        if (_tousDuSecteur(s).any((p) => bas(p.nom) == bas(nom))) continue;
         final id = 'pe-${_cleNom(rn)}-${_cleNom(sn)}-${_cleNom(nom)}';
+        // Doublons : même nom au pluriel, aux accents ou aux majuscules près ; à une lettre près, mis de côté.
+        final autres = [for (final p in _tousDuSecteur(s)) if (p.id != id) p];
+        if (autres.any((p) => bas(p.nom) == bas(nom) || Moderation.presque(p.nom, nom))) continue;
+        gardes.add(id);
         var p = produit(id);
         if (p == null) {
           p = Produit(id, nom.trim(), [], [], 0);
@@ -3090,9 +3144,9 @@ class Etat extends ChangeNotifier {
           }
           produits.add(p);
           produitsPerso[id] = 'e';
+          n++;
         }
         placer('', p.id, s.id);
-        n++;
       }
       for (final e in (j['marques'] as Map? ?? const {}).entries) {
         final l = marquesRecues.putIfAbsent(e.key as String, () => []);
@@ -3104,8 +3158,30 @@ class Etat extends ChangeNotifier {
         }
       }
     }
-    if (n > 0) modifie();
+    // Ce qui n'est plus proposé disparaît, sauf ce qui sert à une liste.
+    var retires = 0;
+    for (final p in [...produits]) {
+      if (produitsPerso[p.id] != 'e' || gardes.contains(p.id) || produitUtilise(p)) continue;
+      produits.remove(p);
+      produitsPerso.remove(p.id);
+      emplacements.removeWhere((e) => e.produitId == p.id);
+      retires++;
+    }
+    if (n > 0 || retires > 0) modifie();
     return n;
+  }
+
+  /// Signale un produit reçu d'un autre foyer (nom fantaisiste, grossier, faux…) : il disparaît de ce foyer
+  /// (sauf s'il sert à une liste), et chaque signalement compte chez les autres foyers.
+  void signalerProduit(Produit p) {
+    final s = secteurCatalogue(p.id);
+    signalements.add(Moderation.cleProduit(s?.nom ?? '', p.nom));
+    if (estRecu(p) && !produitUtilise(p)) {
+      produits.remove(p);
+      produitsPerso.remove(p.id);
+      emplacements.removeWhere((e) => e.produitId == p.id);
+    }
+    modifie();
   }
 
   /// Renomme ou range autrement un article de la liste : un nouveau produit est créé dans le secteur choisi
