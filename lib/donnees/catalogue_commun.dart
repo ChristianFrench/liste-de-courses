@@ -324,7 +324,24 @@ class CatalogueCommun extends ChangeNotifier {
       final s = r == null ? null : b.secteur(r, ancien);
       if (r != null && s != null) b.renommerSecteur(r, s, nouveau);
     }
-    b.absorber([...f.lots, Etat.instance.apports(), await _nouveautesLivrees(b)]);
+    for (final (rn, de, nom, vers) in produitsDeplaces) {
+      final r = b.rayon(rn);
+      final s = r == null ? null : b.secteur(r, de);
+      final p = s == null ? null : b.produitDans(s, nom);
+      if (r == null || s == null || p == null) continue;
+      final cible = b.secteur(r, vers) ?? b.ajouterSecteur(r, vers);
+      s.produits.remove(p);
+      if (b.produitDans(cible, nom) == null) cible.produits.add(p);
+      b.modifications++;
+    }
+    final livre = jsonDecode(await rootBundle.loadString(CatalogueType.fichierLivre)) as Map<String, dynamic>;
+    b.absorber([...f.lots, Etat.instance.apports(), _nouveautesLivrees(livre)]);
+    // Ordre des secteurs du catalogue livré pour les rayons qu'il réorganise.
+    for (final rj in (livre['rayons'] as List).cast<Map>()) {
+      if (rj['nom'] != 'Textile') continue;
+      final r = b.rayon('Textile');
+      if (r != null) b.ordonnerSecteurs(r, [for (final sj in (rj['secteurs'] as List).cast<Map>()) sj['nom'] as String]);
+    }
     return b;
   }
 
@@ -335,12 +352,26 @@ class CatalogueCommun extends ChangeNotifier {
     ('Fromagerie', 'Fromages à la coupe', 'Fromages au comptoir'),
     ('Poissonnerie', 'Poissonnerie traditionnelle', 'Poissonnerie au comptoir'),
     ('Traiteur', 'Traiteur à la coupe', 'Traiteur au comptoir'),
+    ('Textile', 'Vêtements et chaussures', 'Vêtements femme'),
+  ];
+
+  /// Produits déplacés dans le catalogue livré : (rayon, secteur d'avant, nom, secteur d'arrivée).
+  static final produitsDeplaces = [
+    for (final n in [
+      'Baskets', 'Tongs', 'Bottes de pluie', 'Chaussures enfant', 'Bottes', 'Bottines', 'Derbies', 'Escarpins', //
+      'Sandales', 'Mules', 'Espadrilles', 'Chaussures de running', 'Chaussons',
+    ])
+      ('Textile', 'Vêtements femme', n, 'Chaussures'),
+    for (final n in ['Gants', 'Bonnets', 'Écharpes']) ('Textile', 'Vêtements femme', n, 'Accessoires de mode'),
+    for (final n in ['Vêtements bébé', 'Bodies bébé', 'Ensemble naissance', 'Combinaison pilote'])
+      ('Textile', 'Vêtements femme', n, 'Vêtements enfant et bébé'),
+    for (final n in ['Polos', 'Joggings', 'Imperméables']) ('Textile', 'Vêtements femme', n, 'Vêtements homme'),
+    ('Textile', 'Vêtements femme', 'Chaussettes', 'Lingerie'),
   ];
 
   /// Produits du catalogue livré avec l'application absents du dernier catalogue publié (ajoutés au catalogue
   /// livré depuis : natures d'Open Food Facts, 31/10/2026). L'éditeur les publie ensuite pour tous les foyers.
-  Future<Map<String, dynamic>> _nouveautesLivrees(Brouillon b) async {
-    final livre = jsonDecode(await rootBundle.loadString(CatalogueType.fichierLivre)) as Map<String, dynamic>;
+  Map<String, dynamic> _nouveautesLivrees(Map<String, dynamic> livre) {
     return {
       'produits': [
         for (final r in (livre['rayons'] as List).cast<Map>())

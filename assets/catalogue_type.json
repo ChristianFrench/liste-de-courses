@@ -17589,153 +17589,41 @@
    "ordre": 30,
    "secteurs": [
     {
-     "nom": "Vêtements et chaussures",
+     "nom": "Vêtements femme",
      "ordre": 1,
      "taille": 3,
-     "formats": [
-      "à la pièce",
-      "paire",
-      "lot de 2",
-      "lot de 3",
-      "lot de 6",
-      "lot de 8"
-     ],
      "produits": [
       {
-       "nom": "Chaussettes",
-       "taille": 3,
-       "formats": [
-        "lot de 3",
-        "lot de 6",
-        "paire",
-        "lot de 2",
-        "lot de 8"
-       ]
-      },
-      {
        "nom": "T-shirts",
-       "taille": 3,
-       "formats": [
-        "à la pièce",
-        "lot de 2",
-        "lot de 3"
-       ]
-      },
-      {
-       "nom": "Chaussons",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
+       "taille": 3
       },
       {
        "nom": "Pyjamas",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Pulls",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Jeans",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Pantalons",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Sweats",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Leggings",
-       "taille": 3,
-       "formats": [
-        "à la pièce",
-        "lot de 2"
-       ]
-      },
-      {
-       "nom": "Baskets",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
-      },
-      {
-       "nom": "Tongs",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
-      },
-      {
-       "nom": "Bottes de pluie",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
-      },
-      {
-       "nom": "Gants",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
-      },
-      {
-       "nom": "Bonnets",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
-      },
-      {
-       "nom": "Écharpes",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
+       "taille": 3
       },
       {
        "nom": "Maillots de bain",
-       "taille": 3,
-       "formats": [
-        "à la pièce"
-       ]
-      },
-      {
-       "nom": "Vêtements bébé",
-       "taille": 3,
-       "formats": [
-        "à la pièce",
-        "lot de 2",
-        "lot de 3",
-        "lot de 6"
-       ]
-      },
-      {
-       "nom": "Chaussures enfant",
-       "taille": 3,
-       "formats": [
-        "paire"
-       ]
+       "taille": 3
       },
       {
        "nom": "Tops",
@@ -17774,15 +17662,7 @@
        "taille": 3
       },
       {
-       "nom": "Polos",
-       "taille": 3
-      },
-      {
        "nom": "Chemises",
-       "taille": 3
-      },
-      {
-       "nom": "Joggings",
        "taille": 3
       },
       {
@@ -17802,7 +17682,78 @@
        "taille": 3
       },
       {
+       "nom": "Parkas",
+       "taille": 3
+      },
+      {
+       "nom": "Doudounes",
+       "taille": 3
+      },
+      {
+       "nom": "Peignoirs",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Vêtements homme",
+     "ordre": 2,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Polos",
+       "taille": 3
+      },
+      {
+       "nom": "Joggings",
+       "taille": 3
+      },
+      {
        "nom": "Imperméables",
+       "taille": 3
+      },
+      {
+       "nom": "T-shirts",
+       "taille": 3
+      },
+      {
+       "nom": "Chemises",
+       "taille": 3
+      },
+      {
+       "nom": "Pulls",
+       "taille": 3
+      },
+      {
+       "nom": "Gilets",
+       "taille": 3
+      },
+      {
+       "nom": "Sweats",
+       "taille": 3
+      },
+      {
+       "nom": "Jeans",
+       "taille": 3
+      },
+      {
+       "nom": "Pantalons",
+       "taille": 3
+      },
+      {
+       "nom": "Shorts",
+       "taille": 3
+      },
+      {
+       "nom": "Bermudas",
+       "taille": 3
+      },
+      {
+       "nom": "Blousons",
+       "taille": 3
+      },
+      {
+       "nom": "Vestes",
        "taille": 3
       },
       {
@@ -17811,6 +17762,33 @@
       },
       {
        "nom": "Doudounes",
+       "taille": 3
+      },
+      {
+       "nom": "Manteaux",
+       "taille": 3
+      },
+      {
+       "nom": "Pyjamas",
+       "taille": 3
+      },
+      {
+       "nom": "Peignoirs",
+       "taille": 3
+      },
+      {
+       "nom": "Maillots de bain",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Vêtements enfant et bébé",
+     "ordre": 3,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Vêtements bébé",
        "taille": 3
       },
       {
@@ -17823,6 +17801,89 @@
       },
       {
        "nom": "Combinaison pilote",
+       "taille": 3
+      },
+      {
+       "nom": "T-shirts",
+       "taille": 3
+      },
+      {
+       "nom": "Chemises",
+       "taille": 3
+      },
+      {
+       "nom": "Pulls",
+       "taille": 3
+      },
+      {
+       "nom": "Sweats",
+       "taille": 3
+      },
+      {
+       "nom": "Jeans",
+       "taille": 3
+      },
+      {
+       "nom": "Pantalons",
+       "taille": 3
+      },
+      {
+       "nom": "Leggings",
+       "taille": 3
+      },
+      {
+       "nom": "Robes",
+       "taille": 3
+      },
+      {
+       "nom": "Jupes",
+       "taille": 3
+      },
+      {
+       "nom": "Shorts",
+       "taille": 3
+      },
+      {
+       "nom": "Survêtements",
+       "taille": 3
+      },
+      {
+       "nom": "Manteaux",
+       "taille": 3
+      },
+      {
+       "nom": "Doudounes",
+       "taille": 3
+      },
+      {
+       "nom": "Pyjamas",
+       "taille": 3
+      },
+      {
+       "nom": "Maillots de bain",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Chaussures",
+     "ordre": 4,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Baskets",
+       "taille": 3
+      },
+      {
+       "nom": "Tongs",
+       "taille": 3
+      },
+      {
+       "nom": "Bottes de pluie",
+       "taille": 3
+      },
+      {
+       "nom": "Chaussures enfant",
        "taille": 3
       },
       {
@@ -17856,12 +17917,16 @@
       {
        "nom": "Chaussures de running",
        "taille": 3
+      },
+      {
+       "nom": "Chaussons",
+       "taille": 3
       }
      ]
     },
     {
      "nom": "Lingerie",
-     "ordre": 2,
+     "ordre": 5,
      "taille": 3,
      "formats": [
       "lot de 3",
@@ -17998,12 +18063,83 @@
       {
        "nom": "Bodies",
        "taille": 3
+      },
+      {
+       "nom": "Chaussettes",
+       "taille": 3
+      }
+     ]
+    },
+    {
+     "nom": "Accessoires de mode",
+     "ordre": 6,
+     "taille": 3,
+     "produits": [
+      {
+       "nom": "Foulards",
+       "taille": 3
+      },
+      {
+       "nom": "Chèches",
+       "taille": 3
+      },
+      {
+       "nom": "Mitaines",
+       "taille": 3
+      },
+      {
+       "nom": "Chapeaux",
+       "taille": 3
+      },
+      {
+       "nom": "Casquettes",
+       "taille": 3
+      },
+      {
+       "nom": "Ceintures",
+       "taille": 3
+      },
+      {
+       "nom": "Sacs à main",
+       "taille": 3
+      },
+      {
+       "nom": "Portefeuilles",
+       "taille": 3
+      },
+      {
+       "nom": "Colliers fantaisie",
+       "taille": 3
+      },
+      {
+       "nom": "Bracelets",
+       "taille": 3
+      },
+      {
+       "nom": "Boucles d'oreilles",
+       "taille": 3
+      },
+      {
+       "nom": "Montres",
+       "taille": 3
+      },
+      {
+       "nom": "Gants",
+       "taille": 3
+      },
+      {
+       "nom": "Bonnets",
+       "taille": 3
+      },
+      {
+       "nom": "Écharpes",
+       "taille": 3
       }
      ]
     },
     {
      "nom": "Linge de maison",
-     "ordre": 3,
+     "ordre": 7,
      "taille": 3,
      "formats": [
       "à la pièce",
@@ -18161,61 +18297,6 @@
       },
       {
        "nom": "Serviettes de table",
-       "taille": 3
-      }
-     ]
-    },
-    {
-     "nom": "Accessoires de mode",
-     "ordre": 4,
-     "taille": 3,
-     "produits": [
-      {
-       "nom": "Foulards",
-       "taille": 3
-      },
-      {
-       "nom": "Chèches",
-       "taille": 3
-      },
-      {
-       "nom": "Mitaines",
-       "taille": 3
-      },
-      {
-       "nom": "Chapeaux",
-       "taille": 3
-      },
-      {
-       "nom": "Casquettes",
-       "taille": 3
-      },
-      {
-       "nom": "Ceintures",
-       "taille": 3
-      },
-      {
-       "nom": "Sacs à main",
-       "taille": 3
-      },
-      {
-       "nom": "Portefeuilles",
-       "taille": 3
-      },
-      {
-       "nom": "Colliers fantaisie",
-       "taille": 3
-      },
-      {
-       "nom": "Bracelets",
-       "taille": 3
-      },
-      {
-       "nom": "Boucles d'oreilles",
-       "taille": 3
-      },
-      {
-       "nom": "Montres",
        "taille": 3
       }
      ]
