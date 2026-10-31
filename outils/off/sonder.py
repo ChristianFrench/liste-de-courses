@@ -6,14 +6,17 @@ import json, sys, time, urllib.request
 AGENT = "ListeDeCourses/0.7 (outil de catalogue ; https://github.com/ChristianFrench/liste-de-courses)"
 
 
+ERREURS = []
+
+
 def lire(url):
-    for essai in range(4):
+    for essai in range(3):
         try:
             req = urllib.request.Request(url, headers={"User-Agent": AGENT})
             with urllib.request.urlopen(req, timeout=60) as r:
                 return json.load(r)
         except Exception as e:
-            print(f"{url} : {e}", file=sys.stderr)
+            ERREURS.append(f"{url} : {e}")
             time.sleep(10 * (essai + 1))
     return None
 
@@ -29,15 +32,18 @@ def note(titre, lignes):
 
 
 for cat in sys.argv[1].split(","):
-    cat = cat.strip()
+    cat = cat.strip().removeprefix("en:")
     if not cat:
         continue
     marques = facette(cat, "brands")
     sous = facette(cat, "categories")
-    j = lire(f"https://world.openfoodfacts.org/country/france/category/{cat}.json?page_size=1&fields=code")
+    j = lire(f"https://world.openfoodfacts.org/api/v2/search?categories_tags_en={cat}&countries_tags_en=france&page_size=1&fields=code")
     total = j.get("count") if j else "?"
     lignes = [f"{cat} : {total} produits en France, {len(marques)} marques"]
     lignes += ["Marques : " + " ; ".join(f"{n} ({c})" for n, c in marques[:60])]
     lignes += ["Catégories : " + " ; ".join(f"{n} ({c})" for n, c in sous[:60])]
     note(cat, lignes)
     time.sleep(3)
+
+if ERREURS:
+    note("Erreurs", ERREURS[:20])
