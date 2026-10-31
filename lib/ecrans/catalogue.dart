@@ -575,46 +575,95 @@ class EcranCatalogue extends StatefulWidget {
 class _EcranCatalogueState extends State<EcranCatalogue> {
   String recherche = '';
 
-  Widget _rayon(BuildContext context, Rayon x) {
+  /// Secteur déplié (un seul à la fois) : ses produits s'affichent sous lui, à modifier sur place.
+  String? _secteurOuvert;
+
+  static String _cleU(String u) => 'catalogue-univers/$u';
+  static String _cleR(Rayon r) => 'catalogue/${r.nom}';
+
+  /// Univers, rayons et secteurs à plat : un bandeau par univers et par rayon (repliés au départ), une ligne
+  /// par secteur ; toucher un secteur le déplie et replie l'autre.
+  List<Widget> _arbre(BuildContext context, Map<String, List<Rayon>> parUnivers) {
     final etat = Etat.instance;
-    return GroupeRetractable(
-      cle: 'catalogue/${x.nom}',
-      parDefaut: false,
-      titre: x.nom,
-      image: cleRayon(x.nom),
-      nombre: etat.secteursVisibles(x.id).length,
-      ajoute: etat.rayonAjoute(x),
-      actions: [
-        ActionLigne(Icons.add, '+ Nouveau secteur', () => _nouveauSecteur(context, x)),
-        if (etat.secteursVisibles(x.id).length > 1)
-          ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
-            final noms = await ordonner(context,
-                titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
-            if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
-          }),
-        if (etat.rayonAjoute(x)) ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
-      ],
-      enfants: [
-        for (final s in etat.secteursVisibles(x.id))
-          LigneMenu(
-            titre: s.nom,
-            apresTitre: etat.secteurAjoute(s) ? const SigneAjoute() : null,
-            gauche: imageSecteur(context, s),
-            sousTitre: _pluriel(etat.produitsDuSecteur(s).length, 'produit'),
-            onTap: () => menuActions(context, titre: s.nom, actions: [
-              ActionLigne(Icons.list, 'Voir et modifier les produits', () => Nav.aller<void>(context, EcranSecteurCatalogue(secteurId: s.id))),
-              ...actionsSecteur(context, s),
+    final plis = Retractables.i;
+    final res = <Widget>[];
+    for (final MapEntry(key: u, value: rayonsU) in parUnivers.entries) {
+      final uOuvert = plis.ouvert(_cleU(u));
+      res.add(TitreGroupe(
+          key: ValueKey('univers-$u'),
+          nom: u,
+          grand: true,
+          icone: Icons.storefront_outlined,
+          nombre: rayonsU.length,
+          ouvert: uOuvert,
+          onTap: () => plis.basculer(_cleU(u))));
+      if (!uOuvert) continue;
+      for (final x in rayonsU) {
+        final rOuvert = plis.ouvert(_cleR(x), parDefaut: false);
+        res.add(Padding(
+          padding: const EdgeInsets.only(left: 12),
+          child: TitreGroupe(
+              key: ValueKey('rayon-${x.nom}'),
+              nom: x.nom,
+              grand: true,
+              image: cleRayon(x.nom),
+              ajoute: etat.rayonAjoute(x),
+              nombre: etat.secteursVisibles(x.id).length,
+              ouvert: rOuvert,
+              onTap: () => plis.basculer(_cleR(x), parDefaut: false)),
+        ));
+        if (!rOuvert) continue;
+        final lignes = <Widget>[];
+        for (final sec in etat.secteursVisibles(x.id)) {
+          final ouvert = _secteurOuvert == sec.id;
+          final produits = etat.produitsDuSecteur(sec);
+          lignes.add(LigneMenu(
+            key: ValueKey('secteur-${sec.id}'),
+            titre: sec.nom,
+            apresTitre: etat.secteurAjoute(sec) ? const SigneAjoute() : null,
+            gauche: imageSecteur(context, sec),
+            sousTitre: _pluriel(produits.length, 'produit'),
+            droite: Icon(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
+            onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
+          ));
+          if (!ouvert) continue;
+          produits.sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
+          lignes.add(Padding(
+            padding: const EdgeInsets.only(left: 24),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              for (final p in produits) ligneProduit(context, p),
+              for (final a in actionsSecteur(context, sec)) LigneMenu(titre: a.texte, icone: a.icone, onTap: a.faire),
             ]),
-          ),
-      ],
-    );
+          ));
+        }
+        lignes.add(LigneMenu(
+            titre: 'Actions du rayon ${x.nom}',
+            icone: Icons.more_horiz,
+            onTap: () => menuActions(context, titre: x.nom, actions: _actionsRayon(context, x))));
+        res.add(Padding(padding: const EdgeInsets.only(left: 28, right: 16), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: lignes)));
+      }
+    }
+    return res;
+  }
+
+  List<ActionLigne> _actionsRayon(BuildContext context, Rayon x) {
+    final etat = Etat.instance;
+    return [
+      ActionLigne(Icons.add, '+ Nouveau secteur', () => _nouveauSecteur(context, x)),
+      if (etat.secteursVisibles(x.id).length > 1)
+        ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
+          final noms = await ordonner(context, titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
+          if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
+        }),
+      if (etat.rayonAjoute(x)) ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
+    ];
   }
 
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     return ListenableBuilder(
-      listenable: etat,
+      listenable: Listenable.merge([etat, Retractables.i]),
       builder: (context, _) {
         final r = recherche.toLowerCase();
         bool garde(Produit p) =>
@@ -622,6 +671,13 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
         final trouves = r.length < 2 ? <Produit>[] : ([for (final p in etat.produitsVisibles) if (garde(p)) p]..sort((a, b) => a.nom.compareTo(b.nom)));
         final nonRanges = [for (final p in etat.produitsVisibles) if (etat.secteurCatalogue(p.id) == null) p]..sort((a, b) => a.nom.compareTo(b.nom));
         final perso = etat.produitsAjoutes.length;
+        final parUnivers = <String, List<Rayon>>{
+          for (final u in [...universDesRayons.keys, autresRayons])
+            if ([for (final x in etat.rayonsVisibles) if (universDuRayon(x.nom) == u) x] case final l when l.isNotEmpty) u: l,
+        };
+        final plis = Retractables.i;
+        final cles = [for (final e in parUnivers.entries) ...[_cleU(e.key), for (final x in e.value) _cleR(x)]];
+        final toutOuvert = cles.every((c) => plis.ouvert(c, parDefaut: c.startsWith('catalogue-univers/')));
         return PageBase(
           entete: EnTeteFenetre(
             retour: true,
@@ -633,6 +689,10 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
               ActionLigne(Icons.edit_outlined, 'Produits ajoutés ($perso)', () => Nav.aller<void>(context, const EcranProduitsPerso())),
             ],
+            droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier', () {
+              plis.tous(cles, !toutOuvert);
+              if (toutOuvert) setState(() => _secteurOuvert = null);
+            }),
           ),
           haut: [
             Padding(
@@ -658,16 +718,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                     for (final p in trouves) ligneProduit(context, p, avecRangement: true),
                   ]
                 : [
-                    for (final u in [...universDesRayons.keys, autresRayons])
-                      if ([for (final x in etat.rayonsVisibles) if (universDuRayon(x.nom) == u) x] case final rayonsU when rayonsU.isNotEmpty)
-                        GroupeRetractable(
-                          cle: 'catalogue-univers/$u',
-                          parDefaut: false,
-                          titre: u,
-                          icone: Icons.storefront_outlined,
-                          nombre: rayonsU.length,
-                          enfants: [for (final x in rayonsU) _rayon(context, x)],
-                        ),
+                    ..._arbre(context, parUnivers),
                     if (nonRanges.isNotEmpty)
                       GroupeRetractable(
                         cle: 'catalogue/nonRanges',

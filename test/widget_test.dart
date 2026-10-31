@@ -578,15 +578,14 @@ void main() {
       await _accueil(tester);
       await _rubrique(tester, 'Catalogue');
       if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
+      // Toucher un secteur le déplie sur place : ses produits apparaissent sous lui.
       await _toucher(tester, find.text('Crèmerie').last);
-      await _toucher(tester, find.text('Voir et modifier les produits'));
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.textContaining('RANGEMENT'), findsOneWidget, reason: 'fiche produit');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.textContaining('RANGEMENT'), findsNothing);
-      await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.text('FRAIS'), findsOneWidget);
+      expect(find.text('Crèmerie', skipOffstage: false), findsWidgets, reason: 'retour au catalogue, secteur toujours déplié');
 
       await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
@@ -1096,8 +1095,7 @@ void main() {
       for (final m in etat.magasins) {
         expect(etat.secteurDe(m.id, p.id)?.nom, 'Crèmerie', reason: 'le même rangement dans tous les magasins');
       }
-      await _toucher(tester, find.text('Crèmerie').last);
-      await _toucher(tester, find.text('Voir et modifier les produits'));
+      // Le secteur reste déplié après l'ajout
       expect(find.byType(SignePerso), findsWidgets, reason: 'petit signe des produits ajoutés');
 
       // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
@@ -1106,7 +1104,6 @@ void main() {
       expect(find.text('Modifier'), findsNothing);
       expect(find.text('Avec une marque'), findsOneWidget);
       await _fermerVolet(tester);
-      await _toucher(tester, find.byTooltip('Retour'));
       await _toucher(tester, find.byTooltip('Retour'));
 
       // Produits ajoutés : la fenêtre du produit pour le modifier.
@@ -1303,7 +1300,8 @@ void main() {
       final etat = Etat.instance;
       final frais = etat.rayonsCatalogue.firstWhere((r) => r.nom == 'Frais');
       final avant = [for (final s in etat.secteursDu(frais.id)) s.nom];
-      await _toucher(tester, find.text('FRAIS'));
+      if (find.text('Actions du rayon Frais').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
+      await _toucher(tester, find.text('Actions du rayon Frais'));
       await _toucher(tester, find.text('Changer l\'ordre des secteurs'));
       // Le dernier secteur glisse tout en haut
       final dernier = avant.last;
