@@ -59,4 +59,23 @@ void main() {
     expect(etat.listes.firstWhere((x) => x.id == liste.id).nom, 'Liste renommée');
     expect(etat.journalAppareil.join('\n'), contains('références orphelines'));
   });
+
+  test('un produit déjà utilisé, retiré, ne fait plus tout annuler', () async {
+    final dossier = Directory.systemTemp.createTempSync('utilise');
+    final etat = Etat.instance;
+    await etat.charger(dossier: dossier);
+    final p = etat.creerProduit('Produit essai utilisé');
+    await etat.enregistrer();
+    // Il a servi dans une liste autrefois (compteur de la base), mais n'est plus dans aucune liste.
+    final cote = sql.sqlite3.open('${dossier.path}/${Etat.baseFoyer}');
+    cote.execute('UPDATE produit SET nb_utilisations = 3 WHERE id = ?', [p.id]);
+    cote.dispose();
+    await etat.charger(dossier: dossier);
+    etat.produits.removeWhere((x) => x.id == p.id);
+    etat.ajouterRayonCatalogue('Rayon témoin 2', univers: 'Bricolage, auto et jardin');
+    await etat.enregistrer();
+    await etat.charger(dossier: dossier);
+    expect(etat.rayonsCatalogue.where((x) => x.nom == 'Rayon témoin 2'), isNotEmpty);
+  });
 }
+

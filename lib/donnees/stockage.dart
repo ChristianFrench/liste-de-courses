@@ -430,6 +430,7 @@ class Stockage {
   /// validation finale (COMMIT) : tout était annulé, à chaque enregistrement, sans rien montrer. Désormais
   /// l'enregistrement est refait sans ce contrôle, et les références orphelines sont signalées.
   void ecrire(Map<String, dynamic> etat) {
+    avertissements.clear();
     try {
       _ecrireTout(etat);
     } on SqliteException catch (e) {
@@ -440,9 +441,24 @@ class Stockage {
       } finally {
         _db.execute('PRAGMA foreign_keys = ON');
       }
-      erreurs.add('références orphelines : ${referencesOrphelines().join(', ')}');
+      // Les liens qui ne mènent nulle part (emplacement d'un secteur disparu, ligne d'une liste disparue…)
+      // sont retirés ; ce qui reste est noté au journal de l'appareil, sans alerte à l'écran.
+      final avant = referencesOrphelines();
+      for (final r in _db.select('SELECT DISTINCT "table" AS t FROM pragma_foreign_key_check')) {
+        final t = r['t'] as String;
+        if (!_liensRetirables.contains(t)) continue;
+        _db.execute('DELETE FROM "$t" WHERE rowid IN (SELECT rowid FROM pragma_foreign_key_check(?))', [t]);
+      }
+      final reste = referencesOrphelines();
+      avertissements.add('références orphelines : ${avant.join(', ')}'
+          '${reste.isEmpty ? ' (retirées)' : ' ; restent : ${reste.join(', ')}'}');
     }
   }
+
+  static const _liensRetirables = {'emplacement', 'ligne_liste', 'parcours_etape', 'produit_marque', 'produit_packaging'};
+
+  /// Ce qui a été corrigé pendant le dernier enregistrement (noté au journal, sans alerte à l'écran).
+  final List<String> avertissements = [];
 
   /// Références vers des lignes absentes, par table et table visée (« emplacement → secteur × 3 »).
   List<String> referencesOrphelines() => [
@@ -500,8 +516,15 @@ class Stockage {
         }
       }
       for (final cle in _ecrit.keys.where((c) => !presents.contains(c)).toList()) {
-        _retirer(cle, maintenant, requete);
         _ecrit.remove(cle);
+        try {
+          _retirer(cle, maintenant, requete);
+        } on SqliteException catch (e) {
+          // 01/11/2026 : un retrait refusé (produit déjà utilisé…) annulait tout l'enregistrement.
+          // Il est seulement signalé ; la ligne reste dans la base.
+          erreurs.add('${cle.split(_sep).join(' ')} : ${e.message}');
+          continue;
+        }
         final morceaux = cle.split(_sep);
         _journaliser(morceaux.first, morceaux.sublist(1), null, requete);
       }

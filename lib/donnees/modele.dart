@@ -885,6 +885,9 @@ class Etat extends ChangeNotifier {
         debugPrint('Refusé par la base : $e');
         _noterUneFois('Refusé par la base : $e');
       }
+      for (final a in s.avertissements) {
+        _noterUneFois('Base corrigée : $a');
+      }
       if (s.erreurs.isNotEmpty || refusBase.isNotEmpty) {
         final avant = refusBase;
         refusBase = [...s.erreurs];
