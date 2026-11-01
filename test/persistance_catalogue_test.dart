@@ -58,6 +58,8 @@ void main() {
     expect(etat.rayonsCatalogue.where((x) => x.nom == 'Rayon témoin'), isNotEmpty);
     expect(etat.listes.firstWhere((x) => x.id == liste.id).nom, 'Liste renommée');
     expect(etat.journalAppareil.join('\n'), contains('références orphelines'));
+    expect(etat.stockageFoyer!.referencesOrphelines(), isEmpty, reason: 'rayon de reprise vidé');
+    expect(etat.listes.firstWhere((x) => x.id == liste.id).nom, 'Liste renommée');
   });
 
   test('un produit déjà utilisé, retiré, ne fait plus tout annuler', () async {

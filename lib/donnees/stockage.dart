@@ -451,6 +451,14 @@ class Stockage {
         if (!_liensRetirables.contains(t)) continue;
         _db.execute('DELETE FROM "$t" WHERE rowid IN (SELECT rowid FROM pragma_foreign_key_check(?))', [t]);
       }
+      // Ailleurs, une référence facultative (rayon où reprendre une préparation…) qui ne mène nulle part est vidée.
+      for (final r in _db.select('SELECT "table" AS t, rowid AS id, fkid FROM pragma_foreign_key_check')) {
+        final t = r['t'] as String;
+        final colonne = _db.select('SELECT "from" AS c FROM pragma_foreign_key_list(?) WHERE id = ?', [t, r['fkid']]).firstOrNull?['c'];
+        if (colonne == null || r['id'] == null) continue;
+        final facultative = _db.select('SELECT 1 FROM pragma_table_info(?) WHERE name = ? AND "notnull" = 0', [t, colonne]).isNotEmpty;
+        if (facultative) _db.execute('UPDATE "$t" SET "$colonne" = NULL WHERE rowid = ?', [r['id']]);
+      }
       final reste = referencesOrphelines();
       avertissements.add('références orphelines : ${avant.join(', ')}'
           '${reste.isEmpty ? ' (retirées)' : ' ; restent : ${reste.join(', ')}'}');

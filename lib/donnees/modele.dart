@@ -663,6 +663,7 @@ class Etat extends ChangeNotifier {
   }
 
   final Set<String> _dejaNote = {};
+  DateTime? _dernierLent;
 
   /// Une erreur qui se répète à chaque enregistrement n'est notée qu'une fois par séance.
   void _noterUneFois(String texte) {
@@ -878,13 +879,25 @@ class Etat extends ChangeNotifier {
     final s = _actif;
     if (s == null) return;
     try {
+      final chrono = Stopwatch()..start();
       s.ecrire(versJson());
+      final duree = chrono.elapsedMilliseconds;
+      final maintenant = DateTime.now();
+      if (duree > 500 && (_dernierLent == null || maintenant.difference(_dernierLent!).inMinutes >= 1)) {
+        _dernierLent = maintenant;
+        noter('Enregistrement lent : ${duree} ms');
+      }
       for (final e in s.erreurs) {
         debugPrint('Refusé par la base : $e');
         _noterUneFois('Refusé par la base : $e');
       }
       for (final a in s.avertissements) {
         _noterUneFois('Base corrigée : $a');
+      }
+      // La base a été corrigée : on la relit, pour que l'application n'y remette pas les liens retirés.
+      if (s.avertissements.isNotEmpty) {
+        lire(s.lire());
+        _retrouverMoi(s);
       }
       if (s.erreurs.isNotEmpty || refusBase.isNotEmpty) {
         final avant = refusBase;
