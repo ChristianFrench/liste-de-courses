@@ -519,6 +519,12 @@ class Etat extends ChangeNotifier {
   /// Rayons (« Animalerie ») et secteurs (« Animalerie/Chats ») ajoutés par le foyer.
   Set<String> structurePerso = {};
 
+  /// Univers choisi pour un rayon ajouté par le foyer (nom du rayon → univers), 01/11/2026.
+  Map<String, String> universRayons = {};
+
+  /// Ordre des rayons dans le catalogue (noms), fixé en les faisant glisser ; vide = ordre de départ.
+  List<String> ordreRayons = [];
+
   /// Le foyer ne montre que le catalogue de départ, les corrections de l'éditeur et ses propres ajouts :
   /// ce que les autres foyers ont ajouté est gardé, mais caché.
   bool catalogueIsole = false;
@@ -1013,6 +1019,8 @@ class Etat extends ChangeNotifier {
     };
     statutsMembres = {for (final e in (options?['statutsMembres'] as Map? ?? {}).entries) e.key as String: e.value as String};
     structurePerso = {for (final x in (options?['structurePerso'] as List? ?? const [])) x as String};
+    universRayons = {for (final e in (options?['universRayons'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    ordreRayons = [for (final x in (options?['ordreRayons'] as List? ?? const [])) x as String];
     catalogueIsole = options?['catalogueIsole'] == 1;
     idApports = options?['idApports'] as String?;
     structureRecue = {for (final x in (options?['structureRecue'] as List? ?? const [])) x as String};
@@ -1138,6 +1146,8 @@ class Etat extends ChangeNotifier {
             if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
             if (structurePerso.isNotEmpty) 'structurePerso': structurePerso.toList()..sort(),
+            if (universRayons.isNotEmpty) 'universRayons': universRayons,
+            if (ordreRayons.isNotEmpty) 'ordreRayons': ordreRayons,
             if (catalogueIsole) 'catalogueIsole': 1,
             if (idApports != null) 'idApports': idApports,
             if (structureRecue.isNotEmpty) 'structureRecue': structureRecue.toList()..sort(),
@@ -3240,7 +3250,7 @@ class Etat extends ChangeNotifier {
   bool secteurAjoute(Secteur s) => structurePerso.contains('${rayon(s.rayonId)?.nom}/${s.nom}');
 
   /// Nouveau rayon, dans tous les magasins, avec un premier secteur du même nom.
-  Rayon? ajouterRayonCatalogue(String nom) {
+  Rayon? ajouterRayonCatalogue(String nom, {String? univers}) {
     final n = nom.trim();
     if (n.isEmpty || magasins.isEmpty) return null;
     if (_trouve(rayonsCatalogue, (r) => r.nom.toLowerCase() == n.toLowerCase()) != null) return null;
@@ -3251,6 +3261,7 @@ class Etat extends ChangeNotifier {
     structurePerso
       ..add(n)
       ..add('$n/$n');
+    if (univers != null) universRayons[n] = univers;
     modifie();
     return _trouve(rayonsCatalogue, (r) => r.nom == n);
   }
@@ -3292,6 +3303,25 @@ class Etat extends ChangeNotifier {
       x.nom = n;
     }
     structurePerso = {for (final c in structurePerso) c == ancien ? n : (c.startsWith('$ancien/') ? '$n/${c.substring(ancien.length + 1)}' : c)};
+    if (universRayons.remove(ancien) case final u?) universRayons[n] = u;
+    ordreRayons = [for (final x in ordreRayons) x == ancien ? n : x];
+    modifie();
+  }
+
+  /// Range un rayon ajouté par le foyer dans un univers.
+  void changerUniversRayon(Rayon r, String univers) {
+    universRayons[r.nom] = univers;
+    modifie();
+  }
+
+  /// Univers et ordre des rayons du catalogue, après les avoir fait glisser (univers → noms des rayons).
+  void rangerRayons(Map<String, List<String>> parUnivers) {
+    ordreRayons = [for (final l in parUnivers.values) ...l];
+    for (final MapEntry(key: u, value: l) in parUnivers.entries) {
+      for (final n in l) {
+        universRayons[n] = u;
+      }
+    }
     modifie();
   }
 

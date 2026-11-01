@@ -481,8 +481,12 @@ class TitreGroupe extends StatelessWidget {
       this.ajoute = false,
       this.grand = false,
       this.marque,
+      this.couleur,
       this.onTap});
   final String nom;
+
+  /// Couleur de fond propre (bandeau d'un univers) ; sinon la couleur d'accent.
+  final Color? couleur;
 
   /// Petit signe après le nom (ex. : secteur qui a reçu des articles d'une liste rectificative).
   final IconData? marque;
@@ -525,7 +529,7 @@ class TitreGroupe extends StatelessWidget {
                 ? Icon(icone, size: 24, color: Charte.blanc)
                 : null;
     return Material(
-      color: nonPlace ? Charte.texteSecondaire : Charte.accent,
+      color: nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent),
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -1234,6 +1238,104 @@ Future<List<String>?> ordonner(BuildContext context, {required String titre, req
             ),
             const SizedBox(height: 10),
             Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(ordre)),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Comme [ordonner], avec des groupes : chaque élément glisse dans son groupe ou dans un autre ; il appartient
+/// au groupe dont le titre est au-dessus de lui. Renvoie groupe → éléments dans l'ordre, ou null si annulé.
+Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
+    {required String titre, required Map<String, List<String>> groupes, Map<String, Color> couleurs = const {}}) {
+  final ordre = <(bool, String)>[
+    for (final e in groupes.entries) ...[(true, e.key), for (final x in e.value) (false, x)]
+  ];
+  Map<String, List<String>> resultat() {
+    final r = <String, List<String>>{for (final g in groupes.keys) g: []};
+    var g = groupes.keys.first;
+    for (final (titre, nom) in ordre) {
+      if (titre) {
+        g = nom;
+      } else {
+        r[g]!.add(nom);
+      }
+    }
+    return r;
+  }
+
+  return volet<Map<String, List<String>>>(
+    context,
+    fermable: false,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(titre, style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 4),
+            Text('Faites glisser la poignée ≡ pour déplacer un rayon, dans son univers ou sous un autre.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ReorderableListView.builder(
+                shrinkWrap: true,
+                buildDefaultDragHandles: false,
+                itemCount: ordre.length,
+                onReorderItem: (de, vers) => maj(() {
+                  ordre.insert(vers, ordre.removeAt(de));
+                  // Un élément glissé tout en haut va dans le premier groupe.
+                  if (!ordre.first.$1) {
+                    final i = ordre.indexWhere((x) => x.$1);
+                    ordre.insert(0, ordre.removeAt(i));
+                  }
+                }),
+                itemBuilder: (ctx, i) {
+                  final (estTitre, nom) = ordre[i];
+                  if (estTitre) {
+                    return Material(
+                      key: ValueKey('groupe-$nom'),
+                      color: couleurs[nom] ?? Charte.accent,
+                      child: Container(
+                        height: 36,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        alignment: Alignment.centerLeft,
+                        child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+                      ),
+                    );
+                  }
+                  return Material(
+                    key: ValueKey('ordre-$nom'),
+                    color: Charte.blanc,
+                    child: Container(
+                      height: Charte.ligneListe,
+                      padding: const EdgeInsets.only(left: 12),
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                      child: Row(children: [
+                        Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                        ReorderableDragStartListener(
+                          index: i,
+                          child: Container(
+                            width: 44,
+                            height: Charte.ligneListe,
+                            alignment: Alignment.center,
+                            child: Icon(Icons.drag_handle, key: ValueKey('poignee-$nom'), size: 26, color: Charte.cadre),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(resultat())),
             const SizedBox(height: 10),
             Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
           ],

@@ -593,7 +593,8 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           key: ValueKey('univers-$u'),
           nom: u,
           grand: true,
-          icone: Icons.storefront_outlined,
+          icone: apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined,
+          couleur: apparenceUnivers[u]?.$2,
           nombre: rayonsU.length,
           ouvert: uOuvert,
           onTap: () => plis.basculer(_cleU(u))));
@@ -656,6 +657,10 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
         }),
       if (etat.rayonAjoute(x)) ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
+      ActionLigne(Icons.storefront_outlined, 'Changer d\'univers', () async {
+          final u = await choisirDansListe<String>(context, titre: 'Univers du rayon « ${x.nom} »', choix: {for (final u in universDesRayons.keys) u: u});
+          if (u != null) etat.changerUniversRayon(x, u);
+        }),
     ];
   }
 
@@ -673,7 +678,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
         final perso = etat.produitsAjoutes.length;
         final parUnivers = <String, List<Rayon>>{
           for (final u in [...universDesRayons.keys, autresRayons])
-            if ([for (final x in etat.rayonsVisibles) if (universDuRayon(x.nom) == u) x] case final l when l.isNotEmpty) u: l,
+            if (_rayonsRanges(etat).where((x) => universDuRayon(x.nom, etat.universRayons) == u).toList() case final l when l.isNotEmpty) u: l,
         };
         final plis = Retractables.i;
         final cles = [for (final e in parUnivers.entries) ...[_cleU(e.key), for (final x in e.value) _cleR(x)]];
@@ -687,6 +692,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
             aide: Aides.catalogue,
             actions: [
               ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
+              ActionLigne(Icons.drag_handle, 'Déplacer les rayons', () => _deplacerRayons(context)),
               ActionLigne(Icons.edit_outlined, 'Produits ajoutés ($perso)', () => Nav.aller<void>(context, const EcranProduitsPerso())),
             ],
             droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier', () {
@@ -1115,11 +1121,35 @@ class SigneAjoute extends StatelessWidget {
 
 // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
 
+/// Rayons visibles, dans l'ordre choisi par le foyer (ceux qu'il n'a pas placés gardent leur ordre, à la suite).
+List<Rayon> _rayonsRanges(Etat etat) {
+  final l = etat.rayonsVisibles;
+  if (etat.ordreRayons.isEmpty) return l;
+  final rang = {for (var i = 0; i < etat.ordreRayons.length; i++) etat.ordreRayons[i]: i};
+  final initial = {for (var i = 0; i < l.length; i++) l[i].nom: i};
+  return [...l]..sort((a, b) => (rang[a.nom] ?? 100000 + initial[a.nom]!).compareTo(rang[b.nom] ?? 100000 + initial[b.nom]!));
+}
+
+/// Déplacer les rayons au doigt : dans leur univers ou sous un autre.
+Future<void> _deplacerRayons(BuildContext context) async {
+  final etat = Etat.instance;
+  final groupes = <String, List<String>>{for (final u in [...universDesRayons.keys, autresRayons]) u: []};
+  for (final r in _rayonsRanges(etat)) {
+    groupes[universDuRayon(r.nom, etat.universRayons)]!.add(r.nom);
+  }
+  final res = await ordonnerParGroupes(context,
+      titre: 'Déplacer les rayons', groupes: groupes, couleurs: {for (final e in apparenceUnivers.entries) e.key: e.value.$2});
+  if (res != null) etat.rangerRayons(res);
+}
+
 Future<void> _nouveauRayon(BuildContext context) async {
   final etat = Etat.instance;
   final nom = await demanderTexte(context, titre: 'Nouveau rayon', aide: 'Animalerie, Bricolage…', valider: 'Suivant');
   if (nom == null || nom.trim().isEmpty || !context.mounted) return;
-  final r = etat.ajouterRayonCatalogue(nom);
+  final univers = await choisirDansListe<String>(context,
+      titre: 'Univers du rayon « ${nom.trim()} »', choix: {for (final u in [...universDesRayons.keys, autresRayons]) u: u});
+  if (univers == null || !context.mounted) return;
+  final r = etat.ajouterRayonCatalogue(nom, univers: univers == autresRayons ? null : univers);
   if (r == null) {
     Nav.message(context, 'Le rayon « ${nom.trim()} » existe déjà');
     return;

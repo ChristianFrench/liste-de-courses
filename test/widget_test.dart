@@ -15,6 +15,7 @@ import 'package:liste_de_courses/donnees/catalogue_commun.dart' show Brouillon;
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/univers.dart';
 import 'package:liste_de_courses/donnees/synchro.dart' show ServeurMqtt;
 import 'package:liste_de_courses/ecrans/foyer.dart' show choisirPersonne;
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
@@ -1262,7 +1263,8 @@ void main() {
     testWidgets('catalogue : rayon et secteur ajoutés dans tous les magasins, marqués, supprimables vides', (tester) async {
       await _lancer(tester);
       final etat = Etat.instance;
-      final r = etat.ajouterRayonCatalogue('Animalerie')!;
+      final r = etat.ajouterRayonCatalogue('Animalerie', univers: 'Épicerie et boissons')!;
+      expect(universDuRayon(r.nom, etat.universRayons), 'Épicerie et boissons', reason: 'univers choisi à la création');
       for (final m in etat.magasins) {
         expect(etat.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
       }
@@ -1271,6 +1273,12 @@ void main() {
       final s = etat.ajouterSecteurCatalogue(r, 'Chats')!;
       expect(etat.secteurAjoute(s), isTrue);
       expect(etat.secteursDu(r.id).map((x) => x.nom), containsAll(['Animalerie', 'Chats']));
+      etat.changerUniversRayon(r, 'Surgelés');
+      expect(universDuRayon(r.nom, etat.universRayons), 'Surgelés');
+      // Rayons déplacés au doigt : univers et ordre retenus
+      etat.rangerRayons({'Surgelés': ['Surgelés', 'Animalerie'], autresRayons: ['Frais']});
+      expect(universDuRayon('Frais', etat.universRayons), autresRayons);
+      expect(etat.ordreRayons, ['Surgelés', 'Animalerie', 'Frais']);
       etat.renommerSecteurCatalogue(s, 'Chats et chiens');
       expect(etat.secteursDu(r.id).map((x) => x.nom), contains('Chats et chiens'));
       final origine = etat.rayonsCatalogue.firstWhere((x) => !etat.rayonAjoute(x));
@@ -1293,6 +1301,32 @@ void main() {
 
   group('Ordre des secteurs', () {
     setUp(_donnees);
+
+    testWidgets('catalogue : déplacer un rayon au doigt sous un autre univers', (tester) async {
+      await _accueil(tester);
+      await _rubrique(tester, 'Catalogue');
+      await _actionTitre(tester, 'Déplacer les rayons');
+      expect(find.byKey(const ValueKey('groupe-Surgelés')), findsOneWidget);
+      // « Frais » (premier des Autres rayons) glisse au-dessus du titre « Autres rayons » : il passe dans un autre univers
+      final poignee = find.byKey(const ValueKey('poignee-Frais'));
+      await tester.ensureVisible(poignee);
+      await tester.pumpAndSettle();
+      final haut = tester.getCenter(find.byKey(const ValueKey('groupe-Autres rayons')));
+      final g = await tester.startGesture(tester.getCenter(poignee));
+      await tester.pump(const Duration(milliseconds: 100));
+      final x = tester.getCenter(poignee).dx;
+      for (var y = tester.getCenter(poignee).dy; y > haut.dy - 30; y -= 10) {
+        await g.moveTo(Offset(x, y));
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      await tester.pump(const Duration(milliseconds: 500));
+      await g.up();
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.text('Valider'));
+      final u = universDuRayon('Frais', Etat.instance.universRayons);
+      expect(u, isNot(autresRayons));
+      expect(find.byKey(ValueKey('univers-$u'), skipOffstage: false), findsOneWidget, reason: 'le rayon apparaît sous son nouvel univers');
+    });
 
     testWidgets('catalogue du foyer : le bandeau du rayon propose de changer l\'ordre, dans tous les magasins', (tester) async {
       await _accueil(tester);
