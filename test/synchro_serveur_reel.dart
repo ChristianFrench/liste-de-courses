@@ -8,6 +8,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
+import 'package:liste_de_courses/donnees/chiffrement.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/stockage.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
@@ -71,7 +72,7 @@ void main() {
     });
     b.horloge = Horloge('NOEUDB');
     final base = 'ldc/${s.code}';
-    final tb = TransportMqtt(serveur);
+    final tb = TransportChiffre(TransportMqtt(serveur), s.code!);
     var recusB = 0;
     tb.messages.listen((m) {
       if (!m.$1.startsWith('$base/modifs/')) return;
@@ -131,7 +132,7 @@ void main() {
     final c = Stockage.ouvrir('${dossier.path}/c.db');
     c.ecrire({...b.lire(), 'produits': <dynamic>[], 'listes': <dynamic>[], 'emplacements': <dynamic>[]});
     c.horloge = Horloge('NOEUDC');
-    final tc = TransportMqtt(serveur);
+    final tc = TransportChiffre(TransportMqtt(serveur), s.code!);
     var partsC = 0;
     tc.messages.listen((m) {
       if (!m.$1.startsWith('$base/etat/') || m.$2.isEmpty) return;
@@ -145,6 +146,23 @@ void main() {
     notice('C a reçu l\'état gardé sur le serveur',
         '$partsC parts en ${DateTime.now().difference(t4).inMilliseconds} ms : ${(c.lire()['produits'] as List).length} produits');
     await tc.fermer();
+
+    // Chiffrement : un client qui connaît le mot de passe du serveur mais pas le code ne lit rien.
+    final espion = TransportMqtt(serveur);
+    final vus = <(String, String)>[];
+    espion.messages.listen(vus.add);
+    final pretE = Completer<void>();
+    espion.etats.listen((e) {
+      if (e == 'connecte' && !pretE.isCompleted) pretE.complete();
+    });
+    await espion.connecter(identifiant: 'ldc-essai-E-${s.code}', sujetTestament: 'ldc/verif', testament: '', abonnement: '${sujetFoyer(s.code!)}/#');
+    await pretE.future.timeout(const Duration(seconds: 30));
+    await Future<void>.delayed(const Duration(seconds: 3));
+    final pleins = [for (final v in vus) if (v.$2.isNotEmpty) v];
+    expect(pleins, isNotEmpty, reason: 'l\'état du foyer est bien sur le serveur');
+    expect(pleins.every((v) => v.$2.startsWith('chf:') && !v.$1.contains(s.code!)), isTrue, reason: 'tout est chiffré, le code n\'apparaît pas');
+    notice('Chiffrement', '${pleins.length} messages retenus, tous chiffrés');
+    await espion.fermer();
     await s.arreterPartage();
   }, timeout: const Timeout(Duration(minutes: 4)));
 
@@ -169,7 +187,7 @@ void main() {
     a.toutJournaliser(a.lire());
     final code = 'ESSAI${DateTime.now().millisecondsSinceEpoch % 100000}'.padRight(10, 'X');
     final base = 'ldc/$code';
-    final ta = TransportMqtt(serveur);
+    final ta = TransportChiffre(TransportMqtt(serveur), code);
     ta.messages.listen((m) {
       if (m.$1.contains('/etat/') || m.$2.isEmpty) return;
       final j = jsonDecode(m.$2) as Map;

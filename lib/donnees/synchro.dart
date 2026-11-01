@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 import 'catalogue_commun.dart' show CatalogueCommun;
+import 'chiffrement.dart';
 import 'client_mqtt.dart';
 import 'modele.dart';
 import 'stockage.dart';
@@ -592,7 +593,7 @@ class Synchro extends ChangeNotifier {
       _noter(r, erreur: !r.endsWith('ok'));
       _sansPanne('la reprise après réparation', () => base.toutJournaliser(base.lire()));
     }
-    final t = _transport = fabrique(serveur);
+    final t = _transport = TransportChiffre(fabrique(serveur), code ?? '');
     _abonnements
       ..add(t.messages.listen((m) => _sansPanne('la réception (${m.$1.split('/').skip(2).join('/')})', () => _recevoir(m.$1, m.$2))))
       ..add(t.etats.listen((e) {
@@ -620,13 +621,18 @@ class Synchro extends ChangeNotifier {
             t.publier('ldc/annuaire/$cle', jsonEncode({'cree': DateTime.now().millisecondsSinceEpoch}), retenu: true);
             _annuaire = null;
           }
+          if (_reglage('anciens_effaces') != '$code/$noeud') {
+            // Messages retenus en clair laissés par la version d'avant le chiffrement : effacés.
+            t.effacerAnciens(['presence/$noeud', for (var i = 0; i < nbParts; i++) 'etat/$noeud/$i']);
+            _definir('anciens_effaces', '$code/$noeud');
+          }
           // Le contrôle d'abord : une erreur à l'annonce (29/10/2026, web) le laissait sans minuterie,
           // voyant rouge sans explication.
           _controler();
           _controle?.cancel();
           _controle = Timer.periodic(const Duration(seconds: 30), (_) => _controler());
           _sansPanne('l\'annonce aux autres appareils', _annoncer);
-          if (_reglage('etat_publie') != '$code/$noeud' || _partsASalir.isNotEmpty) {
+          if (_reglage('etat_publie') != 'chf/$code/$noeud' || _partsASalir.isNotEmpty) {
             _etatDiffere ??= Timer(const Duration(seconds: 5), _publierEtat);
           }
         } else if (e == 'deconnecte') {
@@ -846,7 +852,8 @@ class Synchro extends ChangeNotifier {
       _etatDiffere = Timer(const Duration(seconds: 10), _publierEtat);
       return;
     }
-    final marque = '$code/$noeud';
+    // « chf/ » : depuis le chiffrement (01/11/2026), tout l'état est redéposé une fois, chiffré.
+    final marque = 'chf/$code/$noeud';
     final tout = _reglage('etat_publie') != marque;
     final parts = tout ? List.generate(nbParts, (i) => i) : (_partsASalir.toList()..sort());
     _partsASalir.clear();
