@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart' as sql;
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 
@@ -36,5 +37,26 @@ void main() {
       expect(etat.secteurCatalogue(x.id)?.nom, 'Jardinerie', reason: x.nom);
     }
     expect(etat.universRayons['Jardinerie'], 'Bricolage, auto et jardin');
+  });
+
+  test('une référence orpheline dans la base ne fait plus tout annuler', () async {
+    final dossier = Directory.systemTemp.createTempSync('orphelin');
+    final etat = Etat.instance;
+    await etat.charger(dossier: dossier);
+    final liste = etat.listes.first;
+    // Comme une base abîmée : une liste désigne un rayon qui n'existe pas.
+    final cote = sql.sqlite3.open('${dossier.path}/${Etat.baseFoyer}');
+    cote.execute('PRAGMA foreign_keys = OFF');
+    cote.execute("UPDATE liste SET rayon_reprise_id = 'rayon-fantome' WHERE id = ?", [liste.id]);
+    cote.dispose();
+    await etat.charger(dossier: dossier);
+    final l = etat.listes.firstWhere((x) => x.id == liste.id);
+    l.nom = 'Liste renommée';
+    etat.ajouterRayonCatalogue('Rayon témoin', univers: 'Bricolage, auto et jardin');
+    await etat.enregistrer();
+    await etat.charger(dossier: dossier);
+    expect(etat.rayonsCatalogue.where((x) => x.nom == 'Rayon témoin'), isNotEmpty);
+    expect(etat.listes.firstWhere((x) => x.id == liste.id).nom, 'Liste renommée');
+    expect(etat.journalAppareil.join('\n'), contains('références orphelines'));
   });
 }

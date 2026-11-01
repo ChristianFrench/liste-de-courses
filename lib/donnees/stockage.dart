@@ -424,7 +424,33 @@ class Stockage {
   // ------------------------------------------------------------ Écriture
 
   /// Enregistre l'état complet : écrit les lignes nouvelles ou modifiées, retire les disparues.
+  ///
+  /// 01/11/2026 : sur le web, toutes les modifications d'une séance disparaissaient à la réouverture. Une
+  /// référence orpheline (ligne qui désigne un secteur, un produit… absent de la base) faisait échouer la
+  /// validation finale (COMMIT) : tout était annulé, à chaque enregistrement, sans rien montrer. Désormais
+  /// l'enregistrement est refait sans ce contrôle, et les références orphelines sont signalées.
   void ecrire(Map<String, dynamic> etat) {
+    try {
+      _ecrireTout(etat);
+    } on SqliteException catch (e) {
+      if (!e.message.contains('FOREIGN KEY')) rethrow;
+      _db.execute('PRAGMA foreign_keys = OFF');
+      try {
+        _ecrireTout(etat);
+      } finally {
+        _db.execute('PRAGMA foreign_keys = ON');
+      }
+      erreurs.add('références orphelines : ${referencesOrphelines().join(', ')}');
+    }
+  }
+
+  /// Références vers des lignes absentes, par table et table visée (« emplacement → secteur × 3 »).
+  List<String> referencesOrphelines() => [
+        for (final r in _db.select('SELECT "table" AS t, parent AS p, count(*) AS n FROM pragma_foreign_key_check GROUP BY 1, 2'))
+          '${r['t']} → ${r['p']} × ${r['n']}'
+      ];
+
+  void _ecrireTout(Map<String, dynamic> etat) {
     final maintenant = DateTime.now().toUtc().toIso8601String().substring(0, 19);
     final lignes = _lignes(etat);
     erreurs.clear();

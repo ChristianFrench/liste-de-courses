@@ -662,6 +662,13 @@ class Etat extends ChangeNotifier {
     return t.isEmpty ? const [] : t.split('\n');
   }
 
+  final Set<String> _dejaNote = {};
+
+  /// Une erreur qui se répète à chaque enregistrement n'est notée qu'une fois par séance.
+  void _noterUneFois(String texte) {
+    if (_dejaNote.add(texte)) noter(texte);
+  }
+
   void noter(String texte) {
     final d = _dossier;
     if (d == null || !enregistrementActif) return;
@@ -876,6 +883,7 @@ class Etat extends ChangeNotifier {
       s.ecrire(versJson());
       for (final e in s.erreurs) {
         debugPrint('Refusé par la base : $e');
+        _noterUneFois('Refusé par la base : $e');
       }
       if (s.erreurs.isNotEmpty || refusBase.isNotEmpty) {
         final avant = refusBase;
@@ -891,6 +899,7 @@ class Etat extends ChangeNotifier {
       if (identical(s, _foyer)) surEnregistrement?.call();
     } catch (e) {
       debugPrint('Enregistrement impossible : $e');
+      _noterUneFois('Enregistrement impossible : $e');
     }
   }
 
