@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
+import '../composants/pictogramme.dart' as picto;
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
@@ -501,6 +502,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                             TitreGroupe(
                               nom: x.nom,
                               nonPlace: x.nonPlace,
+                              pictoDebordant: pictoEtape(x),
                               nombre: x.lignes.length,
                               onTap: x.nonPlace
                                   ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
@@ -1554,6 +1556,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                 TitreGroupe(
                                   key: _titres.putIfAbsent(x.id, GlobalKey.new),
                                   nom: x.nom,
+                                  pictoDebordant: pictoEtape(x),
                                   nonPlace: x.nonPlace,
                                   onTap: x.nonPlace
                                       ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
@@ -1802,7 +1805,7 @@ class EcranConsultation extends StatelessWidget {
                 for (final g in l.lignes) ligne(g)
               else
                 for (final x in etat.etapes(l, l.parcoursId)) ...[
-                  TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length),
+                  TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length, pictoDebordant: pictoEtape(x)),
                   for (final g in x.lignes) ligne(g),
                 ],
             ],
@@ -1811,4 +1814,11 @@ class EcranConsultation extends StatelessWidget {
       },
     );
   }
+}
+
+/// Image du secteur d'une étape de liste (bandeau des listes en préparation et en courses).
+String? pictoEtape(Etape x) {
+  final s = x.secteur;
+  if (s == null) return null;
+  return picto.cleSecteur(Etat.instance.rayon(s.rayonId)?.nom ?? '', s.nom);
 }

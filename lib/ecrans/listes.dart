@@ -658,6 +658,8 @@ List<Widget> groupesPasses(BuildContext context, Etat etat) {
     if (historique.isNotEmpty || libres > 0)
       GroupeRetractable(
         cle: 'courses/historique',
+        pliable: true,
+        parDefaut: false,
         titre: 'Historique',
         icone: Icons.history,
         nombre: historique.length,
@@ -674,6 +676,8 @@ List<Widget> groupesPasses(BuildContext context, Etat etat) {
     if (nbArchives > 0)
       GroupeRetractable(
         cle: 'courses/archives',
+        pliable: true,
+        parDefaut: false,
         titre: 'Archives',
         icone: Icons.inventory_2_outlined,
         nombre: nbArchives,

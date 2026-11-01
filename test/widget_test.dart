@@ -1060,6 +1060,11 @@ void main() {
       final etat = Etat.instance;
       int libres() => etat.tickets.where((t) => etat.course(t.listeId) == null).length;
       final avant = libres();
+      // Groupes repliés par défaut (01/11/2026) : on les déplie tous.
+      final plie = find.byWidgetPredicate((w) => w is TitreGroupe && w.ouvert == false);
+      for (var i = 0; i < 12 && plie.evaluate().isNotEmpty; i++) {
+        await _toucher(tester, plie.first);
+      }
       await _voir(tester, find.byType(BlocTicket).first);
       await _toucher(tester, find.byType(BlocTicket).first);
       await _toucher(tester, find.text('Rattacher à une course'));

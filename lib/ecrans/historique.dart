@@ -75,6 +75,8 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
         if (libres.isNotEmpty && aRattacher == null)
           GroupeRetractable(
             cle: 'historique/tickets',
+        pliable: true,
+        parDefaut: false,
             titre: 'Tickets non rattachés',
             icone: Icons.receipt_long_outlined,
             nombre: libres.length,
@@ -105,6 +107,8 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
         for (final g in groupes.entries)
           GroupeRetractable(
             cle: 'historique/$vue/${g.key}',
+        pliable: true,
+        parDefaut: false,
             titre: g.key,
             icone: vue == 0 ? Icons.calendar_month_outlined : Icons.storefront_outlined,
             nombre: g.value.length,

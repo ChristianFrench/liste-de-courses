@@ -34,6 +34,8 @@ class EcranArchives extends StatelessWidget {
             if (etat.coursesArchivees.isNotEmpty)
               GroupeRetractable(
                 cle: 'archives/historique',
+        pliable: true,
+        parDefaut: false,
                 titre: 'Courses de l\'historique',
                 icone: Icons.history,
                 nombre: etat.coursesArchivees.length,
@@ -55,6 +57,8 @@ class EcranArchives extends StatelessWidget {
             for (final m in etat.magasinsArchives)
               GroupeRetractable(
                 cle: 'archives/${m.id}',
+        pliable: true,
+        parDefaut: false,
                 titre: m.nom,
                 icone: Icons.inventory_2_outlined,
                 actions: [

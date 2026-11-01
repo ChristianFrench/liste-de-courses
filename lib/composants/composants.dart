@@ -481,8 +481,13 @@ class TitreGroupe extends StatelessWidget {
       this.grand = false,
       this.marque,
       this.couleur,
+      this.pictoDebordant,
       this.onTap});
   final String nom;
+
+  /// Image du secteur en début de bandeau, plus haute que lui : elle déborde au-dessus et au-dessous, à droite
+  /// de la colonne des coches (01/11/2026, Aristide : un peu de « fun » dans les listes).
+  final String? pictoDebordant;
 
   /// Couleur de fond propre (bandeau d'un univers) ; sinon la couleur d'accent.
   final Color? couleur;
@@ -525,9 +530,10 @@ class TitreGroupe extends StatelessWidget {
       color: nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent),
       child: InkWell(
         onTap: onTap,
-        child: Container(
+        child: Stack(clipBehavior: Clip.none, children: [
+         Container(
           constraints: BoxConstraints(minHeight: grand ? Charte.ligneListe : 0),
-          padding: EdgeInsets.fromLTRB(grand ? 12 : 16, 4, 14, 4),
+          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? 76 : 16), 4, 14, 4),
           child: Row(children: [
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
@@ -541,7 +547,19 @@ class TitreGroupe extends StatelessWidget {
                 child: Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.blanc),
               ),
           ]),
-        ),
+         ),
+          if (pictoDebordant != null)
+            Positioned(
+              left: 28,
+              top: 0,
+              bottom: 0,
+              width: 40,
+              child: OverflowBox(
+                maxHeight: 40,
+                child: Pictogramme(pictoDebordant, taille: 40, key: ValueKey('picto-$nom')),
+              ),
+            ),
+        ]),
       ),
     );
   }
@@ -594,9 +612,14 @@ class GroupeRetractable extends StatelessWidget {
     this.marge = 16,
     this.ajoute = false,
     this.actions = const [],
+    this.pliable = false,
   });
   final String cle;
   final bool ajoute;
+
+  /// Déplier / replier en touchant le bandeau (chevron), état gardé par [cle] ; [parDefaut] : ouvert au départ
+  /// (01/11/2026, Aristide : Historique et Archives, repliés par défaut).
+  final bool pliable;
 
   /// Actions du groupe : toucher son bandeau les propose dans un volet.
   final List<ActionLigne> actions;
@@ -612,19 +635,33 @@ class GroupeRetractable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!pliable) return _construire(context, true);
+    return ListenableBuilder(
+      listenable: Retractables.i,
+      builder: (context, _) => _construire(context, Retractables.i.ouvert(cle, parDefaut: parDefaut)),
+    );
+  }
+
+  Widget _construire(BuildContext context, bool ouvert) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         TitreGroupe(
+          key: pliable ? ValueKey('groupe-$cle') : null,
           nom: titre,
           nombre: nombre,
           ajoute: ajoute,
           grand: true,
           image: image,
           icone: icone,
-          onTap: actions.isEmpty ? null : () => menuActions(context, titre: titre, actions: actions),
+          ouvert: pliable ? ouvert : null,
+          onTap: pliable
+              ? () => Retractables.i.basculer(cle, parDefaut: parDefaut)
+              : actions.isEmpty
+                  ? null
+                  : () => menuActions(context, titre: titre, actions: actions),
         ),
-        Padding(
+        if (ouvert) Padding(
           padding: EdgeInsets.symmetric(horizontal: marge),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
