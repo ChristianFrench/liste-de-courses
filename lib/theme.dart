@@ -50,12 +50,15 @@ class Charte {
 
   static Palette palette = palettes.first;
 
-  /// Famille des icônes en couleur (dossier de assets/icones/) : 'fluent3d', 'noto' ou 'twemoji'.
-  static String familleIcones = 'fluent3d';
+  /// Famille des icônes en couleur (dossier de assets/icones/ et assets/pictos/) : 'noto3d', 'fluent3d' ou 'twemoji'.
+  static String familleIcones = 'noto3d';
+
+  /// Rayons et secteurs avec leurs dessins d'origine (assets/pictos/png/) plutôt que dans la famille des icônes.
+  static bool imagesOrigine = false;
 
   /// Change de famille d'icônes et redessine toute l'application.
   static void choisirIcones(String famille) {
-    familleIcones = const ['noto', 'twemoji'].contains(famille) ? famille : 'fluent3d';
+    familleIcones = const ['fluent3d', 'twemoji'].contains(famille) ? famille : 'noto3d'; // 'noto' (à plat) → Noto 3D
     choisirPalette(palette.nom);
   }
 

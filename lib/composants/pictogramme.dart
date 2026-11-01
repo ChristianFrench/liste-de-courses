@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../donnees/images_choisies.dart';
 import '../donnees/pictos.dart';
+import '../donnees/pictos_emoji.dart';
+import '../theme.dart';
 import 'icone.dart';
 
 // Images des rayons et des secteurs (assets/pictos/png), retrouvées par le nom.
@@ -88,7 +90,9 @@ class Pictogramme extends StatelessWidget {
   @override
   Widget build(BuildContext context) => cle == null
       ? SizedBox(width: taille, height: taille)
-      : Image.asset('assets/pictos/png/$cle.png',
+      // 01/11/2026 (Aristide) : rayons et secteurs dans la famille des icônes, pour un ensemble homogène.
+      : Image.asset(
+          !Charte.imagesOrigine && pictosEmoji.contains(cle) ? 'assets/pictos/${Charte.familleIcones}/$cle.png' : 'assets/pictos/png/$cle.png',
           width: taille, height: taille, filterQuality: FilterQuality.medium, excludeFromSemantics: true);
 }
 

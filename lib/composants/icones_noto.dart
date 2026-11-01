@@ -1,7 +1,7 @@
-// Fichier produit par outils/icones_noto.mjs : ne pas modifier à la main.
+// Fichier produit par outils/icones_3d.py : ne pas modifier à la main.
 import 'package:flutter/material.dart';
 
-/// Icône Material → image en couleur (assets/icones/<nom>.png).
+/// Icône Material → image en couleur (assets/icones/<famille>/<nom>.png).
 final iconesNoto = <IconData, String>{
   Icons.home_outlined: 'house',
   Icons.checklist: 'memo',

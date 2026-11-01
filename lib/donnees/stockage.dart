@@ -72,7 +72,7 @@ const _avecFoyer = {'membre', 'liste', 'parcours', 'ticket'};
 const _parametresPartages = {'options', 'frequences_preliste', 'corbeille', 'rectificatives'};
 
 /// Options propres à l'appareil, jamais envoyées.
-const _optionsLocales = {'apparence', 'icones'};
+const _optionsLocales = {'apparence', 'icones', 'imagesOrigine'};
 
 const _sqlSynchro = '''
 CREATE TABLE IF NOT EXISTS synchro_objet (

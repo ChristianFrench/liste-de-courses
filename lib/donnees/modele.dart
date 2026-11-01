@@ -569,8 +569,11 @@ class Etat extends ChangeNotifier {
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
 
-  /// Famille d'icônes en couleur : 'fluent3d' (par défaut), 'noto' ou 'twemoji' (Paramètres › Apparence).
+  /// Famille d'icônes en couleur : 'noto3d' (par défaut), 'fluent3d' ou 'twemoji' (Paramètres › Apparence).
   String? icones;
+
+  /// Rayons et secteurs avec leurs dessins d'origine plutôt que dans la famille des icônes.
+  bool imagesOrigine = false;
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;
   set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
@@ -1104,6 +1107,7 @@ class Etat extends ChangeNotifier {
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
     icones = options?['icones'] as String?;
+    imagesOrigine = options?['imagesOrigine'] == 1;
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
@@ -1233,6 +1237,7 @@ class Etat extends ChangeNotifier {
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
             if (icones != null) 'icones': icones,
+            if (imagesOrigine) 'imagesOrigine': 1,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
@@ -3873,6 +3878,11 @@ class Etat extends ChangeNotifier {
 
   void choisirIcones(String famille) {
     icones = famille;
+    modifie();
+  }
+
+  void choisirImagesOrigine(bool oui) {
+    imagesOrigine = oui;
     modifie();
   }
 

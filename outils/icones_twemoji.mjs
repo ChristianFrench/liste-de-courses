@@ -1,4 +1,5 @@
-// Icônes Twemoji (X, ex-Twitter, licence CC BY 4.0) : assets/icones/twemoji/<nom Noto>.png (96 px, fond transparent).
+// Icônes Twemoji (X, ex-Twitter, licence CC BY 4.0) : assets/icones/twemoji/<nom Noto>.png (96 px, fond transparent),
+// et images des rayons et secteurs : assets/pictos/twemoji/<clé>.png.
 // Usage : npm pack @iconify-json/twemoji @iconify-json/noto, extraire, puis :
 //   node outils/icones_twemoji.mjs <twemoji>/package <noto>/package
 import fs from 'node:fs'; import path from 'node:path'; import { createRequire } from 'node:module'; import { execSync } from 'node:child_process';
@@ -18,5 +19,16 @@ for (const n of noms) {
   await p.setContent(`<body style="margin:0"><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 ${i.width ?? ic.width} ${i.height ?? ic.height}">${i.body}</svg></body>`);
   await p.screenshot({ path: `assets/icones/twemoji/${n}.png`, omitBackground: true, clip: { x: 0, y: 0, width: 96, height: 96 } });
 }
+// Rayons et secteurs : outils/pictos_emoji.txt (« clé emoji » par ligne) → assets/pictos/twemoji/<clé>.png
+fs.mkdirSync('assets/pictos/twemoji', { recursive: true });
+const pictos = fs.readFileSync('outils/pictos_emoji.txt', 'utf8').trim().split('\n').map(l => l.split(' '));
+for (const [cle, emoji] of pictos) {
+  const code = [...emoji].map(c => c.codePointAt(0)).filter(c => c !== 0xfe0f).map(c => c.toString(16)).join('-');
+  const nom = ch[code] ?? ch[code + '-fe0f'];
+  const i = ic.icons[nom] || ic.icons[ic.aliases?.[nom]?.parent];
+  if (!i) throw new Error('twemoji : pas d\'image pour ' + cle);
+  await p.setContent(`<body style="margin:0"><svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 ${i.width ?? ic.width} ${i.height ?? ic.height}">${i.body}</svg></body>`);
+  await p.screenshot({ path: `assets/pictos/twemoji/${cle}.png`, omitBackground: true, clip: { x: 0, y: 0, width: 96, height: 96 } });
+}
 await b.close();
-console.log(noms.length + ' icônes');
+console.log(noms.length + ' icônes, ' + pictos.length + ' rayons et secteurs');

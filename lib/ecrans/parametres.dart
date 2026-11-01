@@ -132,7 +132,7 @@ class EcranApparence extends _EcranVivant {
       ChoixDeroulant<String>(
         libelle: 'Icônes',
         valeur: Charte.familleIcones,
-        choix: const {'fluent3d': 'Fluent 3D (Microsoft), en relief', 'noto': 'Noto (Google)', 'twemoji': 'Twemoji (X), à plat'},
+        choix: const {'noto3d': 'Noto 3D (Google)', 'fluent3d': 'Fluent 3D (Microsoft)', 'twemoji': 'Twemoji (X), à plat'},
         onChange: (v) {
           etat.choisirIcones(v);
           Charte.choisirIcones(v);
@@ -144,6 +144,17 @@ class EcranApparence extends _EcranVivant {
           for (final i in [Icons.home_outlined, Icons.checklist, Icons.shopping_cart_outlined, Icons.tune, Icons.storefront_outlined, Icons.delete_outline, Icons.edit_outlined])
             Padding(padding: const EdgeInsets.only(right: 10), child: Icone(i, size: 32)),
         ]),
+      ),
+      const SizedBox(height: 14),
+      ChoixDeroulant<bool>(
+        libelle: 'Images des rayons et secteurs',
+        valeur: Charte.imagesOrigine,
+        choix: const {false: 'Comme les icônes', true: 'Dessins d\'origine'},
+        onChange: (v) {
+          etat.choisirImagesOrigine(v);
+          Charte.imagesOrigine = v;
+          Charte.choisirIcones(Charte.familleIcones);
+        },
       ),
       const TitreSection('Couleur des cadres', cote: 0),
       for (final (cle, nom, couleur) in [
