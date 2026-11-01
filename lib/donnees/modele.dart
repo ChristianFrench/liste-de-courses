@@ -842,9 +842,7 @@ class Etat extends ChangeNotifier {
   /// base : affiché en bandeau rouge, pour ne pas perdre de travail sans le savoir. Null : tout est écrit.
   String? get alerteEnregistrement => disqueBloque
       ? 'Vos modifications ne sont plus écrites sur le disque. Ne fermez pas l\'application et prévenez Claude.'
-      : refusBase.isNotEmpty
-          ? 'Enregistrement refusé par la base : ${refusBase.first}'
-          : null;
+      : null; // lignes refusées par la base : notées au journal de l'appareil seulement (01/11/2026, Aristide)
   bool disqueBloque = false;
   List<String> refusBase = const [];
   DateTime? derniereEcritureDisque;
