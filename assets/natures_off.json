@@ -8,19 +8,7 @@
 ]
 },
 "Abricots": {
-"n": 568,
-"m": [
-"Maison Roucadil",
-"Maître Prunille",
-"Confit de Provence",
-"La Chambre aux Confitures",
-"Sun",
-"St Mamet",
-"Lucien Georgelin",
-"Favols",
-"Les Vergers d'Escoute",
-"Andros"
-]
+"n": 568
 },
 "Abricots au sirop": {
 "n": 47,
@@ -29,19 +17,7 @@
 ]
 },
 "Abricots secs": {
-"n": 602,
-"m": [
-"O'Régal",
-"Maître Prunille",
-"Daco Bello",
-"Holy Fruits",
-"Meyva",
-"Transgourmet",
-"Domino",
-"Brousse & Fils",
-"Fruidyllic",
-"Ciloglu"
-]
+"n": 602
 },
 "Accras de morue": {
 "n": 114,
@@ -98,19 +74,7 @@
 ]
 },
 "Ail": {
-"n": 728,
-"m": [
-"Ducros",
-"Fuchs",
-"Condichef",
-"Santé Nat",
-"L'épicurien",
-"Bedros",
-"Espig",
-"Festifruits",
-"Le Geste Saveur",
-"Cook"
-]
+"n": 728
 },
 "Ail du Sud-Ouest": {
 "n": 1
@@ -181,19 +145,7 @@
 ]
 },
 "Amandes": {
-"n": 2201,
-"m": [
-"Vahiné",
-"Maître Prunille",
-"O'Régal",
-"Meyva",
-"Sainte Lucie",
-"Daco Bello",
-"Holy Fruits",
-"Sun",
-"Domino",
-"Medicis"
-]
+"n": 2201
 },
 "Amandes grillées": {
 "n": 284,
@@ -219,19 +171,7 @@
 ]
 },
 "Ananas": {
-"n": 1165,
-"m": [
-"Del Monte",
-"Florette",
-"Del Monte Quality",
-"St Mamet",
-"Dole",
-"La Fraîcherie",
-"Andros",
-"Ananas Extra Sweet",
-"Saint Mamet",
-"Ethiquable"
-]
+"n": 1165
 },
 "Ananas au sirop": {
 "n": 37,
@@ -284,10 +224,7 @@
 ]
 },
 "Aneth": {
-"n": 81,
-"m": [
-"Ducros"
-]
+"n": 81
 },
 "Anti-limaces": {
 "n": 1
@@ -346,14 +283,7 @@
 "n": 1
 },
 "Artichauts": {
-"n": 204,
-"m": [
-"Polli",
-"biorganica nuova",
-"Bio Gustiamo",
-"Ponti",
-"L'atelier Bernard Marot"
-]
+"n": 204
 },
 "Arôme vanille": {
 "n": 109,
@@ -364,27 +294,10 @@
 ]
 },
 "Asperges": {
-"n": 325,
-"m": [
-"Rochefontaine",
-"Notre Jardin",
-"Géant Vert",
-"Olabe",
-"Rochambeau",
-"Jyrela",
-"Priméale",
-"Gustadéa",
-"La Fragua",
-"Celorrio"
-]
+"n": 325
 },
 "Asperges vertes": {
-"n": 137,
-"m": [
-"Géant Vert",
-"Rochefontaine",
-"Notre Jardin"
-]
+"n": 137
 },
 "Aspirateur": {
 "n": 37,
@@ -422,32 +335,13 @@
 "n": 4
 },
 "Aubergines": {
-"n": 377,
-"m": [
-"Cassegrain",
-"Kerets",
-"Maayane",
-"Baktat",
-"Suntat",
-"Brio",
-"Baton Rouge",
-"Eden Gourmet",
-"Sera",
-"L' Atelier de Noor"
-]
+"n": 377
 },
 "Autobronzant": {
 "n": 7
 },
 "Avocats": {
-"n": 302,
-"m": [
-"Westfalia Fruit",
-"Comexa",
-"Mon Marché Plaisir",
-"Montosa",
-"Halls"
-]
+"n": 302
 },
 "Baba au rhum": {
 "n": 94,
@@ -515,19 +409,7 @@
 ]
 },
 "Baies de goji": {
-"n": 459,
-"m": [
-"Daco Bello",
-"Ecoidées",
-"Uberti",
-"Comptoirs et compagnies",
-"Juventis",
-"ETHNOSCIENCE",
-"Moulin des Moines",
-"Philia",
-"Nat & Form",
-"Natur Attitud"
-]
+"n": 459
 },
 "Bain de bouche": {
 "n": 78,
@@ -549,19 +431,7 @@
 "n": 37
 },
 "Bananes": {
-"n": 1567,
-"m": [
-"Simplement Bon Et Bio",
-"Fruidor",
-"€co+",
-"Max havelaar",
-"Côté Marché",
-"Fairtrade",
-"cavendish",
-"Sélection Intermarché",
-"La Banane Française",
-"Del Monte"
-]
+"n": 1567
 },
 "Bandes de cire": {
 "n": 15,
@@ -636,16 +506,7 @@
 "n": 9
 },
 "Basilic": {
-"n": 225,
-"m": [
-"Ducros",
-"Daregal",
-"Cigalou",
-"Rustica",
-"Fuchs",
-"Sainte Lucie",
-"Lamprien Provence"
-]
+"n": 225
 },
 "Baskets": {
 "n": 12
@@ -657,10 +518,7 @@
 "n": 1
 },
 "Batavia": {
-"n": 37,
-"m": [
-"Les Crudettes"
-]
+"n": 37
 },
 "Batteur": {
 "n": 2
@@ -726,15 +584,7 @@
 "n": 6
 },
 "Betteraves cuites": {
-"n": 209,
-"m": [
-"Kultive",
-"Ferrari",
-"Notre Jardin",
-"D'aucy",
-"Betty Loire",
-"Rocal"
-]
+"n": 209
 },
 "Beurre": {
 "n": 1037,
@@ -1430,10 +1280,7 @@
 ]
 },
 "Brocoli": {
-"n": 109,
-"m": [
-"Bonduelle"
-]
+"n": 109
 },
 "Brocolis surgelés": {
 "n": 14
@@ -1914,33 +1761,10 @@
 ]
 },
 "Carottes": {
-"n": 775,
-"m": [
-"Priméale",
-"Planète Végétal",
-"Auchan Baby Bio",
-"Prim'Bio",
-"Terre et Mer",
-"D'aucy",
-"Florette",
-"Bonduelle",
-"Blédina",
-"Babybio"
-]
+"n": 775
 },
 "Carottes râpées": {
-"n": 459,
-"m": [
-"Mix Buffet",
-"Bonduelle",
-"Pierre Martinet",
-"Tout feu tout frais",
-"Saladinettes",
-"Brédial",
-"Qualité Traiteur",
-"Brindelices",
-"Menu Fraîcheur"
-]
+"n": 459
 },
 "Carottes surgelées": {
 "n": 7
@@ -1980,11 +1804,7 @@
 "n": 8
 },
 "Cassis": {
-"n": 114,
-"m": [
-"Lucien Georgelin",
-"Les Confituriers du Morvan"
-]
+"n": 114
 },
 "Cassonade": {
 "n": 92,
@@ -2036,31 +1856,10 @@
 "n": 16
 },
 "Cerises": {
-"n": 316,
-"m": [
-"Andros",
-"Chambe",
-"Lucien Georgelin",
-"Bonne Maman",
-"Les 3 Capucins",
-"Beyer",
-"Saveurs attitudes"
-]
+"n": 316
 },
 "Cerneaux de noix": {
-"n": 497,
-"m": [
-"Sun",
-"Daco Bello",
-"Des trucs à la noix",
-"Holy Fruits",
-"JusteBio",
-"Meyva",
-"Seeberger",
-"La Fourche",
-"Vahiné",
-"Domino"
-]
+"n": 497
 },
 "Cervelas": {
 "n": 802,
@@ -2113,15 +1912,7 @@
 "n": 22
 },
 "Champignons de Paris": {
-"n": 332,
-"m": [
-"Notre Jardin",
-"Blanchaud",
-"Aro",
-"Rochambeau",
-"Dia",
-"Valtonia"
-]
+"n": 332
 },
 "Champignons en boîte": {
 "n": 12
@@ -2130,11 +1921,7 @@
 "n": 10
 },
 "Champignons émincés": {
-"n": 139,
-"m": [
-"Florette",
-"Notre Jardin"
-]
+"n": 139
 },
 "Chaource": {
 "n": 126,
@@ -2513,20 +2300,13 @@
 ]
 },
 "Chou rouge": {
-"n": 171,
-"m": [
-"HAK"
-]
+"n": 171
 },
 "Chou vert": {
 "n": 14
 },
 "Chou-fleur": {
-"n": 126,
-"m": [
-"Bonduelle",
-"Toupargel"
-]
+"n": 126
 },
 "Choucroute": {
 "n": 478,
@@ -2561,11 +2341,7 @@
 "n": 395
 },
 "Choux de Bruxelles": {
-"n": 119,
-"m": [
-"Priméale",
-"Notre Jardin"
-]
+"n": 119
 },
 "Choux à la crème": {
 "n": 19
@@ -2597,14 +2373,7 @@
 "n": 1
 },
 "Ciboulette": {
-"n": 163,
-"m": [
-"Ducros",
-"Sainte Lucie",
-"Cigalou",
-"Lamprien Provence",
-"Rustica"
-]
+"n": 163
 },
 "Cidre": {
 "n": 539,
@@ -2660,39 +2429,13 @@
 "n": 14
 },
 "Citronnade": {
-"n": 294,
-"m": [
-"Andros",
-"Pulco",
-"Alain Milliat",
-"Vitamont",
-"Lorina",
-"Tidélice",
-"Florette",
-"Sains et Saufs",
-"Tropicana"
-]
+"n": 294
 },
 "Citrons": {
-"n": 669,
-"m": [
-"Le Coq Noir",
-"Brio",
-"Saveurs attitudes",
-"Provence Olives",
-"La Perdiz",
-"Eureka",
-"Lorina",
-"Pulco",
-"Nahil",
-"Clipper"
-]
+"n": 669
 },
 "Citrons verts": {
-"n": 104,
-"m": [
-"Pulco"
-]
+"n": 104
 },
 "Clairette de Die": {
 "n": 48,
@@ -2714,12 +2457,7 @@
 ]
 },
 "Clémentines": {
-"n": 397,
-"m": [
-"AGRUCORSE",
-"Corsica Comptoir",
-"Bouquet"
-]
+"n": 397
 },
 "Clés": {
 "n": 9,
@@ -2895,12 +2633,7 @@
 ]
 },
 "Concombre": {
-"n": 264,
-"m": [
-"Yarden",
-"Oceane",
-"Mix Buffet"
-]
+"n": 264
 },
 "Confipote abricots": {
 "n": 2
@@ -3144,15 +2877,7 @@
 "n": 9
 },
 "Coriandre": {
-"n": 163,
-"m": [
-"Sainte Lucie",
-"Ducros",
-"Bedros",
-"Masalchi",
-"Spigol",
-"Espig"
-]
+"n": 163
 },
 "Corn-flakes": {
 "n": 283,
@@ -3242,13 +2967,7 @@
 "n": 31
 },
 "Courgettes": {
-"n": 377,
-"m": [
-"Cassegrain",
-"Bouquet Bio",
-"Les Paysans Bio",
-"Terre de BIO"
-]
+"n": 377
 },
 "Courgettes en spaghetti": {
 "n": 4
@@ -3296,10 +3015,7 @@
 ]
 },
 "Cranberries séchées": {
-"n": 211,
-"m": [
-"Sun"
-]
+"n": 211
 },
 "Crayon pour les yeux": {
 "n": 1
@@ -3750,10 +3466,7 @@
 ]
 },
 "Céleri": {
-"n": 156,
-"m": [
-"Mix Buffet"
-]
+"n": 156
 },
 "Céleri rémoulade": {
 "n": 382,
@@ -3867,19 +3580,7 @@
 "n": 15
 },
 "Dattes": {
-"n": 862,
-"m": [
-"Maître Prunille",
-"Brousse Vergez",
-"Holy Fruits",
-"Sun",
-"Brousse & Fils",
-"Deglet Nour",
-"Rapunzel",
-"Direct Producteurs Fruits Secs",
-"La Fourche",
-"La Favorite"
-]
+"n": 862
 },
 "Daurade": {
 "n": 36
@@ -4200,13 +3901,7 @@
 ]
 },
 "Endives": {
-"n": 143,
-"m": [
-"Perle du Nord",
-"Prince de Bretagne",
-"Les Nouveaux Producteurs Du Nord",
-"En'Diva"
-]
+"n": 143
 },
 "Enduit de rebouchage": {
 "n": 2
@@ -4291,12 +3986,7 @@
 ]
 },
 "Estragon": {
-"n": 50,
-"m": [
-"Ducros",
-"Rustica",
-"Bedros"
-]
+"n": 50
 },
 "Faisselle": {
 "n": 223,
@@ -4372,10 +4062,7 @@
 ]
 },
 "Fenouil": {
-"n": 89,
-"m": [
-"Masalchi"
-]
+"n": 89
 },
 "Fer à repasser": {
 "n": 2
@@ -4396,12 +4083,7 @@
 ]
 },
 "Feuille de chêne": {
-"n": 62,
-"m": [
-"Bonduelle",
-"Florette",
-"Les Crudettes"
-]
+"n": 62
 },
 "Feuilles de brick": {
 "n": 75,
@@ -4444,27 +4126,10 @@
 ]
 },
 "Figues": {
-"n": 581,
-"m": [
-"Maître Prunille",
-"Charles Antona",
-"Direct Producteurs Fruits Secs",
-"Rapunzel",
-"Maison Roucadil",
-"Vijaya",
-"La Favorite",
-"Saveurs attitudes",
-"Holy Fruits",
-"L'Aliment Sain"
-]
+"n": 581
 },
 "Figues sèches": {
-"n": 107,
-"m": [
-"Rapunzel",
-"Arev",
-"Maître Prunille"
-]
+"n": 107
 },
 "Figurine Funko Pop": {
 "n": 1
@@ -4780,25 +4445,10 @@
 ]
 },
 "Fraises": {
-"n": 853,
-"m": [
-"Les Paysans de Rougeline",
-"Fruits Rouges & Co.",
-"Pronatura",
-"Lucien Georgelin",
-"Sacfel",
-"Savéol",
-"Douceur du Verger",
-"Bonne Maman",
-"Jardin des Papes"
-]
+"n": 853
 },
 "Fraises Gariguette": {
-"n": 56,
-"m": [
-"Les Paysans de Rougeline",
-"Savéol"
-]
+"n": 56
 },
 "Fraisier": {
 "n": 53,
@@ -4809,15 +4459,7 @@
 ]
 },
 "Framboises": {
-"n": 432,
-"m": [
-"Fruits Rouges & Co.",
-"Driscoll's",
-"Berryworld",
-"Holly Fruit",
-"Confit de Provence",
-"Andros"
-]
+"n": 432
 },
 "Friandises pour chat": {
 "n": 8
@@ -4829,10 +4471,7 @@
 ]
 },
 "Frisée": {
-"n": 9,
-"m": [
-"Les Crudettes"
-]
+"n": 9
 },
 "Frites surgelées": {
 "n": 12
@@ -5080,19 +4719,7 @@
 "n": 4
 },
 "Gaspacho": {
-"n": 393,
-"m": [
-"Giraudet",
-"Green Shoot",
-"Alvalle",
-"La Potagère",
-"Ferme d'Anchin",
-"M. de Turenne",
-"Sains et Saufs",
-"Grandeur Nature",
-"Jean Martin",
-"Le Potager De Babette"
-]
+"n": 393
 },
 "Gaufres": {
 "n": 1034,
@@ -5220,19 +4847,7 @@
 ]
 },
 "Gingembre": {
-"n": 767,
-"m": [
-"Ducros",
-"Rustica",
-"Bedros",
-"Yogi Tea",
-"Sainte Lucie",
-"Cock Brand",
-"Assil",
-"Cock",
-"Arcadie",
-"Cook"
-]
+"n": 767
 },
 "Gingembre mariné": {
 "n": 28
@@ -5410,47 +5025,16 @@
 ]
 },
 "Graines de courge": {
-"n": 408,
-"m": [
-"Markal",
-"Celnat",
-"Priméal",
-"Jardin Bio étic",
-"Belledonne",
-"Ofal",
-"Moulin des Moines",
-"Agidra",
-"O'Régal",
-"Biothentic"
-]
+"n": 408
 },
 "Graines de fleurs": {
 "n": 4
 },
 "Graines de lin": {
-"n": 192,
-"m": [
-"Markal",
-"Priméal",
-"Linwoods",
-"Pural",
-"Ofal",
-"Naturéo",
-"Greenweez"
-]
+"n": 192
 },
 "Graines de tournesol": {
-"n": 440,
-"m": [
-"Fruidyllic",
-"Tadim",
-"Celnat",
-"Priméal",
-"Meray",
-"O'Régal",
-"Pinar",
-"Montperal"
-]
+"n": 440
 },
 "Graines de tournesol salées": {
 "n": 56,
@@ -5572,10 +5156,7 @@
 ]
 },
 "Groseilles": {
-"n": 51,
-"m": [
-"Fruits Rouges & Co."
-]
+"n": 51
 },
 "Grosses crevettes": {
 "n": 2
@@ -5776,19 +5357,7 @@
 ]
 },
 "Haricots verts": {
-"n": 484,
-"m": [
-"Notre Jardin",
-"D'aucy",
-"Bonduelle",
-"Maingourd",
-"Jean nicolas",
-"Priméal",
-"Rochefontaine",
-"Avril",
-"Rochambeau",
-"Cassegrain"
-]
+"n": 484
 },
 "Haricots verts en boîte": {
 "n": 1
@@ -6193,10 +5762,7 @@
 ]
 },
 "Jeunes pousses d'épinards": {
-"n": 29,
-"m": [
-"Priméale"
-]
+"n": 29
 },
 "Jeux de cartes": {
 "n": 19
@@ -6331,10 +5897,7 @@
 ]
 },
 "Kakis": {
-"n": 49,
-"m": [
-"Bouquet"
-]
+"n": 49
 },
 "Ketchup": {
 "n": 759,
@@ -6370,20 +5933,10 @@
 ]
 },
 "Kiwis": {
-"n": 358,
-"m": [
-"Zespri",
-"Les Paysans Bio",
-"Oscar",
-"Sapa",
-"Sikig"
-]
+"n": 358
 },
 "Kiwis jaunes": {
-"n": 46,
-"m": [
-"Zespri"
-]
+"n": 46
 },
 "Knacki": {
 "n": 65,
@@ -6582,13 +6135,7 @@
 ]
 },
 "Laitue": {
-"n": 121,
-"m": [
-"Florette",
-"Notre Jardin",
-"Les Crudettes",
-"Saladinettes"
-]
+"n": 121
 },
 "Laitue iceberg en sachet": {
 "n": 3
@@ -7019,13 +6566,7 @@
 ]
 },
 "Mandarines": {
-"n": 274,
-"m": [
-"Mon Marché Plaisir",
-"Destination Saveurs",
-"Bouquet",
-"Terre d'agrumes"
-]
+"n": 274
 },
 "Mangue": {
 "n": 556
@@ -7179,12 +6720,7 @@
 ]
 },
 "Melon": {
-"n": 419,
-"m": [
-"Florette",
-"Soldive",
-"Le rouge gorge"
-]
+"n": 419
 },
 "Mendiants": {
 "n": 200,
@@ -7199,14 +6735,7 @@
 ]
 },
 "Menthe": {
-"n": 251,
-"m": [
-"Lamprien Provence",
-"Palais des Thés",
-"Messegue",
-"Florette",
-"Teisseire"
-]
+"n": 251
 },
 "Merguez": {
 "n": 2576,
@@ -7599,33 +7128,10 @@
 "n": 121
 },
 "Myrtilles": {
-"n": 499,
-"m": [
-"Fruits Rouges & Co.",
-"Driscoll's",
-"Bonne Maman",
-"Douceur du Verger",
-"Royal",
-"Crop's",
-"Bofrost",
-"Socave",
-"Rue Des Plantes"
-]
+"n": 499
 },
 "Mâche": {
-"n": 226,
-"m": [
-"Florette",
-"Bonduelle",
-"Priméale",
-"Oceane",
-"Les Crudettes",
-"Nantial",
-"Saladinettes",
-"Atlantic",
-"Val Nantais",
-"Cuisine et Potager"
-]
+"n": 226
 },
 "Mètre ruban": {
 "n": 1
@@ -7646,21 +7152,10 @@
 "n": 4
 },
 "Mélange étudiant": {
-"n": 174,
-"m": [
-"Les accents du soleil",
-"La Fourche",
-"Bioday"
-]
+"n": 174
 },
 "Mûres": {
-"n": 108,
-"m": [
-"Fruits Rouges & Co.",
-"Les 4 Saisons",
-"Driscoll's",
-"Fini"
-]
+"n": 108
 },
 "Nappe": {
 "n": 21,
@@ -7784,34 +7279,10 @@
 "n": 3
 },
 "Noisettes": {
-"n": 799,
-"m": [
-"Vahiné",
-"Daco Bello",
-"O'Régal",
-"Sainte Lucie",
-"JusteBio",
-"Sun",
-"Holy Fruits",
-"Maître Prunille",
-"La Fabrique Givrée",
-"Les fadas"
-]
+"n": 799
 },
 "Noix": {
-"n": 1225,
-"m": [
-"Alp'noix",
-"Valnoix",
-"Daco Bello",
-"Pepinoix",
-"Fleury Michon",
-"Perlim",
-"Domaine Picard",
-"Kéo",
-"Roches blanches",
-"Boy"
-]
+"n": 1225
 },
 "Noix de Saint-Jacques": {
 "n": 428,
@@ -7824,19 +7295,7 @@
 ]
 },
 "Noix de cajou": {
-"n": 2115,
-"m": [
-"Daco Bello",
-"Vico",
-"O'Régal",
-"La Fourche",
-"JusteBio",
-"Bénénuts",
-"Menguy's",
-"Tokapi",
-"Ethiquable",
-"Greenweez"
-]
+"n": 2115
 },
 "Noix de coco râpée": {
 "n": 179,
@@ -7852,11 +7311,7 @@
 "n": 35
 },
 "Noix de pécan": {
-"n": 205,
-"m": [
-"Daco Bello",
-"JusteBio"
-]
+"n": 205
 },
 "Nonnettes": {
 "n": 274,
@@ -7958,25 +7413,13 @@
 ]
 },
 "Oignons": {
-"n": 518,
-"m": [
-"Condichef",
-"Le Geste Saveur",
-"Jardins Du Midi",
-"La Ferme d'Erquinvillers",
-"Ferme des Arches",
-"Sainte Lucie",
-"Priméale"
-]
+"n": 518
 },
 "Oignons blancs": {
 "n": 43
 },
 "Oignons rouges": {
-"n": 127,
-"m": [
-"Condichef"
-]
+"n": 127
 },
 "Oignons surgelés": {
 "n": 11
@@ -8065,19 +7508,7 @@
 ]
 },
 "Oranges": {
-"n": 1300,
-"m": [
-"Tropicana",
-"Andros",
-"innocent",
-"Fanta",
-"Granini",
-"Pressade",
-"Danao",
-"Fortnum & Mason",
-"River",
-"Vitamont"
-]
+"n": 1300
 },
 "Orangina sans sucre": {
 "n": 1
@@ -8396,10 +7827,7 @@
 "n": 30
 },
 "Pamplemousse": {
-"n": 79,
-"m": [
-"Tropicana"
-]
+"n": 79
 },
 "Panaché": {
 "n": 217,
@@ -8416,10 +7844,7 @@
 ]
 },
 "Panais": {
-"n": 34,
-"m": [
-"Babybio"
-]
+"n": 34
 },
 "Pancakes": {
 "n": 354,
@@ -8486,10 +7911,7 @@
 "n": 18
 },
 "Papaye": {
-"n": 193,
-"m": [
-"O'Régal"
-]
+"n": 193
 },
 "Papier aluminium": {
 "n": 10
@@ -8620,11 +8042,7 @@
 ]
 },
 "Pastèque": {
-"n": 231,
-"m": [
-"Florette",
-"Bouquet Bio"
-]
+"n": 231
 },
 "Patates douces": {
 "n": 128
@@ -8682,15 +8100,7 @@
 "n": 14
 },
 "Persil": {
-"n": 245,
-"m": [
-"Ducros",
-"Sainte Lucie",
-"Cigalou",
-"Rustica",
-"Fuchs",
-"Spigol"
-]
+"n": 245
 },
 "Pesto": {
 "n": 1009,
@@ -8815,13 +8225,7 @@
 "n": 60
 },
 "Pignons de pin": {
-"n": 185,
-"m": [
-"Vahiné",
-"Sun",
-"Bedros Et Savino",
-"Daco Bello"
-]
+"n": 185
 },
 "Piles": {
 "n": 50,
@@ -8972,22 +8376,10 @@
 "n": 2
 },
 "Poireaux": {
-"n": 169,
-"m": [
-"Priméale"
-]
+"n": 169
 },
 "Poires": {
-"n": 464,
-"m": [
-"Santos & Pereira",
-"Andros",
-"Les Paysans Bio",
-"Apifood",
-"Extaz",
-"Lucien Georgelin",
-"Terre de BIO"
-]
+"n": 464
 },
 "Poires au sirop": {
 "n": 70,
@@ -9062,19 +8454,7 @@
 ]
 },
 "Poivrons": {
-"n": 560,
-"m": [
-"Polli",
-"Arev",
-"Albert Ménès",
-"Olabe",
-"Maayane",
-"Florelli",
-"Vicasol",
-"Magda",
-"Altesse",
-"Kerets"
-]
+"n": 560
 },
 "Poivrons piquillos": {
 "n": 61,
@@ -9103,37 +8483,13 @@
 "n": 4
 },
 "Pommes": {
-"n": 1989,
-"m": [
-"Charles & Alice",
-"Andros",
-"Materne",
-"Blédina",
-"Babybio",
-"POM'POTES",
-"Il était un fruit",
-"Douceur du Verger",
-"Thomas Le Prince",
-"Hipp"
-]
+"n": 1989
 },
 "Pommes Golden": {
 "n": 107
 },
 "Pommes de terre": {
-"n": 1517,
-"m": [
-"Priméale",
-"Lunor",
-"Doreoc",
-"Parmentine",
-"Vitalis",
-"Panier du Primeur",
-"Mon Marché Plaisir",
-"Prince de Bretagne",
-"Allaire",
-"Frichot"
-]
+"n": 1517
 },
 "Pommes de terre à frites": {
 "n": 39
@@ -9209,11 +8565,7 @@
 ]
 },
 "Potiron": {
-"n": 52,
-"m": [
-"Liebig",
-"Knorr"
-]
+"n": 52
 },
 "Pots de fleurs": {
 "n": 4
@@ -9320,19 +8672,7 @@
 "n": 12
 },
 "Pruneaux": {
-"n": 906,
-"m": [
-"Maison Roucadil",
-"Maître Prunille",
-"Lou Prunel",
-"Coufidou",
-"Les Vergers d'Escoute",
-"La Compagnie Des Pruneaux",
-"Prunidor",
-"Couleurs Vives",
-"Pruneaux d'Antan",
-"Ferm'en bio"
-]
+"n": 906
 },
 "Prunes": {
 "n": 177
@@ -9741,14 +9081,7 @@
 "n": 15
 },
 "Pêches": {
-"n": 373,
-"m": [
-"St Mamet",
-"Lucien Georgelin",
-"Bonne Maman",
-"Saint Mamet",
-"Saveurs attitudes"
-]
+"n": 373
 },
 "Pêches au sirop": {
 "n": 46,
@@ -9860,31 +9193,13 @@
 ]
 },
 "Radis": {
-"n": 274,
-"m": [
-"Priméale",
-"Florette",
-"Top Légumes",
-"Oceane",
-"Mon Marché Plaisir",
-"The Greenery",
-"Germline"
-]
+"n": 274
 },
 "Raie": {
 "n": 1
 },
 "Raisin": {
-"n": 635,
-"m": [
-"Brio",
-"Arev",
-"Meyva",
-"Barbera",
-"Fresh Garden",
-"El Ciruelo",
-"Maison Guinguet"
-]
+"n": 635
 },
 "Raisin rose": {
 "n": 12
@@ -9893,19 +9208,7 @@
 "n": 32
 },
 "Raisins secs": {
-"n": 450,
-"m": [
-"O'Régal",
-"Sun",
-"Fruidyllic",
-"Vahiné",
-"Maître Prunille",
-"Fruidelys",
-"Orienco",
-"Meyva",
-"Petit prix",
-"Melissa"
-]
+"n": 450
 },
 "Ramettes de papier": {
 "n": 1
@@ -10226,14 +9529,7 @@
 ]
 },
 "Roquette": {
-"n": 87,
-"m": [
-"Priméale",
-"Florette",
-"Vert frais",
-"Les Crudettes",
-"Oceane"
-]
+"n": 87
 },
 "Rosette": {
 "n": 962,
@@ -11144,19 +10440,7 @@
 "n": 8
 },
 "Smoothie": {
-"n": 614,
-"m": [
-"innocent",
-"Vitamont",
-"Vitabio",
-"Sains et Saufs",
-"Ulti",
-"Nu",
-"Pago",
-"Jafaden",
-"Voelkel",
-"True Fruits"
-]
+"n": 614
 },
 "Soda à l'orange": {
 "n": 37,
@@ -11949,49 +11233,19 @@
 ]
 },
 "Tomates": {
-"n": 858,
-"m": [
-"Savéol",
-"Azura",
-"Prince de Bretagne",
-"Oceane",
-"Saclà",
-"Panzani",
-"Solarenn",
-"Les Paysans de Rougeline",
-"Cruscana",
-"Terre de BIO"
-]
+"n": 858
 },
 "Tomates Marmande": {
-"n": 20,
-"m": [
-"Lucien Georgelin"
-]
+"n": 20
 },
 "Tomates cerises": {
-"n": 272,
-"m": [
-"Les Paysans de Rougeline",
-"Azura",
-"Oceane",
-"Solarenn",
-"Bouquet Bio",
-"Savéol",
-"Prince de Bretagne",
-"Kultive",
-"Brio",
-"Les petites cheries"
-]
+"n": 272
 },
 "Tomates côtelées": {
 "n": 11
 },
 "Tomates grappes": {
-"n": 120,
-"m": [
-"Bouquet Bio"
-]
+"n": 120
 },
 "Tomates noires de Crimée": {
 "n": 2
@@ -12584,14 +11838,7 @@
 ]
 },
 "Échalotes": {
-"n": 249,
-"m": [
-"Condichef",
-"Sainte Lucie",
-"Ducros",
-"Le Geste Saveur",
-"Cigalou"
-]
+"n": 249
 },
 "Échine de porc": {
 "n": 240,
@@ -12646,19 +11893,7 @@
 "n": 30
 },
 "Épinards": {
-"n": 399,
-"m": [
-"Notre Jardin",
-"Priméale",
-"Bonduelle",
-"D'aucy",
-"Maingourd",
-"Toupargel",
-"Avril",
-"Blédina",
-"Bio+",
-"M. de Turenne"
-]
+"n": 399
 },
 "Épinards en boîte": {
 "n": 5

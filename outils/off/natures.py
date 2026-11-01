@@ -46,6 +46,10 @@ for natures in sources:
         nom = chemin.split("/")[-1]
         nombres[nom] = nombres.get(nom, 0) + v["n"]
         c = comptes.setdefault(nom, {})
+        # Fruits et légumes frais : Open Food Facts n'y trouve presque que des conserves, épices et soupes
+        # (« Ail » → Ducros, « Haricots verts » → Bonduelle) ; pas de marques prises (01/11/2026).
+        if chemin.startswith("Fruits et légumes/"):
+            continue
         for m, k in v["marques"]:
             m = accents.get(m, m)
             c[m] = c.get(m, 0) + k
