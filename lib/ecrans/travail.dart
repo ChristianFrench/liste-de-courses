@@ -498,18 +498,20 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   children: simple
                       ? [for (final g in l.lignes) _ligne(l, g)]
                       : [
-                          for (final x in etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id)) ...[
+                          for (final x in etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id))
+                           ...sectionSecteur(pictoEtape(x), 4, [
                             TitreGroupe(
                               nom: x.nom,
                               nonPlace: x.nonPlace,
                               pictoDebordant: pictoEtape(x),
+                              pictoGauche: 4,
                               nombre: x.lignes.length,
                               onTap: x.nonPlace
                                   ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
                                   : null,
                             ),
                             for (final g in x.lignes) _ligne(l, g),
-                          ],
+                          ]),
                         ],
                 ),
           bas: [BarreAction(boutons: [Bouton(texte: 'Liste prête', icone: Icons.check, plein: true, onTap: () => _valider(l))])],
@@ -1552,7 +1554,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                         : [
                             ...ajouts,
                             for (final x in etapes)
-                              if (x.lignes.any((g) => !aPart.contains(g.produitId))) ...[
+                              if (x.lignes.any((g) => !aPart.contains(g.produitId)))
+                               ...sectionSecteur(pictoEtape(x), 14, [
                                 TitreGroupe(
                                   key: _titres.putIfAbsent(x.id, GlobalKey.new),
                                   nom: x.nom,
@@ -1565,7 +1568,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                 ),
                                 for (final g in x.lignes)
                                   if (!aPart.contains(g.produitId)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
-                              ],
+                              ]),
                           ],
                   ),
             bas: [
@@ -1804,10 +1807,11 @@ class EcranConsultation extends StatelessWidget {
               if (etat.aPlat(l))
                 for (final g in l.lignes) ligne(g)
               else
-                for (final x in etat.etapes(l, l.parcoursId)) ...[
-                  TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length, pictoDebordant: pictoEtape(x)),
-                  for (final g in x.lignes) ligne(g),
-                ],
+                for (final x in etat.etapes(l, l.parcoursId))
+                  ...sectionSecteur(pictoEtape(x), 4, [
+                    TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length, pictoDebordant: pictoEtape(x), pictoGauche: 4),
+                    for (final g in x.lignes) ligne(g),
+                  ]),
             ],
           ),
         );
@@ -1822,3 +1826,7 @@ String? pictoEtape(Etape x) {
   if (s == null) return null;
   return picto.cleSecteur(Etat.instance.rayon(s.rayonId)?.nom ?? '', s.nom);
 }
+
+/// Bandeau d'un secteur et ses articles ; avec une image, ils sont réunis pour qu'elle déborde par-dessus.
+List<Widget> sectionSecteur(String? picto, double gauche, List<Widget> enfants) =>
+    picto == null ? enfants : [SectionDebordante(picto: picto, gauche: gauche, enfants: enfants)];

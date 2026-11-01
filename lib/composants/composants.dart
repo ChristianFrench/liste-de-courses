@@ -482,12 +482,16 @@ class TitreGroupe extends StatelessWidget {
       this.marque,
       this.couleur,
       this.pictoDebordant,
+      this.pictoGauche = 14,
       this.onTap});
   final String nom;
 
-  /// Image du secteur en début de bandeau, plus haute que lui : elle déborde au-dessus et au-dessous, à droite
-  /// de la colonne des coches (01/11/2026, Aristide : un peu de « fun » dans les listes).
+  /// Image du secteur en début de bandeau (place réservée ; elle est dessinée par [SectionDebordante]).
   final String? pictoDebordant;
+
+  /// Position de l'image depuis le bord gauche : 14 en courses (empiète un peu sur la colonne des coches),
+  /// 4 en préparation (pas de coches, image cadrée à gauche).
+  final double pictoGauche;
 
   /// Couleur de fond propre (bandeau d'un univers) ; sinon la couleur d'accent.
   final Color? couleur;
@@ -533,7 +537,7 @@ class TitreGroupe extends StatelessWidget {
         child: Stack(clipBehavior: Clip.none, children: [
          Container(
           constraints: BoxConstraints(minHeight: grand ? Charte.ligneListe : 0),
-          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? 76 : 16), 4, 14, 4),
+          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? pictoGauche + 48 : 16), 4, 14, 4),
           child: Row(children: [
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
@@ -548,21 +552,32 @@ class TitreGroupe extends StatelessWidget {
               ),
           ]),
          ),
-          if (pictoDebordant != null)
-            Positioned(
-              left: 28,
-              top: 0,
-              bottom: 0,
-              width: 40,
-              child: OverflowBox(
-                maxHeight: 40,
-                child: Pictogramme(pictoDebordant, taille: 40, key: ValueKey('picto-$nom')),
-              ),
-            ),
         ]),
       ),
     );
   }
+}
+
+/// Bandeau de secteur et ses articles, avec l'image du secteur plus haute que le bandeau : dessinée par-dessus
+/// les lignes, elle déborde un peu au-dessus et davantage au-dessous (01/11/2026, Aristide : un peu de « fun »).
+class SectionDebordante extends StatelessWidget {
+  const SectionDebordante({super.key, required this.picto, required this.enfants, this.gauche = 14});
+  final String? picto;
+  final List<Widget> enfants;
+  final double gauche;
+
+  @override
+  Widget build(BuildContext context) => Stack(clipBehavior: Clip.none, children: [
+        Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: enfants),
+        if (picto != null)
+          Positioned(
+            left: gauche,
+            top: -4,
+            width: 40,
+            height: 40,
+            child: IgnorePointer(child: Pictogramme(picto, taille: 40, key: ValueKey('picto-$picto'))),
+          ),
+      ]);
 }
 
 /// Groupes rétractables ouverts ou fermés, gardés tant que l'application tourne.

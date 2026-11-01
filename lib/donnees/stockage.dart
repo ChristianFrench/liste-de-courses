@@ -433,6 +433,17 @@ class Stockage {
   /// l'enregistrement est refait sans ce contrôle, et les références orphelines sont signalées.
   void ecrire(Map<String, dynamic> etat) {
     avertissements.clear();
+    if (_referencesAbimees) {
+      // Des liens orphelins n'ont pas pu être réparés : on écrit sans ce contrôle, en une seule fois
+      // (01/11/2026 : l'échec puis la reprise de chaque enregistrement rendaient le web inutilisable).
+      _db.execute('PRAGMA foreign_keys = OFF');
+      try {
+        _ecrireTout(etat);
+      } finally {
+        _db.execute('PRAGMA foreign_keys = ON');
+      }
+      return;
+    }
     try {
       _ecrireTout(etat);
     } on SqliteException catch (e) {
@@ -460,10 +471,13 @@ class Stockage {
         if (facultative) _db.execute('UPDATE "$t" SET "$colonne" = NULL WHERE rowid = ?', [r['id']]);
       }
       final reste = referencesOrphelines();
+      _referencesAbimees = reste.isNotEmpty;
       avertissements.add('références orphelines : ${avant.join(', ')}'
           '${reste.isEmpty ? ' (retirées)' : ' ; restent : ${reste.join(', ')}'}');
     }
   }
+
+  bool _referencesAbimees = false;
 
   static const _liensRetirables = {'emplacement', 'ligne_liste', 'parcours_etape', 'produit_marque', 'produit_packaging'};
 
