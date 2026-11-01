@@ -88,10 +88,9 @@ class IconeRonde extends StatelessWidget {
         width: taille,
         height: taille,
         alignment: Alignment.center,
-        decoration: BoxDecoration(color: image != null ? Charte.blanc : Charte.fondSelection, shape: BoxShape.circle,
-            border: image != null ? Border.all(color: Charte.separateurZone) : null),
+        decoration: image != null ? null : BoxDecoration(color: Charte.fondSelection, shape: BoxShape.circle),
         child: image != null
-            ? Pictogramme(image, taille: taille * 0.8)
+            ? Pictogramme(image, taille: taille)
             : texte != null
                 ? Text(texte!, style: Charte.texte(taille * 0.32, gras: true, couleur: Charte.cadre))
                 : Icon(icone, size: taille * 0.55, color: Charte.cadre),
@@ -518,13 +517,7 @@ class TitreGroupe extends StatelessWidget {
     final signe = !grand
         ? null
         : image != null
-            ? Container(
-                width: 30,
-                height: 30,
-                decoration: BoxDecoration(color: Charte.blanc, shape: BoxShape.circle),
-                alignment: Alignment.center,
-                child: Pictogramme(image!, taille: 26),
-              )
+            ? Pictogramme(image!, taille: 30) // sans rond (01/11/2026, Aristide)
             : icone != null
                 ? Icon(icone, size: 24, color: Charte.blanc)
                 : null;

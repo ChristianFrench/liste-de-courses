@@ -1,5 +1,4 @@
-// Convertit les pictogrammes SVG (assets/pictos/*.svg) en PNG 96 px posés sur le rond pâle
-// de leur rayon, et écrit la liste des pictogrammes dans lib/donnees/pictos.dart.
+// Convertit les pictogrammes SVG (assets/pictos/*.svg) en PNG 96 px sur fond transparent, et écrit la liste des pictogrammes dans lib/donnees/pictos.dart.
 // Usage : node outils/pictos_png.mjs   (Playwright et Chromium requis)
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,9 +20,9 @@ const noms = fs.readdirSync(dossier).filter(f => f.endsWith('.svg')).map(f => f.
 const navigateur = await chromium.launch();
 const page = await navigateur.newPage({ viewport: { width: 96, height: 96 }, deviceScaleFactor: 1 });
 for (const n of noms) {
-  const fond = couleur[n.split('--')[0]] ?? '#FFF3E0';
-  const svg = fs.readFileSync(path.join(dossier, n + '.svg'), 'utf8').replace('<svg ', '<svg width="78" height="78" ');
-  await page.setContent(`<body style="margin:0;background:transparent"><div style="width:96px;height:96px;border-radius:50%;background:${fond};display:grid;place-items:center">${svg}</div></body>`);
+  // 01/11/2026 (Aristide) : plus de rond de couleur ; le dessin occupe toute l'image, sur fond transparent.
+  const svg = fs.readFileSync(path.join(dossier, n + '.svg'), 'utf8').replace('<svg ', '<svg width="96" height="96" ');
+  await page.setContent(`<body style="margin:0;background:transparent"><div style="width:96px;height:96px;display:grid;place-items:center">${svg}</div></body>`);
   await page.screenshot({ path: path.join(sortie, n + '.png'), omitBackground: true });
 }
 await navigateur.close();
