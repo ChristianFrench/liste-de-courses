@@ -566,6 +566,9 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
       children: [
         GroupeRetractable(
           cle: 'courses/pretes',
+          // 01/11/2026 (Aristide) : déplier / replier comme partout ; ouverts par défaut : À faire et En cours.
+          pliable: true,
+          parDefaut: true,
           titre: 'À faire',
           icone: Icons.shopping_cart_outlined,
           nombre: pretes.length,
@@ -584,6 +587,9 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
         if (enCours != null)
           GroupeRetractable(
             cle: 'courses/interrompues',
+            // 01/11/2026 (Aristide) : déplier / replier comme partout ; ouverts par défaut : À faire et En cours.
+            pliable: true,
+            parDefaut: true,
             titre: 'En cours',
             icone: Icons.pause_circle_outline,
             nombre: 1,
@@ -592,6 +598,9 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
         if (enInstance.isNotEmpty)
           GroupeRetractable(
             cle: 'courses/sansTicket',
+            // 01/11/2026 (Aristide) : déplier / replier comme partout ; ouverts par défaut : À faire et En cours.
+            pliable: true,
+            parDefaut: false,
             titre: 'Terminées sans ticket',
             icone: Icons.receipt_long_outlined,
             nombre: enInstance.length,

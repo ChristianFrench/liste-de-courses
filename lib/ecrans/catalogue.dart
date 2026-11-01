@@ -595,7 +595,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           nom: u,
           grand: true,
           icone: apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined,
-          couleur: apparenceUnivers[u]?.$2,
+          // 01/11/2026 (Aristide) : plus de couleur propre à chaque univers, la palette choisie partout.
           nombre: rayonsU.length,
           ouvert: uOuvert,
           onTap: () => plis.basculer(_cleU(u))));

@@ -302,6 +302,16 @@ class Synchro extends ChangeNotifier {
   Timer? _suiviOuverture;
   DateTime _dernierEtatRecu = DateTime.now();
 
+  /// Avancement de la mise à jour d'ouverture, de 0 à 1, pour la barre du bandeau haut : la connexion
+  /// (jusqu'à 40 %), puis les 2 s de calme qui en marquent la fin (01/11/2026, Aristide).
+  double get progresOuverture {
+    final o = ouverture;
+    if (o == null || o.finie) return 1;
+    final maintenant = DateTime.now();
+    if (o.etape == 0) return 0.4 * (maintenant.difference(o.debut).inMilliseconds / 2000).clamp(0.0, 0.95);
+    return 0.4 + 0.6 * (maintenant.difference(_dernierEtatRecu).inMilliseconds / 2000).clamp(0.0, 0.98);
+  }
+
   void _suivreOuverture() {
     final o = ouverture;
     if (o == null || o.finie) {

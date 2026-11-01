@@ -133,8 +133,9 @@ class Coquille extends StatelessWidget {
   }
 }
 
-/// Fenêtre de la mise à jour faite à l'ouverture (30/10/2026) : étapes avec le rond qui tourne,
-/// au moins 5 secondes, même quand il n'y a rien de nouveau.
+/// Mise à jour faite à l'ouverture : plus de fenêtre (01/11/2026, Aristide), une barre de progression très
+/// légère en haut de l'écran, sur le bandeau, avec un petit texte : « Synchronisation » en foyer,
+/// « Initialisation » pour un appareil seul.
 class GuetteurMiseAJour extends StatefulWidget {
   const GuetteurMiseAJour({super.key, required this.child});
   final Widget child;
@@ -144,112 +145,72 @@ class GuetteurMiseAJour extends StatefulWidget {
 }
 
 class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
-  MiseAJourOuverture? _montree;
+  final _debut = DateTime.now();
+  Timer? _minuteur;
+  bool _visible = true;
+  DateTime? _finie;
 
   @override
   void initState() {
     super.initState();
-    Synchro.instance.addListener(_verifier);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _verifier());
+    _minuteur = Timer.periodic(const Duration(milliseconds: 100), (_) => _avancer());
   }
 
   @override
   void dispose() {
-    Synchro.instance.removeListener(_verifier);
+    _minuteur?.cancel();
     super.dispose();
   }
 
-  Future<void> _verifier() async {
-    final o = Synchro.instance.ouverture;
-    if (o == null || identical(o, _montree) || !mounted) return;
-    _montree = o;
-    final montree = DateTime.now();
-    final fermer = Completer<void>();
-    unawaited(showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => PopScope(canPop: false, child: _FenetreMiseAJour(o)),
-    ).whenComplete(() {
-      if (!fermer.isCompleted) fermer.complete();
-    }));
-    while (!o.finie && mounted) {
-      await Future<void>.delayed(const Duration(milliseconds: 200));
+  bool get _foyer => Synchro.instance.ouverture != null;
+
+  /// Appareil seul : la base est déjà lue, la barre fait un court passage d'une seconde.
+  double get _progres => _foyer ? Synchro.instance.progresOuverture : (DateTime.now().difference(_debut).inMilliseconds / 1000).clamp(0.0, 1.0);
+
+  void _avancer() {
+    if (!mounted) return;
+    if (_progres >= 1) {
+      _finie ??= DateTime.now();
+      // La barre pleine reste un instant, puis disparaît.
+      if (DateTime.now().difference(_finie!).inMilliseconds > 400) {
+        _minuteur?.cancel();
+        _visible = false;
+      }
     }
-    final ferme = [montree.add(const Duration(seconds: 5)), o.fin!.add(const Duration(milliseconds: 1500))]
-        .reduce((a, b) => a.isAfter(b) ? a : b);
-    final reste = ferme.difference(DateTime.now());
-    if (!reste.isNegative) await Future<void>.delayed(reste);
-    if (mounted && !fermer.isCompleted) Navigator.of(context, rootNavigator: true).pop();
+    setState(() {});
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
-}
-
-class _FenetreMiseAJour extends StatelessWidget {
-  const _FenetreMiseAJour(this.o);
-  final MiseAJourOuverture o;
-
-  Widget _etape(String texte, {required bool enCours, required bool faite, bool echec = false}) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(children: [
-          SizedBox(
-            width: 22,
-            height: 22,
-            child: enCours
-                ? const Padding(padding: EdgeInsets.all(2), child: CircularProgressIndicator(strokeWidth: 2.5))
-                : Icone(echec ? Icons.cloud_off : (faite ? Icons.check_circle : Icons.radio_button_unchecked),
-                    size: 22, color: echec ? Charte.rouge : (faite ? Charte.accent : Charte.texteSecondaire)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(child: Text(texte, style: const TextStyle(fontSize: 16))),
-        ]),
-      );
-
-  /// Les autres membres dont un appareil est ouvert en ce moment.
-  static List<String> _presents() {
-    final etat = Etat.instance;
-    final ids = {
-      for (final a in Synchro.instance.appareils.values)
-        if (a.enLigne && a.membreId != null && a.membreId != etat.moi.id) a.membreId!
-    };
-    return [
-      for (final m in etat.membres)
-        if (ids.contains(m.id)) m.nomAffiche
-    ];
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-        title: Text('Bonjour ${Etat.instance.moi.nomAffiche}'),
-        content: ListenableBuilder(
-          listenable: Synchro.instance,
-          builder: (context, _) => Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (final nom in _presents())
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Text('$nom est aussi là', style: const TextStyle(fontSize: 16)),
-                ),
-              _etape('Connexion au serveur', enCours: o.etape == 0, faite: o.etape > 0, echec: o.horsLigne),
-              _etape('Lecture de l\'état du foyer', enCours: o.etape == 1, faite: o.finie && !o.horsLigne),
-              if (o.finie) ...[
-                const SizedBox(height: 10),
-                Text(
-                  o.horsLigne
-                      ? 'Pas de réseau : vous travaillez avec les données de cet appareil.'
-                      : o.recues == 0
-                          ? 'Déjà à jour.'
-                          : '${o.recues} modification${o.recues > 1 ? 's' : ''} reçue${o.recues > 1 ? 's' : ''}.',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-              ],
-            ],
-          ),
+  Widget build(BuildContext context) {
+    if (!_visible) return widget.child;
+    final o = Synchro.instance.ouverture;
+    final texte = !_foyer ? 'Initialisation' : (o != null && o.horsLigne ? 'Hors ligne' : 'Synchronisation');
+    return Stack(children: [
+      widget.child,
+      Positioned(
+        top: MediaQuery.of(context).padding.top + 2,
+        left: 12,
+        right: 12,
+        child: IgnorePointer(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Text(texte,
+                style: Charte.texte(11, couleur: Charte.blanc)
+                    .copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 4)], decoration: TextDecoration.none)),
+            const SizedBox(height: 2),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(2),
+              child: LinearProgressIndicator(
+                value: _progres,
+                minHeight: 3,
+                backgroundColor: const Color(0x55FFFFFF),
+                valueColor: AlwaysStoppedAnimation(Charte.clair(Charte.accent, 0.3)),
+              ),
+            ),
+          ]),
         ),
-      );
+      ),
+    ]);
+  }
 }
 
 /// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du

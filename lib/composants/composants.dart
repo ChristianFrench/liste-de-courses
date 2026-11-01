@@ -528,9 +528,9 @@ class TitreGroupe extends StatelessWidget {
     final encre = Charte.fonce(base);
     final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
     // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
-    // 01/11/2026 (Aristide) : plus grande, avec un très léger débord vers le bas.
+    // 01/11/2026 (Aristide) : plus grande ; elle ne dépasse pas en haut, le léger débord est en bas.
     Widget deborde(Widget w) => SizedBox(
-        width: 34, height: 30, child: OverflowBox(maxWidth: 46, maxHeight: 46, alignment: const Alignment(0, 0.35), child: w));
+        width: 34, height: 30, child: OverflowBox(maxWidth: 46, maxHeight: 46, alignment: const Alignment(0, -0.8), child: w));
     final signe = !grand
         ? null
         : image != null
@@ -580,7 +580,7 @@ class SectionDebordante extends StatelessWidget {
         if (picto != null)
           Positioned(
             left: gauche,
-            top: -4,
+            top: 1, // 01/11/2026 (Aristide) : le débord est en bas, pas en haut
             width: 40,
             height: 40,
             child: IgnorePointer(child: Pictogramme(picto, taille: 40, key: ValueKey('picto-$picto'))),
@@ -1059,8 +1059,11 @@ class ImageAbsente extends StatelessWidget {
 
 /// Liste déroulante, dans le même cadre que les zones de saisie, avec son libellé sur le trait du haut.
 class ChoixDeroulant<T> extends StatelessWidget {
-  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle});
+  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle, this.apercus});
   final T valeur;
+
+  /// Petit aperçu avant le libellé de chaque choix (échantillon d'une palette…).
+  final Map<T, Widget>? apercus;
   final Map<T, String> choix;
   final ValueChanged<T> onChange;
   final String? libelle;
@@ -1083,7 +1086,13 @@ class ChoixDeroulant<T> extends StatelessWidget {
             for (final e in choix.entries)
               DropdownMenuItem<T>(
                 value: e.key,
-                child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: apercus?[e.key] == null
+                    ? Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)
+                    : Row(children: [
+                        apercus![e.key]!,
+                        const SizedBox(width: 10),
+                        Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                      ]),
               ),
           ],
           onChanged: (v) {

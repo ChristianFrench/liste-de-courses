@@ -97,32 +97,13 @@ class EcranApparence extends _EcranVivant {
   Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
-      Text('Couleurs de l\'application : touchez une palette, elle s\'applique tout de suite.',
-          style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-      const SizedBox(height: 8),
-      Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          for (final pal in palettes)
-            _ChoixPalette(
-              palette: pal,
-              choisie: pal.nom == Charte.palette.nom,
-              onTap: () {
-                etat.choisirApparence(pal.nom);
-                Charte.choisirPalette(pal.nom);
-              },
-            ),
-        ],
-      ),
-      const SizedBox(height: 12),
-      // Les autres palettes, dans une liste déroulante pour ne pas prendre de place.
+      // 01/11/2026 (Aristide) : toutes les palettes dans une seule liste déroulante, avec leur échantillon.
       ChoixDeroulant<String>(
-        libelle: 'Autres palettes',
-        valeur: autresPalettes.any((p) => p.nom == Charte.palette.nom) ? Charte.palette.nom : '',
-        choix: {'': 'Choisir…', for (final p in autresPalettes) p.nom: p.nom},
+        libelle: 'Palette de couleurs',
+        valeur: Charte.palette.nom,
+        choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
+        apercus: {for (final p in toutesLesPalettes) p.nom: _Echantillon(p)},
         onChange: (v) {
-          if (v.isEmpty) return;
           etat.choisirApparence(v);
           Charte.choisirPalette(v);
         },
@@ -601,42 +582,18 @@ class EcranTypesPackaging extends StatelessWidget {
 }
 
 /// Pastille d'une palette : ses teintes, du plus foncé au plus pâle, et son nom.
-class _ChoixPalette extends StatelessWidget {
-  const _ChoixPalette({required this.palette, required this.choisie, required this.onTap});
+/// Échantillon d'une palette : son dégradé, du plus foncé au plus clair.
+class _Echantillon extends StatelessWidget {
+  const _Echantillon(this.palette);
   final Palette palette;
-  final bool choisie;
-  final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        selected: choisie,
-        label: 'Palette ${palette.nom}',
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(10),
-          child: Container(
-            width: 104,
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: palette.fond,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: choisie ? palette.accentFonce : palette.separateur, width: choisie ? 3 : 1.5),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    for (final c in [palette.accentFonce, palette.accent, palette.fondSelection, palette.fondBarre])
-                      Expanded(child: Container(height: 22, color: c)),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(palette.nom, style: Charte.texte(13, gras: choisie), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-        ),
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          for (final c in [palette.accentFonce, palette.accent, palette.fondSelection, palette.fondBarre])
+            Container(width: 18, height: 22, color: c),
+        ]),
       );
 }
 
