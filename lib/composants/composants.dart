@@ -523,16 +523,21 @@ class TitreGroupe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: Charte.blanc);
+    // 01/11/2026 (Aristide) : fond éclairci, texte dans la teinte foncée de la même couleur.
+    final base = nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent);
+    final encre = Charte.fonce(base);
+    final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
+    // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
+    Widget deborde(Widget w) => SizedBox(width: 30, height: 30, child: OverflowBox(maxWidth: 38, maxHeight: 38, child: w));
     final signe = !grand
         ? null
         : image != null
-            ? Pictogramme(image!, taille: 30) // sans rond (01/11/2026, Aristide)
+            ? deborde(Pictogramme(image!, taille: 38)) // sans rond (01/11/2026, Aristide)
             : icone != null
-                ? Icone(icone, size: 24, color: Charte.blanc)
+                ? deborde(Icone(icone, size: 38, color: encre))
                 : null;
     return Material(
-      color: nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent),
+      color: Charte.clair(base),
       child: InkWell(
         onTap: onTap,
         child: Stack(clipBehavior: Clip.none, children: [
@@ -543,13 +548,13 @@ class TitreGroupe extends StatelessWidget {
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
             if (ajoute) Text(' +', style: blanc),
-            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: Charte.blanc)),
+            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: encre)),
             if (droite != null) Text(droite!, style: blanc),
             if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
             if (ouvert != null)
               Padding(
                 padding: const EdgeInsets.only(left: 6),
-                child: Icone(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.blanc),
+                child: Icone(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: encre),
               ),
           ]),
          ),
@@ -739,15 +744,16 @@ class Bouton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actif = onTap != null;
-    final fond = plein ? (actif ? Charte.accent : Charte.desactive) : Charte.blanc;
-    final texteCouleur = plein ? Charte.blanc : (actif ? Charte.cadre : Charte.desactive);
+    // 01/11/2026 (Aristide) : bouton plein dans une teinte claire, bordé de la couleur d'accent.
+    final fond = plein ? Charte.clair(Charte.accent, actif ? 0.72 : 0.88) : Charte.blanc;
+    final texteCouleur = plein ? (actif ? Charte.fonce(Charte.accent) : Charte.desactive) : (actif ? Charte.cadre : Charte.desactive);
     final contenu = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icône à gauche du libellé (boutons qui font avancer les listes et les courses).
-          if (icone != null) Icone(icone, size: texte.isEmpty ? 28 : 20, color: texteCouleur),
+          if (icone != null) Icone(icone, size: texte.isEmpty ? 32 : 26, color: texteCouleur),
           if (icone != null && texte.isNotEmpty) const SizedBox(width: 6),
           if (texte.isNotEmpty)
             Flexible(
@@ -757,13 +763,13 @@ class Bouton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
             ),
-          if (iconeApres != null && texte.isEmpty) Icone(iconeApres, size: 28, color: texteCouleur),
+          if (iconeApres != null && texte.isEmpty) Icone(iconeApres, size: 32, color: texteCouleur),
         ],
       ),
     );
     final forme = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(8),
-      side: plein || pointille ? BorderSide.none : _bordCadre,
+      side: pointille ? BorderSide.none : (plein ? BorderSide(color: actif ? Charte.accent : Charte.desactive, width: 1.5) : _bordCadre),
     );
     Widget bouton = Material(
       color: fond,

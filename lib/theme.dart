@@ -73,6 +73,12 @@ class Charte {
   // Couleurs de la palette
   static Color get accent => palette.accent;
   static Color get cadre => palette.accentFonce;
+
+  /// Teinte claire d'une couleur (fonds des bandeaux de titre et des boutons pleins, 01/11/2026 Aristide).
+  static Color clair(Color c, [double t = 0.72]) => Color.lerp(c, blanc, t)!;
+
+  /// Teinte foncée d'une couleur (texte posé sur sa teinte claire).
+  static Color fonce(Color c) => Color.lerp(c, const Color(0xFF000000), 0.35)!;
   static Color get fond => palette.fond;
   static Color get fondBandeau => palette.fondBarre;
   static Color get fondSelection => palette.fondSelection;

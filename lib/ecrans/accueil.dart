@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
@@ -167,17 +168,19 @@ class _EnTetePhoto extends StatelessWidget {
 TextStyle _surPhoto(TextStyle s) =>
     s.copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6), Shadow(color: Color(0x99000000), blurRadius: 2)]);
 
-/// « Comment ça marche » : les cinq étapes, numérotées, du paramétrage au ticket.
+/// « Comment ça marche » : les cinq étapes, chacune avec son icône, du paramétrage au ticket.
 class _Etapes extends StatelessWidget {
   const _Etapes();
 
   static const _etapes = [
-    'Je\nparamètre',
+    'Je paramètre\nune fois',
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
     'Je garde\nle ticket',
   ];
+
+  static const _icones = [Icons.settings_outlined, Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined, Icons.receipt_long_outlined];
 
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
@@ -239,7 +242,7 @@ class _Etapes extends StatelessWidget {
 
   static Future<void> _expliquer(BuildContext context, int i) => modale(
         context,
-        titre: '${i + 1}. ${_explications[i].$1}',
+        titre: _explications[i].$1,
         oui: null,
         non: null,
         contenu: (context, maj) => Column(
@@ -272,13 +275,8 @@ class _Etapes extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
               children: [
-                Container(
-                  width: 30,
-                  height: 30,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: Charte.accent, shape: BoxShape.circle),
-                  child: Text('${i + 1}', style: Charte.texte(15, gras: true, couleur: Charte.blanc)),
-                ),
+                // 01/11/2026 (Aristide) : une icône à la place du numéro.
+                Icone(_icones[i], size: 34),
                 const SizedBox(height: 6),
                 Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],
