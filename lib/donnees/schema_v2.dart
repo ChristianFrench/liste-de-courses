@@ -361,13 +361,8 @@ CREATE TRIGGER interdit_suppression_produit   BEFORE DELETE ON produit   BEGIN S
 CREATE TRIGGER interdit_suppression_marque    BEFORE DELETE ON marque    BEGIN SELECT RAISE(ABORT, 'Suppression interdite : archiver la marque'); END;
 CREATE TRIGGER interdit_suppression_packaging BEFORE DELETE ON packaging BEGIN SELECT RAISE(ABORT, 'Suppression interdite : archiver le packaging'); END;
 
--- R2 : un produit déjà mis dans une liste ne peut pas être archivé.
-CREATE TRIGGER interdit_archivage_produit_utilise
-BEFORE UPDATE OF archive ON produit
-WHEN NEW.archive = 1 AND OLD.nb_utilisations > 0
-BEGIN
-    SELECT RAISE(ABORT, 'Produit déjà utilisé dans une liste : archivage interdit');
-END;
+-- R2 (abandonnée le 01/11/2026, Aristide) : un produit qui a servi peut être archivé s'il n'est plus dans
+-- aucune liste ; l'application le vérifie, les anciennes listes le gardent.
 
 -- R3 : le compteur d'utilisation ne peut que monter.
 CREATE TRIGGER compteur_utilisation_croissant

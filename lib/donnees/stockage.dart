@@ -111,6 +111,8 @@ class Stockage {
     final s = Stockage._(db);
     if (!s._existe('foyer')) s._creer();
     db.execute(_sqlSynchro);
+    // Règle R2 abandonnée (01/11/2026) : un produit qui a servi, mais n'est plus dans aucune liste, peut être supprimé.
+    db.execute('DROP TRIGGER IF EXISTS interdit_archivage_produit_utilise');
     return s;
   }
 

@@ -76,6 +76,7 @@ void main() {
     await etat.enregistrer();
     await etat.charger(dossier: dossier);
     expect(etat.rayonsCatalogue.where((x) => x.nom == 'Rayon témoin 2'), isNotEmpty);
+    expect(etat.produits.where((x) => x.id == p.id), isEmpty, reason: 'produit qui a servi : supprimé quand même');
   });
 }
 
