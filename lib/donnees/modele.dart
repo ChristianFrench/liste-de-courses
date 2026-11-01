@@ -11,6 +11,7 @@ import 'catalogue_type.dart';
 import 'demonstration.dart';
 import 'moderation.dart';
 import 'images_choisies.dart';
+import 'liste_suivie.dart';
 import 'stockage.dart';
 import 'version.dart';
 
@@ -567,12 +568,20 @@ class Etat extends ChangeNotifier {
 
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
-  List<Rayon> rayons = [];
-  List<Secteur> secteurs = [];
+  ListeSuivie<Rayon> _rayons = ListeSuivie([]);
+  List<Rayon> get rayons => _rayons;
+  set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
+  ListeSuivie<Secteur> _secteurs = ListeSuivie([]);
+  List<Secteur> get secteurs => _secteurs;
+  set secteurs(List<Secteur> l) => _secteurs = l is ListeSuivie<Secteur> ? l : ListeSuivie(l);
   List<Marque> marques = [];
   List<Packaging> packagings = [];
-  List<Produit> produits = [];
-  List<Emplacement> emplacements = [];
+  ListeSuivie<Produit> _produits = ListeSuivie([]);
+  List<Produit> get produits => _produits;
+  set produits(List<Produit> l) => _produits = l is ListeSuivie<Produit> ? l : ListeSuivie(l);
+  ListeSuivie<Emplacement> _emplacements = ListeSuivie([]);
+  List<Emplacement> get emplacements => _emplacements;
+  set emplacements(List<Emplacement> l) => _emplacements = l is ListeSuivie<Emplacement> ? l : ListeSuivie(l);
   List<Parcours> parcours = [];
   List<Liste> listes = [];
   List<Course> historique = [];
@@ -1273,11 +1282,14 @@ class Etat extends ChangeNotifier {
   Membre? membre(String? id) => _trouve(membres, (m) => m.id == id);
   Magasin? magasin(String? id) => _trouve(magasins, (m) => m.id == id) ?? _trouve(magasinsArchives, (m) => m.id == id);
   bool estArchive(String? magasinId) => magasinsArchives.any((m) => m.id == magasinId);
-  Rayon? rayon(String? id) => _trouve(rayons, (r) => r.id == id);
-  Secteur? secteur(String? id) => _trouve(secteurs, (s) => s.id == id);
+  final _indexRayons = Index<Rayon>((r) => r.id);
+  Rayon? rayon(String? id) => id == null ? null : _indexRayons.trouver(_rayons, id);
+  final _indexSecteurs = Index<Secteur>((s) => s.id);
+  Secteur? secteur(String? id) => id == null ? null : _indexSecteurs.trouver(_secteurs, id);
   Marque? marque(String? id) => _trouve(marques, (m) => m.id == id);
   Packaging? packaging(String? id) => _trouve(packagings, (k) => k.id == id);
-  Produit? produit(String? id) => _trouve(produits, (p) => p.id == id);
+  final _indexProduits = Index<Produit>((p) => p.id);
+  Produit? produit(String? id) => id == null ? null : _indexProduits.trouver(_produits, id);
   Liste? liste(String? id) => _trouve(listes, (l) => l.id == id);
   Parcours? unParcours(String? id) => _trouve(parcours, (p) => p.id == id);
   TypePromotion? typePromotion(String? id) => _trouve(typesPromotion, (t) => t.id == id);
@@ -1291,8 +1303,9 @@ class Etat extends ChangeNotifier {
     return secteurs.where((s) => ids.contains(s.rayonId)).toList();
   }
 
+  final _indexEmplacements = Index<Emplacement>((e) => '${e.magasinId}\u0000${e.produitId}');
   Secteur? secteurDe(String magasinId, String produitId) {
-    final e = _trouve(emplacements, (e) => e.magasinId == magasinId && e.produitId == produitId);
+    final e = _indexEmplacements.trouver(_emplacements, '$magasinId\u0000$produitId');
     return e == null ? null : secteur(e.secteurId);
   }
 
