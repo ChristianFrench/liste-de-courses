@@ -127,15 +127,11 @@
 "n": 324,
 "m": [
 "Herta",
-"Fleury Michon",
-"Tradilège",
-"Saint Alby",
-"Nestlé",
-"Brocéliande",
 "Les eleveurs de bretagne",
 "Bonneterre",
 "Groupe Auchan",
-"Le Cochon de Marzan"
+"Le Cochon de Marzan",
+"Le Marsigny"
 ]
 },
 "Allumettes de bacon": {
@@ -319,9 +315,7 @@
 "n": 165,
 "m": [
 "Montagne Noire",
-"Saint-Azay",
 "Frais Devant",
-"Charculor",
 "Fratelli Beretta"
 ]
 },
@@ -954,7 +948,6 @@
 "The Bridge",
 "Bjorg",
 "Isola Bio",
-"Alter Eco",
 "Regain",
 "Bonneterre",
 "Vegetalia",
@@ -993,8 +986,7 @@
 "Bols": {
 "n": 164,
 "m": [
-"Carte Nature",
-"Babybio"
+"Carte Nature"
 ]
 },
 "Bonbons": {
@@ -1126,10 +1118,10 @@
 "Celnat",
 "Happy Bio",
 "Markal",
-"Mix Buffet",
 "Sabarot",
 "Ofal",
-"Ekibio"
+"Ekibio",
+"Grain de frais"
 ]
 },
 "Boursin ail et fines herbes": {
@@ -1226,12 +1218,12 @@
 "La Fournée Dorée",
 "Maître Jean Pierre",
 "Pasquier",
-"La Boulangère",
 "Brioche Pasquier",
 "Brioches Fonteneau",
 "Epi d'Or",
 "Les Pâtissades",
-"Brioche fonteneau"
+"Brioche fonteneau",
+"Fonteneau"
 ]
 },
 "Briochettes": {
@@ -1837,8 +1829,8 @@
 "Maayane",
 "Maison Raymond",
 "Albert Ménès",
-"Prosain",
-"L'Apéro du Poissonnier"
+"L'Apéro du Poissonnier",
+"Kaviari"
 ]
 },
 "Ceintures": {
@@ -1957,7 +1949,6 @@
 "Chaussons": {
 "n": 118,
 "m": [
-"Nutella",
 "Bioryza"
 ]
 },
@@ -2062,13 +2053,10 @@
 "m": [
 "Paul & Louise",
 "Zapetti",
-"Fleury Michon",
 "Claude Vétillard",
-"Garbit",
 "Côté Table",
 "Raynal et Roquelaure",
 "Old El Paso",
-"Tendre & Plus",
 "Comme j'aime"
 ]
 },
@@ -2438,11 +2426,7 @@
 "Clous": {
 "n": 119,
 "m": [
-"Ducros",
-"Rustica",
-"Fuchs",
-"Samia",
-"Sainte Lucie"
+"Samia"
 ]
 },
 "Clémentines": {
@@ -2467,7 +2451,6 @@
 "St Mamet",
 "Rochambeau",
 "Del Monte",
-"Escal",
 "Metro",
 "Mocitos"
 ]
@@ -2636,8 +2619,8 @@
 "Larnaudie",
 "Eric Bur",
 "Les Saveurs de Mamie",
-"Labeyrie",
-"Marius Bernard"
+"Marius Bernard",
+"Le voyage de mamabe"
 ]
 },
 "Confit de canard": {
@@ -3439,7 +3422,6 @@
 "Liebig",
 "Bontout",
 "En Cuisine",
-"Pierre Laguilhon",
 "Biraben",
 "Chamsyl",
 "Cook"
@@ -3951,9 +3933,9 @@
 "Romanzini",
 "Grandjean",
 "Maitre Coquille",
-"Sabarot",
 "Roger Dutruy",
-"Valdélice"
+"Valdélice",
+"Toque du Chef"
 ]
 },
 "Esquimaux": {
@@ -4290,7 +4272,6 @@
 "m": [
 "France Délices",
 "Alsa",
-"Monbana",
 "Supplex",
 "Piton Des Neiges",
 "Le Bio De Manon",
@@ -4733,10 +4714,10 @@
 "innocent",
 "Pepsico",
 "Florette",
-"Pierre Martinet",
 "Montperal",
 "Coop",
-"Naturaplan"
+"Naturaplan",
+"Ferrer"
 ]
 },
 "Gel coiffant": {
@@ -4929,7 +4910,6 @@
 "n": 323,
 "m": [
 "Valda",
-"Famille Mary",
 "Vecteur sante",
 "Fleurance nature",
 "Ballot-Flurin",
@@ -4937,7 +4917,8 @@
 "Maped",
 "Auzier Chabernac",
 "Propos Nature",
-"La Confiserie Bressaude"
+"HerbalGem",
+"Tā"
 ]
 },
 "Gorgonzola": {
@@ -5525,8 +5506,6 @@
 "Terra Etica",
 "Kazidomi",
 "Pranarom",
-"Ethiquable",
-"Léa Nature",
 "Florame",
 "Phytosun aroms"
 ]
@@ -5679,16 +5658,16 @@
 "Jambon serrano": {
 "n": 560,
 "m": [
-"Delpeyrat",
 "Espuña",
-"Despi",
 "Boadas",
-"Aoste",
 "Elpozo",
-"Labeyrie",
 "La Jasse",
 "Serrano",
-"Charcuterie des Papes"
+"Charcuterie des Papes",
+"Juan Luna",
+"Sélection Intermarché",
+"Bastides Salaisons",
+"Noel"
 ]
 },
 "Jambon à l'os": {
@@ -5720,12 +5699,7 @@
 "n": 33
 },
 "Jeans": {
-"n": 134,
-"m": [
-"Jean Rozé",
-"Jean Floc'h",
-"Esprit Gourmet"
-]
+"n": 134
 },
 "Jeunes pousses d'épinards": {
 "n": 29
@@ -5940,7 +5914,7 @@
 "Crêperie du Vieux Moulin",
 "Pat'Fondines",
 "Marie Morin",
-"Baramel"
+"Ty Délice"
 ]
 },
 "Kéfir": {
@@ -6019,7 +5993,6 @@
 "Lait de croissance": {
 "n": 63,
 "m": [
-"U Tout Petits Bio",
 "Babybio",
 "Holle",
 "Candia"
@@ -6136,7 +6109,6 @@
 "m": [
 "L'etal Du Volailler",
 "LOEUL ET PIRIOT",
-"Lindt",
 "Ets Ribot",
 "LOEUL & PIRIOT",
 "Volaé"
@@ -6462,10 +6434,8 @@
 "m": [
 "Notre Jardin",
 "Tout feu tout frais",
-"Qualité Traiteur",
 "Avril",
 "Rochambeau",
-"Mix Buffet",
 "Brédial"
 ]
 },
@@ -7119,10 +7089,7 @@
 "n": 108
 },
 "Nappe": {
-"n": 21,
-"m": [
-"Bisson"
-]
+"n": 21
 },
 "Navarin d'agneau": {
 "n": 14
@@ -7535,10 +7502,7 @@
 "n": 7
 },
 "Pailles": {
-"n": 84,
-"m": [
-"LU"
-]
+"n": 84
 },
 "Pain": {
 "n": 5492,
@@ -7649,7 +7613,6 @@
 "Pelletier",
 "LU",
 "Borsa",
-"Jacquet",
 "Céréal Bio",
 "Epi d'Or"
 ]
@@ -7798,10 +7761,8 @@
 "Kingsbräu",
 "Volsberg",
 "Perlembourg",
-"Cité Marine",
 "Sojasun",
-"Charles & Alice",
-"Panache des landes"
+"Charles & Alice"
 ]
 },
 "Panais": {
@@ -7935,7 +7896,6 @@
 "Parfum": {
 "n": 57,
 "m": [
-"Les Jardins de Gaïa",
 "Durance"
 ]
 },
@@ -8092,7 +8052,6 @@
 "William Saurin",
 "Raynal et Roquelaure",
 "La Belle Chaurienne",
-"Fleury Michon",
 "Toque du Chef"
 ]
 },
@@ -8145,7 +8104,6 @@
 "m": [
 "Nestlé",
 "La Laitière",
-"Beillevaire",
 "Holle",
 "Blédina",
 "Babybio",
@@ -8271,12 +8229,12 @@
 "Tokapi",
 "Fruidyllic",
 "Daco Bello",
-"O'Régal",
 "Menguy's",
 "Intersnack",
 "Maître Prunille",
 "JusteBio",
-"Profruit"
+"Profruit",
+"Jean Hervé"
 ]
 },
 "Pizza fraîche": {
@@ -8461,8 +8419,7 @@
 "Pommes noisettes": {
 "n": 55,
 "m": [
-"Findus",
-"Pom'Lisse"
+"Findus"
 ]
 },
 "Pont-l'évêque": {
@@ -8966,9 +8923,9 @@
 "Les Moulins De Provence",
 "Lustucru selection",
 "Saint Jean",
-"Fleury Michon",
 "Turini",
-"Maison Hermine"
+"Maison Hermine",
+"Toque du Chef"
 ]
 },
 "Pâtes à lasagnes": {
@@ -9513,13 +9470,7 @@
 "n": 84
 },
 "Râpe": {
-"n": 131,
-"m": [
-"Cité Marine",
-"Les Croisés",
-"Soignon",
-"Chêne d'argent"
-]
+"n": 131
 },
 "Règle": {
 "n": 8
@@ -10065,10 +10016,10 @@
 "Maison Rivière",
 "Raynal et Roquelaure",
 "Claude Vétillard",
-"Stéphan",
 "Toque du Chef",
 "Chez Raynal",
-"Relais Gourmand"
+"Relais Gourmand",
+"Alain Martin"
 ]
 },
 "Saucisson sec": {
@@ -10765,7 +10716,6 @@
 "Tajine": {
 "n": 133,
 "m": [
-"Fleury Michon",
 "Seazon",
 "Lechef"
 ]
@@ -11267,11 +11217,7 @@
 "n": 7
 },
 "Torchons": {
-"n": 45,
-"m": [
-"Fleury Michon",
-"Madrange"
-]
+"n": 45
 },
 "Tortellini": {
 "n": 409,
@@ -11346,13 +11292,9 @@
 "n": 344,
 "m": [
 "Tripes Paillard",
-"Bigard",
-"Jean Rozé",
 "Paul & Louise",
 "Paillard",
 "Sébire",
-"Férial",
-"Saveurs des mauges",
 "Saveur d'Auge"
 ]
 },
@@ -11604,9 +11546,6 @@
 "Vinaigre blanc": {
 "n": 110,
 "m": [
-"Edmond Fallot",
-"Martin Pouret",
-"Maille",
 "Bongou"
 ]
 },

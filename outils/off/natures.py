@@ -45,6 +45,31 @@ for b in ("obf", "opf", "opff"):
         sources.append(json.load(open(f"outils/off/natures_{b}.json", encoding="utf-8"))["natures"])
     except FileNotFoundError:
         pass
+# Marques égarées : une marque presque toujours vue dans un autre univers (« Clous » → Ducros, épices ;
+# « Jeans » → Jean Rozé, viande ; « Bar » → Teisseire, sirops) n'est pas gardée pour cette nature (01/11/2026).
+src_univers = open("lib/donnees/univers.dart", encoding="utf-8").read()
+univers_du_rayon = {r: u for u, rs in re.findall(r"'([^']+)': \[(.*?)\]", src_univers, re.S) for r in re.findall(r"'([^']+)'", rs)}
+rayon_de = lambda chemin: chemin.replace("Entretien / Droguerie", "Entretien-Droguerie").split("/")[0].replace("Entretien-Droguerie", "Entretien / Droguerie")
+# Le frais et le surgelé vendent les mêmes marques (Père Dodu, Bonduelle) ; les petits pots sont de l'épicerie.
+rapproches = {"Surgelés": "Produits frais"}
+univers_de = lambda chemin: "Épicerie et boissons" if rayon_de(chemin) == "Bébé" else rapproches.get(
+    univers_du_rayon.get(rayon_de(chemin), "?"), univers_du_rayon.get(rayon_de(chemin), "?"))
+par_univers = {}
+for natures in sources:
+    for chemin, v in natures.items():
+        for m, k in v["marques"]:
+            c = par_univers.setdefault(cle(m), {})
+            c[univers_de(chemin)] = c.get(univers_de(chemin), 0) + k
+
+
+def egaree(m, chemin):
+    c = par_univers[cle(m)]
+    tot = sum(c.values())
+    haut = max(c.values())
+    return c.get(univers_de(chemin), 0) < 0.1 * tot and haut >= 0.6 * tot
+
+
+egarees = []
 nombres, comptes = {}, {}
 for natures in sources:
     for chemin, v in natures.items():
@@ -56,6 +81,9 @@ for natures in sources:
         if chemin.startswith("Fruits et légumes/") or nom in sans_marques:
             continue
         for m, k in v["marques"]:
+            if egaree(m, chemin):
+                egarees.append((nom, m))
+                continue
             m = accents.get(m, m)
             c[m] = c.get(m, 0) + k
 res = {}
@@ -64,5 +92,6 @@ for nom, n in nombres.items():
     res[nom] = {"n": n, **({"m": marques} if marques else {})}
 json.dump({"_description": ext["_description"] + " ; plus Open Beauty, Products et Pet Food Facts ; marques d'enseigne retirées (outils/off/natures.py)",
            "natures": dict(sorted(res.items()))}, open("assets/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+print(len(egarees), "marques égarées retirées, par exemple", egarees[:20])
 print(len(res), "natures,", sum(1 for x in res.values() if "m" in x), "avec des marques,",
       sum(len(x.get("m", [])) for x in res.values()), "marques en tout")
