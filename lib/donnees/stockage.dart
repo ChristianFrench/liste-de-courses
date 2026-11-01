@@ -494,6 +494,9 @@ class Stockage {
     final maintenant = DateTime.now().toUtc().toIso8601String().substring(0, 19);
     final lignes = _lignes(etat);
     erreurs.clear();
+    // Ce qui était écrit avant : rendu tel quel si l'écriture est annulée (avant le 01/11/2026, tout était oublié
+    // et la reprise réécrivait chacune des dizaines de milliers de lignes : plusieurs secondes par coche).
+    final ecritAvant = Map.of(_ecrit);
     final requetes = <String, CommonPreparedStatement>{};
     CommonPreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
 
@@ -555,7 +558,9 @@ class Stockage {
       _db.execute('COMMIT');
     } catch (_) {
       _db.execute('ROLLBACK');
-      _ecrit.clear();
+      _ecrit
+        ..clear()
+        ..addAll(ecritAvant);
       rethrow;
     } finally {
       for (final r in requetes.values) {
