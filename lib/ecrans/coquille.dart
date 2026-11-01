@@ -58,21 +58,28 @@ class BarreOnglets extends StatelessWidget {
                 label: entrees[i].$2,
                 child: InkWell(
                   onTap: () => onChoix(i),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 56,
-                        height: 30,
-                        decoration: BoxDecoration(
-                          color: i == actif ? Charte.accent : null,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        child: Icone(entrees[i].$1, size: 24, color: i == actif ? Charte.blanc : Charte.cadre),
+                  // 01/11/2026 (Aristide) : grande icône, le libellé posé dessus, en bas.
+                  child: Center(
+                    child: Container(
+                      width: 72,
+                      height: Charte.barreOnglets - 6,
+                      decoration: BoxDecoration(
+                        color: i == actif ? Charte.clair(Charte.accent, 0.55) : null,
+                        borderRadius: BorderRadius.circular(14),
                       ),
-                      const SizedBox(height: 2),
-                      Text(entrees[i].$2, style: Charte.texte(Charte.tNavigation, gras: i == actif)),
-                    ],
+                      child: Stack(alignment: Alignment.center, children: [
+                        Positioned(top: 0, child: Icone(entrees[i].$1, size: 46, color: Charte.cadre)),
+                        Positioned(
+                          bottom: 1,
+                          child: Text(entrees[i].$2,
+                              style: Charte.texte(Charte.tNavigation + 1, gras: true, couleur: Charte.encre).copyWith(shadows: const [
+                                Shadow(color: Color(0xFFFFFFFF), blurRadius: 3),
+                                Shadow(color: Color(0xFFFFFFFF), blurRadius: 2),
+                                Shadow(color: Color(0xFFFFFFFF), blurRadius: 1),
+                              ])),
+                        ),
+                      ]),
+                    ),
                   ),
                 ),
               ),

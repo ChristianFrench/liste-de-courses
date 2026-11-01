@@ -569,7 +569,7 @@ class Etat extends ChangeNotifier {
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
 
-  /// Famille d'icônes en couleur : 'fluent3d' (par défaut) ou 'noto' (Paramètres › Apparence).
+  /// Famille d'icônes en couleur : 'fluent3d' (par défaut), 'noto' ou 'twemoji' (Paramètres › Apparence).
   String? icones;
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;

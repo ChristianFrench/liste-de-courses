@@ -45,6 +45,7 @@ flutter:
     - assets/pictos/png/
     - assets/icones/noto/
     - assets/icones/fluent3d/
+    - assets/icones/twemoji/
   fonts:
     - family: Atkinson
       fonts:

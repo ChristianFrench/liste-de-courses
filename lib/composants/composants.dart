@@ -528,13 +528,15 @@ class TitreGroupe extends StatelessWidget {
     final encre = Charte.fonce(base);
     final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
     // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
-    Widget deborde(Widget w) => SizedBox(width: 30, height: 30, child: OverflowBox(maxWidth: 38, maxHeight: 38, child: w));
+    // 01/11/2026 (Aristide) : plus grande, avec un très léger débord vers le bas.
+    Widget deborde(Widget w) => SizedBox(
+        width: 34, height: 30, child: OverflowBox(maxWidth: 46, maxHeight: 46, alignment: const Alignment(0, 0.35), child: w));
     final signe = !grand
         ? null
         : image != null
-            ? deborde(Pictogramme(image!, taille: 38)) // sans rond (01/11/2026, Aristide)
+            ? deborde(Pictogramme(image!, taille: 46)) // sans rond (01/11/2026, Aristide)
             : icone != null
-                ? deborde(Icone(icone, size: 38, color: encre))
+                ? deborde(Icone(icone, size: 46, color: encre))
                 : null;
     return Material(
       color: Charte.clair(base),

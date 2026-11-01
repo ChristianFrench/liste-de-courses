@@ -132,7 +132,7 @@ class EcranApparence extends _EcranVivant {
       ChoixDeroulant<String>(
         libelle: 'Icônes',
         valeur: Charte.familleIcones,
-        choix: const {'fluent3d': 'Fluent 3D (Microsoft), en relief', 'noto': 'Noto (Google)'},
+        choix: const {'fluent3d': 'Fluent 3D (Microsoft), en relief', 'noto': 'Noto (Google)', 'twemoji': 'Twemoji (X), à plat'},
         onChange: (v) {
           etat.choisirIcones(v);
           Charte.choisirIcones(v);
