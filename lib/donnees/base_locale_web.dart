@@ -88,3 +88,27 @@ Future<bool> prendreVerrou() async {
   verrous.request(demonstration ? 'liste-de-courses-demo' : 'liste-de-courses-base', {'ifAvailable': true}.jsify() as JSObject, rappel.toJS);
   return obtenu.future;
 }
+
+// Journal de l'appareil (01/11/2026) : gardé à part de la base (localStorage), pour voir ce qui s'est passé
+// même si la base perd des écritures.
+@JS('localStorage')
+external _Stockage? get _local;
+
+extension type _Stockage._(JSObject _) implements JSObject {
+  external String? getItem(String cle);
+  external void setItem(String cle, String valeur);
+}
+
+String lireJournal(String dossier) {
+  try {
+    return _local?.getItem(demonstration ? 'ldc_journal_demo' : 'ldc_journal') ?? '';
+  } catch (_) {
+    return '';
+  }
+}
+
+void ecrireJournal(String dossier, String texte) {
+  try {
+    _local?.setItem(demonstration ? 'ldc_journal_demo' : 'ldc_journal', texte);
+  } catch (_) {}
+}

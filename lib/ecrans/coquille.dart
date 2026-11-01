@@ -258,7 +258,10 @@ class AlerteEnregistrement extends StatefulWidget {
 class _AlerteEnregistrementState extends State<AlerteEnregistrement> {
   late final AppLifecycleListener _cycle = AppLifecycleListener(
     onInactive: ecrireSurDisque,
-    onHide: ecrireSurDisque,
+    onHide: () {
+      Etat.instance.noterMiseEnRetrait();
+      ecrireSurDisque();
+    },
     onPause: ecrireSurDisque,
   );
 

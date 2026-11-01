@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../composants/composants.dart';
 import '../donnees/catalogue_commun.dart';
@@ -186,6 +187,12 @@ class EcranDonnees extends _EcranVivant {
               ? Nav.aller<void>(context, const EcranEditeurCatalogue())
               : _deverrouillerEditeur(context),
         ),
+      LigneMenu(
+        icone: Icons.receipt_long_outlined,
+        titre: 'Journal de l\'appareil',
+        sousTitre: 'Ouvertures et fermetures, avec l\'état de la base',
+        onTap: () => _journal(context),
+      ),
     ], actions: [
       ActionLigne(Icons.restore, 'Remettre les listes exemples', () => _exemples(context)),
     ]);
@@ -601,4 +608,24 @@ class _ChoixPalette extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Journal de l'appareil : à copier pour Claude quand des données semblent perdues.
+Future<void> _journal(BuildContext context) async {
+  final lignes = Etat.instance.journalAppareil;
+  final copier = await confirmer(
+    context,
+    titre: 'Journal de l\'appareil',
+    icone: Icons.receipt_long_outlined,
+    contenu: ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 420),
+      child: SingleChildScrollView(
+        child: SelectableText(lignes.isEmpty ? 'Rien encore.' : lignes.take(60).join('\n\n'),
+            style: Charte.texte(12, couleur: Charte.texteSecondaire)),
+      ),
+    ),
+    plein: 'Fermer',
+    contour: 'Copier',
+  );
+  if (copier == true) await Clipboard.setData(ClipboardData(text: lignes.join('\n')));
 }

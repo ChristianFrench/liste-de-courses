@@ -12,6 +12,7 @@ import 'demonstration.dart';
 import 'moderation.dart';
 import 'images_choisies.dart';
 import 'stockage.dart';
+import 'version.dart';
 
 // Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
 // au schéma v2 (stockage.dart). Chaque action est enregistrée immédiatement.
@@ -632,6 +633,7 @@ class Etat extends ChangeNotifier {
         await _reparerSiAbimee();
         await _reprendreDemonstration();
         await _ouvrirActif();
+        noter('Ouverture ${versionApplication}${reparationBase == null ? '' : ' · $reparationBase'} · ${resumeBase()}');
         return;
       } catch (e, pile) {
         debugPrint('Base locale indisponible : $e');
@@ -646,6 +648,41 @@ class Etat extends ChangeNotifier {
       }
     }
     lire(await _donneesDemo());
+  }
+
+  // ------------------------------------------------------------ Journal de l'appareil (01/11/2026)
+  // Le web a perdu des modifications du catalogue entre deux ouvertures sans qu'on sache pourquoi : l'appareil
+  // note à chaque ouverture et à chaque mise en arrière-plan l'état de sa base, hors de la base.
+
+  /// Lignes du journal, la plus récente en premier.
+  List<String> get journalAppareil {
+    final d = _dossier;
+    if (d == null) return const [];
+    final t = lireJournal(d);
+    return t.isEmpty ? const [] : t.split('\n');
+  }
+
+  void noter(String texte) {
+    final d = _dossier;
+    if (d == null || !enregistrementActif) return;
+    final h = DateTime.now().toIso8601String().substring(0, 19).replaceFirst('T', ' ');
+    ecrireJournal(d, ['$h  $texte', ...journalAppareil.take(299)].join('\n'));
+  }
+
+  /// Ce que contient le foyer, en chiffres : pour comparer d'une ouverture à l'autre.
+  String resumeBase() {
+    final m = magasinReference;
+    final nonPlaces = m == null ? 0 : produits.where((p) => produitVisible(p) && secteurDe(m.id, p.id) == null).length;
+    return 'rayons ${rayonsCatalogue.length}, secteurs ${m == null ? 0 : secteurs.where((x) => rayon(x.rayonId)?.magasinId == m.id).length}, '
+        'produits ${produits.length} (ajoutés ${produitsAjoutes.length}), non placés $nonPlaces, '
+        'emplacements ${emplacements.length}, structure ajoutée ${structurePerso.length}, listes ${listes.length}';
+  }
+
+  /// Mise en arrière-plan ou fermeture : état de la base et des écritures sur le disque.
+  void noterMiseEnRetrait() {
+    final attente = kIsWeb ? ' · écritures sur le disque : ${disqueBloque ? 'BLOQUÉES' : 'à jour'}'
+        '${derniereEcritureDisque == null ? '' : ', dernière à ${derniereEcritureDisque!.toIso8601String().substring(11, 19)}'}' : '';
+    noter('Mise en arrière-plan · ${resumeBase()}$attente');
   }
 
   /// Compte rendu de la réparation de la base faite au lancement, repris dans le journal du partage.

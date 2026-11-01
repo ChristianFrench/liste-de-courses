@@ -33,3 +33,15 @@ Future<bool> prendreVerrou() async => true;
 
 /// Sur disque, SQLite écrit directement : rien à attendre.
 Future<void> ecrireSurDisque() async {}
+
+/// Journal de l'appareil, à côté des bases.
+String lireJournal(String d) {
+  final f = File('$d${Platform.pathSeparator}journal.txt');
+  return f.existsSync() ? f.readAsStringSync() : '';
+}
+
+void ecrireJournal(String d, String texte) {
+  try {
+    File('$d${Platform.pathSeparator}journal.txt').writeAsStringSync(texte);
+  } catch (_) {}
+}
