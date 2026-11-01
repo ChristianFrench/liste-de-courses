@@ -108,35 +108,6 @@ class EcranApparence extends _EcranVivant {
           Charte.choisirPalette(v);
         },
       ),
-      const SizedBox(height: 14),
-      // 01/11/2026 (Aristide) : deux familles d'icônes en couleur, au choix.
-      ChoixDeroulant<String>(
-        libelle: 'Icônes',
-        valeur: Charte.familleIcones,
-        choix: const {'noto3d': 'Noto 3D (Google)', 'fluent3d': 'Fluent 3D (Microsoft)', 'twemoji': 'Twemoji (X), à plat'},
-        onChange: (v) {
-          etat.choisirIcones(v);
-          Charte.choisirIcones(v);
-        },
-      ),
-      Padding(
-        padding: const EdgeInsets.only(top: 8),
-        child: Row(children: [
-          for (final i in [Icons.home_outlined, Icons.checklist, Icons.shopping_cart_outlined, Icons.tune, Icons.storefront_outlined, Icons.delete_outline, Icons.edit_outlined])
-            Padding(padding: const EdgeInsets.only(right: 10), child: Icone(i, size: 32)),
-        ]),
-      ),
-      const SizedBox(height: 14),
-      ChoixDeroulant<bool>(
-        libelle: 'Images des rayons et secteurs',
-        valeur: Charte.imagesOrigine,
-        choix: const {false: 'Comme les icônes', true: 'Dessins d\'origine'},
-        onChange: (v) {
-          etat.choisirImagesOrigine(v);
-          Charte.imagesOrigine = v;
-          Charte.choisirIcones(Charte.familleIcones);
-        },
-      ),
       const TitreSection('Couleur des cadres', cote: 0),
       for (final (cle, nom, couleur) in [
         ('promo', 'Promotions', etat.couleurPromotions),
@@ -582,7 +553,7 @@ class EcranTypesPackaging extends StatelessWidget {
 }
 
 /// Pastille d'une palette : ses teintes, du plus foncé au plus pâle, et son nom.
-/// Échantillon d'une palette : son dégradé, du plus foncé au plus clair.
+/// Échantillon d'une palette : ses quatre niveaux, du plus foncé au plus clair (ceux de [Charte.niveau]).
 class _Echantillon extends StatelessWidget {
   const _Echantillon(this.palette);
   final Palette palette;
@@ -591,8 +562,8 @@ class _Echantillon extends StatelessWidget {
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          for (final c in [palette.accentFonce, palette.accent, palette.fondSelection, palette.fondBarre])
-            Container(width: 18, height: 22, color: c),
+          for (final t in const [0.0, 0.30, 0.60, 0.82])
+            Container(width: 18, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
         ]),
       );
 }

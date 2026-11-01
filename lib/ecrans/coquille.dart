@@ -4,6 +4,7 @@ import 'dart:async';
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 
+import '../composants/barre_ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
@@ -133,9 +134,9 @@ class Coquille extends StatelessWidget {
   }
 }
 
-/// Mise à jour faite à l'ouverture : plus de fenêtre (01/11/2026, Aristide), une barre de progression très
-/// légère en haut de l'écran, sur le bandeau, avec un petit texte : « Synchronisation » en foyer,
-/// « Initialisation » pour un appareil seul.
+/// Mise à jour faite à l'ouverture : plus de fenêtre (01/11/2026, Aristide), une barre de progression légère
+/// sur la photo de l'accueil, au-dessus de « Comment ça marche » ([BarreOuverture]) : « Synchronisation » en
+/// foyer, « Initialisation » pour un appareil seul.
 class GuetteurMiseAJour extends StatefulWidget {
   const GuetteurMiseAJour({super.key, required this.child});
   final Widget child;
@@ -147,7 +148,6 @@ class GuetteurMiseAJour extends StatefulWidget {
 class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
   final _debut = DateTime.now();
   Timer? _minuteur;
-  bool _visible = true;
   DateTime? _finie;
 
   @override
@@ -169,48 +169,25 @@ class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
 
   void _avancer() {
     if (!mounted) return;
-    if (_progres >= 1) {
+    final o = Synchro.instance.ouverture;
+    final valeur = _progres;
+    if (valeur >= 1) {
       _finie ??= DateTime.now();
       // La barre pleine reste un instant, puis disparaît.
       if (DateTime.now().difference(_finie!).inMilliseconds > 400) {
         _minuteur?.cancel();
-        _visible = false;
+        ouvertureEnCours.value = null;
+        return;
       }
     }
-    setState(() {});
+    ouvertureEnCours.value = (
+      texte: !_foyer ? 'Initialisation' : (o != null && o.horsLigne ? 'Hors ligne' : 'Synchronisation'),
+      valeur: valeur,
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    if (!_visible) return widget.child;
-    final o = Synchro.instance.ouverture;
-    final texte = !_foyer ? 'Initialisation' : (o != null && o.horsLigne ? 'Hors ligne' : 'Synchronisation');
-    return Stack(children: [
-      widget.child,
-      Positioned(
-        top: MediaQuery.of(context).padding.top + 2,
-        left: 12,
-        right: 12,
-        child: IgnorePointer(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(texte,
-                style: Charte.texte(11, couleur: Charte.blanc)
-                    .copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 4)], decoration: TextDecoration.none)),
-            const SizedBox(height: 2),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(2),
-              child: LinearProgressIndicator(
-                value: _progres,
-                minHeight: 3,
-                backgroundColor: const Color(0x55FFFFFF),
-                valueColor: AlwaysStoppedAnimation(Charte.clair(Charte.accent, 0.3)),
-              ),
-            ),
-          ]),
-        ),
-      ),
-    ]);
-  }
+  Widget build(BuildContext context) => widget.child;
 }
 
 /// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du

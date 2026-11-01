@@ -1,6 +1,7 @@
 import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
+import '../composants/barre_ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../theme.dart';
@@ -148,6 +149,7 @@ class _EnTetePhoto extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const BarreOuverture(),
                   Container(
                     constraints: const BoxConstraints(minHeight: 36),
                     alignment: Alignment.centerLeft,

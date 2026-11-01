@@ -435,7 +435,7 @@ String rangement(Produit p) {
 
 LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = false}) => LigneMenu(
       titre: p.nom,
-      icone: Icons.shopping_basket_outlined,
+      // 01/11/2026 (Aristide) : pas d'icône sur les produits.
       apresTitre: SignePerso(p),
       sousTitre: avecRangement ? rangement(p) : _description(p),
       onTap: () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id)),
@@ -595,7 +595,10 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           nom: u,
           grand: true,
           icone: apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined,
-          // 01/11/2026 (Aristide) : plus de couleur propre à chaque univers, la palette choisie partout.
+          // 01/11/2026 (Aristide) : la palette choisie partout, à un niveau par profondeur (univers, rayon, secteur) ;
+          // icônes plus petites que dans les autres listes.
+          fond: Charte.niveau(2),
+          tailleSigne: 30,
           nombre: rayonsU.length,
           ouvert: uOuvert,
           onTap: () => plis.basculer(_cleU(u))));
@@ -609,6 +612,8 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               nom: x.nom,
               grand: true,
               image: cleRayon(x.nom),
+              fond: Charte.niveau(3),
+              tailleSigne: 30,
               ajoute: etat.rayonAjoute(x),
               nombre: etat.secteursVisibles(x.id).length,
               ouvert: rOuvert,
@@ -624,6 +629,8 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
             titre: sec.nom,
             apresTitre: etat.secteurAjoute(sec) ? const SigneAjoute() : null,
             gauche: imageSecteur(context, sec),
+            tailleGauche: 26,
+            fond: Charte.niveau(4),
             sousTitre: _pluriel(produits.length, 'produit'),
             droite: Icone(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
             onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),

@@ -484,8 +484,21 @@ class TitreGroupe extends StatelessWidget {
       this.couleur,
       this.pictoDebordant,
       this.pictoGauche = 14,
+      this.fond,
+      this.tailleSigne = 46,
+      this.signeAuDessus = false,
       this.onTap});
   final String nom;
+
+  /// Fond imposé (catalogue : univers, rayons et secteurs à des niveaux différents de la palette).
+  final Color? fond;
+
+  /// Taille de l'icône ou de l'image d'un bandeau [grand] (46 : elle déborde un peu vers le bas).
+  final double tailleSigne;
+
+  /// L'icône est dessinée par-dessus, par [GroupeRetractable], pour ne pas être recouverte par la ligne suivante :
+  /// le bandeau ne fait que lui garder sa place.
+  final bool signeAuDessus;
 
   /// Image du secteur en début de bandeau (place réservée ; elle est dessinée par [SectionDebordante]).
   final String? pictoDebordant;
@@ -523,23 +536,27 @@ class TitreGroupe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 01/11/2026 (Aristide) : fond éclairci, texte dans la teinte foncée de la même couleur.
+    // 01/11/2026 (Aristide) : fond clair (niveau 4 de la palette), texte dans la teinte la plus sombre ;
+    // texte blanc sur un fond imposé sombre.
     final base = nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent);
-    final encre = Charte.fonce(base);
+    final couleurFond = fond ?? (nonPlace || couleur != null ? Charte.clair(base) : Charte.niveau(4));
+    final encre = couleurFond.computeLuminance() < 0.3 ? Charte.blanc : (nonPlace || couleur != null ? Charte.fonce(base) : Charte.niveau(1));
     final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
     // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
     // 01/11/2026 (Aristide) : plus grande ; elle ne dépasse pas en haut, le léger débord est en bas.
     Widget deborde(Widget w) => SizedBox(
-        width: 34, height: 30, child: OverflowBox(maxWidth: 46, maxHeight: 46, alignment: const Alignment(0, -0.8), child: w));
+        width: 34,
+        height: 30,
+        child: signeAuDessus ? null : OverflowBox(minWidth: 0, minHeight: 0, maxWidth: tailleSigne, maxHeight: tailleSigne, alignment: const Alignment(0, -0.8), child: w));
     final signe = !grand
         ? null
         : image != null
-            ? deborde(Pictogramme(image!, taille: 46)) // sans rond (01/11/2026, Aristide)
+            ? deborde(Pictogramme(image!, taille: tailleSigne)) // sans rond (01/11/2026, Aristide)
             : icone != null
-                ? deborde(Icone(icone, size: 46, color: encre))
+                ? deborde(Icone(icone, size: tailleSigne, color: encre))
                 : null;
     return Material(
-      color: Charte.clair(base),
+      color: couleurFond,
       child: InkWell(
         onTap: onTap,
         child: Stack(clipBehavior: Clip.none, children: [
@@ -665,7 +682,20 @@ class GroupeRetractable extends StatelessWidget {
     );
   }
 
+  /// Débord de l'icône du bandeau sous le bandeau (46 px dans un bandeau de 40).
+  static const _debord = 10.0;
+
   Widget _construire(BuildContext context, bool ouvert) {
+    final signe = image != null ? Pictogramme(image!, taille: 46) : (icone != null ? Icone(icone, size: 46) : null);
+    // 01/11/2026 (Aristide) : l'icône qui déborde vers le bas reste au premier plan, par-dessus la ligne
+    // suivante ; replié, le groupe laisse la place de ce débord.
+    return Stack(clipBehavior: Clip.none, children: [
+      _colonne(context, ouvert, signe != null),
+      if (signe != null) Positioned(left: 6, top: 3, width: 46, height: 46, child: IgnorePointer(child: signe)),
+    ]);
+  }
+
+  Widget _colonne(BuildContext context, bool ouvert, bool avecSigne) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -677,6 +707,7 @@ class GroupeRetractable extends StatelessWidget {
           grand: true,
           image: image,
           icone: icone,
+          signeAuDessus: true,
           ouvert: pliable ? ouvert : null,
           onTap: pliable
               ? () => Retractables.i.basculer(cle, parDefaut: parDefaut)
@@ -698,6 +729,7 @@ class GroupeRetractable extends StatelessWidget {
             ],
           ),
         ),
+        if (avecSigne && (!ouvert || (enfants.isEmpty && vide == null))) const SizedBox(height: _debord),
       ],
     );
   }
@@ -1595,8 +1627,14 @@ class BoutonAction extends StatelessWidget {
 /// [icone] et [gauche] ne sont plus affichés.
 class LigneMenu extends StatelessWidget {
   const LigneMenu(
-      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre});
+      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre, this.fond, this.tailleGauche = 32});
   final String titre;
+
+  /// Fond de la ligne (catalogue : les secteurs) ; sinon le fond de l'application.
+  final Color? fond;
+
+  /// Place de l'icône ou de l'image de tête.
+  final double tailleGauche;
 
   /// Petit signe après le titre (ex. : produit ajouté ou modifié par le foyer).
   final Widget? apresTitre;
@@ -1611,7 +1649,7 @@ class LigneMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     final signe = gauche ?? (icone == null ? null : Icone(icone, size: 24, color: Charte.cadre));
     return Material(
-      color: Charte.fond,
+      color: fond ?? Charte.fond,
       child: InkWell(
         onTap: onTap,
         child: Container(
@@ -1620,7 +1658,7 @@ class LigneMenu extends StatelessWidget {
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
             children: [
-              if (signe != null) ...[SizedBox(width: 32, height: 32, child: FittedBox(child: signe)), const SizedBox(width: 10)],
+              if (signe != null) ...[SizedBox(width: tailleGauche, height: tailleGauche, child: FittedBox(child: signe)), const SizedBox(width: 10)],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

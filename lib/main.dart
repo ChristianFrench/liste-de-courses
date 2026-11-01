@@ -20,8 +20,6 @@ Future<void> main() async {
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
   await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
-  if (Etat.instance.icones != null) Charte.choisirIcones(Etat.instance.icones!);
-  Charte.imagesOrigine = Etat.instance.imagesOrigine;
   // Démonstration : un foyer seul, sans partage ni catalogue commun (rien n'en sort, rien n'y entre)
   if (demonstration && Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur

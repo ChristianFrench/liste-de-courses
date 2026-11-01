@@ -26,7 +26,7 @@ def ecrire(famille, code, sortie):
 
 carte = json.load(open('outils/icones_noto.json'))
 pictos = [l.split(' ', 1) for l in open('outils/pictos_emoji.txt', encoding='utf8').read().strip().split('\n')]
-for famille in ('noto3d', 'fluent3d'):
+for famille in ('noto3d',):  # 01/11/2026 (Aristide) : Noto 3D seulement ; Fluent 3D reste possible ici
     for nom in sorted(set(carte.values())):
         ecrire(famille, codes[nom][0], f'assets/icones/{famille}/{nom}.png')
     for cle, emoji in pictos:
