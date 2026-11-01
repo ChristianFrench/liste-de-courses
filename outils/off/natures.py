@@ -28,7 +28,12 @@ exclues |= {cle(x) for x in [
     # hors alimentaire (Open Beauty, Products et Pet Food Facts) : marques d'enseigne et groupes industriels
     "Cosmia", "Auchan Baby", "Kids", "Unilever", "Henkel", "Groupe SEB France", "L'Oreal Consumer products", "Up2Fashion",
     "Les Cosmétiques Design Paris", "Better life", "Inventiv", "Nectar of Beauty", "Bio naïa",
+    # enseignes et appellations prises pour des marques (relu le 01/11/2026)
+    "Toupargel", "Dia", "Carrefour Original", "Metro Chef", "Marks And Spencer", "Bayonne", "Parma", "Comté", "Roquefort", "Lotte", "Terroir",
 ]}
+# Natures dont Open Food Facts ne donne que des produits d'autre sorte (« Bar » → sirops Teisseire,
+# « Ficelle » → crêpes, « Rillettes » → rillettes de poisson) : pas de marques prises.
+sans_marques = {"Bar", "Lotte", "Ficelle", "Rillettes"}
 # Graphies accentuées perdues par l'extraction du 31/10/2026 (corrigé depuis dans extraire.py).
 accents = {"President": "Président", "Cote d'Or": "Côte d'Or", "Nestle": "Nestlé", "Herta": "Herta",
            "kiabi": "Kiabi", "Van|Rysel": "Van Rysel", "royal canin": "Royal Canin", "handy bag": "Handy Bag"}
@@ -48,7 +53,7 @@ for natures in sources:
         c = comptes.setdefault(nom, {})
         # Fruits et légumes frais : Open Food Facts n'y trouve presque que des conserves, épices et soupes
         # (« Ail » → Ducros, « Haricots verts » → Bonduelle) ; pas de marques prises (01/11/2026).
-        if chemin.startswith("Fruits et légumes/"):
+        if chemin.startswith("Fruits et légumes/") or nom in sans_marques:
             continue
         for m, k in v["marques"]:
             m = accents.get(m, m)

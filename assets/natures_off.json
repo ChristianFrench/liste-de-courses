@@ -441,13 +441,7 @@
 ]
 },
 "Bar": {
-"n": 272,
-"m": [
-"Pural",
-"Teisseire",
-"9bar",
-"Le Comptoir de Mathilde"
-]
+"n": 272
 },
 "Barbecue": {
 "n": 1
@@ -665,9 +659,9 @@
 "Les Croisés",
 "Isigny Ste Mère",
 "Grand Fermage",
-"Dia",
 "Paysan Breton",
-"Beillevaire"
+"Beillevaire",
+"C'est qui le patron ?!"
 ]
 },
 "Biberons": {
@@ -864,8 +858,7 @@
 "n": 43,
 "m": [
 "Fleury Michon",
-"Saint Alby",
-"Dia"
+"Saint Alby"
 ]
 },
 "Blancs d'œufs liquides": {
@@ -1173,8 +1166,8 @@
 "Pecheries Basques",
 "Delpierre",
 "Le Grand Lejon",
-"Toupargel",
-"La Cuisine du Poissonnier"
+"La Cuisine du Poissonnier",
+"Toque du Chef"
 ]
 },
 "Bretzels": {
@@ -1396,7 +1389,6 @@
 "Glaces des Alpes",
 "Gourmet Finest Cuisine",
 "Nestlé",
-"Toupargel",
 "Terres Bleues",
 "La Belle Aude",
 "Jampi"
@@ -1872,8 +1864,7 @@
 "Tradilège",
 "Pierre Schmidt",
 "Festein d'Alsace",
-"Stoeffler",
-"Terroir"
+"Stoeffler"
 ]
 },
 "Cervelle d'agneau": {
@@ -2255,8 +2246,7 @@
 "m": [
 "Tablette d'Or",
 "Nestlé",
-"Rochambeau",
-"Dia"
+"Rochambeau"
 ]
 },
 "Chocolats de Noël": {
@@ -2330,7 +2320,6 @@
 "Pierre Schmidt",
 "Produits de la Cigogne",
 "William Saurin",
-"Terroir",
 "Stemmelen",
 "La Ronde des Gourmands",
 "Côté Table",
@@ -2480,7 +2469,6 @@
 "Del Monte",
 "Escal",
 "Metro",
-"Metro Chef",
 "Mocitos"
 ]
 },
@@ -2498,7 +2486,6 @@
 "Vitamont",
 "River",
 "Jean's",
-"Dia",
 "Sodastream",
 "Pepsi",
 "Look"
@@ -2520,9 +2507,9 @@
 "Côté Table",
 "Sélection des Mousquetaires",
 "Les Mousquetaires",
-"Toupargel",
 "Golden Seafood",
-"Argel"
+"Argel",
+"Aldi Einkauf GmbH & Compagnie-oHG"
 ]
 },
 "Collants": {
@@ -2605,13 +2592,13 @@
 "JuraFlore",
 "Le Berger Comtois",
 "Marcel Petite",
-"Comté",
 "Le Fromager Des Halles",
 "Entremont",
 "Rivoire jacquemin",
 "Fromageries Arnaud",
 "Jean Perrin",
-"Les Croisés"
+"Les Croisés",
+"Président"
 ]
 },
 "Concentré de cassis": {
@@ -2958,10 +2945,7 @@
 ]
 },
 "Coupes glacées": {
-"n": 23,
-"m": [
-"Toupargel"
-]
+"n": 23
 },
 "Courge butternut": {
 "n": 31
@@ -2982,7 +2966,6 @@
 "n": 86,
 "m": [
 "Garbit",
-"Toupargel",
 "Toque du Chef",
 "La cuisine des Saveurs"
 ]
@@ -3246,7 +3229,6 @@
 "Crème liquide": {
 "n": 140,
 "m": [
-"Metro Chef",
 "Lait Plaisirs",
 "Natur Avenir"
 ]
@@ -3371,8 +3353,7 @@
 "n": 123,
 "m": [
 "Volaé",
-"Maître CoQ",
-"Carrefour Original"
+"Maître CoQ"
 ]
 },
 "Cuisses de poulet surgelées": {
@@ -3441,7 +3422,6 @@
 "n": 189,
 "m": [
 "Crespo",
-"Metro Chef",
 "Rustica",
 "En Cuisine",
 "Horeca",
@@ -3770,8 +3750,8 @@
 "Rochambeau",
 "Carola",
 "Cristalline",
-"Dia",
-"Evian"
+"Evian",
+"Kirkland"
 ]
 },
 "Eau de toilette": {
@@ -3973,7 +3953,7 @@
 "Maitre Coquille",
 "Sabarot",
 "Roger Dutruy",
-"Toupargel"
+"Valdélice"
 ]
 },
 "Esquimaux": {
@@ -4097,7 +4077,6 @@
 "Feuilletés": {
 "n": 607,
 "m": [
-"Toupargel",
 "Française de Gastronomie",
 "Pierre Clot",
 "La compagnie artique",
@@ -4106,7 +4085,8 @@
 "Maréval",
 "Eismann",
 "Tipiak",
-"Sapresti"
+"Sapresti",
+"Bon Vivant"
 ]
 },
 "Feutres": {
@@ -4116,14 +4096,7 @@
 ]
 },
 "Ficelle": {
-"n": 77,
-"m": [
-"La Crêpe de Brocéliande",
-"Maes",
-"Dessaint",
-"SDB Traiteur",
-"Dessaint Traiteur"
-]
+"n": 77
 },
 "Figues": {
 "n": 581
@@ -4167,7 +4140,6 @@
 "m": [
 "Cité Marine",
 "Findus",
-"Toupargel",
 "Sacrebleu",
 "L'assiette Bleue",
 "La Cuisine du Poissonnier",
@@ -4310,7 +4282,6 @@
 "n": 135,
 "m": [
 "Alsa",
-"Toupargel",
 "Tartefrais"
 ]
 },
@@ -4491,10 +4462,10 @@
 "Yoplait",
 "Beillevaire",
 "Laiterie Les Fayes",
-"Metro Chef",
 "Le Clos des Vaches",
 "Ferme Adam",
-"Nejelis"
+"Nejelis",
+"Nova"
 ]
 },
 "Fromage de brebis": {
@@ -4504,7 +4475,6 @@
 "Istara",
 "Les Croisés",
 "La Bergerie",
-"Metro Chef",
 "Corsica",
 "Savencia",
 "Etorki",
@@ -5094,7 +5064,6 @@
 "n": 456,
 "m": [
 "Marie",
-"Toupargel",
 "Toque du Chef",
 "Qualité Traiteur",
 "Fleury Michon",
@@ -5261,10 +5230,10 @@
 "Fleury Michon",
 "William Saurin",
 "Marie",
-"Toupargel",
 "Findus",
 "Isla Délice",
-"Voyager"
+"Voyager",
+"Tout feu tout frais"
 ]
 },
 "Hachis parmentier surgelé": {
@@ -5633,12 +5602,12 @@
 "Bell",
 "Aoste",
 "Fratelli Beretta",
-"Parma",
 "Dulano",
 "Negroni",
 "Villani",
 "Rovagnati",
-"Montorsi"
+"Montorsi",
+"Fleury Michon"
 ]
 },
 "Jambon de Bayonne": {
@@ -5648,18 +5617,15 @@
 "Aoste",
 "Michel Dupuy",
 "Saint-Azay",
-"Bayonne",
 "Despi",
 "Labeyrie",
 "Saint Alby",
-"Patrimoine Gourmand",
-"Terroir"
+"Patrimoine Gourmand"
 ]
 },
 "Jambon de Parme": {
 "n": 110,
 "m": [
-"Parma",
 "Citterio"
 ]
 },
@@ -6162,8 +6128,7 @@
 "Stéphan",
 "Hénaff",
 "Lechef",
-"Relais Gourmand",
-"Toupargel"
+"Relais Gourmand"
 ]
 },
 "Lapin": {
@@ -6217,7 +6182,6 @@
 "Lasagnes surgelées": {
 "n": 361,
 "m": [
-"Toupargel",
 "Toque du Chef",
 "Stefano Toselli",
 "Côté Table",
@@ -6226,7 +6190,8 @@
 "Panzani",
 "Celtigel",
 "Terbeke",
-"Comme j'aime"
+"Comme j'aime",
+"Saveur & Passion"
 ]
 },
 "Laurier": {
@@ -6460,11 +6425,7 @@
 "n": 1
 },
 "Lotte": {
-"n": 43,
-"m": [
-"Lotte",
-"Lechef"
-]
+"n": 43
 },
 "Louche": {
 "n": 3
@@ -7564,10 +7525,10 @@
 "Garbit",
 "La cuisine des Saveurs",
 "Zapetti",
-"Toupargel",
 "Agis",
 "Briau",
-"Lechef"
+"Lechef",
+"Marie"
 ]
 },
 "Paella surgelée": {
@@ -8051,7 +8012,6 @@
 "n": 366,
 "m": [
 "Tendriade",
-"Toupargel",
 "Comtesse du Barry",
 "Agis"
 ]
@@ -8174,8 +8134,7 @@
 "Notre Jardin",
 "D'aucy",
 "Jean nicolas",
-"Prosain",
-"Dia"
+"Prosain"
 ]
 },
 "Petits pois surgelés": {
@@ -8192,7 +8151,6 @@
 "Babybio",
 "Alsa",
 "Bonne Maman",
-"Carrefour Original",
 "La Grande Epicerie de Paris"
 ]
 },
@@ -8207,11 +8165,11 @@
 "Bisson",
 "Ker Cadélac",
 "Filet Bleu",
-"Dia",
 "Schär",
 "Nature & Cie",
 "Fauchon",
-"La Mère Poulard"
+"La Mère Poulard",
+"St Michel"
 ]
 },
 "Petits-suisses": {
@@ -8625,7 +8583,6 @@
 "Poêlée de légumes": {
 "n": 154,
 "m": [
-"Toupargel",
 "Bofrost",
 "Notre Jardin",
 "Bonduelle"
@@ -9154,7 +9111,6 @@
 "n": 292,
 "m": [
 "Marie",
-"Toupargel",
 "Côté Table",
 "Rochambeau"
 ]
@@ -9346,19 +9302,7 @@
 "n": 5
 },
 "Rillettes": {
-"n": 4794,
-"m": [
-"Petit Navire",
-"Groix & Nature",
-"Guyader",
-"Le Grand Lejon",
-"L'Atelier du Poissonnier",
-"Le Père Eugène",
-"Cap Océan",
-"Algoplus",
-"La Cancalaise",
-"La Chikolodenn"
-]
+"n": 4794
 },
 "Risotto": {
 "n": 827,
@@ -9520,7 +9464,6 @@
 "Gabriel Coulet",
 "Papillon",
 "Le Fromager Des Halles",
-"Roquefort",
 "Savencia",
 "Vernières Frères",
 "Les Croisés",
@@ -9729,15 +9672,13 @@
 "Fruity Pack",
 "Voie verte",
 "Metro",
-"Metro Chef"
+"Royal Bourbon"
 ]
 },
 "Salade de pâtes": {
 "n": 368,
 "m": [
 "Daylicious",
-"Dia",
-"Marks And Spencer",
 "L'Esprit Frais"
 ]
 },
@@ -10472,8 +10413,8 @@
 "Glaces des Alpes",
 "HDG",
 "Histoires de Glaces",
-"Toupargel",
-"Carte d'Or"
+"Carte d'Or",
+"La Manufacture des Belles Glaces"
 ]
 },
 "Sorbet citron": {
@@ -10613,11 +10554,11 @@
 "Socopa",
 "Bigard",
 "L'Étal du Boucher",
-"Toupargel",
 "Férial",
 "La Nouvelle Agriculture",
 "Oriental Viandes",
-"Isla Délice"
+"Isla Délice",
+"Chiron"
 ]
 },
 "Steaks hachés surgelés": {
@@ -11870,7 +11811,7 @@
 "Les éleveurs de la Charentonne",
 "Réghalal",
 "Douce France",
-"Metro Chef"
+"Volandrie"
 ]
 },
 "Épaule cuite": {
