@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
@@ -624,7 +625,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
             apresTitre: etat.secteurAjoute(sec) ? const SigneAjoute() : null,
             gauche: imageSecteur(context, sec),
             sousTitre: _pluriel(produits.length, 'produit'),
-            droite: Icon(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
+            droite: Icone(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
             onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
           ));
           if (!ouvert) continue;
@@ -1039,7 +1040,7 @@ class _LigneMarque extends StatelessWidget {
                 IconButton(
                   tooltip: 'Retirer',
                   onPressed: onSupprimer,
-                  icon: Icon(Icons.delete_outline, size: 22, color: Charte.couleurIcone(Icons.delete_outline)),
+                  icon: Icone(Icons.delete_outline, size: 22, color: Charte.couleurIcone(Icons.delete_outline)),
                 ),
             ]),
           ),

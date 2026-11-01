@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../donnees/images_choisies.dart';
 import '../donnees/pictos.dart';
+import 'icone.dart';
 
 // Images des rayons et des secteurs (assets/pictos/png), retrouvées par le nom.
 // Un rayon ou un secteur qui ne figure pas au catalogue type reçoit l'image la plus proche, ou aucune.
@@ -177,7 +178,7 @@ class ImageModifiable extends StatelessWidget {
                         shape: BoxShape.circle,
                         border: Border.all(color: const Color(0xFFBBBBBB)),
                       ),
-                      child: Icon(Icons.add_photo_alternate_outlined, size: taille * 0.5, color: const Color(0xFF777777)),
+                      child: Icone(Icons.add_photo_alternate_outlined, size: taille * 0.5, color: const Color(0xFF777777)),
                     ),
             ),
           ),

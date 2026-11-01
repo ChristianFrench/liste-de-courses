@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:flutter/material.dart' show Axis, Icons, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/icone.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/composants/signe_perso.dart';
@@ -1167,7 +1168,7 @@ void main() {
       await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
       await tester.pumpAndSettle();
       await _voir(tester, find.byKey(const ValueKey('marque-Candia')));
-      await _toucher(tester, find.descendant(of: find.byKey(const ValueKey('marque-Candia')), matching: find.byIcon(Icons.delete_outline)));
+      await _toucher(tester, find.descendant(of: find.byKey(const ValueKey('marque-Candia')), matching: find.byWidgetPredicate((w) => w is Icone && w.icon == Icons.delete_outline)));
       expect(find.text('Candia'), findsNothing);
       await tester.pump(const Duration(seconds: 6));
       await tester.pumpAndSettle();
@@ -1295,7 +1296,7 @@ void main() {
 
     testWidgets('le nuage montre seulement l\'état : voyant, sa signification, appareils', (tester) async {
       await _accueil(tester);
-      await _toucher(tester, find.byIcon(Icons.cloud_outlined).first);
+      await _toucher(tester, find.byWidgetPredicate((w) => w is Icone && w.icon == Icons.cloud_outlined).first);
       expect(find.text('Synchronisation'), findsOneWidget);
       expect(find.text('Foyer non partagé'), findsOneWidget);
       expect(find.text('Signification du voyant'), findsOneWidget);

@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'dart:async';
 
 // ignore_for_file: prefer_const_constructors
@@ -67,7 +68,7 @@ class BarreOnglets extends StatelessWidget {
                           color: i == actif ? Charte.accent : null,
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Icon(entrees[i].$1, size: 24, color: i == actif ? Charte.blanc : Charte.cadre),
+                        child: Icone(entrees[i].$1, size: 24, color: i == actif ? Charte.blanc : Charte.cadre),
                       ),
                       const SizedBox(height: 2),
                       Text(entrees[i].$2, style: Charte.texte(Charte.tNavigation, gras: i == actif)),
@@ -190,7 +191,7 @@ class _FenetreMiseAJour extends StatelessWidget {
             height: 22,
             child: enCours
                 ? const Padding(padding: EdgeInsets.all(2), child: CircularProgressIndicator(strokeWidth: 2.5))
-                : Icon(echec ? Icons.cloud_off : (faite ? Icons.check_circle : Icons.radio_button_unchecked),
+                : Icone(echec ? Icons.cloud_off : (faite ? Icons.check_circle : Icons.radio_button_unchecked),
                     size: 22, color: echec ? Charte.rouge : (faite ? Charte.accent : Charte.texteSecondaire)),
           ),
           const SizedBox(width: 12),
@@ -292,7 +293,7 @@ class _AlerteEnregistrementState extends State<AlerteEnregistrement> {
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
                     child: Row(children: [
-                      const Icon(Icons.warning_amber_rounded, color: Colors.white),
+                      const Icone(Icons.warning_amber_rounded, color: Colors.white),
                       const SizedBox(width: 8),
                       Expanded(child: Text(alerte, style: Charte.texte(14, gras: true, couleur: Colors.white))),
                     ]),

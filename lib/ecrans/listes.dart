@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
@@ -390,7 +391,7 @@ class _EcranParcoursState extends State<EcranParcours> {
                   Expanded(child: contenu),
                   ReorderableDragStartListener(
                     index: index,
-                    child: SizedBox(width: 44, height: 44, child: Icon(Icons.drag_handle, color: Charte.couleurIcone(Icons.drag_handle))),
+                    child: SizedBox(width: 44, height: 44, child: Icone(Icons.drag_handle, color: Charte.couleurIcone(Icons.drag_handle))),
                   ),
                 ],
               ),
@@ -428,7 +429,7 @@ class _EcranParcoursState extends State<EcranParcours> {
               ),
             ])),
           ),
-          Icon(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.encre),
+          Icone(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.encre),
         ],
       ),
     );

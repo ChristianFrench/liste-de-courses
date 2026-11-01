@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../donnees/import_texte.dart' show normaliser;
 import '../donnees/modele.dart';
 import '../theme.dart';
+import 'icone.dart';
 
 /// Nombre de lettres à taper avant que la liste des articles s'affiche.
 const lettresRecherche = 3;
@@ -187,7 +188,7 @@ class _ChampRechercheState extends State<ChampRecherche> {
             hintText: widget.aide,
             hintMaxLines: 2,
             hintStyle: Charte.texte(widget.largeur == null && widget.droite == null ? 14 : 17, couleur: Charte.texteSecondaire),
-            prefixIcon: Icon(Icons.search, color: Charte.cadre),
+            prefixIcon: Icone(Icons.search, color: Charte.cadre),
             prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 34),
             suffixIcon: ListenableBuilder(
               listenable: controleur,
@@ -195,7 +196,7 @@ class _ChampRechercheState extends State<ChampRecherche> {
                   ? const SizedBox.shrink()
                   : IconButton(
                       tooltip: 'Effacer',
-                      icon: const Icon(Icons.close),
+                      icon: const Icone(Icons.close),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(minWidth: 44, minHeight: 40),
                       onPressed: _fini),
@@ -275,7 +276,7 @@ class _ChampRechercheState extends State<ChampRecherche> {
                                   )
                                 : Row(
                                     children: [
-                                      Icon(Icons.add_circle_outline, color: Charte.cadre),
+                                      Icone(Icons.add_circle_outline, color: Charte.cadre),
                                       const SizedBox(width: 8),
                                       Expanded(
                                         child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),

@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -833,7 +834,7 @@ class LigneArticle extends StatelessWidget {
                     borderRadius: BorderRadius.circular(3),
                     border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
                   ),
-                  child: Icon(Icons.close, size: 16, color: Charte.rouge),
+                  child: Icone(Icons.close, size: 16, color: Charte.rouge),
                 )
               else
                 CaseACocher(coche: coche, taille: 20),
@@ -1126,7 +1127,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
                 alignment: Alignment.centerLeft,
                 child: Row(children: [
                   Expanded(child: Text(libelle.text.isEmpty ? _auto() : libelle.text, style: Charte.texte(16))),
-                  Icon(Icons.edit_outlined, size: 20, color: Charte.couleurIcone(Icons.edit_outlined)),
+                  Icone(Icons.edit_outlined, size: 20, color: Charte.couleurIcone(Icons.edit_outlined)),
                 ]),
               ),
             ),

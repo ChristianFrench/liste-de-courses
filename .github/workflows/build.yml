@@ -52,7 +52,7 @@ jobs:
           grep -o '::\(notice\|warning\) title=.*' reel.log || true
           grep -q 'All tests passed' reel.log || { echo "::warning title=Synchronisation, serveur réel::échec"; tail -n 30 reel.log; exit 1; }
       - name: Captures des écrans (branche « captures »)
-        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')
         env:
           CAPTURES: '1'
         run: |
@@ -70,7 +70,7 @@ jobs:
           git push -qf origin HEAD:refs/heads/captures
           exit $code
       - name: Conserver les captures pour la publication
-        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')
         uses: actions/upload-artifact@v4
         with:
           name: Captures
@@ -114,7 +114,7 @@ jobs:
           path: build/Liste de courses*.apk
 
   windows:
-    if: "!contains(github.event.head_commit.message, '[web]')"
+    if: "!contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')"
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -153,7 +153,8 @@ jobs:
 
   web:
     # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
-    if: "!contains(github.event.head_commit.message, '[rapide]')"
+    # Mode APK (« [apk] ») : l'APK seulement, la page « derniere-version » garde l'exe et les captures précédents
+    if: "!contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[apk]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -226,7 +227,7 @@ jobs:
     name: publication (page « derniere-version »)
     needs: [verification, android, windows]
     concurrency: publication
-    if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && needs.windows.result == 'success' && needs.android.result != 'failure'
+    if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && (needs.windows.result == 'success' || (needs.windows.result == 'skipped' && contains(github.event.head_commit.message, '[apk]'))) && needs.android.result != 'failure'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -242,9 +243,11 @@ jobs:
           mkdir -p publication
           # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
           gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Captures.zip -D publication 2>/dev/null || true
+          # Mode APK : l'exe Windows de la version précédente est repris tel quel
+          if [ ! -d "livrables/Liste de courses Windows" ]; then gh release download derniere-version -p Liste-de-courses-Windows.zip -D publication 2>/dev/null || true; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
-          (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .)
+          if [ -d "livrables/Liste de courses Windows" ]; then (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .); fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
           {

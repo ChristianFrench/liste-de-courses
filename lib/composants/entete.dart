@@ -5,6 +5,7 @@ import '../ecrans/partage.dart' show montrerEtatSynchro;
 import '../navigation.dart';
 import '../theme.dart';
 import 'composants.dart';
+import 'icone.dart';
 
 /// Version affichée en haut de l'accueil, fournie à la compilation (« 0.6.0 · 3d4d87c »).
 export '../donnees/version.dart';
@@ -101,7 +102,7 @@ class EnTeteFenetre extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   style: surPhoto(Charte.texte(20, gras: true, couleur: Charte.blanc))),
                             ),
-                            Icon(Icons.expand_more,
+                            Icone(Icons.expand_more,
                                 size: 26, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)]),
                           ]),
                         ),
@@ -143,7 +144,7 @@ Widget boutonEnTete(IconData i, String libelle, VoidCallback onTap) => Tooltip(
       child: InkResponse(
         onTap: onTap,
         radius: 22,
-        child: SizedBox(width: 44, height: EnTeteFenetre.hauteurBouton, child: Icon(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
+        child: SizedBox(width: 44, height: EnTeteFenetre.hauteurBouton, child: Icone(i, size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
       ),
     );
 
@@ -209,7 +210,7 @@ class BoutonSynchro extends StatelessWidget {
               width: 44,
               height: EnTeteFenetre.hauteurBouton,
               child: Stack(alignment: Alignment.center, children: [
-                const Icon(Icons.cloud_outlined, size: 26, color: Charte.blanc, shadows: ombre),
+                const Icone(Icons.cloud_outlined, size: 26, color: Charte.blanc, shadows: ombre),
                 Positioned(
                   right: 2,
                   top: EnTeteFenetre.hauteurBouton / 2 - 1,

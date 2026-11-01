@@ -30,6 +30,8 @@ Quand le maître d'ouvrage écrit **« Retours »** suivi d'une liste numéroté
 4. Suivre la compilation avec une seule commande d'attente (pas de vérifications répétées), puis répondre en **une ligne par point** : « corrigé », ou la question à poser. Pas de récapitulatif.
 5. Ne pas changer le numéro de version.
 
+Variante **`[apk]`** dans le message de commit : seule l'APK Android est compilée (tests de recette compris) ; l'exe et les captures précédents restent sur la page « derniere-version ». La version web n'est pas republiée.
+
 Variante **`[web]`** dans le message de commit : seule la version web est compilée et publiée (tests de recette compris) ; l'APK, l'exe et les captures précédents restent sur la page « derniere-version ».
 
 Quand le maître d'ouvrage écrit **« Clôturer la version »** : compilation complète (sans `[rapide]`), numéro de version augmenté, fiche d'évolution unique récapitulant tous les retours traités depuis la version précédente, cahier de tests mis à jour.

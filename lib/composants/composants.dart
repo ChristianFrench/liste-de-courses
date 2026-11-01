@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'icone.dart';
 
 import '../theme.dart';
 import 'entete.dart' show glisserOnglet;
@@ -67,7 +68,7 @@ class BoutonIcone extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(22),
-        child: SizedBox(width: 44, height: 44, child: Icon(icone, size: taille, color: couleur ?? Charte.couleurIcone(icone))),
+        child: SizedBox(width: 44, height: 44, child: Icone(icone, size: taille, color: couleur ?? Charte.couleurIcone(icone))),
       ),
     );
   }
@@ -93,7 +94,7 @@ class IconeRonde extends StatelessWidget {
             ? Pictogramme(image, taille: taille)
             : texte != null
                 ? Text(texte!, style: Charte.texte(taille * 0.32, gras: true, couleur: Charte.cadre))
-                : Icon(icone, size: taille * 0.55, color: Charte.cadre),
+                : Icone(icone, size: taille * 0.55, color: Charte.cadre),
       );
 }
 
@@ -222,13 +223,13 @@ class _BandeauPucesState extends State<BandeauPuces> {
                   const SizedBox(width: 8),
                 ],
                 if (p.icone != null) ...[
-                  Icon(p.icone, size: 16, color: couleurTexte),
+                  Icone(p.icone, size: 16, color: couleurTexte),
                   const SizedBox(width: 4),
                 ],
                 Text(p.libelle, style: Charte.texte(grande ? 17 : 15, gras: choisie, couleur: couleurTexte)),
                 if (p.termine && !choisie) ...[
                   const SizedBox(width: 4),
-                  Icon(Icons.check, size: 15, color: couleurTexte),
+                  Icone(Icons.check, size: 15, color: couleurTexte),
                 ],
                 if (p.compteur != null && p.compteur! > 0) ...[
                   const SizedBox(width: 6),
@@ -269,7 +270,7 @@ class CaseACocher extends StatelessWidget {
         borderRadius: BorderRadius.circular(3),
         border: Border.all(color: coche ? Charte.accent : Charte.cadre, width: Charte.traitCadre),
       ),
-      child: coche ? Icon(Icons.check, size: taille - 4, color: Charte.blanc) : null,
+      child: coche ? Icone(Icons.check, size: taille - 4, color: Charte.blanc) : null,
     );
   }
 }
@@ -313,7 +314,7 @@ class BoutonPromo extends StatelessWidget {
       height: 30,
       child: Center(
         child: code == null && iconeVide != null
-            ? Icon(iconeVide, size: 20, color: Charte.couleurIcone(iconeVide!))
+            ? Icone(iconeVide, size: 20, color: Charte.couleurIcone(iconeVide!))
             : Text(code ?? '%',
                 style: Charte.texte(code == null ? 15 : Charte.tCodePromo + 2, gras: true, couleur: code == null ? Charte.rouge : Charte.encre)),
       ),
@@ -355,7 +356,7 @@ class AlerteQuantite extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.warning_amber_rounded, size: 15, color: Charte.couleurIcone(Icons.warning_amber_rounded)),
+          Icone(Icons.warning_amber_rounded, size: 15, color: Charte.couleurIcone(Icons.warning_amber_rounded)),
           const SizedBox(width: 3),
           Flexible(child: Text('Il en faut $requise pour la promotion', style: Charte.texte(12, gras: true))),
         ],
@@ -528,7 +529,7 @@ class TitreGroupe extends StatelessWidget {
         : image != null
             ? Pictogramme(image!, taille: 30) // sans rond (01/11/2026, Aristide)
             : icone != null
-                ? Icon(icone, size: 24, color: Charte.blanc)
+                ? Icone(icone, size: 24, color: Charte.blanc)
                 : null;
     return Material(
       color: nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent),
@@ -542,13 +543,13 @@ class TitreGroupe extends StatelessWidget {
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
             if (ajoute) Text(' +', style: blanc),
-            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icon(marque, size: 18, color: Charte.blanc)),
+            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: Charte.blanc)),
             if (droite != null) Text(droite!, style: blanc),
             if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
             if (ouvert != null)
               Padding(
                 padding: const EdgeInsets.only(left: 6),
-                child: Icon(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.blanc),
+                child: Icone(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.blanc),
               ),
           ]),
          ),
@@ -746,7 +747,7 @@ class Bouton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Icône à gauche du libellé (boutons qui font avancer les listes et les courses).
-          if (icone != null) Icon(icone, size: texte.isEmpty ? 28 : 20, color: texteCouleur),
+          if (icone != null) Icone(icone, size: texte.isEmpty ? 28 : 20, color: texteCouleur),
           if (icone != null && texte.isNotEmpty) const SizedBox(width: 6),
           if (texte.isNotEmpty)
             Flexible(
@@ -756,7 +757,7 @@ class Bouton extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
             ),
-          if (iconeApres != null && texte.isEmpty) Icon(iconeApres, size: 28, color: texteCouleur),
+          if (iconeApres != null && texte.isEmpty) Icone(iconeApres, size: 28, color: texteCouleur),
         ],
       ),
     );
@@ -943,7 +944,7 @@ class BandeauHorsReseau extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Row(
             children: [
-              Icon(Icons.cloud_off_outlined, size: 18, color: Charte.couleurIcone(Icons.cloud_off_outlined)),
+              Icone(Icons.cloud_off_outlined, size: 18, color: Charte.couleurIcone(Icons.cloud_off_outlined)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text('Hors réseau : vos coches sont gardées et seront envoyées au retour du réseau.',
@@ -1067,7 +1068,7 @@ class ChoixDeroulant<T> extends StatelessWidget {
           isDense: true,
           // La hauteur d'une liste dense suit iconSize : 32, pour une cible tactile suffisante.
           iconSize: 32,
-          icon: Icon(Icons.expand_more, size: 24, color: Charte.couleurIcone(Icons.expand_more)),
+          icon: Icone(Icons.expand_more, size: 24, color: Charte.couleurIcone(Icons.expand_more)),
           style: Charte.texte(16),
           dropdownColor: Charte.fond,
           items: [
@@ -1128,7 +1129,7 @@ class ChampDate extends StatelessWidget {
         decoration: InputDecoration(
           labelText: libelle,
           contentPadding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
-          suffixIcon: Icon(Icons.calendar_month_outlined, color: Charte.couleurIcone(Icons.calendar_month_outlined)),
+          suffixIcon: Icone(Icons.calendar_month_outlined, color: Charte.couleurIcone(Icons.calendar_month_outlined)),
         ),
         child: Text(valeur == null ? 'Non renseignée' : texte(valeur!), style: Charte.texte(16)),
       ),
@@ -1154,7 +1155,7 @@ class Etiquette extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(texte, style: Charte.texte(12, gras: !pointille)),
-          if (icone != null) ...[const SizedBox(width: 3), Icon(icone, size: 13, color: Charte.encre)],
+          if (icone != null) ...[const SizedBox(width: 3), Icone(icone, size: 13, color: Charte.encre)],
         ],
       ),
     );
@@ -1273,7 +1274,7 @@ Future<List<String>?> ordonner(BuildContext context, {required String titre, req
                           width: 44,
                           height: Charte.ligneListe,
                           alignment: Alignment.center,
-                          child: Icon(Icons.drag_handle, key: ValueKey('poignee-${ordre[i]}'), size: 26, color: Charte.cadre),
+                          child: Icone(Icons.drag_handle, key: ValueKey('poignee-${ordre[i]}'), size: 26, color: Charte.cadre),
                         ),
                       ),
                     ]),
@@ -1370,7 +1371,7 @@ Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
                             width: 44,
                             height: Charte.ligneListe,
                             alignment: Alignment.center,
-                            child: Icon(Icons.drag_handle, key: ValueKey('poignee-$nom'), size: 26, color: Charte.cadre),
+                            child: Icone(Icons.drag_handle, key: ValueKey('poignee-$nom'), size: 26, color: Charte.cadre),
                           ),
                         ),
                       ]),
@@ -1485,7 +1486,7 @@ class SousOnglets extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(onglets[i].icone, size: 18, color: i == actif ? Charte.blanc : Charte.cadre),
+                          Icone(onglets[i].icone, size: 18, color: i == actif ? Charte.blanc : Charte.cadre),
                           const SizedBox(width: 6),
                           Flexible(
                             child: Text(onglets[i].libelle,
@@ -1533,7 +1534,7 @@ class Carte extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: child),
-              if (avecChevron) Icon(Icons.chevron_right, size: 28, color: Charte.couleurIcone(Icons.chevron_right)),
+              if (avecChevron) Icone(Icons.chevron_right, size: 28, color: Charte.couleurIcone(Icons.chevron_right)),
             ],
           ),
         ),
@@ -1591,7 +1592,7 @@ class LigneMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final signe = gauche ?? (icone == null ? null : Icon(icone, size: 24, color: Charte.cadre));
+    final signe = gauche ?? (icone == null ? null : Icone(icone, size: 24, color: Charte.cadre));
     return Material(
       color: Charte.fond,
       child: InkWell(
@@ -1652,7 +1653,7 @@ class BoutonPause extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.pause, size: 18, color: Charte.couleurIcone(Icons.pause)),
+                  Icone(Icons.pause, size: 18, color: Charte.couleurIcone(Icons.pause)),
                   const SizedBox(width: 4),
                   Text('Pause', style: Charte.texte(15, gras: true)),
                 ],
