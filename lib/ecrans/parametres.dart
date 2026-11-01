@@ -1,3 +1,4 @@
+import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
@@ -125,6 +126,24 @@ class EcranApparence extends _EcranVivant {
           etat.choisirApparence(v);
           Charte.choisirPalette(v);
         },
+      ),
+      const SizedBox(height: 14),
+      // 01/11/2026 (Aristide) : deux familles d'icônes en couleur, au choix.
+      ChoixDeroulant<String>(
+        libelle: 'Icônes',
+        valeur: Charte.familleIcones,
+        choix: const {'fluent3d': 'Fluent 3D (Microsoft), en relief', 'noto': 'Noto (Google)'},
+        onChange: (v) {
+          etat.choisirIcones(v);
+          Charte.choisirIcones(v);
+        },
+      ),
+      Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Row(children: [
+          for (final i in [Icons.home_outlined, Icons.checklist, Icons.shopping_cart_outlined, Icons.tune, Icons.storefront_outlined, Icons.delete_outline, Icons.edit_outlined])
+            Padding(padding: const EdgeInsets.only(right: 10), child: Icone(i, size: 32)),
+        ]),
       ),
       const TitreSection('Couleur des cadres', cote: 0),
       for (final (cle, nom, couleur) in [

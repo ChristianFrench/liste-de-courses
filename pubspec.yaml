@@ -43,7 +43,8 @@ flutter:
     - assets/marques_distributeur.json
     - assets/natures_off.json
     - assets/pictos/png/
-    - assets/icones/
+    - assets/icones/noto/
+    - assets/icones/fluent3d/
   fonts:
     - family: Atkinson
       fonts:

@@ -568,6 +568,9 @@ class Etat extends ChangeNotifier {
 
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
+
+  /// Famille d'icônes en couleur : 'fluent3d' (par défaut) ou 'noto' (Paramètres › Apparence).
+  String? icones;
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;
   set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
@@ -1100,6 +1103,7 @@ class Etat extends ChangeNotifier {
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
+    icones = options?['icones'] as String?;
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
@@ -1228,6 +1232,7 @@ class Etat extends ChangeNotifier {
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
+            if (icones != null) 'icones': icones,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
@@ -3863,6 +3868,11 @@ class Etat extends ChangeNotifier {
     } else {
       couleurs[cle] = couleur;
     }
+    modifie();
+  }
+
+  void choisirIcones(String famille) {
+    icones = famille;
     modifie();
   }
 

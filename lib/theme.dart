@@ -50,6 +50,15 @@ class Charte {
 
   static Palette palette = palettes.first;
 
+  /// Famille des icônes en couleur (dossier de assets/icones/) : 'fluent3d' ou 'noto'.
+  static String familleIcones = 'fluent3d';
+
+  /// Change de famille d'icônes et redessine toute l'application.
+  static void choisirIcones(String famille) {
+    familleIcones = famille == 'noto' ? 'noto' : 'fluent3d';
+    choisirPalette(palette.nom);
+  }
+
   /// Change de palette et redessine toute l'application, sans la relancer.
   static void choisirPalette(String nom) {
     palette = toutesLesPalettes.firstWhere((p) => p.nom == nom, orElse: () => palettes.first);
