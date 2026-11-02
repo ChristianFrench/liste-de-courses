@@ -29,7 +29,7 @@ class BarreOuverture extends StatelessWidget {
                       value: o.valeur,
                       minHeight: 5,
                       backgroundColor: const Color(0x66FFFFFF),
-                      valueColor: AlwaysStoppedAnimation(Charte.niveau(4)),
+                      valueColor: AlwaysStoppedAnimation(Charte.niveau(1)),
                     ),
                   ),
                 ]),

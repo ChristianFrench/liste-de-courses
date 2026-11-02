@@ -433,26 +433,35 @@ String rangement(Produit p) {
   return s == null ? 'Non rangé' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
 }
 
-LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = false, Color? fond}) => LigneMenu(
-      fond: fond,
-      titre: p.nom,
-      // 01/11/2026 (Aristide) : pas d'icône sur les produits.
-      apresTitre: SignePerso(p),
-      sousTitre: avecRangement ? rangement(p) : _description(p),
-      onTap: () => Nav.aller<void>(context, EcranFicheProduit(produitId: p.id)),
-    );
-
-String _description(Produit p) {
+/// Ligne d'un produit du catalogue : ses marques dessous, ses mesures et packagings dans leurs cadres à droite ;
+/// la toucher ouvre ses actions dans un volet (02/11/2026, Aristide : plus de page pour les voir).
+LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = false, Color? fond}) {
   final etat = Etat.instance;
-  final nm = p.marqueIds.length;
-  final nk = p.packagingIds.length;
-  final morceaux = <String>[
-    if (nm > 0) _pluriel(nm, 'marque'),
-    if (nk > 1) _pluriel(nk, 'packaging'),
-    if (nk == 1 && nm == 0) etat.packaging(p.packagingIds.first)?.libelle ?? '',
-  ];
-  return morceaux.isEmpty ? 'à compléter' : morceaux.join(' · ');
+  final packs = p.packagingIds;
+  final marques = [for (final id in p.marqueIds) etat.marque(id)?.nom ?? ''].where((x) => x.isNotEmpty).join(', ');
+  return LigneMenu(
+    fond: fond,
+    titre: p.nom,
+    // 01/11/2026 (Aristide) : pas d'icône sur les produits.
+    apresTitre: SignePerso(p),
+    sousTitre: avecRangement ? rangement(p) : (marques.isEmpty ? (packs.isEmpty ? 'à compléter' : null) : marques),
+    droite: packs.isEmpty
+        ? null
+        : Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              for (final id in packs.take(2))
+                Padding(
+                  padding: const EdgeInsets.only(left: 4),
+                  child: Pastille(etat.packaging(id)?.libelle ?? '', petite: true, couleur: Color(etat.couleurPack(id) ?? etat.couleurMesures)),
+                ),
+              if (packs.length > 2) Padding(padding: const EdgeInsets.only(left: 4), child: Text('+${packs.length - 2}', style: Charte.texte(13))),
+            ]),
+          ),
+    onTap: () => menuActions(context, titre: p.nom, actions: actionsProduit(context, p)),
+  );
 }
+
 
 // ------------------------------------------------------------ Magasins
 
@@ -606,7 +615,19 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                 ouvert: ouvert,
                 onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
                 onCrayon: () => menuActions(context, titre: sec.nom, actions: actionsSecteur(context, sec)),
-                enfants: [for (final p in produits) FeuilleArbre(child: ligneProduit(context, p, fond: Charte.niveau(5)))],
+                // 02/11/2026 (Aristide) : tout à droite, les marques du secteur.
+                droite: IconButton(
+                  key: ValueKey('marques-secteur-${sec.id}'),
+                  tooltip: 'Marques de ${sec.nom}',
+                  visualDensity: VisualDensity.compact,
+                  onPressed: () => menuActions(context, titre: 'Marques · ${sec.nom}', actions: [
+                    for (final n in etat.marquesDuSecteur(sec))
+                      ActionLigne(Icons.sell_outlined, n, () => fenetreMarque(context, secteur: sec, nom: n)),
+                    ActionLigne(Icons.add, '+ Nouvelle marque', () => fenetreMarque(context, secteur: sec)),
+                  ]),
+                  icon: Icone(Icons.sell_outlined, size: 24),
+                ),
+                enfants: [for (final p in produits) FeuilleArbre(child: ligneProduit(context, p, fond: Charte.niveau(4)))],
               ));
             }
           }
@@ -720,7 +741,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                     for (final p in trouves) ligneProduit(context, p, avecRangement: true),
                   ]
                 : [
-                    ..._arbre(context, parUnivers),
+                    ColonneDebord(children: _arbre(context, parUnivers)),
                     if (nonRanges.isNotEmpty)
                       GroupeRetractable(
                         cle: 'catalogue/nonRanges',
@@ -1005,7 +1026,7 @@ class EcranMarques extends StatelessWidget {
                           style: Charte.texte(15, couleur: Charte.texteSecondaire)),
                     ),
                   ]
-                : enfants,
+                : [ColonneDebord(children: enfants)],
           ),
         );
       },
@@ -1037,7 +1058,7 @@ class _LigneMarque extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        color: Charte.niveau(5),
+        color: Charte.niveau(4),
         child: InkWell(
           onTap: onTap,
           child: Container(

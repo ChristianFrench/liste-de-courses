@@ -529,12 +529,15 @@ class _Echantillon extends StatelessWidget {
   final Palette palette;
 
   @override
-  Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          for (final c in [for (var n = 1; n <= 5; n++) Color.lerp(palette.accentFonce, Charte.blanc, const [0.22, 0.48, 0.68, 0.82, 0.92][n - 1])!])
-            Container(width: 22, height: 22, color: c),
-        ]),
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: palette.accent)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(3),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            // 02/11/2026 (Aristide) : sans la teinte sombre, les quatre niveaux clairs des bandeaux.
+            for (final t in const [0.82, 0.88, 0.93, 0.97]) Container(width: 22, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
+          ]),
+        ),
       );
 }
 

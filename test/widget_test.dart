@@ -582,12 +582,13 @@ void main() {
       if (find.text('CRÈMERIE').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
       // Toucher un secteur le déplie sur place : ses produits apparaissent sous lui.
       await _toucher(tester, find.text('CRÈMERIE').last);
+      // Toucher un produit : ses actions dans un volet, plus de page (02/11/2026).
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.textContaining('RANGEMENT'), findsOneWidget, reason: 'fiche produit');
+      expect(find.text('Avec une marque'), findsOneWidget, reason: 'actions du produit');
       await _ciblesTactiles(tester);
-      await _toucher(tester, find.byTooltip('Retour'));
-      expect(find.textContaining('RANGEMENT'), findsNothing);
-      expect(find.text('CRÈMERIE', skipOffstage: false), findsWidgets, reason: 'retour au catalogue, secteur toujours déplié');
+      await _fermerVolet(tester);
+      expect(find.text('Avec une marque'), findsNothing);
+      expect(find.text('CRÈMERIE', skipOffstage: false), findsWidgets, reason: 'secteur toujours déplié');
 
       await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
@@ -1108,11 +1109,14 @@ void main() {
 
       // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
       expect(find.text('Modifier'), findsNothing);
       expect(find.text('Avec une marque'), findsOneWidget);
       await _fermerVolet(tester);
-      await _toucher(tester, find.byTooltip('Retour'));
+      // Tout à droite du secteur : ses marques
+      await _toucher(tester, find.byTooltip('Marques de Crèmerie'));
+      expect(find.text('Marques · Crèmerie'), findsOneWidget);
+      expect(find.text('Président'), findsWidgets);
+      await _fermerVolet(tester);
 
       // Produits ajoutés : la fenêtre du produit pour le modifier.
       await _actionTitre(tester, 'Produits ajoutés (1)');

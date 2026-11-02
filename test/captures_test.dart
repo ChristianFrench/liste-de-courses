@@ -154,8 +154,9 @@ void main() {
     await tester.tapAt(const Offset(195, 20));
     await tester.pumpAndSettle();
     await _toucher(tester, find.text('Lait demi-écrémé'));
-    await _capture('16 Fiche-Produit');
-    await _toucher(tester, find.byTooltip('Retour'));
+    await _capture('16 Produit-Actions');
+    await tester.tapAt(const Offset(195, 20));
+    await tester.pumpAndSettle();
     await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
     await _toucher(tester, find.textContaining('Produits ajoutés'));
     await _capture('20 Produits-ajoutes');

@@ -25,6 +25,53 @@ Future<Magasin?> creerMagasinDemande(BuildContext context) async {
   return m;
 }
 
+/// Actions d'un produit du catalogue : dans le titre de sa fiche, ou dans le volet ouvert en touchant sa ligne
+/// du catalogue (02/11/2026, Aristide : plus de page pour voir mesures et packagings, ils sont sur la ligne).
+List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? listeId, bool depuisFiche = false}) {
+  final etat = Etat.instance;
+  final utilise = etat.produitUtilise(p);
+  final ajoute = etat.estAjoute(p);
+  return [
+    if (etat.secteurCatalogue(p.id) == null)
+      ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
+    if (ajoute) ...[
+      ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
+      ActionLigne(Icons.delete_outline, 'Supprimer', () async {
+        if (await demanderSuppression(context, p, 'le produit ${p.nom}') && depuisFiche && context.mounted) Navigator.of(context).pop();
+      }, danger: true),
+    ] else
+      ActionLigne(Icons.sell_outlined, 'Avec une marque', () async {
+        final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
+        if (q != null && depuisFiche && context.mounted) {
+          Navigator.of(context)
+              .pushReplacement(MaterialPageRoute<void>(builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
+        }
+      }),
+    // Ajouté par un autre foyer : nom fantaisiste, grossier ou faux → signalé (31/10/2026).
+    if (etat.estRecu(p))
+      ActionLigne(Icons.flag_outlined, 'Signaler ce produit', () async {
+        final ok = await confirmer(
+          context,
+          titre: 'Signaler « ${p.nom} » ?',
+          icone: Icons.flag_outlined,
+          contenu: Text(
+            'Ce produit vient d\'un autre foyer. Signalé, il disparaît de votre catalogue'
+            '${utilise ? ' (il reste dans vos listes)' : ''}. Signalé par trois foyers, il disparaît pour tous.',
+            style: Charte.texte(16),
+          ),
+          plein: 'Annuler',
+          contour: 'Signaler',
+        );
+        if (ok != true) return;
+        etat.signalerProduit(p);
+        if (context.mounted) {
+          if (!utilise && depuisFiche) Navigator.of(context).pop();
+          Nav.message(context, 'Produit signalé');
+        }
+      }, danger: true),
+  ];
+}
+
 /// Fiche produit (Gérer › Courses › Catalogue) : nom, rangement (le même dans tous les magasins), marques, packagings.
 /// Avec [listeId] : ouverte depuis la préparation, l'ajout revient à cette liste.
 class EcranFicheProduit extends StatelessWidget {
@@ -53,45 +100,7 @@ class EcranFicheProduit extends StatelessWidget {
             icone: Icons.menu_book_outlined,
             sousTitre: 'Catalogue',
             titre: p.nom,
-            actions: [
-              if (etat.secteurCatalogue(p.id) == null)
-                ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
-              if (ajoute) ...[
-                ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
-                ActionLigne(Icons.delete_outline, 'Supprimer', () async {
-                  if (await demanderSuppression(context, p, 'le produit ${p.nom}') && context.mounted) Navigator.of(context).pop();
-                }, danger: true),
-              ] else
-                ActionLigne(Icons.sell_outlined, 'Avec une marque', () async {
-                  final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
-                  if (q != null && context.mounted) {
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute<void>(builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
-                  }
-                }),
-              // Ajouté par un autre foyer : nom fantaisiste, grossier ou faux → signalé (31/10/2026).
-              if (etat.estRecu(p))
-                ActionLigne(Icons.flag_outlined, 'Signaler ce produit', () async {
-                  final ok = await confirmer(
-                    context,
-                    titre: 'Signaler « ${p.nom} » ?',
-                    icone: Icons.flag_outlined,
-                    contenu: Text(
-                      'Ce produit vient d\'un autre foyer. Signalé, il disparaît de votre catalogue'
-                      '${utilise ? ' (il reste dans vos listes)' : ''}. Signalé par trois foyers, il disparaît pour tous.',
-                      style: Charte.texte(16),
-                    ),
-                    plein: 'Annuler',
-                    contour: 'Signaler',
-                  );
-                  if (ok != true) return;
-                  etat.signalerProduit(p);
-                  if (context.mounted) {
-                    if (!utilise) Navigator.of(context).pop();
-                    Nav.message(context, 'Produit signalé');
-                  }
-                }, danger: true),
-            ],
+            actions: actionsProduit(context, p, listeId: listeId, depuisFiche: true),
           ),
           corps: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 16),

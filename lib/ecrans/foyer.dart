@@ -208,10 +208,35 @@ class LigneMembre extends StatelessWidget {
       if (versions.isNotEmpty) versions else if (!m.moi) 'pas encore connecté',
       if (!m.moi && s.appareilsDe(m).isNotEmpty) _connexion(m),
     ];
+    // 02/11/2026 (Aristide) : point d'état. Vert : en ligne ; orange : déjà connecté, pas en ce moment ;
+    // rouge : jamais connecté (soi-même : rouge sans liaison au serveur).
+    final aps = s.appareilsDe(m);
+    final etatPoint = m.moi
+        ? (s.liaisonOk ? 'en ligne' : 'hors ligne')
+        : aps.any((a) => a.enLigne)
+            ? 'en ligne'
+            : aps.isNotEmpty
+                ? 'déjà connecté'
+                : 'jamais connecté';
+    final couleur = switch (etatPoint) {
+      'en ligne' => const Color(0xFF2E9E44),
+      'déjà connecté' => const Color(0xFFF08C00),
+      _ => const Color(0xFFD93025),
+    };
     return LigneMenu(
       titre: m.nomAffiche,
       sousTitre: details.join(' · '),
       gauche: IconeRonde(null, texte: m.initiales),
+      droite: Semantics(
+        label: etatPoint,
+        child: Container(
+          key: ValueKey('point-membre-${m.id}'),
+          width: 14,
+          height: 14,
+          margin: const EdgeInsets.only(right: 12),
+          decoration: BoxDecoration(color: couleur, shape: BoxShape.circle, border: Border.all(color: Charte.blanc, width: 1.5)),
+        ),
+      ),
       onTap: onTap ?? () => _fiche(context, m),
     );
   }

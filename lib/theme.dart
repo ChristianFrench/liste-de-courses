@@ -46,10 +46,10 @@ const autresPalettes = <Palette>[
 /// packagings. La première est celle par défaut.
 const palettesCadres = <(String, int, int, int)>[
   ('Vive', 0xFFE53935, 0xFF1E88E5, 0xFF43A047),
-  ('Douce', 0xFFE57373, 0xFF64B5F6, 0xFF81C784),
+  ('Franche', 0xFFF44336, 0xFF2196F3, 0xFF4CAF50),
+  ('Douce', 0xFFEF5350, 0xFF42A5F5, 0xFF66BB6A),
+  ('Claire', 0xFFE57373, 0xFF64B5F6, 0xFF81C784),
   ('Profonde', 0xFFC62828, 0xFF1565C0, 0xFF2E7D32),
-  ('Chaude', 0xFFF4511E, 0xFF3949AB, 0xFF7CB342),
-  ('Fraîche', 0xFFD81B60, 0xFF00897B, 0xFF00A86B),
 ];
 
 /// Toutes les palettes : les cinq présentées en pastilles, puis les autres.
@@ -63,10 +63,10 @@ class Charte {
 
   static Palette palette = palettes.first;
 
-  /// Les cinq niveaux de luminosité de la palette, du plus soutenu (1) au plus clair (5). 02/11/2026 (Aristide) :
-  /// le premier niveau n'est plus la teinte sombre, tous partent de [Palette.accentFonce] éclaircie.
-  static const _eclaircis = [0.22, 0.48, 0.68, 0.82, 0.92];
-  static Color niveau(int n) => Color.lerp(palette.accentFonce, blanc, _eclaircis[(n - 1).clamp(0, 4)])!;
+  /// Les quatre niveaux de la palette, du bandeau ordinaire (1) au plus clair (4). 02/11/2026 (Aristide) : plus de
+  /// teinte sombre ; le niveau 1 est la couleur des bandeaux de toute l'application, les suivants plus clairs.
+  static const _eclaircis = [0.82, 0.88, 0.93, 0.97];
+  static Color niveau(int n) => Color.lerp(palette.accentFonce, blanc, _eclaircis[(n - 1).clamp(0, 3)])!;
 
   /// Texte posé sur un niveau de la palette : la teinte la plus sombre.
   static Color get encreNiveau => fonce(palette.accentFonce);
