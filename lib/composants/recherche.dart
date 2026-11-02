@@ -57,6 +57,12 @@ List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte
 }
 
 /// Option « Voir plus » de la liste déroulante.
+/// « Créer « x » dans un autre secteur » : le nom existe déjà au catalogue.
+class _AutreSecteur {
+  const _AutreSecteur(this.nom);
+  final String nom;
+}
+
 class _VoirPlus {
   const _VoirPlus(this.reste);
   final int reste;
@@ -156,7 +162,8 @@ class _ChampRechercheState extends State<ChampRecherche> {
           if (!_tout && trouves.length > premiersResultats) res.add(_VoirPlus(trouves.length - premiersResultats));
           // Les marques seulement si le texte tapé en est une (et n'est pas déjà un article trouvé).
           if (widget.onMarque != null && trouves.length < premiersResultats) res.addAll(chercherMarques(produits, t));
-          if (widget.onNouveau != null && !existe) res.add(t);
+          // 02/11/2026 (Aristide) : un nom déjà au catalogue peut se créer dans un autre secteur (frais / libre-service).
+          if (widget.onNouveau != null) res.add(existe ? _AutreSecteur(t) : t);
           return res;
         },
         onSelected: (o) {
@@ -172,6 +179,8 @@ class _ChampRechercheState extends State<ChampRecherche> {
             widget.onMarque?.call(o.$1, o.$2);
           } else if (o is Produit) {
             widget.onChoix(o);
+          } else if (o is _AutreSecteur) {
+            widget.onNouveau?.call(o.nom);
           } else if (o is String) {
             widget.onNouveau?.call(o);
           }
@@ -279,7 +288,7 @@ class _ChampRechercheState extends State<ChampRecherche> {
                                       Icone(Icons.add_circle_outline, color: Charte.cadre),
                                       const SizedBox(width: 8),
                                       Expanded(
-                                        child: Text('Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
+                                        child: Text(o is _AutreSecteur ? 'Créer « ${o.nom} » dans un autre secteur' : 'Créer « $o »', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
                                       ),
                                     ],
                                   ),
