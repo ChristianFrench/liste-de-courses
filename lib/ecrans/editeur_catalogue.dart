@@ -57,6 +57,25 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
             ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
               if (await ajouterDepuisTexte(context, b)) _modifie();
             }),
+            ActionLigne(Icons.download_outlined, 'Reprendre tout mon catalogue', () async {
+              final ok = await confirmer(
+                context,
+                titre: 'Reprendre tout mon catalogue ?',
+                icone: Icons.download_outlined,
+                contenu: Text(
+                  'Le brouillon reprend votre catalogue : rayons et secteurs renommés, ajouts (même jamais achetés), '
+                  'produits déplacés, mesures et packagings, images et ordre des rayons. Rien n\'est retiré. '
+                  'Relisez avant de publier : un renommage publié vaut pour tous les foyers.',
+                  style: Charte.texte(16),
+                ),
+                plein: 'Annuler',
+                contour: 'Reprendre',
+              );
+              if (ok != true || !context.mounted) return;
+              final n = b.reprendreFoyer(Etat.instance);
+              _modifie();
+              if (context.mounted) Nav.message(context, n == 0 ? 'Le brouillon avait déjà tout votre catalogue' : '${_pluriel(n, 'changement')} repris');
+            }),
             ActionLigne(Icons.groups_outlined, 'Foyers contributeurs', () async {
               await Nav.aller<void>(context, EcranContributeurs(b: b, modifie: _modifie));
               if (mounted) setState(() {});

@@ -399,6 +399,41 @@ void main() {
     expect(await SignatureEditeur.verifie(texte, cle: ''), isTrue, reason: 'sans clé dans l\'application, tout passe');
   });
 
+  test('reprendre tout le catalogue du foyer de l\'éditeur : renommages, ajouts non achetés, déplacements, formats', () {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(demo());
+    final b = Brouillon.lire({
+      'rayons': [
+        {
+          'nom': 'Frais',
+          'secteurs': [
+            {'nom': 'Crèmerie', 'taille': 1, 'produits': [{'nom': 'Lait entier', 'taille': 1}, {'nom': 'Beurre doux', 'taille': 1}]},
+            {'nom': 'Charcuterie', 'taille': 1, 'produits': <Map>[]},
+          ]
+        }
+      ],
+      'version': 1
+    });
+    final frais = e.rayonsVisibles.firstWhere((r) => r.nom == 'Frais');
+    final cremerie = e.secteursVisibles(frais.id).firstWhere((x) => x.nom == 'Crèmerie');
+    final charcuterie = e.secteursVisibles(frais.id).firstWhere((x) => x.nom == 'Charcuterie');
+    final kefir = e.creerProduit('Kéfir', secteur: cremerie);
+    e.placer('', e.produits.firstWhere((p) => p.nom == 'Beurre doux').id, charcuterie.id);
+    final lait = e.produits.firstWhere((p) => p.nom == 'Lait entier');
+    e.definirFormats(lait, [e.packagingCompose('2 L', null)!.id]);
+    e.renommerRayonCatalogue(frais, 'Produits frais');
+    expect(b.reprendreFoyer(e), greaterThan(0));
+    expect(b.renommes, [
+      {'type': 'rayon', 'ancien': 'Frais', 'nouveau': 'Produits frais'}
+    ]);
+    final r = b.rayon('Produits frais')!;
+    expect(b.produitDans(b.secteur(r, 'Crèmerie')!, kefir.nom), isNotNull, reason: 'ajouté, jamais acheté');
+    expect(b.produitDans(b.secteur(r, 'Crèmerie')!, 'Beurre doux'), isNull, reason: 'déplacé');
+    expect(b.produitDans(b.secteur(r, 'Charcuterie')!, 'Beurre doux'), isNotNull);
+    expect(b.produitDans(b.secteur(r, 'Crèmerie')!, 'Lait entier')!.formats, ['2 L']);
+    expect(b.reprendreFoyer(e), 0, reason: 'une seconde fois : rien de plus');
+  });
+
   test('ajout au catalogue commun depuis un texte : titres de secteur, puis produits', () {
     final b = Brouillon.lire(demo()..['rayons'] = [
           {

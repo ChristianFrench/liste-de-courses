@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'catalogue_type.dart';
+import 'images_choisies.dart';
 import 'moderation.dart';
 import 'modele.dart';
 import 'signature.dart';
@@ -654,6 +655,97 @@ class Brouillon {
     }
     modifications += n;
     return n;
+  }
+
+  /// « Reprendre tout mon catalogue » (02/11/2026, Aristide) : le catalogue du foyer de l'éditeur devient le
+  /// brouillon, sans la preuve d'achat demandée aux autres foyers. Reprend les rayons et secteurs renommés,
+  /// les rayons, secteurs et produits ajoutés, les produits d'origine déplacés, les mesures et packagings,
+  /// les images choisies et l'ordre des rayons et des secteurs. Ce que l'éditeur a retiré reste retiré ;
+  /// rien n'est retiré du brouillon. Rend le nombre de changements.
+  int reprendreFoyer(Etat e) {
+    final avant = modifications;
+    final exclus = {...Etat.exclusDu({'retires': retires, 'renommes': renommes}), ...e.exclusCommun};
+
+    // 1. Renommages des rayons et secteurs d'origine.
+    for (final r in e.rayonsVisibles) {
+      final origine = e.origineRayon(r.nom);
+      if (origine != r.nom && rayon(r.nom) == null) {
+        if (rayon(origine) case final cr?) renommerRayon(cr, r.nom);
+      }
+      final cr = rayon(r.nom);
+      if (cr == null) continue;
+      for (final x in e.secteursVisibles(r.id)) {
+        final os = e.origineSecteur(r.nom, x.nom);
+        if (os != x.nom && secteur(cr, x.nom) == null) {
+          if (secteur(cr, os) case final cs?) renommerSecteur(cr, cs, x.nom);
+        }
+      }
+    }
+
+    // 2. Rayons et secteurs, dans l'ordre du foyer.
+    final ordre = e.ordreRayons.isEmpty
+        ? e.rayonsVisibles
+        : ([...e.rayonsVisibles]..sort((a, b) {
+            int rang(String n) => e.ordreRayons.contains(n) ? e.ordreRayons.indexOf(n) : 100000;
+            return rang(a.nom).compareTo(rang(b.nom));
+          }));
+    for (final r in ordre) {
+      if (Etat.estExclu(exclus, rayon: r.nom)) continue;
+      final cr = rayon(r.nom) ?? ajouterRayon(r.nom);
+      final noms = <String>[];
+      for (final x in e.secteursVisibles(r.id)) {
+        if (Etat.estExclu(exclus, rayon: r.nom, secteur: x.nom)) continue;
+        if (secteur(cr, x.nom) == null) ajouterSecteur(cr, x.nom);
+        noms.add(x.nom);
+      }
+      ordonnerSecteurs(cr, noms);
+    }
+    final rangs = {for (var i = 0; i < ordre.length; i++) _bas(ordre[i].nom): i};
+    final avantOrdre = [for (final r in catalogue.rayons) r.nom].join('\n');
+    catalogue.rayons.sort((a, b) => (rangs[_bas(a.nom)] ?? 100000).compareTo(rangs[_bas(b.nom)] ?? 100000));
+    if ([for (final r in catalogue.rayons) r.nom].join('\n') != avantOrdre) modifications++;
+
+    // 3. Produits du foyer (pas ceux reçus des autres foyers) : ajoutés, déplacés, mesures et packagings.
+    final placesFoyer = <String, Set<String>>{};
+    for (final p in e.produits) {
+      final x = e.secteurCatalogue(p.id);
+      if (x != null) (placesFoyer[_bas(p.nom)] ??= {}).add('${_bas(e.rayon(x.rayonId)?.nom ?? '')}/${_bas(x.nom)}');
+    }
+    for (final p in e.produits) {
+      if (e.estRecu(p)) continue;
+      final x = e.secteurCatalogue(p.id);
+      final r = x == null ? null : e.rayon(x.rayonId);
+      if (x == null || r == null || Etat.estExclu(exclus, rayon: r.nom, secteur: x.nom, produit: p.nom)) continue;
+      final cr = rayon(r.nom), cs = cr == null ? null : secteur(cr, x.nom);
+      if (cs == null) continue;
+      final formats = [for (final id in p.packagingIds) if (e.packaging(id)?.libelle case final l?) l];
+      final marques = [for (final id in p.marqueIds) if (e.marque(id)?.nom case final n?) n];
+      var cp = produitDans(cs, p.nom);
+      if (cp == null) {
+        // Un produit d'origine rangé ailleurs dans le brouillon, que le foyer n'a plus là-bas : déplacé.
+        final ailleurs = e.estAjoute(p) ? null : produit(p.nom);
+        if (ailleurs != null && !(placesFoyer[_bas(p.nom)] ?? const {}).contains('${_bas(ailleurs.$1.nom)}/${_bas(ailleurs.$2.nom)}')) {
+          ailleurs.$2.produits.remove(ailleurs.$3);
+          cp = ailleurs.$3;
+          cs.produits.add(cp);
+        } else {
+          cp = CatProduit(p.nom, 1, marques: marques, formats: formats);
+          cs.produits.add(cp);
+          _retirerRetire('produit', p.nom, secteur: cs.nom);
+        }
+        modifications++;
+      }
+      if (formats.join('\n') != cp.formats.join('\n')) {
+        cp.formats = formats;
+        modifications++;
+      }
+    }
+
+    // 4. Images choisies.
+    for (final MapEntry(key: cle, value: picto) in imagesChoisies.entries) {
+      if (images[cle] != picto) choisirImage(cle, picto);
+    }
+    return modifications - avant;
   }
 
   void choisirImage(String cle, String? picto) {
