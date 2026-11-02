@@ -1359,7 +1359,7 @@ Future<List<String>?> ordonner(BuildContext context, {required String titre, req
 /// Comme [ordonner], avec des groupes : chaque élément glisse dans son groupe ou dans un autre ; il appartient
 /// au groupe dont le titre est au-dessus de lui. Renvoie groupe → éléments dans l'ordre, ou null si annulé.
 Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
-    {required String titre, required Map<String, List<String>> groupes, Map<String, Color> couleurs = const {}}) {
+    {required String titre, required Map<String, List<String>> groupes, Map<String, String> noms = const {}}) {
   final ordre = <(bool, String)>[
     for (final e in groupes.entries) ...[(true, e.key), for (final x in e.value) (false, x)]
   ];
@@ -1409,19 +1409,20 @@ Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
                   if (estTitre) {
                     return Material(
                       key: ValueKey('groupe-$nom'),
-                      color: couleurs[nom] ?? Charte.accent,
+                      // 02/11/2026 (Aristide) : les niveaux de la palette, comme le catalogue.
+                      color: Charte.niveau(1),
                       child: Container(
                         height: 36,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         alignment: Alignment.centerLeft,
-                        child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+                        child: Text((noms[nom] ?? nom).toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
                       ),
                     );
                   }
                   return Material(
                     key: ValueKey('ordre-$nom'),
-                    color: Charte.blanc,
+                    color: Charte.niveau(3),
                     child: Container(
                       height: Charte.ligneListe,
                       padding: const EdgeInsets.only(left: 12),
@@ -1641,7 +1642,10 @@ class BoutonAction extends StatelessWidget {
 /// [icone] et [gauche] ne sont plus affichés.
 class LigneMenu extends StatelessWidget {
   const LigneMenu(
-      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre, this.fond, this.tailleGauche = 32});
+      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre, this.fond, this.tailleGauche = 32, this.multiligne = false});
+
+  /// Titre et sous-titre sur plusieurs lignes au besoin, sans « … » (produits du catalogue, 02/11/2026).
+  final bool multiligne;
   final String titre;
 
   /// Fond de la ligne (catalogue : les secteurs) ; sinon le fond de l'application.
@@ -1679,11 +1683,16 @@ class LigneMenu extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(children: [
-                      Flexible(child: Text(titre, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                      Flexible(
+                          child: Text(titre,
+                              maxLines: multiligne ? null : 1, overflow: multiligne ? null : TextOverflow.ellipsis, style: Charte.texte(17))),
                       if (apresTitre != null) ...[const SizedBox(width: 6), apresTitre!],
                     ]),
                     if (sousTitre != null && sousTitre!.isNotEmpty)
-                      Text(sousTitre!, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                      Text(sousTitre!,
+                          maxLines: multiligne ? null : 1,
+                          overflow: multiligne ? null : TextOverflow.ellipsis,
+                          style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                   ],
                 ),
               ),
@@ -1959,8 +1968,12 @@ class NiveauArbre extends StatelessWidget {
     this.droite,
     this.ajoute = false,
     this.nombre,
+    this.tailleSigne = 46,
     int? profondeur,
   }) : profondeur = profondeur ?? niveau;
+
+  /// Taille de l'icône : 46, elle déborde un peu vers le bas ; 34 ou moins, elle tient dans le bandeau (secteurs).
+  final double tailleSigne;
   final String cle;
   final int niveau;
 
@@ -1979,7 +1992,6 @@ class NiveauArbre extends StatelessWidget {
   final int? nombre;
 
   static const _hauteur = 40.0;
-  static const _taille = 46.0;
 
   @override
   Widget build(BuildContext context) {
@@ -1995,11 +2007,13 @@ class NiveauArbre extends StatelessWidget {
           onTap: onTap,
           child: Container(
             height: _hauteur,
-            padding: EdgeInsets.fromLTRB(gauche + (signe == null ? 8 : _taille + 8), 0, 4, 0),
+            padding: EdgeInsets.fromLTRB(gauche + (signe == null ? 8 : tailleSigne + 8), 0, 4, 0),
             child: Row(children: [
               Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
               if (ajoute) Text(' +', style: style),
               if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: style)),
+              // 02/11/2026 (Aristide) : le bouton propre au niveau (marques du secteur) avant le crayon et le chevron.
+              if (droite != null) Padding(padding: const EdgeInsets.only(left: 2), child: droite),
               if (onCrayon != null)
                 Tooltip(
                   message: 'Modifier $nom',
@@ -2011,7 +2025,6 @@ class NiveauArbre extends StatelessWidget {
                   ),
                 ),
               Icone(ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: encre),
-              if (droite != null) Padding(padding: const EdgeInsets.only(left: 2), child: droite),
             ]),
           ),
         ),
@@ -2019,9 +2032,9 @@ class NiveauArbre extends StatelessWidget {
       if (signe != null)
         Positioned(
           left: gauche,
-          top: 2,
-          width: _taille,
-          height: _taille,
+          top: tailleSigne > _hauteur ? 2 : (_hauteur - tailleSigne) / 2,
+          width: tailleSigne,
+          height: tailleSigne,
           child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, onLongPress: surSigneLong, child: signe),
         ),
     ]);

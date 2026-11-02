@@ -2,7 +2,7 @@ import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart' show Pictogramme, cleRayon, cleSecteur;
+import '../composants/pictogramme.dart' show Pictogramme, cleRayon, cleSecteur, cleChoixRayon, cleChoixSecteur;
 import '../composants/signe_perso.dart';
 import '../donnees/modele.dart';
 import '../donnees/univers.dart';
@@ -125,6 +125,154 @@ Future<bool> placerProduit(BuildContext context, Produit p) async {
   if (n.isNotEmpty && n != p.nom) etat.renommerProduit(p, n);
   etat.placer(etat.rayon(rayonId)!.magasinId, p.id, secteurId);
   return true;
+}
+
+/// Déplacer un produit du catalogue (02/11/2026, Aristide) : univers, rayon puis nouveau secteur.
+Future<void> deplacerProduit(BuildContext context, Produit p) async {
+  final etat = Etat.instance;
+  final actuel = etat.secteurCatalogue(p.id);
+  final rayons = [for (final r in _rayonsRanges(etat)) if (etat.secteursVisibles(r.id).isNotEmpty) r];
+  if (rayons.isEmpty) return;
+  String univ(Rayon r) => universDuRayon(r.nom, etat.universRayons);
+  final univers = <String>{for (final r in rayons) univ(r)}.toList();
+  var rayonId = rayons.any((r) => r.id == actuel?.rayonId) ? actuel!.rayonId : rayons.first.id;
+  var u = univ(rayons.firstWhere((r) => r.id == rayonId));
+  var secteurId = etat.secteursVisibles(rayonId).any((s) => s.id == actuel?.id) ? actuel!.id : etat.secteursVisibles(rayonId).first.id;
+  final ok = await modale(
+    context,
+    titre: 'Déplacer « ${p.nom} »',
+    oui: 'Déplacer',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: 6),
+        ChoixDeroulant<String>(
+          key: const ValueKey('deplacer-univers'),
+          libelle: 'Univers',
+          valeur: u,
+          choix: {for (final x in univers) x: etat.nomUnivers(x)},
+          onChange: (v) => maj(() {
+            u = v;
+            rayonId = rayons.firstWhere((r) => univ(r) == v).id;
+            secteurId = etat.secteursVisibles(rayonId).first.id;
+          }),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('deplacer-rayon'),
+          libelle: 'Rayon',
+          valeur: rayonId,
+          choix: {for (final r in rayons) if (univ(r) == u) r.id: r.nom},
+          onChange: (v) => maj(() {
+            rayonId = v;
+            secteurId = etat.secteursVisibles(v).first.id;
+          }),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('deplacer-secteur'),
+          libelle: 'Secteur',
+          valeur: secteurId,
+          choix: {for (final x in etat.secteursVisibles(rayonId)) x.id: x.nom},
+          onChange: (v) => maj(() => secteurId = v),
+        ),
+        const SizedBox(height: 8),
+        Text('Le même rangement dans tous les magasins.', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      ],
+    ),
+  );
+  if (!ok || secteurId == actuel?.id) return;
+  etat.placer('', p.id, secteurId);
+  if (context.mounted) Nav.message(context, '« ${p.nom} » rangé dans ${etat.secteur(secteurId)?.nom ?? ''}');
+}
+
+/// Le même produit d'une marque (02/11/2026, Aristide) : seulement les marques de son secteur, ou une autre.
+Future<void> produitDeMarque(BuildContext context, Produit p) async {
+  final etat = Etat.instance;
+  final s = etat.secteurCatalogue(p.id);
+  const autre = '\u0000autre';
+  final n = await choisirDansListe<String>(context, titre: 'Marque · ${p.nom}', choix: {
+    if (s != null)
+      for (final m in etat.marquesDuSecteur(s)) m: m,
+    autre: 'Autre marque…',
+  });
+  if (n == null || !context.mounted) return;
+  var nom = n;
+  if (n == autre) {
+    final t = await demanderTexte(context, titre: 'Nouvelle marque', aide: 'Président, Lu…');
+    if (t == null || t.trim().isEmpty || !context.mounted) return;
+    nom = t.trim();
+    if (s != null) etat.ajouterMarqueSecteur(s, nom);
+  }
+  final q = etat.produitDeMarque(p, nom);
+  if (context.mounted) Nav.message(context, '« ${q.nom} » est au catalogue');
+}
+
+/// Mettre à jour les mesures et packagings d'un produit (02/11/2026, Aristide).
+Future<void> formatsProduit(BuildContext context, Produit p) async {
+  final etat = Etat.instance;
+  final ids = [...p.packagingIds];
+  String? mesure, lot;
+  final mesures = <String>{for (final id in etat.typesMesure) etat.packaging(id)!.libelle}.toList();
+  final lots = <String>{for (final id in etat.typesLot) etat.packaging(id)!.libelle}.toList();
+  final ok = await modale(
+    context,
+    titre: 'Mesures et packaging',
+    oui: 'Enregistrer',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(p.nom, style: Charte.texte(16, gras: true)),
+        const SizedBox(height: 8),
+        if (ids.isEmpty) Text('Aucun format pour l\'instant.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          for (final id in ids)
+            InputChip(
+              key: ValueKey('format-$id'),
+              label: Text(etat.packaging(id)?.libelle ?? ''),
+              backgroundColor: Color(etat.couleurPack(id) ?? etat.couleurMesures).withValues(alpha: 0.15),
+              onDeleted: () => maj(() => ids.remove(id)),
+            ),
+        ]),
+        const SizedBox(height: 16),
+        ChoixDeroulant<String>(
+          key: const ValueKey('format-mesure'),
+          libelle: 'Mesure',
+          valeur: mesure ?? '',
+          choix: {'': 'Aucune', for (final m in mesures) m: m},
+          onChange: (v) => maj(() => mesure = v.isEmpty ? null : v),
+        ),
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: const ValueKey('format-packaging'),
+          libelle: 'Packaging',
+          valeur: lot ?? '',
+          choix: {'': 'Aucun', for (final x in lots) x: x},
+          onChange: (v) => maj(() => lot = v.isEmpty ? null : v),
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: OutlinedButton.icon(
+            key: const ValueKey('format-ajouter'),
+            icon: const Icon(Icons.add),
+            label: const Text('Ajouter ce format'),
+            onPressed: mesure == null && lot == null
+                ? null
+                : () => maj(() {
+                      final k = etat.packagingCompose(mesure, lot);
+                      if (k != null && !ids.contains(k.id)) ids.add(k.id);
+                      mesure = null;
+                      lot = null;
+                    }),
+          ),
+        ),
+      ],
+    ),
+  );
+  if (ok) etat.definirFormats(p, ids);
 }
 
 /// Renomme un article d'une liste ou le range ailleurs (30/10/2026) : un nouveau produit, partagé avec tous
@@ -442,6 +590,7 @@ LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = fa
   return LigneMenu(
     fond: fond,
     titre: p.nom,
+    multiligne: true,
     // 01/11/2026 (Aristide) : pas d'icône sur les produits.
     apresTitre: SignePerso(p),
     sousTitre: avecRangement ? rangement(p) : (marques.isEmpty ? (packs.isEmpty ? 'à compléter' : null) : marques),
@@ -584,6 +733,21 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
   static String _cleU(String u) => 'catalogue-univers/$u';
   static String _cleR(Rayon r) => 'catalogue/${r.nom}';
 
+  /// Repère du secteur ouvert, pour le faire monter en haut de l'écran.
+  final _ancre = GlobalKey();
+
+  /// 02/11/2026 (Aristide) : ouvrir un secteur replie tout le reste et le fait passer en haut de l'écran.
+  void _ouvrirSecteur(Map<String, List<Rayon>> parUnivers, String u, Rayon x, Secteur sec) {
+    final plis = Retractables.i;
+    plis.fixer([for (final e in parUnivers.entries) ...[_cleU(e.key), for (final r in e.value) _cleR(r)]], false);
+    plis.tous([_cleU(u), _cleR(x)], true);
+    setState(() => _secteurOuvert = sec.id);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _ancre.currentContext;
+      if (c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
+    });
+  }
+
   /// Arborescence comme dans les autres listes (02/11/2026, Aristide) : univers, rayons, secteurs et produits aux
   /// quatre niveaux de la palette, sans retrait à gauche ; grande icône en débord au premier plan (un toucher long
   /// sur celle d'un rayon ou d'un secteur choisit une image de la bibliothèque) ; un crayon à chaque niveau ouvre
@@ -604,18 +768,20 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               final ouvert = _secteurOuvert == sec.id;
               final produits = etat.produitsDuSecteur(sec);
               produits.sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
-              secteurs.add(NiveauArbre(
+              final ligne = NiveauArbre(
                 cle: 'secteur-${sec.id}',
                 niveau: 3,
                 nom: sec.nom,
-                signe: Pictogramme(cleSecteur(x.nom, sec.nom), taille: 40),
+                // 02/11/2026 (Aristide) : icône plus petite, sans débord, pour les secteurs.
+                tailleSigne: 32,
+                signe: Pictogramme(cleSecteur(x.nom, sec.nom), taille: 30),
                 surSigneLong: () => choisirImageSecteur(context, x.nom, sec.nom),
                 ajoute: etat.secteurAjoute(sec),
                 nombre: produits.length,
                 ouvert: ouvert,
-                onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
+                onTap: () => ouvert ? setState(() => _secteurOuvert = null) : _ouvrirSecteur(parUnivers, u, x, sec),
                 onCrayon: () => menuActions(context, titre: sec.nom, actions: actionsSecteur(context, sec)),
-                // 02/11/2026 (Aristide) : tout à droite, les marques du secteur.
+                // 02/11/2026 (Aristide) : les marques du secteur, à gauche du crayon.
                 droite: IconButton(
                   key: ValueKey('marques-secteur-${sec.id}'),
                   tooltip: 'Marques de ${sec.nom}',
@@ -628,7 +794,8 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
                   icon: Icone(Icons.sell_outlined, size: 24),
                 ),
                 enfants: [for (final p in produits) FeuilleArbre(child: ligneProduit(context, p, fond: Charte.niveau(4)))],
-              ));
+              );
+              secteurs.add(ouvert ? KeyedSubtree(key: _ancre, child: ligne) : ligne);
             }
           }
           rayons.add(NiveauArbre(
@@ -649,12 +816,16 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
       res.add(NiveauArbre(
         cle: 'univers-$u',
         niveau: 1,
-        nom: u,
+        nom: etat.nomUnivers(u),
         signe: Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 40, color: Charte.encreNiveau),
         nombre: rayonsU.length,
         ouvert: uOuvert,
         onTap: () => plis.basculer(_cleU(u)),
-        onCrayon: () => menuActions(context, titre: u, actions: [
+        onCrayon: () => menuActions(context, titre: etat.nomUnivers(u), actions: [
+          ActionLigne(Icons.edit_outlined, 'Renommer l\'univers', () async {
+            final nom = await demanderTexte(context, titre: 'Nom de l\'univers', initial: etat.nomUnivers(u));
+            if (nom != null && nom.trim().isNotEmpty) etat.renommerUnivers(u, nom);
+          }),
           ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
           ActionLigne(Icons.drag_handle, 'Déplacer les rayons', () => _deplacerRayons(context)),
         ]),
@@ -673,7 +844,7 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           final noms = await ordonner(context, titre: 'Ordre des secteurs · ${x.nom}', noms: [for (final s in etat.secteursVisibles(x.id)) s.nom]);
           if (noms != null) etat.ordonnerSecteursCatalogue(x, noms);
         }),
-      if (etat.rayonAjoute(x)) ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
+      ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () => _renommerRayon(context, x)),
       ActionLigne(Icons.storefront_outlined, 'Changer d\'univers', () async {
           final u = await choisirDansListe<String>(context, titre: 'Univers du rayon « ${x.nom} »', choix: {for (final u in universDesRayons.keys) u: u});
           if (u != null) etat.changerUniversRayon(x, u);
@@ -822,7 +993,7 @@ List<ActionLigne> actionsSecteur(BuildContext context, Secteur s) => [
         final p = await fenetreProduit(context, secteur: s);
         if (p != null && context.mounted) Nav.message(context, '« ${p.nom} » ajouté au catalogue');
       }),
-      if (Etat.instance.secteurAjoute(s)) ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () => _renommerSecteur(context, s)),
+      ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () => _renommerSecteur(context, s)),
     ];
 
 /// Catalogue › Produits ajoutés : les produits que le foyer a ajoutés, à corriger (fenêtre du produit) ou supprimer.
@@ -1176,7 +1347,7 @@ Future<void> _deplacerRayons(BuildContext context) async {
     groupes[universDuRayon(r.nom, etat.universRayons)]!.add(r.nom);
   }
   final res = await ordonnerParGroupes(context,
-      titre: 'Déplacer les rayons', groupes: groupes, couleurs: {for (final e in apparenceUnivers.entries) e.key: e.value.$2});
+      titre: 'Déplacer les rayons', groupes: groupes, noms: {for (final u in groupes.keys) u: etat.nomUnivers(u)});
   if (res != null) etat.rangerRayons(res);
 }
 
@@ -1207,14 +1378,36 @@ Future<void> _nouveauSecteur(BuildContext context, Rayon r) async {
   if (context.mounted) Nav.message(context, 'Secteur « ${s.nom} » ajouté');
 }
 
+/// Renomme un rayon (02/11/2026 : aussi ceux d'origine) ; ses images et celles de ses secteurs le suivent.
 Future<void> _renommerRayon(BuildContext context, Rayon r) async {
+  final etat = Etat.instance;
   final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
-  if (nom == null || nom.trim().isEmpty) return;
-  Etat.instance.renommerRayonCatalogue(r, nom);
+  if (nom == null || nom.trim().isEmpty || nom.trim() == r.nom || !context.mounted) return;
+  final n = nom.trim(), ancien = r.nom;
+  if (etat.rayons.any((x) => x.nom == n)) {
+    Nav.message(context, 'Le rayon « $n » existe déjà');
+    return;
+  }
+  final image = cleRayon(ancien);
+  final imagesSecteurs = {for (final s in etat.secteursVisibles(r.id)) s.nom: cleSecteur(ancien, s.nom)};
+  etat.renommerRayonCatalogue(r, n);
+  if (image != null && cleRayon(n) != image) etat.choisirImage(cleChoixRayon(n), image);
+  for (final MapEntry(key: s, value: img) in imagesSecteurs.entries) {
+    if (img != null && cleSecteur(n, s) != img) etat.choisirImage(cleChoixSecteur(n, s), img);
+  }
 }
 
+/// Renomme un secteur (02/11/2026 : aussi ceux d'origine) ; son image le suit.
 Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
+  final etat = Etat.instance;
   final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
-  if (nom == null || nom.trim().isEmpty) return;
-  Etat.instance.renommerSecteurCatalogue(s, nom);
+  if (nom == null || nom.trim().isEmpty || nom.trim() == s.nom || !context.mounted) return;
+  final n = nom.trim(), rn = etat.rayon(s.rayonId)?.nom ?? '';
+  if (etat.secteurs.any((x) => x.rayonId == s.rayonId && x.nom == n)) {
+    Nav.message(context, 'Le secteur « $n » existe déjà dans ce rayon');
+    return;
+  }
+  final image = cleSecteur(rn, s.nom);
+  etat.renommerSecteurCatalogue(s, n);
+  if (image != null && cleSecteur(rn, n) != image) etat.choisirImage(cleChoixSecteur(rn, n), image);
 }

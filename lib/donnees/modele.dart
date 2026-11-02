@@ -524,6 +524,18 @@ class Etat extends ChangeNotifier {
   /// Univers choisi pour un rayon ajouté par le foyer (nom du rayon → univers), 01/11/2026.
   Map<String, String> universRayons = {};
 
+  /// Rayons et secteurs renommés par le foyer (02/11/2026, Aristide) : nom actuel → nom d'origine
+  /// (« r:Nouveau » → rayon d'origine, « s:Rayon d'origine/Nouveau » → secteur d'origine). Le catalogue des marques
+  /// et les mises à jour du catalogue commun restent reliés aux noms d'origine.
+  Map<String, String> renommages = {};
+
+  /// Univers renommés (nom d'origine → nom affiché).
+  Map<String, String> nomsUnivers = {};
+
+  String nomUnivers(String u) => nomsUnivers[u] ?? u;
+  String origineRayon(String nom) => renommages['r:$nom'] ?? nom;
+  String origineSecteur(String rayonNom, String nom) => renommages['s:${origineRayon(rayonNom)}/$nom'] ?? nom;
+
   /// Ordre des rayons dans le catalogue (noms), fixé en les faisant glisser ; vide = ordre de départ.
   List<String> ordreRayons = [];
 
@@ -1089,6 +1101,8 @@ class Etat extends ChangeNotifier {
     statutsMembres = {for (final e in (options?['statutsMembres'] as Map? ?? {}).entries) e.key as String: e.value as String};
     structurePerso = {for (final x in (options?['structurePerso'] as List? ?? const [])) x as String};
     universRayons = {for (final e in (options?['universRayons'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    renommages = {for (final e in (options?['renommages'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    nomsUnivers = {for (final e in (options?['nomsUnivers'] as Map? ?? {}).entries) e.key as String: e.value as String};
     ordreRayons = [for (final x in (options?['ordreRayons'] as List? ?? const [])) x as String];
     catalogueIsole = options?['catalogueIsole'] == 1;
     idApports = options?['idApports'] as String?;
@@ -1216,6 +1230,8 @@ class Etat extends ChangeNotifier {
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
             if (structurePerso.isNotEmpty) 'structurePerso': structurePerso.toList()..sort(),
             if (universRayons.isNotEmpty) 'universRayons': universRayons,
+            if (renommages.isNotEmpty) 'renommages': renommages,
+            if (nomsUnivers.isNotEmpty) 'nomsUnivers': nomsUnivers,
             if (ordreRayons.isNotEmpty) 'ordreRayons': ordreRayons,
             if (catalogueIsole) 'catalogueIsole': 1,
             if (idApports != null) 'idApports': idApports,
@@ -1513,6 +1529,38 @@ class Etat extends ChangeNotifier {
     _toucheConstruction(l);
     modifie();
     return q;
+  }
+
+  /// Le même produit d'une marque, hors de toute liste (catalogue, 02/11/2026) : « Camembert » → « Camembert
+  /// Président », créé au besoin avec les mêmes mesures et packagings, rangé aux mêmes endroits.
+  Produit produitDeMarque(Produit p, String marqueNom) {
+    final mq = marqueNom.trim();
+    var racine = p.nom;
+    for (final id in p.marqueIds) {
+      final n = marque(id)?.nom;
+      if (n != null && racine.toLowerCase().endsWith(' ${n.toLowerCase()}')) racine = racine.substring(0, racine.length - n.length - 1);
+    }
+    final nom = mq.isEmpty ? racine : '$racine $mq';
+    var q = _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
+    if (q == null) {
+      q = Produit(nouvelId('p'), nom, [], [...p.packagingIds], 0);
+      produits.add(q);
+      _marquerAjoute(q);
+      for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
+        emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
+      }
+    }
+    if (mq.isNotEmpty) ajouterMarque(q, mq);
+    modifie();
+    return q;
+  }
+
+  /// Mesures et packagings d'un produit du catalogue (02/11/2026).
+  void definirFormats(Produit p, List<String> packagingIds) {
+    p.packagingIds
+      ..clear()
+      ..addAll(packagingIds);
+    modifie();
   }
 
   /// Nom de l'article sans la marque de sa ligne (« Camembert Président » → « Camembert »).
@@ -2898,6 +2946,18 @@ class Etat extends ChangeNotifier {
   List<String> appliquerCatalogueCommun(Map<String, dynamic> j) {
     final version = (j['version'] as num? ?? 0).toInt();
     if (version <= versionCatalogueCommun || magasins.isEmpty) return const [];
+    // Rayons et secteurs renommés par le foyer : les noms d'origine du catalogue commun deviennent les siens.
+    if (renommages.isNotEmpty) {
+      final rayonsActuels = {for (final e in renommages.entries) if (e.key.startsWith('r:')) e.value: e.key.substring(2)};
+      final secteursActuels = {for (final e in renommages.entries) if (e.key.startsWith('s:')) '${e.key.substring(2, e.key.lastIndexOf('/'))}/${e.value}': e.key.substring(e.key.lastIndexOf('/') + 1)};
+      for (final rj in (j['rayons'] as List? ?? const []).whereType<Map>()) {
+        final ro = rj['nom'] as String? ?? '';
+        for (final sj in (rj['secteurs'] as List? ?? const []).whereType<Map>()) {
+          if (secteursActuels['$ro/${sj['nom']}'] case final n?) sj['nom'] = n;
+        }
+        if (rayonsActuels[ro] case final n?) rj['nom'] = n;
+      }
+    }
     final lignes = <String>[];
     String bas(String t) => t.trim().toLowerCase();
     Produit? produitNomme(String nom) => _trouve(produits, (p) => bas(p.nom) == bas(nom));
@@ -3368,16 +3428,32 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  /// Renomme un rayon ajouté, dans tous les magasins.
+  /// Renomme un rayon dans tous les magasins (02/11/2026 : aussi ceux d'origine, dont le nom d'origine est gardé).
   void renommerRayonCatalogue(Rayon r, String nom) {
     final n = nom.trim(), ancien = r.nom;
-    if (n.isEmpty || n == ancien || !rayonAjoute(r)) return;
+    if (n.isEmpty || n == ancien || _trouve(rayons, (x) => x.nom == n) != null) return;
+    if (!rayonAjoute(r)) {
+      final origine = origineRayon(ancien);
+      renommages.remove('r:$ancien');
+      if (n != origine) renommages['r:$n'] = origine;
+    }
     for (final x in rayons.where((x) => x.nom == ancien)) {
       x.nom = n;
     }
     structurePerso = {for (final c in structurePerso) c == ancien ? n : (c.startsWith('$ancien/') ? '$n/${c.substring(ancien.length + 1)}' : c)};
     if (universRayons.remove(ancien) case final u?) universRayons[n] = u;
     ordreRayons = [for (final x in ordreRayons) x == ancien ? n : x];
+    modifie();
+  }
+
+  /// Renomme un univers (seulement le nom affiché).
+  void renommerUnivers(String origine, String nom) {
+    final n = nom.trim();
+    if (n.isEmpty || n == origine) {
+      nomsUnivers.remove(origine);
+    } else {
+      nomsUnivers[origine] = n;
+    }
     modifie();
   }
 
@@ -3398,16 +3474,24 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  /// Renomme un secteur ajouté, dans tous les magasins.
+  /// Renomme un secteur dans tous les magasins (02/11/2026 : aussi ceux d'origine, dont le nom d'origine est gardé).
   void renommerSecteurCatalogue(Secteur s, String nom) {
     final n = nom.trim(), ancien = s.nom, rn = rayon(s.rayonId)?.nom ?? '';
-    if (n.isEmpty || n == ancien || !secteurAjoute(s)) return;
+    if (n.isEmpty || n == ancien || _trouve(secteurs, (x) => x.rayonId == s.rayonId && x.nom == n) != null) return;
+    final ajoute = secteurAjoute(s);
+    if (!ajoute) {
+      final ro = origineRayon(rn), origine = origineSecteur(rn, ancien);
+      renommages.remove('s:$ro/$ancien');
+      if (n != origine) renommages['s:$ro/$n'] = origine;
+    }
     for (final x in secteurs.where((x) => x.nom == ancien && rayon(x.rayonId)?.nom == rn)) {
       x.nom = n;
     }
-    structurePerso
-      ..remove('$rn/$ancien')
-      ..add('$rn/$n');
+    if (ajoute) {
+      structurePerso
+        ..remove('$rn/$ancien')
+        ..add('$rn/$n');
+    }
     modifie();
   }
 
@@ -3648,7 +3732,10 @@ class Etat extends ChangeNotifier {
     marquesType = {for (final e in (j['secteurs'] as Map).entries) e.key as String: _ids(e.value)};
   }
 
-  String cleSecteur(Secteur s) => '${rayon(s.rayonId)?.nom ?? ''}/${s.nom}';
+  String cleSecteur(Secteur s) {
+    final rn = rayon(s.rayonId)?.nom ?? '';
+    return '${origineRayon(rn)}/${origineSecteur(rn, s.nom)}';
+  }
 
   /// Marques d'un secteur : celles du catalogue des marques, celles ajoutées par le foyer et celles des
   /// produits du secteur, sans celles que le foyer a retirées ; par ordre alphabétique.

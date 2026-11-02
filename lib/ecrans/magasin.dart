@@ -39,14 +39,12 @@ List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? liste
       ActionLigne(Icons.delete_outline, 'Supprimer', () async {
         if (await demanderSuppression(context, p, 'le produit ${p.nom}') && depuisFiche && context.mounted) Navigator.of(context).pop();
       }, danger: true),
-    ] else
-      ActionLigne(Icons.sell_outlined, 'Avec une marque', () async {
-        final q = await fenetreProduit(context, secteur: etat.secteurCatalogue(p.id), libelle: p.nom);
-        if (q != null && depuisFiche && context.mounted) {
-          Navigator.of(context)
-              .pushReplacement(MaterialPageRoute<void>(builder: (_) => EcranFicheProduit(produitId: q.id, listeId: listeId)));
-        }
-      }),
+    ],
+    ActionLigne(Icons.sell_outlined, 'Créer le même produit d\'une marque', () => produitDeMarque(context, p)),
+    // 02/11/2026 (Aristide) : déplacer le produit, mettre à jour ses mesures et packagings.
+    if (etat.secteurCatalogue(p.id) != null)
+      ActionLigne(Icons.drive_file_move_outline, 'Déplacer le produit', () => deplacerProduit(context, p)),
+    ActionLigne(Icons.straighten, 'Mettre à jour mesures et packaging', () => formatsProduit(context, p)),
     // Ajouté par un autre foyer : nom fantaisiste, grossier ou faux → signalé (31/10/2026).
     if (etat.estRecu(p))
       ActionLigne(Icons.flag_outlined, 'Signaler ce produit', () async {
@@ -112,7 +110,7 @@ class EcranFicheProduit extends StatelessWidget {
                   child: Text(
                       ajoute
                           ? 'Ajouté par le foyer : il peut être modifié.'
-                          : 'Produit du catalogue d\'origine : il ne se modifie pas. Avec une marque, il devient un nouveau produit.',
+                          : 'Produit du catalogue d\'origine : il ne se modifie pas. « Créer le même produit d\'une marque » en fait un nouveau produit.',
                       style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                 ),
               ]),

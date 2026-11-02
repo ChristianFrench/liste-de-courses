@@ -584,10 +584,10 @@ void main() {
       await _toucher(tester, find.text('CRÈMERIE').last);
       // Toucher un produit : ses actions dans un volet, plus de page (02/11/2026).
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('Avec une marque'), findsOneWidget, reason: 'actions du produit');
+      expect(find.text('Créer le même produit d\'une marque'), findsOneWidget, reason: 'actions du produit');
       await _ciblesTactiles(tester);
       await _fermerVolet(tester);
-      expect(find.text('Avec une marque'), findsNothing);
+      expect(find.text('Créer le même produit d\'une marque'), findsNothing);
       expect(find.text('CRÈMERIE', skipOffstage: false), findsWidgets, reason: 'secteur toujours déplié');
 
       await _rubrique(tester, 'Types de promotion');
@@ -1110,7 +1110,7 @@ void main() {
       // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.text('Modifier'), findsNothing);
-      expect(find.text('Avec une marque'), findsOneWidget);
+      expect(find.text('Créer le même produit d\'une marque'), findsOneWidget);
       await _fermerVolet(tester);
       // Tout à droite du secteur : ses marques
       await _toucher(tester, find.byTooltip('Marques de Crèmerie'));

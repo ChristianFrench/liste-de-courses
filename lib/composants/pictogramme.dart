@@ -53,10 +53,16 @@ String cleChoixSecteur(String rayon, String secteur) => '${_slug(rayon)}--${_slu
 /// Images de réserve, à choisir pour les rayons et secteurs ajoutés par l'utilisateur.
 List<String> get pictosReserve => [for (final c in pictosDisponibles) if (c.startsWith('reserve--')) c];
 
+/// Images Noto 3D de plus, à choisir pour n'importe quel rayon ou secteur (02/11/2026, Aristide : celles dont le
+/// nom croise le catalogue).
+List<String> get pictosBibliotheque => [for (final c in pictosEmoji) if (c.startsWith('bibliotheque--')) c];
+
+bool _dispo(String c) => pictosDisponibles.contains(c) || pictosEmoji.contains(c);
+
 String? cleRayon(String nom) {
   final s = _slug(nom);
   final choisie = imagesChoisies[s];
-  if (choisie != null && pictosDisponibles.contains(choisie)) return choisie;
+  if (choisie != null && _dispo(choisie)) return choisie;
   if (pictosDisponibles.contains(s)) return s;
   final a = _alias[s];
   if (a != null && pictosDisponibles.contains(a)) return a;
@@ -66,7 +72,7 @@ String? cleRayon(String nom) {
 String? cleSecteur(String rayon, String nom) {
   final s = _slug(nom);
   final choisie = imagesChoisies['${_slug(rayon)}--$s'];
-  if (choisie != null && pictosDisponibles.contains(choisie)) return choisie;
+  if (choisie != null && _dispo(choisie)) return choisie;
   final r = cleRayon(rayon) ?? _slug(rayon);
   if (pictosDisponibles.contains('$r--$s')) return '$r--$s';
   for (final c in pictosDisponibles) {
@@ -145,6 +151,8 @@ Future<String?> choisirPictogramme(BuildContext context, {required String titre}
               ),
             ),
             if (reserve.isNotEmpty) ...[intertitre('Images de réserve'), grille(ctx, reserve)],
+            intertitre('Bibliothèque Noto 3D'),
+            grille(ctx, pictosBibliotheque),
             intertitre('Images du catalogue'),
             grille(ctx, autres),
           ],
