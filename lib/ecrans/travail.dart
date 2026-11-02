@@ -1828,7 +1828,8 @@ class EcranConsultation extends StatelessWidget {
 /// Image du secteur d'une étape de liste (bandeau des listes en préparation et en courses).
 String? pictoEtape(Etape x) {
   final s = x.secteur;
-  if (s == null) return null;
+  // 02/11/2026 (Aristide) : Apparence › « Icônes dans les listes ».
+  if (s == null || !Etat.instance.iconesListes) return null;
   return picto.cleSecteur(Etat.instance.rayon(s.rayonId)?.nom ?? '', s.nom);
 }
 

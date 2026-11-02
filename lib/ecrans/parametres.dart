@@ -116,6 +116,15 @@ class EcranApparence extends _EcranVivant {
       const SizedBox(height: 10),
       TitreGroupe(nom: 'Fruits et légumes', grand: true, image: cleRayon('Fruits et légumes'), nombre: 2),
       for (final (n, d) in [('Pommes Golden', '1 kg'), ('Bananes', 'Lot de 6')]) LigneMenu(titre: n, sousTitre: d),
+      // 02/11/2026 (Aristide) : icônes des secteurs dans les listes, ou pas.
+      CheckboxListTile(
+        key: const ValueKey('icones-listes'),
+        value: etat.iconesListes,
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        title: Text('Icônes dans les listes', style: Charte.texte(16)),
+        onChanged: (v) => etat.montrerIconesListes(v ?? true),
+      ),
       const TitreSection('Palette des cadres', cote: 0),
       ChoixDeroulant<String>(
         key: const ValueKey('palette-cadres'),

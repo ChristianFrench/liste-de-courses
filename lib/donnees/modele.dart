@@ -580,6 +580,9 @@ class Etat extends ChangeNotifier {
 
   /// Palette de couleurs choisie (Paramètres › Apparence) ; null : la première.
   String? apparence;
+
+  /// Images des secteurs dans les listes (Apparence, 02/11/2026) ; propre à l'appareil.
+  bool iconesListes = true;
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;
   set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
@@ -1114,6 +1117,7 @@ class Etat extends ChangeNotifier {
     typesPackaging = _ids(options?['typesPackaging']);
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
+    iconesListes = options?['iconesListes'] as bool? ?? true;
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
@@ -1244,6 +1248,7 @@ class Etat extends ChangeNotifier {
             if (magasinsArchives.isNotEmpty) 'magasinsArchives': [for (final m in magasinsArchives) m.id],
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
+            if (!iconesListes) 'iconesListes': false,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
@@ -3951,6 +3956,11 @@ class Etat extends ChangeNotifier {
     } else {
       couleurs[cle] = couleur;
     }
+    modifie();
+  }
+
+  void montrerIconesListes(bool oui) {
+    iconesListes = oui;
     modifie();
   }
 

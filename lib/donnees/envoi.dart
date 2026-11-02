@@ -227,7 +227,9 @@ Future<Envoi> envoyerListe(Etat etat, Liste l, {List<String>? a}) =>
     envoyerMail(a ?? destinataires(etat), _sujetListe(etat, l), texteListe(etat, l), html: htmlListe(etat, l));
 
 /// L'objet du mail est le titre de la liste (02/11/2026, Aristide).
-String _sujetListe(Etat etat, Liste l) => etat.nomListe(l);
+/// EmailJS remplace « / », « ' », « & »… de l'objet par des codes (&#x2F;…) : la date s'écrit avec des points.
+String _sujetListe(Etat etat, Liste l) =>
+    etat.nomListe(l).replaceAll('/', '.').replaceAll("'", '’').replaceAll('&', 'et').replaceAll('"', '').replaceAll('<', '').replaceAll('>', '').replaceAll('=', '-');
 
 /// Le mail préparé de la liste, pour la messagerie.
 Uri lienMail(Etat etat, Liste l) => _mailto(destinataires(etat), _sujetListe(etat, l), texteListe(etat, l));
