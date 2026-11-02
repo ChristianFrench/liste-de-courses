@@ -462,7 +462,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
             actions: [
               ActionLigne(Icons.event_outlined, 'Changer le magasin ou la date', () => changerMagasinEtDate(context, l)),
               ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
-                final r = messageEnvoi(await envoyerListe(etat, l), destinataires(etat).length);
+                final a = await choisirDestinataires(context);
+                if (a == null) return;
+                final r = messageEnvoi(await envoyerListe(etat, l, a: a), a.length);
                 if (r != null && context.mounted) Nav.message(context, r);
               }),
             ],
@@ -691,7 +693,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
       if (enListeType && nom.isNotEmpty) Nav.message(context, 'Liste type « $nom » enregistrée');
       return;
     }
-    final envoi = envoyer ? messageEnvoi(await envoyerListe(etat, l), destinataires(etat).length) : null;
+    final a = envoyer ? await choisirDestinataires(context) : null;
+    if (!mounted) return;
+    final envoi = a != null ? messageEnvoi(await envoyerListe(etat, l, a: a), a.length) : null;
     etat.listePrete(l);
     Nav.i.retourOnglet(Nav.courses);
     if (mounted) {
@@ -1831,3 +1835,40 @@ String? pictoEtape(Etape x) {
 /// Bandeau d'un secteur et ses articles ; avec une image, ils sont réunis pour qu'elle déborde par-dessus.
 List<Widget> sectionSecteur(String? picto, double gauche, List<Widget> enfants) =>
     picto == null ? enfants : [SectionDebordante(picto: picto, gauche: gauche, enfants: enfants)];
+
+/// Qui reçoit la liste (02/11/2026, Aristide) : les membres du foyer qui ont une adresse, tous cochés au départ.
+/// Rend null si l'on renonce. Sans membre à adresse : la liste vide (la messagerie s'ouvre, on choisit là).
+Future<List<String>?> choisirDestinataires(BuildContext context) async {
+  final etat = Etat.instance;
+  final vues = <String>{};
+  final membres = [
+    for (final m in etat.membresVisibles)
+      if (m.email.trim().isNotEmpty && vues.add(m.email.trim().toLowerCase())) m
+  ];
+  if (membres.isEmpty) return const [];
+  final coches = {for (final m in membres) m.id};
+  final ok = await modale(
+    context,
+    titre: 'Envoyer la liste à',
+    icone: Icons.mail_outline,
+    oui: 'Envoyer',
+    contenu: (context, maj) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (final m in membres)
+          CheckboxListTile(
+            key: ValueKey('destinataire-${m.id}'),
+            value: coches.contains(m.id),
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
+            title: Text(m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche, style: Charte.texte(16)),
+            subtitle: Text(m.email.trim(), style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+            onChanged: (v) => maj(() => v == true ? coches.add(m.id) : coches.remove(m.id)),
+          ),
+      ],
+    ),
+  );
+  if (!ok) return null;
+  // Personne de coché : rien ne part.
+  return coches.isEmpty ? null : [for (final m in membres) if (coches.contains(m.id)) m.email.trim()];
+}

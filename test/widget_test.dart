@@ -185,7 +185,8 @@ void main() {
       expect(texte, contains('NON PLACÉ'));
       final html = htmlListe(e, l);
       expect(html, contains('<b>Liste de courses · Magasin 1 · 9 articles</b>'));
-      expect(html, contains('<li>'));
+      expect(html, contains('<div>3 × Pâtes <span style="color:#c62828">promo'), reason: 'quantité devant, promo en rouge');
+      expect(html, isNot(contains('background')), reason: 'sobre (02/11/2026)');
       final autre = e.membres.firstWhere((m) => m.id != e.moi.id);
       e.modifierEmail(autre, 'a@exemple.fr');
       e.modifierEmail(e.moi, 'moi@exemple.fr');

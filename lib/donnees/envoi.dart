@@ -154,19 +154,19 @@ String texteListe(Etat etat, Liste l) {
 
 /// La même liste mise en forme pour le mail envoyé directement : titres en gras, promotions en rouge.
 String htmlListe(Etat etat, Liste l) {
-  final b = StringBuffer('<div style="font-family:Arial,sans-serif;font-size:15px;color:#1f2a24">'
-      '<p style="font-size:17px;margin:0 0 8px"><b>${_echapper(_enTeteListe(etat, l))}</b></p>');
+  // 02/11/2026 (Aristide) : sobre, police normale de Gmail ; titres des rayons en gras, articles à la même
+  // taille en normal, quantité devant le nom ; seule couleur, le rouge des promotions.
+  final b = StringBuffer('<div style="font-family:Arial,Helvetica,sans-serif;font-size:small">'
+      '<div><b>${_echapper(_enTeteListe(etat, l))}</b></div>');
   final commentaire = etat.commentaire(l);
-  if (commentaire != null) b.write('<p style="margin:0 0 8px"><i>${_echapper(commentaire).replaceAll('\n', '<br>')}</i></p>');
+  if (commentaire != null) b.write('<div><i>${_echapper(commentaire).replaceAll('\n', '<br>')}</i></div>');
   for (final (titre, lignes) in _groupesListe(etat, l)) {
-    b.write('<p style="margin:14px 0 4px;padding:3px 8px;background:#3c7a58;color:#ffffff"><b>${_echapper(titre)}</b></p>'
-        '<ul style="margin:0;padding-left:22px">');
+    b.write('<div><br><b>${_echapper(titre)}</b></div>');
     for (final x in lignes) {
-      b.write('<li>${x.quantite > 1 ? '<b>${x.quantite} ×</b> ' : ''}<b>${_echapper(x.nom)}</b>'
+      b.write('<div>${x.quantite > 1 ? '${x.quantite} × ' : ''}${_echapper(x.nom)}'
           '${x.detail.isEmpty ? '' : ', ${_echapper(x.detail)}'}'
-          '${x.promo.isEmpty ? '' : ' <span style="color:#c62828"><b>promo : ${_echapper(x.promo)}</b></span>'}</li>');
+          '${x.promo.isEmpty ? '' : ' <span style="color:#c62828">promo : ${_echapper(x.promo)}</span>'}</div>');
     }
-    b.write('</ul>');
   }
   b.write('</div>');
   return b.toString();
@@ -222,10 +222,12 @@ String _requete(Map<String, String> p) =>
     p.entries.map((e) => '${e.key}=${Uri.encodeComponent(e.value)}').join('&');
 
 /// La liste, au foyer si l'option est choisie ; sinon la messagerie s'ouvre et l'on choisit à qui l'envoyer.
-Future<Envoi> envoyerListe(Etat etat, Liste l) =>
-    envoyerMail(destinataires(etat), _sujetListe(etat, l), texteListe(etat, l), html: htmlListe(etat, l));
+/// [a] : les destinataires choisis (02/11/2026), sinon ceux du foyer.
+Future<Envoi> envoyerListe(Etat etat, Liste l, {List<String>? a}) =>
+    envoyerMail(a ?? destinataires(etat), _sujetListe(etat, l), texteListe(etat, l), html: htmlListe(etat, l));
 
-String _sujetListe(Etat etat, Liste l) => 'Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''}';
+/// L'objet du mail est le titre de la liste (02/11/2026, Aristide).
+String _sujetListe(Etat etat, Liste l) => etat.nomListe(l);
 
 /// Le mail préparé de la liste, pour la messagerie.
 Uri lienMail(Etat etat, Liste l) => _mailto(destinataires(etat), _sujetListe(etat, l), texteListe(etat, l));
