@@ -802,7 +802,9 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
             cle: 'rayon-${x.nom}',
             niveau: 2,
             nom: x.nom,
-            signe: Pictogramme(cleRayon(x.nom), taille: 40),
+            // 02/11/2026 (Aristide) : icône des rayons réduite, à la hauteur du bandeau.
+            tailleSigne: 38,
+            signe: Pictogramme(cleRayon(x.nom), taille: 36),
             surSigneLong: () => choisirImageRayon(context, x.nom),
             ajoute: etat.rayonAjoute(x),
             nombre: etat.secteursVisibles(x.id).length,
