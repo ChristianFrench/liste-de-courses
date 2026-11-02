@@ -544,7 +544,7 @@ class TitreGroupe extends StatelessWidget {
     // texte blanc sur un fond imposé sombre.
     final base = nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent);
     final couleurFond = fond ?? (nonPlace || couleur != null ? Charte.clair(base) : Charte.niveau(4));
-    final encre = couleurFond.computeLuminance() < 0.3 ? Charte.blanc : (nonPlace || couleur != null ? Charte.fonce(base) : Charte.niveau(1));
+    final encre = couleurFond.computeLuminance() < 0.3 ? Charte.blanc : (nonPlace || couleur != null ? Charte.fonce(base) : Charte.encreNiveau);
     final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
     // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
     // 01/11/2026 (Aristide) : plus grande ; elle ne dépasse pas en haut, le léger débord est en bas.
@@ -1921,4 +1921,105 @@ Future<void> menuActions(BuildContext context, {String? titre, String? detail, r
     ),
   );
   choix?.faire();
+}
+
+/// Retrait de chaque niveau d'une arborescence (catalogues des produits et des marques).
+const double retraitNiveau = 20;
+
+/// Un niveau d'arborescence des catalogues (02/11/2026, Aristide : le même look pour les deux catalogues) :
+/// bandeau à la couleur du [niveau] de la palette (1 univers, 2 rayon, 3 secteur), icône et texte décalés d'un
+/// cran par niveau, pas de blanc entre les lignes ; un toucher long sur l'icône la change ([surSigneLong]),
+/// le crayon ouvre les actions du niveau ([onCrayon]).
+class NiveauArbre extends StatelessWidget {
+  const NiveauArbre({
+    super.key,
+    required this.cle,
+    required this.niveau,
+    required this.nom,
+    required this.ouvert,
+    required this.onTap,
+    required this.enfants,
+    this.signe,
+    this.surSigneLong,
+    this.onCrayon,
+    this.ajoute = false,
+    this.nombre,
+    int? profondeur,
+  }) : profondeur = profondeur ?? niveau;
+  final String cle;
+  final int niveau;
+
+  /// Rang dans l'arborescence, pour le retrait (par défaut : [niveau]) ; le catalogue des marques commence aux
+  /// rayons, qui gardent leur couleur de rayon.
+  final int profondeur;
+  final String nom;
+  final bool ouvert;
+  final VoidCallback onTap;
+  final List<Widget> enfants;
+  final Widget? signe;
+  final VoidCallback? surSigneLong;
+  final VoidCallback? onCrayon;
+  final bool ajoute;
+  final int? nombre;
+
+  @override
+  Widget build(BuildContext context) {
+    final fond = Charte.niveau(niveau);
+    final encre = Charte.encreNiveau;
+    final style = Charte.texte(profondeur == 1 ? 17 : 16, gras: true, couleur: encre);
+    final icone = signe == null
+        ? null
+        : SizedBox(
+            width: 40,
+            height: 40,
+            child: surSigneLong == null
+                ? signe
+                : GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, onLongPress: surSigneLong, child: signe));
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Material(
+        key: ValueKey(cle),
+        color: fond,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 46),
+            padding: EdgeInsets.fromLTRB(8 + (profondeur - 1) * retraitNiveau, 2, 8, 2),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.niveau(5)))),
+            child: Row(children: [
+              if (icone != null) ...[icone, const SizedBox(width: 10)] else const SizedBox(width: 8),
+              Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
+              if (ajoute) Text(' +', style: style),
+              if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: style)),
+              if (onCrayon != null)
+                Tooltip(
+                  message: 'Modifier $nom',
+                  child: InkResponse(
+                    key: ValueKey('crayon-$cle'),
+                    onTap: onCrayon,
+                    radius: 22,
+                    child: Padding(padding: const EdgeInsets.all(6), child: Icone(Icons.edit_outlined, size: 24, color: encre)),
+                  ),
+                ),
+              Icone(ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: encre),
+            ]),
+          ),
+        ),
+      ),
+      if (ouvert) ...enfants,
+    ]);
+  }
+}
+
+/// Dernier niveau d'une arborescence des catalogues (produit, marque) : fond le plus clair de la palette,
+/// texte décalé sous celui de son secteur.
+class FeuilleArbre extends StatelessWidget {
+  const FeuilleArbre({super.key, required this.child, this.profondeur = 4});
+  final Widget child;
+  final int profondeur;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+        color: Charte.niveau(5),
+        child: Padding(padding: EdgeInsets.only(left: 8 + (profondeur - 1) * retraitNiveau + 8), child: child),
+      );
 }

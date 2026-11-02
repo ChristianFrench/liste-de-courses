@@ -38,6 +38,15 @@ void main() {
     expect(m.canal, startsWith('ldc-'));
     expect(m.messages.single.texte, 'Il manque le lait é');
     expect(m.messages.single.titre, 'Zoé · Maison');
+    // Le journal du foyer garde l'expéditeur et les destinataires (historique de chaque membre)
+    final autres = [for (final x in e.membresVisibles) if (x.id != e.moi.id) x.id];
+    expect(envoyes.first['tags'], containsAll(['de-${e.moi.id}', for (final id in autres) 'a-$id']));
+    expect(envoyes.last['tags'], isNot(contains('de-${e.moi.id}')), reason: 'pas d\'étiquettes sur le canal d\'un membre');
+    final x = MessageFoyer.lire(envoyes.first..addAll({'id': 'c', 'time': 1761560200}))!;
+    expect(x.envoyePar(e.moi.id), isTrue);
+    expect(x.recuPar(autres.first), isTrue);
+    expect(x.recuPar(e.moi.id), isFalse);
+    expect(x.mail, isFalse);
   });
 
   test('mail direct par EmailJS : destinataires, sujet et texte ; rien sans destinataire ni identifiants', () async {

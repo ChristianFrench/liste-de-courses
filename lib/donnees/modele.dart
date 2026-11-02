@@ -3827,10 +3827,11 @@ class Etat extends ChangeNotifier {
   }
 
   /// Couleurs des pastilles (Gérer › Paramètres › Apparence) : une pour les promotions, une pour les mesures,
-  /// une pour les packagings (lots). Par défaut : promotion en rouge, mesure et packaging en vert.
+  /// une pour les packagings (lots). Par défaut (02/11/2026, Aristide) : promotion en rouge, mesure en bleu,
+  /// packaging en vert.
   static const couleurPromoDefaut = 0xFFE53935;
-  static const couleurMesureDefaut = 0xFF43A047;
-  static const couleurLotDefaut = 0xFF2E7D32;
+  static const couleurMesureDefaut = 0xFF1E88E5;
+  static const couleurLotDefaut = 0xFF43A047;
   int get couleurPromotions => couleurs['promo'] ?? couleurPromoDefaut;
   int get couleurMesures => couleurs['mesure'] ?? couleurMesureDefaut;
   int get couleurLots => couleurs['lot'] ?? couleurLotDefaut;

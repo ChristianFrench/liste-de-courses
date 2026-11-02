@@ -1188,7 +1188,8 @@ void main() {
 
     testWidgets('Gérer › Paramètres › Synchronisation : état, serveur imposé caché sous « Avancé »', (tester) async {
       await _lancer(tester);
-      await _rubrique(tester, 'Synchronisation');
+      await _rubrique(tester, 'Collaboration');
+      await _toucher(tester, find.text('Synchronisation').last);
       expect(find.text('Le code de partage et les membres sont dans Gérer › Foyer.'), findsOneWidget);
       expect(find.text('Partager ce foyer'), findsNothing);
       expect(find.byKey(const ValueKey('mqtt-hote')), findsNothing, reason: 'serveur dans un volet');

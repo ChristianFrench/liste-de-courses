@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../composants/composants.dart';
+import '../composants/pictogramme.dart' show cleRayon;
 import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
@@ -95,11 +96,14 @@ class EcranApparence extends _EcranVivant {
   @override
   Widget construire(BuildContext context) {
     final etat = Etat.instance;
+    final cadres = (etat.couleurPromotions, etat.couleurMesures, etat.couleurLots);
+    final cadresActuels = palettesCadres.where((p) => (p.$2, p.$3, p.$4) == cadres).firstOrNull?.$1 ?? '';
     return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
-      // 01/11/2026 (Aristide) : toutes les palettes dans une seule liste déroulante, avec leur échantillon ;
-      // 02/11/2026 : libellé à gauche, mini palette (plus large) à droite.
+      // 02/11/2026 (Aristide) : deux sujets titrés, chacun avec une liste déroulante (libellé à gauche, palette à
+      // droite) et un petit exemple du résultat en dessous.
+      const TitreSection('Palette de l\'application', cote: 0),
       ChoixDeroulant<String>(
-        libelle: 'Palette de couleurs',
+        libelle: 'Palette',
         valeur: Charte.palette.nom,
         choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
         apercus: {for (final p in toutesLesPalettes) p.nom: _Echantillon(p)},
@@ -109,30 +113,49 @@ class EcranApparence extends _EcranVivant {
           Charte.choisirPalette(v);
         },
       ),
-      // 02/11/2026 (Aristide) : promotions, mesures et packagings, une zone unique chacun, avec les mêmes palettes
-      // (le cadre prend la teinte la plus soutenue de la palette choisie).
-      for (final (cle, nom, exemple, defaut) in [
-        ('promo', 'Promotions', 'Promo', Etat.couleurPromoDefaut),
-        ('mesure', 'Mesures', '500 g', Etat.couleurMesureDefaut),
-        ('lot', 'Packagings', 'Lot de 4', Etat.couleurLotDefaut),
-      ]) ...[
-        const SizedBox(height: 14),
-        ChoixDeroulant<String>(
-          key: ValueKey('couleur-$cle'),
-          libelle: nom,
-          valeur: _paletteDeCouleur(etat.couleurs[cle]),
-          choix: {'': 'Par défaut', for (final p in toutesLesPalettes) p.nom: p.nom},
-          apercus: {
-            '': Pastille(exemple, couleur: Color(defaut)),
-            for (final p in toutesLesPalettes) p.nom: _Echantillon(p),
-          },
-          apercuADroite: true,
-          onChange: (v) => etat.choisirCouleur(
-              cle, v.isEmpty ? null : toutesLesPalettes.firstWhere((p) => p.nom == v).accentFonce.toARGB32()),
-        ),
-      ],
+      const SizedBox(height: 10),
+      TitreGroupe(nom: 'Fruits et légumes', grand: true, image: cleRayon('Fruits et légumes'), nombre: 2),
+      for (final (n, d) in [('Pommes Golden', '1 kg'), ('Bananes', 'Lot de 6')]) LigneMenu(titre: n, sousTitre: d),
+      const TitreSection('Palette des cadres', cote: 0),
+      ChoixDeroulant<String>(
+        key: const ValueKey('palette-cadres'),
+        libelle: 'Promotions, mesures, packagings',
+        valeur: cadresActuels,
+        choix: {if (cadresActuels.isEmpty) '': 'Personnalisée', for (final p in palettesCadres) p.$1: p.$1},
+        apercus: {
+          if (cadresActuels.isEmpty) '': _EchantillonCadres(cadres),
+          for (final p in palettesCadres) p.$1: _EchantillonCadres((p.$2, p.$3, p.$4)),
+        },
+        apercuADroite: true,
+        onChange: (v) {
+          final p = palettesCadres.firstWhere((p) => p.$1 == v);
+          etat.choisirCouleur('promo', p.$2);
+          etat.choisirCouleur('mesure', p.$3);
+          etat.choisirCouleur('lot', p.$4);
+        },
+      ),
+      const SizedBox(height: 12),
+      Wrap(spacing: 10, runSpacing: 8, children: [
+        Pastille('Promo -30 %', couleur: Color(etat.couleurPromotions)),
+        Pastille('500 g', couleur: Color(etat.couleurMesures)),
+        Pastille('Lot de 4', couleur: Color(etat.couleurLots)),
+      ]),
     ]);
   }
+}
+
+/// Les trois couleurs d'une palette des cadres, côte à côte.
+class _EchantillonCadres extends StatelessWidget {
+  const _EchantillonCadres(this.couleurs);
+  final (int, int, int) couleurs;
+
+  @override
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          for (final c in [couleurs.$1, couleurs.$2, couleurs.$3]) Container(width: 26, height: 22, color: Color(c)),
+        ]),
+      );
 }
 
 /// Gérer › Paramètres › Données : listes exemples, puis suppression automatique des archives.
@@ -294,7 +317,7 @@ class EcranTypesPromotion extends StatelessWidget {
           ],
         ),
         corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: [
             for (final t in etat.typesPromotion)
               LigneMenu(
@@ -401,15 +424,6 @@ class _Option extends StatelessWidget {
 }
 
 
-/// Palette dont la teinte soutenue est [couleur] ; '' : couleur par défaut (ou ancienne couleur hors palette).
-String _paletteDeCouleur(int? couleur) {
-  if (couleur == null) return '';
-  for (final p in toutesLesPalettes) {
-    if (p.accentFonce.toARGB32() == couleur) return p.nom;
-  }
-  return '';
-}
-
 /// Gérer › Courses › Types de mesure (poids, volume, à la pièce…) ou Types de packaging (lots de 2 à 10…),
 /// dans de petits cadres de la couleur choisie dans Gérer › Paramètres › Apparence.
 class EcranTypesPackaging extends StatelessWidget {
@@ -491,7 +505,7 @@ class EcranTypesPackaging extends StatelessWidget {
                 }),
               ]),
           corps: ListView(
-            padding: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             children: [
               for (final id in ids)
                 if (etat.packaging(id) case final k?)
@@ -518,13 +532,8 @@ class _Echantillon extends StatelessWidget {
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          for (final c in [
-            palette.accentFonce,
-            palette.accent,
-            Color.lerp(palette.accentFonce, Charte.blanc, 0.60)!,
-            Color.lerp(palette.accentFonce, Charte.blanc, 0.82)!,
-          ])
-            Container(width: 26, height: 22, color: c),
+          for (final c in [for (var n = 1; n <= 5; n++) Color.lerp(palette.accentFonce, Charte.blanc, const [0.22, 0.48, 0.68, 0.82, 0.92][n - 1])!])
+            Container(width: 22, height: 22, color: c),
         ]),
       );
 }

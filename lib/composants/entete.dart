@@ -411,11 +411,18 @@ class Aides {
       'Catalogue : le catalogue est commun à tous les foyers et s\'enrichit de leurs ajouts. « Catalogue du foyer seul » '
       'coché : seuls le catalogue de départ et vos propres ajouts sont montrés ; ceux des autres foyers sont cachés, pas perdus.\n$_gestes';
 
-  static const messages = 'Écrire à tout le foyer. Les messages et les notifications (liste prête, départ et fin des courses, '
-      'liste rectificative) passent par le service gratuit ntfy. Pour les recevoir même quand l\'application est fermée, touchez '
-      'le titre « Messages » puis « Être prévenu (ntfy) » : sur Android, installez d\'abord l\'appli ntfy ; dans un navigateur, '
-      'autorisez les notifications sur la page ntfy. « Copier le nom du canal » donne votre canal.\n'
-      '« Essai d\'envoi de mail » (en touchant le titre) montre les champs du modèle EmailJS et sa réponse.\n$_gestes';
+  static const collaboration = 'Membres : touchez un membre pour voir les notifications et les mails qu\'il a envoyés et reçus.\n'
+      'Communication : une notification part à tous les membres, par le service gratuit ntfy ; « Envoyer un mail » '
+      'montre les champs du mail (destinataires, sujet, texte) et la réponse du service d\'envoi.\n'
+      'Pour recevoir les notifications même quand l\'application est fermée, touchez le titre puis « Recevoir les '
+      'notifications sur cet appareil » : sur Android, installez d\'abord l\'appli ntfy ; dans un navigateur, autorisez les '
+      'notifications sur la page qui s\'ouvre. « Copier mon adresse de notification » donne cette adresse, à saisir à la main '
+      'dans ntfy si besoin.\n'
+      'Synchronisation : l\'état des échanges entre les appareils du foyer.\n$_gestes';
+
+  static const historiqueMembre = 'Les notifications et les mails envoyés et reçus par ce membre, du plus récent au plus '
+      'ancien. Le journal est gardé sur cet appareil depuis qu\'il le lit : le service de notifications n\'en garde que '
+      'quelques heures.';
 
   static const magasins = 'Vos magasins. Ils ont tous le même catalogue ; touchez un magasin pour ses parcours, '
       'le renommer ou le supprimer. Supprimer un magasin efface ses parcours et ses listes en cours (après confirmation) ; '

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'demonstration.dart';
+import 'messages.dart';
 import 'modele.dart';
 
 // Envoi des mails (liste, résumé, invitation) et tickets de caisse en PDF.
@@ -74,7 +76,10 @@ enum Envoi { parti, messagerie, echec, demonstration }
 /// Envoie directement si possible, sinon ouvre la messagerie avec le mail préparé.
 Future<Envoi> envoyerMail(List<String> a, String sujet, String texte, {String? html}) async {
   if (demonstration) return Envoi.demonstration;
-  if (await MailDirect.envoyer(a, sujet, texte, html: html)) return Envoi.parti;
+  if (await MailDirect.envoyer(a, sujet, texte, html: html)) {
+    unawaited(MessagesFoyer.instance.journaliserMail(a, sujet));
+    return Envoi.parti;
+  }
   try {
     final ok = await launchUrl(_mailto(a, sujet, texte));
     return ok ? Envoi.messagerie : Envoi.echec;

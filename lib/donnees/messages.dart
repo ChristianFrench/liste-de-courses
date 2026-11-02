@@ -14,13 +14,51 @@ import 'synchro.dart';
 // (navigateur), et y reçoit messages et notifications même quand Liste de courses est fermée. Tout ce qui
 // est envoyé passe aussi par le canal du foyer, que personne n'écoute : c'est le journal de l'écran Messages.
 
-/// Un message reçu du canal.
+/// Un message reçu du canal du foyer : notification ou trace d'un mail (02/11/2026 : expéditeur et
+/// destinataires dans les étiquettes « de-… » et « a-… », pour l'historique de chaque membre).
 class MessageFoyer {
-  MessageFoyer(this.id, this.heure, this.titre, this.texte);
+  MessageFoyer(this.id, this.heure, this.titre, this.texte, {this.de, this.a = const [], this.mail = false});
   final String id;
   final DateTime heure;
   final String titre;
   final String texte;
+
+  /// Membre qui l'a envoyé (null : inconnu).
+  final String? de;
+
+  /// Membres destinataires (vide : tout le foyer, anciens messages).
+  final List<String> a;
+  final bool mail;
+
+  /// Lu depuis une ligne JSON de ntfy (ou du journal gardé sur l'appareil).
+  static MessageFoyer? lire(Map m) {
+    if (m case {'id': final String id, 'time': final int t}) {
+      final tags = [for (final x in (m['tags'] as List? ?? const [])) '$x'];
+      final titre = m['title'] as String? ?? '';
+      String? de = [for (final x in tags) if (x.startsWith('de-')) x.substring(3)].firstOrNull;
+      if (de == null) {
+        final nom = titre.split(' · ').first;
+        de = Etat.instance.membresVisibles.where((x) => x.nomAffiche == nom).firstOrNull?.id;
+      }
+      return MessageFoyer(id, DateTime.fromMillisecondsSinceEpoch(t * 1000), titre, m['message'] as String? ?? '',
+          de: de, a: [for (final x in tags) if (x.startsWith('a-')) x.substring(2)], mail: tags.contains('mail'));
+    }
+    return null;
+  }
+
+  Map<String, Object?> versJson() => {
+        'id': id,
+        'time': heure.millisecondsSinceEpoch ~/ 1000,
+        'title': titre,
+        'message': texte,
+        'tags': [if (de != null) 'de-$de', for (final x in a) 'a-$x', if (mail) 'mail'],
+      };
+
+  /// Envoyé par [membreId] ?
+  bool envoyePar(String membreId) => de == membreId;
+
+  /// Reçu par [membreId] : destinataire nommé, ou message à tout le foyer d'un autre membre.
+  bool recuPar(String membreId) => a.isEmpty ? (de != null && de != membreId) : a.contains(membreId);
 }
 
 class MessagesFoyer extends ChangeNotifier {
@@ -88,16 +126,40 @@ class MessagesFoyer extends ChangeNotifier {
                   'topic': c,
                   'title': '${etat.moi.nomAffiche} · ${etat.foyerNom}',
                   'message': t,
-                  'tags': [notification ? 'bell' : 'shopping_cart'],
+                  // Le journal du foyer garde l'expéditeur et les destinataires (personne n'écoute ce canal).
+                  'tags': [notification ? 'bell' : 'shopping_cart', if (c == canal) ...['de-$moi', for (final id in pour.toSet()) 'a-$id']],
                 }))
             .timeout(const Duration(seconds: 15));
         if (r.statusCode >= 300) return 'Le service ntfy a refusé le message (${r.statusCode})';
       }
-      if (!notification) await lire();
+      await lire();
       return null;
     } catch (e) {
       debugPrint('ntfy : $e');
       return 'Pas de réseau ou service ntfy injoignable';
+    }
+  }
+
+  /// Trace d'un mail parti, dans le journal du foyer (sans prévenir personne) : pour l'historique des membres.
+  Future<void> journaliserMail(List<String> adresses, String sujet) async {
+    final etat = Etat.instance;
+    final moi = etat.moi.id;
+    final ad = {for (final x in adresses) x.trim().toLowerCase()};
+    final pour = [for (final m in etat.membresVisibles) if (m.email.isNotEmpty && ad.contains(m.email.trim().toLowerCase())) m.id];
+    try {
+      await client
+          .post(Uri.parse(serveur),
+              headers: {'Content-Type': 'application/json'},
+              body: jsonEncode({
+                'topic': canal,
+                'title': '${etat.moi.nomAffiche} · ${etat.foyerNom}',
+                'message': sujet,
+                'tags': ['mail', 'de-$moi', for (final id in pour) 'a-$id'],
+              }))
+          .timeout(const Duration(seconds: 15));
+      await lire();
+    } catch (e) {
+      debugPrint('ntfy (trace du mail) : $e');
     }
   }
 
@@ -107,21 +169,42 @@ class MessagesFoyer extends ChangeNotifier {
     envoyer(texte, a: a, notification: true);
   }
 
-  /// Messages des dernières 48 heures, du plus ancien au plus récent.
+  /// Journal gardé sur l'appareil (ntfy.sh n'en garde que quelques heures), du plus ancien au plus récent.
+  void _garder(List<MessageFoyer> lus) {
+    final base = Etat.instance.stockageFoyer;
+    final tous = <String, MessageFoyer>{for (final x in messages) x.id: x};
+    if (messages.isEmpty) {
+      try {
+        for (final m in (jsonDecode(base?.reglage('journal_ntfy') ?? '[]') as List).whereType<Map>()) {
+          if (MessageFoyer.lire(m) case final x?) tous[x.id] = x;
+        }
+      } catch (_) {}
+    }
+    for (final x in lus) {
+      tous[x.id] = x;
+    }
+    final liste = tous.values.toList()..sort((a, b) => a.heure.compareTo(b.heure));
+    final garde = liste.length > 400 ? liste.sublist(liste.length - 400) : liste;
+    messages
+      ..clear()
+      ..addAll(garde);
+    base?.definirReglage('journal_ntfy', jsonEncode([for (final x in garde) x.versJson()]));
+  }
+
+  /// Relit le canal du foyer (dernières 48 heures) et l'ajoute au journal de l'appareil.
   Future<void> lire() async {
     if (enCours) return;
     enCours = true;
     try {
       final r = await client.get(Uri.parse('$serveur/$canal/json?poll=1&since=48h')).timeout(const Duration(seconds: 15));
       if (r.statusCode >= 300) throw 'statut ${r.statusCode}';
-      messages
-        ..clear()
-        ..addAll([
-          for (final ligne in const LineSplitter().convert(utf8.decode(r.bodyBytes)))
-            if (ligne.trim().isNotEmpty)
-              if (jsonDecode(ligne) case {'event': 'message', 'id': final String id, 'time': final int t} && final Map m)
-                MessageFoyer(id, DateTime.fromMillisecondsSinceEpoch(t * 1000), m['title'] as String? ?? '', m['message'] as String? ?? ''),
-        ]);
+      final lus = [
+        for (final ligne in const LineSplitter().convert(utf8.decode(r.bodyBytes)))
+          if (ligne.trim().isNotEmpty)
+            if (jsonDecode(ligne) case {'event': 'message'} && final Map m)
+              if (MessageFoyer.lire(m) case final x?) x,
+      ];
+      _garder(lus);
       erreur = null;
     } catch (_) {
       erreur = 'Messages injoignables (pas de réseau ?)';

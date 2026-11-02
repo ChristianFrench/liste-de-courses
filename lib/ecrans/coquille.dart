@@ -23,7 +23,6 @@ import 'messages.dart';
 import 'historique.dart';
 import 'listes.dart';
 import 'parametres.dart';
-import 'partage.dart';
 
 /// Barre d'onglets (64) : 3 entrées icône 22 + libellé ; onglet actif = pastille 56 × 30 pleine.
 class BarreOnglets extends StatelessWidget {
@@ -298,9 +297,7 @@ class MenuGerer extends StatelessWidget {
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Mon foyer', icone: Icons.home_outlined, enfants: [
             ecran(Icons.home_outlined, 'Foyer',
                 '${etat.foyerNom} · ${etat.membresVisibles.length} membre${etat.membresVisibles.length > 1 ? 's' : ''}', const EcranFoyer()),
-            ecran(Icons.chat_outlined, 'Messages', 'Messages au foyer, essai d\'envoi de mail', const EcranMessages()),
-            if (Synchro.instance.mode != 'seul')
-              ecran(Icons.sync, 'Synchronisation', 'Échanges entre les appareils du foyer', const EcranPartage()),
+            ecran(Icons.groups_outlined, 'Collaboration', 'Membres, notifications, mails, synchronisation', const EcranCollaboration()),
           ]),
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''}', const EcranMagasins()),

@@ -29,7 +29,7 @@ final iconesNoto = <IconData, String>{
   Icons.add: 'plus',
   Icons.add_circle_outline: 'plus',
   Icons.add_circle: 'plus',
-  Icons.storefront_outlined: 'convenience-store',
+  Icons.storefront_outlined: 'shopping-bags',
   Icons.menu_book_outlined: 'open-book',
   Icons.public: 'globe-showing-europe-africa',
   Icons.route_outlined: 'world-map',

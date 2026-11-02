@@ -92,11 +92,11 @@ class EcranFoyer extends StatelessWidget {
         ]),
         if (enFoyer)
           GroupeRetractable(cle: 'foyer/membres', titre: 'Membres', icone: Icons.groups_outlined, nombre: etat.membresVisibles.length, enfants: [
-            for (final m in etat.membresVisibles) _LigneMembre(m),
+            for (final m in etat.membresVisibles) LigneMembre(m),
           ]),
         if (enFoyer)
-          GroupeRetractable(cle: 'foyer/listes', titre: 'Listes', icone: Icons.checklist, enfants: [
-            OptionFoyer(texte: 'Envoyer la liste à tout le foyer', coche: etat.envoiFoyer, onChange: (v) => etat.options(envoiFoyer: v)),
+          GroupeRetractable(cle: 'foyer/listes', titre: 'Mails', icone: Icons.mail_outline, enfants: [
+            OptionFoyer(texte: 'Envoyer à tout le foyer la liste des courses à faire ou finies', coche: etat.envoiFoyer, onChange: (v) => etat.options(envoiFoyer: v)),
           ]),
         GroupeRetractable(cle: 'foyer/catalogue', titre: 'Catalogue', icone: Icons.menu_book_outlined, enfants: [
           OptionFoyer(texte: 'Catalogue du foyer seul', coche: etat.catalogueIsole, onChange: etat.isolerCatalogue),
@@ -189,9 +189,12 @@ Membre? _trouveNouveau(Etat etat, Set<String> avant) {
   return null;
 }
 
-class _LigneMembre extends StatelessWidget {
-  const _LigneMembre(this.m);
+class LigneMembre extends StatelessWidget {
+  const LigneMembre(this.m, {super.key, this.onTap});
   final Membre m;
+
+  /// Par défaut : la fiche du membre ; Collaboration : son historique.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +212,7 @@ class _LigneMembre extends StatelessWidget {
       titre: m.nomAffiche,
       sousTitre: details.join(' · '),
       gauche: IconeRonde(null, texte: m.initiales),
-      onTap: () => _fiche(context, m),
+      onTap: onTap ?? () => _fiche(context, m),
     );
   }
 }

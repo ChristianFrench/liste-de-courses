@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/envoi.dart';
+import '../donnees/messages.dart';
 import '../donnees/modele.dart';
 import '../theme.dart';
 
@@ -54,6 +57,9 @@ class _EcranEssaiMailState extends State<EcranEssaiMail> {
       _reponse = null;
     });
     final (parti, reponse) = await MailDirect.envoyerParametres({for (final e in _champs.entries) e.key: e.value.text.trim()});
+    if (parti) {
+      unawaited(MessagesFoyer.instance.journaliserMail(_champs['destinataires']!.text.split(','), _champs['sujet']!.text.trim()));
+    }
     if (!mounted) return;
     setState(() {
       _envoi = false;
@@ -65,17 +71,12 @@ class _EcranEssaiMailState extends State<EcranEssaiMail> {
   @override
   Widget build(BuildContext context) {
     return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.outgoing_mail, sousTitre: 'Gérer › Mon foyer', titre: 'Essai d\'envoi de mail'),
+      entete: const EnTeteFenetre(retour: true, icone: Icons.outgoing_mail, sousTitre: 'Gérer › Collaboration', titre: 'Envoyer un mail'),
       corps: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         children: [
-          Text(
-              MailDirect.disponible
-                  ? 'Identifiants EmailJS présents dans cette version. Les champs sont remplis comme l\'application le fait ; '
-                      'modifiez-les si besoin, puis « Envoyer ».'
-                  : 'Identifiants EmailJS absents de cette version : l\'envoi ne peut pas partir.',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          const SizedBox(height: 8),
+          if (!MailDirect.disponible)
+            Text('Envoi de mail impossible avec cette version.', style: Charte.texte(14, couleur: const Color(0xFFB00020))),
           for (final e in _libelles.entries)
             Padding(
               padding: const EdgeInsets.only(top: 10),

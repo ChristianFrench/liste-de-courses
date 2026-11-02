@@ -41,6 +41,17 @@ const autresPalettes = <Palette>[
   Palette('Turquoise', Color(0xFF7AA7B0), Color(0xFF3E7F8C), Color(0xFFF3F9FA), Color(0xFFDEEEF1), Color(0xFFCDE5EA), Color(0xFFACD4DC)),
 ];
 
+/// Palettes des cadres (02/11/2026, Aristide) : une seule palette pour les trois sujets, sa première couleur
+/// (tirée du rouge) pour les promotions, la deuxième (du bleu) pour les mesures, la dernière (du vert) pour les
+/// packagings. La première est celle par défaut.
+const palettesCadres = <(String, int, int, int)>[
+  ('Vive', 0xFFE53935, 0xFF1E88E5, 0xFF43A047),
+  ('Douce', 0xFFE57373, 0xFF64B5F6, 0xFF81C784),
+  ('Profonde', 0xFFC62828, 0xFF1565C0, 0xFF2E7D32),
+  ('Chaude', 0xFFF4511E, 0xFF3949AB, 0xFF7CB342),
+  ('Fraîche', 0xFFD81B60, 0xFF00897B, 0xFF00A86B),
+];
+
 /// Toutes les palettes : les cinq présentées en pastilles, puis les autres.
 const toutesLesPalettes = <Palette>[...palettes, ...autresPalettes];
 
@@ -52,14 +63,13 @@ class Charte {
 
   static Palette palette = palettes.first;
 
-  /// Les quatre niveaux de la palette, du plus sombre (1) au plus clair (4) : texte des bandeaux, accent,
-  /// fond des bandeaux de rayon, fond des bandeaux ordinaires et des secteurs (01/11/2026, Aristide).
-  static Color niveau(int n) => switch (n) {
-        1 => palette.accentFonce,
-        2 => palette.accent,
-        3 => Color.lerp(palette.accentFonce, blanc, 0.60)!,
-        _ => Color.lerp(palette.accentFonce, blanc, 0.82)!,
-      };
+  /// Les cinq niveaux de luminosité de la palette, du plus soutenu (1) au plus clair (5). 02/11/2026 (Aristide) :
+  /// le premier niveau n'est plus la teinte sombre, tous partent de [Palette.accentFonce] éclaircie.
+  static const _eclaircis = [0.22, 0.48, 0.68, 0.82, 0.92];
+  static Color niveau(int n) => Color.lerp(palette.accentFonce, blanc, _eclaircis[(n - 1).clamp(0, 4)])!;
+
+  /// Texte posé sur un niveau de la palette : la teinte la plus sombre.
+  static Color get encreNiveau => fonce(palette.accentFonce);
 
   /// Change de palette et redessine toute l'application, sans la relancer.
   static void choisirPalette(String nom) {

@@ -180,7 +180,7 @@ void main() {
       ('Gérer', 'Corbeille', '26 Corbeille'),
       ('Gérer', 'Foyer', '25 Foyer'),
       ('Gérer', 'Apparence', '27 Apparence'),
-      ('Gérer', 'Synchronisation', '27 Synchronisation'),
+      ('Gérer', 'Collaboration', '27 Collaboration'),
     ]) {
       await _toucher(tester, _onglet(onglet));
       await _toucher(tester, _onglet(onglet));

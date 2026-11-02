@@ -433,7 +433,8 @@ String rangement(Produit p) {
   return s == null ? 'Non rangé' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
 }
 
-LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = false}) => LigneMenu(
+LigneMenu ligneProduit(BuildContext context, Produit p, {bool avecRangement = false, Color? fond}) => LigneMenu(
+      fond: fond,
       titre: p.nom,
       // 01/11/2026 (Aristide) : pas d'icône sur les produits.
       apresTitre: SignePerso(p),
@@ -479,7 +480,7 @@ class EcranMagasins extends StatelessWidget {
           ],
         ),
         corps: ListView(
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           children: [
             for (final m in etat.magasins)
               Glissable(
@@ -594,28 +595,26 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               final ouvert = _secteurOuvert == sec.id;
               final produits = etat.produitsDuSecteur(sec);
               produits.sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
-              secteurs.add(_NiveauCatalogue(
+              secteurs.add(NiveauArbre(
                 cle: 'secteur-${sec.id}',
+                niveau: 3,
                 nom: sec.nom,
-                fond: Charte.niveau(3),
-                signe: Pictogramme(cleSecteur(x.nom, sec.nom), taille: 46),
+                signe: Pictogramme(cleSecteur(x.nom, sec.nom), taille: 40),
                 surSigneLong: () => choisirImageSecteur(context, x.nom, sec.nom),
                 ajoute: etat.secteurAjoute(sec),
                 nombre: produits.length,
                 ouvert: ouvert,
                 onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
                 onCrayon: () => menuActions(context, titre: sec.nom, actions: actionsSecteur(context, sec)),
-                enfants: [
-                  for (final p in produits) ColoredBox(color: Charte.niveau(4), child: ligneProduit(context, p)),
-                ],
+                enfants: [for (final p in produits) FeuilleArbre(child: ligneProduit(context, p, fond: Charte.niveau(5)))],
               ));
             }
           }
-          rayons.add(_NiveauCatalogue(
+          rayons.add(NiveauArbre(
             cle: 'rayon-${x.nom}',
+            niveau: 2,
             nom: x.nom,
-            fond: Charte.niveau(2),
-            signe: Pictogramme(cleRayon(x.nom), taille: 46),
+            signe: Pictogramme(cleRayon(x.nom), taille: 40),
             surSigneLong: () => choisirImageRayon(context, x.nom),
             ajoute: etat.rayonAjoute(x),
             nombre: etat.secteursVisibles(x.id).length,
@@ -626,11 +625,11 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
           ));
         }
       }
-      res.add(_NiveauCatalogue(
+      res.add(NiveauArbre(
         cle: 'univers-$u',
+        niveau: 1,
         nom: u,
-        fond: Charte.niveau(1),
-        signe: Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 46),
+        signe: Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 40, color: Charte.encreNiveau),
         nombre: rayonsU.length,
         ouvert: uOuvert,
         onTap: () => plis.basculer(_cleU(u)),
@@ -887,79 +886,100 @@ class EcranMarques extends StatelessWidget {
           final cleR = 'marques/r/${r.nom}';
           final rOuvert = plis.ouvert(cleR, parDefaut: false);
           cles.add(cleR);
-          enfants.add(TitreGroupe(
-              key: ValueKey('rayon-marques-${r.nom}'),
-              nom: r.nom,
-              grand: true,
-              image: cleRayon(r.nom),
-              ouvert: rOuvert,
-              onTap: () => plis.basculer(cleR, parDefaut: false),
-              nombre: {for (final (_, noms) in secteurs) ...noms.map((n) => n.toLowerCase())}.length));
+          final lignes = <Widget>[];
           for (final (s, noms) in secteurs) {
             final cleS = 'marques/s/${r.nom}/${s.nom}';
             cles.add(cleS);
             if (!rOuvert) continue;
             final sOuvert = plis.ouvert(cleS);
-            enfants.add(TitreGroupe(
-                key: ValueKey('secteur-marques-${s.nom}'),
-                nom: s.nom,
-                nonPlace: true,
-                nombre: noms.length,
-                ouvert: sOuvert,
-                onTap: () => plis.basculer(cleS)));
-            if (!sOuvert) continue;
-            for (final n in noms) {
-              enfants.add(Glissable(
-                key: ValueKey('glisser-marque-${s.id}-$n'),
-                titre: n,
-                versGauche: ActionLigne(Icons.delete_outline, 'Retirer', () => _retirer(context, s, n), danger: true),
-                child: _LigneMarque(
-                  key: ValueKey('marque-$n'),
-                  nom: n,
-                  detail: _produitsDeMarque(n),
-                  onTap: () => fenetreMarque(context, secteur: s, nom: n),
-                  onSupprimer: () => _retirer(context, s, n),
+            lignes.add(NiveauArbre(
+              cle: 'secteur-marques-${s.nom}',
+              niveau: 3,
+              profondeur: 2,
+              nom: s.nom,
+              signe: Pictogramme(cleSecteur(r.nom, s.nom), taille: 40),
+              nombre: noms.length,
+              ouvert: sOuvert,
+              onTap: () => plis.basculer(cleS),
+              onCrayon: () => menuActions(context, titre: s.nom, actions: [
+                ActionLigne(Icons.add, '+ Nouvelle marque', () => fenetreMarque(context, secteur: s)),
+              ]),
+              enfants: [
+                for (final n in noms)
+                  Glissable(
+                    key: ValueKey('glisser-marque-${s.id}-$n'),
+                    titre: n,
+                    versGauche: ActionLigne(Icons.delete_outline, 'Retirer', () => _retirer(context, s, n), danger: true),
+                    child: FeuilleArbre(
+                      profondeur: 3,
+                      child: _LigneMarque(
+                        key: ValueKey('marque-$n'),
+                        nom: n,
+                        detail: _produitsDeMarque(n),
+                        onTap: () => fenetreMarque(context, secteur: s, nom: n),
+                        onSupprimer: () => _retirer(context, s, n),
+                      ),
+                    ),
+                  ),
+                FeuilleArbre(
+                  profondeur: 3,
+                  child: _LigneMarque(
+                    key: ValueKey('nouvelle-marque-${s.nom}'),
+                    nom: '+ Nouvelle marque',
+                    ajout: true,
+                    onTap: () => fenetreMarque(context, secteur: s),
+                  ),
                 ),
-              ));
-            }
-            enfants.add(_LigneMarque(
-              key: ValueKey('nouvelle-marque-${s.nom}'),
-              nom: '+ Nouvelle marque',
-              ajout: true,
-              onTap: () => fenetreMarque(context, secteur: s),
+              ],
             ));
           }
+          enfants.add(NiveauArbre(
+            cle: 'rayon-marques-${r.nom}',
+            niveau: 2,
+            profondeur: 1,
+            nom: r.nom,
+            signe: Pictogramme(cleRayon(r.nom), taille: 40),
+            ouvert: rOuvert,
+            onTap: () => plis.basculer(cleR, parDefaut: false),
+            nombre: {for (final (_, noms) in secteurs) ...noms.map((n) => n.toLowerCase())}.length,
+            enfants: lignes,
+          ));
         }
         // Marques distributeur : un rayon, un secteur par enseigne (proposées selon l'enseigne du magasin de la liste)
         if (etat.marquesDistributeur.isNotEmpty) {
           const cleR = 'marques/r/mdd';
           final rOuvert = plis.ouvert(cleR, parDefaut: false);
           cles.add(cleR);
-          enfants.add(TitreGroupe(
-              key: const ValueKey('rayon-mdd'),
-              nom: 'Marques distributeur',
-              grand: true,
-              icone: Icons.local_mall_outlined,
-              nombre: etat.marquesDistributeur.values.fold<int>(0, (n, l) => n + l.length),
-              ouvert: rOuvert,
-              onTap: () => plis.basculer(cleR, parDefaut: false)));
+          final lignes = <Widget>[];
           for (final e in etat.marquesDistributeur.entries) {
             final cleE = 'marques/s/mdd/${e.key}';
             cles.add(cleE);
             if (!rOuvert) continue;
             final eOuvert = plis.ouvert(cleE);
-            enfants.add(TitreGroupe(
-                key: ValueKey('mdd-${e.key}'),
-                nom: e.key,
-                nonPlace: true,
-                nombre: e.value.length,
-                ouvert: eOuvert,
-                onTap: () => plis.basculer(cleE)));
-            if (!eOuvert) continue;
-            for (final x in e.value) {
-              enfants.add(_LigneMarque(nom: x.marque, detail: x.categorie, onTap: () {}));
-            }
+            lignes.add(NiveauArbre(
+              cle: 'mdd-${e.key}',
+              niveau: 3,
+              profondeur: 2,
+              nom: e.key,
+              nombre: e.value.length,
+              ouvert: eOuvert,
+              onTap: () => plis.basculer(cleE),
+              enfants: [
+                for (final x in e.value) FeuilleArbre(profondeur: 3, child: _LigneMarque(nom: x.marque, detail: x.categorie, onTap: () {})),
+              ],
+            ));
           }
+          enfants.add(NiveauArbre(
+            cle: 'rayon-mdd',
+            niveau: 2,
+            profondeur: 1,
+            nom: 'Marques distributeur',
+            signe: Icone(Icons.local_mall_outlined, size: 40, color: Charte.encreNiveau),
+            nombre: etat.marquesDistributeur.values.fold<int>(0, (n, l) => n + l.length),
+            ouvert: rOuvert,
+            onTap: () => plis.basculer(cleR, parDefaut: false),
+            enfants: lignes,
+          ));
         }
         // Rayons repliés par défaut, secteurs déployés : « tout déplier » les ouvre tous.
         final toutOuvert = cles.isNotEmpty &&
@@ -1017,12 +1037,12 @@ class _LigneMarque extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-        color: Charte.fond,
+        color: Charte.niveau(5),
         child: InkWell(
           onTap: onTap,
           child: Container(
             height: Charte.ligneListe,
-            padding: const EdgeInsets.only(left: 16, right: 4),
+            padding: const EdgeInsets.only(right: 4),
             decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
             child: Row(children: [
               Expanded(
@@ -1176,77 +1196,4 @@ Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
   final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
   if (nom == null || nom.trim().isEmpty) return;
   Etat.instance.renommerSecteurCatalogue(s, nom);
-}
-
-/// Un niveau de l'arborescence du catalogue : bandeau (fond de la palette, crayon, chevron) et ses enfants ; la
-/// grande icône est dessinée par-dessus pour déborder au premier plan sur la ligne suivante.
-class _NiveauCatalogue extends StatelessWidget {
-  const _NiveauCatalogue({
-    required this.cle,
-    required this.nom,
-    required this.fond,
-    required this.signe,
-    required this.ouvert,
-    required this.onTap,
-    required this.onCrayon,
-    required this.enfants,
-    this.surSigneLong,
-    this.ajoute = false,
-    this.nombre,
-  });
-  final String cle;
-  final String nom;
-  final Color fond;
-  final Widget signe;
-  final bool ouvert;
-  final VoidCallback onTap;
-  final VoidCallback onCrayon;
-  final VoidCallback? surSigneLong;
-  final List<Widget> enfants;
-  final bool ajoute;
-  final int? nombre;
-
-  @override
-  Widget build(BuildContext context) {
-    final encre = fond.computeLuminance() < 0.3 ? Charte.blanc : Charte.niveau(1);
-    return Stack(clipBehavior: Clip.none, children: [
-      Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        TitreGroupe(
-          key: ValueKey(cle),
-          nom: nom,
-          grand: true,
-          fond: fond,
-          icone: Icons.circle, // place réservée : l'icône est dessinée par-dessus
-          signeAuDessus: true,
-          ajoute: ajoute,
-          nombre: nombre,
-          ouvert: ouvert,
-          onTap: onTap,
-          apres: Semantics(
-            button: true,
-            child: Tooltip(
-              message: 'Modifier $nom',
-              child: InkResponse(
-                key: ValueKey('crayon-$cle'),
-                onTap: onCrayon,
-                radius: 22,
-                child: Padding(padding: const EdgeInsets.all(4), child: Icone(Icons.edit_outlined, size: 24, color: encre)),
-              ),
-            ),
-          ),
-        ),
-        if (ouvert) ...enfants,
-        if (!ouvert || enfants.isEmpty) const SizedBox(height: 10),
-      ]),
-      Positioned(
-        left: 6,
-        top: 3,
-        width: 46,
-        height: 46,
-        child: surSigneLong == null
-            ? IgnorePointer(child: signe)
-            : GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, onLongPress: surSigneLong, child: signe),
-      ),
-    ]);
-  }
 }
