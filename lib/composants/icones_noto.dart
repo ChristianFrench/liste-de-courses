@@ -57,7 +57,7 @@ final iconesNoto = <IconData, String>{
   Icons.chat_outlined: 'speech-balloon',
   Icons.key_outlined: 'key',
   Icons.palette_outlined: 'artist-palette',
-  Icons.help_outline: 'red-question-mark',
+  Icons.help_outline: 'ring-buoy',
   Icons.warning_amber_rounded: 'warning',
   Icons.info_outline: 'information',
   Icons.storage_outlined: 'file-cabinet',

@@ -1,4 +1,3 @@
-import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
@@ -97,29 +96,41 @@ class EcranApparence extends _EcranVivant {
   Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
-      // 01/11/2026 (Aristide) : toutes les palettes dans une seule liste déroulante, avec leur échantillon.
+      // 01/11/2026 (Aristide) : toutes les palettes dans une seule liste déroulante, avec leur échantillon ;
+      // 02/11/2026 : libellé à gauche, mini palette (plus large) à droite.
       ChoixDeroulant<String>(
         libelle: 'Palette de couleurs',
         valeur: Charte.palette.nom,
         choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
         apercus: {for (final p in toutesLesPalettes) p.nom: _Echantillon(p)},
+        apercuADroite: true,
         onChange: (v) {
           etat.choisirApparence(v);
           Charte.choisirPalette(v);
         },
       ),
-      const TitreSection('Couleur des cadres', cote: 0),
-      for (final (cle, nom, couleur) in [
-        ('promo', 'Promotions', etat.couleurPromotions),
-        ('mesure', 'Mesures', etat.couleurMesures),
-        ('lot', 'Packagings', etat.couleurLots),
-      ])
-        LigneMenu(
-          titre: nom,
-          sousTitre: 'Touchez pour changer la couleur',
-          gauche: SizedBox(width: 80, child: Center(child: Pastille(nom == 'Promotions' ? 'Promo' : (nom == 'Mesures' ? '500 g' : 'Lot de 4'), couleur: Color(couleur)))),
-          onTap: () => _changerCouleur(context, cle, nom),
+      // 02/11/2026 (Aristide) : promotions, mesures et packagings, une zone unique chacun, avec les mêmes palettes
+      // (le cadre prend la teinte la plus soutenue de la palette choisie).
+      for (final (cle, nom, exemple, defaut) in [
+        ('promo', 'Promotions', 'Promo', Etat.couleurPromoDefaut),
+        ('mesure', 'Mesures', '500 g', Etat.couleurMesureDefaut),
+        ('lot', 'Packagings', 'Lot de 4', Etat.couleurLotDefaut),
+      ]) ...[
+        const SizedBox(height: 14),
+        ChoixDeroulant<String>(
+          key: ValueKey('couleur-$cle'),
+          libelle: nom,
+          valeur: _paletteDeCouleur(etat.couleurs[cle]),
+          choix: {'': 'Par défaut', for (final p in toutesLesPalettes) p.nom: p.nom},
+          apercus: {
+            '': Pastille(exemple, couleur: Color(defaut)),
+            for (final p in toutesLesPalettes) p.nom: _Echantillon(p),
+          },
+          apercuADroite: true,
+          onChange: (v) => etat.choisirCouleur(
+              cle, v.isEmpty ? null : toutesLesPalettes.firstWhere((p) => p.nom == v).accentFonce.toARGB32()),
         ),
+      ],
     ]);
   }
 }
@@ -270,6 +281,7 @@ class EcranTypesPromotion extends StatelessWidget {
           icone: Icons.local_offer_outlined,
           sousTitre: 'Gérer › Courses',
           titre: 'Types de promotion',
+          aide: Aides.typesPromotion,
           actions: [
             ActionLigne(Icons.add, '+ Nouveau type', () async {
               final nom = await demanderTexte(context, titre: 'Nouveau type de promotion', aide: 'Nom (ex. : Bon de réduction)');
@@ -288,11 +300,8 @@ class EcranTypesPromotion extends StatelessWidget {
               LigneMenu(
                 titre: t.nom,
                 sousTitre: 'code ${t.code}',
-                gauche: PastilleType(Color(etat.couleurPromotions)),
                 onTap: () => _agir(context, t),
               ),
-            _NoteTypes('Proposés quand on indique une promotion sur une ligne de la liste. Touchez un type pour le modifier '
-                'ou le supprimer. Leur couleur se choisit dans Gérer › Paramètres › Apparence.'),
           ],
         ),
       ),
@@ -360,24 +369,14 @@ class PastilleType extends StatelessWidget {
       );
 }
 
-class _NoteTypes extends StatelessWidget {
-  const _NoteTypes(this.texte);
-  final String texte;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-        child: Text(texte, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      );
-}
-
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 /// Case à cocher d'une option, sur toute la largeur.
 class _Option extends StatelessWidget {
-  const _Option({required this.texte, required this.aide, required this.coche, required this.onChange});
+  const _Option({required this.texte, required this.coche, required this.onChange});
   final String texte;
-  final String aide;
+
+  // 02/11/2026 (Aristide) : les explications des options passent dans l'aide.
   final bool coche;
   final ValueChanged<bool> onChange;
 
@@ -385,7 +384,7 @@ class _Option extends StatelessWidget {
   Widget build(BuildContext context) => InkWell(
         onTap: () => onChange(!coche),
         child: Container(
-          constraints: const BoxConstraints(minHeight: 56),
+          constraints: BoxConstraints(minHeight: Charte.ligneListe),
           padding: const EdgeInsets.symmetric(vertical: 8),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(
@@ -393,13 +392,7 @@ class _Option extends StatelessWidget {
               CaseACocher(coche: coche, taille: 26),
               const SizedBox(width: 12),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(texte, style: Charte.texte(16, gras: true)),
-                    Text(aide, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ],
-                ),
+                child: Text(texte, style: Charte.texte(16)),
               ),
             ],
           ),
@@ -408,45 +401,13 @@ class _Option extends StatelessWidget {
 }
 
 
-const _palette = <int>[
-  0xFFE53935, 0xFFFB8C00, 0xFFFDD835, 0xFF43A047, 0xFF00ACC1, 0xFF1E88E5, 0xFF8E24AA, 0xFFEC407A, 0xFF8D6E63, 0xFF757575,
-];
-
-/// Choix d'une couleur (ou aucune) pour un type de promotion ou de packaging.
-Future<void> _changerCouleur(BuildContext context, String cle, String nom) async {
-  final etat = Etat.instance;
-  final v = await volet<int>(
-    context,
-    builder: (ctx) => corpsVolet(
-      titre: 'Couleur · $nom',
-      contenu: Wrap(
-        spacing: 10,
-        runSpacing: 10,
-        children: [
-          for (final c in _palette)
-            Semantics(
-              button: true,
-              label: 'Couleur',
-              child: InkWell(
-                customBorder: const CircleBorder(),
-                onTap: () => Navigator.of(ctx).pop(c),
-                child: Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Color(c), border: Border.all(color: Charte.encre)),
-                ),
-              ),
-            ),
-        ],
-      ),
-      boutons: [
-        Bouton(texte: 'Couleur par défaut', onTap: () => Navigator.of(ctx).pop(-1)),
-        Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
-      ],
-    ),
-  );
-  if (v == null) return;
-  etat.choisirCouleur(cle, v == -1 ? null : v);
+/// Palette dont la teinte soutenue est [couleur] ; '' : couleur par défaut (ou ancienne couleur hors palette).
+String _paletteDeCouleur(int? couleur) {
+  if (couleur == null) return '';
+  for (final p in toutesLesPalettes) {
+    if (p.accentFonce.toARGB32() == couleur) return p.nom;
+  }
+  return '';
 }
 
 /// Gérer › Courses › Types de mesure (poids, volume, à la pièce…) ou Types de packaging (lots de 2 à 10…),
@@ -517,6 +478,7 @@ class EcranTypesPackaging extends StatelessWidget {
               icone: lots ? Icons.inventory_2_outlined : Icons.scale_outlined,
               sousTitre: 'Gérer › Courses',
               titre: lots ? 'Types de packaging' : 'Types de mesure',
+              aide: lots ? Aides.typesPackaging : Aides.typesMesure,
               actions: [
                 ActionLigne(Icons.add, lots ? '+ Nouveau packaging' : '+ Nouvelle mesure', () async {
                   final nom = await demanderTexte(libelle: 'Libellé', context,
@@ -536,14 +498,8 @@ class EcranTypesPackaging extends StatelessWidget {
                   LigneMenu(
                     titre: k.libelle,
                     sousTitre: _pluriel(etat.nbProduitsAvecPackaging(id), 'article'),
-                    gauche: PastilleType(Color(lots ? etat.couleurLots : etat.couleurMesures)),
                     onTap: () => _agir(context, etat, id),
                   ),
-              _NoteTypes(
-                  lots
-                      ? 'Ce sont essentiellement des lots, de 2 à 10. Touchez-en un pour le modifier, voir ses articles ou le supprimer.'
-                      : 'C\'est le poids (g, kg), le volume (cl, l) ou la vente à la pièce. Touchez-en une pour la modifier, '
-                          'voir ses articles ou la supprimer. La couleur se choisit dans Gérer › Paramètres › Apparence.'),
             ],
           ),
         );
@@ -562,8 +518,13 @@ class _Echantillon extends StatelessWidget {
   Widget build(BuildContext context) => ClipRRect(
         borderRadius: BorderRadius.circular(4),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          for (final t in const [0.0, 0.30, 0.60, 0.82])
-            Container(width: 18, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
+          for (final c in [
+            palette.accentFonce,
+            palette.accent,
+            Color.lerp(palette.accentFonce, Charte.blanc, 0.60)!,
+            Color.lerp(palette.accentFonce, Charte.blanc, 0.82)!,
+          ])
+            Container(width: 26, height: 22, color: c),
         ]),
       );
 }

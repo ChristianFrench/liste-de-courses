@@ -61,12 +61,6 @@ class SousEcranPreparer extends StatelessWidget {
                 ),
             ],
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-            child: Text('Touchez une liste pour voir ce que vous pouvez en faire. Glissez-la vers la gauche pour la supprimer, '
-                'vers la droite pour la remettre en préparation.',
-                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          ),
         ],
       ),
     );
@@ -572,7 +566,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           titre: 'À faire',
           icone: Icons.shopping_cart_outlined,
           nombre: pretes.length,
-          vide: 'Aucune liste prête : terminez d\'abord une préparation (« Liste prête »).',
+          vide: 'Aucune liste prête.',
           enfants: [
             for (final l in pretes)
               listeGlissable(

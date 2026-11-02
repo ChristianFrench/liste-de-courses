@@ -41,6 +41,7 @@ class EcranFoyer extends StatelessWidget {
         icone: Icons.home_outlined,
         sousTitre: 'Gérer › Mon foyer',
         titre: 'Foyer',
+        aide: Aides.foyer,
         actions: [
           if (enFoyer) ...[
             ActionLigne(Icons.person_add_outlined, '+ Nouveau membre', () => nouveauMembre(context)),
@@ -59,57 +60,50 @@ class EcranFoyer extends StatelessWidget {
           ActionLigne(Icons.restart_alt, 'Foyer neuf', () => repartirANeuf(context), danger: true),
         ],
       ),
-      corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: [
-        if (!enFoyer) ...[
-          Text('Seul sur cet appareil', style: Charte.texte(20, gras: true)),
-          Text('Pas de membres ni de synchronisation. Pour partager les listes avec d\'autres personnes, '
-              'touchez le titre « Foyer » puis « Passer en foyer ».', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        ] else ...[
-          Text(etat.foyerNom, style: Charte.texte(20, gras: true)),
-          Text(
-              'Foyer partagé · cet appareil est celui de ${etat.moi.nomAffiche}'
-              '${etat.appareilPartage ? ' (appareil partagé : on choisit son nom à chaque lancement)' : ''}',
-              style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          ..._code(s),
-          const TitreSection('Membres', cote: 0),
-          for (final m in etat.membresVisibles) _LigneMembre(m),
-          Padding(
-            padding: const EdgeInsets.only(top: 6, bottom: 4),
-            child: Text('Touchez un membre pour lui envoyer l\'invitation, le renommer ou le retirer du foyer.',
-                style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      // 02/11/2026 (Aristide) : quatre sections comme le menu de Gérer, les explications passent dans l'aide.
+      corps: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
+        GroupeRetractable(cle: 'foyer/foyer', titre: 'Foyer', icone: Icons.home_outlined, enfants: [
+          LigneMenu(
+            titre: enFoyer ? etat.foyerNom : 'Seul sur cet appareil',
+            sousTitre: enFoyer ? 'Foyer partagé · cet appareil est celui de ${etat.moi.nomAffiche}' : 'Ni membres ni synchronisation',
+            onTap: () => menuActions(context, titre: enFoyer ? etat.foyerNom : 'Seul sur cet appareil', actions: [
+              if (enFoyer)
+                ActionLigne(Icons.edit_outlined, 'Renommer le foyer', () async {
+                  final nom = await demanderTexte(context, titre: 'Nom du foyer', initial: etat.foyerNom);
+                  if (nom != null && nom.isNotEmpty) etat.renommerFoyer(nom);
+                }),
+              ActionLigne(Icons.swap_horiz, enFoyer ? 'Utiliser seul' : 'Passer en foyer', () => _changerMode(context, enFoyer)),
+            ]),
           ),
-          OptionFoyer(
-            texte: 'Envoyer la liste à tout le foyer',
-            aide: 'Le mail est préparé avec les adresses de tous les membres',
-            coche: etat.envoiFoyer,
-            onChange: (v) => etat.options(envoiFoyer: v),
-          ),
-          OptionFoyer(
-            texte: 'Appareil partagé',
-            aide: 'Tablette ou PC de la famille : à chaque lancement, on choisit son nom',
-            coche: etat.appareilPartage,
-            onChange: (v) => etat.appareilPartage = v,
-          ),
-        ],
-        const TitreSection('Catalogue', cote: 0),
-        OptionFoyer(
-          texte: 'Catalogue du foyer seul',
-          aide: 'Le catalogue est commun à tous les foyers et s\'enrichit de leurs ajouts. Coché : seuls le catalogue '
-              'de départ et vos propres ajouts sont montrés ; ceux des autres foyers sont cachés, pas perdus.',
-          coche: etat.catalogueIsole,
-          onChange: etat.isolerCatalogue,
-        ),
+          if (enFoyer) ...[
+            LigneMenu(
+              titre: s.code!.split('').join(' '),
+              sousTitre: 'Code de partage',
+              onTap: () => menuActions(context, titre: 'Code de partage', actions: [
+                ActionLigne(Icons.copy, 'Copier le code', () {
+                  Clipboard.setData(ClipboardData(text: s.code!));
+                  Nav.message(context, 'Code copié');
+                }),
+                ActionLigne(Icons.key_outlined, 'Régénérer le code', () => _regenerer(context, s)),
+              ]),
+            ),
+            OptionFoyer(texte: 'Appareil partagé', coche: etat.appareilPartage, onChange: (v) => etat.appareilPartage = v),
+          ],
+        ]),
+        if (enFoyer)
+          GroupeRetractable(cle: 'foyer/membres', titre: 'Membres', icone: Icons.groups_outlined, nombre: etat.membresVisibles.length, enfants: [
+            for (final m in etat.membresVisibles) _LigneMembre(m),
+          ]),
+        if (enFoyer)
+          GroupeRetractable(cle: 'foyer/listes', titre: 'Listes', icone: Icons.checklist, enfants: [
+            OptionFoyer(texte: 'Envoyer la liste à tout le foyer', coche: etat.envoiFoyer, onChange: (v) => etat.options(envoiFoyer: v)),
+          ]),
+        GroupeRetractable(cle: 'foyer/catalogue', titre: 'Catalogue', icone: Icons.menu_book_outlined, enfants: [
+          OptionFoyer(texte: 'Catalogue du foyer seul', coche: etat.catalogueIsole, onChange: etat.isolerCatalogue),
+        ]),
       ]),
     );
   }
-
-  List<Widget> _code(Synchro s) => [
-        const TitreSection('Code de partage', cote: 0),
-        Text(s.code!.split('').join(' '), maxLines: 1, style: Charte.texte(24, gras: true, espacement: 1)),
-        Text('À saisir sur un autre appareil : « Rejoindre un foyer », puis chacun choisit son nom dans la liste des membres. '
-            'L\'invitation envoyée à un membre contient ce code.',
-            style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-      ];
 
   Future<void> _regenerer(BuildContext context, Synchro s) async {
     final ok = await confirmer(context,

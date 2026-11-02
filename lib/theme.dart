@@ -15,30 +15,30 @@ class Palette {
   final Color separateur;
 }
 
-// 01/11/2026 (Aristide) : chaque palette part de sa couleur la plus sombre (accentFonce, niveau 1), puis trois
-// niveaux nettement plus clairs (Charte.niveau) : l'accent est la couleur sombre éclaircie de 30 %.
+// Quatre niveaux par palette (Charte.niveau), du plus foncé au plus clair. 02/11/2026 (Aristide) : le premier
+// niveau moins sombre : accentFonce = couleur d'origine éclaircie de 20 %, accent = éclaircie de 45 %.
 const palettes = <Palette>[
-  Palette('Sauge', Color(0xFF6B8C79), Color(0xFF2B5A40), Color(0xFFF5F9F6), Color(0xFFE3EFE7), Color(0xFFD5E8DC), Color(0xFFB9D3C3)),
-  Palette('Océan', Color(0xFF6283A1), Color(0xFF1F4E79), Color(0xFFF4F8FC), Color(0xFFE0ECF7), Color(0xFFD0E2F3), Color(0xFFB3CDE6)),
-  Palette('Terracotta', Color(0xFFAD7964), Color(0xFF8A3F22), Color(0xFFFCF7F4), Color(0xFFF6E6DD), Color(0xFFF0D7C9), Color(0xFFE2BFAA)),
-  Palette('Lavande', Color(0xFF8377A6), Color(0xFF4E3D80), Color(0xFFF8F6FC), Color(0xFFEAE5F5), Color(0xFFDDD5EF), Color(0xFFC7BCE3)),
-  Palette('Noir et blanc', Color(0xFF222222), Color(0xFF222222), Color(0xFFFFFFFF), Color(0xFFF7F7F7), Color(0xFFF2F2F2), Color(0xFFCCCCCC)),
+  Palette('Sauge', Color(0xFF8AA496), Color(0xFF557B66), Color(0xFFF5F9F6), Color(0xFFE3EFE7), Color(0xFFD5E8DC), Color(0xFFB9D3C3)),
+  Palette('Océan', Color(0xFF849EB5), Color(0xFF4C7194), Color(0xFFF4F8FC), Color(0xFFE0ECF7), Color(0xFFD0E2F3), Color(0xFFB3CDE6)),
+  Palette('Terracotta', Color(0xFFBF9585), Color(0xFFA1654E), Color(0xFFFCF7F4), Color(0xFFF6E6DD), Color(0xFFF0D7C9), Color(0xFFE2BFAA)),
+  Palette('Lavande', Color(0xFF9E94B9), Color(0xFF716499), Color(0xFFF8F6FC), Color(0xFFEAE5F5), Color(0xFFDDD5EF), Color(0xFFC7BCE3)),
+  Palette('Noir et blanc', Color(0xFF858585), Color(0xFF4E4E4E), Color(0xFFFFFFFF), Color(0xFFF7F7F7), Color(0xFFF2F2F2), Color(0xFFCCCCCC)),
 ];
 
 /// Palettes de plus, proposées dans une liste déroulante (Paramètres › Apparence › Autres palettes).
 const autresPalettes = <Palette>[
-  Palette('Framboise', Color(0xFFA5647C), Color(0xFF7F2144), Color(0xFFFBF5F7), Color(0xFFF4E2E8), Color(0xFFEED3DD), Color(0xFFE3B6C7)),
-  Palette('Moutarde', Color(0xFFA08B4C), Color(0xFF785900), Color(0xFFFBF8F2), Color(0xFFF3EDDB), Color(0xFFECE3C9), Color(0xFFE0D1A6)),
-  Palette('Pétrole', Color(0xFF5C8489), Color(0xFF165056), Color(0xFFF4F8F8), Color(0xFFE0EBEC), Color(0xFFD0E1E3), Color(0xFFB1CDD0)),
-  Palette('Ardoise', Color(0xFF727A82), Color(0xFF35414C), Color(0xFFF6F7F8), Color(0xFFE6E8EA), Color(0xFFD9DCE0), Color(0xFFC0C5CB)),
-  Palette('Olive', Color(0xFF828562), Color(0xFF4D511E), Color(0xFFF8F8F4), Color(0xFFEAEBE1), Color(0xFFE0E1D2), Color(0xFFCBCDB4)),
-  Palette('Prune', Color(0xFF8A6782), Color(0xFF58264C), Color(0xFFF8F5F8), Color(0xFFECE3EA), Color(0xFFE3D5E0), Color(0xFFD0B8CB)),
-  Palette('Corail', Color(0xFFB67A74), Color(0xFF964138), Color(0xFFFDF7F6), Color(0xFFF8E8E6), Color(0xFFF5DCDA), Color(0xFFEFC5C1)),
-  Palette('Menthe', Color(0xFF649287), Color(0xFF216454), Color(0xFFF5F9F8), Color(0xFFE2EFEC), Color(0xFFD3E7E2), Color(0xFFB6D6CE)),
-  Palette('Chocolat', Color(0xFF827065), Color(0xFF4D3223), Color(0xFFF8F6F5), Color(0xFFEAE5E2), Color(0xFFE0D8D4), Color(0xFFCBBEB7)),
-  Palette('Marine', Color(0xFF5E6A82), Color(0xFF192A4D), Color(0xFFF4F5F8), Color(0xFFE0E3EA), Color(0xFFD1D6E0), Color(0xFFB2BACB)),
-  Palette('Cerise', Color(0xFFA15A64), Color(0xFF791421), Color(0xFFFBF4F5), Color(0xFFF3DFE2), Color(0xFFEDCFD3), Color(0xFFE1B0B6)),
-  Palette('Turquoise', Color(0xFF568F9A), Color(0xFF0E5F6F), Color(0xFFF3F9FA), Color(0xFFDEEEF1), Color(0xFFCDE5EA), Color(0xFFACD4DC)),
+  Palette('Framboise', Color(0xFFB98598), Color(0xFF994D69), Color(0xFFFBF5F7), Color(0xFFF4E2E8), Color(0xFFEED3DD), Color(0xFFE3B6C7)),
+  Palette('Moutarde', Color(0xFFB5A473), Color(0xFF937A33), Color(0xFFFBF8F2), Color(0xFFF3EDDB), Color(0xFFECE3C9), Color(0xFFE0D1A6)),
+  Palette('Pétrole', Color(0xFF7F9FA2), Color(0xFF457378), Color(0xFFF4F8F8), Color(0xFFE0EBEC), Color(0xFFD0E1E3), Color(0xFFB1CDD0)),
+  Palette('Ardoise', Color(0xFF90969D), Color(0xFF5D6770), Color(0xFFF6F7F8), Color(0xFFE6E8EA), Color(0xFFD9DCE0), Color(0xFFC0C5CB)),
+  Palette('Olive', Color(0xFF9D9F83), Color(0xFF71744B), Color(0xFFF8F8F4), Color(0xFFEAEBE1), Color(0xFFE0E1D2), Color(0xFFCBCDB4)),
+  Palette('Prune', Color(0xFFA3889D), Color(0xFF795170), Color(0xFFF8F5F8), Color(0xFFECE3EA), Color(0xFFE3D5E0), Color(0xFFD0B8CB)),
+  Palette('Corail', Color(0xFFC59692), Color(0xFFAB6760), Color(0xFFFDF7F6), Color(0xFFF8E8E6), Color(0xFFF5DCDA), Color(0xFFEFC5C1)),
+  Palette('Menthe', Color(0xFF85AAA1), Color(0xFF4D8376), Color(0xFFF5F9F8), Color(0xFFE2EFEC), Color(0xFFD3E7E2), Color(0xFFB6D6CE)),
+  Palette('Chocolat', Color(0xFF9D8E86), Color(0xFF715B4F), Color(0xFFF8F6F5), Color(0xFFEAE5E2), Color(0xFFE0D8D4), Color(0xFFCBBEB7)),
+  Palette('Marine', Color(0xFF808A9D), Color(0xFF475571), Color(0xFFF4F5F8), Color(0xFFE0E3EA), Color(0xFFD1D6E0), Color(0xFFB2BACB)),
+  Palette('Cerise', Color(0xFFB57E85), Color(0xFF94434D), Color(0xFFFBF4F5), Color(0xFFF3DFE2), Color(0xFFEDCFD3), Color(0xFFE1B0B6)),
+  Palette('Turquoise', Color(0xFF7AA7B0), Color(0xFF3E7F8C), Color(0xFFF3F9FA), Color(0xFFDEEEF1), Color(0xFFCDE5EA), Color(0xFFACD4DC)),
 ];
 
 /// Toutes les palettes : les cinq présentées en pastilles, puis les autres.

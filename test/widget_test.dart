@@ -509,15 +509,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'glisser à droite : retour à Préparer');
       // Sur une zone libre de la fenêtre, le même geste change aussi d'onglet
-      await tester.fling(find.textContaining('Touchez une liste pour voir'), const Offset(-200, 0), 1000);
+      await tester.fling(find.text('Nouvelle liste'), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
-      expect(find.text('Nouvelle liste'), findsNothing, reason: 'glisser sur le texte : onglet Courses');
+      expect(find.text('Nouvelle liste'), findsNothing, reason: 'glisser sur la liste : onglet Courses');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(200, 0), 1000);
       await tester.pumpAndSettle();
       await _toucher(tester, find.byTooltip('Synchronisation : foyer non partagé'));
       expect(find.text('Foyer non partagé'), findsOneWidget, reason: 'l\'icône ouvre l\'état du partage');
       await _fermerVolet(tester);
-      await _actionTitre(tester, 'Aide');
+      await _toucher(tester, find.byTooltip('Aide').first);
       expect(find.text('Aide · Préparer'), findsOneWidget);
       await _fermerVolet(tester);
       expect(find.text('Aide · Préparer'), findsNothing);
@@ -532,7 +532,7 @@ void main() {
       await _rubrique(tester, 'Magasins');
       await _menuTitre(tester, '+ Nouveau magasin');
       await _ciblesTactiles(tester);
-      await _rubrique(tester, 'Catalogue');
+      await _rubrique(tester, 'Catalogue des produits');
       await _menuTitre(tester, 'Produits ajoutés (0)');
       expect(find.text('FRAIS'), findsOneWidget);
       await _ciblesTactiles(tester);
@@ -578,16 +578,16 @@ void main() {
 
     testWidgets('3. la flèche de retour remonte d\'un niveau', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Catalogue');
-      if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
+      await _rubrique(tester, 'Catalogue des produits');
+      if (find.text('CRÈMERIE').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
       // Toucher un secteur le déplie sur place : ses produits apparaissent sous lui.
-      await _toucher(tester, find.text('Crèmerie').last);
+      await _toucher(tester, find.text('CRÈMERIE').last);
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.textContaining('RANGEMENT'), findsOneWidget, reason: 'fiche produit');
       await _ciblesTactiles(tester);
       await _toucher(tester, find.byTooltip('Retour'));
       expect(find.textContaining('RANGEMENT'), findsNothing);
-      expect(find.text('Crèmerie', skipOffstage: false), findsWidgets, reason: 'retour au catalogue, secteur toujours déplié');
+      expect(find.text('CRÈMERIE', skipOffstage: false), findsWidgets, reason: 'retour au catalogue, secteur toujours déplié');
 
       await _rubrique(tester, 'Types de promotion');
       expect(find.text('Remise immédiate'), findsOneWidget);
@@ -1077,11 +1077,12 @@ void main() {
       final etat = Etat.instance;
       etat.harmoniserCatalogue(); // fait à l'ouverture du foyer
       await _accueil(tester);
-      await _rubrique(tester, 'Catalogue');
+      await _rubrique(tester, 'Catalogue des produits');
       expect(find.text('+ Nouveau produit'), findsNothing, reason: 'on ajoute depuis un rayon et un secteur');
       // Le rayon a pu rester ouvert (groupes mémorisés d'un test à l'autre).
-      if (find.text('Crèmerie').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
-      await _toucher(tester, find.text('Crèmerie').last);
+      if (find.text('CRÈMERIE').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
+      if (find.text('Lait demi-écrémé').evaluate().isEmpty) await _toucher(tester, find.text('CRÈMERIE').last);
+      await _toucher(tester, find.byTooltip('Modifier Crèmerie'));
       await _toucher(tester, find.text('+ Nouveau produit'));
       expect(find.textContaining('photo'), findsNothing);
       await tester.enterText(find.byKey(const ValueKey('produit-nom')), 'Camembert');
@@ -1310,7 +1311,7 @@ void main() {
 
     testWidgets('catalogue : déplacer un rayon au doigt sous un autre univers', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Catalogue');
+      await _rubrique(tester, 'Catalogue des produits');
       await _actionTitre(tester, 'Déplacer les rayons');
       expect(find.byKey(const ValueKey('groupe-Surgelés')), findsOneWidget);
       // « Frais » (premier des Autres rayons) glisse au-dessus du titre « Autres rayons » : il passe dans un autre univers
@@ -1336,12 +1337,11 @@ void main() {
 
     testWidgets('catalogue du foyer : le bandeau du rayon propose de changer l\'ordre, dans tous les magasins', (tester) async {
       await _accueil(tester);
-      await _rubrique(tester, 'Catalogue');
+      await _rubrique(tester, 'Catalogue des produits');
       final etat = Etat.instance;
       final frais = etat.rayonsCatalogue.firstWhere((r) => r.nom == 'Frais');
       final avant = [for (final s in etat.secteursDu(frais.id)) s.nom];
-      if (find.text('Actions du rayon Frais').evaluate().isEmpty) await _toucher(tester, find.text('FRAIS'));
-      await _toucher(tester, find.text('Actions du rayon Frais'));
+      await _toucher(tester, find.byKey(const ValueKey('crayon-rayon-Frais')));
       await _toucher(tester, find.text('Changer l\'ordre des secteurs'));
       // Le dernier secteur glisse tout en haut
       final dernier = avant.last;

@@ -2,7 +2,7 @@ import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart' show cleRayon, cleSecteur;
+import '../composants/pictogramme.dart' show Pictogramme, cleRayon, cleSecteur;
 import '../composants/signe_perso.dart';
 import '../donnees/modele.dart';
 import '../donnees/univers.dart';
@@ -491,19 +491,11 @@ class EcranMagasins extends StatelessWidget {
                 ],
                 child: LigneMenu(
                   titre: m.nom,
-                  icone: Icons.storefront_outlined,
                   sousTitre: '${_pluriel(etat.parcours.where((p) => p.magasinId == m.id).length, 'parcours')} · '
                       '${_pluriel(etat.listesDuMagasin(m.id).length, 'liste')} en cours',
                   onTap: () => Nav.aller<void>(context, EcranMagasin(magasinId: m.id)),
                 ),
               ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
-              child: Text(
-                  'Tous les magasins ont le même catalogue. Supprimer un magasin efface ses parcours et ses listes en cours '
-                  '(après confirmation) ; son historique de courses part dans les archives.',
-                  style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            ),
           ],
         ),
       ),
@@ -582,75 +574,72 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
   static String _cleU(String u) => 'catalogue-univers/$u';
   static String _cleR(Rayon r) => 'catalogue/${r.nom}';
 
-  /// Univers, rayons et secteurs à plat : un bandeau par univers et par rayon (repliés au départ), une ligne
-  /// par secteur ; toucher un secteur le déplie et replie l'autre.
+  /// Arborescence comme dans les autres listes (02/11/2026, Aristide) : univers, rayons, secteurs et produits aux
+  /// quatre niveaux de la palette, sans retrait à gauche ; grande icône en débord au premier plan (un toucher long
+  /// sur celle d'un rayon ou d'un secteur choisit une image de la bibliothèque) ; un crayon à chaque niveau ouvre
+  /// ses actions dans un volet.
   List<Widget> _arbre(BuildContext context, Map<String, List<Rayon>> parUnivers) {
     final etat = Etat.instance;
     final plis = Retractables.i;
     final res = <Widget>[];
     for (final MapEntry(key: u, value: rayonsU) in parUnivers.entries) {
       final uOuvert = plis.ouvert(_cleU(u));
-      res.add(TitreGroupe(
-          key: ValueKey('univers-$u'),
-          nom: u,
-          grand: true,
-          icone: apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined,
-          // 01/11/2026 (Aristide) : la palette choisie partout, à un niveau par profondeur (univers, rayon, secteur) ;
-          // icônes plus petites que dans les autres listes.
-          fond: Charte.niveau(2),
-          tailleSigne: 30,
-          nombre: rayonsU.length,
-          ouvert: uOuvert,
-          onTap: () => plis.basculer(_cleU(u))));
-      if (!uOuvert) continue;
-      for (final x in rayonsU) {
-        final rOuvert = plis.ouvert(_cleR(x), parDefaut: false);
-        res.add(Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: TitreGroupe(
-              key: ValueKey('rayon-${x.nom}'),
-              nom: x.nom,
-              grand: true,
-              image: cleRayon(x.nom),
-              fond: Charte.niveau(3),
-              tailleSigne: 30,
-              ajoute: etat.rayonAjoute(x),
-              nombre: etat.secteursVisibles(x.id).length,
-              ouvert: rOuvert,
-              onTap: () => plis.basculer(_cleR(x), parDefaut: false)),
-        ));
-        if (!rOuvert) continue;
-        final lignes = <Widget>[];
-        for (final sec in etat.secteursVisibles(x.id)) {
-          final ouvert = _secteurOuvert == sec.id;
-          final produits = etat.produitsDuSecteur(sec);
-          lignes.add(LigneMenu(
-            key: ValueKey('secteur-${sec.id}'),
-            titre: sec.nom,
-            apresTitre: etat.secteurAjoute(sec) ? const SigneAjoute() : null,
-            gauche: imageSecteur(context, sec),
-            tailleGauche: 26,
-            fond: Charte.niveau(4),
-            sousTitre: _pluriel(produits.length, 'produit'),
-            droite: Icone(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
-            onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
-          ));
-          if (!ouvert) continue;
-          produits.sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
-          lignes.add(Padding(
-            padding: const EdgeInsets.only(left: 24),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              for (final p in produits) ligneProduit(context, p),
-              for (final a in actionsSecteur(context, sec)) LigneMenu(titre: a.texte, icone: a.icone, onTap: a.faire),
-            ]),
+      final rayons = <Widget>[];
+      if (uOuvert) {
+        for (final x in rayonsU) {
+          final rOuvert = plis.ouvert(_cleR(x), parDefaut: false);
+          final secteurs = <Widget>[];
+          if (rOuvert) {
+            for (final sec in etat.secteursVisibles(x.id)) {
+              final ouvert = _secteurOuvert == sec.id;
+              final produits = etat.produitsDuSecteur(sec);
+              produits.sort((a, b) => a.nom.toLowerCase().compareTo(b.nom.toLowerCase()));
+              secteurs.add(_NiveauCatalogue(
+                cle: 'secteur-${sec.id}',
+                nom: sec.nom,
+                fond: Charte.niveau(3),
+                signe: Pictogramme(cleSecteur(x.nom, sec.nom), taille: 46),
+                surSigneLong: () => choisirImageSecteur(context, x.nom, sec.nom),
+                ajoute: etat.secteurAjoute(sec),
+                nombre: produits.length,
+                ouvert: ouvert,
+                onTap: () => setState(() => _secteurOuvert = ouvert ? null : sec.id),
+                onCrayon: () => menuActions(context, titre: sec.nom, actions: actionsSecteur(context, sec)),
+                enfants: [
+                  for (final p in produits) ColoredBox(color: Charte.niveau(4), child: ligneProduit(context, p)),
+                ],
+              ));
+            }
+          }
+          rayons.add(_NiveauCatalogue(
+            cle: 'rayon-${x.nom}',
+            nom: x.nom,
+            fond: Charte.niveau(2),
+            signe: Pictogramme(cleRayon(x.nom), taille: 46),
+            surSigneLong: () => choisirImageRayon(context, x.nom),
+            ajoute: etat.rayonAjoute(x),
+            nombre: etat.secteursVisibles(x.id).length,
+            ouvert: rOuvert,
+            onTap: () => plis.basculer(_cleR(x), parDefaut: false),
+            onCrayon: () => menuActions(context, titre: x.nom, actions: _actionsRayon(context, x)),
+            enfants: secteurs,
           ));
         }
-        lignes.add(LigneMenu(
-            titre: 'Actions du rayon ${x.nom}',
-            icone: Icons.more_horiz,
-            onTap: () => menuActions(context, titre: x.nom, actions: _actionsRayon(context, x))));
-        res.add(Padding(padding: const EdgeInsets.only(left: 28, right: 16), child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: lignes)));
       }
+      res.add(_NiveauCatalogue(
+        cle: 'univers-$u',
+        nom: u,
+        fond: Charte.niveau(1),
+        signe: Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 46),
+        nombre: rayonsU.length,
+        ouvert: uOuvert,
+        onTap: () => plis.basculer(_cleU(u)),
+        onCrayon: () => menuActions(context, titre: u, actions: [
+          ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
+          ActionLigne(Icons.drag_handle, 'Déplacer les rayons', () => _deplacerRayons(context)),
+        ]),
+        enfants: rayons,
+      ));
     }
     return res;
   }
@@ -1187,4 +1176,77 @@ Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
   final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
   if (nom == null || nom.trim().isEmpty) return;
   Etat.instance.renommerSecteurCatalogue(s, nom);
+}
+
+/// Un niveau de l'arborescence du catalogue : bandeau (fond de la palette, crayon, chevron) et ses enfants ; la
+/// grande icône est dessinée par-dessus pour déborder au premier plan sur la ligne suivante.
+class _NiveauCatalogue extends StatelessWidget {
+  const _NiveauCatalogue({
+    required this.cle,
+    required this.nom,
+    required this.fond,
+    required this.signe,
+    required this.ouvert,
+    required this.onTap,
+    required this.onCrayon,
+    required this.enfants,
+    this.surSigneLong,
+    this.ajoute = false,
+    this.nombre,
+  });
+  final String cle;
+  final String nom;
+  final Color fond;
+  final Widget signe;
+  final bool ouvert;
+  final VoidCallback onTap;
+  final VoidCallback onCrayon;
+  final VoidCallback? surSigneLong;
+  final List<Widget> enfants;
+  final bool ajoute;
+  final int? nombre;
+
+  @override
+  Widget build(BuildContext context) {
+    final encre = fond.computeLuminance() < 0.3 ? Charte.blanc : Charte.niveau(1);
+    return Stack(clipBehavior: Clip.none, children: [
+      Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        TitreGroupe(
+          key: ValueKey(cle),
+          nom: nom,
+          grand: true,
+          fond: fond,
+          icone: Icons.circle, // place réservée : l'icône est dessinée par-dessus
+          signeAuDessus: true,
+          ajoute: ajoute,
+          nombre: nombre,
+          ouvert: ouvert,
+          onTap: onTap,
+          apres: Semantics(
+            button: true,
+            child: Tooltip(
+              message: 'Modifier $nom',
+              child: InkResponse(
+                key: ValueKey('crayon-$cle'),
+                onTap: onCrayon,
+                radius: 22,
+                child: Padding(padding: const EdgeInsets.all(4), child: Icone(Icons.edit_outlined, size: 24, color: encre)),
+              ),
+            ),
+          ),
+        ),
+        if (ouvert) ...enfants,
+        if (!ouvert || enfants.isEmpty) const SizedBox(height: 10),
+      ]),
+      Positioned(
+        left: 6,
+        top: 3,
+        width: 46,
+        height: 46,
+        child: surSigneLong == null
+            ? IgnorePointer(child: signe)
+            : GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, onLongPress: surSigneLong, child: signe),
+      ),
+    ]);
+  }
 }

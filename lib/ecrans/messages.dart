@@ -1,3 +1,4 @@
+import 'essai_mail.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart' show kIsWeb, defaultTargetPlatform, TargetPlatform;
@@ -74,6 +75,7 @@ class _EcranMessagesState extends State<EcranMessages> {
           icone: Icons.chat_outlined,
           sousTitre: 'Gérer › Mon foyer',
           titre: 'Messages',
+          aide: Aides.messages,
           actions: [
             ActionLigne(Icons.notifications_active_outlined, 'Être prévenu (ntfy)', _abonner),
             ActionLigne(Icons.copy, 'Copier le nom du canal', () {
@@ -81,6 +83,7 @@ class _EcranMessagesState extends State<EcranMessages> {
               Nav.message(context, 'Canal copié : ${m.monCanal}');
             }),
             ActionLigne(Icons.refresh, 'Rafraîchir', m.lire),
+            ActionLigne(Icons.outgoing_mail, 'Essai d\'envoi de mail', () => Nav.aller<void>(context, const EcranEssaiMail())),
           ],
         ),
         corps: ListView(
@@ -95,15 +98,6 @@ class _EcranMessagesState extends State<EcranMessages> {
                     style: Charte.texte(15, couleur: Charte.texteSecondaire)),
               ),
             if (m.erreur != null) Text(m.erreur!, style: Charte.texte(14, couleur: const Color(0xFFB00020))),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                  'Les messages et les notifications (liste prête, départ et fin des courses, liste rectificative) '
-                  'passent par le service gratuit ntfy. Pour les recevoir même quand l\'application est fermée, touchez '
-                  'le titre « Messages » puis « Être prévenu (ntfy) » : sur Android, installez d\'abord l\'appli ntfy ; '
-                  'dans un navigateur, autorisez les notifications sur la page ntfy. Votre canal : ${m.monCanal}',
-                  style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            ),
           ],
         ),
         bas: [

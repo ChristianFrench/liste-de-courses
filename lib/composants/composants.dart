@@ -487,8 +487,12 @@ class TitreGroupe extends StatelessWidget {
       this.fond,
       this.tailleSigne = 46,
       this.signeAuDessus = false,
+      this.apres,
       this.onTap});
   final String nom;
+
+  /// Bouton placé avant le chevron (catalogue : le crayon qui ouvre les actions du niveau).
+  final Widget? apres;
 
   /// Fond imposé (catalogue : univers, rayons et secteurs à des niveaux différents de la palette).
   final Color? fond;
@@ -570,6 +574,7 @@ class TitreGroupe extends StatelessWidget {
             if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: encre)),
             if (droite != null) Text(droite!, style: blanc),
             if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
+            if (apres != null) Padding(padding: const EdgeInsets.only(left: 6), child: apres),
             if (ouvert != null)
               Padding(
                 padding: const EdgeInsets.only(left: 6),
@@ -1091,11 +1096,14 @@ class ImageAbsente extends StatelessWidget {
 
 /// Liste déroulante, dans le même cadre que les zones de saisie, avec son libellé sur le trait du haut.
 class ChoixDeroulant<T> extends StatelessWidget {
-  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle, this.apercus});
+  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle, this.apercus, this.apercuADroite = false});
   final T valeur;
 
   /// Petit aperçu avant le libellé de chaque choix (échantillon d'une palette…).
   final Map<T, Widget>? apercus;
+
+  /// Aperçu après le libellé, calé à droite (palettes : 02/11/2026, Aristide).
+  final bool apercuADroite;
   final Map<T, String> choix;
   final ValueChanged<T> onChange;
   final String? libelle;
@@ -1120,11 +1128,17 @@ class ChoixDeroulant<T> extends StatelessWidget {
                 value: e.key,
                 child: apercus?[e.key] == null
                     ? Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)
-                    : Row(children: [
-                        apercus![e.key]!,
-                        const SizedBox(width: 10),
-                        Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
-                      ]),
+                    : apercuADroite
+                        ? Row(children: [
+                            Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                            const SizedBox(width: 10),
+                            apercus![e.key]!,
+                          ])
+                        : Row(children: [
+                            apercus![e.key]!,
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          ]),
               ),
           ],
           onChanged: (v) {

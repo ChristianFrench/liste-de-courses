@@ -17,17 +17,17 @@ class BarreOuverture extends StatelessWidget {
         builder: (context, o, _) => o == null
             ? const SizedBox.shrink()
             : Padding(
-                padding: const EdgeInsets.fromLTRB(18, 0, 18, 8),
+                padding: const EdgeInsets.fromLTRB(18, 4, 18, 0),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   Text(o.texte,
-                      style: Charte.texte(14, gras: true, couleur: Charte.blanc)
+                      style: Charte.texte(13, gras: true, couleur: Charte.blanc)
                           .copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 4)])),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 3),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(3),
                     child: LinearProgressIndicator(
                       value: o.valeur,
-                      minHeight: 6,
+                      minHeight: 5,
                       backgroundColor: const Color(0x66FFFFFF),
                       valueColor: AlwaysStoppedAnimation(Charte.niveau(4)),
                     ),

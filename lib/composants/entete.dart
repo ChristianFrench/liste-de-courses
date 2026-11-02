@@ -89,10 +89,12 @@ class EnTeteFenetre extends StatelessWidget {
                       child: InkWell(
                         key: const ValueKey('titre-actions'),
                         borderRadius: BorderRadius.circular(8),
-                        onTap: () => menuActions(context, titre: titre, actions: [
-                          ...actions,
-                          ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
-                        ]),
+                        onTap: () => actions.isEmpty
+                            ? montrerAide(context, titre, aide ?? Aides.generale)
+                            : menuActions(context, titre: titre, actions: [
+                                ...actions,
+                                ActionLigne(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
+                              ]),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -111,6 +113,9 @@ class EnTeteFenetre extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
+                // 02/11/2026 (Aristide) : sur toutes les fenêtres, le nuage puis l'aide, en haut à droite.
+                const BoutonSynchro(),
+                boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
               ],
             ),
             Row(
@@ -125,7 +130,7 @@ class EnTeteFenetre extends StatelessWidget {
                           style: surPhoto(Charte.texte(13, couleur: const Color(0xEEFFFFFF)))),
                 ),
                 if (droite != null) ...[droite!, const SizedBox(width: 4)],
-                const BoutonSynchro(),
+                const SizedBox(height: hauteurBouton), // hauteur fixe : le titre reste au même endroit sur toutes les fenêtres
               ],
             ),
           ],
@@ -318,8 +323,8 @@ class Aides {
   static const generale = 'L\'application compte quatre onglets, en bas de l\'écran : Accueil, Préparer, Courses et Gérer.\n$_gestes';
 
   static const accueil = 'L\'accueil rassemble ce qui est en cours.\n'
-      '« Comment ça marche » rappelle les cinq étapes : je paramètre, je prépare ma liste, je la valide, je fais mes courses, '
-      'je garde le ticket. Touchez une étape pour son explication.\n'
+      '« Comment ça marche » rappelle les quatre étapes : je paramètre une fois, je prépare ma liste, je la valide, '
+      'je fais mes courses. Touchez une étape pour son explication.\n'
       '« En préparation » : les listes que vous êtes en train de construire. « À faire » : les listes prêtes pour les courses. '
       '« Courses en cours » : des courses interrompues par « Pause ». Touchez une liste pour ce que vous pouvez en faire.\n'
       'Une nouvelle liste se crée dans l\'onglet Préparer.\n$_gestes';
@@ -328,12 +333,13 @@ class Aides {
       '« Nouvelle liste » : choisissez le magasin, le nom de la liste (proposé d\'office), puis son type : '
       'liste simple (sans secteurs), liste type ou liste vide, liste personnalisée (reprise d\'une course passée), '
       'liste depuis un texte (collé), ou liste calculée (plus tard).\n'
-      '« En préparation » et « Prêtes pour les courses » : touchez une liste pour la reprendre, la remettre en préparation, '
-      'la renommer ou la supprimer.\n$_gestes';
+      '« En préparation » et « Prêtes pour les courses » : touchez une liste pour voir ce que vous pouvez en faire '
+      '(la reprendre, la remettre en préparation, la renommer, la supprimer). Glissez-la vers la gauche pour la supprimer, '
+      'vers la droite pour la remettre en préparation.\n$_gestes';
 
   static const courses = 'L\'onglet Courses suit la vie des listes, en une seule liste :\n'
-      '« À faire » : les listes prêtes ; touchez-en une puis « Faire les courses » : une fenêtre demande qui fait les courses '
-      'et avec quel parcours.\n'
+      '« À faire » : les listes prêtes (une liste arrive ici quand sa préparation est terminée par « Liste prête ») ; '
+      'touchez-en une puis « Faire les courses » : une fenêtre demande qui fait les courses et avec quel parcours.\n'
       '« En cours » : des courses mises en pause, à reprendre.\n'
       '« Terminées sans ticket » : joignez le ticket de caisse (fichier PDF), ou classez la course sans ticket ; '
       'elle rejoint alors l\'historique.\n'
@@ -349,11 +355,13 @@ class Aides {
       'l\'invitation par mail (code de partage et liens d\'installation), le renommer ou le retirer du foyer, et régénérer le code. '
       'En rejoignant le foyer, on choisit son nom dans la liste des membres ; « Changer de personne » corrige une erreur. '
       'Appareil partagé (tablette, PC de la famille) : on choisit son nom à chaque lancement.\n'
-      'Messages (essai) : écrire à tout le foyer ; avec l\'appli ntfy (Android) ou la page ntfy du navigateur, on est prévenu même application fermée.\n'
-      'Courses : les magasins (et les parcours appris dans chacun), le catalogue (le même pour tous les magasins ; '
-      'rayons, secteurs et produits ajoutés marqués d\'un petit +), '
-      'les types de promotion, de mesure et de packaging, et les marques avec leurs produits.\n'
-      'Paramètres : apparence (couleurs), données (listes exemples, préliste, passage aux archives et suppression des archives), synchronisation (état des échanges ; serveur sous « Avancé », pour un dépannage).\n'
+      'Messages : écrire à tout le foyer ; avec l\'appli ntfy (Android) ou la page ntfy du navigateur, on est prévenu même application fermée. '
+      'L\'essai d\'envoi de mail (champs du modèle EmailJS et sa réponse) s\'y trouve aussi, en touchant le titre.\n'
+      'Synchronisation : l\'état des échanges entre les appareils du foyer ; serveur sous « Avancé », pour un dépannage.\n'
+      'Courses : les magasins (et les parcours appris dans chacun), le catalogue des produits (le même pour tous les magasins ; '
+      'rayons, secteurs et produits ajoutés marqués d\'un petit +), le catalogue des marques (les marques de chaque secteur, '
+      'proposées en préparation), puis les types de promotion, de mesure (poids, volume, à la pièce) et de packaging (lots de 2 à 10…).\n'
+      'Paramètres : apparence (palette de couleurs, couleurs des cadres), données (listes exemples, préliste, passage aux archives et suppression des archives).\n'
       'La corbeille est dans Paramètres ; l\'historique et les archives sont dans l\'onglet Courses.\n$_gestes';
 
   static const nouvelleListe = 'Choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; '
@@ -392,8 +400,38 @@ class Aides {
       '« Terminer » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
       'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n$_gestes';
 
+  static const foyer = 'Foyer : son nom, partagé ou seul sur cet appareil. Seul : pas de membres ni de synchronisation ; pour '
+      'partager les listes avec d\'autres personnes, touchez la ligne du foyer puis « Passer en foyer ».\n'
+      'Code de partage : à saisir sur un autre appareil (« Rejoindre un foyer »), puis chacun choisit son nom dans la liste '
+      'des membres. L\'invitation envoyée à un membre contient ce code. Touchez-le pour le copier ou le régénérer.\n'
+      'Appareil partagé : tablette ou PC de la famille ; à chaque lancement, on choisit son nom.\n'
+      'Membres : touchez un membre pour lui envoyer l\'invitation, le renommer ou le retirer du foyer. '
+      '« + Nouveau membre » et « Changer de personne » sont dans le titre.\n'
+      'Listes : « Envoyer la liste à tout le foyer » prépare le mail avec les adresses de tous les membres.\n'
+      'Catalogue : le catalogue est commun à tous les foyers et s\'enrichit de leurs ajouts. « Catalogue du foyer seul » '
+      'coché : seuls le catalogue de départ et vos propres ajouts sont montrés ; ceux des autres foyers sont cachés, pas perdus.\n$_gestes';
+
+  static const messages = 'Écrire à tout le foyer. Les messages et les notifications (liste prête, départ et fin des courses, '
+      'liste rectificative) passent par le service gratuit ntfy. Pour les recevoir même quand l\'application est fermée, touchez '
+      'le titre « Messages » puis « Être prévenu (ntfy) » : sur Android, installez d\'abord l\'appli ntfy ; dans un navigateur, '
+      'autorisez les notifications sur la page ntfy. « Copier le nom du canal » donne votre canal.\n'
+      '« Essai d\'envoi de mail » (en touchant le titre) montre les champs du modèle EmailJS et sa réponse.\n$_gestes';
+
   static const magasins = 'Vos magasins. Ils ont tous le même catalogue ; touchez un magasin pour ses parcours, '
-      'le renommer ou le supprimer.\n$_gestes';
+      'le renommer ou le supprimer. Supprimer un magasin efface ses parcours et ses listes en cours (après confirmation) ; '
+      'son historique de courses part dans les archives.\n$_gestes';
+
+  static const typesPromotion = 'Les types de promotion, proposés quand on indique une promotion sur une ligne de la liste. '
+      'Touchez un type pour le modifier ou le supprimer ; « + Nouveau type » est dans le titre. Leur couleur se choisit dans '
+      'Gérer › Paramètres › Apparence.\n$_gestes';
+
+  static const typesMesure = 'Les mesures : le poids (g, kg), le volume (cl, l) ou la vente à la pièce. Touchez-en une pour la '
+      'modifier, voir ses articles ou la supprimer ; « + Nouvelle mesure » est dans le titre. La couleur se choisit dans '
+      'Gérer › Paramètres › Apparence.\n$_gestes';
+
+  static const typesPackaging = 'Les packagings, essentiellement des lots de 2 à 10. Touchez-en un pour le modifier, voir ses '
+      'articles ou le supprimer ; « + Nouveau packaging » est dans le titre. La couleur se choisit dans Gérer › Paramètres › '
+      'Apparence.\n$_gestes';
 
   static const catalogue = 'Le catalogue du foyer, le même dans tous les magasins : ses rayons, ses secteurs et ses produits. '
       'Les rayons, les secteurs et les produits d\'origine ne changent pas.\n'

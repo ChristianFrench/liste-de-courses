@@ -27,7 +27,14 @@ class EcranAccueil extends StatelessWidget {
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       const _EnTetePhoto(),
       Expanded(
-        child: ListView(
+        // 02/11/2026 (Aristide) : glisser à gauche ou à droite, même sur la partie vide, passe à l'onglet voisin.
+        child: GestureDetector(
+          behavior: HitTestBehavior.translucent,
+          onHorizontalDragEnd: (d) {
+            final v = d.primaryVelocity ?? 0;
+            if (v.abs() > 200) glisserOnglet(context, v < 0 ? 1 : -1);
+          },
+          child: ListView(
           padding: EdgeInsets.zero,
           children: [
             GroupeRetractable(
@@ -85,6 +92,7 @@ class EcranAccueil extends StatelessWidget {
             const SizedBox(height: 12),
           ],
         ),
+        ),
       ),
       ]),
     );
@@ -140,7 +148,7 @@ class _EnTetePhoto extends StatelessWidget {
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+                    padding: const EdgeInsets.fromLTRB(18, 0, 18, 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -149,7 +157,8 @@ class _EnTetePhoto extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const BarreOuverture(),
+                  // Place toujours réservée : la barre d'ouverture n'agrandit pas la photo (02/11/2026, Aristide).
+                  const SizedBox(height: 30, child: BarreOuverture()),
                   Container(
                     constraints: const BoxConstraints(minHeight: 36),
                     alignment: Alignment.centerLeft,
@@ -170,7 +179,7 @@ class _EnTetePhoto extends StatelessWidget {
 TextStyle _surPhoto(TextStyle s) =>
     s.copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6), Shadow(color: Color(0x99000000), blurRadius: 2)]);
 
-/// « Comment ça marche » : les cinq étapes, chacune avec son icône, du paramétrage au ticket.
+/// « Comment ça marche » : les quatre étapes, chacune avec son icône (02/11/2026 : plus d'étape du ticket).
 class _Etapes extends StatelessWidget {
   const _Etapes();
 
@@ -179,10 +188,9 @@ class _Etapes extends StatelessWidget {
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
-    'Je garde\nle ticket',
   ];
 
-  static const _icones = [Icons.settings_outlined, Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined, Icons.receipt_long_outlined];
+  static const _icones = [Icons.settings_outlined, Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined];
 
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
@@ -228,16 +236,9 @@ class _Etapes extends StatelessWidget {
             'touchez son P ou son packaging pour en voir le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
         'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
-      ],
-    ),
-    (
-      'Je garde le ticket',
-      [
-        'À la fin, touchez « Terminer les courses ».',
-        'La course attend son ticket de caisse dans l\'onglet Courses (« Terminées sans ticket ») : joignez le PDF '
-            'fourni par l\'application du magasin.',
-        'Avec son ticket, la course rejoint l\'historique (Gérer › Historique). Ces courses passées servent ensuite '
-            'à préparer les prochaines listes.',
+        'À la fin, touchez « Terminer les courses ». La course attend son ticket de caisse dans l\'onglet Courses '
+            '(« Terminées sans ticket ») : joignez le PDF fourni par l\'application du magasin. Avec son ticket, elle rejoint '
+            'l\'historique ; ces courses passées servent ensuite à préparer les prochaines listes.',
       ],
     ),
   ];

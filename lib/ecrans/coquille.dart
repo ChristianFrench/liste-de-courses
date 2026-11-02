@@ -19,7 +19,6 @@ import 'catalogue.dart';
 import 'corbeille.dart';
 import 'editeur_catalogue.dart';
 import 'foyer.dart';
-import 'essai_mail.dart';
 import 'messages.dart';
 import 'historique.dart';
 import 'listes.dart';
@@ -294,34 +293,30 @@ class MenuGerer extends StatelessWidget {
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
+          // 02/11/2026 (Aristide) : sous-titres courts, les explications passent dans l'aide ; Messages regroupe
+          // l'essai d'envoi de mail ; Synchronisation remonte dans Mon foyer ; Courses réordonné.
           GroupeRetractable(cle: 'gerer/foyer', titre: 'Mon foyer', icone: Icons.home_outlined, enfants: [
             ecran(Icons.home_outlined, 'Foyer',
                 '${etat.foyerNom} · ${etat.membresVisibles.length} membre${etat.membresVisibles.length > 1 ? 's' : ''}', const EcranFoyer()),
-            ecran(Icons.chat_outlined, 'Messages', 'Écrire au foyer · essai avec ntfy', const EcranMessages()),
-            ecran(Icons.outgoing_mail, 'Essai d\'envoi de mail', 'Les champs du modèle EmailJS et sa réponse', const EcranEssaiMail()),
+            ecran(Icons.chat_outlined, 'Messages', 'Messages au foyer, essai d\'envoi de mail', const EcranMessages()),
+            if (Synchro.instance.mode != 'seul')
+              ecran(Icons.sync, 'Synchronisation', 'Échanges entre les appareils du foyer', const EcranPartage()),
           ]),
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
-            ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''} · leurs parcours', const EcranMagasins()),
+            ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''}', const EcranMagasins()),
+            ecran(Icons.menu_book_outlined, 'Catalogue des produits', '${etat.produits.length} produits', const EcranCatalogue()),
             if (CatalogueCommun.instance.editeur)
               ecran(Icons.public, 'Catalogue commun', 'Éditeur : modifier et publier pour tous les foyers', const EcranEditeurCatalogue()),
-            ecran(Icons.menu_book_outlined, 'Catalogue',
-                '${etat.produits.length} produits · le même dans tous les magasins', const EcranCatalogue()),
-            ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types · chacun avec sa couleur',
-                const EcranTypesPromotion()),
-            ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures : poids, volume, à la pièce',
-                const EcranTypesPackaging(lots: false)),
-            ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings : lots de 2 à 10…',
-                const EcranTypesPackaging()),
-            ecran(Icons.sell_outlined, 'Catalogue des marques', 'Les marques de chaque secteur, proposées en préparation',
-                const EcranMarques()),
+            ecran(Icons.sell_outlined, 'Catalogue des marques', '${etat.marques.length} marques', const EcranMarques()),
+            ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
+            ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures', const EcranTypesPackaging(lots: false)),
+            ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings', const EcranTypesPackaging()),
           ]),
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
-            ecran(Icons.palette_outlined, 'Apparence', 'Couleurs de l\'application', const EcranApparence()),
-            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, préliste, suppression des archives', const EcranDonnees()),
+            ecran(Icons.palette_outlined, 'Apparence', 'Palette de couleurs', const EcranApparence()),
+            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, préliste, archives', const EcranDonnees()),
             ecran(Icons.delete_outline, 'Corbeille', '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''}',
                 const EcranCorbeille()),
-            if (Synchro.instance.mode != 'seul')
-              ecran(Icons.sync, 'Synchronisation', 'État des échanges entre les appareils du foyer', const EcranPartage()),
           ]),
         ],
       ),
