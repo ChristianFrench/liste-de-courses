@@ -140,7 +140,7 @@ class _EnTetePhoto extends StatelessWidget {
                       const SizedBox(width: 18),
                       Expanded(
                         child: Text('Version $versionApplication',
-                            style: _surPhoto(Charte.texte(11, couleur: const Color(0xEEFFFFFF)))),
+                            style: _surPhoto(Charte.texte(12.5, couleur: const Color(0xEEFFFFFF)))),
                       ),
                       const BoutonSynchro(),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
@@ -152,8 +152,17 @@ class _EnTetePhoto extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Bonjour !', style: _surPhoto(Charte.texte(30, gras: true, couleur: Charte.blanc))),
-                        Text('Prêt(e) pour vos courses ?', style: _surPhoto(Charte.texte(16, couleur: Charte.blanc))),
+                        // 03/11/2026 (Aristide) : l'image d'Emplettes à la place de « Bonjour ! », le texte à sa droite en plus petit.
+                        Row(children: [
+                          const ImageEmplettes('complet', key: ValueKey('accueil-emplettes'), taille: 96),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text('Bonjour !', style: _surPhoto(Charte.texte(22, gras: true, couleur: Charte.blanc))),
+                              Text('Prêt(e) pour vos courses ?', style: _surPhoto(Charte.texte(14, couleur: Charte.blanc))),
+                            ]),
+                          ),
+                        ]),
                       ],
                     ),
                   ),
@@ -279,7 +288,11 @@ class _Etapes extends StatelessWidget {
             child: Column(
               children: [
                 // 01/11/2026 (Aristide) : une icône à la place du numéro.
-                Icone(_icones[i], size: 34),
+                // 03/11/2026 : les images d'Emplettes pour préparer et faire les courses.
+                if (i == 1 || i == 3)
+                  ImageEmplettes(ImageEmplettes.pourIcone(_icones[i]), taille: 44)
+                else
+                  Icone(_icones[i], size: 44),
                 const SizedBox(height: 6),
                 Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],

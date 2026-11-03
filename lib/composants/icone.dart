@@ -28,3 +28,22 @@ class Icone extends StatelessWidget {
     );
   }
 }
+
+/// 03/11/2026 (Aristide) : les trois images d'Emplettes (assets/emplettes/) :
+/// « complet » (chariot, liste et crayon) = l'application et l'Accueil, « liste_crayon » = Préparer, « liste_chariot » = Courses.
+class ImageEmplettes extends StatelessWidget {
+  const ImageEmplettes(this.nom, {super.key, required this.taille});
+  final String nom;
+  final double taille;
+
+  /// Image de l'onglet dont l'en-tête porte cette icône, sinon l'image complète.
+  static String pourIcone(IconData? i) => switch (i) {
+        Icons.checklist => 'liste_crayon',
+        Icons.shopping_cart_outlined => 'liste_chariot',
+        _ => 'complet',
+      };
+
+  @override
+  Widget build(BuildContext context) => Image.asset('assets/emplettes/$nom.png',
+      width: taille, height: taille, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
+}

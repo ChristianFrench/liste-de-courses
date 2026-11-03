@@ -67,7 +67,11 @@ class BarreOnglets extends StatelessWidget {
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Stack(alignment: Alignment.center, children: [
-                        Positioned(top: 0, child: Icone(entrees[i].$1, size: 46, color: Charte.cadre)),
+                        Positioned(
+                            top: 0,
+                            child: i == 3
+                                ? Icone(entrees[i].$1, size: 52, color: Charte.cadre)
+                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 54)),
                         Positioned(
                           bottom: 1,
                           child: Text(entrees[i].$2,

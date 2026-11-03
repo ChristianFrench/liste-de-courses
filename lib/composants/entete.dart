@@ -28,7 +28,8 @@ class EnTeteFenetre extends StatelessWidget {
   });
   final String titre;
 
-  /// N'est plus affichée (pas d'icônes dans l'application).
+  /// Choisit l'image de signature des onglets (sans flèche de retour) : liste et crayon (Préparer),
+  /// liste et chariot (Courses), engrenage (Gérer), sinon l'image complète d'Emplettes.
   final IconData? icone;
   final String? sousTitre;
 
@@ -82,8 +83,9 @@ class EnTeteFenetre extends StatelessWidget {
                 if (!retour)
                   Padding(
                     padding: const EdgeInsets.only(left: 2, right: 8),
-                    child: Image.asset('assets/icone_signature.png',
-                        key: const ValueKey('signature'), width: 30, height: 30, filterQuality: FilterQuality.medium),
+                    child: icone == Icons.tune
+                        ? Icone(icone, key: const ValueKey('signature'), size: 44)
+                        : ImageEmplettes(ImageEmplettes.pourIcone(icone), key: const ValueKey('signature'), taille: 46),
                   ),
                 // Toucher le titre propose les actions de la fenêtre, puis l'aide, dans un volet.
                 Expanded(
