@@ -49,6 +49,8 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
   await tester.tap(f);
+  // Une ligne de liste attend un éventuel second toucher (double toucher) avant d'ouvrir son volet.
+  await tester.pump(const Duration(milliseconds: 310));
   await tester.pumpAndSettle();
 }
 
