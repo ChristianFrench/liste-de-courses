@@ -60,7 +60,7 @@ class _EcranBienvenueState extends State<EcranBienvenue> {
     final s = Synchro.instance;
     final suspendu = s.actif ? null : s.suspendu;
     return PageBase(
-      entete: EnTeteFenetre(retour: widget.depuisFoyer, icone: Icons.home_outlined, titre: 'Bienvenue', sousTitre: 'Liste de courses'),
+      entete: EnTeteFenetre(retour: widget.depuisFoyer, icone: Icons.home_outlined, titre: 'Bienvenue', sousTitre: 'Emplettes'),
       corps: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 24), children: [
         if (suspendu != null) ..._suspendu(suspendu),
         Text('Comment utilisez-vous l\'application ?', style: Charte.texte(20, gras: true)),

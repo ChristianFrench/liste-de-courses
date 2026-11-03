@@ -2,7 +2,7 @@
 Lancé automatiquement par GitHub Actions ; rien à faire à la main."""
 import pathlib, re, sys
 
-NOM = "Liste de courses"
+NOM = "Emplettes"
 LARGEUR, HAUTEUR = 390, 844   # format de référence de la spécification IHM, en points
 
 
@@ -118,7 +118,7 @@ remplacer("windows/runner/win32_window.cpp",
 remplacer("web/index.html", "<html>", '<html lang="fr">')
 remplacer("web/index.html", "<title>liste_de_courses</title>", f"<title>{NOM}</title>")
 remplacer("web/index.html", 'content="liste_de_courses"', f'content="{NOM}"')
-remplacer("web/index.html", 'content="A new Flutter project."', f'content="{NOM} partagée du foyer"')
+remplacer("web/index.html", 'content="A new Flutter project."', 'content="Liste de courses partagée du foyer"')
 remplacer("web/manifest.json", r'"(short_)?name": "liste_de_courses"', lambda m: f'"{m[1] or ""}name": "{NOM}"', regex=True)
-remplacer("web/manifest.json", '"A new Flutter project."', f'"{NOM} partagée du foyer"')
+remplacer("web/manifest.json", '"A new Flutter project."', '"Liste de courses partagée du foyer"')
 remplacer("web/manifest.json", '"#0175C2"', '"#3F7D5A"')

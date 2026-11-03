@@ -135,7 +135,7 @@ List<(String, List<_LigneMail>)> _groupesListe(Etat etat, Liste l) {
   ];
 }
 
-String _enTeteListe(Etat etat, Liste l) => 'Liste de courses · ${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.lignes.length} articles';
+String _enTeteListe(Etat etat, Liste l) => 'Emplettes · ${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.lignes.length} articles';
 
 /// Texte de la liste (messagerie de l'appareil), par rayon et secteur dans l'ordre du magasin.
 String texteListe(Etat etat, Liste l) {

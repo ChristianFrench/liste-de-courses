@@ -11,7 +11,7 @@ import 'synchro.dart';
 
 // Messages entre les membres du foyer (maquette du 27/10/2026), par le service gratuit ntfy.sh.
 // Depuis le 28/10/2026 : chaque membre s'abonne à SON canal dans l'appli ntfy (Android) ou sur ntfy.sh
-// (navigateur), et y reçoit messages et notifications même quand Liste de courses est fermée. Tout ce qui
+// (navigateur), et y reçoit messages et notifications même quand Emplettes est fermée. Tout ce qui
 // est envoyé passe aussi par le canal du foyer, que personne n'écoute : c'est le journal de l'écran Messages.
 
 /// Un message reçu du canal du foyer : notification ou trace d'un mail (02/11/2026 : expéditeur et

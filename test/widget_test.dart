@@ -180,11 +180,11 @@ void main() {
       final e = Etat.instance;
       final l = e.liste('l4')!;
       final texte = texteListe(e, l);
-      expect(texte, startsWith('Liste de courses · Magasin 1 · 9 articles'));
+      expect(texte, startsWith('Emplettes · Magasin 1 · 9 articles'));
       expect(texte.indexOf('FRAIS - '), lessThan(texte.indexOf('ÉPICERIE - ')), reason: 'rayon et secteur, dans l\'ordre du magasin');
       expect(texte, contains('NON PLACÉ'));
       final html = htmlListe(e, l);
-      expect(html, contains('<b>Liste de courses · Magasin 1 · 9 articles</b>'));
+      expect(html, contains('<b>Emplettes · Magasin 1 · 9 articles</b>'));
       expect(html, contains('<div>3 × Pâtes <span style="color:#c62828">promo'), reason: 'quantité devant, promo en rouge');
       expect(html, isNot(contains('background')), reason: 'sobre (02/11/2026)');
       final autre = e.membres.firstWhere((m) => m.id != e.moi.id);

@@ -412,7 +412,7 @@ class _DejaOuverte extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            Text('Liste de courses est déjà ouverte', style: Charte.texte(20, gras: true)),
+            Text('Emplettes est déjà ouverte', style: Charte.texte(20, gras: true)),
             const SizedBox(height: 12),
             Text('Elle est ouverte dans un autre onglet ou une autre fenêtre de ce navigateur (par exemple l\'icône de '
                 'l\'écran d\'accueil). Pour protéger vos données, elle ne s\'ouvre qu\'une fois à la fois.\n\n'

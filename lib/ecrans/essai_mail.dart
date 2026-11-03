@@ -37,8 +37,8 @@ class _EcranEssaiMailState extends State<EcranEssaiMail> {
     super.initState();
     final etat = Etat.instance;
     final a = adressesFoyer(etat);
-    final p = MailDirect.parametres(a.isEmpty ? [etat.moi.email] : a, 'Essai · Liste de courses',
-        'Ceci est un mail d\'essai envoyé par ${etat.moi.nomAffiche} depuis Liste de courses.');
+    final p = MailDirect.parametres(a.isEmpty ? [etat.moi.email] : a, 'Essai · Emplettes',
+        'Ceci est un mail d\'essai envoyé par ${etat.moi.nomAffiche} depuis Emplettes.');
     _champs = {for (final k in _libelles.keys) k: TextEditingController(text: p[k] ?? '')};
   }
 

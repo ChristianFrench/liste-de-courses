@@ -38,7 +38,7 @@ class ListeDeCoursesApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Liste de courses',
+      title: 'Emplettes',
       debugShowCheckedModeBanner: false,
       theme: Charte.theme(),
       scrollBehavior: Charte.defilement(),

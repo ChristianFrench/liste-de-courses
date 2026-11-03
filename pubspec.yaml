@@ -35,6 +35,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icone_ronde.png
+    - assets/icone_signature.png
     - assets/accueil_photo.jpg
     - assets/donnees_maquette.json
     - assets/catalogue_type.json

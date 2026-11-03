@@ -78,7 +78,13 @@ class EnTeteFenetre extends StatelessWidget {
             Row(
               children: [
                 if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
-                if (!retour) const SizedBox(width: 4),
+                // 03/11/2026 (Aristide) : l'icône de l'application en signature sur les onglets
+                if (!retour)
+                  Padding(
+                    padding: const EdgeInsets.only(left: 2, right: 8),
+                    child: Image.asset('assets/icone_signature.png',
+                        key: const ValueKey('signature'), width: 30, height: 30, filterQuality: FilterQuality.medium),
+                  ),
                 // Toucher le titre propose les actions de la fenêtre, puis l'aide, dans un volet.
                 Expanded(
                   child: Align(
@@ -347,8 +353,8 @@ class Aides {
       'la remettre en « Terminées sans ticket », l\'archiver ou la remettre en historique. Les courses de plus de trois mois '
       'passent aux archives (réglable dans Données).\n'
       'En terminant les courses, vous pouvez envoyer un résumé au foyer : oubliés, absents des rayons, achetés.\n'
-      'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Liste de courses ; '
-      'ou, dans les téléchargements, ouvrez le PDF avec Liste de courses. L\'application demande à quelle course le joindre.\n$_gestes';
+      'Ticket reçu dans l\'application du magasin : touchez « Partager » et choisissez Emplettes ; '
+      'ou, dans les téléchargements, ouvrez le PDF avec Emplettes. L\'application demande à quelle course le joindre.\n$_gestes';
 
   static const gerer = 'L\'onglet Gérer regroupe tout ce qui se règle une fois pour toutes.\n'
       'Mon foyer : seul sur cet appareil ou en foyer partagé. En foyer, chacun peut ajouter un membre et lui envoyer '
