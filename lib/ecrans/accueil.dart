@@ -161,7 +161,11 @@ class _EnTetePhoto extends StatelessWidget {
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 6),
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('Bonjour !', style: _surPhoto(Charte.texte(22, gras: true, couleur: Charte.blanc))),
+                              Text(Etat.instance.moi.nomAffiche.trim().isEmpty ? 'Bonjour !' : 'Bonjour ${Etat.instance.moi.nomAffiche.trim()} !',
+                                  key: const ValueKey('bonjour'),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: _surPhoto(Charte.texte(22, gras: true, couleur: Charte.blanc))),
                               Text('Prêt(e) pour vos courses ?', style: _surPhoto(Charte.texte(14, couleur: Charte.blanc))),
                               ]),
                             ),

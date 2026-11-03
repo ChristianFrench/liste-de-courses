@@ -427,6 +427,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
   /// Article signalé après une recherche (fond coloré quelques secondes).
   String? _surligne;
 
+  /// 03/11/2026 (Aristide, essai) : article tout juste ajouté par la recherche, à qui l'on propose une promotion.
+  String? _promoPour;
+
   Liste? get liste => etat.liste(widget.listeId);
 
   @override
@@ -478,11 +481,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
               produits: () => etat.produitsVisibles,
               detail: ou,
               aide: 'Ajouter un article (3 lettres ou plus)',
-              onChoix: (p) => _ajouter(l, p),
+              onChoix: (p) => _ajouter(l, p, proposerPromo: true),
               // « nut » → Pâte à tartiner chocolat · Nutella : l'article générique, avec sa marque.
               onMarque: (p, marque) {
                 if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
-                _ajouter(l, etat.changerMarque(l, p, marque));
+                _ajouter(l, etat.changerMarque(l, p, marque), proposerPromo: true);
               },
               onNouveau: (nom) async {
                 final p = await nouveauProduit(context, nom: nom);
@@ -490,6 +493,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 _ajouter(l, p);
               },
             ),
+            if (_promoPour case final id? when etat.ligne(l, id) != null) _bandeauPromo(context, l, etat.ligne(l, id)!),
             Container(height: 1, color: Charte.separateurZone),
           ],
           corps: l.lignes.isEmpty
@@ -530,13 +534,60 @@ class _EcranConstructionState extends State<EcranConstruction> {
   }
 
   /// L'article trouvé s'ajoute (s'il n'y est pas) ; l'écran va sur lui et le signale quelques secondes.
-  void _ajouter(Liste l, Produit p) {
+  void _ajouter(Liste l, Produit p, {bool proposerPromo = false}) {
     if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
-    setState(() => _surligne = p.id);
+    setState(() {
+      _surligne = p.id;
+      _promoPour = proposerPromo && etat.ligne(l, p.id)?.promotion == null ? p.id : null;
+    });
     _amener(p.id, essais: 4);
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _surligne == p.id) setState(() => _surligne = null);
     });
+  }
+
+  /// Sous la recherche, après un ajout : « Promo ? » et les types de promotion ; un appui ouvre le volet de
+  /// l'article avec ce type, prêt à compléter.
+  Widget _bandeauPromo(BuildContext context, Liste l, LigneListe g) {
+    final types = [
+      for (final id in FeuillePromotion.typesProposes)
+        if (etat.typePromotion(id) case final t?) t,
+    ];
+    return Container(
+      key: const ValueKey('bandeau-promo'),
+      color: Charte.niveau(1),
+      padding: const EdgeInsets.fromLTRB(10, 4, 0, 4),
+      child: Row(children: [
+        Text('Promo ?', style: Charte.texte(15, gras: true)),
+        const SizedBox(width: 8),
+        Expanded(
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              for (final t in types)
+                Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: ActionChip(
+                    key: ValueKey('promo-rapide-${t.id}'),
+                    label: Text(FeuillePromotion.nomCourt(t), style: Charte.texte(14)),
+                    visualDensity: VisualDensity.compact,
+                    onPressed: () {
+                      setState(() => _promoPour = null);
+                      volet<void>(context, builder: (_) => FeuillePromotion(liste: l, ligne: g, promoInitiale: t.id));
+                    },
+                  ),
+                ),
+            ]),
+          ),
+        ),
+        IconButton(
+          tooltip: 'Pas de promotion',
+          visualDensity: VisualDensity.compact,
+          onPressed: () => setState(() => _promoPour = null),
+          icon: const Icon(Icons.close, size: 20),
+        ),
+      ]),
+    );
   }
 
   /// Fait venir la ligne d'un article à l'écran ; si elle n'est pas encore construite (loin dans la liste),
@@ -937,9 +988,14 @@ Future<void> ouvrirFeuillePromotion(BuildContext context, Liste l, LigneListe g)
 
 /// Volet de l'article : le packaging (pack de x), la consigne, puis la promotion visée.
 class FeuillePromotion extends StatefulWidget {
-  const FeuillePromotion({super.key, required this.liste, required this.ligne});
+  const FeuillePromotion({super.key, required this.liste, required this.ligne, this.promoInitiale});
   final Liste liste;
   final LigneListe ligne;
+
+  /// Type de promotion choisi d'avance (bandeau « Promo ? » de la recherche) : son détail s'ouvre aussitôt.
+  final String? promoInitiale;
+
+  static String nomCourt(TypePromotion? t) => _FeuillePromotionState._nomCourt(t);
 
   /// Promotions proposées : lot « 3 dont 1 gratuit », lot pour bénéficier d'une promo, remise simple, autre.
   static const typesProposes = ['lot', 'prixGlobal', 'remise', 'autre'];
@@ -988,6 +1044,16 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     }
     libelle.text = p?.libelle ?? _auto();
     libelleModifie = p != null && p.libelle != _auto();
+    if (widget.promoInitiale case final t? when p == null) {
+      type = t;
+      c1.text = switch (t) { 'lot' => '3', 'prixGlobal' => '2', _ => '' };
+      c2.text = switch (t) { 'lot' => '1', _ => '' };
+      libelle.text = _auto();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Au plus court : le détail, OK, et c'est enregistré (le volet de l'article se referme).
+        if (mounted) _completerPromo().then((_) { if (mounted) _valider(); });
+      });
+    }
   }
 
   @override

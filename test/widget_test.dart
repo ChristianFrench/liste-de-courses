@@ -504,7 +504,7 @@ void main() {
   group('Écrans', () {
     testWidgets('10. accueil : comment ça marche, et ce qui est en cours à reprendre', (tester) async {
       await _lancer(tester);
-      expect(find.text('Bonjour !'), findsOneWidget);
+      expect(find.byKey(const ValueKey('bonjour')), findsOneWidget);
       expect(find.text('Je prépare\nma liste'), findsOneWidget, reason: 'les étapes de « comment ça marche »');
       expect(find.text('EN PRÉPARATION'), findsOneWidget);
       expect(find.text('À FAIRE'), findsOneWidget, reason: 'les listes prêtes');
@@ -521,7 +521,7 @@ void main() {
       await _lancer(tester);
       expect(find.textContaining('Version '), findsOneWidget, reason: 'numéro de version en haut de l\'accueil');
       expect(find.byType(EnTeteFenetre), findsNothing, reason: 'pas de bandeau de titre sur l\'accueil');
-      await tester.fling(find.text('Bonjour !'), const Offset(-200, 0), 1000);
+      await tester.fling(find.byKey(const ValueKey('bonjour')), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
       expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'glisser à gauche : onglet Préparer');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(-200, 0), 1000);
@@ -948,6 +948,14 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
       await tester.pumpAndSettle();
+      // Essai 03/11/2026 : après l'ajout par la recherche, les promotions sont proposées ; ✕ les retire
+      expect(find.byKey(const ValueKey('bandeau-promo')), findsOneWidget);
+      expect(find.byKey(const ValueKey('promo-rapide-lot')), findsOneWidget);
+      await _toucher(tester, find.byKey(const ValueKey('promo-rapide-lot')));
+      expect(find.byKey(const ValueKey('libelle-promo')), findsOneWidget, reason: 'le détail de la promo s\'ouvre aussitôt');
+      await _toucher(tester, find.text('OK'));
+      expect(find.byKey(const ValueKey('bandeau-promo')), findsNothing);
+      expect(Etat.instance.listes.last.lignes.last.promotion?.type, 'lot');
       await tester.pump(const Duration(seconds: 4));
       await _toucher(tester, find.text('Liste prête'));
       expect(find.textContaining('il l\'acceptera ou la refusera'), findsOneWidget);
