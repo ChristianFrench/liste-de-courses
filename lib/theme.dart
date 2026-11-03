@@ -66,8 +66,9 @@ class Charte {
   /// Les quatre niveaux de la palette, du bandeau ordinaire (1) au plus clair (4). 02/11/2026 (Aristide) : plus de
   /// teinte sombre ; le niveau 1 est la couleur des bandeaux de toute l'application, les suivants plus clairs.
   // 02/11/2026 (Aristide) : la couleur première (niveau 1, celle des bandeaux) légèrement plus foncée.
-  static const _eclaircis = [0.75, 0.88, 0.93, 0.97];
-  static Color niveau(int n) => Color.lerp(palette.accentFonce, blanc, _eclaircis[(n - 1).clamp(0, 3)])!;
+  // 03/11/2026 (Aristide) : niveau 1 encore très légèrement assombri.
+  static const eclaircis = [0.70, 0.88, 0.93, 0.97];
+  static Color niveau(int n) => Color.lerp(palette.accentFonce, blanc, eclaircis[(n - 1).clamp(0, 3)])!;
 
   /// Texte posé sur un niveau de la palette : la teinte la plus sombre.
   static Color get encreNiveau => fonce(palette.accentFonce);

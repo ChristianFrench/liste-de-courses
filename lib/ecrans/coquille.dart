@@ -165,10 +165,16 @@ class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
   /// Appareil seul : la base est déjà lue, la barre fait un court passage d'une seconde.
   double get _progres => _foyer ? Synchro.instance.progresOuverture : (DateTime.now().difference(_debut).inMilliseconds / 1000).clamp(0.0, 1.0);
 
+  /// Valeur affichée : elle ne recule jamais (03/11/2026, Aristide : la barre faisait des retours en arrière
+  /// à chaque paquet reçu) ; quand la synchronisation attend, elle avance encore doucement.
+  double _affiche = 0;
+
   void _avancer() {
     if (!mounted) return;
     final o = Synchro.instance.ouverture;
-    final valeur = _progres;
+    final brut = _progres;
+    _affiche = brut >= 1 ? 1 : (brut > _affiche ? brut : _affiche + (0.95 - _affiche).clamp(0.0, 1.0) * 0.004);
+    final valeur = _affiche;
     if (valeur >= 1) {
       _finie ??= DateTime.now();
       // La barre pleine reste un instant, puis disparaît.

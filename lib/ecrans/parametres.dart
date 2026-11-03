@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart' show cleRayon;
+import '../composants/pictogramme.dart' show cleSecteur;
 import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
@@ -98,9 +98,9 @@ class EcranApparence extends _EcranVivant {
     final etat = Etat.instance;
     final cadres = (etat.couleurPromotions, etat.couleurMesures, etat.couleurLots);
     final cadresActuels = palettesCadres.where((p) => (p.$2, p.$3, p.$4) == cadres).firstOrNull?.$1 ?? '';
+    // 03/11/2026 (Aristide) : les trois choix dans l'ordre, puis un seul exemple encadré qui les montre tous :
+    // une liste de courses prête, avec promotions, mesures, packagings et les icônes (ou non) des secteurs.
     return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
-      // 02/11/2026 (Aristide) : deux sujets titrés, chacun avec une liste déroulante (libellé à gauche, palette à
-      // droite) et un petit exemple du résultat en dessous.
       const TitreSection('Palette de l\'application', cote: 0),
       ChoixDeroulant<String>(
         libelle: 'Palette',
@@ -112,18 +112,6 @@ class EcranApparence extends _EcranVivant {
           etat.choisirApparence(v);
           Charte.choisirPalette(v);
         },
-      ),
-      const SizedBox(height: 10),
-      TitreGroupe(nom: 'Fruits et légumes', grand: true, image: cleRayon('Fruits et légumes'), nombre: 2),
-      for (final (n, d) in [('Pommes Golden', '1 kg'), ('Bananes', 'Lot de 6')]) LigneMenu(titre: n, sousTitre: d),
-      // 02/11/2026 (Aristide) : icônes des secteurs dans les listes, ou pas.
-      CheckboxListTile(
-        key: const ValueKey('icones-listes'),
-        value: etat.iconesListes,
-        contentPadding: EdgeInsets.zero,
-        controlAffinity: ListTileControlAffinity.leading,
-        title: Text('Icônes dans les listes', style: Charte.texte(16)),
-        onChanged: (v) => etat.montrerIconesListes(v ?? true),
       ),
       const TitreSection('Palette des cadres', cote: 0),
       ChoixDeroulant<String>(
@@ -143,13 +131,67 @@ class EcranApparence extends _EcranVivant {
           etat.choisirCouleur('lot', p.$4);
         },
       ),
-      const SizedBox(height: 12),
-      Wrap(spacing: 10, runSpacing: 8, children: [
-        Pastille('Promo -30 %', couleur: Color(etat.couleurPromotions)),
-        Pastille('500 g', couleur: Color(etat.couleurMesures)),
-        Pastille('Lot de 4', couleur: Color(etat.couleurLots)),
-      ]),
+      const TitreSection('Icônes', cote: 0),
+      CheckboxListTile(
+        key: const ValueKey('icones-listes'),
+        value: etat.iconesListes,
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        title: Text('Icônes dans les titres des listes', style: Charte.texte(16)),
+        onChanged: (v) => etat.montrerIconesListes(v ?? true),
+      ),
+      const TitreSection('Exemple', cote: 0),
+      const _ExempleListe(),
     ]);
+  }
+}
+
+/// Exemple d'une liste de courses prête, entouré d'un cadre, qui suit les trois choix de l'Apparence.
+class _ExempleListe extends StatelessWidget {
+  const _ExempleListe();
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    final promo = Color(etat.couleurPromotions), mesure = Color(etat.couleurMesures), lot = Color(etat.couleurLots);
+    Widget ligne(String nom, List<Widget> cadres) => Container(
+          color: Charte.blanc,
+          // Comme dans les listes : le nom commence après l'icône du secteur.
+          padding: const EdgeInsets.fromLTRB(56, 6, 10, 6),
+          child: Row(children: [
+            Expanded(child: Text(nom, style: Charte.texte(16))),
+            for (final c in cadres) Padding(padding: const EdgeInsets.only(left: 4), child: c),
+          ]),
+        );
+    List<Widget> section(String rayon, String secteur, List<Widget> lignes) {
+      final picto = etat.iconesListes ? cleSecteur(rayon, secteur) : null;
+      final enfants = [
+        TitreGroupe(nom: secteur, pictoDebordant: picto, pictoGauche: 4, nombre: lignes.length),
+        ...lignes,
+      ];
+      return picto == null ? enfants : [SectionDebordante(picto: picto, gauche: 4, enfants: enfants)];
+    }
+
+    return Container(
+      key: const ValueKey('exemple-apparence'),
+      decoration: BoxDecoration(border: Border.all(color: Charte.separateurZone, width: 1.5), borderRadius: BorderRadius.circular(8)),
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Container(
+          color: Charte.niveau(1),
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          child: Text('Liste prête · Intermarché', style: Charte.texte(16, gras: true, couleur: Charte.encreNiveau)),
+        ),
+        ...section('Frais', 'Fruits et légumes', [
+          ligne('Pommes Golden', [Pastille('1 kg', petite: true, couleur: mesure)]),
+          ligne('2 × Bananes', [Pastille('-30 %', petite: true, couleur: promo)]),
+        ]),
+        ...section('Frais', 'Crèmerie', [
+          ligne('Yaourts nature', [Pastille('Lot de 12', petite: true, couleur: lot), Pastille('2 achetés = 1 offert', petite: true, couleur: promo)]),
+          ligne('Lait demi-écrémé', [Pastille('1 L', petite: true, couleur: mesure), Pastille('Pack de 6', petite: true, couleur: lot)]),
+        ]),
+      ]),
+    );
   }
 }
 
@@ -544,7 +586,7 @@ class _Echantillon extends StatelessWidget {
           borderRadius: BorderRadius.circular(3),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             // 02/11/2026 (Aristide) : sans la teinte sombre, les quatre niveaux clairs des bandeaux.
-            for (final t in const [0.82, 0.88, 0.93, 0.97]) Container(width: 22, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
+            for (final t in Charte.eclaircis) Container(width: 22, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
           ]),
         ),
       );
