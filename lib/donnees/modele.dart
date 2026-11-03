@@ -185,6 +185,79 @@ class PromotionLigne {
   }
 
   Map<String, dynamic> toJson() => {'type': type, 'parametres': parametres, 'libelle': libelle};
+
+  /// 03/11/2026 (Aristide) : la valeur courte montrée et saisie sur la ligne, après le code (« PX 2,50 € »,
+  /// « LOT 3+1 », « −% 30 % »).
+  String get valeur {
+    final v = parametres['valeur'];
+    if (v is String) return v;
+    String f(num n) => n == n.roundToDouble() ? '${n.toInt()}' : n.toString().replaceAll('.', ',');
+    switch (type) {
+      case 'prix':
+        final n = parametres['prix'] as num?;
+        return n == null ? '' : euros(n.toDouble());
+      case 'lot':
+        final a = parametres['quantiteAchetee'] as num?, b = parametres['quantiteOfferte'] as num?;
+        return a == null ? '' : '${f(a)}+${f(b ?? 0)}';
+      case 'remise':
+      case 'fidelite':
+        final pc = parametres['pourcentage'] as num?, m = parametres['montant'] as num?;
+        return pc != null ? '${f(pc)} %' : (m != null ? euros(m.toDouble()) : '');
+      case 'prixGlobal':
+        final q = parametres['quantiteMinimale'] as num?;
+        return q == null ? '' : 'par ${f(q)}';
+      default:
+        return '';
+    }
+  }
+
+  /// Promotion tirée de la valeur tapée sur la ligne : « 2,50 » (prix), « 3+1 » (lot), « 30 » ou « 30 % »
+  /// ou « 1 € » (remise), « 2 » (lot pour promo), sinon le texte tel quel.
+  static PromotionLigne depuisValeur(String type, String saisie, {String nomType = 'Promotion'}) {
+    final t = saisie.trim();
+    num? n(String x) => num.tryParse(x.replaceAll(RegExp(r'[^0-9,.\-]'), '').replaceAll(',', '.'));
+    String f(num v) => v == v.roundToDouble() ? '${v.toInt()}' : v.toString().replaceAll('.', ',');
+    final p = <String, dynamic>{};
+    var libelle = t.isEmpty ? nomType : '$nomType $t';
+    var valeur = t;
+    switch (type) {
+      case 'prix':
+        final v = n(t);
+        if (v != null) {
+          p['prix'] = v;
+          valeur = euros(v.toDouble());
+          libelle = 'Prix promo $valeur';
+        }
+      case 'lot':
+        final m = RegExp(r'(\d+)\D+(\d+)').firstMatch(t);
+        if (m != null) {
+          final a = int.parse(m.group(1)!), b = int.parse(m.group(2)!);
+          p['quantiteAchetee'] = a;
+          p['quantiteOfferte'] = b;
+          valeur = '$a+$b';
+          libelle = '$a dont $b gratuit${b > 1 ? 's' : ''}';
+        }
+      case 'remise':
+      case 'fidelite':
+        final v = n(t);
+        if (v != null) {
+          final montant = t.contains('€');
+          p[montant ? 'montant' : 'pourcentage'] = v;
+          valeur = montant ? euros(v.toDouble()) : '${f(v)} %';
+          libelle = '${type == 'remise' ? 'Remise' : 'Fidélité'} de $valeur';
+        }
+      case 'prixGlobal':
+        final v = n(t);
+        if (v != null) {
+          p['quantiteMinimale'] = v;
+          valeur = 'par ${f(v)}';
+          libelle = 'Par ${f(v)}';
+        }
+    }
+    p['valeur'] = valeur;
+    return PromotionLigne(type, p, libelle);
+  }
+
   static PromotionLigne? depuis(dynamic j) {
     if (j is! Map) return null;
     return PromotionLigne(j['type'] as String, Map<String, dynamic>.from(j['parametres'] as Map? ?? {}),
@@ -1148,6 +1221,10 @@ class Etat extends ChangeNotifier {
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
             _ids(t['parametres']))
     ];
+    // 03/11/2026 (Aristide) : le prix promotionnel, code PX, saisi directement sur la ligne.
+    if (!typesPromotion.any((t) => t.id == 'prix')) {
+      typesPromotion.insert(0, TypePromotion('prix', 'PX', 'Prix promo', '2,50 € au lieu de 3,20 €', ['prix']));
+    }
     magasins = [];
     magasinsArchives = [];
     for (final m in (j['magasins'] as List).cast<Map>()) {

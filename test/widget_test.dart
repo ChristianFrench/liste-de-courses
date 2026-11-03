@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Axis, Icons, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/icone.dart';
@@ -27,7 +27,7 @@ import 'package:liste_de_courses/ecrans/archives.dart';
 import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
 import 'package:liste_de_courses/ecrans/historique.dart' show BlocTicket, SousEcranHistorique;
 import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
-import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranConsultation, EcranCoursesSecteur, FeuillePromotion, LigneArticle, codeCourtPackaging;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranConsultation, EcranCoursesSecteur, FeuillePromotion, LigneArticle, ZonePromo, codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -651,7 +651,8 @@ void main() {
       await tester.pump(const Duration(seconds: 6));
 
       // 6 : toucher la ligne ouvre le volet de l'article : packaging, consigne et promotion ensemble
-      await _toucher(tester, find.byKey(ValueKey('condense-${lait.id}')));
+      // (sur le nom : la promotion de la ligne a sa propre zone)
+      await _toucher(tester, find.descendant(of: find.byKey(ValueKey('condense-${lait.id}')), matching: find.byType(RichText)).first);
       expect(find.byType(FeuillePromotion), findsOneWidget);
       expect(find.text('Packaging'), findsOneWidget);
       expect(find.text('Promotion visée'), findsOneWidget);
@@ -664,7 +665,7 @@ void main() {
       etat.lireMarquesType({
         'secteurs': {etat.cleSecteur(etat.secteurCatalogue(lait.id)!): ['Lactel', 'Candia']}
       });
-      await _toucher(tester, find.byKey(ValueKey('condense-${lait.id}')));
+      await _toucher(tester, find.descendant(of: find.byKey(ValueKey('condense-${lait.id}')), matching: find.byType(RichText)).first);
       expect(find.text('Marque'), findsOneWidget);
       await _toucher(tester, find.byKey(const ValueKey('choix-marque')));
       await _toucher(tester, find.text('Lactel').last);
@@ -674,7 +675,7 @@ void main() {
       etat.marquesType = {};
 
       // 8 : appui long : retiré (produit ajouté par le foyer : par son menu)
-      await tester.longPress(find.byKey(ValueKey('condense-${lactel.id}')));
+      await tester.longPress(find.descendant(of: find.byKey(ValueKey('condense-${lactel.id}')), matching: find.byType(RichText)).first);
       await tester.pumpAndSettle();
       await _toucher(tester, find.text('Retirer de la liste'));
       expect(etat.ligne(l, lactel.id), isNull);
@@ -808,7 +809,7 @@ void main() {
       expect(etat.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
       expect(find.byKey(const ValueKey('option-recherche-0')), findsNothing, reason: 'liste des trouvés fermée');
       expect(tester.widget<TextField>(find.byKey(const ValueKey('champ-recherche'))).controller!.text, isEmpty);
-      if (l.lignes.any((g) => g.promotion != null)) expect(find.text('P'), findsWidgets, reason: 'P devant les promotions');
+      if (l.lignes.any((g) => g.promotion != null)) expect(find.byType(ZonePromo), findsWidgets, reason: 'promotion sur la ligne, avant la mesure');
       // Article déjà dans la liste : on va dessus, sans rien ajouter.
       final n = l.lignes.length;
       await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'huile oli');
@@ -951,14 +952,18 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
       await tester.pumpAndSettle();
-      // Essai 03/11/2026 : après l'ajout par la recherche, les promotions sont proposées ; ✕ les retire
-      expect(find.byKey(const ValueKey('bandeau-promo')), findsOneWidget);
-      expect(find.byKey(const ValueKey('promo-rapide-lot')), findsOneWidget);
-      await _toucher(tester, find.byKey(const ValueKey('promo-rapide-lot')));
-      expect(find.byKey(const ValueKey('libelle-promo')), findsOneWidget, reason: 'le détail de la promo s\'ouvre aussitôt');
-      await _toucher(tester, find.text('OK'));
-      expect(find.byKey(const ValueKey('bandeau-promo')), findsNothing);
-      expect(Etat.instance.listes.last.lignes.last.promotion?.type, 'lot');
+      // 03/11/2026 : après l'ajout par la recherche, la promotion se choisit sur la ligne (code), puis sa valeur
+      final ligne = Etat.instance.listes.last.lignes.last;
+      final code = find.byKey(ValueKey('code-promo-${ligne.produitId}'));
+      expect(code, findsOneWidget);
+      await _toucher(tester, code);
+      await _toucher(tester, find.textContaining('PX').last);
+      await tester.enterText(find.byKey(ValueKey('valeur-promo-${ligne.produitId}')), '2,5');
+      await tester.testTextInput.receiveAction(TextInputAction.done);
+      await tester.pumpAndSettle();
+      expect(ligne.promotion?.type, 'prix');
+      expect(ligne.promotion?.valeur, '2,50 €');
+      expect(ligne.promotion?.libelle, 'Prix promo 2,50 €');
       await tester.pump(const Duration(seconds: 4));
       await _toucher(tester, find.text('Liste prête'));
       expect(find.textContaining('il l\'acceptera ou la refusera'), findsOneWidget);

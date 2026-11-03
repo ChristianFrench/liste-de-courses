@@ -493,7 +493,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 _ajouter(l, p);
               },
             ),
-            if (_promoPour case final id? when etat.ligne(l, id) != null) _bandeauPromo(context, l, etat.ligne(l, id)!),
             Container(height: 1, color: Charte.separateurZone),
           ],
           corps: l.lignes.isEmpty
@@ -544,50 +543,6 @@ class _EcranConstructionState extends State<EcranConstruction> {
     Future.delayed(const Duration(seconds: 3), () {
       if (mounted && _surligne == p.id) setState(() => _surligne = null);
     });
-  }
-
-  /// Sous la recherche, après un ajout : « Promo ? » et les types de promotion ; un appui ouvre le volet de
-  /// l'article avec ce type, prêt à compléter.
-  Widget _bandeauPromo(BuildContext context, Liste l, LigneListe g) {
-    final types = [
-      for (final id in FeuillePromotion.typesProposes)
-        if (etat.typePromotion(id) case final t?) t,
-    ];
-    return Container(
-      key: const ValueKey('bandeau-promo'),
-      color: Charte.niveau(1),
-      padding: const EdgeInsets.fromLTRB(10, 4, 0, 4),
-      child: Row(children: [
-        Text('Promo ?', style: Charte.texte(15, gras: true)),
-        const SizedBox(width: 8),
-        Expanded(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(children: [
-              for (final t in types)
-                Padding(
-                  padding: const EdgeInsets.only(right: 6),
-                  child: ActionChip(
-                    key: ValueKey('promo-rapide-${t.id}'),
-                    label: Text(FeuillePromotion.nomCourt(t), style: Charte.texte(14)),
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () {
-                      setState(() => _promoPour = null);
-                      volet<void>(context, builder: (_) => FeuillePromotion(liste: l, ligne: g, promoInitiale: t.id));
-                    },
-                  ),
-                ),
-            ]),
-          ),
-        ),
-        IconButton(
-          tooltip: 'Pas de promotion',
-          visualDensity: VisualDensity.compact,
-          onPressed: () => setState(() => _promoPour = null),
-          icon: const Icon(Icons.close, size: 20),
-        ),
-      ]),
-    );
   }
 
   /// Fait venir la ligne d'un article à l'écran ; si elle n'est pas encore construite (loin dans la liste),
@@ -641,6 +596,11 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ligne: g,
       produit: p,
       surligne: _surligne == p.id,
+      // 03/11/2026 (Aristide) : la promotion se choisit et se saisit sur la ligne (code + valeur) ; proposée
+      // d'office sur l'article qu'on vient d'ajouter par la recherche.
+      promo: g.promotion != null || _promoPour == p.id
+          ? ZonePromo(key: ValueKey('zone-promo-${p.id}'), liste: l, ligne: g, onFini: () => setState(() => _promoPour = null))
+          : null,
       onTap: () => ouvrirFeuillePromotion(context, l, g),
       onDetail: () => ouvrirFeuillePromotion(context, l, g),
       // Appui long : retirer ; un produit ajouté par le foyer se corrige aussi (renommer, déplacer, supprimer).
@@ -811,8 +771,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
   }
 }
 
-/// Une ligne d'article, la même en préparation et en courses (30 points) : le P des promotions, le nom
-/// (et la consigne en petit), le packaging en code court, puis la quantité (ou [reglage]).
+/// Une ligne d'article, la même en préparation et en courses (30 points) : le nom
+/// (et la consigne en petit), la promotion (code et valeur), le packaging en code court, puis la quantité (ou [reglage]).
 /// Toucher le P ou le packaging appelle [onDetail] ; toucher le reste de la ligne, [onTap].
 class LigneArticle extends StatelessWidget {
   const LigneArticle({
@@ -828,8 +788,12 @@ class LigneArticle extends StatelessWidget {
     this.manquant = false,
     this.surligne = false,
     this.caseCourse = false,
+    this.promo,
   });
   final LigneListe ligne;
+
+  /// Promotion modifiable sur la ligne (préparation) ; sinon son code et sa valeur sont seulement affichés.
+  final Widget? promo;
   final Produit produit;
 
   /// Clé de la zone sensible de la ligne.
@@ -903,16 +867,6 @@ class LigneArticle extends StatelessWidget {
                 CaseACocher(coche: coche, taille: 20),
               const SizedBox(width: 2),
             ],
-            SizedBox(
-              width: 30,
-              child: g.promotion == null
-                  ? null
-                  : signe(
-                      Text('P',
-                          key: ValueKey('promo-${produit.id}'),
-                          style: Charte.texte(16, gras: true, couleur: couleurPromo == null ? Charte.rouge : Color(couleurPromo))),
-                      'Promotion'),
-            ),
             Expanded(
               child: Text.rich(
                 TextSpan(text: produit.nom, style: styleNom, children: [
@@ -922,6 +876,15 @@ class LigneArticle extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            // 03/11/2026 (Aristide) : la promotion avant la mesure, « PX 2,50 € » (plus de P en tête de ligne).
+            if (promo != null)
+              promo!
+            else if (g.promotion case final pr?)
+              signe(
+                Text(texteCourtPromo(pr),
+                    key: ValueKey('promo-${produit.id}'),
+                    style: Charte.texte(13, gras: true, couleur: couleurPromo == null ? Charte.rouge : Color(couleurPromo))),
+                'Promotion'),
             if (k != null)
               signe(
                 Text(codeCourtPackaging(k.libelle),
@@ -998,7 +961,7 @@ class FeuillePromotion extends StatefulWidget {
   static String nomCourt(TypePromotion? t) => _FeuillePromotionState._nomCourt(t);
 
   /// Promotions proposées : lot « 3 dont 1 gratuit », lot pour bénéficier d'une promo, remise simple, autre.
-  static const typesProposes = ['lot', 'prixGlobal', 'remise', 'autre'];
+  static const typesProposes = ['prix', 'lot', 'prixGlobal', 'remise', 'autre'];
   static const aucune = '';
 
   @override
@@ -1031,6 +994,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     final par = p?.parametres ?? const {};
     String v(String k) => par[k] == null ? '' : '${par[k]}'.replaceAll('.', ',');
     switch (type) {
+      case 'prix':
+        c1.text = v('prix');
       case 'lot':
         c1.text = v('quantiteAchetee');
         c2.text = v('quantiteOfferte');
@@ -1070,6 +1035,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   String _auto() {
     switch (type) {
+      case 'prix':
+        return 'Prix promo ${euros(_n(c1).toDouble())}';
       case 'lot':
         return '${_f(_n(c1))} dont ${_f(_n(c2))} gratuit${_n(c2) > 1 ? 's' : ''}';
       case 'prixGlobal':
@@ -1091,6 +1058,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   Map<String, dynamic> _parametres() {
     switch (type) {
+      case 'prix':
+        return {'prix': _n(c1)};
       case 'lot':
         return {'quantiteAchetee': _n(c1), 'quantiteOfferte': _n(c2)};
       case 'prixGlobal':
@@ -1313,6 +1282,7 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
 
   static String _nomCourt(TypePromotion? t) => switch (t?.id) {
         null => 'Aucune',
+        'prix' => 'Prix promo',
         'lot' => 'Lot x dont y',
         'prixGlobal' => 'Lot pour promo',
         'remise' => 'Remise',
@@ -1334,6 +1304,8 @@ class _FeuillePromotionState extends State<FeuillePromotion> {
     switch (type) {
       case FeuillePromotion.aucune:
         return const [];
+      case 'prix':
+        return [_nombre(c1, 'Prix promotionnel (€)')];
       case 'lot':
         return [
           _deux(_nombre(c1, 'Lot de'), _nombre(c2, 'dont gratuits')),
@@ -2035,3 +2007,141 @@ Widget boutonLoupe(VoidCallback maj) => KeyedSubtree(
 /// La liste, avec le texte à la taille choisie par la loupe.
 Widget avecLoupe(BuildContext context, Widget liste) =>
     MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(Loupe.echelle)), child: liste);
+
+
+/// « PX 2,50 € » : code du type de promotion et sa valeur.
+String texteCourtPromo(PromotionLigne p) {
+  final code = Etat.instance.typePromotion(p.type)?.code ?? 'P';
+  final v = p.valeur;
+  return v.isEmpty ? code : '$code $v';
+}
+
+/// Promotion sur la ligne de préparation (03/11/2026, Aristide) : le code dans une liste déroulante (« PX »,
+/// « LOT »…), puis une petite zone pour la valeur (prix promotionnel, 3+1, 30 %…).
+class ZonePromo extends StatefulWidget {
+  const ZonePromo({super.key, required this.liste, required this.ligne, this.onFini});
+  final Liste liste;
+  final LigneListe ligne;
+
+  /// Appelé quand la promotion est posée ou refusée.
+  final VoidCallback? onFini;
+
+  @override
+  State<ZonePromo> createState() => _ZonePromoState();
+}
+
+class _ZonePromoState extends State<ZonePromo> {
+  final etat = Etat.instance;
+  late final TextEditingController _valeur;
+  final _focus = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    _valeur = TextEditingController(text: widget.ligne.promotion?.valeur ?? '');
+    _focus.addListener(() {
+      if (!_focus.hasFocus) _enregistrer();
+    });
+  }
+
+  @override
+  void dispose() {
+    _valeur.dispose();
+    _focus.dispose();
+    super.dispose();
+  }
+
+  String? get _type => widget.ligne.promotion?.type;
+
+  void _enregistrer() {
+    final t = _type;
+    if (t == null) return;
+    final nom = FeuillePromotion.nomCourt(etat.typePromotion(t));
+    final p = PromotionLigne.depuisValeur(t, _valeur.text, nomType: nom);
+    if (p.valeur == widget.ligne.promotion?.valeur && p.libelle == widget.ligne.promotion?.libelle) return;
+    etat.definirPromotion(widget.liste, widget.ligne.produitId, p);
+    _valeur.text = p.valeur;
+  }
+
+  Future<void> _choisir() async {
+    final types = [
+      for (final id in FeuillePromotion.typesProposes)
+        if (etat.typePromotion(id) case final t?) t,
+    ];
+    final v = await choisirDansListe<String>(context, titre: 'Promotion', choix: {
+      for (final t in types) t.id: '${t.code}  ·  ${FeuillePromotion.nomCourt(t)}',
+      FeuillePromotion.aucune: 'Aucune promotion',
+    });
+    if (v == null || !mounted) return;
+    if (v == FeuillePromotion.aucune) {
+      etat.definirPromotion(widget.liste, widget.ligne.produitId, null);
+      _valeur.text = '';
+      widget.onFini?.call();
+      return;
+    }
+    if (v != _type) {
+      _valeur.text = '';
+      etat.definirPromotion(widget.liste, widget.ligne.produitId,
+          PromotionLigne.depuisValeur(v, '', nomType: FeuillePromotion.nomCourt(etat.typePromotion(v))));
+    }
+    widget.onFini?.call();
+    setState(() {});
+    _focus.requestFocus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = etat.typePromotion(_type);
+    final couleur = etat.couleurPromo(_type);
+    final c = couleur == null ? Charte.rouge : Color(couleur);
+    final aide = switch (_type) { 'prix' => '2,50', 'lot' => '3+1', 'remise' || 'fidelite' => '30 %', 'prixGlobal' => '2', _ => '' };
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      Semantics(
+        button: true,
+        label: 'Promotion',
+        child: InkWell(
+          key: ValueKey('code-promo-${widget.ligne.produitId}'),
+          onTap: _choisir,
+          child: Container(
+            height: 30,
+            padding: const EdgeInsets.only(left: 5, right: 1),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(color: t == null ? Charte.cadre : c, width: 1.2),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Text(t?.code ?? 'Promo', style: Charte.texte(13, gras: true, couleur: t == null ? Charte.texteSecondaire : c)),
+              Icon(Icons.arrow_drop_down, size: 18, color: t == null ? Charte.texteSecondaire : c),
+            ]),
+          ),
+        ),
+      ),
+      if (t != null) ...[
+        const SizedBox(width: 3),
+        SizedBox(
+          width: 62,
+          height: 30,
+          child: TextField(
+            key: ValueKey('valeur-promo-${widget.ligne.produitId}'),
+            controller: _valeur,
+            focusNode: _focus,
+            style: Charte.texte(13, gras: true, couleur: c),
+            textAlign: TextAlign.center,
+            keyboardType: _type == 'lot' ? TextInputType.text : const TextInputType.numberWithOptions(decimal: true),
+            onSubmitted: (_) => _enregistrer(),
+            decoration: InputDecoration(
+              isDense: true,
+              hintText: aide,
+              hintStyle: Charte.texte(12, couleur: Charte.texteSecondaire),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 2, vertical: 7),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(5)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5), borderSide: BorderSide(color: c, width: 1.2)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(5), borderSide: BorderSide(color: c, width: 1.8)),
+            ),
+          ),
+        ),
+      ],
+      const SizedBox(width: 4),
+    ]);
+  }
+}

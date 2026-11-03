@@ -1,7 +1,7 @@
 flutter_launcher_icons:
   android: true
   image_path: "assets/icone.png"
-  adaptive_icon_background: "#3F7D5A"
+  adaptive_icon_background: "#7CB98F"
   adaptive_icon_foreground: "assets/icone_premier_plan.png"
   windows:
     generate: true

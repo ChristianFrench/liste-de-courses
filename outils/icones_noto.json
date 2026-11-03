@@ -47,5 +47,6 @@
  "play_arrow_outlined": "play-button",
  "visibility_outlined": "eyes",
  "drive_file_move_outline": "file-folder",
- "block": "prohibited"
+ "block": "prohibited",
+ "save_outlined": "floppy-disk", "anchor": "anchor", "folder_open_outlined": "open-file-folder"
 }

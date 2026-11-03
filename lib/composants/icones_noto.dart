@@ -83,4 +83,8 @@ final iconesNoto = <IconData, String>{
   Icons.visibility_outlined: 'eyes',
   Icons.drive_file_move_outline: 'file-folder',
   Icons.block: 'prohibited',
+  // 03/11/2026 (Aristide) : sauvegardes
+  Icons.save_outlined: 'floppy-disk',
+  Icons.anchor: 'anchor',
+  Icons.folder_open_outlined: 'open-file-folder',
 };
