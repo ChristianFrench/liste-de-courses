@@ -70,8 +70,8 @@ class BarreOnglets extends StatelessWidget {
                         Positioned(
                             top: 0,
                             child: i == 3
-                                ? Icone(entrees[i].$1, size: 52, color: Charte.cadre)
-                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 54)),
+                                ? Icone(entrees[i].$1, size: 56, color: Charte.cadre)
+                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
                         Positioned(
                           bottom: 1,
                           child: Text(entrees[i].$2,

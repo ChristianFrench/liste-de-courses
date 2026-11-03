@@ -484,7 +484,7 @@ void main() {
     testWidgets('10. accueil : comment ça marche, et ce qui est en cours à reprendre', (tester) async {
       await _lancer(tester);
       expect(find.text('Bonjour !'), findsOneWidget);
-      expect(find.text('COMMENT ÇA MARCHE'), findsOneWidget);
+      expect(find.text('Je prépare\nma liste'), findsOneWidget, reason: 'les étapes de « comment ça marche »');
       expect(find.text('EN PRÉPARATION'), findsOneWidget);
       expect(find.text('À FAIRE'), findsOneWidget, reason: 'les listes prêtes');
       await _ciblesTactiles(tester);

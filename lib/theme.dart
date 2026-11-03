@@ -135,7 +135,7 @@ class Charte {
   static const double barreNavigation = 64;
   static const double enTeteNiveau = 52;
   static const double sousOnglets = 44;
-  static const double barreOnglets = 76;
+  static const double barreOnglets = 80;
   static const double puce = 36;
   static const double bouton = 48;
   static const double selecteurQuantite = 34;

@@ -153,14 +153,18 @@ class _EnTetePhoto extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // 03/11/2026 (Aristide) : l'image d'Emplettes à la place de « Bonjour ! », le texte à sa droite en plus petit.
-                        Row(children: [
+                        // Le bas du texte cadré sur le bas de l'image.
+                        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                           const ImageEmplettes('complet', key: ValueKey('accueil-emplettes'), taille: 96),
                           const SizedBox(width: 14),
                           Expanded(
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 6),
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text('Bonjour !', style: _surPhoto(Charte.texte(22, gras: true, couleur: Charte.blanc))),
                               Text('Prêt(e) pour vos courses ?', style: _surPhoto(Charte.texte(14, couleur: Charte.blanc))),
-                            ]),
+                              ]),
+                            ),
                           ),
                         ]),
                       ],
@@ -168,13 +172,7 @@ class _EnTetePhoto extends StatelessWidget {
                   ),
                   // Place toujours réservée : la barre d'ouverture n'agrandit pas la photo (02/11/2026, Aristide).
                   const SizedBox(height: 30, child: BarreOuverture()),
-                  Container(
-                    constraints: const BoxConstraints(minHeight: 36),
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    decoration: const BoxDecoration(border: Border(top: BorderSide(color: Color(0x55FFFFFF)))),
-                    child: Text('COMMENT ÇA MARCHE', style: _surPhoto(Charte.texte(15, gras: true, couleur: Charte.blanc, espacement: 0.8))),
-                  ),
+                  // 03/11/2026 (Aristide) : plus de titre « Comment ça marche » ni de trait au-dessus.
                   const _Etapes(),
                 ],
               ),
