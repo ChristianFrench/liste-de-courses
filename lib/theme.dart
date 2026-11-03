@@ -44,12 +44,13 @@ const autresPalettes = <Palette>[
 /// Palettes des cadres (02/11/2026, Aristide) : une seule palette pour les trois sujets, sa première couleur
 /// (tirée du rouge) pour les promotions, la deuxième (du bleu) pour les mesures, la dernière (du vert) pour les
 /// packagings. La première est celle par défaut.
+// 03/11/2026 (Aristide) : des choix nettement différents les uns des autres.
 const palettesCadres = <(String, int, int, int)>[
-  ('Vive', 0xFFE53935, 0xFF1E88E5, 0xFF43A047),
-  ('Franche', 0xFFF44336, 0xFF2196F3, 0xFF4CAF50),
-  ('Douce', 0xFFEF5350, 0xFF42A5F5, 0xFF66BB6A),
-  ('Claire', 0xFFE57373, 0xFF64B5F6, 0xFF81C784),
-  ('Profonde', 0xFFC62828, 0xFF1565C0, 0xFF2E7D32),
+  ('Classique', 0xFFE53935, 0xFF1E88E5, 0xFF43A047),
+  ('Soutenue', 0xFFB71C1C, 0xFF0D47A1, 0xFF1B5E20),
+  ('Éclatante', 0xFFFF1744, 0xFF2979FF, 0xFF00C853),
+  ('Orange, violet, turquoise', 0xFFF57C00, 0xFF6A1B9A, 0xFF00897B),
+  ('Lisible par les daltoniens', 0xFFD55E00, 0xFF0072B2, 0xFF009E73),
 ];
 
 /// Toutes les palettes : les cinq présentées en pastilles, puis les autres.

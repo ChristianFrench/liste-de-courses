@@ -155,6 +155,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                   '${lus[i].produit == null && lus[i].secteur != null ? ' · rangé dans ${lus[i].secteur!.nom}' : ''}',
               coche: choisis.contains(i),
               onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+              encadree: false,
             ),
         ],
       ),
@@ -209,6 +210,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 aide: etat.complement(lignes[i], p).isEmpty ? null : etat.complement(lignes[i], p),
                 coche: choisis.contains(i),
                 onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+                encadree: false,
               ),
         ],
       ),
@@ -1856,16 +1858,19 @@ Future<List<String>?> choisirDestinataires(BuildContext context) async {
     contenu: (context, maj) => Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        for (final m in membres)
-          CheckboxListTile(
-            key: ValueKey('destinataire-${m.id}'),
-            value: coches.contains(m.id),
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche, style: Charte.texte(16)),
-            subtitle: Text(m.email.trim(), style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            onChanged: (v) => maj(() => v == true ? coches.add(m.id) : coches.remove(m.id)),
-          ),
+        GroupeCases(
+          titre: 'Destinataires',
+          cases: [
+            for (final m in membres)
+              CaseModale(
+                key: ValueKey('destinataire-${m.id}'),
+                texte: m.moi ? '${m.nomAffiche} (moi)' : m.nomAffiche,
+                aide: m.email.trim(),
+                coche: coches.contains(m.id),
+                onChange: (v) => maj(() => v ? coches.add(m.id) : coches.remove(m.id)),
+              ),
+          ],
+        ),
       ],
     ),
   );

@@ -265,18 +265,7 @@ class _ServeurState extends State<_Serveur> {
         const SizedBox(height: 6),
         _champ('Adresse du serveur', hote, aide: ServeurMqtt.hoteDefaut, key: const ValueKey('mqtt-hote')),
         _champ('Port', port, aide: '8883', nombre: true, key: const ValueKey('mqtt-port')),
-        InkWell(
-          onTap: () => setState(() => tls = !tls),
-          child: Container(
-            constraints: const BoxConstraints(minHeight: 48),
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(children: [
-              CaseACocher(coche: tls, taille: 26),
-              const SizedBox(width: 12),
-              Expanded(child: Text('Connexion chiffrée (TLS)', style: Charte.texte(16))),
-            ]),
-          ),
-        ),
+        CaseModale(texte: 'Connexion chiffrée (TLS)', coche: tls, onChange: (v) => setState(() => tls = v)),
         if (Synchro.instance.certificatRefuse case final refuse?) ...[
           Text('Le serveur présente un autre certificat (${ServeurMqtt.empreinteCourte(refuse)}) que celui reconnu '
               'au départ (${ServeurMqtt.empreinteCourte(widget.serveur.empreinte)}). Acceptez-le seulement si vous '

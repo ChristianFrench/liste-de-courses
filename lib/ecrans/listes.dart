@@ -298,19 +298,7 @@ class _EcranParcoursState extends State<EcranParcours> {
 
     final bas = Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-      child: InkWell(
-        onTap: () => etat.definirParDefaut(p, !p.parDefaut),
-        child: SizedBox(
-          height: 48,
-          child: Row(
-            children: [
-              CaseACocher(coche: p.parDefaut, taille: 26),
-              const SizedBox(width: 12),
-              Expanded(child: Text('Parcours par défaut pour ce magasin', style: Charte.texte(16))),
-            ],
-          ),
-        ),
-      ),
+      child: CaseModale(texte: 'Parcours par défaut pour ce magasin', coche: p.parDefaut, onChange: (v) => etat.definirParDefaut(p, v)),
     );
 
     return ReorderableListView.builder(

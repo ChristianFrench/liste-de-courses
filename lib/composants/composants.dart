@@ -1774,34 +1774,73 @@ Future<bool> modale(
   return r == true;
 }
 
-/// Case à cocher d'une fenêtre modale (ex. : « Enregistrer le parcours »).
+/// Case à cocher d'un réglage (ex. : « Enregistrer le parcours »). 03/11/2026 (Aristide) : entourée d'un cadre,
+/// comme les zones de saisie et les listes déroulantes ; [encadree] faux pour les cases d'un choix parmi
+/// plusieurs éléments (articles lus dans un mail…) ou d'un [GroupeCases].
 class CaseModale extends StatelessWidget {
-  const CaseModale({super.key, required this.texte, this.aide, required this.coche, required this.onChange});
+  const CaseModale({super.key, required this.texte, this.aide, required this.coche, required this.onChange, this.encadree = true});
   final String texte;
   final String? aide;
   final bool coche;
   final ValueChanged<bool> onChange;
+  final bool encadree;
 
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: () => onChange(!coche),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Row(
-            children: [
-              CaseACocher(coche: coche, taille: 26),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(texte, style: Charte.texte(16, gras: true)),
-                    if (aide != null) Text(aide!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ],
-                ),
+  Widget build(BuildContext context) {
+    final ligne = InkWell(
+      onTap: () => onChange(!coche),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 48),
+        padding: EdgeInsets.symmetric(horizontal: encadree ? 12 : 0, vertical: 8),
+        child: Row(
+          children: [
+            CaseACocher(coche: coche, taille: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(texte, style: Charte.texte(16)),
+                  if (aide != null) Text(aide!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!encadree) return ligne;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Material(
+        color: Charte.blanc,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        child: ligne,
+      ),
+    );
+  }
+}
+
+/// Plusieurs cases liées dans un seul cadre, le titre posé sur le bord comme le libellé des zones de saisie
+/// (03/11/2026, Aristide) : « Destinataires »…
+class GroupeCases extends StatelessWidget {
+  const GroupeCases({super.key, required this.titre, required this.cases});
+  final String titre;
+  final List<CaseModale> cases;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: InputDecorator(
+          decoration: InputDecoration(labelText: titre, contentPadding: const EdgeInsets.fromLTRB(12, 6, 12, 2)),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            for (final c in cases)
+              CaseModale(key: c.key, texte: c.texte, aide: c.aide, coche: c.coche, onChange: c.onChange, encadree: false),
+          ]),
         ),
       );
 }

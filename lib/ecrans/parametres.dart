@@ -98,62 +98,77 @@ class EcranApparence extends _EcranVivant {
     final etat = Etat.instance;
     final cadres = (etat.couleurPromotions, etat.couleurMesures, etat.couleurLots);
     final cadresActuels = palettesCadres.where((p) => (p.$2, p.$3, p.$4) == cadres).firstOrNull?.$1 ?? '';
-    // 03/11/2026 (Aristide) : les trois choix dans l'ordre, puis un seul exemple encadré qui les montre tous :
-    // une liste de courses prête, avec promotions, mesures, packagings et les icônes (ou non) des secteurs.
-    return _page('Gérer › Paramètres', 'Apparence', Icons.palette_outlined, [
-      const TitreSection('Palette de l\'application', cote: 0),
-      ChoixDeroulant<String>(
-        libelle: 'Palette',
-        valeur: Charte.palette.nom,
-        choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
-        apercus: {for (final p in toutesLesPalettes) p.nom: _Echantillon(p)},
-        apercuADroite: true,
-        onChange: (v) {
-          etat.choisirApparence(v);
-          Charte.choisirPalette(v);
-        },
-      ),
-      const TitreSection('Palette des cadres', cote: 0),
-      ChoixDeroulant<String>(
-        key: const ValueKey('palette-cadres'),
-        libelle: 'Promotions, mesures, packagings',
-        valeur: cadresActuels,
-        choix: {if (cadresActuels.isEmpty) '': 'Personnalisée', for (final p in palettesCadres) p.$1: p.$1},
-        apercus: {
-          if (cadresActuels.isEmpty) '': _EchantillonCadres(cadres),
-          for (final p in palettesCadres) p.$1: _EchantillonCadres((p.$2, p.$3, p.$4)),
-        },
-        apercuADroite: true,
-        onChange: (v) {
-          final p = palettesCadres.firstWhere((p) => p.$1 == v);
-          etat.choisirCouleur('promo', p.$2);
-          etat.choisirCouleur('mesure', p.$3);
-          etat.choisirCouleur('lot', p.$4);
-        },
-      ),
-      const TitreSection('Icônes', cote: 0),
-      CheckboxListTile(
-        key: const ValueKey('icones-listes'),
-        value: etat.iconesListes,
-        contentPadding: EdgeInsets.zero,
-        controlAffinity: ListTileControlAffinity.leading,
-        title: Text('Icônes dans les titres des listes', style: Charte.texte(16)),
-        onChanged: (v) => etat.montrerIconesListes(v ?? true),
-      ),
-      const TitreSection('Exemple', cote: 0),
-      const _ExempleListe(),
-    ]);
+    // 03/11/2026 (Aristide) : deux sections titrées comme les autres écrans, « Présentation » (les trois choix,
+    // dans l'ordre) et « Aperçu » (une liste de courses prête, encadrée, qui suit chaque choix).
+    return PageBase(
+      entete: EnTeteFenetre(retour: true, icone: Icons.palette_outlined, sousTitre: 'Gérer › Paramètres', titre: 'Apparence'),
+      corps: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
+        GroupeRetractable(cle: 'apparence/presentation', titre: 'Présentation', image: 'bibliotheque--crayon-pastel', enfants: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              ChoixDeroulant<String>(
+                libelle: 'Palette de l\'application',
+                valeur: Charte.palette.nom,
+                choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
+                apercus: {for (final p in toutesLesPalettes) p.nom: _Echantillon(p)},
+                apercuADroite: true,
+                onChange: (v) {
+                  etat.choisirApparence(v);
+                  Charte.choisirPalette(v);
+                },
+              ),
+              const SizedBox(height: 14),
+              ChoixDeroulant<String>(
+                key: const ValueKey('palette-cadres'),
+                libelle: 'Palette des promotions, mesures, packagings',
+                valeur: cadresActuels,
+                choix: {if (cadresActuels.isEmpty) '': 'Personnalisée', for (final p in palettesCadres) p.$1: p.$1},
+                apercus: {
+                  if (cadresActuels.isEmpty) '': _EchantillonCadres(cadres),
+                  for (final p in palettesCadres) p.$1: _EchantillonCadres((p.$2, p.$3, p.$4)),
+                },
+                apercuADroite: true,
+                onChange: (v) {
+                  final p = palettesCadres.firstWhere((p) => p.$1 == v);
+                  etat.choisirCouleur('promo', p.$2);
+                  etat.choisirCouleur('mesure', p.$3);
+                  etat.choisirCouleur('lot', p.$4);
+                },
+              ),
+              const SizedBox(height: 9),
+              CaseModale(
+                key: const ValueKey('icones-listes'),
+                texte: 'Icônes dans les titres des listes',
+                coche: etat.iconesListes,
+                onChange: etat.montrerIconesListes,
+              ),
+            ]),
+          ),
+        ]),
+        GroupeRetractable(cle: 'apparence/apercu', titre: 'Aperçu', icone: Icons.visibility_outlined, enfants: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+            child: _ExempleListe(icones: etat.iconesListes, cadres: cadres, palette: Charte.palette.nom),
+          ),
+        ]),
+      ]),
+    );
   }
 }
 
 /// Exemple d'une liste de courses prête, entouré d'un cadre, qui suit les trois choix de l'Apparence.
 class _ExempleListe extends StatelessWidget {
-  const _ExempleListe();
+  // Les choix sont passés en paramètres : l'aperçu se redessine dès que l'un change (la case des icônes
+  // ne le rafraîchissait pas, 03/11/2026).
+  const _ExempleListe({required this.icones, required this.cadres, required this.palette});
+  final bool icones;
+  final (int, int, int) cadres;
+  final String palette;
 
   @override
   Widget build(BuildContext context) {
-    final etat = Etat.instance;
-    final promo = Color(etat.couleurPromotions), mesure = Color(etat.couleurMesures), lot = Color(etat.couleurLots);
+    final promo = Color(cadres.$1), mesure = Color(cadres.$2), lot = Color(cadres.$3);
     Widget ligne(String nom, List<Widget> cadres) => Container(
           color: Charte.blanc,
           // Comme dans les listes : le nom commence après l'icône du secteur.
@@ -164,7 +179,7 @@ class _ExempleListe extends StatelessWidget {
           ]),
         );
     List<Widget> section(String rayon, String secteur, List<Widget> lignes) {
-      final picto = etat.iconesListes ? cleSecteur(rayon, secteur) : null;
+      final picto = icones ? cleSecteur(rayon, secteur) : null;
       final enfants = [
         TitreGroupe(nom: secteur, pictoDebordant: picto, pictoGauche: 4, nombre: lignes.length),
         ...lignes,
@@ -454,24 +469,9 @@ class _Option extends StatelessWidget {
   final bool coche;
   final ValueChanged<bool> onChange;
 
+  // 03/11/2026 (Aristide) : une case de réglage, entourée comme les zones de saisie.
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: () => onChange(!coche),
-        child: Container(
-          constraints: BoxConstraints(minHeight: Charte.ligneListe),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
-          child: Row(
-            children: [
-              CaseACocher(coche: coche, taille: 26),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(texte, style: Charte.texte(16)),
-              ),
-            ],
-          ),
-        ),
-      );
+  Widget build(BuildContext context) => CaseModale(texte: texte, coche: coche, onChange: onChange);
 }
 
 
