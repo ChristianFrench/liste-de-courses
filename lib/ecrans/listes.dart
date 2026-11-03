@@ -180,12 +180,11 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
             for (final x in tous)
               LigneMenu(
                 icone: Icons.route_outlined,
-                titre: x.nom,
+                titre: etat.nomParcours(x),
                 sousTitre: [
                   '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}',
-                  if (etat.parcoursAppris.contains(x.id)) 'appris par ${etat.membre(x.membreId)?.nomAffiche ?? '?'}'
-                  else 'de ${etat.membre(x.membreId)?.nomAffiche ?? '?'}',
-                  if (etat.parcoursFusionnes.contains(x.id)) 'fusionné',
+                  if (etat.parcoursFusionnes.contains(x.id)) 'fusionné' else if (etat.parcoursAppris.contains(x.id)) 'appris',
+                  if (quandParcours(etat, x) case final q?) q,
                 ].join(' · '),
                 onTap: () => Nav.aller<void>(context, EcranParcours(parcoursId: x.id)),
               ),
@@ -232,8 +231,8 @@ class _EcranParcoursState extends State<EcranParcours> {
             entete: EnTeteFenetre(
               retour: true,
               icone: Icons.route_outlined,
-              sousTitre: 'Parcours · ${etat.magasin(p.magasinId)?.nom ?? ''}',
-              titre: p.nom,
+              sousTitre: '${etat.magasin(p.magasinId)?.nom ?? ''}${quandParcours(etat, p) == null ? '' : ' · ${quandParcours(etat, p)}'}',
+              titre: etat.nomParcours(p),
               aide: Aides.parcours,
               actions: [
                 ActionLigne(Icons.add, '+ Secteur', () => _ajouterSecteur(context, p)),
@@ -261,10 +260,10 @@ class _EcranParcoursState extends State<EcranParcours> {
     }
     final id = await choisirDansListe<String>(
       context,
-      titre: 'Fusionner « ${p.nom} » avec',
+      titre: 'Fusionner « ${etat.nomParcours(p)} » avec',
       choix: {
         for (final x in autres)
-          x.id: '${x.nom} · ${x.etapes.length} secteurs${x.membreId == p.membreId ? '' : ' · ${etat.membre(x.membreId)?.nomAffiche ?? ''}'}'
+          x.id: '${etat.nomParcours(x)} · ${x.etapes.length} secteurs'
       },
     );
     final autre = id == null ? null : etat.unParcours(id);
@@ -274,8 +273,8 @@ class _EcranParcoursState extends State<EcranParcours> {
       titre: 'Fusionner les parcours',
       oui: 'Fusionner',
       contenu: (context, maj) => Text(
-          '« ${p.nom} » garde son ordre et reçoit, à leur place, les secteurs que seul « ${autre.nom} » connaît. '
-          '« ${autre.nom} » part dans la corbeille.',
+          '« ${etat.nomParcours(p)} » garde son ordre et reçoit, à leur place, les secteurs que seul « ${etat.nomParcours(autre)} » connaît. '
+          '« ${etat.nomParcours(autre)} » part dans la corbeille.',
           style: Charte.texte(16)),
     );
     if (!ok || !context.mounted) return;
@@ -515,7 +514,7 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
           valeur: parcoursId,
           choix: {
             for (final p in etat.parcoursDuMagasin(l.magasinId))
-              p.id: '${p.nom} · ${etat.membre(p.membreId)?.nomAffiche ?? '?'}${etat.parcoursFusionnes.contains(p.id) ? ' · fusionné' : ''}',
+              p.id: '${etat.nomParcours(p)}${etat.parcoursFusionnes.contains(p.id) ? ' · fusionné' : ''}',
             '': 'Ordre des rayons',
           },
           onChange: (v) => maj(() => parcoursId = v),
@@ -787,4 +786,11 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
               child: Icone(Icons.receipt_long_outlined, size: 26, semanticLabel: 'Ticket joint')),
     ),
   );
+}
+
+/// Date (et heure, quand elle est connue) du dernier apprentissage d'un parcours : « le 03/11 à 11h42 ».
+String? quandParcours(Etat etat, Parcours p) {
+  final d = etat.dateParcours(p);
+  if (d == null) return null;
+  return etat.datesParcours.containsKey(p.id) ? 'le ${jjmm(d)} à ${deux(d.hour)}h${deux(d.minute)}' : 'le ${jjmm(d)}';
 }

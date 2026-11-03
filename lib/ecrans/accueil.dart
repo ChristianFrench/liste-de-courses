@@ -191,27 +191,15 @@ class _Etapes extends StatelessWidget {
   const _Etapes();
 
   static const _etapes = [
-    'Je paramètre\nune fois',
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
   ];
 
-  static const _icones = [Icons.settings_outlined, Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined];
+  static const _icones = [Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined];
 
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
-    (
-      'Je paramètre',
-      [
-        'Une fois au début, dans l\'onglet Gérer :',
-        '• Mon foyer : le foyer et ses membres, avec leur adresse mail pour recevoir les listes.',
-        '• Courses : vos magasins et leurs parcours, puis le catalogue, le même pour tous les magasins, '
-            'auquel vous pouvez ajouter des produits ; les types de promotion, les marques et les packagings.',
-        '• Paramètres : l\'apparence, les données, la synchronisation.',
-        'Le parcours de chaque magasin n\'est pas à décrire : il s\'apprend pendant vos premières courses.',
-      ],
-    ),
     (
       'Je prépare ma liste',
       [
@@ -287,10 +275,10 @@ class _Etapes extends StatelessWidget {
               children: [
                 // 01/11/2026 (Aristide) : une icône à la place du numéro.
                 // 03/11/2026 : les images d'Emplettes pour préparer et faire les courses.
-                if (i == 1 || i == 3)
-                  ImageEmplettes(ImageEmplettes.pourIcone(_icones[i]), taille: 44)
+                if (i != 1)
+                  ImageEmplettes(ImageEmplettes.pourIcone(_icones[i]), taille: 52)
                 else
-                  Icone(_icones[i], size: 44),
+                  Icone(_icones[i], size: 52),
                 const SizedBox(height: 6),
                 Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],

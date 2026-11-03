@@ -461,6 +461,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             titre: etat.nomListe(l),
             sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · ${etat.creeeLe(l)}',
             aide: simple ? Aides.listeSimple : Aides.preparation,
+            droite: boutonLoupe(() => setState(() {})),
             actions: [
               ActionLigne(Icons.event_outlined, 'Changer le magasin ou la date', () => changerMagasinEtDate(context, l)),
               ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
@@ -497,13 +498,15 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
                       style: Charte.texte(16, couleur: Charte.texteSecondaire)),
                 )
-              : ListView(
+              : avecLoupe(
+                  context,
+                  ListView(
                   controller: _defilement,
                   padding: const EdgeInsets.only(bottom: 16),
                   children: simple
                       ? [for (final g in l.lignes) _ligne(l, g)]
                       : [
-                          for (final x in etat.etapes(l, etat.parcoursParDefaut(l.magasinId, etat.moi.id)?.id))
+                          for (final x in etat.etapes(l, etat.parcoursPourCourses(l.magasinId, etat.moi.id)?.id))
                            ...sectionSecteur(pictoEtape(x), 4, [
                             TitreGroupe(
                               nom: x.nom,
@@ -518,6 +521,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                             for (final g in x.lignes) _ligne(l, g),
                           ]),
                         ],
+                ),
                 ),
           bas: [BarreAction(boutons: [Bouton(texte: 'Liste prête', icone: Icons.check, plein: true, onTap: () => _valider(l))])],
         );
@@ -1370,9 +1374,6 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   /// 03/11/2026 (Aristide) : ne montrer que les articles restant à prendre (pas encore cochés).
   static bool _restants = false;
 
-  /// 03/11/2026 (Aristide) : loupe : +30 % à chaque appui, puis retour à la taille normale.
-  static const _paliers = [1.0, 1.3, 1.6, 1.9];
-  static int _palier = 0;
 
   /// Fenêtre simple : se ferme par la poignée ou un appui à côté.
   Future<void> _commentaire(BuildContext context, String texte) => modale(
@@ -1547,21 +1548,12 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                         key: const ValueKey('bouton-restants'),
                         child: _BoutonBascule(
                           actif: _restants,
-                          icone: _restants ? Icons.filter_alt : Icons.filter_alt_outlined,
+                          image: 'eyes',
                           libelle: _restants ? 'Voir tous les articles' : 'Ne voir que les articles restants',
                           onTap: () => setState(() => _restants = !_restants),
                         ),
                       ),
-                      KeyedSubtree(
-                        key: const ValueKey('bouton-loupe'),
-                        child: _BoutonBascule(
-                          actif: _palier > 0,
-                          icone: Icons.zoom_in,
-                          libelle: _palier > 0 ? 'Texte à ${(_paliers[_palier] * 100).round()} %' : 'Agrandir le texte',
-                          texte: _palier > 0 ? '${(_paliers[_palier] * 100).round()} %' : null,
-                          onTap: () => setState(() => _palier = (_palier + 1) % _paliers.length),
-                        ),
-                      ),
+                      boutonLoupe(() => setState(() {})),
                       if (rectif != null)
                         KeyedSubtree(
                           key: const ValueKey('bouton-rectificative'),
@@ -1577,9 +1569,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
-                : MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_paliers[_palier])),
-                  child: ListView(
+                : avecLoupe(
+                  context,
+                  ListView(
                     padding: const EdgeInsets.only(bottom: 16),
                     children: aplat
                         ? [
@@ -1911,9 +1903,11 @@ Future<List<String>?> choisirDestinataires(BuildContext context) async {
 
 /// Bouton de l'en-tête des courses qui reste allumé quand il est actif (filtre, loupe) ; [texte] : le palier en cours.
 class _BoutonBascule extends StatelessWidget {
-  const _BoutonBascule({required this.actif, required this.icone, required this.libelle, required this.onTap, this.texte});
+  const _BoutonBascule({required this.actif, required this.image, required this.libelle, required this.onTap, this.texte});
   final bool actif;
-  final IconData icone;
+
+  /// Image Noto 3D (assets/icones/noto3d/), 03/11/2026 (Aristide).
+  final String image;
   final String libelle;
   final String? texte;
   final VoidCallback onTap;
@@ -1938,7 +1932,7 @@ class _BoutonBascule extends StatelessWidget {
                 border: Border.all(color: actif ? Charte.blanc : const Color(0x88FFFFFF)),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icone, size: 22, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)]),
+                Image.asset('assets/icones/noto3d/$image.png', width: 24, height: 24, filterQuality: FilterQuality.medium),
                 if (texte != null) ...[
                   const SizedBox(width: 3),
                   Text(texte!, style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
@@ -1949,3 +1943,28 @@ class _BoutonBascule extends StatelessWidget {
         ),
       );
 }
+
+/// 03/11/2026 (Aristide) : loupe des listes (préparation et courses) : deux agrandissements, puis la taille normale.
+class Loupe {
+  static const paliers = [1.0, 1.3, 1.6];
+  static int palier = 0;
+  static double get echelle => paliers[palier];
+}
+
+Widget boutonLoupe(VoidCallback maj) => KeyedSubtree(
+      key: const ValueKey('bouton-loupe'),
+      child: _BoutonBascule(
+        actif: Loupe.palier > 0,
+        image: 'magnifying-glass-tilted-left',
+        libelle: Loupe.palier > 0 ? 'Texte à ${(Loupe.echelle * 100).round()} %' : 'Agrandir le texte',
+        texte: Loupe.palier > 0 ? '${(Loupe.echelle * 100).round()} %' : null,
+        onTap: () {
+          Loupe.palier = (Loupe.palier + 1) % Loupe.paliers.length;
+          maj();
+        },
+      ),
+    );
+
+/// La liste, avec le texte à la taille choisie par la loupe.
+Widget avecLoupe(BuildContext context, Widget liste) =>
+    MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(Loupe.echelle)), child: liste);

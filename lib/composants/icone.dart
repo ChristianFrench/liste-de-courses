@@ -36,6 +36,22 @@ class ImageEmplettes extends StatelessWidget {
   final String nom;
   final double taille;
 
+  /// Courses interrompues (03/11/2026, Aristide) : l'image des courses, avec le bouton pause en petit en bas à gauche.
+  static Widget interrompue(double taille, {Key? key}) => SizedBox(
+        key: key,
+        width: taille,
+        height: taille,
+        child: Stack(children: [
+          Positioned.fill(child: ImageEmplettes('liste_chariot', taille: taille)),
+          Positioned(
+            left: 0,
+            bottom: 0,
+            child: Image.asset('assets/icones/noto3d/pause-button.png',
+                width: taille * 0.5, height: taille * 0.5, filterQuality: FilterQuality.medium),
+          ),
+        ]),
+      );
+
   /// Image de l'onglet dont l'en-tête porte cette icône, sinon l'image complète.
   static String pourIcone(IconData? i) => switch (i) {
         Icons.checklist => 'liste_crayon',

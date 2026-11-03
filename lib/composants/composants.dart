@@ -696,7 +696,9 @@ class GroupeRetractable extends StatelessWidget {
         ? Pictogramme(image!, taille: 46)
         : icone == Icons.checklist || icone == Icons.shopping_cart_outlined
             ? ImageEmplettes(ImageEmplettes.pourIcone(icone), taille: 46)
-            : (icone != null ? Icone(icone, size: 46) : null);
+            : icone == Icons.pause_circle_outline
+                ? ImageEmplettes.interrompue(46)
+                : (icone != null ? Icone(icone, size: 46) : null);
     // 01/11/2026 (Aristide) : l'icône qui déborde vers le bas reste au premier plan, par-dessus la ligne
     // suivante ; replié, le groupe laisse la place de ce débord.
     return Stack(clipBehavior: Clip.none, children: [

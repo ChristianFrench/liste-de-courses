@@ -585,7 +585,7 @@ void main() {
       await _toucher(tester, find.text(Etat.instance.magasin(mien.magasinId)!.nom));
       expect(find.text('+ Nouveau parcours'), findsNothing, reason: 'les parcours s\'apprennent pendant les courses');
       expect(find.byType(GroupeRetractable), findsWidgets);
-      await _toucher(tester, find.text(mien.nom).first);
+      await _toucher(tester, find.text(Etat.instance.nomParcours(mien)).first);
       expect(find.textContaining('Glissez un rayon entier'), findsOneWidget);
       await _ciblesTactiles(tester);
       // Arborescence : les secteurs n'apparaissent qu'en ouvrant le rayon

@@ -507,6 +507,9 @@ class Etat extends ChangeNotifier {
   /// Parcours issus d'une fusion : prioritaires au départ des courses (03/11/2026, Aristide).
   Set<String> parcoursFusionnes = {};
 
+  /// Date et heure du dernier apprentissage ou de la fusion de chaque parcours (03/11/2026).
+  Map<String, DateTime> datesParcours = {};
+
   /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
   Map<String, String> produitsPerso = {};
 
@@ -1105,6 +1108,10 @@ class Etat extends ChangeNotifier {
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
     parcoursFusionnes = _ids(options?['parcoursFusionnes']).toSet();
+    datesParcours = {
+      for (final e in (options?['datesParcours'] as Map? ?? {}).entries)
+        if (_date(e.value) case final d?) e.key as String: d
+    };
     produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
     marquesSecteurs = {
       for (final e in (options?['marquesSecteurs'] as Map? ?? {}).entries)
@@ -1245,6 +1252,7 @@ class Etat extends ChangeNotifier {
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             if (parcoursFusionnes.isNotEmpty) 'parcoursFusionnes': parcoursFusionnes.toList(),
+            if (datesParcours.isNotEmpty) 'datesParcours': {for (final e in datesParcours.entries) e.key: e.value.toIso8601String()},
             if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
             if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
@@ -1939,6 +1947,24 @@ class Etat extends ChangeNotifier {
     return l.firstWhere((p) => p.parDefaut, orElse: () => l.first);
   }
 
+  /// 03/11/2026 (Aristide) : « Parcours de <membre> », suivi du nom donné au parcours s'il en a un.
+  String nomParcours(Parcours p) {
+    final de = 'Parcours de ${membre(p.membreId)?.nomAffiche ?? '?'}';
+    final n = p.nom.trim();
+    return n.isEmpty || n == 'Parcours appris' || n.startsWith('Parcours de ') ? de : '$de · $n';
+  }
+
+  /// Date du dernier apprentissage (ou de la fusion) ; à défaut, celle des dernières courses faites avec ce parcours.
+  DateTime? dateParcours(Parcours p) {
+    if (datesParcours[p.id] case final d?) return d;
+    DateTime? res;
+    for (final c in historique) {
+      if (liste(c.id)?.parcoursId != p.id) continue;
+      if (res == null || c.dateCourses.isAfter(res)) res = c.dateCourses;
+    }
+    return res;
+  }
+
   /// Tous les parcours d'un magasin, quel que soit le membre qui les a appris (03/11/2026 : ils servent à tous).
   List<Parcours> parcoursDuMagasin(String magasinId) => parcours.where((p) => p.magasinId == magasinId).toList();
 
@@ -1977,6 +2003,8 @@ class Etat extends ChangeNotifier {
     }
     if (autre.parDefaut && autre.membreId == p.membreId) p.parDefaut = true;
     parcoursFusionnes.add(p.id);
+    datesParcours[p.id] = DateTime.now();
+    datesParcours.remove(autre.id);
     if (parcoursAppris.contains(autre.id)) parcoursAppris.add(p.id);
     modifie();
     supprimer(autre);
@@ -2111,12 +2139,14 @@ class Etat extends ChangeNotifier {
       for (final autre in parcoursDe(l.magasinId, membreId)) {
         autre.parDefaut = false;
       }
-      final p = Parcours(nouvelId('pc'), l.magasinId, membreId, 'Parcours appris', true, suite);
+      final p = Parcours(nouvelId('pc'), l.magasinId, membreId, 'Parcours de ${membre(membreId)?.nomAffiche ?? ''}'.trim(), true, suite);
       parcours.add(p);
       parcoursAppris.add(p.id);
+      datesParcours[p.id] = DateTime.now();
       return p;
     }
     existant.etapes = insererSecteurs(existant.etapes, suite);
+    datesParcours[existant.id] = DateTime.now();
     return existant;
   }
 
