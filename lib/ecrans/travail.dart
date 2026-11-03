@@ -1548,7 +1548,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                         key: const ValueKey('bouton-restants'),
                         child: _BoutonBascule(
                           actif: _restants,
-                          image: 'eyes',
+                          image: 'assets/emplettes/filtre.png',
+                          estompe: !_restants,
                           libelle: _restants ? 'Voir tous les articles' : 'Ne voir que les articles restants',
                           onTap: () => setState(() => _restants = !_restants),
                         ),
@@ -1903,11 +1904,15 @@ Future<List<String>?> choisirDestinataires(BuildContext context) async {
 
 /// Bouton de l'en-tête des courses qui reste allumé quand il est actif (filtre, loupe) ; [texte] : le palier en cours.
 class _BoutonBascule extends StatelessWidget {
-  const _BoutonBascule({required this.actif, required this.image, required this.libelle, required this.onTap, this.texte});
+  const _BoutonBascule(
+      {required this.actif, required this.image, required this.libelle, required this.onTap, this.texte, this.estompe = false});
   final bool actif;
 
-  /// Image Noto 3D (assets/icones/noto3d/), 03/11/2026 (Aristide).
+  /// Chemin de l'image (Noto 3D), seule, sans cadre (03/11/2026, Aristide).
   final String image;
+
+  /// Image pâlie quand le bouton est au repos (filtre).
+  final bool estompe;
   final String libelle;
   final String? texte;
   final VoidCallback onTap;
@@ -1919,23 +1924,19 @@ class _BoutonBascule extends StatelessWidget {
           button: true,
           selected: actif,
           label: libelle,
-          child: InkWell(
+          child: InkResponse(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              height: 36,
-              margin: const EdgeInsets.symmetric(horizontal: 2),
-              padding: const EdgeInsets.symmetric(horizontal: 6),
-              decoration: BoxDecoration(
-                color: actif ? const Color(0x55FFFFFF) : null,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: actif ? Charte.blanc : const Color(0x88FFFFFF)),
-              ),
+            radius: 24,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Image.asset('assets/icones/noto3d/$image.png', width: 24, height: 24, filterQuality: FilterQuality.medium),
+                Opacity(
+                  opacity: estompe ? 0.55 : 1,
+                  child: Image.asset(image, width: 32, height: 32, filterQuality: FilterQuality.medium),
+                ),
                 if (texte != null) ...[
                   const SizedBox(width: 3),
-                  Text(texte!, style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
+                  Text(texte!, style: surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
                 ],
               ]),
             ),
@@ -1955,7 +1956,7 @@ Widget boutonLoupe(VoidCallback maj) => KeyedSubtree(
       key: const ValueKey('bouton-loupe'),
       child: _BoutonBascule(
         actif: Loupe.palier > 0,
-        image: 'magnifying-glass-tilted-left',
+        image: 'assets/icones/noto3d/magnifying-glass-tilted-left.png',
         libelle: Loupe.palier > 0 ? 'Texte à ${(Loupe.echelle * 100).round()} %' : 'Agrandir le texte',
         texte: Loupe.palier > 0 ? '${(Loupe.echelle * 100).round()} %' : null,
         onTap: () {
