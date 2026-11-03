@@ -32,6 +32,10 @@ void main() {
     expect(m.single.$1, b);
     expect(m.single.$2, 'Nutella');
     expect(chercherMarques([a, b], 'xyz'), isEmpty);
+    // 03/11/2026 : nom et marque mêlés (« pâte choc bov », « tartiner bonne ») ; la marque doit y être.
+    expect(chercherMarques([a, b], 'pâte choc bov').single, (a, 'Bovetti'));
+    expect(chercherMarques([a, b], 'tartiner bonne').single, (b, 'Bonne Maman'));
+    expect(chercherMarques([a, b], 'pâte tartiner'), isEmpty);
     // Les marques de la nature sont proposées dans la liste déroulante « Marque ».
     expect(e.marquesProposees(null, b), containsAll(['Nutella', 'Bonne Maman']));
     expect(e.marquesProposees(null, a), contains('Bovetti'));
@@ -43,6 +47,11 @@ void main() {
     expect(e.naturesOff.length, greaterThan(1000));
     expect(e.naturesOff.values.every((v) => v.marques.length <= 10), isTrue);
     expect(e.naturesOff['camembert']?.marques, contains('Président'));
+    // Avec le catalogue livré : « camembert prés » propose Camembert · Président.
+    e.lire(jsonDecode(File(Etat.fichierDonnees).readAsStringSync()) as Map<String, dynamic>);
+    e.lireNaturesOff(j);
+    final cam = e.produits.where((p) => p.nom.toLowerCase() == 'camembert').toList();
+    if (cam.isNotEmpty) expect(chercherMarques(e.produits, 'camembert prés').first, (cam.first, 'Président'));
   });
 
   test('chaque rayon du catalogue livré a son univers', () {

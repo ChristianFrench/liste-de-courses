@@ -34,25 +34,57 @@ List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int ma
   return [for (final r in res.take(max)) r.$1];
 }
 
-/// Natures portant une marque qui commence par le texte tapé (« nut » : Pâte à tartiner chocolat · Nutella),
-/// les plus courantes d'abord ; seulement celles de [produits].
+/// Recherche par marque (31/10/2026, élargie le 03/11/2026 à la demande d'Aristide) : un article et une marque
+/// qu'on peut lui donner. Les marques d'un article : celles de sa nature (Open Food Facts) et celles de son
+/// secteur dans le catalogue des marques. Chaque mot tapé commence un mot du nom ou de la marque, et au moins
+/// un mot est celui de la marque : « nut » → Pâte à tartiner chocolat · Nutella ; « camembert prés » →
+/// Camembert · Président. Ceux qui reprennent des mots du nom d'abord, puis la nature, l'usage, la popularité.
 List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte, {int max = 6}) {
   final etat = Etat.instance;
-  final q = normaliser(texte);
-  if (q.length < lettresRecherche || etat.naturesParMarque.isEmpty) return [];
-  final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
-  final res = <(Produit, String, int)>[];
-  for (final e in etat.naturesParMarque.entries) {
-    final m = normaliser(e.key);
-    if (!m.startsWith(q) && !m.split(' ').any((x) => x.startsWith(q))) continue;
-    for (final n in e.value) {
-      final p = parNom[n];
-      if (p == null) continue;
-      final marque = etat.naturesOff[n]!.marques.firstWhere((x) => x.toLowerCase() == e.key);
-      res.add((p, marque, etat.popularite(p)));
+  final q = normaliser(texte).split(' ').where((m) => m.isNotEmpty).toList();
+  if (q.isEmpty || normaliser(texte).length < lettresRecherche) return [];
+  final parSecteur = <String, List<String>>{};
+  final res = <(Produit, String, int, bool)>[];
+  for (final p in produits) {
+    final nom = normaliser(p.nom);
+    final motsNom = nom.split(' ');
+    final nature = etat.naturesOff[p.nom.toLowerCase()]?.marques ?? const <String>[];
+    final s = etat.secteurCatalogue(p.id);
+    final marques = <String>{
+      ...nature,
+      if (s != null) ...parSecteur.putIfAbsent(s.id, () => etat.marquesDuSecteur(s)),
+    };
+    (String, int, bool)? meilleur;
+    for (final m in marques) {
+      final nm = normaliser(m);
+      if (nm.isEmpty || nom.contains(nm)) continue;
+      final motsMarque = nm.split(' ');
+      var dansMarque = false, dansNom = 0, ok = true;
+      for (final x in q) {
+        final n = motsNom.any((w) => w.startsWith(x));
+        final mq = motsMarque.any((w) => w.startsWith(x));
+        if (!n && !mq) {
+          ok = false;
+          break;
+        }
+        if (mq) dansMarque = true;
+        if (n) dansNom++;
+      }
+      // La marque seule (« président ») : seulement pour les natures qui la portent (sinon tout le secteur viendrait).
+      if (!ok || !dansMarque) continue;
+      final deNature = nature.contains(m);
+      if (dansNom == 0 && !deNature) continue;
+      if (meilleur == null || dansNom > meilleur.$2 || (deNature && !meilleur.$3)) meilleur = (m, dansNom, deNature);
     }
+    if (meilleur != null) res.add((p, meilleur.$1, meilleur.$2, meilleur.$3));
   }
-  res.sort((a, b) => b.$3.compareTo(a.$3));
+  res.sort((a, b) {
+    if (a.$3 != b.$3) return b.$3.compareTo(a.$3);
+    if (a.$4 != b.$4) return a.$4 ? -1 : 1;
+    final u = b.$1.nbUtilisations.compareTo(a.$1.nbUtilisations);
+    if (u != 0) return u;
+    return etat.popularite(b.$1).compareTo(etat.popularite(a.$1));
+  });
   return [for (final r in res.take(max)) (r.$1, r.$2)];
 }
 
@@ -160,8 +192,10 @@ class _ChampRechercheState extends State<ChampRecherche> {
           final existe = trouves.any((p) => normaliser(p.nom) == normaliser(t));
           final res = <Object>[...(_tout ? trouves : trouves.take(premiersResultats))];
           if (!_tout && trouves.length > premiersResultats) res.add(_VoirPlus(trouves.length - premiersResultats));
-          // Les marques seulement si le texte tapé en est une (et n'est pas déjà un article trouvé).
-          if (widget.onMarque != null && trouves.length < premiersResultats) res.addAll(chercherMarques(produits, t));
+          // Les marques quand le texte tapé en contient une (et que les articles trouvés laissent la place).
+          if (widget.onMarque != null && trouves.length < premiersResultats) {
+            res.addAll(chercherMarques(produits, t, max: premiersResultats - trouves.length.clamp(0, 2)));
+          }
           // 02/11/2026 (Aristide) : un nom déjà au catalogue peut se créer dans un autre secteur (frais / libre-service).
           if (widget.onNouveau != null) res.add(existe ? _AutreSecteur(t) : t);
           return res;
