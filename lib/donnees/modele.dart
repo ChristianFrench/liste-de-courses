@@ -460,8 +460,12 @@ class Etat extends ChangeNotifier {
   /// Courses pendant lesquelles on enregistre le parcours (identifiants de listes).
   Set<String> apprentissage = {};
 
-  /// Courses terminées classées dans l'historique sans ticket de caisse.
+  /// Courses terminées passées dans l'historique (glissement à droite dans « Terminées »), avec ou sans ticket.
+  /// 03/11/2026 (Aristide) : un ticket ne classe plus la course ; la clé garde son ancien nom « sansTicket ».
   Set<String> sansTicket = {};
+
+  /// Les courses qui avaient déjà un ticket avant le 03/11/2026 ont été mises dans l'historique une fois pour toutes.
+  bool terminees2 = false;
 
   /// Courses passées de l'historique aux archives (à la main, ou d'elles-mêmes après [delaiHistorique] mois).
   Set<String> archivees = {};
@@ -1087,6 +1091,7 @@ class Etat extends ChangeNotifier {
     couleurs = {for (final e in (options?['couleurs'] as Map? ?? {}).entries) e.key as String: (e.value as num).toInt()};
     apprentissage = _ids(options?['apprentissage']).toSet();
     sansTicket = _ids(options?['sansTicket']).toSet();
+    terminees2 = options?['terminees2'] == true;
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
@@ -1194,6 +1199,11 @@ class Etat extends ChangeNotifier {
         frequences[cle as String] = (valeur as Map).map((k, v) => MapEntry(k as String, (v as num).toInt()));
       }
     });
+    // 03/11/2026 : avant, une course avec ticket était d'office dans l'historique ; elle y reste.
+    if (!terminees2) {
+      terminees2 = true;
+      sansTicket.addAll([for (final c in historique) if (ticketDe(c.id) != null) c.id]);
+    }
     notifyListeners();
   }
 
@@ -1220,6 +1230,7 @@ class Etat extends ChangeNotifier {
             if (couleurs.isNotEmpty) 'couleurs': couleurs,
             if (apprentissage.isNotEmpty) 'apprentissage': apprentissage.toList(),
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
+            if (terminees2) 'terminees2': true,
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
@@ -1938,6 +1949,19 @@ class Etat extends ChangeNotifier {
     return p;
   }
 
+  /// 03/11/2026 (Aristide) : fusionne [autre] dans [p] (même magasin) : [p] garde son ordre et reçoit, à leur place,
+  /// les secteurs que seul [autre] connaît ; les listes qui suivaient [autre] suivent [p] ; [autre] part dans la corbeille.
+  void fusionnerParcours(Parcours p, Parcours autre) {
+    if (p.id == autre.id || p.magasinId != autre.magasinId) return;
+    p.etapes = insererSecteurs(p.etapes, autre.etapes);
+    for (final l in listes) {
+      if (l.parcoursId == autre.id) l.parcoursId = p.id;
+    }
+    if (autre.parDefaut && autre.membreId == p.membreId) p.parDefaut = true;
+    modifie();
+    supprimer(autre);
+  }
+
   void renommerParcours(Parcours p, String nom) {
     if (nom.trim().isEmpty) return;
     p.nom = nom.trim();
@@ -2544,6 +2568,12 @@ class Etat extends ChangeNotifier {
       libelle = objet.nom;
       retirer('produits', (o) => o['id'] == objet.id);
       retirer('emplacements', (o) => o['produitId'] == objet.id);
+    } else if (objet is Course) {
+      // 03/11/2026 : une course de l'historique se supprime (glissement à gauche), sa liste avec elle.
+      type = 'liste';
+      libelle = 'Courses ${nomCourse(objet)} · ${objet.nbArticles} articles';
+      retirer('listes', (o) => o['id'] == objet.id);
+      retirer('historique', (o) => o['id'] == objet.id);
     } else if (objet is Liste) {
       type = 'liste';
       libelle = 'Liste ${nomListe(objet)} · ${objet.lignes.length} articles';
@@ -2644,9 +2674,10 @@ class Etat extends ChangeNotifier {
   }
 
   /// Courses terminées en instance : ni ticket joint, ni classées sans ticket. Elles restent dans l'onglet Courses.
+  /// Courses « Terminées » (onglet Courses), avec ou sans ticket, pas encore passées dans l'historique.
   List<Course> get coursesEnInstance =>
-      historique.where((c) => !estArchive(c.magasinId) && ticketDe(c.id) == null && !sansTicket.contains(c.id)).toList();
-  bool enInstance(Course c) => ticketDe(c.id) == null && !sansTicket.contains(c.id);
+      historique.where((c) => !estArchive(c.magasinId) && !sansTicket.contains(c.id) && !archivees.contains(c.id)).toList();
+  bool enInstance(Course c) => !sansTicket.contains(c.id);
 
   String? commentaire(Liste l) => commentaires[l.id];
 
@@ -2723,12 +2754,15 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  void classerSansTicket(Course c) {
+  /// « Terminées » → Historique (glissement à droite).
+  void classerSansTicket(Course c) => mettreEnHistorique(c);
+
+  void mettreEnHistorique(Course c) {
     sansTicket.add(c.id);
     modifie();
   }
 
-  /// Historique › « Remettre en terminées sans ticket » : la course revient dans l'onglet Courses.
+  /// Historique › « Remettre dans Terminées » : la course revient dans l'onglet Courses.
   void remettreSansTicket(Course c) {
     sansTicket.remove(c.id);
     archivees.remove(c.id);

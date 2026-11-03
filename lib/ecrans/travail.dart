@@ -1729,7 +1729,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                 style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ],
           const SizedBox(height: 8),
-          Text('La course attend son ticket de caisse dans l\'onglet Courses (« Terminées sans ticket »).', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          Text('La course ira dans l\'onglet Courses, « Terminées », où vous pourrez joindre le ticket de caisse.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 4),
           CaseModale(
             texte: 'Envoyer un résumé au foyer',
@@ -1746,7 +1746,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     if (!context.mounted) return;
     Etat.instance.terminerCourses(l);
     Nav.i.retourOnglet(Nav.courses);
-    Nav.message(context, '${envoi == null ? '' : '$envoi. '}Courses terminées : joignez le ticket de caisse pour les classer dans l\'historique');
+    Nav.message(context, '${envoi == null ? '' : '$envoi. '}Courses terminées : elles sont dans « Terminées », où joindre le ticket de caisse');
   }
 }
 

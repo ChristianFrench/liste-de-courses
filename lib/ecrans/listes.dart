@@ -255,6 +255,7 @@ class _EcranParcoursState extends State<EcranParcours> {
                   final nom = await demanderTexte(context, titre: 'Nom du parcours', initial: p.nom);
                   if (nom != null && nom.isNotEmpty) etat.renommerParcours(p, nom);
                 }),
+                ActionLigne(Icons.merge, 'Fusionner avec un autre parcours', () => _fusionner(context, p)),
                 ActionLigne(Icons.delete_outline, 'Supprimer le parcours', () async {
                   if (await demanderSuppression(context, p, 'le parcours ${p.nom}') && context.mounted) Navigator.of(context).pop();
                 }, danger: true),
@@ -264,6 +265,40 @@ class _EcranParcoursState extends State<EcranParcours> {
           );
         },
       );
+
+  /// Fusion avec un autre parcours du même magasin : celui-ci garde son ordre, l'autre lui apporte ses secteurs.
+  Future<void> _fusionner(BuildContext context, Parcours p) async {
+    final autres = etat.parcours.where((x) => x.magasinId == p.magasinId && x.id != p.id).toList();
+    if (autres.isEmpty) {
+      Nav.message(context, 'Pas d\'autre parcours pour ce magasin');
+      return;
+    }
+    final id = await choisirDansListe<String>(
+      context,
+      titre: 'Fusionner « ${p.nom} » avec',
+      choix: {
+        for (final x in autres)
+          x.id: '${x.nom} · ${x.etapes.length} secteurs${x.membreId == p.membreId ? '' : ' · ${etat.membre(x.membreId)?.nomAffiche ?? ''}'}'
+      },
+    );
+    final autre = id == null ? null : etat.unParcours(id);
+    if (autre == null || !context.mounted) return;
+    final ok = await modale(
+      context,
+      titre: 'Fusionner les parcours',
+      oui: 'Fusionner',
+      contenu: (context, maj) => Text(
+          '« ${p.nom} » garde son ordre et reçoit, à leur place, les secteurs que seul « ${autre.nom} » connaît. '
+          '« ${autre.nom} » part dans la corbeille.',
+          style: Charte.texte(16)),
+    );
+    if (!ok || !context.mounted) return;
+    final avant = p.etapes.length;
+    etat.fusionnerParcours(p, autre);
+    final c = etat.corbeille.first;
+    Nav.message(context, 'Parcours fusionnés : ${p.etapes.length - avant} secteur${p.etapes.length - avant > 1 ? 's' : ''} ajouté'
+        '${p.etapes.length - avant > 1 ? 's' : ''}', annuler: () => etat.restaurer(c));
+  }
 
   Future<void> _ajouterSecteur(BuildContext context, Parcours p) async {
     final restants = etat.secteursDuMagasin(p.magasinId).where((s) => !p.etapes.contains(s.id)).toList();
@@ -579,50 +614,54 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           ),
         if (enInstance.isNotEmpty)
           GroupeRetractable(
-            cle: 'courses/sansTicket',
-            // 01/11/2026 (Aristide) : déplier / replier comme partout ; ouverts par défaut : À faire et En cours.
+            cle: 'courses/terminees',
+            // 03/11/2026 (Aristide) : toutes les courses finies, avec ou sans ticket ; ouvert par défaut.
             pliable: true,
-            parDefaut: false,
-            titre: 'Terminées sans ticket',
+            parDefaut: true,
+            titre: 'Terminées',
             icone: Icons.receipt_long_outlined,
             nombre: enInstance.length,
-            enfants: [
-              for (final c in enInstance)
-                Glissable(
-                  key: ValueKey('glisser-${c.id}'),
-                  titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-                  detail: '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''} · ${etat.membre(c.membreId)?.nomAffiche ?? ''} · '
-                      'joignez le ticket pour la classer dans l\'historique',
-                  auToucher: true,
-                  versDroite: ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket', () => joindreTicket(context, etat, c)),
-                  actions: [
-                    ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
-                    ActionLigne(Icons.receipt_long_outlined, 'Classer sans ticket', () => _classer(context, c)),
-                    if (etat.liste(c.id) != null) consulterListe(context, c.id),
-                  ],
-                  child: LigneMenu(
-                    titre: '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}',
-                    sousTitre: '${c.nbArticles} art.',
-                  ),
-                ),
-            ],
+            enfants: [for (final c in enInstance) _ligneTerminee(context, c)],
           ),
         ...groupesPasses(context, etat),
       ],
     );
   }
 
-  Future<void> _classer(BuildContext context, Course c) async {
-    final ok = await modale(
-      context,
-      titre: 'Classer sans ticket',
-      oui: 'Classer sans ticket',
-      contenu: (context, maj) => Text(
-          'La course du ${jjmm(c.dateCourses)} passera dans Courses › Historique sans ticket de caisse. '
-          'Vous pourrez encore y joindre le ticket.',
-          style: Charte.texte(16)),
+  /// Une course terminée : l'icône de ticket s'il est joint ; glisser à droite la passe dans l'historique.
+  Widget _ligneTerminee(BuildContext context, Course c) {
+    final t = etat.ticketDe(c.id);
+    final titre = '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}';
+    final historique = ActionLigne(Icons.history, 'Mettre en historique', () {
+      etat.mettreEnHistorique(c);
+      Nav.message(context, 'Course passée dans l\'historique', annuler: () => etat.remettreSansTicket(c));
+    });
+    return Glissable(
+      key: ValueKey('glisser-${c.id}'),
+      titre: titre,
+      detail: [
+        '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+        if (etat.membre(c.membreId)?.nomAffiche case final qui? when qui.isNotEmpty) 'par $qui',
+        t == null ? 'sans ticket' : 'ticket joint · ${euros(t.montant)}',
+      ].join(' · '),
+      auToucher: true,
+      versDroite: historique,
+      actions: [
+        if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
+        if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+        historique,
+        if (etat.liste(c.id) != null) consulterListe(context, c.id),
+      ],
+      child: LigneMenu(
+        titre: titre,
+        sousTitre: t == null ? '${c.nbArticles} art.' : '${c.nbArticles} art. · ${euros(t.montant)}',
+        droite: t == null
+            ? null
+            : const Padding(
+                padding: EdgeInsets.only(right: 4),
+                child: Icone(Icons.receipt_long_outlined, key: ValueKey('ticket-joint'), size: 26, semanticLabel: 'Ticket joint')),
+      ),
     );
-    if (ok) etat.classerSansTicket(c);
   }
 
   Widget _ligneInterrompue(BuildContext context, Liste l) {
@@ -722,6 +761,8 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
   final liste = etat.liste(c.id);
   final qui = etat.membre(c.membreId)?.nomAffiche ?? '';
   final titre = '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}';
+  final supprimer = ActionLigne(Icons.delete_outline, 'Supprimer', () => supprimerVite(context, c, 'la course du ${jjmm(c.dateCourses)}'),
+      danger: true);
   return Glissable(
     key: ValueKey('historique-${c.id}'),
     titre: titre,
@@ -738,13 +779,23 @@ Widget _ligneHistorique(BuildContext context, Etat etat, Course c) {
       if (liste != null) consulterListe(context, liste.id),
       if (liste != null && liste.lignes.isNotEmpty)
         ActionLigne(Icons.playlist_add, 'Créer une liste type', () => creerListeType(context, etat, liste)),
-      if (t == null)
-        ActionLigne(Icons.undo, 'Remettre en terminées sans ticket', () {
-          etat.remettreSansTicket(c);
-          Nav.message(context, 'La course est de nouveau dans « Terminées sans ticket »');
-        }),
+      ActionLigne(Icons.undo, 'Remettre dans Terminées', () {
+        etat.remettreSansTicket(c);
+        Nav.message(context, 'La course est de nouveau dans « Terminées »');
+      }),
       ActionLigne(Icons.inventory_2_outlined, 'Archiver', () => etat.archiver(c)),
+      supprimer,
     ],
-    child: LigneMenu(titre: titre, sousTitre: t == null ? '${c.nbArticles} art.' : euros(t.montant)),
+    // 03/11/2026 (Aristide) : glisser à gauche supprime la course (corbeille, avec « Annuler »).
+    versGauche: supprimer,
+    child: LigneMenu(
+      titre: titre,
+      sousTitre: t == null ? '${c.nbArticles} art.' : '${c.nbArticles} art. · ${euros(t.montant)}',
+      droite: t == null
+          ? null
+          : const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icone(Icons.receipt_long_outlined, size: 26, semanticLabel: 'Ticket joint')),
+    ),
   );
 }

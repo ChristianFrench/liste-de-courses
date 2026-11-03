@@ -278,6 +278,20 @@ void main() {
       expect(e.coursesEnInstance.length, sans.length - 1);
     });
 
+    test('parcours : la fusion garde l\'ordre du premier et insère les secteurs du second', () {
+      final e = Etat.instance;
+      final m = e.magasins.first;
+      final secteurs = e.secteursDuMagasin(m.id).map((s) => s.id).toList();
+      final a = Parcours('pa', m.id, e.moi.id, 'A', false, [secteurs[0], secteurs[2], secteurs[4]]);
+      final b = Parcours('pb', m.id, e.moi.id, 'B', true, [secteurs[0], secteurs[1], secteurs[2], secteurs[3]]);
+      e.parcours.addAll([a, b]);
+      e.fusionnerParcours(a, b);
+      final fusion = e.unParcours('pa')!;
+      expect(fusion.etapes, [secteurs[0], secteurs[1], secteurs[2], secteurs[3], secteurs[4]]);
+      expect(fusion.parDefaut, isTrue);
+      expect(e.unParcours('pb'), isNull, reason: 'le second part dans la corbeille');
+    });
+
     test('magasins : pas de doublon de nom ; listes en cours effacées à la suppression', () {
       final e = Etat.instance;
       expect(e.magasinNomme(' magasin 1 '), isNotNull);
@@ -807,7 +821,17 @@ void main() {
       etat.archiverAnciennes();
       expect(etat.archivees.contains(c.id), isFalse, reason: 'remise à la main : elle reste dans l\'historique');
       etat.remettreSansTicket(c);
-      expect(etat.enInstance(c), etat.ticketDe(c.id) == null);
+      expect(etat.enInstance(c), isTrue, reason: '03/11/2026 : avec ou sans ticket, elle revient dans « Terminées »');
+      expect(etat.coursesEnInstance, contains(c));
+      etat.mettreEnHistorique(c);
+      expect(etat.coursesEnInstance, isNot(contains(c)));
+      // Glissement à gauche dans l'historique : la course part dans la corbeille, et revient.
+      final n = etat.historique.length;
+      etat.supprimer(c);
+      expect(etat.historique.length, n - 1);
+      expect(etat.corbeille.first.type, 'liste');
+      etat.restaurer(etat.corbeille.first);
+      expect(etat.historique.any((x) => x.id == c.id), isTrue);
       // Changer de personne (appareil partagé, ou mauvais choix) : l'ancien moi reste membre
       final ancien = etat.moi;
       final autre = etat.membres.firstWhere((m) => !m.moi);
@@ -1007,7 +1031,7 @@ void main() {
       await _fermerVolet(tester);
       expect(find.text('Terminer les courses ?'), findsOneWidget, reason: 'ce volet ne se ferme que par ses boutons');
       await _toucher(tester, find.text('Terminer les courses').last);
-      expect(find.text('TERMINÉES SANS TICKET'), findsOneWidget, reason: 'la course attend son ticket dans l\'onglet Courses');
+      expect(find.text('TERMINÉES'), findsOneWidget, reason: 'la course attend son ticket dans l\'onglet Courses');
       expect(etat.coursesEnInstance.any((c) => c.id == 'l4'), isTrue);
     });
 

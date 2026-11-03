@@ -243,9 +243,9 @@ class _Etapes extends StatelessWidget {
             'touchez son P ou son packaging pour en voir le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
         'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
-        'À la fin, touchez « Terminer les courses ». La course attend son ticket de caisse dans l\'onglet Courses '
-            '(« Terminées sans ticket ») : joignez le PDF fourni par l\'application du magasin. Avec son ticket, elle rejoint '
-            'l\'historique ; ces courses passées servent ensuite à préparer les prochaines listes.',
+        'À la fin, touchez « Terminer les courses ». La course va dans l\'onglet Courses, « Terminées » : joignez-y le PDF '
+            'du ticket fourni par l\'application du magasin, puis glissez-la vers la droite pour la mettre dans l\'historique ; '
+            'ces courses passées servent ensuite à préparer les prochaines listes.',
       ],
     ),
   ];

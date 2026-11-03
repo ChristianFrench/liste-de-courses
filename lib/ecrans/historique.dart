@@ -136,11 +136,10 @@ class _SousEcranHistoriqueState extends State<SousEcranHistorique> {
                   if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
                   if (liste != null && liste.lignes.isNotEmpty)
                     ActionLigne(Icons.note_add_outlined, 'Créer une liste type', () => creerListeType(context, etat, liste)),
-                  if (t == null)
-                    ActionLigne(Icons.undo, 'Remettre en terminées sans ticket', () {
-                      etat.remettreSansTicket(c);
-                      Nav.message(context, 'La course est de nouveau dans Courses › Terminées sans ticket');
-                    }),
+                  ActionLigne(Icons.undo, 'Remettre dans Terminées', () {
+                    etat.remettreSansTicket(c);
+                    Nav.message(context, 'La course est de nouveau dans Courses › Terminées');
+                  }),
                   ActionLigne(Icons.inventory_2_outlined, 'Archiver', () {
                     etat.archiver(c);
                     Nav.message(context, 'Course archivée (Courses › Archives)');
