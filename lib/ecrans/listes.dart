@@ -161,47 +161,32 @@ class SousEcranParcours extends StatefulWidget {
 
 class _SousEcranParcoursState extends State<SousEcranParcours> {
   final etat = Etat.instance;
-  int membreIndex = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    membreIndex = etat.membres.indexWhere((m) => m.moi);
-    if (membreIndex < 0) membreIndex = 0;
-  }
-
-  Membre get membre => etat.membres[membreIndex.clamp(0, etat.membres.length - 1)];
-
+  // 03/11/2026 (Aristide) : plus de choix du membre en haut ; tous les parcours du magasin, avec le nom
+  // de celui qui les a appris (qui a fait les courses).
   @override
   Widget build(BuildContext context) {
-    final mes = etat.parcoursDuMembre(membre.id).where((x) => x.magasinId == widget.magasinId).toList();
+    final tous = etat.parcoursDuMagasin(widget.magasinId);
     return ListView(
       padding: const EdgeInsets.only(top: 8, bottom: 16),
       children: [
-        if (etat.membres.length > 1)
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-            child: Bascule(
-              hauteur: 48,
-              options: [for (final m in etat.membres) m.nomAffiche],
-              index: membreIndex,
-              onChange: (i) => setState(() => membreIndex = i),
-            ),
-          ),
         GroupeRetractable(
           cle: 'parcours/${widget.magasinId}',
           titre: 'Parcours',
           icone: Icons.route_outlined,
-          nombre: mes.length,
+          nombre: tous.length,
           vide: 'Aucun parcours : il s\'enregistre pendant les courses (« Enregistrer le parcours »).',
           enfants: [
-            for (final x in mes)
+            for (final x in tous)
               LigneMenu(
                 icone: Icons.route_outlined,
                 titre: x.nom,
-                sousTitre: '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}'
-                    '${etat.parcoursAppris.contains(x.id) ? ' · appris pendant les courses' : ''}'
-                    '${x.parDefaut ? ' · par défaut' : ''}',
+                sousTitre: [
+                  '${x.etapes.length} secteur${x.etapes.length > 1 ? 's' : ''}',
+                  if (etat.parcoursAppris.contains(x.id)) 'appris par ${etat.membre(x.membreId)?.nomAffiche ?? '?'}'
+                  else 'de ${etat.membre(x.membreId)?.nomAffiche ?? '?'}',
+                  if (etat.parcoursFusionnes.contains(x.id)) 'fusionné',
+                ].join(' · '),
                 onTap: () => Nav.aller<void>(context, EcranParcours(parcoursId: x.id)),
               ),
           ],
@@ -210,7 +195,8 @@ class _SousEcranParcoursState extends State<SousEcranParcours> {
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
           child: Text(
               'Le parcours s\'apprend pendant les courses : activez « Enregistrer le parcours », l\'ordre dans lequel vous cochez '
-              'les articles donne l\'ordre des secteurs. Les courses enregistrées suivantes complètent le parcours appris.',
+              'les articles donne l\'ordre des secteurs. Au départ des courses, un parcours fusionné est proposé en premier, '
+              'sinon celui de la personne qui fait les courses.',
               style: Charte.texte(14, couleur: Charte.texteSecondaire)),
         ),
       ],
@@ -498,9 +484,9 @@ class _Element {
 Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
   final etat = Etat.instance;
   var membreId = etat.moi.id;
-  String parcoursDefaut() => etat.parcoursParDefaut(l.magasinId, membreId)?.id ?? '';
+  String parcoursDefaut() => etat.parcoursPourCourses(l.magasinId, membreId)?.id ?? '';
   var parcoursId = parcoursDefaut();
-  var apprendre = etat.parcoursDe(l.magasinId, membreId).isEmpty;
+  var apprendre = etat.parcoursDuMagasin(l.magasinId).isEmpty;
   final avecConsigne = l.lignes.where((g) => g.consigne != null).toList();
   final ok = await modale(
     context,
@@ -520,7 +506,6 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
             onChange: (v) => maj(() {
               membreId = v;
               parcoursId = parcoursDefaut();
-              apprendre = etat.parcoursDe(l.magasinId, membreId).isEmpty;
             }),
           ),
         ],
@@ -528,7 +513,11 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
         ChoixDeroulant<String>(
           libelle: 'Parcours',
           valeur: parcoursId,
-          choix: {for (final p in etat.parcoursDe(l.magasinId, membreId)) p.id: p.nom, '': 'Ordre des rayons'},
+          choix: {
+            for (final p in etat.parcoursDuMagasin(l.magasinId))
+              p.id: '${p.nom} · ${etat.membre(p.membreId)?.nomAffiche ?? '?'}${etat.parcoursFusionnes.contains(p.id) ? ' · fusionné' : ''}',
+            '': 'Ordre des rayons',
+          },
           onChange: (v) => maj(() => parcoursId = v),
         ),
         const SizedBox(height: 4),

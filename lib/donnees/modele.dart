@@ -504,6 +504,9 @@ class Etat extends ChangeNotifier {
   /// Parcours issus de l'apprentissage : de nouvelles courses enregistrées les complètent.
   Set<String> parcoursAppris = {};
 
+  /// Parcours issus d'une fusion : prioritaires au départ des courses (03/11/2026, Aristide).
+  Set<String> parcoursFusionnes = {};
+
   /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
   Map<String, String> produitsPerso = {};
 
@@ -1101,6 +1104,7 @@ class Etat extends ChangeNotifier {
     nonRangees = _ids(options?['nonRangees']).toSet();
     listesTypes = [for (final t in (options?['listesTypes'] as List? ?? const []).cast<Map>()) ListeType.depuis(t)];
     parcoursAppris = _ids(options?['parcoursAppris']).toSet();
+    parcoursFusionnes = _ids(options?['parcoursFusionnes']).toSet();
     produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
     marquesSecteurs = {
       for (final e in (options?['marquesSecteurs'] as Map? ?? {}).entries)
@@ -1240,6 +1244,7 @@ class Etat extends ChangeNotifier {
             if (nonRangees.isNotEmpty) 'nonRangees': nonRangees.toList(),
             if (listesTypes.isNotEmpty) 'listesTypes': [for (final t in listesTypes) t.toJson()],
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
+            if (parcoursFusionnes.isNotEmpty) 'parcoursFusionnes': parcoursFusionnes.toList(),
             if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
             if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
@@ -1934,6 +1939,19 @@ class Etat extends ChangeNotifier {
     return l.firstWhere((p) => p.parDefaut, orElse: () => l.first);
   }
 
+  /// Tous les parcours d'un magasin, quel que soit le membre qui les a appris (03/11/2026 : ils servent à tous).
+  List<Parcours> parcoursDuMagasin(String magasinId) => parcours.where((p) => p.magasinId == magasinId).toList();
+
+  /// Parcours proposé au départ des courses (03/11/2026, Aristide) : un parcours issu d'une fusion s'il y en a,
+  /// sinon celui de la personne qui fait les courses, sinon un parcours du magasin.
+  Parcours? parcoursPourCourses(String magasinId, String membreId) {
+    final tous = parcoursDuMagasin(magasinId);
+    if (tous.isEmpty) return null;
+    final fusion = tous.where((p) => parcoursFusionnes.contains(p.id)).toList();
+    if (fusion.isNotEmpty) return fusion.firstWhere((p) => p.parDefaut, orElse: () => fusion.last);
+    return parcoursParDefaut(magasinId, membreId) ?? tous.firstWhere((p) => p.parDefaut, orElse: () => tous.first);
+  }
+
   void definirParDefaut(Parcours p, bool oui) {
     for (final autre in parcoursDe(p.magasinId, p.membreId)) {
       autre.parDefaut = oui ? identical(autre, p) : (identical(autre, p) ? false : autre.parDefaut);
@@ -1958,6 +1976,8 @@ class Etat extends ChangeNotifier {
       if (l.parcoursId == autre.id) l.parcoursId = p.id;
     }
     if (autre.parDefaut && autre.membreId == p.membreId) p.parDefaut = true;
+    parcoursFusionnes.add(p.id);
+    if (parcoursAppris.contains(autre.id)) parcoursAppris.add(p.id);
     modifie();
     supprimer(autre);
   }
@@ -2081,7 +2101,10 @@ class Etat extends ChangeNotifier {
     final suite = secteursDansLOrdre(l);
     if (suite.isEmpty) return null;
     final membreId = l.membreId ?? moi.id;
-    final existant = _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id) && p.id == l.parcoursId) ??
+    // Le parcours suivi, s'il est appris ou fusionné, se complète, quel que soit le membre qui l'a appris.
+    final existant = _trouve(parcoursDuMagasin(l.magasinId),
+            (p) => p.id == l.parcoursId && (parcoursAppris.contains(p.id) || parcoursFusionnes.contains(p.id))) ??
+        _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id) && p.id == l.parcoursId) ??
         _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id) && p.parDefaut) ??
         _trouve(parcoursDe(l.magasinId, membreId), (p) => parcoursAppris.contains(p.id));
     if (existant == null) {

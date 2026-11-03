@@ -290,6 +290,13 @@ void main() {
       expect(fusion.etapes, [secteurs[0], secteurs[1], secteurs[2], secteurs[3], secteurs[4]]);
       expect(fusion.parDefaut, isTrue);
       expect(e.unParcours('pb'), isNull, reason: 'le second part dans la corbeille');
+      // Au départ des courses, le parcours fusionné passe avant celui du membre.
+      final autre = e.membres.firstWhere((x) => !x.moi, orElse: () => e.moi);
+      e.parcours.add(Parcours('pc', m.id, autre.id, 'C', true, [secteurs[1]]));
+      expect(e.parcoursPourCourses(m.id, autre.id)!.id, 'pa');
+      e.parcoursFusionnes.clear();
+      expect(e.parcoursPourCourses(m.id, autre.id)!.id, e.parcoursParDefaut(m.id, autre.id)!.id,
+          reason: 'sans fusion : le parcours de la personne qui fait les courses');
     });
 
     test('magasins : pas de doublon de nom ; listes en cours effacées à la suppression', () {

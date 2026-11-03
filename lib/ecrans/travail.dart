@@ -800,6 +800,8 @@ class LigneArticle extends StatelessWidget {
     final couleurPack = k == null ? null : etat.couleurPack(k.id);
     final couleurPromo = g.promotion == null ? null : etat.couleurPromo(g.promotion!.type);
     final grise = coche || manquant;
+    // La ligne grandit avec le texte (loupe des courses, réglage du téléphone).
+    final hauteur = Charte.ligne * MediaQuery.textScalerOf(context).scale(16) / 16;
     final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
       decoration: grise ? TextDecoration.lineThrough : null,
     );
@@ -810,7 +812,7 @@ class LigneArticle extends StatelessWidget {
           child: InkWell(
             onTap: onDetail,
             child: Container(
-              height: Charte.ligne,
+              height: hauteur,
               constraints: const BoxConstraints(minWidth: 32),
               alignment: Alignment.center,
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -825,7 +827,7 @@ class LigneArticle extends StatelessWidget {
         onTap: onTap,
         onLongPress: onLongPress,
         child: Container(
-          height: Charte.ligne,
+          height: hauteur,
           padding: const EdgeInsets.only(left: 6, right: 6),
           // Le trait sous la ligne ne prend pas de place : les signes gardent leurs 30 points.
           foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
@@ -1365,6 +1367,13 @@ class EcranCoursesSecteur extends StatefulWidget {
 class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   bool _commentaireVu = false;
 
+  /// 03/11/2026 (Aristide) : ne montrer que les articles restant à prendre (pas encore cochés).
+  static bool _restants = false;
+
+  /// 03/11/2026 (Aristide) : loupe : +30 % à chaque appui, puis retour à la taille normale.
+  static const _paliers = [1.0, 1.3, 1.6, 1.9];
+  static int _palier = 0;
+
   /// Fenêtre simple : se ferme par la poignée ou un appui à côté.
   Future<void> _commentaire(BuildContext context, String texte) => modale(
         context,
@@ -1493,6 +1502,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           );
         }
         final etapes = etat.etapes(l, l.parcoursId);
+        bool vue(LigneListe g) => !_restants || !g.coche;
         final rectif = etat.rectificativeEnAttente(l);
         _suivreRectificative(rectif);
         final acceptees = etat.rectificativesAcceptees(l);
@@ -1532,9 +1542,26 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
               retour: true,
               titre: '${etat.magasin(l.magasinId)?.nom ?? ''} · ${l.nbCoches} / $total',
               aide: Aides.enMagasin,
-              droite: commentaire == null && rectif == null
-                  ? null
-                  : Row(mainAxisSize: MainAxisSize.min, children: [
+              droite: Row(mainAxisSize: MainAxisSize.min, children: [
+                      KeyedSubtree(
+                        key: const ValueKey('bouton-restants'),
+                        child: _BoutonBascule(
+                          actif: _restants,
+                          icone: _restants ? Icons.filter_alt : Icons.filter_alt_outlined,
+                          libelle: _restants ? 'Voir tous les articles' : 'Ne voir que les articles restants',
+                          onTap: () => setState(() => _restants = !_restants),
+                        ),
+                      ),
+                      KeyedSubtree(
+                        key: const ValueKey('bouton-loupe'),
+                        child: _BoutonBascule(
+                          actif: _palier > 0,
+                          icone: Icons.zoom_in,
+                          libelle: _palier > 0 ? 'Texte à ${(_paliers[_palier] * 100).round()} %' : 'Agrandir le texte',
+                          texte: _palier > 0 ? '${(_paliers[_palier] * 100).round()} %' : null,
+                          onTap: () => setState(() => _palier = (_palier + 1) % _paliers.length),
+                        ),
+                      ),
                       if (rectif != null)
                         KeyedSubtree(
                           key: const ValueKey('bouton-rectificative'),
@@ -1550,18 +1577,20 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
             ),
             corps: etapes.isEmpty
                 ? Center(child: Text('La liste est vide.', style: Charte.texte(16)))
-                : ListView(
+                : MediaQuery(
+                  data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(_paliers[_palier])),
+                  child: ListView(
                     padding: const EdgeInsets.only(bottom: 16),
                     children: aplat
                         ? [
                             ...ajouts,
                             for (final g in l.lignes)
-                              if (!aPart.contains(g.produitId)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
+                              if (!aPart.contains(g.produitId) && vue(g)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
                           ]
                         : [
                             ...ajouts,
                             for (final x in etapes)
-                              if (x.lignes.any((g) => !aPart.contains(g.produitId)))
+                              if (x.lignes.any((g) => !aPart.contains(g.produitId) && vue(g)))
                                ...sectionSecteur(pictoEtape(x), 14, [
                                 TitreGroupe(
                                   key: _titres.putIfAbsent(x.id, GlobalKey.new),
@@ -1574,10 +1603,11 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                   marque: x.lignes.any((g) => fondus.contains(g.produitId)) ? Icons.playlist_add : null,
                                 ),
                                 for (final g in x.lignes)
-                                  if (!aPart.contains(g.produitId)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
+                                  if (!aPart.contains(g.produitId) && vue(g)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
                               ]),
                           ],
                   ),
+                ),
             bas: [
               BarreAction(boutons: [
                 Bouton(texte: 'Pause', icone: Icons.pause, onTap: () => _pause(context, l, e)),
@@ -1877,4 +1907,45 @@ Future<List<String>?> choisirDestinataires(BuildContext context) async {
   if (!ok) return null;
   // Personne de coché : rien ne part.
   return coches.isEmpty ? null : [for (final m in membres) if (coches.contains(m.id)) m.email.trim()];
+}
+
+/// Bouton de l'en-tête des courses qui reste allumé quand il est actif (filtre, loupe) ; [texte] : le palier en cours.
+class _BoutonBascule extends StatelessWidget {
+  const _BoutonBascule({required this.actif, required this.icone, required this.libelle, required this.onTap, this.texte});
+  final bool actif;
+  final IconData icone;
+  final String libelle;
+  final String? texte;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Tooltip(
+        message: libelle,
+        child: Semantics(
+          button: true,
+          selected: actif,
+          label: libelle,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              height: 36,
+              margin: const EdgeInsets.symmetric(horizontal: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              decoration: BoxDecoration(
+                color: actif ? const Color(0x55FFFFFF) : null,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: actif ? Charte.blanc : const Color(0x88FFFFFF)),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(icone, size: 22, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)]),
+                if (texte != null) ...[
+                  const SizedBox(width: 3),
+                  Text(texte!, style: Charte.texte(12, gras: true, couleur: Charte.blanc)),
+                ],
+              ]),
+            ),
+          ),
+        ),
+      );
 }
