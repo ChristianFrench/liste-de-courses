@@ -10,6 +10,7 @@ import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
 import 'moderation.dart';
+import 'sauvegarde.dart';
 import 'images_choisies.dart';
 import 'liste_suivie.dart';
 import 'stockage.dart';
@@ -1460,6 +1461,7 @@ class Etat extends ChangeNotifier {
 
   /// Enregistre les articles de la liste sous un nom (sans coche) ; un nom déjà pris remplace l'ancienne liste type.
   ListeType enregistrerListeType(Liste l, String nom) {
+    Sauvegarde.instance.jalon('Liste type enregistrée');
     listesTypes.removeWhere((t) => t.nom.trim().toLowerCase() == nom.trim().toLowerCase());
     final t = ListeType(nouvelId('lt'), nom.trim(), l.magasinId, lignesReprises(l));
     listesTypes.add(t);
@@ -1814,6 +1816,7 @@ class Etat extends ChangeNotifier {
   }
 
   void listePrete(Liste l) {
+    Sauvegarde.instance.jalon('Liste prête');
     // Une rectificative refusée ou restée sans réponse est signalée à son auteur, pas annoncée au foyer.
     if (rectificatives[l.id] == null && l.statut != StatutListe.prete) {
       _avertir('Liste « ${nomListe(l)} » prête (${_articles(l)})');
@@ -2196,6 +2199,7 @@ class Etat extends ChangeNotifier {
   }
 
   Course terminerCourses(Liste l) {
+    Sauvegarde.instance.jalon('Courses terminées');
     // Dans la base, une course de l'historique est la liste elle-même, au statut « terminee ».
     final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches, nom: l.nom);
     historique.insert(0, c);
@@ -2225,6 +2229,7 @@ class Etat extends ChangeNotifier {
       listes.where((l) => l.magasinId == magasinId && l.statut != StatutListe.terminee).toList();
 
   Magasin creerMagasin(String nom) {
+    Sauvegarde.instance.jalon('Magasin créé');
     final m = Magasin(nouvelId('mg'), nom, '', '');
     magasins.add(m);
     modifie();
@@ -2860,6 +2865,7 @@ class Etat extends ChangeNotifier {
   }
 
   Membre ajouterMembre(String nom, String email) {
+    Sauvegarde.instance.jalon('Membre ajouté');
     final m = Membre(nouvelId('m'), nom.trim(), 'membre', false, email: email.trim());
     membres.add(m);
     modifie();
@@ -2938,6 +2944,7 @@ class Etat extends ChangeNotifier {
   /// Retirer du foyer : le membre disparaît de la liste ; ses listes et ses courses restent.
   /// Son appareil cesse de partager ; il revient en saisissant le code de partage.
   void supprimerMembre(Membre m) {
+    Sauvegarde.instance.jalon('Membre retiré');
     statutsMembres[m.id] = 's';
     modifie();
   }
@@ -3036,6 +3043,7 @@ class Etat extends ChangeNotifier {
 
   /// Ajoute au foyer une version plus récente du catalogue commun. Rend les nouveautés (vide si rien).
   List<String> appliquerCatalogueCommun(Map<String, dynamic> j) {
+    Sauvegarde.instance.jalon('Catalogue commun reçu');
     final version = (j['version'] as num? ?? 0).toInt();
     if (version <= versionCatalogueCommun || magasins.isEmpty) return const [];
     // Rayons et secteurs renommés par le foyer : les noms d'origine du catalogue commun deviennent les siens.

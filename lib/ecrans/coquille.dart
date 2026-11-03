@@ -321,7 +321,7 @@ class MenuGerer extends StatelessWidget {
           ]),
           GroupeRetractable(cle: 'gerer/parametres', titre: 'Paramètres', icone: Icons.settings_outlined, enfants: [
             ecran(Icons.palette_outlined, 'Apparence', 'Palette de couleurs', const EcranApparence()),
-            ecran(Icons.storage_outlined, 'Données', 'Listes exemples, préliste, archives', const EcranDonnees()),
+            ecran(Icons.storage_outlined, 'Données', 'Sauvegardes, préliste, archives', const EcranDonnees()),
             ecran(Icons.delete_outline, 'Corbeille', '${etat.corbeille.length} élément${etat.corbeille.length > 1 ? 's' : ''}',
                 const EcranCorbeille()),
           ]),

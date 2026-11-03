@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'donnees/sauvegarde.dart';
 import 'donnees/catalogue_commun.dart';
 import 'donnees/demonstration.dart';
 import 'donnees/messages.dart';
@@ -23,6 +24,8 @@ Future<void> main() async {
   // Démonstration : un foyer seul, sans partage ni catalogue commun (rien n'en sort, rien n'y entre)
   if (demonstration && Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
+  // Sauvegarde aux jalons (pas dans la démonstration)
+  Sauvegarde.actif = !demonstration;
   runApp(const ListeDeCoursesApp());
   if (!kIsWeb) TicketRecu.demarrer();
   if (demonstration) return;

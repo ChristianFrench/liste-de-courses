@@ -7,6 +7,7 @@ import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import 'editeur_catalogue.dart';
+import 'sauvegardes.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
 
@@ -232,6 +233,13 @@ class EcranDonnees extends _EcranVivant {
   Widget construire(BuildContext context) {
     final etat = Etat.instance;
     return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, [
+      LigneMenu(
+        key: const ValueKey('menu-sauvegardes'),
+        icone: Icons.save_outlined,
+        titre: 'Sauvegardes',
+        sousTitre: 'Copies automatiques, sauvegarder maintenant, restaurer',
+        onTap: () => Nav.aller<void>(context, const EcranSauvegardes()),
+      ),
       LigneMenu(
         icone: Icons.playlist_add_check,
         titre: 'Préliste',

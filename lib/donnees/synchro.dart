@@ -20,6 +20,7 @@ import 'catalogue_commun.dart' show CatalogueCommun;
 import 'chiffrement.dart';
 import 'client_mqtt.dart';
 import 'modele.dart';
+import 'sauvegarde.dart';
 import 'stockage.dart';
 import 'version.dart';
 
@@ -358,6 +359,7 @@ class Synchro extends ChangeNotifier {
   /// Autre appareil : remplace les données de cet appareil par celles du foyer qui partage [codePartage].
   /// Les produits ajoutés et les listes non terminées de cet appareil sont gardés et ajoutés au foyer.
   Future<void> rejoindre(String codePartage, String nom, {String email = ''}) async {
+    if (Sauvegarde.actif) await Sauvegarde.instance.copier('Avant de rejoindre un foyer', forcer: true);
     final ancien = _base?.reglage('synchro_hote') == null ? null : serveur;
     final garder = _etat.magasins.isEmpty ? null : _etat.aReprendre();
     await _deconnecter();
@@ -458,6 +460,7 @@ class Synchro extends ChangeNotifier {
   /// Administrateur : un nouveau code remplace l'ancien. Les autres appareils s'arrêtent et
   /// demandent le nouveau code ; leurs données restent.
   Future<void> regenererCode() async {
+    Sauvegarde.instance.jalon('Code du foyer changé');
     if (!actif) return;
     _transport?.publier('$_sujet/ferme', jsonEncode({'de': noeud, 'heure': DateTime.now().millisecondsSinceEpoch}),
         retenu: true);

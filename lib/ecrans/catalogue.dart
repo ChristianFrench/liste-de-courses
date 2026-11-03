@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' show Pictogramme, cleRayon, cleSecteur, cleChoixRayon, cleChoixSecteur;
 import '../composants/signe_perso.dart';
+import '../donnees/sauvegarde.dart';
 import '../donnees/modele.dart';
 import '../donnees/univers.dart';
 import '../navigation.dart';
@@ -726,6 +727,13 @@ class EcranCatalogue extends StatefulWidget {
 
 class _EcranCatalogueState extends State<EcranCatalogue> {
   String recherche = '';
+
+  // Sauvegarde : la sortie du catalogue est un jalon (pas de copie si rien n'a changé).
+  @override
+  void dispose() {
+    Sauvegarde.instance.jalon('Catalogue modifié');
+    super.dispose();
+  }
 
   /// Secteur déplié (un seul à la fois) : ses produits s'affichent sous lui, à modifier sur place.
   String? _secteurOuvert;

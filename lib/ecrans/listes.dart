@@ -110,7 +110,8 @@ Future<void> coursesEnPreparation(BuildContext context, Liste l) async {
 
 /// Gestes d'une liste, partout où elle apparaît : glisser vers la gauche la supprime,
 /// vers la droite la remet en préparation (liste prête ou courses interrompues) ; le toucher (ou l'appui long)
-/// ouvre son volet : le détail, puis les actions.
+/// ouvre son volet : le détail, puis les actions. Le double toucher fait directement la première action
+/// (continuer la préparation, faire ou reprendre les courses).
 /// « Consulter » : la liste en lecture seule, quel que soit son état.
 ActionLigne consulterListe(BuildContext context, String listeId) =>
     ActionLigne(Icons.visibility_outlined, 'Consulter', () => Nav.aller<void>(context, EcranConsultation(listeId: listeId)));
@@ -141,6 +142,7 @@ Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interro
     titre: etat.nomListe(l),
     detail: detail,
     auToucher: true,
+    auDoubleToucher: actions.first,
     versGauche: supprimer,
     versDroite: droite,
     actions: actions,

@@ -1891,7 +1891,7 @@ class ActionLigne {
 /// vers la droite [versDroite] (l'action principale) ; un appui long ouvre le menu de toutes les [actions].
 class Glissable extends StatelessWidget {
   const Glissable(
-      {required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.detail, this.auToucher = false, this.actions = const []})
+      {required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.detail, this.auToucher = false, this.actions = const [], this.auDoubleToucher})
       : super(key: key);
   final Widget child;
 
@@ -1900,6 +1900,9 @@ class Glissable extends StatelessWidget {
 
   /// Toucher la ligne ouvre aussi le volet (détail et actions), comme l'appui long.
   final bool auToucher;
+
+  /// 03/11/2026 (Aristide) : le double toucher fait directement l'action principale (préparer, faire les courses…).
+  final ActionLigne? auDoubleToucher;
   final ActionLigne? versGauche;
   final ActionLigne? versDroite;
   final String? titre;
@@ -1918,6 +1921,12 @@ class Glissable extends StatelessWidget {
     if (actions.isNotEmpty) {
       w = GestureDetector(
         onTap: auToucher ? () => menuActions(context, titre: titre, detail: detail, actions: actions) : null,
+        onDoubleTap: auDoubleToucher == null
+            ? null
+            : () {
+                HapticFeedback.selectionClick();
+                auDoubleToucher!.faire();
+              },
         onLongPress: () {
           HapticFeedback.mediumImpact();
           menuActions(context, titre: titre, detail: detail, actions: actions);

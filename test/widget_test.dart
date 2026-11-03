@@ -16,6 +16,7 @@ import 'package:liste_de_courses/donnees/catalogue_commun.dart' show Brouillon;
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/sauvegarde.dart';
 import 'package:liste_de_courses/donnees/univers.dart';
 import 'package:liste_de_courses/donnees/synchro.dart' show ServeurMqtt;
 import 'package:liste_de_courses/ecrans/foyer.dart' show choisirPersonne;
@@ -105,6 +106,8 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
   await tester.ensureVisible(f);
   await tester.pumpAndSettle();
   await tester.tap(f);
+  // Une ligne de liste attend un éventuel second toucher (double toucher) avant d'ouvrir son volet.
+  await tester.pump(const Duration(milliseconds: 310));
   await tester.pumpAndSettle();
 }
 
@@ -985,6 +988,18 @@ void main() {
       EcranCoursesSecteur.clignoter = true;
     });
 
+    testWidgets('double toucher une liste : son action principale directement', (tester) async {
+      final etat = Etat.instance;
+      await _accueil(tester);
+      await _toucher(tester, _onglet('Courses'));
+      final f = find.text(etat.nomListe(etat.liste('l4')!)).first;
+      await tester.tap(f);
+      await tester.pump(const Duration(milliseconds: 80));
+      await tester.tap(f);
+      await tester.pumpAndSettle();
+      expect(find.byType(EcranCoursesSecteur), findsOneWidget, reason: 'courses interrompues : reprendre');
+    });
+
     testWidgets('consulter une liste, quel que soit son état', (tester) async {
       final etat = Etat.instance;
       await _accueil(tester);
@@ -1228,6 +1243,22 @@ void main() {
       expect(find.text('Fusionner avec un autre'), findsOneWidget);
       await _fermerVolet(tester);
       await _ciblesTactiles(tester);
+    });
+
+    testWidgets('Gérer › Paramètres › Données › Sauvegardes : copies, sauvegarder maintenant, depuis un fichier', (tester) async {
+      dossierSauvegardesEssai = Directory.systemTemp.createTempSync('sauvegardes-ecran').path;
+      await tester.runAsync(() => Sauvegarde.instance.copier('Liste prête'));
+      await _lancer(tester);
+      await _rubrique(tester, 'Données');
+      await _toucher(tester, find.byKey(const ValueKey('menu-sauvegardes')));
+      // Lecture des copies sur le disque : vraie attente, puis affichage.
+      for (var i = 0; i < 10 && find.textContaining('Lecture').evaluate().isNotEmpty; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+        await tester.pump();
+      }
+      expect(find.textContaining('Liste prête ·'), findsOneWidget);
+      expect(find.text('Sauvegarder maintenant'), findsOneWidget);
+      expect(find.text('Depuis un fichier'), findsOneWidget);
     });
 
     testWidgets('Gérer › Paramètres › Synchronisation : état, serveur imposé caché sous « Avancé »', (tester) async {

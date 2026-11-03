@@ -1,9 +1,12 @@
 package fr.listecourses.liste_de_courses
 
 import android.content.ComponentName
+import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.MediaStore
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -27,6 +30,12 @@ class MainActivity : FlutterActivity() {
                     enAttente = null
                 } else if (appel.method == "ouvrirPdf") {
                     resultat.success(ouvrirPdf(appel.arguments as String))
+                } else if (appel.method == "copieDocuments") {
+                    resultat.success(copieDocuments(appel.argument<String>("nom")!!, appel.argument<String>("chemin")!!))
+                } else if (appel.method == "effacerDocument") {
+                    resultat.success(effacerDocument(appel.argument<String>("nom")!!))
+                } else if (appel.method == "partagerFichier") {
+                    resultat.success(partagerFichier(appel.argument<String>("chemin")!!, appel.argument<String>("titre") ?: ""))
                 } else {
                     resultat.notImplemented()
                 }
@@ -52,6 +61,67 @@ class MainActivity : FlutterActivity() {
                 .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             // L'application elle-même sait recevoir un PDF : on l'écarte, pour ne proposer que les lecteurs.
             val choix = Intent.createChooser(voir, "Ouvrir le ticket").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            if (Build.VERSION.SDK_INT >= 24) {
+                choix.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(this, MainActivity::class.java)))
+            }
+            startActivity(choix)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // Sauvegardes (03/11/2026) : chaque copie est aussi déposée dans Documents/Emplettes du téléphone
+    // (MediaStore, Android 10 et suivants, sans autorisation) ; elle y reste après une désinstallation.
+    private val dossierDocuments = "Documents/Emplettes/"
+
+    private fun trouverDocument(nom: String): Uri? {
+        if (Build.VERSION.SDK_INT < 29) return null
+        val table = MediaStore.Files.getContentUri("external")
+        contentResolver.query(
+            table, arrayOf(MediaStore.MediaColumns._ID),
+            "${MediaStore.MediaColumns.RELATIVE_PATH} = ? AND ${MediaStore.MediaColumns.DISPLAY_NAME} = ?",
+            arrayOf(dossierDocuments, nom), null
+        )?.use { c -> if (c.moveToFirst()) return ContentUris.withAppendedId(table, c.getLong(0)) }
+        return null
+    }
+
+    private fun copieDocuments(nom: String, chemin: String): Boolean {
+        if (Build.VERSION.SDK_INT < 29) return false
+        return try {
+            val uri = trouverDocument(nom) ?: contentResolver.insert(
+                MediaStore.Files.getContentUri("external"),
+                ContentValues().apply {
+                    put(MediaStore.MediaColumns.DISPLAY_NAME, nom)
+                    put(MediaStore.MediaColumns.MIME_TYPE, "application/octet-stream")
+                    put(MediaStore.MediaColumns.RELATIVE_PATH, dossierDocuments)
+                }
+            ) ?: return false
+            contentResolver.openOutputStream(uri, "wt")?.use { sortie -> File(chemin).inputStream().use { it.copyTo(sortie) } }
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun effacerDocument(nom: String): Boolean {
+        return try {
+            val uri = trouverDocument(nom) ?: return false
+            contentResolver.delete(uri, null, null) > 0
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    // « Sauvegarder maintenant » : le fichier est proposé aux autres applications (Drive, mail, Fichiers…).
+    private fun partagerFichier(chemin: String, titre: String): Boolean {
+        return try {
+            val uri = FileProvider.getUriForFile(this, "$packageName.tickets", File(chemin))
+            val envoi = Intent(Intent.ACTION_SEND).setType("application/octet-stream")
+                .putExtra(Intent.EXTRA_STREAM, uri)
+                .putExtra(Intent.EXTRA_SUBJECT, titre)
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            val choix = Intent.createChooser(envoi, titre).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             if (Build.VERSION.SDK_INT >= 24) {
                 choix.putExtra(Intent.EXTRA_EXCLUDE_COMPONENTS, arrayOf(ComponentName(this, MainActivity::class.java)))
             }
