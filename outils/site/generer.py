@@ -214,7 +214,7 @@ TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes su
         <div class="telechargement">
           <div class="tete"><img src="icones/globe-showing-europe-africa.png" alt=""><h3>iPhone, iPad, navigateur</h3></div>
           <p>Rien à installer : l'application s'ouvre dans le navigateur, même sans réseau ensuite.</p>
-          <ol class="note" style="margin:0;padding-left:18px"><li>Ouvrez l'application web.</li><li>iPhone et iPad : Partager › « Sur l'écran d'accueil ».</li><li>Android : menu ⋮ › « Ajouter à l'écran d'accueil ».</li></ol>
+          <ol class="note" style="margin:0;padding-left:18px"><li>Ouvrez l'application web.</li><li>iPhone et iPad : Partager › « Sur l'écran d'accueil ».</li><li>Sur Android, préférez l'APK : la version web garde ses propres données, à part de celles de l'application.</li></ol>
           <a class="bouton plein" href="web/">Ouvrir l'application web</a>
         </div>
       </div>

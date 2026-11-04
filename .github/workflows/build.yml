@@ -197,6 +197,11 @@ jobs:
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation démonstration"; else tail -n 5 compilation-demo.log; fi
           exit $code
+      - name: Démonstration non installable (pas de deuxième icône sur l'écran d'accueil)
+        run: |
+          sed -i '/<link rel="manifest"/d; s#<title>[^<]*</title>#<title>Emplettes · démonstration</title>#' build/demo/index.html
+          rm -f build/demo/manifest.json
+          grep -c manifest build/demo/index.html || true
       - name: Ouverture sans réseau de la démonstration
         run: python3 outils/web/hors_ligne.py build/demo ldc-demo-
       - name: Assembler le site (page de présentation + application + démonstration)

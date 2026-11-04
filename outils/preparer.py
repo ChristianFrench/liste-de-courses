@@ -119,6 +119,8 @@ remplacer("web/index.html", "<html>", '<html lang="fr">')
 remplacer("web/index.html", "<title>liste_de_courses</title>", f"<title>{NOM}</title>")
 remplacer("web/index.html", 'content="liste_de_courses"', f'content="{NOM}"')
 remplacer("web/index.html", 'content="A new Flutter project."', 'content="Liste de courses partagée du foyer"')
-remplacer("web/manifest.json", r'"(short_)?name": "liste_de_courses"', lambda m: f'"{m[1] or ""}name": "{NOM}"', regex=True)
+# Nom distinct de l'application Android : sur un téléphone où l'APK est installé, la version web ajoutée à
+# l'écran d'accueil (données séparées, celles du navigateur) ne doit pas se confondre avec elle.
+remplacer("web/manifest.json", r'"(short_)?name": "liste_de_courses"', lambda m: f'"{m[1] or ""}name": "{NOM} web"', regex=True)
 remplacer("web/manifest.json", '"A new Flutter project."', '"Liste de courses partagée du foyer"')
 remplacer("web/manifest.json", '"#0175C2"', '"#3F7D5A"')
