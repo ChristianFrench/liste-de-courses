@@ -14,9 +14,15 @@ import 'package:flutter/material.dart';
 
 const _dossier = 'assets/emplettes/anim';
 
+/// Hauteur / largeur des images d'articles.
+const _proportions = {
+  'lait': 120 / 88, 'pomme': 120 / 113, 'pain': 120 / 99, 'fromage': 112 / 120, //
+  'eau': 120 / 55, 'boite': 120 / 89, 'salade': 125 / 130,
+};
+
 /// Les images de l'animation, à précharger (essais, captures).
 const imagesAnimationEmplettes = [
-  'feuille', 'crayon', 'trait', 'coche_rouge', 'coche_verte', 'caddie', //
+  'feuille', 'crayon', 'trait', 'coche_rouge', 'coche_verte', 'caddie', 'caddie_avant', //
   'lait', 'pomme', 'pain', 'fromage', 'eau', 'boite', 'salade',
 ];
 
@@ -28,7 +34,7 @@ class AnimationEmplettes extends StatefulWidget {
   static bool jouee = false;
 
   /// Durée totale.
-  static const duree = Duration(milliseconds: 6500);
+  static const duree = Duration(milliseconds: 10000);
 
   /// Essais : position imposée dans l'animation (0 à 1), sans horloge.
   static double? instantEssai;
@@ -86,91 +92,121 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
         ),
       );
 
+  // La face de la feuille est vue en perspective : un parallélogramme, en pixels de feuille.png (214 × 240).
+  // Coin haut gauche, bord du haut, bord de gauche. Traits et coches y sont dessinés dans un carré de 100 × 100.
+  static const _origine = Offset(14, 24), _haut = Offset(136, -12), _gauche = Offset(40, 168);
+
+  /// Point (x, y) de la face (0 à 100), en coordonnées de la scène.
+  Offset _surFeuille(double x, double y, double fx, double fy, double ech) =>
+      Offset(fx, fy) + (_origine + _haut * (x / 100) + _gauche * (y / 100)) * ech;
+
   List<Widget> _scene(double t, double w, double h) {
     // Moments (fractions de la durée totale)
-    final apparition = _entre(t, 0, .07);
-    final traits = [for (var i = 0; i < 3; i++) _entre(t, .08 + i * .09, .16 + i * .09, Curves.easeOut)];
-    final crayonParti = _entre(t, .36, .44);
-    final rapetisse = _entre(t, .44, .56);
-    final caddie = _entre(t, .54, .62, Curves.easeOut);
-    final listeFinie = _entre(t, .88, .97);
+    final apparition = _entre(t, 0, .06);
+    final traits = [for (var i = 0; i < 3; i++) _entre(t, .07 + i * .09, .15 + i * .09, Curves.easeOut)];
+    final crayonParti = _entre(t, .35, .42);
+    final rapetisse = _entre(t, .42, .52);
+    final caddie = _entre(t, .50, .57, Curves.easeOut);
+    final listeFinie = _entre(t, .90, .98);
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
     final fw = fh * 214 / 240;
+    final ech = fw / 214;
     final fx = _mix((w - fw) / 2 - h * .08, w - fw, rapetisse) + listeFinie * h * .5;
     final fy = _mix(0, h * .02, rapetisse);
 
-    // Les traits et les coches, en fractions de la feuille
-    const lignesY = [.22, .42, .62];
-    final traitX = fx + fw * .40, traitW = fw * .44, traitH = traitW * 38 / 160;
+    // Les traits et les coches, dans le carré de la face
+    const lignesY = [22.0, 40.0, 58.0];
+    const traitX = 42.0, traitW = 40.0, traitH = traitW * 38 / 160;
 
     // (nom, taille, position dans le panier de 0 à 1, moment de la chute, inclinaison)
     final articles = [
-      ('pain', .34, .80, .62, .45),
-      ('lait', .30, .30, .63, -.12),
-      ('eau', .30, .10, .66, -.15),
-      ('salade', .30, .60, .69, .15),
-      ('pomme', .26, .45, .72, 0.0),
+      ('pain', .34, .80, .58, .45),
+      ('lait', .30, .30, .60, -.12),
+      ('eau', .30, .10, .63, -.15),
+      ('salade', .30, .60, .67, .15),
+      ('pomme', .26, .45, .71, 0.0),
       ('fromage', .26, .22, .75, -.1),
-      ('boite', .24, .95, .78, .1),
+      ('boite', .24, .95, .79, .1),
     ];
-    // Caddie (rapport ≈ 1) : à gauche, derrière la liste ; au centre à la fin.
+    // Caddie (260 × 257) : à gauche, derrière la liste ; au centre à la fin.
     final cw = h * .86;
+    final ce = cw / 260;
     final cx = _mix(-h * .3, 0, caddie) + listeFinie * (w - cw) / 2;
     final cy = h * .14;
 
-    final scene = <Widget>[];
-    // Les articles tombent dans le caddie (dessinés avant lui : sa grille passe devant)
+    final scene = <Widget>[_img('caddie', cx, cy, cw, opacite: caddie)];
+    // Les articles tombent dans le panier : devant sa paroi du fond, derrière son bord avant.
     for (final (nom, taille, x, debut, angle) in articles) {
       final p = _entre(t, debut, debut + .07, Curves.bounceOut);
       if (p <= 0) continue;
-      final aw = h * taille * 1.15;
-      final fondY = cy + cw * .24 - aw * .8;
-      scene.add(_img(nom, cx + cw * (.30 + x * .52) - aw / 2, _mix(-h * .6, fondY, p), aw, opacite: _entre(t, debut, debut + .02), angle: angle));
+      final aw = h * taille;
+      final ah = aw * _proportions[nom]!; // hauteur de l'image
+      final px = 75 + x * 160; // le long du bord avant (pixels de caddie.png)
+      final bord = 55 + (px - 70) * .085 + 12; // l'objet s'enfonce jusqu'au milieu du bord avant
+      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h * .6, cy + bord * ce - ah, p), aw,
+          opacite: _entre(t, debut, debut + .02), angle: angle));
     }
-    scene.add(_img('caddie', cx, cy, cw, opacite: caddie));
+    scene.add(_img('caddie_avant', cx, cy, cw, opacite: caddie));
 
     // La liste par-dessus
     final liste = (apparition * (1 - listeFinie)).clamp(0.0, 1.0);
     if (liste > 0) {
       scene.add(_img('feuille', fx, fy, fw, opacite: liste));
+      final face = <Widget>[];
       for (var i = 0; i < 3; i++) {
         if (traits[i] <= 0) continue;
-        scene.add(Positioned(
+        face.add(Positioned(
           left: traitX,
-          top: fy + fh * lignesY[i] - traitH / 2,
+          top: lignesY[i] - traitH / 2,
           width: traitW * traits[i],
           height: traitH,
-          child: Opacity(
-            opacity: liste,
-            child: ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.centerLeft,
-                maxWidth: traitW,
-                minWidth: traitW,
-                child: Image.asset('$_dossier/trait.png', width: traitW, filterQuality: FilterQuality.medium),
-              ),
+          child: ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.centerLeft,
+              maxWidth: traitW,
+              minWidth: traitW,
+              child: Image.asset('$_dossier/trait.png', width: traitW, filterQuality: FilterQuality.medium),
             ),
           ),
         ));
         // Les coches, en même temps que les articles : vert, vert, rouge
-        final coche = _entre(t, .64 + i * .08, .70 + i * .08, Curves.elasticOut);
+        final coche = _entre(t, .60 + i * .09, .67 + i * .09, Curves.elasticOut);
         if (coche > 0) {
-          final cW = fw * .30 * coche.clamp(0.0, 1.3);
-          scene.add(_img(i == 2 ? 'coche_rouge' : 'coche_verte', fx + fw * .22 - cW / 2, fy + fh * lignesY[i] - cW * .55, cW,
-              opacite: liste));
+          final cW = 18 * coche.clamp(0.0, 1.3);
+          face.add(Positioned(
+            left: 24 - cW / 2,
+            top: lignesY[i] - cW * .6,
+            width: cW,
+            child: Image.asset('$_dossier/${i == 2 ? 'coche_rouge' : 'coche_verte'}.png', width: cW, filterQuality: FilterQuality.medium),
+          ));
         }
       }
+      // Le carré 100 × 100 posé sur la face, en perspective
+      final o = _surFeuille(0, 0, fx, fy, ech);
+      scene.add(Positioned(
+        left: 0,
+        top: 0,
+        width: 100,
+        height: 100,
+        child: Opacity(
+          opacity: liste,
+          child: Transform(
+            transform: Matrix4(_haut.dx * ech / 100, _haut.dy * ech / 100, 0, 0, _gauche.dx * ech / 100, _gauche.dy * ech / 100, 0, 0,
+                0, 0, 1, 0, o.dx, o.dy, 0, 1),
+            child: Stack(clipBehavior: Clip.none, children: face),
+          ),
+        ),
+      ));
       // Le crayon suit la fin du trait en cours, puis s'en va
       if (crayonParti < 1) {
         final enCours = traits.indexWhere((p) => p < 1);
         final i = enCours < 0 ? 2 : enCours;
-        final pointeX = traitX + traitW * traits[i];
-        final pointeY = fy + fh * lignesY[i];
+        final pointe = _surFeuille(traitX + traitW * traits[i], lignesY[i], fx, fy, ech);
         final cwr = h * .62;
         final chr = cwr * 200 / 143;
-        scene.add(_img('crayon', pointeX - cwr * .04 + crayonParti * h * .4, pointeY - chr * .97 - crayonParti * h * .3, cwr,
+        scene.add(_img('crayon', pointe.dx - cwr * .04 + crayonParti * h * .4, pointe.dy - chr * .97 - crayonParti * h * .3, cwr,
             opacite: apparition * (1 - crayonParti), angle: math.sin(t * 60) * .03 * (1 - crayonParti)));
       }
     }
