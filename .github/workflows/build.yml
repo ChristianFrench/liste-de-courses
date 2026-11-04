@@ -143,13 +143,20 @@ jobs:
           foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") {
             Copy-Item "C:\Windows\System32\$f" $dest
           }
-      - name: Mettre de côté l'application
-        shell: bash
-        run: mv build/windows/x64/runner/Release "build/Liste de courses Windows"
+      - name: Programme d'installation et de mise à jour (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          $version = ((Select-String -Path pubspec.yaml -Pattern '^version:\s*([^+\s]+)').Matches[0].Groups[1].Value)
+          $commit = "${{ github.sha }}".Substring(0, 7)
+          & $iscc /Q "/DVersion=$version" "/DCommit=$commit" "/DSource=$PWD\build\windows\x64\runner\Release" "/DIcone=$PWD\windows\runner\resources\app_icon.ico" "/DSortie=$PWD\build\installation" outils\installation\emplettes.iss
+          if ($LASTEXITCODE -ne 0) { Write-Output "::error title=Installation::échec d'Inno Setup"; exit 1 }
+          Get-ChildItem build\installation
       - uses: actions/upload-artifact@v4
         with:
-          name: Liste de courses Windows
-          path: build/Liste de courses Windows/
+          name: Emplettes Installation
+          path: build/installation/Emplettes-Installation.exe
 
   web:
     # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
@@ -243,11 +250,11 @@ jobs:
           mkdir -p publication
           # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
           gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Captures.zip -D publication 2>/dev/null || true
-          # Mode APK : l'exe Windows de la version précédente est repris tel quel
-          if [ ! -d "livrables/Liste de courses Windows" ]; then gh release download derniere-version -p Liste-de-courses-Windows.zip -D publication 2>/dev/null || true; fi
+          # Mode APK : le programme d'installation Windows de la version précédente est repris tel quel
+          if [ ! -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then gh release download derniere-version -p Emplettes-Installation.exe -D publication 2>/dev/null || true; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
-          if [ -d "livrables/Liste de courses Windows" ]; then (cd "livrables/Liste de courses Windows" && zip -qr ../../publication/Liste-de-courses-Windows.zip .); fi
+          if [ -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then cp -f "livrables/Emplettes Installation/Emplettes-Installation.exe" publication/; fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
           {
@@ -269,7 +276,7 @@ jobs:
             --target "$GITHUB_SHA" \
             --prerelease \
             --title "Dernière version — $VERSION (${GITHUB_SHA::7})" \
-            --notes "Fichiers récupérés automatiquement par « Mettre a jour.bat ». Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')." 2> erreur.txt
+            --notes "Windows : Emplettes-Installation.exe installe ou met à jour en place. Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')." 2> erreur.txt
           code=$?
           if [ $code -ne 0 ]; then echo "::error title=Publication::$(sed ':a;N;$!ba;s/\n/ | /g' erreur.txt)"; fi
           exit $code

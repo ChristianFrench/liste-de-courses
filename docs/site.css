@@ -18,6 +18,10 @@ a{color:var(--accent-fonce)}
 .menu .large{display:flex;align-items:center;gap:12px;height:60px}
 .marque{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--encre);font-weight:700;font-size:22px;margin-right:auto}
 .marque img{width:42px;height:42px;object-fit:contain}
+/* Icône du menu : plus grande, elle déborde sous la barre sur la page */
+.menu .marque{position:relative;padding-left:84px}
+.menu .marque img{position:absolute;left:-6px;top:-14px;width:88px;height:88px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.28))}
+@media (max-width:820px){.menu .marque{padding-left:68px}.menu .marque img{width:72px;height:72px;top:-10px;left:-4px}}
 .menu nav{display:flex;gap:4px}
 .menu nav a{text-decoration:none;color:var(--encre);font-weight:700;font-size:15px;padding:8px 12px;border-radius:999px}
 .menu nav a:hover,.menu nav a.actif{background:var(--selection)}
@@ -155,7 +159,7 @@ footer .bas{border-top:1px solid rgba(255,255,255,.18);padding:14px 16px 22px;te
 
 /* Découvrir : au rythme de chacun */
 .visite{display:grid;grid-template-columns:auto minmax(0,1fr);gap:36px;align-items:center}
-.visite .telephone{width:320px}
+.visite .telephone{width:250px}
 .explication .compteur{font-weight:700;color:var(--accent-fonce);letter-spacing:.04em}
 .explication h2{margin:4px 0 8px;color:var(--encre);font-size:clamp(24px,3.4vw,32px)}
 .explication p{margin:0 0 10px;color:var(--texte2);max-width:560px}
@@ -167,7 +171,7 @@ footer .bas{border-top:1px solid rgba(255,255,255,.18);padding:14px 16px 22px;te
 .auto{font:inherit;font-size:15px;color:var(--texte2);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
 @media (max-width:820px){
   .visite{grid-template-columns:1fr;gap:18px}
-  .visite .telephone{width:min(74vw,300px);justify-self:center}
+  .visite .telephone{width:min(58vw,230px);justify-self:center}
   .navigation-visite{justify-content:center}
   .points{justify-content:center}
 }

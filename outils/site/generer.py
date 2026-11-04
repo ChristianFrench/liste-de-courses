@@ -6,7 +6,7 @@ Charte : docs/site.css (palette Sauge, Atkinson Hyperlegible, bandeaux de l'appl
 import json, os
 
 APK = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk'
-EXE = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses-Windows.zip'
+EXE = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Emplettes-Installation.exe'
 
 PAGES = [  # (fichier, titre du menu)
     ('index.html', 'Accueil'),
@@ -195,7 +195,7 @@ DECOUVRIR = titre_page('icones/mobile-phone.png', 'Découvrir', 'Les écrans d\'
 '''
 
 # ------------------------------------------------------------------ Télécharger
-TELECHARGER = titre_page('images/liste_chariot.png', 'Télécharger', 'Emplettes sur téléphone Android, sur PC Windows ou dans le navigateur.') + f'''<main>
+TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes sur téléphone Android, sur PC Windows ou dans le navigateur.') + f'''<main>
   <section>
     <div class="large">
       <div class="telechargements">
@@ -207,8 +207,8 @@ TELECHARGER = titre_page('images/liste_chariot.png', 'Télécharger', 'Emplettes
         </div>
         <div class="telechargement">
           <div class="tete"><img src="icones/desktop-computer.png" alt=""><h3>Windows</h3></div>
-          <p>Un dossier compressé, sans installation.</p>
-          <ol class="note" style="margin:0;padding-left:18px"><li>Téléchargez le fichier .zip.</li><li>Clic droit › « Extraire tout ».</li><li>Lancez Emplettes dans le dossier extrait.</li></ol>
+          <p>Un programme d'installation, qui sert aussi aux mises à jour.</p>
+          <ol class="note" style="margin:0;padding-left:18px"><li>Téléchargez et ouvrez « Emplettes-Installation.exe ».</li><li>Si Windows affiche « Windows a protégé votre ordinateur » : « Informations complémentaires » › « Exécuter quand même ».</li><li>Pour mettre à jour, refaites la même chose : vos listes et votre foyer sont conservés.</li></ol>
           <a class="bouton plein" href="{EXE}">Télécharger pour Windows</a>
         </div>
         <div class="telechargement">
