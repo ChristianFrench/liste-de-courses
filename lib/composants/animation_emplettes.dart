@@ -39,7 +39,7 @@ class AnimationEmplettes extends StatefulWidget {
   static bool jouee = false;
 
   /// Durée totale.
-  static const duree = Duration(milliseconds: 12000);
+  static const duree = Duration(milliseconds: 14200);
 
   /// Essais : position imposée dans l'animation (0 à 1), sans horloge.
   static double? instantEssai;
@@ -83,11 +83,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     return SizedBox(
       width: w,
       height: h,
-      // Le caddie entre et sort par les côtés : on coupe à gauche et à droite (pas en haut, où passe le crayon).
-      child: ClipRect(
-        clipper: _Tuile(Rect.fromLTWH(0, -h * .9, w, h * 2)),
-        child: AnimatedBuilder(animation: _c, builder: (context, _) => Stack(clipBehavior: Clip.none, children: _scene(_c.value, w, h))),
-      ),
+      child: AnimatedBuilder(animation: _c, builder: (context, _) => Stack(clipBehavior: Clip.none, children: _scene(_c.value, w, h))),
     );
   }
 
@@ -156,15 +152,18 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
   List<Widget> _scene(double t, double w, double h) {
     // Moments (fractions de la durée totale)
     // Pas de fondu : tout arrive en grandissant ou en roulant, et part en éclatant ou en roulant.
-    final apparition = _entre(t, 0, .06, Curves.easeOutBack);
-    final crayonVenu = _entre(t, .06, .10, Curves.easeOutBack);
-    final traits = [for (var i = 0; i < _lignes; i++) _entre(t, .11 + i * .06, .16 + i * .06, Curves.easeOut)];
-    final crayonParti = _entre(t, .41, .49, Curves.linear);
-    final rapetisse = _entre(t, .49, .56);
-    final caddie = _entre(t, .53, .61, Curves.easeOut);
-    final listeFinie = _entre(t, .85, .91, Curves.linear);
-    final caddieParti = _entre(t, .91, .96, Curves.easeIn);
-    final imageFinale = _entre(t, .96, 1, Curves.easeOutBack);
+    // Moments en secondes, ramenés à la durée totale.
+    final d = AnimationEmplettes.duree.inMilliseconds / 1000;
+    double sec(double a, double b, [Curve c = Curves.easeInOut]) => _entre(t, a / d, b / d, c);
+    final apparition = sec(0, .7, Curves.easeOutBack);
+    final crayonVenu = sec(.7, 1.2, Curves.easeOutBack);
+    final traits = [for (var i = 0; i < _lignes; i++) sec(1.3 + i * .9, 2.05 + i * .9, Curves.easeOut)];
+    final crayonParti = sec(5.75, 6.7, Curves.linear);
+    final rapetisse = sec(6.7, 7.5);
+    final caddie = sec(7.1, 8.1, Curves.easeOut);
+    final listeFinie = sec(11.9, 12.8, Curves.linear);
+    final caddieParti = sec(12.8, 13.5, Curves.easeIn);
+    final imageFinale = sec(13.5, 14.2, Curves.easeOutBack);
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
@@ -177,16 +176,16 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     const lignesY = [10.0, 27.0, 44.0, 61.0, 78.0];
     const traitX = 42.0, traitW = 40.0, traitH = traitW * 38 / 160;
 
-    // (nom, taille, position dans le panier de 0 à 1, moment de la chute, inclinaison, bas de l'objet arrivé)
+    // (nom, taille, position dans le panier de 0 à 1, début de la chute en secondes, inclinaison, bas de l'objet arrivé)
     // Les premiers tombent au fond ; les suivants s'entassent et dépassent du panier, comme dans l'image Emplettes.
     final articles = [
-      ('fromage', .24, .22, 0.59, -.1, 150.0),
-      ('boite', .24, .78, 0.62, .1, 150.0),
-      ('eau', .30, .48, 0.65, -.08, 148.0),
-      ('salade', .32, .80, 0.68, .15, 100.0),
-      ('pain', .38, .58, 0.71, .35, 96.0),
-      ('lait', .30, .10, 0.74, -.12, 100.0),
-      ('pomme', .30, .34, 0.77, 0.0, 104.0),
+      ('fromage', .24, .22, 7.90, -.1, 150.0),
+      ('boite', .24, .78, 8.35, .1, 150.0),
+      ('eau', .30, .48, 8.80, -.08, 148.0),
+      ('salade', .32, .80, 9.25, .15, 100.0),
+      ('pain', .38, .58, 9.70, .35, 96.0),
+      ('lait', .30, .10, 10.15, -.12, 100.0),
+      ('pomme', .30, .34, 10.60, 0.0, 104.0),
     ];
     // Caddie (260 × 257) : arrive de la gauche, derrière la liste ; au centre à la fin.
     final cw = h * .86;
@@ -196,19 +195,25 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     final cx = avance;
     final cy = h * .10 + avance * _pente;
 
-    final scene = <Widget>[_img('caddie', cx, cy, cw)];
+    final chariot = <Widget>[_img('caddie', cx, cy, cw)];
     // Les articles tombent dans le panier : devant sa paroi du fond, derrière sa face avant (caddie_avant.png).
     for (final (nom, taille, x, debut, angle, bas) in articles) {
-      final p = _entre(t, debut, debut + .06, Curves.bounceOut);
+      final p = sec(debut, debut + .8, Curves.bounceOut);
       if (p <= 0) continue;
       final aw = h * taille;
       final ah = aw * _proportions[nom]!; // hauteur de l'image
       final px = 72 + x * 120; // dans la largeur de la face avant (pixels de caddie.png)
       final fond = bas + (px - 70) * .06;
-      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h - ah, cy + fond * ce - ah, p), aw,
+      chariot.add(_img(nom, cx + px * ce - aw / 2, _mix(-h - ah, cy + fond * ce - ah, p), aw,
           angle: angle));
     }
-    scene.add(_img('caddie_avant', cx, cy, cw));
+    chariot.add(_img('caddie_avant', cx, cy, cw));
+    // Le caddie entre et sort par les côtés : on le coupe à gauche et à droite (le crayon et la liste, non).
+    final scene = <Widget>[
+      Positioned.fill(
+        child: ClipRect(clipper: _Tuile(Rect.fromLTWH(0, -h * .9, w, h * 2)), child: Stack(clipBehavior: Clip.none, children: chariot)),
+      ),
+    ];
 
     // La liste par-dessus
     final liste = <Widget>[_img('feuille', fx, fy, fw)];
@@ -230,7 +235,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
         ),
       ));
       // Une coche à chaque article ou presque : 3 vertes, 1 rouge (article pas trouvé), 1 verte
-      final coche = _entre(t, .61 + i * .045, .66 + i * .045, Curves.elasticOut);
+      final coche = sec(8.2 + i * .7, 8.8 + i * .7, Curves.elasticOut);
       if (coche > 0) {
         final cW = 16 * coche.clamp(0.0, 1.3);
         face.add(Positioned(
@@ -271,7 +276,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       final enCours = traits.indexWhere((p) => p < 1);
       final i = enCours < 0 ? _lignes - 1 : enCours;
       final pointe = _surFeuille(traitX + traitW * traits[i], lignesY[i], fx, fy, ech);
-      final cwr = h * .62;
+      final cwr = h * .42; // assez petit pour rester entier dans le cadre
       final chr = cwr * 200 / 143;
       final l = pointe.dx - cwr * .04, hautCrayon = pointe.dy - chr * .97;
       final crayon = _img('crayon', l, hautCrayon, cwr,
