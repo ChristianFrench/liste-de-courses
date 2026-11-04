@@ -9,6 +9,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/animation_emplettes.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/pictos.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
@@ -71,11 +72,15 @@ void main() {
     tester.view.viewPadding = const FakeViewPadding(top: 94, bottom: 68);
     addTearDown(tester.view.reset);
 
+    AnimationEmplettes.jouee = true;
     await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
     await tester.runAsync(() async {
       await precacheImage(const AssetImage('assets/icone_ronde.png'), tester.element(find.byType(Scaffold).first));
       for (final f in ['emplettes/complet', 'emplettes/liste_crayon', 'emplettes/liste_chariot', 'emplettes/filtre']) {
         await precacheImage(AssetImage('assets/$f.png'), tester.element(find.byType(Scaffold).first));
+      }
+      for (final f in imagesAnimationEmplettes) {
+        await precacheImage(AssetImage('assets/emplettes/anim/$f.png'), tester.element(find.byType(Scaffold).first));
       }
       for (final c in pictosDisponibles) {
         await precacheImage(AssetImage('assets/pictos/png/$c.png'), tester.element(find.byType(Scaffold).first));

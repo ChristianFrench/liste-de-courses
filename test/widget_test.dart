@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:flutter/material.dart' show Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/animation_emplettes.dart';
 import 'package:liste_de_courses/composants/icone.dart';
 import 'package:liste_de_courses/composants/composants.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
@@ -42,6 +43,7 @@ Future<void> _chargerPolice() async {
 void _donnees() {
   final e = Etat.instance;
   e.enregistrementActif = false;
+  AnimationEmplettes.jouee = true; // l'accueil montre directement l'image finale
   EcranConstruction.promoApresRecherche = false; // le volet « Promo » est essayé à part
   e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
   Nav.i.reinitialiser();
