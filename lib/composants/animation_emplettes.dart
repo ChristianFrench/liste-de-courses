@@ -3,15 +3,15 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 // Animation de l'accueil (scénario d'Aristide, 04/11/2026), jouée une fois par lancement :
-// 1. la feuille apparaît en fondu, seule, à la taille de celle de Préparer, puis le crayon ;
+// 1. la feuille apparaît seule en grandissant depuis son centre, à la taille de celle de Préparer, puis le crayon ;
 // 2. les traits gris s'écrivent l'un après l'autre (le crayon les suit) ;
-// 3. le crayon part en poussière sur place (comme une application désinstallée sur un Xiaomi) ;
+// 3. le crayon rapetisse puis éclate en petits fragments sur place (comme une application désinstallée sur un Xiaomi) ;
 // 4. la liste rapetisse et se place comme dans l'image des courses ;
-// 5. le caddie arrive, vide, derrière la liste, en roulant dans l'axe de ses roues ;
+// 5. le caddie arrive de la gauche, vide, derrière la liste, en roulant dans l'axe de ses roues ;
 // 6. les lignes se cochent une à une (3 vertes, 1 rouge, 1 verte) pendant que les articles tombent dans le caddie,
 //    jusqu'à le remplir comme celui de l'image Emplettes ;
-// 7. les courses sont finies : la liste part en poussière, le caddie plein se recentre puis s'efface ;
-//    l'image Emplettes apparaît et reste.
+// 7. les courses sont finies : la liste éclate à son tour, le caddie plein sort par la droite ;
+//    l'image Emplettes grandit depuis le centre et reste. Aucun fondu (demande d'Aristide).
 // Images : planche d'Aristide (« Planche d'icônes courses en 3D »), découpée dans assets/emplettes/anim/.
 
 const _dossier = 'assets/emplettes/anim';
@@ -83,54 +83,60 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     return SizedBox(
       width: w,
       height: h,
-      child: AnimatedBuilder(animation: _c, builder: (context, _) => Stack(clipBehavior: Clip.none, children: _scene(_c.value, w, h))),
+      // Le caddie entre et sort par les côtés : on coupe à gauche et à droite (pas en haut, où passe le crayon).
+      child: ClipRect(
+        clipper: _Tuile(Rect.fromLTWH(0, -h * .9, w, h * 2)),
+        child: AnimatedBuilder(animation: _c, builder: (context, _) => Stack(clipBehavior: Clip.none, children: _scene(_c.value, w, h))),
+      ),
     );
   }
 
-  Widget _img(String nom, double l, double t, double largeur, {double opacite = 1, double angle = 0, String dossier = _dossier}) =>
+  /// Une image ; [echelle] la fait grandir depuis [depuis] (0 à 1 dans l'image, le centre par défaut).
+  Widget _img(String nom, double l, double t, double largeur,
+          {double echelle = 1, Alignment depuis = Alignment.center, double angle = 0, String dossier = _dossier}) =>
       Positioned(
         left: l,
         top: t,
         width: largeur,
-        child: Opacity(
-          opacity: opacite.clamp(0.0, 1.0),
+        child: Transform.scale(
+          scale: echelle,
+          alignment: depuis,
           child: Transform.rotate(angle: angle, child: Image.asset('$dossier/$nom.png', width: largeur, filterQuality: FilterQuality.medium)),
         ),
       );
 
-  /// Effet « désinstallation Xiaomi » : le groupe [enfants] (coordonnées de la scène) rapetisse un peu,
-  /// puis se brise en petits carrés qui s'envolent et s'effacent. [p] de 0 (intact) à 1 (disparu).
-  List<Widget> _poussiere(List<Widget> enfants, Rect zone, double p, double h) {
+  /// Effet « désinstallation Xiaomi » : le groupe [enfants] (coordonnées de la scène) rapetisse de moitié,
+  /// puis éclate en petits fragments qui partent dans tous les sens en rapetissant jusqu'à disparaître.
+  /// [p] de 0 (intact) à 1 (disparu).
+  List<Widget> _eclatement(List<Widget> enfants, Rect zone, double p, double h) {
     if (p <= 0) return enfants;
     if (p >= 1) return const [];
-    const n = 11;
+    const n = 16, finSerre = .45;
     final groupe = Stack(clipBehavior: Clip.none, children: enfants);
-    final serre = 1 - .08 * _entre(p, 0, .25);
+    final serre = 1 - .55 * _entre(p, 0, finSerre, Curves.easeInCubic);
+    final c = zone.center;
+    Matrix4 serrer() => Matrix4.identity()
+      ..translateByDouble(c.dx, c.dy, 0, 1)
+      ..scaleByDouble(serre, serre, 1, 1)
+      ..translateByDouble(-c.dx, -c.dy, 0, 1);
+    if (p < finSerre) return [Positioned.fill(child: Transform(transform: serrer(), child: groupe))];
     final res = <Widget>[];
     for (var i = 0; i < n; i++) {
       for (var j = 0; j < n; j++) {
-        final tuile = Rect.fromLTWH(zone.left + zone.width * i / n, zone.top + zone.height * j / n, zone.width / n + .5, zone.height / n + .5);
-        double hasard(int k) => (math.sin((i * 12.9898 + j * 78.233 + k * 37.719)) * 43758.5453) % 1.0;
-        final r1 = hasard(1).abs(), r2 = hasard(2).abs(), r3 = hasard(3).abs();
-        // Les carrés partent l'un après l'autre, du haut à droite vers le bas à gauche, avec un peu de hasard.
-        final depart = .22 + .45 * ((n - 1 - i + j) / (2 * n - 2)) * .7 + .15 * r1;
-        final q = _entre(p, depart, depart + .3, Curves.easeIn);
+        final tuile = Rect.fromLTWH(zone.left + zone.width * i / n, zone.top + zone.height * j / n, zone.width / n + .3, zone.height / n + .3);
+        double hasard(int k) => ((math.sin(i * 12.9898 + j * 78.233 + k * 37.719) * 43758.5453) % 1.0).abs();
+        final q = _entre(p, finSerre + .1 * hasard(1), .8 + .2 * hasard(4), Curves.easeOutCubic);
         if (q >= 1) continue;
-        final dx = (r2 - .5) * h * .5 * q, dy = -(.15 + r3 * .35) * h * q;
-        final centre = tuile.center;
-        final m = Matrix4.identity()
-          ..translateByDouble(zone.center.dx, zone.center.dy, 0, 1)
-          ..scaleByDouble(serre, serre, 1, 1)
-          ..translateByDouble(-zone.center.dx, -zone.center.dy, 0, 1)
-          ..translateByDouble(centre.dx + dx, centre.dy + dy, 0, 1)
-          ..scaleByDouble(1 - .6 * q, 1 - .6 * q, 1, 1)
-          ..translateByDouble(-centre.dx, -centre.dy, 0, 1);
-        res.add(Positioned.fill(
-          child: Opacity(
-            opacity: 1 - q,
-            child: Transform(transform: m, child: ClipRect(clipper: _Tuile(tuile), child: groupe)),
-          ),
-        ));
+        // Chaque fragment part depuis le centre, un peu au hasard, et rapetisse jusqu'à rien.
+        final dir = tuile.center - c;
+        final angle = math.atan2(dir.dy, dir.dx) + (hasard(2) - .5) * 1.2;
+        final loin = h * (.25 + .45 * hasard(3)) * q;
+        final m = serrer()
+          ..translateByDouble(tuile.center.dx, tuile.center.dy, 0, 1)
+          ..translateByDouble(math.cos(angle) * loin / serre, math.sin(angle) * loin / serre, 0, 1)
+          ..scaleByDouble(1 - q, 1 - q, 1, 1)
+          ..translateByDouble(-tuile.center.dx, -tuile.center.dy, 0, 1);
+        res.add(Positioned.fill(child: Transform(transform: m, child: ClipRect(clipper: _Tuile(tuile), child: groupe))));
       }
     }
     return res;
@@ -149,16 +155,16 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
 
   List<Widget> _scene(double t, double w, double h) {
     // Moments (fractions de la durée totale)
-    final apparition = _entre(t, 0, .05);
-    final crayonVenu = _entre(t, .05, .09);
-    final traits = [for (var i = 0; i < _lignes; i++) _entre(t, .10 + i * .06, .15 + i * .06, Curves.easeOut)];
-    final crayonParti = _entre(t, .40, .47, Curves.linear);
-    final rapetisse = _entre(t, .47, .54);
-    final caddie = _entre(t, .52, .60, Curves.easeOut);
-    final listeFinie = _entre(t, .82, .89, Curves.linear);
-    final recentre = _entre(t, .88, .93);
-    final caddieParti = _entre(t, .95, .985);
-    final imageFinale = _entre(t, .97, 1);
+    // Pas de fondu : tout arrive en grandissant ou en roulant, et part en éclatant ou en roulant.
+    final apparition = _entre(t, 0, .06, Curves.easeOutBack);
+    final crayonVenu = _entre(t, .06, .10, Curves.easeOutBack);
+    final traits = [for (var i = 0; i < _lignes; i++) _entre(t, .11 + i * .06, .16 + i * .06, Curves.easeOut)];
+    final crayonParti = _entre(t, .41, .49, Curves.linear);
+    final rapetisse = _entre(t, .49, .56);
+    final caddie = _entre(t, .53, .61, Curves.easeOut);
+    final listeFinie = _entre(t, .85, .91, Curves.linear);
+    final caddieParti = _entre(t, .91, .96, Curves.easeIn);
+    final imageFinale = _entre(t, .96, 1, Curves.easeOutBack);
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
@@ -168,29 +174,29 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     final fy = _mix(0, h * .02, rapetisse);
 
     // Les traits et les coches, dans le carré de la face
-    const lignesY = [12.0, 27.0, 42.0, 57.0, 72.0];
+    const lignesY = [10.0, 27.0, 44.0, 61.0, 78.0];
     const traitX = 42.0, traitW = 40.0, traitH = traitW * 38 / 160;
 
     // (nom, taille, position dans le panier de 0 à 1, moment de la chute, inclinaison, bas de l'objet arrivé)
     // Les premiers tombent au fond ; les suivants s'entassent et dépassent du panier, comme dans l'image Emplettes.
     final articles = [
-      ('fromage', .24, .22, .60, -.1, 150.0),
-      ('boite', .24, .78, .63, .1, 150.0),
-      ('eau', .30, .48, .66, -.08, 148.0),
-      ('salade', .32, .80, .70, .15, 100.0),
-      ('pain', .38, .58, .73, .35, 96.0),
-      ('lait', .30, .10, .77, -.12, 100.0),
-      ('pomme', .30, .34, .80, 0.0, 104.0),
+      ('fromage', .24, .22, 0.59, -.1, 150.0),
+      ('boite', .24, .78, 0.62, .1, 150.0),
+      ('eau', .30, .48, 0.65, -.08, 148.0),
+      ('salade', .32, .80, 0.68, .15, 100.0),
+      ('pain', .38, .58, 0.71, .35, 96.0),
+      ('lait', .30, .10, 0.74, -.12, 100.0),
+      ('pomme', .30, .34, 0.77, 0.0, 104.0),
     ];
     // Caddie (260 × 257) : arrive de la gauche, derrière la liste ; au centre à la fin.
     final cw = h * .86;
     final ce = cw / 260;
-    final avance = _mix(-h * .45, 0, caddie) + recentre * (w - cw) / 2;
+    // Il arrive de la gauche, hors du champ, et repart par la droite.
+    final avance = _mix(-cw * 1.05, 0, caddie) + caddieParti * (w + cw * .1);
     final cx = avance;
     final cy = h * .10 + avance * _pente;
-    final opaciteCaddie = caddie * (1 - caddieParti);
 
-    final scene = <Widget>[_img('caddie', cx, cy, cw, opacite: opaciteCaddie)];
+    final scene = <Widget>[_img('caddie', cx, cy, cw)];
     // Les articles tombent dans le panier : devant sa paroi du fond, derrière sa face avant (caddie_avant.png).
     for (final (nom, taille, x, debut, angle, bas) in articles) {
       final p = _entre(t, debut, debut + .06, Curves.bounceOut);
@@ -199,10 +205,10 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       final ah = aw * _proportions[nom]!; // hauteur de l'image
       final px = 72 + x * 120; // dans la largeur de la face avant (pixels de caddie.png)
       final fond = bas + (px - 70) * .06;
-      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h * .6, cy + fond * ce - ah, p), aw,
-          opacite: _entre(t, debut, debut + .02) * (1 - caddieParti), angle: angle));
+      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h - ah, cy + fond * ce - ah, p), aw,
+          angle: angle));
     }
-    scene.add(_img('caddie_avant', cx, cy, cw, opacite: opaciteCaddie));
+    scene.add(_img('caddie_avant', cx, cy, cw));
 
     // La liste par-dessus
     final liste = <Widget>[_img('feuille', fx, fy, fw)];
@@ -224,7 +230,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
         ),
       ));
       // Une coche à chaque article ou presque : 3 vertes, 1 rouge (article pas trouvé), 1 verte
-      final coche = _entre(t, .62 + i * .045, .67 + i * .045, Curves.elasticOut);
+      final coche = _entre(t, .61 + i * .045, .66 + i * .045, Curves.elasticOut);
       if (coche > 0) {
         final cW = 16 * coche.clamp(0.0, 1.3);
         face.add(Positioned(
@@ -248,10 +254,15 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
         child: Stack(clipBehavior: Clip.none, children: face),
       ),
     ));
+    // La feuille grandit depuis son centre au début.
+    final centreFeuille = Offset(fx + fw / 2, fy + fh / 2);
     scene.add(Positioned.fill(
-      child: Opacity(
-        opacity: apparition,
-        child: Stack(clipBehavior: Clip.none, children: _poussiere(liste, Rect.fromLTWH(fx - 4, fy - 4, fw + 8, fh + 8), listeFinie, h)),
+      child: Transform(
+        transform: Matrix4.identity()
+          ..translateByDouble(centreFeuille.dx, centreFeuille.dy, 0, 1)
+          ..scaleByDouble(apparition, apparition, 1, 1)
+          ..translateByDouble(-centreFeuille.dx, -centreFeuille.dy, 0, 1),
+        child: Stack(clipBehavior: Clip.none, children: _eclatement(liste, Rect.fromLTWH(fx - 4, fy - 4, fw + 8, fh + 8), listeFinie, h)),
       ),
     ));
 
@@ -264,13 +275,13 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       final chr = cwr * 200 / 143;
       final l = pointe.dx - cwr * .04, hautCrayon = pointe.dy - chr * .97;
       final crayon = _img('crayon', l, hautCrayon, cwr,
-          opacite: crayonVenu, angle: crayonParti > 0 ? 0 : math.sin(t * 60) * .03);
-      scene.addAll(_poussiere([crayon], Rect.fromLTWH(l, hautCrayon, cwr, chr), crayonParti, h));
+          echelle: crayonVenu, depuis: const Alignment(-.92, .94), angle: crayonParti > 0 ? 0 : math.sin(t * 60) * .03);
+      scene.addAll(_eclatement([crayon], Rect.fromLTWH(l, hautCrayon, cwr, chr), crayonParti, h));
     }
 
     // Les courses sont finies : l'image Emplettes reste.
     if (imageFinale > 0) {
-      scene.add(_img('complet', (w - h) / 2, 0, h, opacite: imageFinale, dossier: 'assets/emplettes'));
+      scene.add(_img('complet', (w - h) / 2, 0, h, echelle: imageFinale, dossier: 'assets/emplettes'));
     }
     return scene;
   }
