@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Essayer · Emplettes</title>
+<meta name="description" content="La démonstration d'Emplettes.">
+<link rel="icon" href="images/complet.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<!-- Page produite par outils/site/generer.py : modifier le script, pas ce fichier. -->
+<header class="menu">
+  <div class="large">
+    <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="navigation"><a href="index.html">Accueil</a><a href="decouvrir.html">Découvrir</a><a href="telecharger.html">Télécharger</a><a href="aide.html">Aide</a><a href="essayer.html" class="essayer" aria-current="page">Essayer</a></nav>
+  </div>
+</header>
+<div class="titre-page"><div class="large"><img src="icones/check-mark-button.png" alt=""><div><h1>Essayer</h1><p>La démonstration : un foyer d'exemple déjà rempli, rien n'est envoyé ni partagé.</p></div></div></div>
+<main>
+  <section>
+    <div class="large">
+      <p class="intro">La démonstration ouvre la dernière version d'Emplettes avec la famille Martin : quatre membres, trois magasins, deux mois de courses. Vous pouvez tout essayer.</p>
+      <div class="grand-ecran-seulement">
+        <p class="intro"><b>Où voulez-vous l'ouvrir ?</b></p>
+        <div class="choix">
+          <div class="telechargement">
+            <div class="tete"><img src="icones/mobile-phone.png" alt=""><h3>Dans cette page</h3></div>
+            <p>Dans un cadre à la taille d'un téléphone, sous cette question.</p>
+            <button class="bouton plein" id="dansLaPage">Ouvrir ici</button>
+          </div>
+          <div class="telechargement">
+            <div class="tete"><img src="icones/desktop-computer.png" alt=""><h3>Dans une fenêtre à part</h3></div>
+            <p>Une petite fenêtre détachée, que l'on place où l'on veut à côté de cette page.</p>
+            <button class="bouton plein" id="fenetre">Ouvrir une fenêtre</button>
+          </div>
+        </div>
+        <div id="zoneCadre"><div class="telephone"><div class="ecran" id="cadre"></div></div></div>
+      </div>
+      <div class="petit-ecran-seulement">
+        <div class="boutons">
+          <a class="bouton plein" href="demo/">Ouvrir la démonstration</a>
+          <a class="bouton" href="web/">Ouvrir l'application</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="large">
+    <div>
+      <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+      <p style="margin:0;font-size:14.5px">La liste de courses du foyer, préparée à plusieurs.</p>
+    </div>
+    <div>
+      <h4>L'application</h4>
+      <ul>
+        <li><a href="decouvrir.html">Découvrir</a></li>
+        <li><a href="essayer.html">Essayer</a></li>
+        <li><a href="documents/mode-emploi.html">Mode d'emploi</a></li>
+        <li><a href="documents/depliant.html">Dépliant</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Télécharger</h4>
+      <ul>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk">Android (APK)</a></li>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses-Windows.zip">Windows</a></li>
+        <li><a href="web/">Application web</a></li>
+        <li><a href="telecharger.html">Installer pas à pas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Aide</h4>
+      <ul>
+        <li><a href="aide.html#questions">Questions fréquentes</a></li>
+        <li><a href="aide.html#video">Vidéo</a><span class="a-venir">à venir</span></li>
+        <li><a href="aide.html#donnees">Vos données</a></li>
+        <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bas"><span id="basVersion">Emplettes</span> · Police Atkinson Hyperlegible et icônes Noto 3D, licence SIL OFL</div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

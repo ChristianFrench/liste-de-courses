@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Découvrir · Emplettes</title>
+<meta name="description" content="Les écrans d'Emplettes, un par un.">
+<link rel="icon" href="images/complet.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<!-- Page produite par outils/site/generer.py : modifier le script, pas ce fichier. -->
+<header class="menu">
+  <div class="large">
+    <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="navigation"><a href="index.html">Accueil</a><a href="decouvrir.html" aria-current="page">Découvrir</a><a href="telecharger.html">Télécharger</a><a href="aide.html">Aide</a><a href="essayer.html" class="essayer">Essayer</a></nav>
+  </div>
+</header>
+<div class="titre-page"><div class="large"><img src="icones/mobile-phone.png" alt=""><div><h1>Découvrir</h1><p>Les écrans d'Emplettes, un par un, à votre rythme.</p></div></div></div>
+<main>
+  <section>
+    <div class="large">
+      <div class="visite">
+        <div class="telephone"><div class="ecran" id="diapos"></div></div>
+        <div class="explication">
+          <div class="compteur" id="compteur"></div>
+          <h2 id="titreEcran"></h2>
+          <p id="texteEcran"></p>
+          <ul id="pointsEcran"></ul>
+          <div class="navigation-visite">
+            <button class="bouton" id="precedent">‹ Précédent</button>
+            <button class="bouton plein" id="suivant">Suivant ›</button>
+            <label class="auto"><input type="checkbox" id="auto"> Défilement automatique</label>
+          </div>
+          <div class="points" id="points"></div>
+          <div class="boutons" style="margin-top:22px"><a class="bouton" href="essayer.html">Essayer la démonstration</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>window.VISITE = [{"f": "01 Accueil", "t": "L'accueil", "x": "Tout ce qui est en cours, d'un coup d'œil : les listes en préparation, celles à faire et les courses commencées.", "p": ["« Comment ça marche » rappelle les étapes.", "Touchez une liste pour ce que vous pouvez en faire."]}, {"f": "02 Preparer", "t": "Préparer", "x": "Les listes du foyer en préparation, et celles qui sont prêtes pour les courses.", "p": ["« Nouvelle liste » en bas de l'écran.", "Glisser une liste à gauche la supprime, à droite la remet en préparation."]}, {"f": "03 Nouvelle-liste", "t": "Une nouvelle liste", "x": "Le magasin, le nom proposé d'office, puis le point de départ.", "p": ["Liste par secteur ou liste simple.", "Depuis une liste type, une course passée ou un texte collé (mail, message)."]}, {"f": "05 Remplir", "t": "Remplir la liste", "x": "On cherche l'article en tapant trois lettres : il se range sous son secteur, dans l'ordre du magasin.", "p": ["− et + règlent la quantité.", "Promotion, packaging et consigne s'affichent sur la ligne.", "« Liste prête » la valide."]}, {"f": "07 Courses", "t": "Les courses", "x": "Les listes à faire, les courses en cours et les courses terminées, avec leur ticket.", "p": ["Touchez une liste puis « Faire les courses ».", "On choisit qui fait les courses et avec quel parcours."]}, {"f": "08 En-magasin", "t": "En magasin", "x": "La liste suit l'ordre des allées. Un appui coche l'article quand il est dans le chariot.", "p": ["Deux appuis : manquant en rayon.", "« Pause » sans rien perdre, « Terminer » pour le bilan.", "L'ordre des coches apprend le parcours."]}, {"f": "09 Historique", "t": "L'historique", "x": "Les courses passées, avec leur montant et leur ticket de caisse.", "p": ["Une course peut redevenir une liste type.", "Les plus anciennes passent aux archives."]}, {"f": "11 Magasins", "t": "Les magasins", "x": "Les magasins du foyer, et les parcours appris dans chacun.", "p": ["Tous partagent le même catalogue."]}, {"f": "12 Catalogue", "t": "Le catalogue", "x": "Plus de 2 000 produits rangés par rayons et secteurs, le même dans tous les magasins.", "p": ["On peut ajouter ses produits et ses marques.", "Un petit + signale ce que le foyer a ajouté."]}, {"f": "10 Gerer", "t": "Gérer", "x": "Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, le catalogue, l'apparence, les sauvegardes.", "p": ["Le foyer se partage avec un simple code."]}];</script>
+<footer>
+  <div class="large">
+    <div>
+      <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+      <p style="margin:0;font-size:14.5px">La liste de courses du foyer, préparée à plusieurs.</p>
+    </div>
+    <div>
+      <h4>L'application</h4>
+      <ul>
+        <li><a href="decouvrir.html">Découvrir</a></li>
+        <li><a href="essayer.html">Essayer</a></li>
+        <li><a href="documents/mode-emploi.html">Mode d'emploi</a></li>
+        <li><a href="documents/depliant.html">Dépliant</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Télécharger</h4>
+      <ul>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk">Android (APK)</a></li>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses-Windows.zip">Windows</a></li>
+        <li><a href="web/">Application web</a></li>
+        <li><a href="telecharger.html">Installer pas à pas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Aide</h4>
+      <ul>
+        <li><a href="aide.html#questions">Questions fréquentes</a></li>
+        <li><a href="aide.html#video">Vidéo</a><span class="a-venir">à venir</span></li>
+        <li><a href="aide.html#donnees">Vos données</a></li>
+        <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bas"><span id="basVersion">Emplettes</span> · Police Atkinson Hyperlegible et icônes Noto 3D, licence SIL OFL</div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+@font-face{font-family:"Atkinson";src:url(polices/AtkinsonHyperlegible-Regular.ttf) format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Atkinson";src:url(polices/AtkinsonHyperlegible-Bold.ttf) format("truetype");font-weight:700;font-display:swap}
+:root{
+  /* Palette Sauge de l'application (lib/theme.dart) */
+  --accent:#8AA496; --accent-fonce:#557B66; --fond:#F5F9F6; --fond-barre:#E3EFE7; --selection:#D5E8DC; --separateur:#B9D3C3;
+  --niveau1:#CCD7D1; --encre:#375042; --texte:#222; --texte2:#555; --blanc:#fff; --vert-icone:#D3ECDB;
+  --ombre:0 10px 28px rgba(30,50,40,.18);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;font-family:"Atkinson",system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--texte);background:var(--fond);line-height:1.5;font-size:17px}
+img{max-width:100%}
+a{color:var(--accent-fonce)}
+.large{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ---------- Menu du haut ---------- */
+.menu{position:sticky;top:0;z-index:20;background:rgba(245,249,246,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--separateur)}
+.menu .large{display:flex;align-items:center;gap:12px;height:60px}
+.marque{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--encre);font-weight:700;font-size:22px;margin-right:auto}
+.marque img{width:42px;height:42px;object-fit:contain}
+.menu nav{display:flex;gap:4px}
+.menu nav a{text-decoration:none;color:var(--encre);font-weight:700;font-size:15px;padding:8px 12px;border-radius:999px}
+.menu nav a:hover,.menu nav a.actif{background:var(--selection)}
+.menu nav a.essayer{background:var(--accent-fonce);color:#fff}
+.burger{display:none;background:none;border:0;width:44px;height:44px;border-radius:12px;cursor:pointer;color:var(--encre)}
+.burger:hover{background:var(--selection)}
+@media (max-width:820px){
+  .burger{display:block}
+  .menu nav{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:var(--fond);border-bottom:1px solid var(--separateur);padding:8px 16px 14px;box-shadow:0 12px 20px rgba(0,0,0,.08)}
+  .menu nav.ouvert{display:flex}
+  .menu nav a{padding:12px 14px;font-size:17px}
+}
+
+/* ---------- Bandeau d'ouverture : la photo de l'accueil de l'application ---------- */
+.une{position:relative;color:#fff;background:#2c3a31 url(images/photo.jpg) center/cover no-repeat}
+.une::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(20,32,25,.86) 0%,rgba(20,32,25,.62) 55%,rgba(20,32,25,.35) 100%)}
+.une .large{position:relative;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:24px;align-items:center;padding-top:36px;padding-bottom:36px}
+.une h1{margin:0 0 6px;font-size:clamp(40px,7vw,64px);line-height:1}
+.une .slogan{font-size:clamp(19px,2.4vw,24px);font-weight:700;margin:0 0 12px}
+.une p{margin:0 0 20px;color:#e6efe9;max-width:520px}
+.boutons{display:flex;flex-wrap:wrap;gap:10px}
+.bouton{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:700;font-size:16px;padding:12px 20px;border-radius:12px;border:2px solid var(--accent-fonce);background:var(--blanc);color:var(--encre);cursor:pointer;font-family:inherit}
+.bouton.plein{background:var(--accent-fonce);color:#fff}
+.bouton img{width:26px;height:26px}
+.une .bouton{border-color:#fff}
+.scene{position:relative;display:flex;flex-direction:column;align-items:center}
+.scene img.anim{width:min(100%,360px);aspect-ratio:310/335;height:auto;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
+.rejouer{margin-top:-6px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.55);color:#fff;font:700 14px/1 "Atkinson",sans-serif;padding:9px 16px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.rejouer:hover{background:rgba(255,255,255,.28)}
+@media (max-width:720px){
+  .une .large{grid-template-columns:1fr;text-align:center}
+  .une p{margin-left:auto;margin-right:auto}
+  .boutons{justify-content:center}
+  .scene{order:-1}
+  .scene img.anim{width:min(80%,300px)}
+}
+
+/* ---------- Sections, avec un bandeau de groupe comme dans l'application ---------- */
+section{padding:28px 0 34px}
+.bandeau{display:flex;align-items:center;gap:12px;background:var(--niveau1);color:var(--encre);border-radius:14px;padding:10px 18px 10px 12px;margin:0 0 18px}
+.bandeau img{width:46px;height:46px;margin:-14px 0 -14px;object-fit:contain}
+.bandeau h2{margin:0;font-size:clamp(18px,2.4vw,22px);text-transform:uppercase;letter-spacing:.02em}
+.intro{max-width:780px;margin:0 0 18px;color:var(--texte2)}
+
+.cartes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.carte{background:var(--blanc);border:1px solid var(--separateur);border-radius:16px;padding:18px}
+.carte img{width:52px;height:52px}
+.carte h3{margin:8px 0 4px;color:var(--encre);font-size:19px}
+.carte p{margin:0;color:var(--texte2);font-size:16px}
+
+/* ---------- Écrans qui s'enchaînent ---------- */
+.ecrans{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}
+.legendes{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.legendes button{width:100%;text-align:left;background:none;border:0;border-radius:12px;padding:10px 14px;font:inherit;color:var(--texte2);cursor:pointer;display:flex;gap:12px;align-items:baseline}
+.legendes button b{color:var(--encre)}
+.legendes button span.no{flex:none;width:26px;height:26px;border-radius:50%;background:var(--fond-barre);color:var(--encre);font-weight:700;font-size:14px;display:inline-flex;align-items:center;justify-content:center}
+.legendes button.actif{background:var(--selection);color:var(--texte)}
+.legendes button.actif span.no{background:var(--accent-fonce);color:#fff}
+.telephone{position:relative;width:300px;aspect-ratio:390/844;background:#111;border-radius:42px;padding:10px;box-shadow:var(--ombre),inset 0 0 0 2px #333;justify-self:center}
+.telephone .ecran{position:relative;width:100%;height:100%;border-radius:33px;overflow:hidden;background:var(--fond)}
+.telephone .ecran img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;opacity:0;transition:opacity .6s}
+.telephone .ecran img.visible{opacity:1}
+.telephone::after{content:"";position:absolute;top:18px;left:50%;transform:translateX(-50%);width:84px;height:22px;border-radius:12px;background:#111}
+.commandes{display:flex;justify-content:center;gap:10px;margin-top:14px}
+.rond{width:44px;height:44px;border-radius:50%;border:2px solid var(--accent-fonce);background:var(--blanc);color:var(--encre);font-size:20px;cursor:pointer}
+@media (max-width:820px){
+  .ecrans{grid-template-columns:1fr}
+  .legendes{display:none}
+  .telephone{width:min(78vw,300px)}
+  .legende-mobile{display:block!important}
+}
+.legende-mobile{display:none;text-align:center;margin:12px auto 0;max-width:340px;color:var(--texte2)}
+.legende-mobile b{color:var(--encre)}
+
+/* ---------- Télécharger ---------- */
+.telechargements{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.telechargement{background:var(--blanc);border:1px solid var(--separateur);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:8px}
+.telechargement .tete{display:flex;align-items:center;gap:12px}
+.telechargement .tete img{width:52px;height:52px}
+.telechargement h3{margin:0;color:var(--encre);font-size:20px}
+.telechargement p{margin:0;color:var(--texte2);font-size:15.5px;flex:1}
+.telechargement .bouton{align-self:flex-start;margin-top:6px}
+.note{font-size:14.5px;color:var(--texte2);margin-top:14px}
+
+/* ---------- Vidéo ---------- */
+.video{position:relative;aspect-ratio:16/9;max-width:820px;border-radius:18px;overflow:hidden;background:#2c3a31 url(images/photo.jpg) center/cover;display:flex;align-items:center;justify-content:center;color:#fff;text-align:center}
+.video::before{content:"";position:absolute;inset:0;background:rgba(20,32,25,.66)}
+.video div{position:relative;padding:16px}
+.video img{width:76px;height:76px;opacity:.9}
+.video b{display:block;font-size:22px;margin-top:6px}
+
+/* ---------- Essayer ---------- */
+.essai{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}
+.essai .telephone{width:390px;aspect-ratio:auto;height:min(844px,calc(100vh - 110px));padding:12px}
+.essai .telephone .ecran{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:24px}
+.essai .telephone iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--fond)}
+.essai .telephone .ecran img{position:static;opacity:1;width:120px;height:auto}
+.essai-telephone{display:none}
+/* Sans grand écran (téléphone, tablette en portrait) : pas de cadre, on ouvre l'application. */
+@media (max-width:899px),(orientation:portrait) and (pointer:coarse){
+  .essai{grid-template-columns:1fr}
+  .essai .telephone{display:none}
+  .essai-telephone{display:block}
+}
+
+/* ---------- Bas de page ---------- */
+footer{background:var(--encre);color:#dfe9e3;margin-top:24px}
+footer .large{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;padding-top:30px;padding-bottom:16px}
+footer h4{margin:0 0 8px;color:#fff;font-size:16px;text-transform:uppercase;letter-spacing:.04em}
+footer ul{list-style:none;margin:0;padding:0}
+footer li{margin:5px 0}
+footer a{color:#dfe9e3;text-decoration:none}
+footer a:hover{color:#fff;text-decoration:underline}
+footer .marque{color:#fff;font-size:20px;margin-bottom:6px}
+footer .bas{border-top:1px solid rgba(255,255,255,.18);padding:14px 16px 22px;text-align:center;font-size:13.5px;color:#b9c9bf}
+.a-venir{font-size:12px;background:rgba(255,255,255,.14);border-radius:999px;padding:1px 7px;margin-left:4px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.telephone .ecran img{transition:none}}
+
+/* ---------- Pages (04/11/2026 : un site de quelques pages courtes) ---------- */
+.titre-page{position:relative;color:#fff;background:#2c3a31 url(images/photo.jpg) center/cover no-repeat}
+.titre-page::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(20,32,25,.86),rgba(20,32,25,.55))}
+.titre-page .large{position:relative;display:flex;align-items:center;gap:16px;padding-top:22px;padding-bottom:22px}
+.titre-page img{width:64px;height:64px;object-fit:contain;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
+.titre-page h1{margin:0;font-size:clamp(28px,4.5vw,40px);line-height:1.1}
+.titre-page p{margin:2px 0 0;color:#e6efe9}
+.menu nav a[aria-current="page"]{background:var(--selection)}
+.menu nav a.essayer[aria-current="page"]{background:var(--encre)}
+
+/* Accueil : les étapes */
+.etapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;counter-reset:etape}
+.etape{background:var(--blanc);border:1px solid var(--separateur);border-radius:16px;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.etape .no{flex:none;width:32px;height:32px;border-radius:50%;background:var(--accent-fonce);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.etape b{display:block;color:var(--encre)}
+.etape span{color:var(--texte2);font-size:15.5px}
+
+/* Découvrir : au rythme de chacun */
+.visite{display:grid;grid-template-columns:auto minmax(0,1fr);gap:36px;align-items:center}
+.visite .telephone{width:320px}
+.explication .compteur{font-weight:700;color:var(--accent-fonce);letter-spacing:.04em}
+.explication h2{margin:4px 0 8px;color:var(--encre);font-size:clamp(24px,3.4vw,32px)}
+.explication p{margin:0 0 10px;color:var(--texte2);max-width:560px}
+.explication ul{margin:0 0 12px;padding-left:20px;color:var(--texte2)}
+.navigation-visite{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.points{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.points button{width:12px;height:12px;border-radius:50%;border:0;background:var(--separateur);cursor:pointer;padding:0}
+.points button.actif{background:var(--accent-fonce);transform:scale(1.25)}
+.auto{font:inherit;font-size:15px;color:var(--texte2);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+@media (max-width:820px){
+  .visite{grid-template-columns:1fr;gap:18px}
+  .visite .telephone{width:min(74vw,300px);justify-self:center}
+  .navigation-visite{justify-content:center}
+  .points{justify-content:center}
+}
+
+/* Essayer : dans la page ou dans une fenêtre à part */
+.choix{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:22px}
+.choix .telechargement p{flex:none}
+#zoneCadre{display:none;justify-content:center;margin-top:8px}
+#zoneCadre.visible{display:flex}
+#zoneCadre .telephone{width:390px;aspect-ratio:auto;height:min(844px,calc(100vh - 90px));padding:12px}
+#zoneCadre iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--fond)}
+.grand-ecran-seulement{display:block}
+.petit-ecran-seulement{display:none}
+@media (max-width:899px),(orientation:portrait) and (pointer:coarse){
+  .grand-ecran-seulement{display:none}
+  .petit-ecran-seulement{display:block}
+}
+
+/* Aide : documents et questions */
+.documents{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.documents .apercu{height:150px;border-radius:10px;background:var(--fond-barre) center/cover no-repeat;border:1px solid var(--separateur)}
+.questions details{background:var(--blanc);border:1px solid var(--separateur);border-radius:14px;padding:12px 16px;margin-bottom:10px}
+.questions summary{font-weight:700;color:var(--encre);cursor:pointer}
+.questions details p{margin:8px 0 0;color:var(--texte2)}

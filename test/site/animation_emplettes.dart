@@ -24,7 +24,8 @@ const _dossier = 'outils/animation';
 final _octets = <String, Uint8List>{};
 
 /// Le contenu d'une image de outils/animation (lu une fois).
-Uint8List octetsAnimation(String nom) => _octets.putIfAbsent(nom, () => File('$_dossier/$nom.png').readAsBytesSync());
+Uint8List octetsAnimation(String nom) => _octets.putIfAbsent(
+    nom, () => File(nom == 'complet' ? 'assets/emplettes/complet.png' : '$_dossier/$nom.png').readAsBytesSync());
 
 /// Lignes de la liste ; la coche rouge est l'avant-dernière.
 const _lignes = 5, _ligneRouge = 3;
@@ -37,7 +38,7 @@ const _proportions = {
 
 /// Les images de l'animation (outils/animation), à précharger avant de dessiner.
 const imagesAnimationEmplettes = [
-  'feuille', 'crayon', 'trait', 'coche_rouge', 'coche_verte', 'caddie', 'caddie_avant', //
+  'complet', 'feuille', 'crayon', 'trait', 'coche_rouge', 'coche_verte', 'caddie', 'caddie_avant', //
   'lait', 'pomme', 'pain', 'fromage', 'eau', 'boite', 'salade',
 ];
 
@@ -49,7 +50,7 @@ class AnimationEmplettes extends StatefulWidget {
   static bool jouee = false;
 
   /// Durée totale.
-  static const duree = Duration(milliseconds: 14000);
+  static const duree = Duration(milliseconds: 14800);
 
   /// Essais : position imposée dans l'animation (0 à 1), sans horloge.
   static double? instantEssai;
@@ -173,6 +174,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     final caddie = sec(7.1, 8.1, Curves.easeOut);
     final listeFinie = sec(11.9, 12.8, Curves.linear);
     final caddieParti = sec(12.9, 13.8, Curves.easeInBack); // il rapetisse vers son centre, à l'inverse de la feuille
+    final icone = sec(13.7, 14.6, Curves.easeOutBack); // puis l'image de l'application grandit et reste
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
@@ -305,6 +307,11 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       scene.addAll(_eclatement([crayon], Rect.fromLTWH(l, hautCrayon, cwr, chr), crayonParti, h));
     }
 
+    // Fin : l'image de l'application, agrandie, au centre.
+    if (icone > 0) {
+      final iw = h * 1.15;
+      scene.add(_img('complet', (w - iw) / 2, (h - iw * 352 / 384) / 2, iw, echelle: icone));
+    }
     return scene;
   }
 }

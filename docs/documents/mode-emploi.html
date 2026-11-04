@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mode d'emploi · Emplettes</title>
+<link rel="icon" href="../images/complet.png">
+<!-- Mode d'emploi d'Emplettes (refait le 04/11/2026 pour la version 0.7), d'après les aides de l'application
+     (lib/composants/entete.dart, classe Aides) et les écrans de la démonstration (docs/ecrans).
+     PDF : node outils/site/pdf.js (docs/documents/Emplettes - Mode d'emploi.pdf). -->
+<style>
+@font-face{font-family:Atkinson;src:url(../polices/AtkinsonHyperlegible-Regular.ttf)}
+@font-face{font-family:Atkinson;src:url(../polices/AtkinsonHyperlegible-Bold.ttf);font-weight:700}
+@page{size:A4;margin:14mm 13mm 16mm}
+:root{--accent-fonce:#557B66;--fond:#F5F9F6;--fond-barre:#E3EFE7;--niveau1:#CCD7D1;--separateur:#B9D3C3;--encre:#375042;--texte:#222;--gris:#555}
+*{box-sizing:border-box}
+body{margin:0;font-family:Atkinson,system-ui,sans-serif;color:var(--texte);background:var(--fond);line-height:1.5;font-size:16px}
+.feuille{max-width:900px;margin:0 auto;padding:0 18px 40px}
+.barre-doc{position:sticky;top:0;z-index:2;background:var(--encre);color:#fff;display:flex;gap:12px;align-items:center;justify-content:center;padding:8px 12px;font:700 14px Atkinson,sans-serif}
+.barre-doc a{color:#fff;background:rgba(255,255,255,.15);border-radius:8px;padding:6px 12px;text-decoration:none}
+.couverture{position:relative;color:#fff;background:linear-gradient(100deg,rgba(20,32,25,.86),rgba(20,32,25,.5)),url(../images/photo.jpg) center/cover;border-radius:0 0 18px 18px;padding:34px 28px;display:flex;gap:22px;align-items:center;margin-bottom:22px}
+.couverture img{width:120px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.4))}
+.couverture h1{margin:0;font-size:40px;line-height:1.05}
+.couverture p{margin:6px 0 0;color:#e6efe9}
+nav.sommaire{background:#fff;border:1px solid var(--separateur);border-radius:14px;padding:14px 18px;margin-bottom:10px}
+nav.sommaire b{color:var(--encre)}
+nav.sommaire ol{margin:6px 0 0;padding-left:22px;columns:2;column-gap:28px}
+nav.sommaire a{color:var(--accent-fonce);text-decoration:none}
+section{padding-top:18px;break-before:page}
+section.premiere{break-before:auto}
+.bandeau{display:flex;align-items:center;gap:12px;background:var(--niveau1);color:var(--encre);border-radius:12px;padding:8px 16px 8px 10px;margin:0 0 12px}
+.bandeau img{width:42px;height:42px;margin:-12px 0;object-fit:contain}
+.bandeau h2{margin:0;font-size:20px;text-transform:uppercase;letter-spacing:.02em}
+h3{color:var(--encre);margin:14px 0 4px;font-size:17px}
+p{margin:0 0 8px}
+ul{margin:0 0 10px;padding-left:20px}
+li{margin:3px 0}
+b{color:var(--encre)}
+.ecrans{display:flex;flex-wrap:wrap;gap:18px;justify-content:center;margin:12px 0 6px;break-inside:avoid}
+figure{margin:0;width:200px;break-inside:avoid}
+.tel{background:#1f2421;border-radius:26px;padding:6px;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+.tel img{display:block;width:100%;border-radius:20px}
+figcaption{font-size:13px;color:var(--gris);text-align:center;margin-top:6px;line-height:1.3}
+.astuce{background:var(--fond-barre);border-radius:12px;padding:10px 14px;margin:10px 0;font-size:15px}
+@media (max-width:600px){figure{width:44%}.couverture{flex-direction:column;text-align:center}nav.sommaire ol{columns:1}}
+@media print{
+  body{background:#fff;font-size:11pt}
+  .barre-doc{display:none}
+  .feuille{max-width:none;padding:0}
+  .couverture{border-radius:12px}
+  figure{width:52mm}
+  a{color:inherit}
+}
+</style>
+</head>
+<body>
+<div class="barre-doc"><a href="../aide.html">‹ Retour au site</a><a href="Emplettes - Mode d'emploi.pdf" download>Télécharger le PDF</a></div>
+<div class="feuille">
+
+<div class="couverture">
+  <img src="../images/complet.png" alt="">
+  <div><h1>Emplettes<br>Mode d'emploi</h1><p>La liste de courses du foyer, préparée à plusieurs, faite dans l'ordre des rayons. Version 0.7.</p></div>
+</div>
+
+<nav class="sommaire"><b>Sommaire</b>
+<ol>
+  <li><a href="#principes">Les principes</a></li>
+  <li><a href="#accueil">L'accueil</a></li>
+  <li><a href="#nouvelle">Créer une liste</a></li>
+  <li><a href="#preparer">Remplir et valider la liste</a></li>
+  <li><a href="#courses">Faire les courses</a></li>
+  <li><a href="#historique">Après les courses</a></li>
+  <li><a href="#foyer">Le foyer et ses membres</a></li>
+  <li><a href="#catalogue">Magasins et catalogue</a></li>
+  <li><a href="#parametres">Apparence, données, sauvegardes</a></li>
+</ol>
+</nav>
+
+<section id="principes" class="premiere">
+  <div class="bandeau"><img src="../icones/information.png" alt=""><h2>1. Les principes</h2></div>
+  <p>L'application compte quatre onglets, en bas de l'écran : <b>Accueil</b>, <b>Préparer</b>, <b>Courses</b> et <b>Gérer</b>. Toutes les fenêtres ont les mêmes gestes.</p>
+  <ul>
+    <li><b>Changer d'onglet</b> : glisser le doigt à gauche ou à droite sur le bandeau du haut, ou sur une zone libre de la fenêtre.</li>
+    <li><b>Des listes serrées</b> : toutes les listes ont des lignes serrées sous de minces bandeaux.</li>
+    <li><b>Toucher une ligne</b> en ouvre le volet du bas : son détail, puis ses actions. Deux appuis rapides font l'action principale.</li>
+    <li><b>Glisser une ligne</b> à gauche supprime ou retire (« Annuler » apparaît quelques secondes en bas) ; à droite, elle fait l'action principale.</li>
+    <li><b>Les volets du bas</b> se ferment en tirant la poignée vers le bas, ou en touchant à côté.</li>
+    <li><b>Toucher le titre</b> de la fenêtre (avec la petite flèche) propose ses actions et son aide ; toucher un bandeau propose les actions de son groupe.</li>
+    <li><b>En bas de l'écran</b> ne restent que les boutons qui font avancer une liste : Nouvelle liste, Liste prête, Pause, Terminer.</li>
+    <li><b>Le nuage</b> en haut à droite indique l'état de la synchronisation avec le foyer.</li>
+  </ul>
+  <div class="astuce">Tout est enregistré sur l'appareil : l'application fonctionne sans réseau, même au fond du magasin.</div>
+</section>
+
+<section id="accueil">
+  <div class="bandeau"><img src="../icones/house.png" alt=""><h2>2. L'accueil</h2></div>
+  <p>L'accueil rassemble ce qui est en cours.</p>
+  <ul>
+    <li><b>Comment ça marche</b> rappelle les étapes : je paramètre une fois, je prépare ma liste, je la valide, je fais mes courses. Touchez une étape pour son explication.</li>
+    <li><b>En préparation</b> : les listes que vous êtes en train de construire.</li>
+    <li><b>À faire</b> : les listes prêtes pour les courses.</li>
+    <li><b>Courses en cours</b> : des courses interrompues par « Pause ».</li>
+  </ul>
+  <p>Touchez une liste pour ce que vous pouvez en faire. Une nouvelle liste se crée dans l'onglet Préparer.</p>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/01 Accueil.webp" alt=""></div><figcaption>L'accueil</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/02 Preparer.webp" alt=""></div><figcaption>L'onglet Préparer</figcaption></figure>
+  </div>
+</section>
+
+<section id="nouvelle">
+  <div class="bandeau"><img src="../images/liste_crayon.png" alt=""><h2>3. Créer une liste</h2></div>
+  <p>Dans l'onglet Préparer, <b>« Nouvelle liste »</b> : choisissez le magasin, puis vérifiez le nom de la liste (magasin, date et heure, à modifier si vous voulez ; deux listes ne peuvent pas porter le même nom). Choisissez ensuite le point de départ :</p>
+  <ul>
+    <li><b>Nouvelle liste, par secteur</b> : vous cherchez les articles un à un, ils se rangent sous leur secteur.</li>
+    <li><b>Nouvelle liste simple</b> : les articles s'ajoutent les uns sous les autres, sans rayons ni secteurs. À la fin, la liste peut être rangée par rayons et secteurs.</li>
+    <li><b>Depuis une liste type</b> : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou une liste vide.</li>
+    <li><b>Depuis une course passée</b> : une de vos dernières courses ; cochez les articles à reprendre.</li>
+    <li><b>Depuis un texte</b> : collez le texte d'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, vous décochez ceux à ne pas garder.</li>
+    <li><b>Compléter des courses (rectificative)</b> : des articles à ajouter à des courses en cours ; celui qui les fait accepte ou refuse.</li>
+    <li><b>Liste calculée</b> : à partir de vos tickets de caisse, prévue plus tard.</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/03 Nouvelle-liste.webp" alt=""></div><figcaption>Magasin, nom et point de départ</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/04 Volet-liste.webp" alt=""></div><figcaption>Toucher une liste ouvre son volet</figcaption></figure>
+  </div>
+</section>
+
+<section id="preparer">
+  <div class="bandeau"><img src="../icones/memo.png" alt=""><h2>4. Remplir et valider la liste</h2></div>
+  <ul>
+    <li><b>Le champ de recherche</b>, sous le titre : tapez au moins trois lettres, les articles dont un mot commence ainsi s'affichent. Touchez-en un : il s'ajoute à la liste et l'écran va sur lui. Absent du catalogue ? Touchez « Créer « … » ».</li>
+    <li><b>La promotion</b> : juste après l'ajout, un volet propose sa nature (prix promo, lot, prix global, remise, fidélité…) et une seule valeur à saisir. Elle s'affiche ensuite en couleur sur la ligne (ex. « PX2,50€ »).</li>
+    <li><b>La liste</b> a la même présentation que pendant les courses : de minces bandeaux de secteur dans l'ordre de votre parcours, une ligne par article, avec la mesure, le packaging et la consigne.</li>
+    <li><b>− et +</b> règlent la quantité ; à 0, l'article est retiré (« Annuler » le remet).</li>
+    <li><b>Toucher la ligne</b> ouvre son volet : consigne, marque (les marques de son secteur), promotion, packaging.</li>
+    <li><b>« Liste prête »</b> la valide : commentaire pour celui qui fera les courses, enregistrement comme liste type, envoi par mail. La liste passe alors dans les courses à faire.</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/05 Remplir.webp" alt=""></div><figcaption>La liste en préparation</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/06 Article.webp" alt=""></div><figcaption>Le volet d'un article</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/06 Liste-prete.webp" alt=""></div><figcaption>« Liste prête »</figcaption></figure>
+  </div>
+</section>
+
+<section id="courses">
+  <div class="bandeau"><img src="../images/liste_chariot.png" alt=""><h2>5. Faire les courses</h2></div>
+  <p>L'onglet Courses suit la vie des listes, en une seule liste : <b>À faire</b> (les listes prêtes), <b>En cours</b> (des courses mises en pause), <b>Terminées</b> (avec ou sans ticket), puis l'historique et les archives.</p>
+  <ul>
+    <li><b>Partir</b> : touchez une liste à faire puis « Faire les courses ». Une fenêtre demande qui fait les courses et avec quel parcours ; « Enregistrer le parcours » l'apprend.</li>
+    <li><b>En magasin</b>, la liste suit l'ordre des allées. Touchez un article quand il est dans le chariot : il est barré et grisé, à sa place. Touchez-le de nouveau pour le décocher.</li>
+    <li><b>Deux appuis</b> sur un article absent du rayon (ou un appui long) : il est marqué « manquant », en rouge.</li>
+    <li><b>Pause</b> interrompt les courses sans rien perdre.</li>
+    <li><b>Terminer</b> affiche les articles manquants et non cochés, propose d'envoyer un résumé au foyer, puis range la course en attente de son ticket.</li>
+  </ul>
+  <div class="astuce">L'ordre dans lequel vous cochez apprend le parcours du magasin : les fois suivantes, la liste se range dans cet ordre.</div>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/07 Partir.webp" alt=""></div><figcaption>Qui fait les courses, avec quel parcours</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/08 En-magasin.webp" alt=""></div><figcaption>En magasin</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/08 Terminer.webp" alt=""></div><figcaption>Terminer : le bilan</figcaption></figure>
+  </div>
+</section>
+
+<section id="historique">
+  <div class="bandeau"><img src="../icones/receipt.png" alt=""><h2>6. Après les courses</h2></div>
+  <ul>
+    <li><b>Terminées</b> : touchez une course pour joindre le ticket de caisse (fichier PDF) ; glissez-la vers la droite pour la mettre dans l'historique.</li>
+    <li><b>Ticket reçu</b> dans l'application du magasin : touchez « Partager » et choisissez Emplettes, ou ouvrez le PDF avec Emplettes. L'application demande à quelle course le joindre.</li>
+    <li><b>Historique et archives</b> : touchez une course pour voir ou joindre son ticket, en faire une liste type, l'archiver ou la remettre en historique. Les courses de plus de trois mois passent aux archives (réglable dans Données).</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/07 Courses.webp" alt=""></div><figcaption>L'onglet Courses</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/09 Historique.webp" alt=""></div><figcaption>L'historique, avec les montants</figcaption></figure>
+  </div>
+</section>
+
+<section id="foyer">
+  <div class="bandeau"><img src="../icones/busts-in-silhouette.png" alt=""><h2>7. Le foyer et ses membres</h2></div>
+  <ul>
+    <li><b>Seul ou en foyer</b> : au premier lancement, on choisit « Seul, sur cet appareil », « Créer un foyer » ou « Rejoindre un foyer ». Seul, on peut passer en foyer plus tard (Gérer › Foyer).</li>
+    <li><b>Code de partage</b> : à saisir sur un autre appareil (« Rejoindre un foyer ») ; chacun choisit ensuite son nom dans la liste des membres. Pas de compte, pas de mot de passe. Les données du foyer sont chiffrées avec ce code.</li>
+    <li><b>Membres</b> : touchez un membre pour lui envoyer l'invitation par mail (code et liens d'installation), le renommer ou le retirer du foyer.</li>
+    <li><b>Appareil partagé</b> (tablette, PC de la famille) : on choisit son nom à chaque lancement.</li>
+    <li><b>Collaboration</b> : les notifications envoyées à tout le foyer et les mails ; pour être prévenu application fermée, « Recevoir les notifications sur cet appareil » (application ntfy sur Android, ou le navigateur).</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/10 Gerer.webp" alt=""></div><figcaption>L'onglet Gérer</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/17 Collaboration.webp" alt=""></div><figcaption>Membres et communication</figcaption></figure>
+  </div>
+</section>
+
+<section id="catalogue">
+  <div class="bandeau"><img src="../icones/shopping-cart.png" alt=""><h2>8. Magasins et catalogue</h2></div>
+  <ul>
+    <li><b>Magasins</b> : communs à tout le foyer ; touchez un magasin pour ses parcours (appris pendant les courses, un par membre), le renommer ou le supprimer. Son historique part alors dans les archives.</li>
+    <li><b>Catalogue des produits</b> : le même dans tous les magasins, rangé par rayons et secteurs. Touchez un secteur pour voir ses produits ou en ajouter un (nom, marque, mesure, packaging). Un petit + signale ce que le foyer a ajouté. Le catalogue s'enrichit des ajouts de tous les foyers.</li>
+    <li><b>Catalogue des marques</b> : les marques de chaque secteur, proposées en préparation.</li>
+    <li><b>Types</b> de promotion, de mesure (poids, volume, à la pièce) et de packaging (lots de 2 à 10…).</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/11 Magasins.webp" alt=""></div><figcaption>Les magasins</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/12 Catalogue.webp" alt=""></div><figcaption>Le catalogue des produits</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/13 Marques.webp" alt=""></div><figcaption>Le catalogue des marques</figcaption></figure>
+  </div>
+</section>
+
+<section id="parametres">
+  <div class="bandeau"><img src="../icones/floppy-disk.png" alt=""><h2>9. Apparence, données, sauvegardes</h2></div>
+  <ul>
+    <li><b>Apparence</b> : la palette de l'application (17 au choix) et les couleurs des cadres des promotions, mesures et packagings, avec un aperçu.</li>
+    <li><b>Sauvegardes</b> : une copie est faite à chaque étape importante (liste prête, courses terminées, catalogue, foyer), seulement si quelque chose a changé. Les trois dernières sont gardées, et une plus ancienne d'au moins un mois. « Sauvegarder maintenant » donne un fichier à garder ailleurs (Drive, mail, ordinateur) ; « Depuis un fichier » restaure.</li>
+    <li><b>Données</b> : préliste, passage de l'historique aux archives, suppression automatique des archives.</li>
+    <li><b>Corbeille</b> : ce qui a été supprimé, à restaurer ou à effacer pour de bon.</li>
+  </ul>
+  <div class="ecrans">
+    <figure><div class="tel"><img src="../ecrans/15 Apparence.webp" alt=""></div><figcaption>Apparence</figcaption></figure>
+    <figure><div class="tel"><img src="../ecrans/16 Donnees.webp" alt=""></div><figcaption>Données et sauvegardes</figcaption></figure>
+  </div>
+</section>
+
+</div>
+</body>
+</html>
