@@ -47,7 +47,7 @@ ADMIN="${ADMIN:-${SUDO_USER:-debian}}"
 demander DOMAINE "Nom de domaine" "emplettes.eu"
 demander COURRIEL "Votre adresse mail (avis de Let's Encrypt)" "${COURRIEL:-}"
 demander ADMIN "Votre compte d'administration sur ce serveur" "$ADMIN"
-demander MQTT_UTILISATEUR "Compte de l'application pour le partage (secret GitHub MQTT_UTILISATEUR)" "${MQTT_UTILISATEUR:-emplettes}"
+demander MQTT_UTILISATEUR "Compte de l'application pour le partage (secret GitHub MQTT_UTILISATEUR_VPS)" "${MQTT_UTILISATEUR:-emplettes}"
 demander MAIL_COMPTE "Boîte mail d'envoi (compte Zimbra)" "${MAIL_COMPTE:-listes@$DOMAINE}"
 demander SMTP_HOTE "Serveur d'envoi de la boîte mail" "${SMTP_HOTE:-smtp.mail.ovh.net}"
 demander SMTP_PORT "Port du serveur d'envoi (465 ou 587)" "${SMTP_PORT:-465}"
@@ -58,7 +58,7 @@ if [ -s /etc/mosquitto/motsdepasse ] && [ -s /etc/emplettes/relais.env ]; then
   CHANGER=n; demander CHANGER "Changer les mots de passe déjà en place ? (o/n)" "n"
 fi
 if [ "$CHANGER" = o ]; then
-  secret MQTT_MDP "Mot de passe du compte $MQTT_UTILISATEUR (secret GitHub MQTT_MOT_DE_PASSE)"
+  secret MQTT_MDP "Mot de passe du compte $MQTT_UTILISATEUR (secret GitHub MQTT_MOT_DE_PASSE_VPS)"
   secret MQTT_ADMIN_MDP "Mot de passe du compte « admin » du partage (pour vous seul)"
   secret MAIL_MDP "Mot de passe de la boîte $MAIL_COMPTE"
 fi
@@ -429,12 +429,12 @@ fi
 
 vert "Terminé. À saisir dans GitHub (Settings › Secrets and variables › Actions)"
 cat <<EOF
-   MQTT_HOTE            mqtt.$DOMAINE
-   MQTT_UTILISATEUR     $MQTT_UTILISATEUR
-   MQTT_MOT_DE_PASSE    (le mot de passe choisi pour $MQTT_UTILISATEUR)
-   RELAIS_CLE           $RELAIS_CLE
-   VPS_HOTE             $DOMAINE
-   VPS_CLE_DEPLOIEMENT  la clé ci-dessous, en entier, lignes BEGIN et END comprises :
+   MQTT_HOTE_VPS          mqtt.$DOMAINE
+   MQTT_UTILISATEUR_VPS   $MQTT_UTILISATEUR
+   MQTT_MOT_DE_PASSE_VPS  (le mot de passe choisi pour $MQTT_UTILISATEUR)
+   RELAIS_CLE             $RELAIS_CLE
+   VPS_HOTE               $DOMAINE
+   VPS_CLE_DEPLOIEMENT    la clé ci-dessous, en entier, lignes BEGIN et END comprises :
 EOF
 cat /etc/emplettes/deploiement_ed25519
 echo
