@@ -169,12 +169,60 @@ VISITE = [  # (capture, titre, texte, points)
      ['Le foyer se partage avec un simple code.']),
 ]
 
+VISITE_DETAIL = [  # visite détaillée, 20 étapes (04/11/2026, Aristide)
+    ('01 Accueil', 'L\'accueil', 'Tout ce qui est en cours, d\'un coup d\'œil : les listes en préparation, celles à faire et les courses commencées.',
+     ['« Comment ça marche » rappelle les étapes.', 'Touchez une liste pour ce que vous pouvez en faire.', 'Le nuage en haut à droite indique l\'état du partage avec le foyer.']),
+    ('02 Preparer', 'L\'onglet Préparer', 'Les listes du foyer en préparation, puis celles qui sont prêtes pour les courses.',
+     ['« Nouvelle liste » en bas de l\'écran.', 'Glisser une liste à gauche la supprime (« Annuler » la rétablit), à droite la remet en préparation.', 'Un appui long ouvre ses actions.']),
+    ('03 Nouvelle-liste', 'Une nouvelle liste', 'Le magasin, la date et le nom proposé d\'office, puis le type de liste.',
+     ['Par secteur : chaque article se range sous son secteur.', 'Simple : les articles à la suite, sans rayons.', 'Depuis une liste type, une course passée ou un texte collé.']),
+    ('03 Liste-type', 'Les listes types', 'Vos listes habituelles, prêtes à reprendre : petit-déjeuner, ménage du mois…',
+     ['Une liste type se crée depuis une liste ou une course passée.', 'On repart d\'elle et on la complète.']),
+    ('05 Remplir', 'Remplir la liste', 'La liste se présente comme en magasin : les secteurs dans l\'ordre de votre parcours.',
+     ['− et + règlent la quantité.', 'Promotion, mesure, lot et consigne s\'affichent sur la ligne.']),
+    ('05 Recherche', 'Trois lettres suffisent', 'En tapant « cam », le catalogue propose Camembert, Camembert Président, Camomille…',
+     ['Chaque proposition indique son rayon et son secteur.', 'Un produit absent du catalogue se crée sur place.']),
+    ('06 Article', 'Le détail d\'un article', 'Un appui sur l\'article ouvre son volet : consigne pour celui qui fait les courses, marque, promotion visée, packaging.',
+     ['« Pas trop mûres » s\'affichera en magasin.', '« Nom, rayon, secteur » corrige la fiche du produit.']),
+    ('06 Marque', 'Les marques', 'Les marques connues du secteur sont proposées ; « Autre marque… » en ajoute une.',
+     ['Choisir une marque crée le produit précis (Camembert Président).', 'Le catalogue des marques se complète au fil des listes.']),
+    ('06 Liste-prete', 'Liste prête', 'La liste est validée : un commentaire pour celui qui part, et le mail au foyer si besoin.',
+     ['La liste passe dans l\'onglet Courses.', 'Elle peut revenir en préparation à tout moment.']),
+    ('07 Partir', 'Partir faire les courses', 'On indique qui fait les courses et dans quel magasin, avec quel parcours.',
+     ['« Enregistrer le parcours » l\'apprend dès la première fois.', 'Chacun a son parcours, dans chaque magasin.']),
+    ('08 En-magasin', 'En magasin', 'La liste suit l\'ordre des allées. Un appui coche l\'article quand il est dans le chariot.',
+     ['Deux appuis : manquant en rayon.', 'L\'ordre des coches apprend le parcours : les rayons nouveaux s\'insèrent à leur place.', '« Pause » sans rien perdre.']),
+    ('08 Terminer', 'Le bilan', 'Avant de terminer : les articles manquants et non cochés, le montant, le ticket de caisse.',
+     ['Les articles non achetés peuvent partir dans une prochaine liste.', 'Un résumé peut être envoyé au foyer.']),
+    ('09 Course-passee', 'Les courses passées', 'Chaque course garde ses articles, son montant et son ticket de caisse.',
+     ['« Voir le ticket », « Consulter ».', 'Une course passée peut redevenir une liste ou une liste type.']),
+    ('17 Collaboration', 'Le foyer', 'Plusieurs membres, plusieurs appareils, les mêmes listes. On rejoint le foyer avec son code de partage, sans compte ni mot de passe.',
+     ['Les données sont chiffrées avec le code du foyer.', 'Les modifications faites sans réseau se partagent au retour.', 'Notifications et mails aux membres.']),
+    ('10 Gerer', 'L\'onglet Gérer', 'Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, les catalogues, l\'apparence, les données.',
+     ['Les réglages sont rangés par rubriques, comme les listes.']),
+    ('11 Magasins', 'Les magasins', 'Les magasins du foyer, partagés par tous, avec les parcours appris dans chacun.',
+     ['Les grandes enseignes sont proposées d\'office.', 'Le parcours d\'un magasin se recommence ou se corrige.']),
+    ('12 Produits', 'Le catalogue des produits', 'Plus de 2 000 produits rangés en rayons et secteurs, le même catalogue dans tous les magasins.',
+     ['On ajoute ses produits, on les renomme, on les déplace.', 'Un petit signe distingue ce que le foyer a ajouté ou modifié.']),
+    ('13 Marques', 'Le catalogue des marques', 'Les marques rangées par secteur : celles proposées dans le volet de l\'article.',
+     ['On y ajoute ou retire des marques.', 'Le nombre de marques s\'affiche pour chaque secteur.']),
+    ('15 Palettes', 'L\'apparence', '17 palettes de couleurs pour l\'application, une autre pour les promotions et mesures, et un aperçu immédiat.',
+     ['Les icônes dans les titres des listes se retirent si on préfère.', 'Grands caractères et police conçue pour la lisibilité.']),
+    ('16 Donnees', 'Vos données', 'Tout reste sur l\'appareil, avec des sauvegardes automatiques et une corbeille.',
+     ['« Sauvegarder maintenant » donne un fichier à garder ailleurs.', 'Les anciennes courses passent aux archives.']),
+]
+
+
 DECOUVRIR = titre_page('icones/mobile-phone.png', 'Découvrir', 'Les écrans d\'Emplettes, un par un, à votre rythme.') + f'''<main>
   <section>
     <div class="large">
       <div class="visite">
         <div class="telephone"><div class="ecran" id="diapos"></div></div>
         <div class="explication">
+          <div class="choix-visite" role="tablist">
+            <button class="bouton" id="visiteCourte" role="tab">L'essentiel · 10 écrans</button>
+            <button class="bouton" id="visiteDetail" role="tab">En détail · 20 écrans</button>
+          </div>
           <div class="compteur" id="compteur"></div>
           <h2 id="titreEcran"></h2>
           <p id="texteEcran"></p>
@@ -191,7 +239,8 @@ DECOUVRIR = titre_page('icones/mobile-phone.png', 'Découvrir', 'Les écrans d\'
     </div>
   </section>
 </main>
-<script>window.VISITE = {json.dumps([dict(f=f, t=t, x=x, p=p) for f, t, x, p in VISITE], ensure_ascii=False)};</script>
+<script>window.VISITE = {json.dumps([dict(f=f, t=t, x=x, p=p) for f, t, x, p in VISITE], ensure_ascii=False)};
+window.VISITE_DETAIL = {json.dumps([dict(f=f, t=t, x=x, p=p) for f, t, x, p in VISITE_DETAIL], ensure_ascii=False)};</script>
 '''
 
 # ------------------------------------------------------------------ Télécharger

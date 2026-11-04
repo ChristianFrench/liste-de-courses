@@ -17,19 +17,33 @@
   if ($('rejouer')) $('rejouer').addEventListener('click', () => { $('animation').src = 'animation.webp?' + Date.now(); });
 
   // Découvrir : les écrans un par un, au rythme de chacun (défilement automatique lent, à cocher).
+  // Deux visites : l'essentiel (10 écrans) et en détail (20 écrans, adresse decouvrir.html#detail).
   if (window.VISITE && $('diapos')) {
-    const ecrans = window.VISITE, n = ecrans.length;
-    let courant = 0, minuterie = null;
-    ecrans.forEach((e, i) => {
-      const im = document.createElement('img');
-      im.src = 'ecrans/' + encodeURIComponent(e.f) + '.webp';
-      im.alt = e.t;
-      $('diapos').appendChild(im);
-      const p = document.createElement('button');
-      p.setAttribute('aria-label', e.t);
-      p.addEventListener('click', () => montrer(i));
-      $('points').appendChild(p);
-    });
+    let ecrans = [], n = 0, courant = 0, minuterie = null;
+    function charger(detail) {
+      ecrans = detail && window.VISITE_DETAIL ? window.VISITE_DETAIL : window.VISITE;
+      n = ecrans.length;
+      $('diapos').innerHTML = '';
+      $('points').innerHTML = '';
+      ecrans.forEach((e, i) => {
+        const im = document.createElement('img');
+        im.src = 'ecrans/' + encodeURIComponent(e.f) + '.webp';
+        im.alt = e.t;
+        $('diapos').appendChild(im);
+        const p = document.createElement('button');
+        p.setAttribute('aria-label', e.t);
+        p.addEventListener('click', () => { montrer(i); auto(); });
+        $('points').appendChild(p);
+      });
+      if ($('visiteCourte')) {
+        $('visiteCourte').classList.toggle('plein', !detail);
+        $('visiteDetail').classList.toggle('plein', !!detail);
+        $('visiteCourte').setAttribute('aria-selected', !detail);
+        $('visiteDetail').setAttribute('aria-selected', !!detail);
+      }
+      montrer(0);
+      auto();
+    }
     function montrer(i) {
       courant = (i + n) % n;
       const e = ecrans[courant];
@@ -48,6 +62,10 @@
     $('precedent').addEventListener('click', () => { montrer(courant - 1); auto(); });
     $('suivant').addEventListener('click', () => { montrer(courant + 1); auto(); });
     $('auto').addEventListener('change', auto);
+    if ($('visiteCourte')) {
+      $('visiteCourte').addEventListener('click', () => { history.replaceState(null, '', '#'); charger(false); });
+      $('visiteDetail').addEventListener('click', () => { history.replaceState(null, '', '#detail'); charger(true); });
+    }
     document.addEventListener('keydown', (ev) => {
       if (ev.key === 'ArrowRight') { montrer(courant + 1); auto(); }
       if (ev.key === 'ArrowLeft') { montrer(courant - 1); auto(); }
@@ -61,7 +79,7 @@
       if (Math.abs(dx) > 40) { montrer(courant + (dx < 0 ? 1 : -1)); auto(); }
       x0 = null;
     });
-    montrer(0);
+    charger(location.hash === '#detail');
   }
 
   // Essayer : dans la page (cadre de téléphone) ou dans une fenêtre détachée

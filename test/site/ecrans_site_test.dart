@@ -14,6 +14,7 @@ import 'package:liste_de_courses/donnees/synchro.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
+import 'package:liste_de_courses/theme.dart';
 
 final _cle = GlobalKey();
 
@@ -110,6 +111,11 @@ void main() {
     await _essayer('Nouvelle liste', () async {
       await _toucher(tester, find.text('Nouvelle liste'));
       await _capture('03 Nouvelle-liste');
+      await _essayer('Liste type', () async {
+        await _toucher(tester, find.text('Depuis une liste type'));
+        await _capture('03 Liste-type');
+        await _toucher(tester, find.byTooltip('Retour'));
+      });
       await _toucher(tester, find.byTooltip('Retour'));
     });
     await _essayer('Remplir la liste', () async {
@@ -117,9 +123,25 @@ void main() {
       await _capture('04 Volet-liste');
       await _toucher(tester, find.text('Continuer la préparation').last);
       await _capture('05 Remplir');
+      await _essayer('Recherche', () async {
+        await tester.enterText(find.byType(TextField).first, 'cam');
+        await tester.pump(const Duration(milliseconds: 400));
+        await tester.pumpAndSettle();
+        await _capture('05 Recherche');
+        await tester.enterText(find.byType(TextField).first, '');
+        await tester.pumpAndSettle();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+      });
       await _essayer('Article', () async {
         await _toucher(tester, find.textContaining('Bananes', findRichText: true).first);
         await _capture('06 Article');
+        await _essayer('Marques', () async {
+          await _toucher(tester, find.text('Indifférente').first);
+          await _capture('06 Marque');
+          await tester.tapAt(const Offset(195, 20));
+          await tester.pumpAndSettle();
+        });
         await tester.tapAt(const Offset(195, 20));
         await tester.pumpAndSettle();
       });
@@ -156,6 +178,10 @@ void main() {
       await _toucher(tester, _onglet('Courses'));
       await _toucher(tester, find.text('HISTORIQUE'));
       await _capture('09 Historique');
+      await _essayer('Course passée', () async {
+        await _toucher(tester, find.textContaining('Intermarché Les Halles').first);
+        await _capture('09 Course-passee');
+      });
     });
     for (final (rubrique, nom) in [('Foyer', '10 Foyer'), ('Magasins', '11 Magasins'), ('Catalogue des produits', '12 Catalogue'), ('Catalogue des marques', '13 Marques'), ('Types de promotion', '14 Promotions'), ('Apparence', '15 Apparence'), ('Données', '16 Donnees'), ('Collaboration', '17 Collaboration')]) {
       await _essayer(rubrique, () async {
@@ -164,7 +190,30 @@ void main() {
         if (nom == '10 Foyer') await _capture('10 Gerer');
         await _toucher(tester, find.text(rubrique));
         await _capture(nom);
+        if (nom == '12 Catalogue') {
+          await _essayer('Produits', () async {
+            await _toucher(tester, find.text('FRUITS ET LÉGUMES').first);
+            await _capture('12 Produits');
+          });
+        }
+        if (nom == '15 Apparence') {
+          await _essayer('Palettes', () async {
+            await _toucher(tester, find.text('Sauge').first);
+            await _capture('15 Palettes');
+            await tester.tapAt(const Offset(195, 20));
+            await tester.pumpAndSettle();
+          });
+        }
       });
     }
+    await _essayer('Autre palette', () async {
+      Charte.choisirPalette('Océan');
+      await tester.pumpAndSettle();
+      await _toucher(tester, _onglet('Accueil'));
+      await _toucher(tester, _onglet('Accueil'));
+      await _capture('15 Accueil-Ocean');
+      Charte.choisirPalette('Sauge');
+      await tester.pumpAndSettle();
+    });
   });
 }

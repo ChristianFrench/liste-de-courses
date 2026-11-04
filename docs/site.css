@@ -169,6 +169,15 @@ footer .bas{border-top:1px solid rgba(255,255,255,.18);padding:14px 16px 22px;te
 .points button{width:12px;height:12px;border-radius:50%;border:0;background:var(--separateur);cursor:pointer;padding:0}
 .points button.actif{background:var(--accent-fonce);transform:scale(1.25)}
 .auto{font:inherit;font-size:15px;color:var(--texte2);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.choix-visite{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.choix-visite .bouton{padding:8px 14px;font-size:15px}
+/* PC et tablette en paysage : explications à gauche, en haut ; le téléphone à droite, assez grand pour être lu,
+   en fort débordement sur le bandeau du titre (04/11/2026, Aristide). */
+@media (min-width:821px) and (orientation:landscape){
+  .visite{grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:48px}
+  .visite .explication{order:1;padding-top:4px}
+  .visite .telephone{order:2;position:relative;z-index:5;width:min(360px,calc((100vh - 96px) * 390 / 844));margin-top:-132px;margin-right:4vw}
+}
 @media (max-width:820px){
   .visite{grid-template-columns:1fr;gap:18px}
   .visite .telephone{width:min(58vw,230px);justify-self:center}
