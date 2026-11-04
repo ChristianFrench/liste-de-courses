@@ -1,7 +1,6 @@
 import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
-import '../composants/animation_emplettes.dart';
 import '../composants/barre_ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
@@ -156,7 +155,7 @@ class _EnTetePhoto extends StatelessWidget {
                         // 03/11/2026 (Aristide) : l'image d'Emplettes à la place de « Bonjour ! », le texte à sa droite en plus petit.
                         // Le bas du texte cadré sur le bas de l'image.
                         Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          const AnimationEmplettes(key: ValueKey('accueil-emplettes')),
+                          const ImageEmplettes('complet', key: ValueKey('accueil-emplettes'), taille: 96),
                           const SizedBox(width: 14),
                           Expanded(
                             child: Padding(

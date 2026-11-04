@@ -1,5 +1,8 @@
 import 'dart:math' as math;
 
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 // Animation de l'accueil (scénario d'Aristide, 04/11/2026), jouée une fois par lancement :
@@ -10,11 +13,18 @@ import 'package:flutter/material.dart';
 // 5. le caddie arrive de la gauche, vide, derrière la liste, en roulant dans l'axe de ses roues ;
 // 6. les lignes se cochent une à une (3 vertes, 1 rouge, 1 verte) pendant que les articles tombent dans le caddie,
 //    jusqu'à le remplir comme celui de l'image Emplettes ;
-// 7. les courses sont finies : la liste éclate à son tour, le caddie plein sort par la droite ;
-//    l'image Emplettes grandit depuis le centre et reste. Aucun fondu (demande d'Aristide).
+// 7. les courses sont finies : la liste éclate à son tour, puis le caddie plein rapetisse jusqu'à disparaître.
+//    Aucun fondu (demande d'Aristide).
+// 04/11/2026 (Aristide) : elle ne sert pas dans l'application, mais sur le mini site (docs/, rendue en image animée
+// par test/site/animation_site_test.dart, ANIMATION=1).
 // Images : planche d'Aristide (« Planche d'icônes courses en 3D »), découpée dans assets/emplettes/anim/.
 
-const _dossier = 'assets/emplettes/anim';
+const _dossier = 'outils/animation';
+
+final _octets = <String, Uint8List>{};
+
+/// Le contenu d'une image de outils/animation (lu une fois).
+Uint8List octetsAnimation(String nom) => _octets.putIfAbsent(nom, () => File('$_dossier/$nom.png').readAsBytesSync());
 
 /// Lignes de la liste ; la coche rouge est l'avant-dernière.
 const _lignes = 5, _ligneRouge = 3;
@@ -25,7 +35,7 @@ const _proportions = {
   'eau': 120 / 55, 'boite': 120 / 89, 'salade': 125 / 130,
 };
 
-/// Les images de l'animation, à précharger (essais, captures).
+/// Les images de l'animation (outils/animation), à précharger avant de dessiner.
 const imagesAnimationEmplettes = [
   'feuille', 'crayon', 'trait', 'coche_rouge', 'coche_verte', 'caddie', 'caddie_avant', //
   'lait', 'pomme', 'pain', 'fromage', 'eau', 'boite', 'salade',
@@ -39,7 +49,7 @@ class AnimationEmplettes extends StatefulWidget {
   static bool jouee = false;
 
   /// Durée totale.
-  static const duree = Duration(milliseconds: 14200);
+  static const duree = Duration(milliseconds: 14000);
 
   /// Essais : position imposée dans l'animation (0 à 1), sans horloge.
   static double? instantEssai;
@@ -89,7 +99,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
 
   /// Une image ; [echelle] la fait grandir depuis [depuis] (0 à 1 dans l'image, le centre par défaut).
   Widget _img(String nom, double l, double t, double largeur,
-          {double echelle = 1, Alignment depuis = Alignment.center, double angle = 0, String dossier = _dossier}) =>
+          {double echelle = 1, Alignment depuis = Alignment.center, double angle = 0}) =>
       Positioned(
         left: l,
         top: t,
@@ -97,7 +107,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
         child: Transform.scale(
           scale: echelle,
           alignment: depuis,
-          child: Transform.rotate(angle: angle, child: Image.asset('$dossier/$nom.png', width: largeur, filterQuality: FilterQuality.medium)),
+          child: Transform.rotate(angle: angle, child: Image.memory(octetsAnimation(nom), width: largeur, filterQuality: FilterQuality.medium)),
         ),
       );
 
@@ -162,8 +172,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     final rapetisse = sec(6.7, 7.5);
     final caddie = sec(7.1, 8.1, Curves.easeOut);
     final listeFinie = sec(11.9, 12.8, Curves.linear);
-    final caddieParti = sec(12.8, 13.5, Curves.easeIn);
-    final imageFinale = sec(13.5, 14.2, Curves.easeOutBack);
+    final caddieParti = sec(12.9, 13.8, Curves.easeInBack); // il rapetisse vers son centre, à l'inverse de la feuille
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
@@ -190,8 +199,8 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     // Caddie (260 × 257) : arrive de la gauche, derrière la liste ; au centre à la fin.
     final cw = h * .86;
     final ce = cw / 260;
-    // Il arrive de la gauche, hors du champ, et repart par la droite.
-    final avance = _mix(-cw * 1.05, 0, caddie) + caddieParti * (w + cw * .1);
+    // Il arrive de la gauche, hors du champ.
+    final avance = _mix(-cw * 1.05, 0, caddie);
     final cx = avance;
     final cy = h * .10 + avance * _pente;
 
@@ -209,10 +218,22 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     }
     chariot.add(_img('caddie_avant', cx, cy, cw));
     // Le caddie entre et sort par les côtés : on le coupe à gauche et à droite (le crayon et la liste, non).
+    final centreCaddie = Offset(cx + cw / 2, cy + cw / 2);
+    final reste = 1 - caddieParti;
     final scene = <Widget>[
-      Positioned.fill(
-        child: ClipRect(clipper: _Tuile(Rect.fromLTWH(0, -h * .9, w, h * 2)), child: Stack(clipBehavior: Clip.none, children: chariot)),
-      ),
+      if (reste > 0)
+        Positioned.fill(
+          child: ClipRect(
+            clipper: _Tuile(Rect.fromLTWH(0, -h * .9, w, h * 2)),
+            child: Transform(
+              transform: Matrix4.identity()
+                ..translateByDouble(centreCaddie.dx, centreCaddie.dy, 0, 1)
+                ..scaleByDouble(reste, reste, 1, 1)
+                ..translateByDouble(-centreCaddie.dx, -centreCaddie.dy, 0, 1),
+              child: Stack(clipBehavior: Clip.none, children: chariot),
+            ),
+          ),
+        ),
     ];
 
     // La liste par-dessus
@@ -230,7 +251,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
             alignment: Alignment.centerLeft,
             maxWidth: traitW,
             minWidth: traitW,
-            child: Image.asset('$_dossier/trait.png', width: traitW, filterQuality: FilterQuality.medium),
+            child: Image.memory(octetsAnimation('trait'), width: traitW, filterQuality: FilterQuality.medium),
           ),
         ),
       ));
@@ -242,7 +263,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
           left: 24 - cW / 2,
           top: lignesY[i] - cW * .6,
           width: cW,
-          child: Image.asset('$_dossier/${i == _ligneRouge ? 'coche_rouge' : 'coche_verte'}.png', width: cW, filterQuality: FilterQuality.medium),
+          child: Image.memory(octetsAnimation(i == _ligneRouge ? 'coche_rouge' : 'coche_verte'), width: cW, filterQuality: FilterQuality.medium),
         ));
       }
     }
@@ -284,10 +305,6 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       scene.addAll(_eclatement([crayon], Rect.fromLTWH(l, hautCrayon, cwr, chr), crayonParti, h));
     }
 
-    // Les courses sont finies : l'image Emplettes reste.
-    if (imageFinale > 0) {
-      scene.add(_img('complet', (w - h) / 2, 0, h, echelle: imageFinale, dossier: 'assets/emplettes'));
-    }
     return scene;
   }
 }
