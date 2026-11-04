@@ -8,11 +8,14 @@ import 'package:flutter/material.dart';
 // 3. le crayon disparaît ;
 // 4. la liste rapetisse et se place comme dans l'image des courses ;
 // 5. le caddie apparaît, vide, derrière la liste ;
-// 6. les coches (deux vertes, une rouge) apparaissent pendant que les articles tombent dans le caddie ;
-// 7. les courses sont finies : la liste disparaît, il reste le caddie plein.
+// 6. les lignes se cochent une à une (la rouge au milieu) pendant que les articles tombent au fond du caddie ;
+// 7. les courses sont finies : la liste s'efface sur place, il reste le caddie plein.
 // Images : planche d'Aristide (« Planche d'icônes courses en 3D »), découpée dans assets/emplettes/anim/.
 
 const _dossier = 'assets/emplettes/anim';
+
+/// Lignes de la liste ; la coche rouge est au milieu.
+const _lignes = 5, _ligneRouge = 2;
 
 /// Hauteur / largeur des images d'articles.
 const _proportions = {
@@ -34,7 +37,7 @@ class AnimationEmplettes extends StatefulWidget {
   static bool jouee = false;
 
   /// Durée totale.
-  static const duree = Duration(milliseconds: 10000);
+  static const duree = Duration(milliseconds: 11000);
 
   /// Essais : position imposée dans l'animation (0 à 1), sans horloge.
   static double? instantEssai;
@@ -103,49 +106,50 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
   List<Widget> _scene(double t, double w, double h) {
     // Moments (fractions de la durée totale)
     final apparition = _entre(t, 0, .06);
-    final traits = [for (var i = 0; i < 3; i++) _entre(t, .07 + i * .09, .15 + i * .09, Curves.easeOut)];
-    final crayonParti = _entre(t, .35, .42);
-    final rapetisse = _entre(t, .42, .52);
-    final caddie = _entre(t, .50, .57, Curves.easeOut);
-    final listeFinie = _entre(t, .90, .98);
+    final traits = [for (var i = 0; i < _lignes; i++) _entre(t, .07 + i * .07, .13 + i * .07, Curves.easeOut)];
+    final crayonParti = _entre(t, .42, .47);
+    final rapetisse = _entre(t, .47, .55);
+    final caddie = _entre(t, .53, .59, Curves.easeOut);
+    final listeFinie = _entre(t, .86, .92); // la liste s'efface sur place
+    final recentre = _entre(t, .92, .98);
 
     // La feuille (rapport 214 × 240) : à la taille de Préparer, puis à droite comme dans l'image des courses.
     final fh = _mix(h, h * .78, rapetisse);
     final fw = fh * 214 / 240;
     final ech = fw / 214;
-    final fx = _mix((w - fw) / 2 - h * .08, w - fw, rapetisse) + listeFinie * h * .5;
+    final fx = _mix((w - fw) / 2 - h * .08, w - fw, rapetisse);
     final fy = _mix(0, h * .02, rapetisse);
 
     // Les traits et les coches, dans le carré de la face
-    const lignesY = [22.0, 40.0, 58.0];
+    const lignesY = [16.0, 29.0, 42.0, 55.0, 68.0];
     const traitX = 42.0, traitW = 40.0, traitH = traitW * 38 / 160;
 
     // (nom, taille, position dans le panier de 0 à 1, moment de la chute, inclinaison)
     final articles = [
-      ('pain', .34, .80, .58, .45),
-      ('lait', .30, .30, .60, -.12),
-      ('eau', .30, .10, .63, -.15),
-      ('salade', .30, .60, .67, .15),
-      ('pomme', .26, .45, .71, 0.0),
-      ('fromage', .26, .22, .75, -.1),
-      ('boite', .24, .95, .79, .1),
+      ('pain', .24, .80, .60, .45),
+      ('lait', .21, .30, .64, -.12),
+      ('eau', .21, .08, .68, -.15),
+      ('salade', .21, .58, .72, .15),
+      ('pomme', .18, .42, .76, 0.0),
+      ('fromage', .18, .20, .80, -.1),
+      ('boite', .17, .95, .83, .1),
     ];
     // Caddie (260 × 257) : à gauche, derrière la liste ; au centre à la fin.
     final cw = h * .86;
     final ce = cw / 260;
-    final cx = _mix(-h * .3, 0, caddie) + listeFinie * (w - cw) / 2;
+    final cx = _mix(-h * .3, 0, caddie) + recentre * (w - cw) / 2;
     final cy = h * .14;
 
     final scene = <Widget>[_img('caddie', cx, cy, cw, opacite: caddie)];
-    // Les articles tombent dans le panier : devant sa paroi du fond, derrière son bord avant.
-    for (final (nom, taille, x, debut, angle) in articles) {
+    // Les articles tombent au fond du panier : devant sa paroi du fond, derrière sa face avant (caddie_avant.png).
+    for (final (k, (nom, taille, x, debut, angle)) in articles.indexed) {
       final p = _entre(t, debut, debut + .07, Curves.bounceOut);
       if (p <= 0) continue;
       final aw = h * taille;
       final ah = aw * _proportions[nom]!; // hauteur de l'image
-      final px = 75 + x * 160; // le long du bord avant (pixels de caddie.png)
-      final bord = 55 + (px - 70) * .085 + 12; // l'objet s'enfonce jusqu'au milieu du bord avant
-      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h * .6, cy + bord * ce - ah, p), aw,
+      final px = 72 + x * 120; // dans la largeur de la face avant (pixels de caddie.png)
+      final fond = 150 + (px - 70) * .06 - k * 7; // le fond du panier, puis sur les articles déjà tombés
+      scene.add(_img(nom, cx + px * ce - aw / 2, _mix(-h * .6, cy + fond * ce - ah, p), aw,
           opacite: _entre(t, debut, debut + .02), angle: angle));
     }
     scene.add(_img('caddie_avant', cx, cy, cw, opacite: caddie));
@@ -155,7 +159,7 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
     if (liste > 0) {
       scene.add(_img('feuille', fx, fy, fw, opacite: liste));
       final face = <Widget>[];
-      for (var i = 0; i < 3; i++) {
+      for (var i = 0; i < _lignes; i++) {
         if (traits[i] <= 0) continue;
         face.add(Positioned(
           left: traitX,
@@ -171,15 +175,15 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
             ),
           ),
         ));
-        // Les coches, en même temps que les articles : vert, vert, rouge
-        final coche = _entre(t, .60 + i * .09, .67 + i * .09, Curves.elasticOut);
+        // Une coche à chaque article tombé ; la rouge (article pas trouvé) au milieu
+        final coche = _entre(t, .63 + i * .045, .68 + i * .045, Curves.elasticOut);
         if (coche > 0) {
           final cW = 18 * coche.clamp(0.0, 1.3);
           face.add(Positioned(
             left: 24 - cW / 2,
             top: lignesY[i] - cW * .6,
             width: cW,
-            child: Image.asset('$_dossier/${i == 2 ? 'coche_rouge' : 'coche_verte'}.png', width: cW, filterQuality: FilterQuality.medium),
+            child: Image.asset('$_dossier/${i == _ligneRouge ? 'coche_rouge' : 'coche_verte'}.png', width: cW, filterQuality: FilterQuality.medium),
           ));
         }
       }
@@ -202,11 +206,11 @@ class _AnimationEmplettesState extends State<AnimationEmplettes> with SingleTick
       // Le crayon suit la fin du trait en cours, puis s'en va
       if (crayonParti < 1) {
         final enCours = traits.indexWhere((p) => p < 1);
-        final i = enCours < 0 ? 2 : enCours;
+        final i = enCours < 0 ? _lignes - 1 : enCours;
         final pointe = _surFeuille(traitX + traitW * traits[i], lignesY[i], fx, fy, ech);
         final cwr = h * .62;
         final chr = cwr * 200 / 143;
-        scene.add(_img('crayon', pointe.dx - cwr * .04 + crayonParti * h * .4, pointe.dy - chr * .97 - crayonParti * h * .3, cwr,
+        scene.add(_img('crayon', pointe.dx - cwr * .04, pointe.dy - chr * .97, cwr, // s'efface sur place
             opacite: apparition * (1 - crayonParti), angle: math.sin(t * 60) * .03 * (1 - crayonParti)));
       }
     }
