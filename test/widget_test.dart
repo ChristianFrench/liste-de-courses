@@ -27,7 +27,7 @@ import 'package:liste_de_courses/ecrans/archives.dart';
 import 'package:liste_de_courses/ecrans/corbeille.dart' show EcranCorbeille;
 import 'package:liste_de_courses/ecrans/historique.dart' show BlocTicket, SousEcranHistorique;
 import 'package:liste_de_courses/ecrans/listes.dart' show SousEcranCourses;
-import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranConsultation, EcranCoursesSecteur, FeuillePromotion, LigneArticle, ZonePromo, codeCourtPackaging;
+import 'package:liste_de_courses/ecrans/travail.dart' show EcranConstruction, EcranConsultation, EcranCoursesSecteur, FeuillePromotion, LigneArticle, codeCourtPackaging;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -42,6 +42,7 @@ Future<void> _chargerPolice() async {
 void _donnees() {
   final e = Etat.instance;
   e.enregistrementActif = false;
+  EcranConstruction.promoApresRecherche = false; // le volet « Promo » est essayé à part
   e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
   Nav.i.reinitialiser();
 }
@@ -809,7 +810,7 @@ void main() {
       expect(etat.ligne(l, huile.id), isNotNull, reason: 'ajouté à la liste');
       expect(find.byKey(const ValueKey('option-recherche-0')), findsNothing, reason: 'liste des trouvés fermée');
       expect(tester.widget<TextField>(find.byKey(const ValueKey('champ-recherche'))).controller!.text, isEmpty);
-      if (l.lignes.any((g) => g.promotion != null)) expect(find.byType(ZonePromo), findsWidgets, reason: 'promotion sur la ligne, avant la mesure');
+      if (l.lignes.any((g) => g.promotion != null)) expect(find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('promo-')), findsWidgets, reason: 'promotion en texte, avant la mesure');
       // Article déjà dans la liste : on va dessus, sans rien ajouter.
       final n = l.lignes.length;
       await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'huile oli');
@@ -948,22 +949,28 @@ void main() {
       await _toucher(tester, find.text('Compléter des courses : rectificative'));
       expect(find.text('Liste à rectifier'), findsOneWidget);
       await _toucher(tester, find.text(etat.nomListe(l4)).last);
+      EcranConstruction.promoApresRecherche = true;
       await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'dentif');
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
       await tester.pumpAndSettle();
-      // 03/11/2026 : après l'ajout par la recherche, la promotion se choisit sur la ligne (code), puis sa valeur
+      // 04/11/2026 : après l'ajout par la recherche, le volet « Promo » : la nature, la valeur, OK
       final ligne = Etat.instance.listes.last.lignes.last;
-      final code = find.byKey(ValueKey('code-promo-${ligne.produitId}'));
-      expect(code, findsOneWidget);
-      await _toucher(tester, code);
-      await _toucher(tester, find.textContaining('PX').last);
-      await tester.enterText(find.byKey(ValueKey('valeur-promo-${ligne.produitId}')), '2,5');
-      await tester.testTextInput.receiveAction(TextInputAction.done);
-      await tester.pumpAndSettle();
+      expect(find.text('Promo pour ${etat.produit(ligne.produitId)!.nom} ?'), findsOneWidget);
+      await _toucher(tester, find.byKey(const ValueKey('nature-promo-prix')));
+      await tester.enterText(find.byKey(const ValueKey('promo-saisie-Prix promo (€)')), '2,5');
+      await _toucher(tester, find.text('OK'));
       expect(ligne.promotion?.type, 'prix');
       expect(ligne.promotion?.valeur, '2,50 €');
       expect(ligne.promotion?.libelle, 'Prix promo 2,50 €');
+      expect(find.text('PX2,50€'), findsOneWidget, reason: 'texte seul sur la ligne');
+      // Toucher ce texte rouvre le volet ; « Retirer » enlève la promotion, et on la remet en LOT 3+1
+      await _toucher(tester, find.text('PX2,50€'));
+      await _toucher(tester, find.byKey(const ValueKey('nature-promo-lot')));
+      await tester.enterText(find.byKey(const ValueKey('promo-saisie-Achetés')), '3');
+      await _toucher(tester, find.text('OK'));
+      expect(find.text('LOT3+1'), findsOneWidget);
+      expect(ligne.quantite, 3, reason: 'la quantité suit le lot');
       await tester.pump(const Duration(seconds: 4));
       await _toucher(tester, find.text('Liste prête'));
       expect(find.textContaining('il l\'acceptera ou la refusera'), findsOneWidget);

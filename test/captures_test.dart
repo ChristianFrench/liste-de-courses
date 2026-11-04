@@ -101,6 +101,9 @@ void main() {
     await _toucher(tester, find.textContaining('Lait demi-écrémé', findRichText: true));
     await _capture('04 Construire-Article');
     await _toucher(tester, find.text('Annuler'));
+    await _toucher(tester, find.text('LOT3+1'));
+    await _capture('04 Promo');
+    await _toucher(tester, find.text('OK'));
     await _toucher(tester, find.byTooltip('Retour'));
 
     await _toucher(tester, _onglet('Gérer'));
