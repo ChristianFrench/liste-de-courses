@@ -2846,7 +2846,9 @@ class Etat extends ChangeNotifier {
   /// à la création (« Intermarché · samedi 25/10 ») ; un nom choisi par l'utilisateur est gardé.
   void changerMagasinEtDate(Liste l, String magasinId, DateTime prevue) {
     final avant = datePrevue(l) ?? l.dateCreation;
-    final nomAuto = l.nom == null || l.nom!.startsWith(nomPrevu(l.magasinId, avant));
+    final ancienMagasin = l.magasinId;
+    final propose = nomPrevu(l.magasinId, avant);
+    final nomAuto = l.nom == null || l.nom == propose || RegExp('^${RegExp.escape(propose)} \\(\\d+\\)\$').hasMatch(l.nom!);
     if (l.magasinId != magasinId) {
       l.magasinId = magasinId;
       l.parcoursId = null; // le parcours est propre à un magasin
@@ -2855,6 +2857,19 @@ class Etat extends ChangeNotifier {
     if (nomAuto) {
       l.nom = null;
       l.nom = nomLibre(nomPrevu(magasinId, prevue));
+    } else if (l.nom != null) {
+      // 05/11/2026 (Aristide) : « la date ne change pas ». Un nom retouché qui contient encore le jour
+      // (« Intermarché · samedi 25/10 + apéro ») suit lui aussi la nouvelle date et le nouveau magasin.
+      final jourAvant = '${joursSemaine[avant.weekday - 1]} ${jjmm(avant)}';
+      final jourApres = '${joursSemaine[prevue.weekday - 1]} ${jjmm(prevue)}';
+      var n = l.nom!;
+      if (n.contains(jourAvant)) n = n.replaceFirst(jourAvant, jourApres);
+      final mAvant = magasin(ancienMagasin)?.nom, mApres = magasin(magasinId)?.nom;
+      if (mAvant != null && mApres != null && n.startsWith('$mAvant · ')) n = '$mApres${n.substring(mAvant.length)}';
+      if (n != l.nom) {
+        l.nom = null;
+        l.nom = nomLibre(n);
+      }
     }
     modifie();
   }
@@ -2865,6 +2880,12 @@ class Etat extends ChangeNotifier {
 
   /// Deuxième ligne de l'en-tête d'une liste : date de création.
   String creeeLe(Liste l) => 'Créée le ${jjmm(l.dateCreation)} à ${heure(l.dateCreation)}';
+
+  /// Jour prévu des courses d'une liste en préparation, en clair (« courses samedi 07/11 ») ; vide sans date.
+  String coursesPrevues(Liste l) {
+    final d = datePrevue(l);
+    return d == null ? '' : 'courses ${joursSemaine[d.weekday - 1]} ${jjmm(d)}';
+  }
 
   void marquerSimple(Liste l, bool oui) {
     if (oui ? simples.add(l.id) : simples.remove(l.id)) modifie();

@@ -462,7 +462,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
           entete: EnTeteFenetre(
             retour: true,
             titre: etat.nomListe(l),
-            sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · ${etat.creeeLe(l)}',
+            sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · '
+                '${etat.coursesPrevues(l).isEmpty ? etat.creeeLe(l) : etat.coursesPrevues(l)}',
             aide: simple ? Aides.listeSimple : Aides.preparation,
             droite: boutonLoupe(() => setState(() {})),
             actions: [

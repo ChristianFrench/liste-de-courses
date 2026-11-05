@@ -100,7 +100,7 @@ class EcranApparence extends _EcranVivant {
     final cadres = (etat.couleurPromotions, etat.couleurMesures, etat.couleurLots);
     final cadresActuels = palettesCadres.where((p) => (p.$2, p.$3, p.$4) == cadres).firstOrNull?.$1 ?? '';
     // 03/11/2026 (Aristide) : deux sections titrées comme les autres écrans, « Présentation » (les trois choix,
-    // dans l'ordre) et « Aperçu » (une liste de courses prête, encadrée, qui suit chaque choix).
+    // dans l'ordre) et « Aperçu » (une liste de courses dessinée comme les listes, qui suit chaque choix).
     return PageBase(
       entete: EnTeteFenetre(retour: true, icone: Icons.palette_outlined, sousTitre: 'Gérer › Paramètres', titre: 'Apparence'),
       corps: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
@@ -149,7 +149,7 @@ class EcranApparence extends _EcranVivant {
         ]),
         GroupeRetractable(cle: 'apparence/apercu', titre: 'Aperçu', icone: Icons.visibility_outlined, enfants: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
+            padding: const EdgeInsets.only(top: 8),
             child: _ExempleListe(icones: etat.iconesListes, cadres: cadres, palette: Charte.palette.nom),
           ),
         ]),
@@ -158,7 +158,9 @@ class EcranApparence extends _EcranVivant {
   }
 }
 
-/// Exemple d'une liste de courses prête, entouré d'un cadre, qui suit les trois choix de l'Apparence.
+/// Exemple d'une liste de courses, dessiné comme les listes (lignes d'article de 30 points, codes de promotion
+/// et de packaging en couleur, quantité à droite), qui suit les trois choix de l'Apparence. 05/11/2026 (Aristide) :
+/// sans cadre ni bandeau de titre, comme dans les listes.
 class _ExempleListe extends StatelessWidget {
   // Les choix sont passés en paramètres : l'aperçu se redessine dès que l'un change (la case des icônes
   // ne le rafraîchissait pas, 03/11/2026).
@@ -170,13 +172,28 @@ class _ExempleListe extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final promo = Color(cadres.$1), mesure = Color(cadres.$2), lot = Color(cadres.$3);
-    Widget ligne(String nom, List<Widget> cadres) => Container(
-          color: Charte.blanc,
-          // Comme dans les listes : le nom commence après l'icône du secteur.
-          padding: const EdgeInsets.fromLTRB(56, 6, 10, 6),
+    final hauteur = Charte.ligne * MediaQuery.textScalerOf(context).scale(16) / 16;
+    Widget code(String t, Color c) => Container(
+          height: hauteur,
+          constraints: const BoxConstraints(minWidth: 30),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 3),
+          child: Text(t, style: Charte.texte(13, gras: true, couleur: c)),
+        );
+    // Même dessin que LigneArticle (travail.dart).
+    Widget ligne(String nom, int quantite, List<Widget> codes) => Container(
+          height: hauteur,
+          padding: const EdgeInsets.only(left: 6, right: 6),
+          foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(children: [
-            Expanded(child: Text(nom, style: Charte.texte(16))),
-            for (final c in cadres) Padding(padding: const EdgeInsets.only(left: 4), child: c),
+            Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16))),
+            ...codes,
+            SizedBox(
+              width: 30,
+              child: Text('$quantite',
+                  textAlign: TextAlign.right,
+                  style: Charte.texte(15, gras: quantite > 1, couleur: quantite > 1 ? Charte.encre : Charte.texteSecondaire)),
+            ),
           ]),
         );
     List<Widget> section(String rayon, String secteur, List<Widget> lignes) {
@@ -188,26 +205,16 @@ class _ExempleListe extends StatelessWidget {
       return picto == null ? enfants : [SectionDebordante(picto: picto, gauche: 4, enfants: enfants)];
     }
 
-    return Container(
-      key: const ValueKey('exemple-apparence'),
-      decoration: BoxDecoration(border: Border.all(color: Charte.separateurZone, width: 1.5), borderRadius: BorderRadius.circular(8)),
-      clipBehavior: Clip.antiAlias,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Container(
-          color: Charte.niveau(1),
-          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
-          child: Text('Liste prête · Intermarché', style: Charte.texte(16, gras: true, couleur: Charte.encreNiveau)),
-        ),
-        ...section('Frais', 'Fruits et légumes', [
-          ligne('Pommes Golden', [Pastille('1 kg', petite: true, couleur: mesure)]),
-          ligne('2 × Bananes', [Pastille('-30 %', petite: true, couleur: promo)]),
-        ]),
-        ...section('Frais', 'Crèmerie', [
-          ligne('Yaourts nature', [Pastille('Lot de 12', petite: true, couleur: lot), Pastille('2 achetés = 1 offert', petite: true, couleur: promo)]),
-          ligne('Lait demi-écrémé', [Pastille('1 L', petite: true, couleur: mesure), Pastille('Pack de 6', petite: true, couleur: lot)]),
-        ]),
+    return Column(key: const ValueKey('exemple-apparence'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      ...section('Frais', 'Fruits et légumes', [
+        ligne('Pommes Golden', 1, [code('kg', mesure)]),
+        ligne('Bananes', 2, [code('PX1,99€', promo)]),
       ]),
-    );
+      ...section('Frais', 'Crèmerie', [
+        ligne('Yaourts nature', 1, [code('LOT3+1', promo), code('×12', lot)]),
+        ligne('Lait demi-écrémé', 2, [code('1l', mesure), code('×6', lot)]),
+      ]),
+    ]);
   }
 }
 

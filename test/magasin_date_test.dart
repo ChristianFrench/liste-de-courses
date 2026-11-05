@@ -23,6 +23,11 @@ void main() {
     l.nom = 'Mes courses';
     e.changerMagasinEtDate(l, m1.id, d1);
     expect(l.nom, 'Mes courses');
+    // Un nom retouché qui contient encore le jour suit la nouvelle date (05/11/2026).
+    l.nom = '${e.nomPrevu(m1.id, d1)} + apéro';
+    e.changerMagasinEtDate(l, m1.id, d2);
+    expect(l.nom, '${e.nomPrevu(m1.id, d2)} + apéro');
+    expect(e.coursesPrevues(l), contains('05/11'));
   });
 }
 

@@ -48,7 +48,7 @@ class EcranAccueil extends StatelessWidget {
                   listeGlissable(
                     context,
                     l,
-                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.mentionRectificative(l)}'),
+                    LigneMenu(titre: etat.nomListe(l), sousTitre: '${l.lignes.length} art.${etat.coursesPrevues(l).isEmpty ? '' : ' · ${etat.coursesPrevues(l)}'}${etat.mentionRectificative(l)}'),
                     detail: '${l.lignes.length} article${l.lignes.length > 1 ? 's' : ''} · '
                         '${l.interrompueLe != null ? 'interrompue ${quand(l.interrompueLe!)}' : quandJour(l.modifieeLe ?? l.dateCreation)}',
                   ),
