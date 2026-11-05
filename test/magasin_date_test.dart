@@ -28,6 +28,12 @@ void main() {
     e.changerMagasinEtDate(l, m1.id, d2);
     expect(l.nom, '${e.nomPrevu(m1.id, d2)} + apéro');
     expect(e.coursesPrevues(l), contains('05/11'));
+    l.nom = 'Leclerc 25/10/2026';
+    e.changerMagasinEtDate(l, m1.id, DateTime(2026, 11, 7));
+    expect(l.nom, 'Leclerc samedi 07/11/2026');
+    l.nom = null;
+    e.changerMagasinEtDate(l, m1.id, d2);
+    expect(l.nom, startsWith(e.nomPrevu(m1.id, d2)));
   });
 }
 

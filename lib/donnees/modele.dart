@@ -2848,7 +2848,10 @@ class Etat extends ChangeNotifier {
     final avant = datePrevue(l) ?? l.dateCreation;
     final ancienMagasin = l.magasinId;
     final propose = nomPrevu(l.magasinId, avant);
-    final nomAuto = l.nom == null || l.nom == propose || RegExp('^${RegExp.escape(propose)} \\(\\d+\\)\$').hasMatch(l.nom!);
+    final nomAuto = l.nom == null ||
+        l.nom == propose ||
+        l.nom == nomParDefaut(l.magasinId, l.dateCreation) ||
+        RegExp('^${RegExp.escape(propose)} \\(\\d+\\)\$').hasMatch(l.nom!);
     if (l.magasinId != magasinId) {
       l.magasinId = magasinId;
       l.parcoursId = null; // le parcours est propre à un magasin
@@ -2858,14 +2861,12 @@ class Etat extends ChangeNotifier {
       l.nom = null;
       l.nom = nomLibre(nomPrevu(magasinId, prevue));
     } else if (l.nom != null) {
-      // 05/11/2026 (Aristide) : « la date ne change pas ». Un nom retouché qui contient encore le jour
-      // (« Intermarché · samedi 25/10 + apéro ») suit lui aussi la nouvelle date et le nouveau magasin.
-      final jourAvant = '${joursSemaine[avant.weekday - 1]} ${jjmm(avant)}';
-      final jourApres = '${joursSemaine[prevue.weekday - 1]} ${jjmm(prevue)}';
-      var n = l.nom!;
-      if (n.contains(jourAvant)) n = n.replaceFirst(jourAvant, jourApres);
+      // 05/11/2026 (Aristide) : « la date ne change pas ». Un nom retouché qui contient une date
+      // (« Intermarché · samedi 25/10 + apéro », « Leclerc 25/10/2026 ») prend la nouvelle, avec son jour.
+      var n = l.nom!.replaceFirstMapped(RegExp('(?:(?:${joursSemaine.join('|')}) +)?(\\d{1,2})/(\\d{1,2})(/\\d{4})?'),
+          (m) => '${joursSemaine[prevue.weekday - 1]} ${m.group(3) == null ? jjmm(prevue) : jjmmaaaa(prevue)}');
       final mAvant = magasin(ancienMagasin)?.nom, mApres = magasin(magasinId)?.nom;
-      if (mAvant != null && mApres != null && n.startsWith('$mAvant · ')) n = '$mApres${n.substring(mAvant.length)}';
+      if (mAvant != null && mApres != null && mAvant != mApres && n.startsWith(mAvant)) n = '$mApres${n.substring(mAvant.length)}';
       if (n != l.nom) {
         l.nom = null;
         l.nom = nomLibre(n);
