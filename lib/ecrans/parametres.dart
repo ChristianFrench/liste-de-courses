@@ -3,10 +3,8 @@ import 'package:flutter/services.dart' show Clipboard, ClipboardData;
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' show cleSecteur;
-import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
-import 'editeur_catalogue.dart';
 import 'sauvegardes.dart';
 import '../theme.dart';
 import '../donnees/synchro.dart';
@@ -273,17 +271,6 @@ class EcranDonnees extends _EcranVivant {
           if (v != null) etat.reglerDelaiArchives(v);
         },
       ),
-      if (CatalogueCommun.editeurPossible)
-        LigneMenu(
-          icone: Icons.public,
-          titre: 'Éditeur du catalogue commun',
-          sousTitre: CatalogueCommun.instance.editeur
-              ? 'Ouvert sur cet appareil (aussi dans Gérer › Courses)'
-              : 'Fermé : touchez pour saisir le code d\'éditeur',
-          onTap: () => CatalogueCommun.instance.editeur
-              ? Nav.aller<void>(context, const EcranEditeurCatalogue())
-              : _deverrouillerEditeur(context),
-        ),
       LigneMenu(
         icone: Icons.receipt_long_outlined,
         titre: 'Journal de l\'appareil',
@@ -293,18 +280,6 @@ class EcranDonnees extends _EcranVivant {
     ], actions: [
       ActionLigne(Icons.restore, 'Remettre les listes exemples', () => _exemples(context)),
     ]);
-  }
-}
-
-/// Le code d'éditeur (secret GitHub CODE_EDITEUR) ouvre Gérer › Courses › Catalogue commun sur cet appareil.
-Future<void> _deverrouillerEditeur(BuildContext context) async {
-  final code = await demanderTexte(libelle: 'Code', context, titre: 'Éditeur du catalogue commun', aide: 'Code d\'éditeur', valider: 'Ouvrir');
-  if (code == null || !context.mounted) return;
-  if (CatalogueCommun.instance.deverrouiller(code)) {
-    Etat.instance.modifie();
-    await Nav.aller<void>(context, const EcranEditeurCatalogue());
-  } else {
-    Nav.message(context, 'Code incorrect');
   }
 }
 

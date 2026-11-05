@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '../composants/barre_ouverture.dart';
 import '../composants/composants.dart';
-import '../donnees/catalogue_commun.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
@@ -312,8 +311,6 @@ class MenuGerer extends StatelessWidget {
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''}', const EcranMagasins()),
             ecran(Icons.menu_book_outlined, 'Catalogue des produits', '${etat.produits.length} produits', const EcranCatalogue()),
-            if (CatalogueCommun.instance.editeur)
-              ecran(Icons.public, 'Catalogue commun', 'Éditeur : modifier et publier pour tous les foyers', const EcranEditeurCatalogue()),
             ecran(Icons.sell_outlined, 'Catalogue des marques', '${etat.marques.length} marques', const EcranMarques()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
             ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures', const EcranTypesPackaging(lots: false)),

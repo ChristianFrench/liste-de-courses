@@ -623,9 +623,18 @@ class Etat extends ChangeNotifier {
   /// Ordre des rayons dans le catalogue (noms), fixé en les faisant glisser ; vide = ordre de départ.
   List<String> ordreRayons = [];
 
-  /// Le foyer ne montre que le catalogue de départ, les corrections de l'éditeur et ses propres ajouts :
-  /// ce que les autres foyers ont ajouté est gardé, mais caché.
-  bool catalogueIsole = false;
+  /// Le foyer ne montre que le catalogue commun et ses propres modifications. 05/11/2026 (Aristide) : les ajouts
+  /// des foyers ne circulent plus de l'un à l'autre, ils sont proposés à l'éditeur ; ce qu'un foyer avait déjà
+  /// reçu d'un autre est caché (et retiré s'il ne sert à aucune liste). Toujours vrai désormais.
+  bool catalogueIsole = true;
+
+  /// Produits du catalogue commun que le foyer a masqués chez lui (05/11/2026) : ni dans le catalogue, ni dans
+  /// la recherche ; ils restent dans les listes qui les ont.
+  Set<String> masques = {};
+
+  /// Produits du catalogue commun que le foyer a rangés ailleurs : un nouveau catalogue commun ne les remet pas
+  /// à leur place d'origine (05/11/2026, « toutes les modifications du foyer sont reprises »).
+  Set<String> deplacesFoyer = {};
 
   /// Identifiant sous lequel le foyer dépose ses ajouts au catalogue (tiré une fois, le même sur ses appareils).
   String? idApports;
@@ -1197,7 +1206,8 @@ class Etat extends ChangeNotifier {
     renommages = {for (final e in (options?['renommages'] as Map? ?? {}).entries) e.key as String: e.value as String};
     nomsUnivers = {for (final e in (options?['nomsUnivers'] as Map? ?? {}).entries) e.key as String: e.value as String};
     ordreRayons = [for (final x in (options?['ordreRayons'] as List? ?? const [])) x as String];
-    catalogueIsole = options?['catalogueIsole'] == 1;
+    masques = _ids(options?['masques']).toSet();
+    deplacesFoyer = _ids(options?['deplacesFoyer']).toSet();
     idApports = options?['idApports'] as String?;
     structureRecue = {for (final x in (options?['structureRecue'] as List? ?? const [])) x as String};
     marquesRecues = {for (final e in (options?['marquesRecues'] as Map? ?? {}).entries) e.key as String: _ids(e.value)};
@@ -1339,7 +1349,8 @@ class Etat extends ChangeNotifier {
             if (renommages.isNotEmpty) 'renommages': renommages,
             if (nomsUnivers.isNotEmpty) 'nomsUnivers': nomsUnivers,
             if (ordreRayons.isNotEmpty) 'ordreRayons': ordreRayons,
-            if (catalogueIsole) 'catalogueIsole': 1,
+            if (masques.isNotEmpty) 'masques': masques.toList()..sort(),
+            if (deplacesFoyer.isNotEmpty) 'deplacesFoyer': deplacesFoyer.toList()..sort(),
             if (idApports != null) 'idApports': idApports,
             if (structureRecue.isNotEmpty) 'structureRecue': structureRecue.toList()..sort(),
             if (marquesRecues.isNotEmpty) 'marquesRecues': marquesRecues,
@@ -3252,9 +3263,9 @@ class Etat extends ChangeNotifier {
             lignes.add('$sn : $nom');
           }
           pris.add(p.id);
-          // Rangé là où le catalogue commun le met (un produit d'origine ne se déplace que par l'éditeur).
+          // Rangé là où le catalogue commun le met, sauf si le foyer l'a rangé ailleurs ([deplacesFoyer]).
           final ici = secteurCatalogue(p.id);
-          if (ici == null || (!estAjoute(p) && ici.id != secteurRef.id)) placer(ref.magasinId, p.id, secteurRef.id);
+          if (ici == null || (!estAjoute(p) && !deplacesFoyer.contains(p.id) && ici.id != secteurRef.id)) placer(ref.magasinId, p.id, secteurRef.id);
         }
       }
     }
@@ -3343,10 +3354,23 @@ class Etat extends ChangeNotifier {
     return exclus.contains(cleExclue('produit', produit, secteur: secteur)) || exclus.contains(cleExclue('produit', produit));
   }
 
-  bool produitVisible(Produit p) => !catalogueIsole || !estRecu(p);
+  bool produitVisible(Produit p) => !masques.contains(p.id) && (!catalogueIsole || !estRecu(p));
 
-  /// Produits proposés à la recherche : tous, ou sans ceux des autres foyers si le catalogue est isolé.
-  List<Produit> get produitsVisibles => catalogueIsole ? [for (final p in produits) if (!estRecu(p)) p] : produits;
+  /// Produits proposés à la recherche : ni ceux reçus d'autres foyers, ni ceux que le foyer a masqués.
+  List<Produit> get produitsVisibles => [for (final p in produits) if (produitVisible(p)) p];
+
+  /// Masque chez le foyer un produit du catalogue commun (ou le remontre).
+  void masquer(Produit p, bool oui) {
+    if (oui ? masques.add(p.id) : masques.remove(p.id)) modifie();
+  }
+
+  /// Produits masqués par le foyer, par ordre alphabétique.
+  List<Produit> get produitsMasques => [for (final p in produits) if (masques.contains(p.id)) p]..sort((a, b) => a.nom.compareTo(b.nom));
+
+  /// Le foyer range ailleurs un produit du catalogue commun : retenu pour les prochaines versions du commun.
+  void retenirDeplacement(Produit p) {
+    if (!estAjoute(p) && deplacesFoyer.add(p.id)) modifie();
+  }
 
   bool rayonVisible(Rayon r) => !catalogueIsole || !structureRecue.contains(r.nom);
   bool secteurVisible(Secteur s) => !catalogueIsole || !structureRecue.contains(cleSecteur(s));
@@ -3355,10 +3379,8 @@ class Etat extends ChangeNotifier {
   List<Rayon> get rayonsVisibles => [for (final r in rayonsCatalogue) if (rayonVisible(r)) r];
   List<Secteur> secteursVisibles(String rayonId) => [for (final s in secteursDu(rayonId)) if (secteurVisible(s)) s];
 
-  void isolerCatalogue(bool oui) {
-    catalogueIsole = oui;
-    modifie();
-  }
+  /// Numéro court sous lequel l'éditeur voit le catalogue proposé par ce foyer (« AB12 »).
+  String get numeroProposition => idApports == null ? '…' : idApports!.substring(0, 4).toUpperCase();
 
   /// Identifiant des apports du foyer (tiré au premier dépôt).
   String identifiantApports() {

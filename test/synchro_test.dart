@@ -8,6 +8,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
+import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/donnees/moderation.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/signature.dart';
@@ -233,31 +234,32 @@ void main() {
     expect([for (final p in apportsA['produits'] as List) p['nom']], ['Croquettes Félix'], reason: 'un non placé reste au foyer');
     expect(jsonEncode(e.apports()), jsonEncode(apportsA), reason: 'le même texte tant que rien ne change');
 
-    // Foyer B (le catalogue de départ) reçoit les apports de A.
+    // Foyer B (le catalogue de départ) : ce qu'il avait reçu de A avant le 05/11/2026 est caché, puis retiré
+    // à la réception suivante (rien ne le retient dans une liste).
     e.lire(parLeModele(demo()));
     final nb = e.produits.length;
     expect(e.appliquerApports([apportsA]), greaterThan(0));
     final ref = e.rayonsCatalogue.firstWhere((x) => x.nom == 'Animalerie');
     final chatsB = e.secteursDu(ref.id).firstWhere((x) => x.nom == 'Chats');
-    final croquettes = e.produitsDuSecteur(chatsB).single;
-    expect(croquettes.nom, 'Croquettes Félix');
+    final croquettes = e.produits.firstWhere((p) => p.nom == 'Croquettes Félix');
     expect(e.estRecu(croquettes), isTrue);
-    expect(e.marque(croquettes.marqueIds.first)?.nom, 'Félix');
-    expect(e.marquesDuSecteur(chatsB), isNot(contains('Whiskas')), reason: 'aucun produit Whiskas acheté');
-    for (final m in e.magasins) {
-      expect(e.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
-    }
-    expect(e.produits.length, nb + 1);
-    expect(e.appliquerApports([apportsA]), 0, reason: 'rien de doublé à la lecture suivante');
-    expect(e.apports()['produits'], isEmpty, reason: 'ce qui est reçu ne repart pas');
-
-    // Foyer isolé : les apports reçus sont gardés mais cachés.
-    e.isolerCatalogue(true);
-    expect(e.produitsDuSecteur(chatsB), isEmpty);
+    expect(e.produitsDuSecteur(chatsB), isEmpty, reason: 'les ajouts des autres foyers ne sont plus montrés');
     expect(e.produitsVisibles.contains(croquettes), isFalse);
     expect(e.rayonsVisibles.any((x) => x.nom == 'Animalerie'), isFalse);
-    e.isolerCatalogue(false);
-    expect(e.produitsDuSecteur(chatsB), [croquettes]);
+    expect(e.apports()['produits'], isEmpty, reason: 'ce qui est reçu ne repart pas');
+    e.appliquerApports(const []);
+    expect(e.produit(croquettes.id), isNull);
+    expect(e.produits.length, nb);
+
+    // Masquer un produit du catalogue commun : ni catalogue ni recherche, et il revient.
+    final commun1 = e.produits.firstWhere((p) => !e.estAjoute(p) && e.secteurCatalogue(p.id) != null);
+    final sec = e.secteurCatalogue(commun1.id)!;
+    e.masquer(commun1, true);
+    expect(e.produitsDuSecteur(sec).contains(commun1), isFalse);
+    expect(e.produitsVisibles.contains(commun1), isFalse);
+    expect(e.produitsMasques, [commun1]);
+    e.masquer(commun1, false);
+    expect(e.produitsDuSecteur(sec).contains(commun1), isTrue);
 
     // Renommer et ranger ailleurs un article d'une liste : un nouveau produit, l'ancien reste.
     final l = e.listes.firstWhere((x) => x.lignes.isNotEmpty);
@@ -275,6 +277,60 @@ void main() {
     acheter(e, [q]);
     expect([for (final p in e.apports()['produits'] as List) p['nom']], contains('Noix de cajou'));
     expect(e.remplacerArticle(l, q, 'Noix de cajou', autre).id, q.id, reason: 'rien ne change');
+  });
+
+  test('nouvelle version du catalogue commun : un produit rangé ailleurs par le foyer y reste', () {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(demo()));
+    final p = e.produits.firstWhere((x) => !e.estAjoute(x) && e.secteurCatalogue(x.id) != null);
+    final origine = e.secteurCatalogue(p.id)!;
+    final r = e.rayon(origine.rayonId)!;
+    final ailleurs = e.secteursDu(e.rayonsCatalogue.firstWhere((x) => x.id != r.id).id).first;
+    e.placer('', p.id, ailleurs.id);
+    e.retenirDeplacement(p);
+    // Le catalogue commun remet le produit à sa place d'origine… sauf chez ce foyer.
+    final commun = {
+      'version': 9999999999999,
+      'numero': 3,
+      'rayons': [
+        {
+          'nom': r.nom,
+          'secteurs': [
+            {
+              'nom': origine.nom,
+              'taille': 1,
+              'produits': [
+                {'nom': p.nom, 'taille': 1}
+              ]
+            }
+          ]
+        }
+      ],
+    };
+    e.appliquerCatalogueCommun(jsonDecode(jsonEncode(commun)) as Map<String, dynamic>);
+    expect(e.secteurCatalogue(p.id)?.id, ailleurs.id);
+  });
+
+  test('récapitulatif avant de généraliser : ajouts, retraits, déplacements', () {
+    Map<String, dynamic> cat(List<(String, String, List<String>)> l) => {
+          'rayons': [
+            for (final r in {for (final x in l) x.$1})
+              {
+                'nom': r,
+                'secteurs': [
+                  for (final x in l.where((x) => x.$1 == r)) {'nom': x.$2, 'produits': [for (final p in x.$3) {'nom': p}]}
+                ]
+              }
+          ]
+        };
+    final avant = cat([('Frais', 'Crèmerie', ['Lait', 'Beurre']), ('Épicerie', 'Pâtes', ['Spaghetti'])]);
+    final apres = cat([('Frais', 'Crèmerie', ['Lait']), ('Frais', 'Fromages', ['Beurre', 'Comté']), ('Épicerie', 'Pâtes', ['Spaghetti'])]);
+    final r = Recapitulatif.entre(avant, apres);
+    expect(r.secteursAjoutes, ['Frais › Fromages']);
+    expect(r.produitsAjoutes, ['Comté (Frais › Fromages)']);
+    expect(r.produitsDeplaces, ['Beurre, vers Frais › Fromages']);
+    expect(r.produitsRetires, isEmpty);
+    expect(Recapitulatif.entre(avant, avant).vide, isTrue);
   });
 
   test('éditeur : les ajouts des foyers entrent dans son brouillon ; ce qu\'il retire ne revient plus', () {

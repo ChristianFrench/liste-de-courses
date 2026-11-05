@@ -11,6 +11,7 @@ import 'donnees/modele.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
+import 'ecrans/outil_editeur.dart';
 import 'navigation.dart';
 import 'theme.dart';
 
@@ -21,6 +22,12 @@ Future<void> main() async {
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
   await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
+  // Outil de l'éditeur du catalogue commun : rien d'autre que son écran (ni foyer, ni partage).
+  if (outilEditeur) {
+    if (Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
+    runApp(const OutilEditeurApp());
+    return;
+  }
   // Démonstration : un foyer seul, sans partage ni catalogue commun (rien n'en sort, rien n'y entre)
   if (demonstration && Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
@@ -35,13 +42,23 @@ Future<void> main() async {
   CatalogueCommun.instance.verifier();
 }
 
+/// L'outil de l'éditeur du catalogue commun : la même charte, un seul écran.
+class OutilEditeurApp extends StatelessWidget {
+  const OutilEditeurApp({super.key});
+
+  @override
+  Widget build(BuildContext context) => const ListeDeCoursesApp(accueil: EcranOutilEditeur(), titre: 'Emplettes · éditeur du catalogue');
+}
+
 class ListeDeCoursesApp extends StatelessWidget {
-  const ListeDeCoursesApp({super.key});
+  const ListeDeCoursesApp({super.key, this.accueil, this.titre = 'Emplettes'});
+  final Widget? accueil;
+  final String titre;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Emplettes',
+      title: titre,
       debugShowCheckedModeBanner: false,
       theme: Charte.theme(),
       scrollBehavior: Charte.defilement(),
@@ -55,7 +72,7 @@ class ListeDeCoursesApp extends StatelessWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       // L'accueil montre ce qui est en cours (préparations, courses) avec de quoi le reprendre.
-      home: const Coquille(),
+      home: accueil ?? const Coquille(),
       builder: (context, enfant) => CallbackShortcuts(
         // Sous Windows, Échap = retour système
         bindings: {

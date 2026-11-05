@@ -416,8 +416,8 @@ class Aides {
       'Membres : touchez un membre pour lui envoyer l\'invitation, le renommer ou le retirer du foyer. '
       '« + Nouveau membre » et « Changer de personne » sont dans le titre.\n'
       'Listes : « Envoyer la liste à tout le foyer » prépare le mail avec les adresses de tous les membres.\n'
-      'Catalogue : le catalogue est commun à tous les foyers et s\'enrichit de leurs ajouts. « Catalogue du foyer seul » '
-      'coché : seuls le catalogue de départ et vos propres ajouts sont montrés ; ceux des autres foyers sont cachés, pas perdus.\n$_gestes';
+      'Catalogue : le catalogue commun est le même pour tous les foyers ; vos ajouts et modifications restent chez vous, '
+      'et sont proposés à l\'éditeur du catalogue commun.\n$_gestes';
 
   static const collaboration = 'Membres : touchez un membre pour voir les notifications et les mails qu\'il a envoyés et reçus.\n'
       'Communication : une notification part à tous les membres, par le service gratuit ntfy ; « Envoyer un mail » '

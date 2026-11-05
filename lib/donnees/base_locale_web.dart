@@ -14,7 +14,7 @@ IndexedDbFileSystem? _fichiers;
 Future<String> preparerDossierBases(String? dossier) async {
   if (_sqlite == null) {
     final sqlite = await WasmSqlite3.loadFromUrl(Uri.parse('sqlite3.wasm'));
-    final fichiers = await IndexedDbFileSystem.open(dbName: demonstration ? 'liste_de_courses_demo' : 'liste_de_courses');
+    final fichiers = await IndexedDbFileSystem.open(dbName: outilEditeur ? 'emplettes_editeur' : (demonstration ? 'liste_de_courses_demo' : 'liste_de_courses'));
     sqlite.registerVirtualFileSystem(fichiers, makeDefault: true);
     _sqlite = sqlite;
     _fichiers = fichiers;
@@ -85,7 +85,7 @@ Future<bool> prendreVerrou() async {
     return verrou == null ? Future<JSAny?>.value(null).toJS : Completer<JSAny?>().future.toJS;
   }
 
-  verrous.request(demonstration ? 'liste-de-courses-demo' : 'liste-de-courses-base', {'ifAvailable': true}.jsify() as JSObject, rappel.toJS);
+  verrous.request(outilEditeur ? 'emplettes-editeur' : (demonstration ? 'liste-de-courses-demo' : 'liste-de-courses-base'), {'ifAvailable': true}.jsify() as JSObject, rappel.toJS);
   return obtenu.future;
 }
 

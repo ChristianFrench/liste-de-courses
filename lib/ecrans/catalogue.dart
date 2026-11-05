@@ -185,6 +185,7 @@ Future<void> deplacerProduit(BuildContext context, Produit p) async {
   );
   if (!ok || secteurId == actuel?.id) return;
   etat.placer('', p.id, secteurId);
+  etat.retenirDeplacement(p);
   if (context.mounted) Nav.message(context, '« ${p.nom} » rangé dans ${etat.secteur(secteurId)?.nom ?? ''}');
 }
 
@@ -892,6 +893,9 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
               ActionLigne(Icons.add, '+ Nouveau rayon', () => _nouveauRayon(context)),
               ActionLigne(Icons.drag_handle, 'Déplacer les rayons', () => _deplacerRayons(context)),
               ActionLigne(Icons.edit_outlined, 'Produits ajoutés ($perso)', () => Nav.aller<void>(context, const EcranProduitsPerso())),
+              if (etat.masques.isNotEmpty)
+                ActionLigne(Icons.visibility_off_outlined, 'Produits masqués (${etat.produitsMasques.length})',
+                    () => Nav.aller<void>(context, const EcranProduitsMasques())),
             ],
             droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier', () {
               plis.tous(cles, !toutOuvert);
@@ -1047,9 +1051,9 @@ class EcranProduitsPerso extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
                 child: Text(
-                    'Vos produits ajoutés rejoignent le catalogue de tous les foyers dès qu\'ils ont été achetés '
-                    '(cochés dans des courses terminées). Touchez-en un pour le modifier. '
-                    'Seul l\'éditeur du catalogue commun supprime un produit.',
+                    'Vos produits ajoutés restent dans votre foyer, même quand une nouvelle version du catalogue commun arrive. '
+                    'Ils sont proposés à l\'éditeur du catalogue commun, qui peut les retenir pour tous les foyers '
+                    '(votre foyer y est le n° ${etat.numeroProposition}). Touchez-en un pour le modifier.',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire)),
               ),
             ],
@@ -1420,4 +1424,44 @@ Future<void> _renommerSecteur(BuildContext context, Secteur s) async {
   final image = cleSecteur(rn, s.nom);
   etat.renommerSecteurCatalogue(s, n);
   if (image != null && cleSecteur(rn, n) != image) etat.choisirImage(cleChoixSecteur(rn, n), image);
+}
+
+/// Catalogue › Produits masqués (05/11/2026) : les produits du catalogue commun que le foyer a masqués chez lui.
+class EcranProduitsMasques extends StatelessWidget {
+  const EcranProduitsMasques({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final etat = Etat.instance;
+    return ListenableBuilder(
+      listenable: etat,
+      builder: (context, _) {
+        final masques = etat.produitsMasques;
+        return PageBase(
+          entete: const EnTeteFenetre(
+              retour: true, icone: Icons.visibility_off_outlined, sousTitre: 'Gérer › Courses › Catalogue', titre: 'Produits masqués', aide: Aides.catalogue),
+          corps: ListView(
+            padding: const EdgeInsets.only(bottom: 16),
+            children: [
+              if (masques.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text('Aucun produit masqué.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                ),
+              for (final p in masques)
+                Glissable(
+                  key: ValueKey('masque-${p.id}'),
+                  titre: p.nom,
+                  auToucher: true,
+                  actions: [
+                    ActionLigne(Icons.visibility_outlined, 'Afficher de nouveau', () => etat.masquer(p, false)),
+                  ],
+                  child: LigneMenu(titre: p.nom, icone: Icons.shopping_basket_outlined, sousTitre: rangement(p)),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

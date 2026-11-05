@@ -98,9 +98,6 @@ class EcranFoyer extends StatelessWidget {
           GroupeRetractable(cle: 'foyer/listes', titre: 'Mails', icone: Icons.mail_outline, enfants: [
             OptionFoyer(texte: 'Envoyer à tout le foyer la liste des courses à faire ou finies', coche: etat.envoiFoyer, onChange: (v) => etat.options(envoiFoyer: v)),
           ]),
-        GroupeRetractable(cle: 'foyer/catalogue', titre: 'Catalogue', icone: Icons.menu_book_outlined, enfants: [
-          OptionFoyer(texte: 'Catalogue du foyer seul', coche: etat.catalogueIsole, onChange: etat.isolerCatalogue),
-        ]),
       ]),
     );
   }

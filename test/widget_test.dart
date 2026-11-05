@@ -1319,22 +1319,23 @@ void main() {
     testWidgets('éditeur du catalogue commun : rayons, secteurs, ajout depuis un texte', (tester) async {
       await _lancer(tester);
       await _rubrique(tester, 'Foyer');
+      EcranEditeurCatalogue.actualiserAuServeur = false;
       Nav.aller<void>(tester.element(find.text('Seul sur cet appareil')), const EcranEditeurCatalogue());
       await tester.pump();
       // Le catalogue livré se lit vraiment (fichier de l'application) : on lui laisse le temps.
-      for (var i = 0; i < 20 && find.textContaining('Jamais publié').evaluate().isEmpty; i++) {
+      for (var i = 0; i < 20 && find.textContaining('Aucune version publiée').evaluate().isEmpty; i++) {
         await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 100)));
         await tester.pump();
       }
       await tester.pumpAndSettle();
-      expect(find.textContaining('Jamais publié'), findsOneWidget);
+      expect(find.textContaining('Aucune version publiée'), findsOneWidget);
       expect(find.text('FRUITS ET LÉGUMES'), findsOneWidget);
       await _actionTitre(tester, 'Ajouter depuis un texte');
       await tester.enterText(find.byKey(const ValueKey('editeur-texte')), 'Animalerie / Chats :\nCroquettes\nLitière');
       await _toucher(tester, find.text('Lire le texte'));
       expect(find.text('Animalerie › Chats (nouveau rayon)'), findsOneWidget);
       await _toucher(tester, find.text('Ajouter au brouillon'));
-      expect(find.textContaining('modifications à publier'), findsOneWidget);
+      expect(find.textContaining('modifications à généraliser'), findsOneWidget);
       await tester.scrollUntilVisible(find.text('ANIMALERIE'), 300,
           scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
       expect(find.text('ANIMALERIE'), findsOneWidget);

@@ -10,13 +10,17 @@ import '../donnees/signature.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Gérer › Courses › Catalogue commun (26/10/2026) : réservé à l'éditeur. Les modifications forment
-// un brouillon gardé sur l'appareil ; « Publier » l'envoie à tous les foyers.
+// Outil de l'éditeur du catalogue commun (page web à part depuis le 05/11/2026 ; voir main.dart, OUTIL_EDITEUR).
+// Les modifications forment un brouillon gardé dans le navigateur ; « Généraliser » publie une version numérotée
+// pour tous les foyers.
 
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 class EcranEditeurCatalogue extends StatefulWidget {
   const EcranEditeurCatalogue({super.key});
+
+  /// Relire la version publiée sur le serveur à l'ouverture (coupé dans les tests, sans serveur).
+  static bool actualiserAuServeur = true;
 
   @override
   State<EcranEditeurCatalogue> createState() => _EcranEditeurCatalogueState();
@@ -24,12 +28,27 @@ class EcranEditeurCatalogue extends StatefulWidget {
 
 class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
   Brouillon? b;
+  Map<String, dynamic>? publie;
   bool _publication = false;
 
   @override
   void initState() {
     super.initState();
-    CatalogueCommun.instance.brouillon().then((x) => mounted ? setState(() => b = x) : null);
+    _charger();
+  }
+
+  /// Relit la dernière version publiée sur le serveur, puis le brouillon.
+  Future<void> _charger() async {
+    final c = CatalogueCommun.instance;
+    if (EcranEditeurCatalogue.actualiserAuServeur) await c.actualiser();
+    final d = await c.dernier();
+    final x = await c.brouillon();
+    if (mounted) {
+      setState(() {
+        publie = d;
+        b = x;
+      });
+    }
   }
 
   void _modifie() {
@@ -37,17 +56,19 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     setState(() {});
   }
 
+  int get _numero => ((publie?['numero'] as num?) ?? 0).toInt();
+
   @override
   Widget build(BuildContext context) {
     final b = this.b;
     return PageBase(
       entete: EnTeteFenetre(
-        retour: true,
         icone: Icons.public,
-        sousTitre: 'Gérer › Courses',
+        sousTitre: 'Emplettes · outil de l\'éditeur',
         titre: 'Catalogue commun',
         actions: [
           if (b != null) ...[
+            ActionLigne(Icons.restore, 'Repartir d\'un catalogue', () => _repartir()),
             ActionLigne(Icons.add, '+ Nouveau rayon', () async {
               final nom = await demanderTexte(context, titre: 'Nouveau rayon', valider: 'Ajouter');
               if (nom == null || nom.trim().isEmpty) return;
@@ -56,29 +77,6 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
             }),
             ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
               if (await ajouterDepuisTexte(context, b)) _modifie();
-            }),
-            ActionLigne(Icons.download_outlined, 'Reprendre tout mon catalogue', () async {
-              final ok = await confirmer(
-                context,
-                titre: 'Reprendre tout mon catalogue ?',
-                icone: Icons.download_outlined,
-                contenu: Text(
-                  'Le brouillon reprend votre catalogue : rayons et secteurs renommés, ajouts (même jamais achetés), '
-                  'produits déplacés, mesures et packagings, images et ordre des rayons. Rien n\'est retiré. '
-                  'Relisez avant de publier : un renommage publié vaut pour tous les foyers.',
-                  style: Charte.texte(16),
-                ),
-                plein: 'Annuler',
-                contour: 'Reprendre',
-              );
-              if (ok != true || !context.mounted) return;
-              final n = b.reprendreFoyer(Etat.instance);
-              _modifie();
-              if (context.mounted) Nav.message(context, n == 0 ? 'Le brouillon avait déjà tout votre catalogue' : '${_pluriel(n, 'changement')} repris');
-            }),
-            ActionLigne(Icons.groups_outlined, 'Foyers contributeurs', () async {
-              await Nav.aller<void>(context, EcranContributeurs(b: b, modifie: _modifie));
-              if (mounted) setState(() {});
             }),
             ActionLigne(Icons.key_outlined, 'Clé de signature', () => _cleSignature(b)),
           ],
@@ -92,9 +90,9 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
                   child: Text(
-                    '${b.version == 0 ? 'Jamais publié : catalogue livré avec l\'application' : 'Publié le ${_date(b.version)}'} · '
-                    '${_pluriel(b.catalogue.rayons.length, 'rayon')}, ${_pluriel(b.nbProduits, 'produit')}.\n'
-                    '${b.modifications == 0 ? 'Aucune modification en attente.' : '${_pluriel(b.modifications, 'modification')} à publier.'}',
+                    '${_numero == 0 ? 'Aucune version publiée : catalogue livré avec l\'application' : 'Version publiée : v$_numero du ${_date((publie!['version'] as num).toInt())}'}.\n'
+                    'Brouillon : ${_pluriel(b.catalogue.rayons.length, 'rayon')}, ${_pluriel(b.nbProduits, 'produit')}, '
+                    '${b.modifications == 0 ? 'aucune modification.' : '${_pluriel(b.modifications, 'modification')} à généraliser.'}',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire),
                   ),
                 ),
@@ -164,7 +162,8 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
           BarreAction(
             boutons: [
               Bouton(
-                texte: _publication ? 'Envoi…' : 'Publier',
+                key: const ValueKey('generaliser'),
+                texte: _publication ? 'Envoi…' : 'Généraliser (v${_numero + 1})',
                 icone: Icons.public,
                 plein: true,
                 onTap: _publication || b.modifications == 0 ? null : () => _publier(b),
@@ -175,18 +174,50 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     );
   }
 
-  Future<void> _publier(Brouillon b) async {
+  /// « Repartir d'un catalogue » : une des versions gardées sur le serveur, ou le catalogue proposé par un foyer.
+  Future<void> _repartir() async {
+    Nav.message(context, 'Lecture des versions et des propositions…');
+    final c = CatalogueCommun.instance;
+    final versions = await c.versions();
+    final propositions = await c.propositions();
+    if (!mounted) return;
+    final choix = <String, String>{
+      for (var i = 0; i < versions.length; i++)
+        'v$i': 'Version v${versions[i]['numero'] ?? '?'} du ${_date(((versions[i]['version'] as num?) ?? 0).toInt())}',
+      for (var i = 0; i < propositions.length; i++)
+        'p$i': 'Foyer n° ${propositions[i]['foyer'] ?? '?'} · ${_pluriel(((propositions[i]['changements'] as num?) ?? 0).toInt(), 'changement')} '
+            '· ${'${propositions[i]['date'] ?? ''}'.replaceFirst('T', ' à ')}',
+    };
+    if (choix.isEmpty) {
+      Nav.message(context, 'Ni version gardée ni proposition sur le serveur');
+      return;
+    }
+    final k = await choisirDansListe<String>(context, titre: 'Repartir d\'un catalogue', choix: choix);
+    if (k == null || !mounted) return;
+    final j = k.startsWith('v') ? versions[int.parse(k.substring(1))] : propositions[int.parse(k.substring(1))];
     final ok = await confirmer(
       context,
-      titre: 'Publier le catalogue commun ?',
-      icone: Icons.public,
-      contenu: Text(
-        'Les ${_pluriel(b.modifications, 'modification')} partent vers tous les foyers. Chaque application les ajoute '
-        'à son lancement et montre les nouveautés. Rien de ce qu\'un foyer utilise n\'est retiré.',
-        style: Charte.texte(16),
-      ),
+      titre: 'Remplacer le brouillon ?',
+      icone: Icons.restore,
+      contenu: Text('Le brouillon devient « ${choix[k]} ». Ce qu\'il contenait jusqu\'ici est abandonné.', style: Charte.texte(16)),
       plein: 'Annuler',
-      contour: 'Publier',
+      contour: 'Remplacer',
+    );
+    if (ok != true || !mounted) return;
+    final nouveau = c.repartirDe(j, modifications: k.startsWith('p') ? ((j['changements'] as num?) ?? 1).toInt() : 1);
+    setState(() => b = nouveau);
+    Nav.message(context, 'Brouillon repris de « ${choix[k]} »');
+  }
+
+  Future<void> _publier(Brouillon b) async {
+    final recap = Recapitulatif.entre(publie ?? const {}, b.versJson());
+    final ok = await confirmer(
+      context,
+      titre: 'Généraliser la version v${_numero + 1} ?',
+      icone: Icons.public,
+      contenu: RecapitulatifVue(recap),
+      plein: 'Annuler',
+      contour: 'Généraliser',
     );
     if (ok != true || !mounted) return;
     // Le catalogue part signé : la phrase est demandée une fois sur cet appareil.
@@ -201,13 +232,9 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     }
     if (!mounted) return;
     if (fait) {
-      final nouveau = await CatalogueCommun.instance.brouillon();
-      if (!mounted) return;
-      setState(() {
-        _publication = false;
-        this.b = nouveau;
-      });
-      Nav.message(context, 'Catalogue commun publié');
+      setState(() => _publication = false);
+      await _charger();
+      if (mounted) Nav.message(context, 'Version v$_numero généralisée : chaque foyer la reçoit à son prochain lancement');
     } else {
       setState(() => _publication = false);
       Nav.message(context,
@@ -244,7 +271,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
           clePubliqueEditeur.isEmpty
               ? 'Envoyez cette clé à Claude : elle n\'est pas secrète. Une fois dans l\'application, seuls les catalogues '
                   'signés par votre phrase seront acceptés.'
-              : 'Cette clé est celle de l\'application : vos publications sont reconnues par tous les foyers.',
+              : 'Cette clé est celle de l\'application : vos versions sont reconnues par tous les foyers.',
           style: Charte.texte(15),
         ),
         const SizedBox(height: 10),
@@ -257,60 +284,105 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
   }
 }
 
-/// Les foyers qui ajoutent au catalogue (anonymes), du plus suspect au moins suspect ; l'éditeur bloque
-/// ou débloque un foyer (effet à la prochaine publication).
-class EcranContributeurs extends StatefulWidget {
-  const EcranContributeurs({super.key, required this.b, required this.modifie});
-  final Brouillon b;
-  final VoidCallback modifie;
+/// Ce qui change entre la dernière version publiée et le brouillon (comparaison par noms).
+class Recapitulatif {
+  Recapitulatif(this.rayonsAjoutes, this.rayonsRetires, this.secteursAjoutes, this.secteursRetires, this.produitsAjoutes,
+      this.produitsRetires, this.produitsDeplaces, this.renommes);
+  final List<String> rayonsAjoutes, rayonsRetires, secteursAjoutes, secteursRetires, produitsAjoutes, produitsRetires, produitsDeplaces;
+  final int renommes;
 
-  @override
-  State<EcranContributeurs> createState() => _EcranContributeursState();
-}
+  bool get vide =>
+      rayonsAjoutes.isEmpty && rayonsRetires.isEmpty && secteursAjoutes.isEmpty && secteursRetires.isEmpty &&
+      produitsAjoutes.isEmpty && produitsRetires.isEmpty && produitsDeplaces.isEmpty && renommes == 0;
 
-class _EcranContributeursState extends State<EcranContributeurs> {
-  @override
-  Widget build(BuildContext context) {
-    final b = widget.b;
-    final liste = CatalogueCommun.instance.contributeurs(b);
-    return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.groups_outlined, sousTitre: 'Catalogue commun', titre: 'Foyers contributeurs'),
-      corps: liste.isEmpty
-          ? Center(child: Text('Aucun ajout reçu des foyers.', style: Charte.texte(16)))
-          : ListView(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
-                  child: Text(
-                    'Les plus suspects en tête. Bloquer un foyer retire tous ses ajouts chez tous les foyers, '
-                    'à la prochaine publication.',
-                    style: Charte.texte(14, couleur: Charte.texteSecondaire),
-                  ),
-                ),
-                for (final c in liste)
-                  LigneMenu(
-                    titre: 'Foyer ${c.id.length > 4 ? c.id.substring(0, 4) : c.id}${c.bloque ? ' · bloqué' : c.ecarte ? ' · écarté' : ''}',
-                    icone: c.bloque ? Icons.block : Icons.home_outlined,
-                    sousTitre: '${_pluriel(c.produits, 'produit')}'
-                        '${c.refuses > 0 ? ', ${_pluriel(c.refuses, 'nom')} refusé${c.refuses > 1 ? 's' : ''}' : ''}'
-                        '${c.signales > 0 ? ', ${_pluriel(c.signales, 'produit')} signalé${c.signales > 1 ? 's' : ''}' : ''}',
-                    onTap: () => menuActions(context, titre: 'Foyer ${c.id.length > 4 ? c.id.substring(0, 4) : c.id}', actions: [
-                      if (c.bloque)
-                        ActionLigne(Icons.check_circle_outline, 'Débloquer', () => _bloquer(c.id, false))
-                      else
-                        ActionLigne(Icons.block, 'Bloquer ce foyer', () => _bloquer(c.id, true), danger: true),
-                    ]),
-                  ),
-              ],
-            ),
+  factory Recapitulatif.entre(Map<String, dynamic> avant, Map<String, dynamic> apres) {
+    ({Set<String> rayons, Set<String> secteurs, Map<String, Set<String>> produits}) lire(Map<String, dynamic> j) {
+      final rayons = <String>{}, secteurs = <String>{};
+      final produits = <String, Set<String>>{};
+      for (final r in (j['rayons'] as List? ?? const []).cast<Map>()) {
+        rayons.add('${r['nom']}');
+        for (final x in (r['secteurs'] as List? ?? const []).cast<Map>()) {
+          secteurs.add('${r['nom']} › ${x['nom']}');
+          for (final p in (x['produits'] as List? ?? const []).cast<Map>()) {
+            (produits['${p['nom']}'] ??= {}).add('${r['nom']} › ${x['nom']}');
+          }
+        }
+      }
+      return (rayons: rayons, secteurs: secteurs, produits: produits);
+    }
+
+    final a = lire(avant), b = lire(apres);
+    List<String> trie(Iterable<String> l) => l.toList()..sort();
+    // Un produit à une seule place avant et après, mais pas la même : déplacé ; sinon chaque place compte à part.
+    final deplaces = <String>[];
+    final ajoutes = <String>[], retires = <String>[];
+    for (final nom in {...a.produits.keys, ...b.produits.keys}) {
+      final av = a.produits[nom] ?? const <String>{}, ap = b.produits[nom] ?? const <String>{};
+      if (av.length == 1 && ap.length == 1 && av.first != ap.first) {
+        deplaces.add('$nom, vers ${ap.first}');
+        continue;
+      }
+      for (final x in ap.difference(av)) {
+        ajoutes.add('$nom ($x)');
+      }
+      for (final x in av.difference(ap)) {
+        retires.add('$nom ($x)');
+      }
+    }
+    final renommes = (apres['renommes'] as List? ?? const []).length - (avant['renommes'] as List? ?? const []).length;
+    return Recapitulatif(
+      trie(b.rayons.difference(a.rayons)),
+      trie(a.rayons.difference(b.rayons)),
+      trie(b.secteurs.difference(a.secteurs)),
+      trie(a.secteurs.difference(b.secteurs)),
+      trie(ajoutes),
+      trie(retires),
+      trie(deplaces),
+      renommes < 0 ? 0 : renommes,
     );
   }
+}
 
-  void _bloquer(String id, bool oui) {
-    if (oui ? !widget.b.bloques.add(id) : !widget.b.bloques.remove(id)) return;
-    widget.b.modifications++;
-    widget.modifie();
-    setState(() {});
+/// Le récapitulatif montré avant de généraliser : un titre par nature de changement, puis les noms.
+class RecapitulatifVue extends StatelessWidget {
+  const RecapitulatifVue(this.r, {super.key});
+  final Recapitulatif r;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget bloc(String titre, List<String> noms) => noms.isEmpty
+        ? const SizedBox.shrink()
+        : Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('$titre (${noms.length})', style: Charte.texte(15, gras: true)),
+              for (final n in noms.take(12)) Text('· $n', style: Charte.texte(14)),
+              if (noms.length > 12) Text('· et ${noms.length - 12} autres', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            ]),
+          );
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 420),
+      child: SingleChildScrollView(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+          Text(
+            r.vide
+                ? 'Aucune différence avec la version publiée.'
+                : 'Par rapport à la version publiée. Chaque foyer la reçoit à son prochain lancement et garde ses '
+                    'propres modifications ; ce qui sert à ses listes n\'est jamais retiré.',
+            style: Charte.texte(15, couleur: Charte.texteSecondaire),
+          ),
+          const SizedBox(height: 10),
+          bloc('Rayons ajoutés', r.rayonsAjoutes),
+          bloc('Rayons retirés', r.rayonsRetires),
+          bloc('Secteurs ajoutés', r.secteursAjoutes),
+          bloc('Secteurs retirés', r.secteursRetires),
+          bloc('Produits ajoutés', r.produitsAjoutes),
+          bloc('Produits déplacés', r.produitsDeplaces),
+          bloc('Produits retirés', r.produitsRetires),
+          if (r.renommes > 0) Text('Noms corrigés : ${r.renommes}', style: Charte.texte(15, gras: true)),
+        ]),
+      ),
+    );
   }
 }
 

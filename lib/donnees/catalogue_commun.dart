@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 
 import 'catalogue_type.dart';
 import 'images_choisies.dart';
-import 'moderation.dart';
 import 'modele.dart';
 import 'signature.dart';
 import 'synchro.dart';
@@ -23,12 +22,14 @@ import 'synchro.dart';
 //   renommes  [{type: rayon|secteur|produit, rayon?, ancien, nouveau}], cumulés d'une version à l'autre
 //   retires   [{type, rayon?, nom}], cumulés
 //
-// Catalogue ouvert à tous les foyers (30/10/2026) : chaque foyer dépose aussi ses propres ajouts, en message
-// retenu sous « ldc/catalogue-commun/apports/<identifiant du foyer> » (Etat.apports) ; au lancement, chaque
-// application lit le catalogue commun et tous les apports, et ajoute au foyer ce qui lui manque.
+// 05/11/2026 (Aristide) : le catalogue commun est tenu dans un outil à part (page web de l'éditeur, main.dart
+// avec OUTIL_EDITEUR) ; l'application n'a plus de menu d'éditeur. Chaque version porte un numéro (« numero ») ;
+// les 5 dernières restent sur le serveur (« ldc/catalogue-versions/<numéro> »), l'éditeur peut repartir de
+// l'une d'elles. Les foyers ne s'envoient plus leurs ajouts : chacun garde ses modifications, réappliquées à
+// chaque nouvelle version, et dépose son catalogue comme proposition pour l'éditeur
+// (« ldc/catalogue-propositions/<identifiant du foyer> »).
 //
-// Contre les mauvais usages (31/10/2026) : le catalogue commun est signé par l'éditeur (signature.dart), il
-// liste les foyers bloqués (« bloques ») ; les apports reçus passent les règles de moderation.dart.
+// Contre les mauvais usages (31/10/2026) : le catalogue commun est signé par l'éditeur (signature.dart).
 
 class CatalogueCommun extends ChangeNotifier {
   CatalogueCommun._();
@@ -148,6 +149,11 @@ class CatalogueCommun extends ChangeNotifier {
           if (!retour.isCompleted) retour.complete(false);
         });
         t.publier(sujet, texte, retenu: true);
+        // Les 5 dernières versions restent sur le serveur ; la plus ancienne au-delà est effacée.
+        if (j['numero'] case final num n) {
+          t.publier(sujetVersion(n.toInt()), texte, retenu: true);
+          if (n > versionsGardees) t.publier(sujetVersion(n.toInt() - versionsGardees), '', retenu: true);
+        }
         try {
           return await retour.future.timeout(const Duration(seconds: 20));
         } on TimeoutException {
@@ -164,10 +170,6 @@ class CatalogueCommun extends ChangeNotifier {
     }
     if (ok == true) {
       _definir('catalogue_commun', jsonEncode(j));
-      // L'éditeur connaît déjà ce qu'il vient de publier : pas de fenêtre « Nouveautés » chez lui.
-      Etat.instance.appliquerCatalogueCommun(j);
-      final n = Etat.instance.nouveautesCatalogue;
-      if (n != null) _definir('nouveautes_vues', '${n['version']}');
       notifyListeners();
     }
     return ok == true;
@@ -192,21 +194,143 @@ class CatalogueCommun extends ChangeNotifier {
   }
 
   static String sujetApports(String id) => '$sujet/apports/$id';
+  static const sujetVersions = 'ldc/catalogue-versions';
+  static const sujetPropositions = 'ldc/catalogue-propositions';
+  static String sujetVersion(int n) => '$sujetVersions/$n';
+  static String sujetProposition(String id) => '$sujetPropositions/$id';
 
-  /// Apports du foyer tels que le serveur les a (texte JSON), pour ne redéposer que s'ils ont changé.
+  /// Nombre de versions gardées sur le serveur.
+  static const versionsGardees = 5;
+
+  /// Proposition du foyer telle qu'elle a été déposée (texte JSON), pour ne redéposer que si elle a changé.
   String? _deposes;
   Timer? _veille;
 
-  /// Au lancement : lit le catalogue commun et les apports des autres foyers, ajoute au foyer ce qui est
-  /// nouveau, puis dépose les apports du foyer s'ils ont changé. Ensuite, toutes les 3 minutes, redépose
-  /// les apports du foyer s'ils ont changé.
+  /// Au lancement : lit le catalogue commun et l'ajoute au foyer s'il est nouveau, puis dépose le catalogue du
+  /// foyer comme proposition pour l'éditeur s'il a changé. Ensuite, toutes les 10 minutes, redépose la
+  /// proposition si elle a changé.
   Future<void> verifier() async {
     final etat = Etat.instance;
     if (etat.stockageFoyer == null) return;
+    // Ce qu'un foyer avait reçu des autres avant le 05/11/2026 : retiré, sauf ce qui sert à une liste.
+    etat.appliquerApports(const []);
+    etat.identifiantApports();
     try {
-      final recus = await _avecServeur<Map<String, String>>((t, messages) async {
+      final ok = await _avecServeur<bool>((t, messages) async {
+        String? commun;
+        try {
+          commun = (await messages.firstWhere((m) => m.$1 == sujet && m.$2.isNotEmpty).timeout(const Duration(seconds: 8))).$2;
+        } on TimeoutException {
+          commun = null;
+        }
+        if (commun != null) await _appliquerCommun(commun);
+        // Les anciens dépôts du foyer (avant le 05/11/2026) ne servent plus.
+        if (_reglage('apports_effaces') != '1') {
+          t.publier(sujetApports(etat.identifiantApports()), '', retenu: true);
+          _definir('apports_effaces', '1');
+        }
+        await _deposer(t);
+        await Future<void>.delayed(const Duration(seconds: 2));
+        return true;
+      });
+      if (ok != null) notifyListeners();
+    } catch (e) {
+      debugPrint('Catalogue commun : $e');
+    } finally {
+      _veille ??= Timer.periodic(const Duration(minutes: 10), (_) => _redeposer());
+    }
+  }
+
+  Future<void> _appliquerCommun(String commun) async {
+    // Un catalogue mal signé (déposé par un autre que l'éditeur) est ignoré : le dernier bon reste.
+    if (!await SignatureEditeur.verifie(commun)) return;
+    final j = deballer(commun);
+    _definir('catalogue_commun', jsonEncode(j));
+    Etat.instance.appliquerCatalogueCommun(j);
+  }
+
+  static Map<String, dynamic>? _lire(String t) {
+    try {
+      return deballer(t);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Le catalogue du foyer, dans le format du catalogue commun, tel que l'éditeur le verrait s'il le reprenait :
+  /// le dernier catalogue commun connu, plus les rayons, secteurs et produits ajoutés, les renommages, les
+  /// déplacements, les mesures et packagings, les images et l'ordre du foyer. Null si le foyer n'a rien changé.
+  Future<Map<String, dynamic>?> proposition() async {
+    final etat = Etat.instance;
+    if (etat.magasins.isEmpty) return null;
+    final base = await dernier();
+    final b = Brouillon.lire(base);
+    final n = b.reprendreFoyer(etat);
+    if (n == 0) return null;
+    final j = b.versJson()..remove('modifications');
+    return {...j, 'base': base['numero'] ?? 0, 'changements': n, 'foyer': etat.numeroProposition};
+  }
+
+  /// Dépose la proposition du foyer si elle a changé depuis le dernier dépôt (vide : la retire).
+  Future<bool> _deposer(Transport t) async {
+    final etat = Etat.instance;
+    final p = await proposition();
+    final texte = p == null ? '' : jsonEncode(p);
+    if (texte == (_deposes ?? _reglage('proposition_deposee') ?? '')) return false;
+    final avecDate = p == null ? '' : emballer({...p, 'date': DateTime.now().toIso8601String().substring(0, 16)});
+    t.publier(sujetProposition(etat.identifiantApports()), avecDate, retenu: true);
+    _deposes = texte;
+    _definir('proposition_deposee', texte);
+    return true;
+  }
+
+  Future<void> _redeposer() async {
+    final etat = Etat.instance;
+    if (etat.stockageFoyer == null || etat.magasins.isEmpty) return;
+    final p = await proposition();
+    if ((p == null ? '' : jsonEncode(p)) == (_deposes ?? _reglage('proposition_deposee') ?? '')) return;
+    try {
+      await _avecServeur<bool>((t, messages) async {
+        final fait = await _deposer(t);
+        // Le temps que le message parte avant la fermeture de la liaison.
+        if (fait) await Future<void>.delayed(const Duration(seconds: 2));
+        return fait;
+      }, abonnement: 'ldc/verif');
+    } catch (e) {
+      debugPrint('Proposition de catalogue : $e');
+    }
+  }
+
+  // ------------------------------------------------------------ Outil de l'éditeur
+
+  /// Les versions gardées sur le serveur (signées), de la plus récente à la plus ancienne.
+  Future<List<Map<String, dynamic>>> versions() async {
+    final recus = await _tout('$sujetVersions/#');
+    final res = <Map<String, dynamic>>[];
+    for (final v in recus.values) {
+      if (v.isEmpty || !await SignatureEditeur.verifie(v)) continue;
+      if (_lire(v) case final j?) res.add(j);
+    }
+    res.sort((a, b) => ((b['numero'] as num?) ?? 0).compareTo((a['numero'] as num?) ?? 0));
+    return res;
+  }
+
+  /// Les catalogues proposés par les foyers (« foyer » : leur numéro court), du plus récent au plus ancien.
+  Future<List<Map<String, dynamic>>> propositions() async {
+    final recus = await _tout('$sujetPropositions/#');
+    final res = [
+      for (final e in recus.entries)
+        if (e.value.isNotEmpty)
+          if (_lire(e.value) case final j?) {...j, 'id': e.key.substring(sujetPropositions.length + 1)}
+    ];
+    res.sort((a, b) => '${b['date'] ?? ''}'.compareTo('${a['date'] ?? ''}'));
+    return res;
+  }
+
+  /// Tous les messages retenus sous [abonnement] (fini quand plus rien n'arrive depuis 2 s).
+  Future<Map<String, String>> _tout(String abonnement) async =>
+      await _avecServeur<Map<String, String>>((t, messages) async {
         final recus = <String, String>{};
-        // Tout arrive dès l'abonnement (messages retenus) : fini quand plus rien n'arrive depuis 2 s.
         final fini = Completer<void>();
         Timer? silence;
         void relancer() {
@@ -224,82 +348,16 @@ class CatalogueCommun extends ChangeNotifier {
         await fini.future.timeout(const Duration(seconds: 12), onTimeout: () {});
         silence?.cancel();
         await sub.cancel();
-        await _appliquerRecus(recus);
-        // Puis les apports du foyer, s'ils ont changé (le catalogue commun a pu en reprendre).
-        _deposes = _texte(recus[sujetApports(etat.identifiantApports())]);
-        if (_deposer(t)) await Future<void>.delayed(const Duration(seconds: 2));
         return recus;
-      }, abonnement: '$sujet/#');
-      if (recus != null) notifyListeners();
-    } catch (e) {
-      debugPrint('Catalogue commun : $e');
-    } finally {
-      _veille ??= Timer.periodic(const Duration(minutes: 3), (_) => _redeposer());
-    }
-  }
+      }, abonnement: abonnement) ??
+      {};
 
-  Future<void> _appliquerRecus(Map<String, String> recus) async {
-    final etat = Etat.instance;
-    final commun = recus[sujet];
-    // Un catalogue mal signé (déposé par un autre que l'éditeur) est ignoré : le dernier bon reste.
-    if (commun != null && commun.isNotEmpty && await SignatureEditeur.verifie(commun)) {
-      final j = deballer(commun);
-      _definir('catalogue_commun', jsonEncode(j));
-      etat.appliquerCatalogueCommun(j);
-    }
-    final moi = sujetApports(etat.identifiantApports());
-    final apports = [
-      for (final e in recus.entries)
-        if (e.key.startsWith('$sujet/apports/') && e.key != moi && e.value.isNotEmpty)
-          if (_lire(e.value) case final j?) {...j, 'id': e.key.substring('$sujet/apports/'.length)}
-    ];
-    // Gardés sur l'appareil : l'éditeur les reprend dans son brouillon.
-    _definir('apports_recus', jsonEncode(apports));
-    etat.appliquerApports(apports);
-  }
-
-  static Map<String, dynamic>? _lire(String t) {
-    try {
-      return deballer(t);
-    } catch (_) {
-      return null;
-    }
-  }
-
-  static String? _texte(String? t) => t == null || t.isEmpty ? null : (_lire(t) == null ? null : jsonEncode(_lire(t)));
-
-  /// Dépose les apports du foyer s'ils ont changé depuis le dernier dépôt connu.
-  bool _deposer(Transport t) {
-    final etat = Etat.instance;
-    if (etat.magasins.isEmpty) return false;
-    final a = etat.apports();
-    final texte = jsonEncode(a);
-    if (texte == _deposes) return false;
-    final vide = (a['rayons'] as List).isEmpty &&
-        (a['secteurs'] as List).isEmpty &&
-        (a['produits'] as List).isEmpty &&
-        (a['marques'] as Map).isEmpty &&
-        a['signales'] == null;
-    if (vide && _deposes == null) return false;
-    t.publier(sujetApports(etat.identifiantApports()), emballer(a), retenu: true);
-    _deposes = texte;
-    return true;
-  }
-
-  Future<void> _redeposer() async {
-    final etat = Etat.instance;
-    if (etat.stockageFoyer == null || etat.magasins.isEmpty) return;
-    if (jsonEncode(etat.apports()) == _deposes) return;
-    try {
-      await _avecServeur<bool>((t, messages) async {
-        final fait = _deposer(t);
-        // Le temps que le message parte avant la fermeture de la liaison.
-        if (fait) await Future<void>.delayed(const Duration(seconds: 2));
-        return fait;
-      }, abonnement: 'ldc/verif');
-    } catch (e) {
-      debugPrint('Apports au catalogue : $e');
-    }
+  /// Relit sur le serveur la dernière version publiée (pour l'outil, qui n'a pas de foyer à tenir à jour).
+  Future<Map<String, dynamic>?> actualiser() async {
+    final j = await recuperer();
+    if (j != null) _definir('catalogue_commun', jsonEncode(j));
+    notifyListeners();
+    return j;
   }
 
   /// Dernier catalogue commun connu (reçu ou publié), sinon le catalogue livré avec l'application.
@@ -311,14 +369,10 @@ class CatalogueCommun extends ChangeNotifier {
 
   // ------------------------------------------------------------ Brouillon de l'éditeur
 
-  /// Le brouillon en cours, gardé sur cet appareil jusqu'à la publication.
-  /// Les ajouts de tous les foyers (reçus au lancement, et ceux du foyer de l'éditeur) y sont repris :
-  /// l'éditeur les voit, et peut les retirer, les renommer ou les déplacer.
+  /// Le brouillon en cours, gardé dans l'outil jusqu'à la généralisation.
   Future<Brouillon> brouillon() async {
     final t = _reglage('catalogue_brouillon');
     final b = Brouillon.lire(t != null ? jsonDecode(t) as Map<String, dynamic> : await dernier());
-    // Seulement ce qui passe les règles (ni foyer bloqué, ni nom refusé, ni produit signalé).
-    final f = Moderation.filtrer(apportsRecus, bloques: b.bloques, signales: Etat.instance.signalements);
     // Secteurs renommés dans le catalogue livré (31/10/2026) : renommés aussi pour tous les foyers à la publication.
     for (final (rn, ancien, nouveau) in secteursRenommes) {
       final r = b.rayon(rn);
@@ -336,7 +390,7 @@ class CatalogueCommun extends ChangeNotifier {
       b.modifications++;
     }
     final livre = jsonDecode(await rootBundle.loadString(CatalogueType.fichierLivre)) as Map<String, dynamic>;
-    b.absorber([...f.lots, Etat.instance.apports(), _nouveautesLivrees(livre)]);
+    b.absorber([_nouveautesLivrees(livre)]);
     // Ordre des secteurs du catalogue livré pour les rayons qu'il réorganise.
     for (final rj in (livre['rayons'] as List).cast<Map>()) {
       if (rj['nom'] != 'Textile') continue;
@@ -383,43 +437,30 @@ class CatalogueCommun extends ChangeNotifier {
     };
   }
 
-  /// Apports des autres foyers reçus au dernier lancement (avec leur identifiant « id »).
-  List<Map<String, dynamic>> get apportsRecus {
-    final recus = _reglage('apports_recus');
-    return recus == null ? const [] : (jsonDecode(recus) as List).cast<Map<String, dynamic>>();
-  }
-
-  /// Pour l'éditeur : chaque foyer contributeur (anonyme), avec ce qu'il a déposé et ce qu'en disent les règles.
-  List<({String id, int produits, int refuses, int signales, bool bloque, bool ecarte})> contributeurs(Brouillon b) {
-    final f = Moderation.filtrer(apportsRecus, signales: Etat.instance.signalements);
-    final res = [
-      for (final j in apportsRecus)
-        (() {
-          final id = '${j['id'] ?? ''}';
-          final produits = (j['produits'] as List? ?? const []).cast<Map>();
-          final propres = Moderation.nettoyer(j, const {})['produits'] as List;
-          final signales = produits.where((p) => f.signales.contains(Moderation.cleProduit('${p['secteur']}', '${p['nom']}'))).length;
-          return (
-            id: id,
-            produits: produits.length,
-            refuses: produits.length - propres.length,
-            signales: signales,
-            bloque: b.bloques.contains(id),
-            ecarte: f.ecartes.contains(id),
-          );
-        })()
-    ];
-    res.sort((x, y) => (y.refuses + y.signales * 3).compareTo(x.refuses + x.signales * 3));
-    return res;
-  }
-
   void enregistrerBrouillon(Brouillon b) => _definir('catalogue_brouillon', jsonEncode(b.versJson()));
 
   void abandonnerBrouillon() => Etat.instance.stockageFoyer?.effacerReglage('catalogue_brouillon');
 
+  /// Le brouillon repart d'un catalogue (une version gardée, ou la proposition d'un foyer).
+  Brouillon repartirDe(Map<String, dynamic> j, {required int modifications}) {
+    final base = Map<String, dynamic>.from(j)
+      ..remove('id')
+      ..remove('foyer')
+      ..remove('changements')
+      ..remove('base')
+      ..['modifications'] = modifications;
+    final b = Brouillon.lire(base);
+    enregistrerBrouillon(b);
+    return b;
+  }
+
+  /// Numéro de la prochaine version : celui de la dernière publiée, plus un.
+  Future<int> prochainNumero() async => (((await dernier())['numero'] as num?) ?? 0).toInt() + 1;
+
   Future<bool> publierBrouillon(Brouillon b) async {
     final j = b.versJson()
       ..['version'] = DateTime.now().millisecondsSinceEpoch
+      ..['numero'] = await prochainNumero()
       ..['date'] = DateTime.now().toIso8601String().substring(0, 16);
     j.remove('modifications');
     final ok = await publier(j);

@@ -45,28 +45,28 @@ List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? liste
     if (etat.secteurCatalogue(p.id) != null)
       ActionLigne(Icons.drive_file_move_outline, 'Déplacer le produit', () => deplacerProduit(context, p)),
     ActionLigne(Icons.straighten, 'Mettre à jour mesures et packaging', () => formatsProduit(context, p)),
-    // Ajouté par un autre foyer : nom fantaisiste, grossier ou faux → signalé (31/10/2026).
-    if (etat.estRecu(p))
-      ActionLigne(Icons.flag_outlined, 'Signaler ce produit', () async {
+    // 05/11/2026 (Aristide) : un produit du catalogue commun dont le foyer n'a pas l'usage se masque chez lui.
+    if (!ajoute)
+      ActionLigne(Icons.visibility_off_outlined, 'Masquer chez nous', () async {
         final ok = await confirmer(
           context,
-          titre: 'Signaler « ${p.nom} » ?',
-          icone: Icons.flag_outlined,
+          titre: 'Masquer « ${p.nom} » ?',
+          icone: Icons.visibility_off_outlined,
           contenu: Text(
-            'Ce produit vient d\'un autre foyer. Signalé, il disparaît de votre catalogue'
-            '${utilise ? ' (il reste dans vos listes)' : ''}. Signalé par trois foyers, il disparaît pour tous.',
+            'Il disparaît de votre catalogue et de la recherche${utilise ? ', et reste dans vos listes' : ''}. '
+            'Les autres foyers le gardent. Gérer › Catalogue › Produits masqués le fait revenir.',
             style: Charte.texte(16),
           ),
           plein: 'Annuler',
-          contour: 'Signaler',
+          contour: 'Masquer',
         );
         if (ok != true) return;
-        etat.signalerProduit(p);
+        etat.masquer(p, true);
         if (context.mounted) {
-          if (!utilise && depuisFiche) Navigator.of(context).pop();
-          Nav.message(context, 'Produit signalé');
+          if (depuisFiche) Navigator.of(context).pop();
+          Nav.message(context, '« ${p.nom} » masqué');
         }
-      }, danger: true),
+      }),
   ];
 }
 

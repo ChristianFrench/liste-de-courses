@@ -204,12 +204,25 @@ jobs:
           grep -c manifest build/demo/index.html || true
       - name: Ouverture sans réseau de la démonstration
         run: python3 outils/web/hors_ligne.py build/demo ldc-demo-
+      - name: Compiler l'outil de l'éditeur du catalogue commun (page à part, non référencée)
+        run: |
+          set +e
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/editeur/ --dart-define-from-file=definitions-editeur.json --dart-define=OUTIL_EDITEUR=true -o "$PWD/build/editeur" > compilation-editeur.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-editeur.log "Compilation outil de l'éditeur"; else tail -n 5 compilation-editeur.log; fi
+          exit $code
+      - name: Outil de l'éditeur non installable et non référencé
+        run: |
+          sed -i '/<link rel="manifest"/d; s#<title>[^<]*</title>#<title>Emplettes · éditeur du catalogue</title>#; s#<head>#<head><meta name="robots" content="noindex, nofollow">#' build/editeur/index.html
+          rm -f build/editeur/manifest.json
+          python3 outils/web/hors_ligne.py build/editeur ldc-editeur-
       - name: Assembler le site (page de présentation + application + démonstration)
         run: |
           mkdir site
           cp -r docs/. site/
           cp -r build/web site/web
           cp -r build/demo site/demo
+          cp -r build/editeur site/editeur
           touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }

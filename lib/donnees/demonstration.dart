@@ -6,6 +6,10 @@ import 'modele.dart';
 /// …/liste-de-courses/demo/) : base séparée, sans partage, sans mail direct, remplie d'exemples.
 const demonstration = bool.fromEnvironment('DEMONSTRATION');
 
+/// Outil de l'éditeur du catalogue commun (05/11/2026, compilé avec --dart-define=OUTIL_EDITEUR=true, publié à
+/// part sur …/liste-de-courses/editeur/) : base séparée, seulement l'écran du catalogue commun.
+const outilEditeur = bool.fromEnvironment('OUTIL_EDITEUR');
+
 /// Foyer de démonstration (30/10/2026) : quatre membres, trois magasins avec leur parcours appris,
 /// deux mois de courses avec tickets, des listes à tous les stades, des listes types,
 /// des promotions, des marques et des consignes. Créé au premier lancement (et par « Foyer neuf »).
