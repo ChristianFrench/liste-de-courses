@@ -50,7 +50,7 @@ demander ADMIN "Votre compte d'administration sur ce serveur" "$ADMIN"
 demander MQTT_UTILISATEUR "Compte de l'application pour le partage (secret GitHub MQTT_UTILISATEUR_VPS)" "${MQTT_UTILISATEUR:-emplettes}"
 demander MAIL_COMPTE "Boîte mail d'envoi (compte Zimbra)" "${MAIL_COMPTE:-listes@$DOMAINE}"
 demander SMTP_HOTE "Serveur d'envoi de la boîte mail" "${SMTP_HOTE:-smtp.mail.ovh.net}"
-demander SMTP_PORT "Port du serveur d'envoi (465 ou 587)" "${SMTP_PORT:-465}"
+demander SMTP_PORT "Port du serveur d'envoi (465 ou 587)" "${SMTP_PORT:-587}"
 id "$ADMIN" >/dev/null 2>&1 || stop "le compte $ADMIN n'existe pas."
 
 CHANGER=o

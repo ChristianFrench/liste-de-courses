@@ -23,7 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 CLE = os.environ.get('CLE', '')
 SMTP_HOTE = os.environ.get('SMTP_HOTE', 'smtp.mail.ovh.net')
-SMTP_PORT = int(os.environ.get('SMTP_PORT', '465'))
+SMTP_PORT = int(os.environ.get('SMTP_PORT', '587'))
 SMTP_UTILISATEUR = os.environ.get('SMTP_UTILISATEUR', '')
 SMTP_MOT_DE_PASSE = os.environ.get('SMTP_MOT_DE_PASSE', '')
 EXPEDITEUR = os.environ.get('EXPEDITEUR', SMTP_UTILISATEUR)
