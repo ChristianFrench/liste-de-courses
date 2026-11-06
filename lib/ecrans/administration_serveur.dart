@@ -677,11 +677,16 @@ class _PageShellState extends State<PageShell> {
           margin: const EdgeInsets.fromLTRB(28, 0, 28, 20),
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(color: TerminalThemes.defaultTheme.background, borderRadius: BorderRadius.circular(8)),
-          child: TerminalView(
-            c.terminal,
-            focusNode: _focus,
-            autofocus: true,
-            textStyle: const TerminalStyle(fontSize: 14, fontFamily: 'Consolas'),
+          // Un clic n'importe où dans la zone noire lui donne le clavier.
+          child: Listener(
+            onPointerDown: (_) => _focus.requestFocus(),
+            child: TerminalView(
+              c.terminal,
+              focusNode: _focus,
+              autofocus: true,
+              hardwareKeyboardOnly: true,
+              textStyle: const TerminalStyle(fontSize: 14, fontFamily: 'Consolas'),
+            ),
           ),
         ),
       ),
