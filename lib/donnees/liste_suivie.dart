@@ -11,6 +11,9 @@ class ListeSuivie<T> extends ListBase<T> {
   final List<T> _l;
   int version = 0;
 
+  /// Modifications autres que des ajouts en fin de liste : un index n'a alors qu'à lire les nouveaux éléments.
+  int versionHorsAjouts = 0;
+
   @override
   int get length => _l.length;
 
@@ -18,6 +21,7 @@ class ListeSuivie<T> extends ListBase<T> {
   set length(int n) {
     _l.length = n;
     version++;
+    versionHorsAjouts++;
   }
 
   @override
@@ -27,6 +31,7 @@ class ListeSuivie<T> extends ListBase<T> {
   void operator []=(int i, T v) {
     _l[i] = v;
     version++;
+    versionHorsAjouts++;
   }
 
   @override
@@ -39,11 +44,13 @@ class ListeSuivie<T> extends ListBase<T> {
   void addAll(Iterable<T> iterable) {
     _l.addAll(iterable);
     version++;
+    versionHorsAjouts++;
   }
 
   @override
   bool remove(Object? element) {
     version++;
+    versionHorsAjouts++;
     return _l.remove(element);
   }
 
@@ -51,23 +58,27 @@ class ListeSuivie<T> extends ListBase<T> {
   void removeWhere(bool Function(T) test) {
     _l.removeWhere(test);
     version++;
+    versionHorsAjouts++;
   }
 
   @override
   void retainWhere(bool Function(T) test) {
     _l.retainWhere(test);
     version++;
+    versionHorsAjouts++;
   }
 
   @override
   void insert(int index, T element) {
     _l.insert(index, element);
     version++;
+    versionHorsAjouts++;
   }
 
   @override
   T removeAt(int index) {
     version++;
+    versionHorsAjouts++;
     return _l.removeAt(index);
   }
 
@@ -75,12 +86,14 @@ class ListeSuivie<T> extends ListBase<T> {
   void clear() {
     _l.clear();
     version++;
+    versionHorsAjouts++;
   }
 
   @override
   void sort([int Function(T, T)? compare]) {
     _l.sort(compare);
     version++;
+    versionHorsAjouts++;
   }
 }
 
@@ -89,10 +102,18 @@ class Index<T> {
   Index(this.cle);
   final String Function(T) cle;
   ListeSuivie<T>? _liste;
-  int _version = -1;
+  int _version = -1, _horsAjouts = -1, _longueur = 0;
   final Map<String, T> _map = {};
 
   T? trouver(ListeSuivie<T> liste, String k) {
+    // 06/11/2026 : seulement des ajouts depuis la dernière lecture (catalogue commun reçu) : les nouveaux suffisent.
+    if (identical(liste, _liste) && liste.version != _version && liste.versionHorsAjouts == _horsAjouts && liste.length >= _longueur) {
+      for (var i = _longueur; i < liste.length; i++) {
+        _map.putIfAbsent(cle(liste[i]), () => liste[i]);
+      }
+      _version = liste.version;
+      _longueur = liste.length;
+    }
     if (!identical(liste, _liste) || liste.version != _version) {
       _map.clear();
       for (final e in liste) {
@@ -100,6 +121,8 @@ class Index<T> {
       }
       _liste = liste;
       _version = liste.version;
+      _horsAjouts = liste.versionHorsAjouts;
+      _longueur = liste.length;
     }
     return _map[k];
   }

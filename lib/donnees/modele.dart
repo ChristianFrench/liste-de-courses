@@ -1152,6 +1152,10 @@ class Etat extends ChangeNotifier {
 
   /// À appeler après chaque action : prévient les écrans et enregistre.
   void modifie() {
+    if (_enLot) {
+      _modifieEnAttente = true;
+      return;
+    }
     notifyListeners();
     enregistrer();
   }
@@ -2503,15 +2507,20 @@ class Etat extends ChangeNotifier {
     for (final m in magasins) {
       final h = secteurHomologue(m.id, s);
       if (h == null) continue;
-      final e = _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == produitId);
+      final e = _indexEmplacements.trouver(_emplacements, '${m.id}\u0000$produitId');
       if (e == null) {
         emplacements.add(Emplacement(m.id, produitId, h.id));
       } else {
         e.secteurId = h.id;
       }
     }
+    // Pendant l'application du catalogue commun, un seul enregistrement à la fin (06/11/2026 : un par produit
+    // bloquait le téléphone plusieurs minutes).
     modifie();
   }
+
+  /// Pendant un lot (catalogue commun reçu), [modifie] n'enregistre qu'une fois, à la fin.
+  bool _enLot = false, _modifieEnAttente = false;
 
   /// Nouveau produit du catalogue (marqué « ajouté »), rangé dans [secteur] s'il est donné.
   Produit creerProduit(String nom, {Secteur? secteur}) {
@@ -3158,6 +3167,17 @@ class Etat extends ChangeNotifier {
 
   /// Ajoute au foyer une version plus récente du catalogue commun. Rend les nouveautés (vide si rien).
   List<String> appliquerCatalogueCommun(Map<String, dynamic> j) {
+    _enLot = true;
+    _modifieEnAttente = false;
+    try {
+      return _appliquerCatalogueCommun(j);
+    } finally {
+      _enLot = false;
+      if (_modifieEnAttente) modifie();
+    }
+  }
+
+  List<String> _appliquerCatalogueCommun(Map<String, dynamic> j) {
     Sauvegarde.instance.jalon('Catalogue commun reçu');
     final version = (j['version'] as num? ?? 0).toInt();
     // Version déjà appliquée par une version d'Emplettes qui ne retenait pas son numéro : il est repris.
@@ -3181,7 +3201,17 @@ class Etat extends ChangeNotifier {
     }
     final lignes = <String>[];
     String bas(String t) => t.trim().toLowerCase();
-    Produit? produitNomme(String nom) => _trouve(produits, (p) => bas(p.nom) == bas(nom));
+    // Recherche par nom en table (le premier de ce nom, comme avant), tenue à jour aux renommages et ajouts.
+    final parNom = <String, Produit>{};
+    void indexer() {
+      parNom.clear();
+      for (final p in produits) {
+        parNom.putIfAbsent(bas(p.nom), () => p);
+      }
+    }
+
+    indexer();
+    Produit? produitNomme(String nom) => parNom[bas(nom)];
     // Un même nom peut être dans plusieurs secteurs : le produit est alors repéré par son secteur.
     String? secteurDuProduit(Produit p) => secteurCatalogue(p.id)?.nom;
     Produit? produitDuSecteur(String nom, Object? secteur) =>
@@ -3220,6 +3250,7 @@ class Etat extends ChangeNotifier {
           if (p != null && produitDuSecteur(nouveau, o['secteur']) == null) {
             p.nom = nouveau;
             renommes++;
+            indexer();
           }
       }
     }
@@ -3265,6 +3296,7 @@ class Etat extends ChangeNotifier {
             final id = 'pc-${_cleNom(nom)}';
             p = Produit(plusieurs && _trouve(produits, (x) => x.id == id) != null ? 'pc-${_cleNom(sn)}-${_cleNom(nom)}' : id, nom, [], [], 0);
             produits.add(p);
+            parNom.putIfAbsent(bas(nom), () => p!);
             for (final f in (pj['formats'] as List? ?? const []).cast<String>()) {
               p.packagingIds.add(_packagingNomme(f).id);
             }
@@ -3296,6 +3328,7 @@ class Etat extends ChangeNotifier {
           produits.remove(p);
           produitsPerso.remove(p.id);
           emplacements.removeWhere((e) => e.produitId == p.id);
+          indexer();
           retires++;
         case 'secteur':
           final ids = {
