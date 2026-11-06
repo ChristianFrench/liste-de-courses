@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<style>
+@font-face{font-family:A;src:url(polices/AtkinsonHyperlegible-Regular.ttf)}
+@font-face{font-family:A;font-weight:700;src:url(polices/AtkinsonHyperlegible-Bold.ttf)}
+:root{--encre:#375042;--bande:#CCD7D1;--fond:#EEF3EF;--accent:#3F7D5A}
+*{box-sizing:border-box;margin:0}
+html,body{width:var(--L);height:var(--H);overflow:hidden;background:var(--fond);font-family:A,sans-serif;color:var(--encre)}
+#scene{position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,#fff 0,#EEF3EF 55%,#DCE6DF 100%)}
+.tel{position:absolute;width:calc(var(--th)*390/844);height:var(--th);border-radius:calc(var(--th)*0.055);background:#1d2a23;
+  padding:calc(var(--th)*0.014);box-shadow:0 18px 50px rgba(30,50,40,.28)}
+.ecran{position:relative;width:100%;height:100%;border-radius:calc(var(--th)*0.045);overflow:hidden;background:#fff}
+.ecran img{position:absolute;inset:0;width:100%;height:100%}
+.nom{position:absolute;left:0;right:0;text-align:center;font-weight:700;font-size:calc(var(--th)*0.04);top:calc(var(--th)*-0.065)}
+.doigt{position:absolute;width:13%;aspect-ratio:1;border-radius:50%;background:rgba(55,80,66,.35);border:3px solid #fff;
+  transform:translate(-50%,-50%);box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.onde{position:absolute;aspect-ratio:1;border-radius:50%;border:4px solid rgba(63,125,90,.8);transform:translate(-50%,-50%)}
+.surligne{position:absolute;left:0;right:0;height:5.5%;background:rgba(255,214,90,.35);border-top:2px solid #e8b400;border-bottom:2px solid #e8b400;transform:translateY(-50%)}
+#texte{position:absolute;font-weight:700;line-height:1.25}
+#partie{position:absolute;font-size:var(--fp);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.titre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--encre);color:#fff;text-align:center;padding:0 8%}
+.titre .num{width:var(--tn);height:var(--tn);border-radius:50%;background:#7CB98F;color:var(--encre);display:flex;align-items:center;justify-content:center;font-size:calc(var(--tn)*.55);font-weight:700}
+.titre .t{font-size:var(--tt);font-weight:700}
+.html{position:absolute;inset:0;font-family:A,sans-serif}
+</style></head><body><div id="scene"></div>
+<script>
+const P = new URLSearchParams(location.search);
+const VERTICAL = P.get('format') === 'vertical';
+const L = VERTICAL ? 720 : 1280, H = VERTICAL ? 1280 : 720;
+document.documentElement.style.setProperty('--L', L + 'px');
+document.documentElement.style.setProperty('--H', H + 'px');
+let T = null;
+const scene = document.getElementById('scene');
+const cache = {};
+function img(src) { if (!cache[src]) { const i = new Image(); i.src = src; cache[src] = i; } return cache[src].src; }
+
+function telephone(x, y, h, contenu, nom) {
+  const d = document.createElement('div');
+  d.className = 'tel'; d.style.setProperty('--th', h + 'px'); d.style.left = x + 'px'; d.style.top = y + 'px';
+  const e = document.createElement('div'); e.className = 'ecran'; d.appendChild(e);
+  if (typeof contenu === 'string') { const i = document.createElement('img'); i.src = img('ecrans/' + contenu + '.jpg'); e.appendChild(i); }
+  else e.appendChild(contenu);
+  if (nom) { const n = document.createElement('div'); n.className = 'nom'; n.textContent = nom; d.appendChild(n); }
+  scene.appendChild(d);
+  return e;
+}
+// gestes : un doigt qui arrive 0,5 s avant l'appui, une onde à l'appui.
+function gestes(ecran, liste, t) {
+  for (const g of liste || []) {
+    const dt = t - g.t;
+    if (dt < -0.5 || dt > 0.6) continue;
+    const px = g.x / 390 * 100, py = g.y / 844 * 100;
+    const doigt = document.createElement('div'); doigt.className = 'doigt';
+    const appui = dt >= 0 && dt < 0.15 || (g.type === 'double' && dt >= 0.22 && dt < 0.37);
+    doigt.style.left = px + '%'; doigt.style.top = (py + (dt < 0 ? -dt * 6 : 0)) + '%';
+    doigt.style.opacity = dt < 0 ? 1 + dt * 2 : Math.max(0, 1 - Math.max(0, dt - 0.4) * 5);
+    if (appui) doigt.style.transform = 'translate(-50%,-50%) scale(.85)';
+    ecran.appendChild(doigt);
+    for (const d0 of g.type === 'double' ? [0, 0.22] : [0]) {
+      const u = dt - d0;
+      if (u < 0 || u > 0.45) continue;
+      const o = document.createElement('div'); o.className = 'onde';
+      o.style.left = px + '%'; o.style.top = py + '%'; o.style.width = (8 + u * 60) + '%'; o.style.opacity = 1 - u / 0.45;
+      ecran.appendChild(o);
+    }
+  }
+}
+function surligne(ecran, y, t) {
+  if (y == null || t < 0.8) return;
+  const s = document.createElement('div'); s.className = 'surligne'; s.style.top = (y / 844 * 100) + '%';
+  s.style.opacity = Math.min(1, (t - 0.8) * 3); ecran.appendChild(s);
+}
+function imageA(sc, t) { let i = sc.img; for (const [t0, im] of sc.images || []) if (t >= t0) i = im; return i; }
+
+function html(type, t) {
+  const d = document.createElement('div'); d.className = 'html';
+  if (type === 'mail') {
+    d.style.background = '#fff';
+    d.innerHTML = `<div style="background:#3F7D5A;color:#fff;padding:52px 18px 14px;font-size:15px">Boîte de réception</div>
+    <div style="padding:16px 18px;font-size:14px;color:#333">
+      <div style="font-size:19px;font-weight:700;color:#222;margin-bottom:6px">Claire vous invite dans le foyer « Famille Martin »</div>
+      <div style="color:#777;margin-bottom:14px">Emplettes · à : mamie.martin@exemple.fr</div>
+      <p style="margin-bottom:12px">Bonjour,<br>Claire vous propose de partager les listes de courses de la famille avec Emplettes.</p>
+      <p style="margin-bottom:6px">Votre code de foyer :</p>
+      <div style="font-size:30px;font-weight:700;letter-spacing:.12em;color:#375042;background:#EEF3EF;border-radius:10px;text-align:center;padding:12px 0;margin-bottom:14px">K7P-29M-QX4</div>
+      <p style="margin-bottom:10px">1. Installez Emplettes : emplettes.eu<br>2. « Rejoindre un foyer », puis saisissez ce code.</p>
+      <p style="color:#777">Pas de compte, pas de mot de passe.</p></div>`;
+  } else if (type === 'notif') {
+    const a = Math.min(1, Math.max(0, (t - 1.0) * 3));
+    d.style.background = 'linear-gradient(160deg,#2b4a3a,#14231b)';
+    d.innerHTML = `<div style="color:#fff;text-align:center;margin-top:120px;font-size:64px;font-weight:300">08:42</div>
+      <div style="color:#d9e6dd;text-align:center;font-size:16px">samedi 14 novembre</div>
+      <div style="position:absolute;left:12px;right:12px;top:${300 - (1 - a) * 40}px;opacity:${a};background:rgba(255,255,255,.95);border-radius:18px;padding:12px 14px;display:flex;gap:10px">
+        <img src="${img('images/complet.png')}" style="width:38px;height:38px;border-radius:8px;background:#3F7D5A">
+        <div style="font-size:14px;color:#222"><b>Emplettes · Famille Martin</b> <span style="color:#888">maintenant</span><br>Claire : Pensez aux piles pour la télécommande !</div></div>`;
+  } else if (type === 'fin') {
+    d.style.background = 'var(--encre)';
+  }
+  return d;
+}
+
+window.rendre = function (t) {
+  scene.innerHTML = '';
+  let seg = T.segments[T.segments.length - 1];
+  for (const s of T.segments) if (t >= s.debut && t < s.debut + s.duree) { seg = s; break; }
+  const ts = t - seg.debut;
+  const poidsTotal = seg.scenes.reduce((a, s) => a + (s.poids || 1), 0);
+  let u = 0, sc = seg.scenes[0], t0 = 0;
+  for (const s of seg.scenes) { const d = seg.duree * (s.poids || 1) / poidsTotal; if (ts < u + d) { sc = s; t0 = u; break; } u += d; sc = s; t0 = u - d; }
+  const tl = ts - t0;
+  const partie = seg.voix >= '14' && seg.voix <= '22' ? 'Partie 3' : seg.voix >= '08' && seg.voix <= '13' ? 'Partie 2' : seg.voix >= '01' && seg.voix <= '07' ? 'Partie 1' : '';
+  const th = VERTICAL ? 760 : 620;
+  if (sc.type === 'titre') {
+    const d = document.createElement('div'); d.className = 'titre';
+    d.style.setProperty('--tn', (VERTICAL ? 110 : 96) + 'px'); d.style.setProperty('--tt', (VERTICAL ? 54 : 52) + 'px');
+    d.innerHTML = `<div class="num">${sc.numero}</div><div class="t">${sc.texte}</div>`;
+    scene.appendChild(d); return;
+  }
+  if (sc.type === 'anim') {
+    const n = Math.min(278, Math.floor(ts * 20));
+    const i = document.createElement('img'); i.src = img('anim/' + String(n).padStart(3, '0') + '.png');
+    const w = VERTICAL ? 520 : 420;
+    i.style.cssText = `position:absolute;width:${w}px;left:${(L - w) / 2}px;top:${VERTICAL ? 260 : 40}px`;
+    scene.appendChild(i);
+    if (ts > 9) {
+      const tx = document.createElement('div');
+      tx.style.cssText = `position:absolute;left:0;right:0;text-align:center;top:${VERTICAL ? 900 : 520}px;opacity:${Math.min(1, (ts - 9) * 2)}`;
+      tx.innerHTML = `<div style="font-size:${VERTICAL ? 78 : 64}px;font-weight:700">Emplettes</div><div style="font-size:${VERTICAL ? 34 : 28}px;margin-top:6px">La liste de courses de tout le foyer</div>`;
+      scene.appendChild(tx);
+    }
+    return;
+  }
+  if (sc.type === 'fin') {
+    const d = document.createElement('div'); d.className = 'titre';
+    d.innerHTML = `<img src="${img('images/complet.png')}" style="width:${VERTICAL ? 300 : 220}px">
+      <div style="font-size:${VERTICAL ? 76 : 64}px;font-weight:700">Emplettes</div>
+      <div style="font-size:${VERTICAL ? 40 : 34}px">emplettes.eu</div>
+      <div style="display:flex;gap:14px;margin-top:8px">${['Android', 'Windows', 'Navigateur'].map(p => `<span style="border:2px solid #fff;border-radius:30px;padding:6px 18px;font-size:${VERTICAL ? 28 : 22}px">${p}</span>`).join('')}</div>
+      <div style="font-size:${VERTICAL ? 24 : 18}px;opacity:.75;margin-top:6px">Gratuit · voix de synthèse Piper (Siwis, CC BY 4.0)</div>`;
+    scene.appendChild(d); return;
+  }
+  // un ou deux téléphones, le texte à côté (dessous en vertical)
+  if (sc.type === 'deux') {
+    const h = VERTICAL ? 600 : 560, w = h * 390 / 844;
+    const y = VERTICAL ? 150 : (H - h) / 2 + 20;
+    const xs = VERTICAL ? [L / 2 - w - 15, L / 2 + 15] : [70, 120 + w];
+    const g = telephone(xs[0], y, h, sc.g, sc.lg); surligne(g, sc.surligne_g, tl);
+    const d = telephone(xs[1], y, h, sc.d, sc.ld); gestes(d, sc.gestes_d, tl);
+  } else {
+    const y = VERTICAL ? 70 : (H - th) / 2;
+    const x = VERTICAL ? (L - th * 390 / 844) / 2 : 150;
+    const contenu = sc.type === 'tel' ? imageA(sc, tl) : html(sc.type, tl);
+    const e = telephone(x, y, th, contenu);
+    if (sc.type === 'tel') { gestes(e, sc.gestes, tl); surligne(e, sc.surligne, tl); }
+  }
+  const zone = VERTICAL ? { x: 50, y: sc.type === 'deux' ? 820 : 880, w: L - 100 } : { x: sc.type === 'deux' ? 760 : 620, y: 0, w: sc.type === 'deux' ? 460 : 560 };
+  if (partie) {
+    const p = document.createElement('div'); p.id = 'partie'; p.textContent = partie;
+    p.style.setProperty('--fp', (VERTICAL ? 26 : 20) + 'px');
+    p.style.left = zone.x + 'px'; p.style.top = (VERTICAL ? zone.y : 230) + 'px'; scene.appendChild(p);
+  }
+  if (seg.sousTitre) {
+    const s = document.createElement('div'); s.id = 'texte'; s.textContent = seg.sousTitre;
+    s.style.left = zone.x + 'px'; s.style.width = zone.w + 'px'; s.style.top = (VERTICAL ? zone.y + 50 : 270) + 'px';
+    s.style.fontSize = (VERTICAL ? 46 : sc.type === 'deux' ? 38 : 44) + 'px';
+    s.style.opacity = Math.min(1, ts * 4);
+    scene.appendChild(s);
+  }
+};
+window.charger = async function () {
+  T = await (await fetch('timeline.json')).json();
+  const srcs = new Set(['images/complet.png']);
+  for (const s of T.segments) for (const sc of s.scenes) {
+    for (const k of ['img', 'g', 'd']) if (sc[k]) srcs.add('ecrans/' + sc[k] + '.jpg');
+    for (const [, im] of sc.images || []) srcs.add('ecrans/' + im + '.jpg');
+  }
+  for (let n = 0; n < 279; n++) srcs.add('anim/' + String(n).padStart(3, '0') + '.png');
+  await Promise.all([...srcs].map(s => new Promise(r => { const i = new Image(); i.onload = i.onerror = r; i.src = s; cache[s] = i; })));
+  await document.fonts.ready;
+  return T.total;
+};
+</script></body></html>
