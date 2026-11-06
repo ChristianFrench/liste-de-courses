@@ -10,7 +10,7 @@ html,body{width:var(--L);height:var(--H);overflow:hidden;background:var(--fond);
 .tel{position:absolute;width:calc(var(--th)*390/844);height:var(--th);border-radius:calc(var(--th)*0.055);background:#1d2a23;
   padding:calc(var(--th)*0.014);box-shadow:0 18px 50px rgba(30,50,40,.28)}
 .ecran{position:relative;width:100%;height:100%;border-radius:calc(var(--th)*0.045);overflow:hidden;background:#fff}
-.ecran img{position:absolute;inset:0;width:100%;height:100%}
+.ecran > img{position:absolute;inset:0;width:100%;height:100%}
 .nom{position:absolute;left:0;right:0;text-align:center;font-weight:700;font-size:calc(var(--th)*0.04);top:calc(var(--th)*-0.065)}
 .doigt{position:absolute;width:13%;aspect-ratio:1;border-radius:50%;background:rgba(55,80,66,.35);border:3px solid #fff;
   transform:translate(-50%,-50%);box-shadow:0 4px 14px rgba(0,0,0,.25)}
@@ -21,7 +21,7 @@ html,body{width:var(--L);height:var(--H);overflow:hidden;background:var(--fond);
 .titre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--encre);color:#fff;text-align:center;padding:0 8%}
 .titre .num{width:var(--tn);height:var(--tn);border-radius:50%;background:#7CB98F;color:var(--encre);display:flex;align-items:center;justify-content:center;font-size:calc(var(--tn)*.55);font-weight:700}
 .titre .t{font-size:var(--tt);font-weight:700}
-.html{position:absolute;inset:0;font-family:A,sans-serif}
+.html{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;font-family:A,sans-serif}
 </style></head><body><div id="scene"></div>
 <script>
 const P = new URLSearchParams(location.search);
@@ -88,10 +88,10 @@ function html(type, t) {
   } else if (type === 'notif') {
     const a = Math.min(1, Math.max(0, (t - 1.0) * 3));
     d.style.background = 'linear-gradient(160deg,#2b4a3a,#14231b)';
-    d.innerHTML = `<div style="color:#fff;text-align:center;margin-top:120px;font-size:64px;font-weight:300">08:42</div>
+    d.innerHTML = `<div style="color:#fff;text-align:center;margin-top:90px;font-size:64px;font-weight:300">08:42</div>
       <div style="color:#d9e6dd;text-align:center;font-size:16px">samedi 14 novembre</div>
-      <div style="position:absolute;left:12px;right:12px;top:${300 - (1 - a) * 40}px;opacity:${a};background:rgba(255,255,255,.95);border-radius:18px;padding:12px 14px;display:flex;gap:10px">
-        <img src="${img('images/complet.png')}" style="width:38px;height:38px;border-radius:8px;background:#3F7D5A">
+      <div style="position:absolute;left:12px;right:12px;top:${240 - (1 - a) * 40}px;opacity:${a};background:rgba(255,255,255,.95);border-radius:18px;padding:12px 14px;display:flex;gap:10px">
+        <img src="${img('images/complet.png')}" style="width:38px;height:38px;flex-shrink:0;border-radius:8px;background:#3F7D5A;object-fit:contain">
         <div style="font-size:14px;color:#222"><b>Emplettes · Famille Martin</b> <span style="color:#888">maintenant</span><br>Claire : Pensez aux piles pour la télécommande !</div></div>`;
   } else if (type === 'fin') {
     d.style.background = 'var(--encre)';
@@ -151,6 +151,7 @@ window.rendre = function (t) {
     const x = VERTICAL ? (L - th * 390 / 844) / 2 : 150;
     const contenu = sc.type === 'tel' ? imageA(sc, tl) : html(sc.type, tl);
     const e = telephone(x, y, th, contenu);
+    if (sc.type !== 'tel') { const k = e.clientWidth / 300; contenu.style.width = '300px'; contenu.style.height = (e.clientHeight / k) + 'px'; contenu.style.transform = `scale(${k})`; }
     if (sc.type === 'tel') { gestes(e, sc.gestes, tl); surligne(e, sc.surligne, tl); }
   }
   const zone = VERTICAL ? { x: 50, y: sc.type === 'deux' ? 820 : 880, w: L - 100 } : { x: sc.type === 'deux' ? 760 : 620, y: 0, w: sc.type === 'deux' ? 460 : 560 };

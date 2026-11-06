@@ -84,7 +84,7 @@ BAS = f'''<footer>
       <h4>Aide</h4>
       <ul>
         <li><a href="aide.html#questions">Questions fréquentes</a></li>
-        <li><a href="aide.html#video">Vidéo</a><span class="a-venir">à venir</span></li>
+        <li><a href="aide.html#video">Vidéo</a></li>
         <li><a href="aide.html#donnees">Vos données</a></li>
         <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
       </ul>
@@ -306,7 +306,10 @@ AIDE = titre_page('icones/open-book.png', 'Aide', 'Mode d\'emploi, dépliant, qu
   <section id="video">
     <div class="large">
       {bandeau('icones/clapper-board.png', 'Vidéo de démonstration')}
-      <div class="video"><div><img src="icones/play-button.png" alt=""><b>Bientôt disponible</b>Quelques minutes pour voir Emplettes en action.</div></div>
+      <p class="intro">Moins de trois minutes pour voir Emplettes en action : préparer à plusieurs, faire les courses, et profiter de son expérience.</p>
+      <video class="film paysage" controls preload="none" poster="video/affiche.jpg" src="video/emplettes.mp4"></video>
+      <video class="film vertical" controls preload="none" poster="video/affiche-vertical.jpg" src="video/emplettes-vertical.mp4"></video>
+      <p class="note"><a href="video/emplettes.mp4" download>Télécharger la vidéo</a> · voix de synthèse Piper (Siwis, CC BY 4.0).</p>
     </div>
   </section>
   <section id="questions">
