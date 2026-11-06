@@ -3949,6 +3949,13 @@ class Etat extends ChangeNotifier {
     ];
   }
 
+  /// Version du catalogue des marques : celui livré avec l'application tant que la console ne publie pas
+  /// de catalogue des marques (06/11/2026 : numéro prévu, affiché dans Gérer).
+  int versionCatalogueMarques = 0;
+
+  /// « Version 7 », ou « Version d'origine » pour le catalogue livré avec l'application (Gérer, 06/11/2026).
+  String libelleVersion(int n) => n > 0 ? 'Version $n' : 'Version d\'origine';
+
   void lireMarquesType(Map<String, dynamic> j) {
     marquesType = {for (final e in (j['secteurs'] as Map).entries) e.key as String: _ids(e.value)};
   }
