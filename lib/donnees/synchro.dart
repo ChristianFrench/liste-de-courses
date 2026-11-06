@@ -69,6 +69,9 @@ class ServeurMqtt {
   static const utilisateurDefaut = String.fromEnvironment('MQTT_UTILISATEUR');
   static const motDePasseDefaut = String.fromEnvironment('MQTT_MOT_DE_PASSE');
 
+  /// Serveurs abandonnés : un réglage qui les nomme encore est ignoré (06/11/2026, passage au serveur OVH).
+  static const anciensHotes = {'w041270a.ala.us-east-1.emqxsl.com'};
+
   /// Vrai si l'application a reçu l'identifiant du serveur à la compilation.
   static bool get identifiantIntegre => utilisateurDefaut.isNotEmpty;
 
@@ -247,8 +250,14 @@ class Synchro extends ChangeNotifier {
 
   String get noeud => _reglage('noeud') ?? '';
 
+  /// Tout l'état de l'appareil est redéposé une fois quand cette marque change : chiffrement (« chf/ »,
+  /// 01/11/2026), puis serveur (06/11/2026 : le nouveau serveur ne connaît pas l'état gardé sur l'ancien).
+  String get _marqueEtat => 'chf/${serveur.hote}/$code/$noeud';
+
   ServeurMqtt get serveur {
-    final hote = _reglage('hote') ?? '';
+    var hote = _reglage('hote') ?? '';
+    // Ancien serveur EMQX saisi à la main (avant le serveur OVH du 06/11/2026) : remplacé par le serveur imposé.
+    if (ServeurMqtt.anciensHotes.contains(hote) && hote != ServeurMqtt.hoteDefaut) hote = '';
     // Serveur imposé, sauf réglage de dépannage (« Avancé ») ou ancien serveur saisi à la main.
     if (hote.isEmpty) return ServeurMqtt(empreinte: _reglage('empreinte') ?? '');
     final u = _reglage('utilisateur') ?? '';
@@ -645,7 +654,7 @@ class Synchro extends ChangeNotifier {
           _controle?.cancel();
           _controle = Timer.periodic(const Duration(seconds: 30), (_) => _controler());
           _sansPanne('l\'annonce aux autres appareils', _annoncer);
-          if (_reglage('etat_publie') != 'chf/$code/$noeud' || _partsASalir.isNotEmpty) {
+          if (_reglage('etat_publie') != _marqueEtat || _partsASalir.isNotEmpty) {
             _etatDiffere ??= Timer(const Duration(seconds: 5), _publierEtat);
           }
         } else if (e == 'deconnecte') {
@@ -865,8 +874,7 @@ class Synchro extends ChangeNotifier {
       _etatDiffere = Timer(const Duration(seconds: 10), _publierEtat);
       return;
     }
-    // « chf/ » : depuis le chiffrement (01/11/2026), tout l'état est redéposé une fois, chiffré.
-    final marque = 'chf/$code/$noeud';
+    final marque = _marqueEtat;
     final tout = _reglage('etat_publie') != marque;
     final parts = tout ? List.generate(nbParts, (i) => i) : (_partsASalir.toList()..sort());
     _partsASalir.clear();

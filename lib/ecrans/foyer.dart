@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../donnees/envoi.dart';
+import '../donnees/messages.dart';
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
@@ -15,7 +16,9 @@ import 'parametres.dart' show OptionFoyer, ajouterMembreParNom, repartirANeuf;
 // et régénérer le code. Chacun choisit son nom dans la liste des membres en rejoignant le foyer.
 
 const lienApk = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk';
-const lienWeb = 'https://christianfrench.github.io/liste-de-courses/web/';
+const lienWeb = MessagesFoyer.domaine == ''
+    ? 'https://christianfrench.github.io/liste-de-courses/web/'
+    : 'https://${MessagesFoyer.domaine}/web/';
 
 String _vu(DateTime d) {
   final j = DateTime.now().difference(d).inDays;

@@ -65,7 +65,10 @@ class MessagesFoyer extends ChangeNotifier {
   MessagesFoyer._();
   static final MessagesFoyer instance = MessagesFoyer._();
 
-  static const serveur = 'https://ntfy.sh';
+  /// Domaine du serveur OVH d'Emplettes (secret GitHub VPS_HOTE) : ntfy y tourne depuis le 06/11/2026 ;
+  /// sans lui, le service public ntfy.sh comme avant.
+  static const domaine = String.fromEnvironment('DOMAINE');
+  static const serveur = domaine == '' ? 'https://ntfy.sh' : 'https://ntfy.$domaine';
 
   /// Remplaçable dans les essais.
   http.Client client = http.Client();
@@ -105,7 +108,7 @@ class MessagesFoyer extends ChangeNotifier {
   String get lienWeb => '$serveur/$monCanal';
 
   /// Lien qui abonne l'appli ntfy d'Android au canal.
-  String get lienAppli => 'ntfy://ntfy.sh/$monCanal';
+  String get lienAppli => 'ntfy://${Uri.parse(serveur).host}/$monCanal';
 
   /// Envoie [texte] au journal du foyer et sur le canal des membres [a] (tous si null), sauf soi-même ;
   /// renvoie une erreur lisible, ou null.

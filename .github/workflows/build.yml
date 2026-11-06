@@ -14,6 +14,12 @@ env:
   EMAILJS_SERVICE: ${{ secrets.EMAILJS_SERVICE }}
   EMAILJS_MODELE: ${{ secrets.EMAILJS_MODELE }}
   EMAILJS_CLE: ${{ secrets.EMAILJS_CLE }}
+  # Serveur OVH d'Emplettes (06/11/2026) : partage, messages (ntfy), relais de mails, site web.
+  MQTT_HOTE_VPS: ${{ secrets.MQTT_HOTE_VPS }}
+  MQTT_UTILISATEUR_VPS: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+  MQTT_MOT_DE_PASSE_VPS: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+  RELAIS_CLE: ${{ secrets.RELAIS_CLE }}
+  VPS_HOTE: ${{ secrets.VPS_HOTE }}
   CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,windows .
 
 jobs:
@@ -51,6 +57,21 @@ jobs:
           flutter test test/synchro_serveur_reel.dart --reporter expanded > reel.log 2>&1
           grep -o '::\(notice\|warning\) title=.*' reel.log || true
           grep -q 'All tests passed' reel.log || { echo "::warning title=Synchronisation, serveur réel::échec"; tail -n 30 reel.log; exit 1; }
+      - name: Deux appareils sur le serveur OVH d'Emplettes (partage, messages, relais de mails)
+        if: always() && env.MQTT_HOTE_VPS != ''
+        continue-on-error: true
+        env:
+          MQTT_HOTE: ${{ secrets.MQTT_HOTE_VPS }}
+          MQTT_PORT: '8883'
+          MQTT_TLS: '1'
+          MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          MQTT_MDP: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          curl -fsS "https://ntfy.$VPS_HOTE/v1/health" && echo " ntfy bon" || echo "::warning title=Serveur OVH::ntfy injoignable"
+          curl -fsS "https://$VPS_HOTE/api/mail/etat" && echo " relais bon" || echo "::warning title=Serveur OVH::relais de mails injoignable"
+          flutter test test/synchro_serveur_reel.dart --reporter expanded > vps.log 2>&1
+          grep -o '::\(notice\|warning\) title=.*' vps.log || true
+          grep -q 'All tests passed' vps.log || { echo "::warning title=Synchronisation, serveur OVH::échec"; tail -n 30 vps.log; exit 1; }
       - name: Captures des écrans (branche « captures »)
         if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')
         env:
@@ -238,6 +259,24 @@ jobs:
           touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with: { path: site }
+      - name: Publier aussi sur le serveur OVH (https://<domaine>/, /web/, /demo/)
+        if: github.ref == 'refs/heads/main' && env.VPS_HOTE != ''
+        env:
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+        run: |
+          # Même site, servi à la racine du domaine : seule l'adresse de base change.
+          cp -r site site-vps
+          sed -i 's#<base href="/liste-de-courses/web/">#<base href="/web/">#' site-vps/web/index.html
+          sed -i 's#<base href="/liste-de-courses/demo/">#<base href="/demo/">#' site-vps/demo/index.html
+          grep -c '<base href="/web/">' site-vps/web/index.html
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          # Le compte « deploiement » ne peut qu'écrire dans le dossier du site (rrsync).
+          rsync -rlz --delete-after --exclude telechargements/ \
+            -e "ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new" \
+            site-vps/ "deploiement@$VPS_HOTE:"
+          rm -f ~/.ssh/deploiement
+          curl -fsS "https://$VPS_HOTE/web/" | grep -c '<base href="/web/">'
 
   site_web:
     name: publication de la version web (GitHub Pages)

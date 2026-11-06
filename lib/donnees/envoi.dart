@@ -24,11 +24,18 @@ class MailDirect {
   static const modele = String.fromEnvironment('EMAILJS_MODELE');
   static const cle = String.fromEnvironment('EMAILJS_CLE');
 
+  /// Relais de mails du serveur OVH d'Emplettes (06/11/2026) : les mails partent de la boîte du domaine ;
+  /// EmailJS ne sert plus qu'en secours, si le relais ne répond pas.
+  static const domaine = String.fromEnvironment('DOMAINE');
+  static const cleRelais = String.fromEnvironment('RELAIS_CLE');
+  static bool get relais => domaine.isNotEmpty && cleRelais.isNotEmpty;
+  static bool get emailJs => service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty;
+
   /// Remplaçable dans les essais.
   static bool? disponibleEssai;
   static http.Client client = http.Client();
 
-  static bool get disponible => disponibleEssai ?? (!demonstration && service.isNotEmpty && modele.isNotEmpty && cle.isNotEmpty);
+  static bool get disponible => disponibleEssai ?? (!demonstration && (relais || emailJs));
 
   /// Paramètres du modèle EmailJS (champs {{...}} du modèle).
   /// [html] : le même contenu mis en forme (champ {{{texte_html}}} du modèle) ; par défaut, le texte tel quel.
@@ -52,9 +59,24 @@ class MailDirect {
   static String enHtml(String texte) => '<div style="font-family:Arial,sans-serif;font-size:15px">'
       '${_echapper(texte).replaceAll('\n', '<br>')}</div>';
 
-  /// Envoi brut (écran d'essai) : parti ou non, et la réponse d'EmailJS telle quelle.
+  /// Envoi brut (écran d'essai) : parti ou non, et la réponse du relais (ou d'EmailJS) telle quelle.
   static Future<(bool, String)> envoyerParametres(Map<String, String> p) async {
-    if (!disponible) return (false, 'Identifiants EmailJS absents de cette version (secrets GitHub EMAILJS_*)');
+    if (!disponible) return (false, 'Ni relais ni EmailJS dans cette version (secrets GitHub RELAIS_CLE, EMAILJS_*)');
+    String? refus;
+    if (relais) {
+      try {
+        final r = await client
+            .post(Uri.parse('https://$domaine/api/mail'),
+                headers: {'Content-Type': 'application/json'}, body: jsonEncode({'cle': cleRelais, 'template_params': p}))
+            .timeout(const Duration(seconds: 20));
+        if (r.statusCode < 300) return (true, 'Relais $domaine : ${r.statusCode} ${r.body}');
+        refus = 'Relais $domaine : ${r.statusCode} ${r.body}';
+      } catch (e) {
+        refus = 'Relais $domaine : pas de réponse ($e)';
+      }
+      debugPrint(refus);
+      if (!emailJs) return (false, refus);
+    }
     try {
       final r = await client
           .post(Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
@@ -62,10 +84,11 @@ class MailDirect {
               body: jsonEncode({'service_id': service, 'template_id': modele, 'user_id': cle, 'template_params': p}))
           .timeout(const Duration(seconds: 20));
       if (r.statusCode >= 300) debugPrint('EmailJS : ${r.statusCode} ${r.body}');
-      return (r.statusCode < 300, 'Réponse ${r.statusCode} : ${r.body}');
+      final emailjs = 'EmailJS : ${r.statusCode} ${r.body}';
+      return (r.statusCode < 300, refus == null ? emailjs : '$refus\n$emailjs (secours)');
     } catch (e) {
       debugPrint('EmailJS : $e');
-      return (false, 'Pas de réponse : $e');
+      return (false, '${refus == null ? '' : '$refus\n'}EmailJS : pas de réponse ($e)');
     }
   }
 }
