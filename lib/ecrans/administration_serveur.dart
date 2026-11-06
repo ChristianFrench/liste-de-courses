@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:xterm/xterm.dart';
 
@@ -617,6 +618,25 @@ class PageShell extends StatefulWidget {
 
 class _PageShellState extends State<PageShell> {
   final _focus = FocusNode();
+  final _selection = TerminalController();
+  final _defilement = ScrollController();
+
+  /// Copie la sélection (Ctrl+C ou clic droit, comme le terminal de Windows) ; rend false s'il n'y en a pas.
+  bool _copier() {
+    final s = _selection.selection;
+    if (s == null) return false;
+    Clipboard.setData(ClipboardData(text: ConsoleShell.instance.terminal.buffer.getText(s)));
+    _selection.clearSelection();
+    ScaffoldMessenger.maybeOf(context)
+      ?..hideCurrentSnackBar()
+      ..showSnackBar(const SnackBar(content: Text('Copié'), duration: Duration(seconds: 1)));
+    return true;
+  }
+
+  Future<void> _coller() async {
+    final t = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    if (t != null && t.isNotEmpty) ConsoleShell.instance.terminal.paste(t);
+  }
 
   @override
   void initState() {
@@ -636,6 +656,8 @@ class _PageShellState extends State<PageShell> {
   @override
   void dispose() {
     _focus.dispose();
+    _selection.dispose();
+    _defilement.dispose();
     super.dispose();
   }
 
@@ -680,12 +702,32 @@ class _PageShellState extends State<PageShell> {
           // Un clic n'importe où dans la zone noire lui donne le clavier.
           child: Listener(
             onPointerDown: (_) => _focus.requestFocus(),
-            child: TerminalView(
-              c.terminal,
-              focusNode: _focus,
-              autofocus: true,
-              hardwareKeyboardOnly: true,
-              textStyle: const TerminalStyle(fontSize: 14, fontFamily: 'Consolas'),
+            child: Scrollbar(
+              controller: _defilement,
+              thumbVisibility: true,
+              child: TerminalView(
+                c.terminal,
+                controller: _selection,
+                scrollController: _defilement,
+                focusNode: _focus,
+                autofocus: true,
+                hardwareKeyboardOnly: true,
+                textStyle: const TerminalStyle(fontSize: 14, fontFamily: 'Consolas'),
+                // Ctrl+C copie s'il y a une sélection, sinon interrompt la commande (comme le terminal de Windows).
+                onKeyEvent: (_, e) {
+                  if (e is KeyDownEvent &&
+                      e.logicalKey == LogicalKeyboardKey.keyC &&
+                      HardwareKeyboard.instance.isControlPressed &&
+                      _copier()) {
+                    return KeyEventResult.handled;
+                  }
+                  return KeyEventResult.ignored;
+                },
+                // Clic droit : copie la sélection, ou colle s'il n'y en a pas.
+                onSecondaryTapDown: (_, __) {
+                  if (!_copier()) _coller();
+                },
+              ),
             ),
           ),
         ),
