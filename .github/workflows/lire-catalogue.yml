@@ -1,0 +1,28 @@
+name: Lire le catalogue commun publié (diagnostic)
+on: workflow_dispatch
+jobs:
+  lire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Catalogue retenu sur le serveur OVH
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null
+          for t in ldc/catalogue-commun 'ldc/catalogue-versions/+'; do
+            echo "== $t"
+            mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t "$t" -v -W 10 -F '%t %l' > /tmp/m.txt 2>&1 || true
+            cat /tmp/m.txt
+          done
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 10 > /tmp/c.txt || true
+          python3 - <<'PY'
+          import base64, gzip, json
+          t = open('/tmp/c.txt').read().strip()
+          print('taille', len(t), 'début', t[:12])
+          if t.startswith('sig:'): t = t[t.index(':', 4) + 1:]
+          if t.startswith('gz:'): t = gzip.decompress(base64.b64decode(t[3:])).decode()
+          j = json.loads(t)
+          print({k: j.get(k) for k in ('version', 'numero', 'date')}, 'rayons', len(j.get('rayons', [])))
+          PY
