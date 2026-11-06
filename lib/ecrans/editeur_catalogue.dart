@@ -17,16 +17,23 @@ import '../theme.dart';
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 class EcranEditeurCatalogue extends StatefulWidget {
-  const EcranEditeurCatalogue({super.key});
+  const EcranEditeurCatalogue({super.key, this.auChangement, this.actionsAPart = false});
+
+  /// Prévenu à chaque modification du brouillon (panneau de droite de la console).
+  final VoidCallback? auChangement;
+
+  /// Console Windows : les actions générales sont dans le panneau de droite, pas dans l'écran du téléphone.
+  final bool actionsAPart;
 
   /// Relire la version publiée sur le serveur à l'ouverture (coupé dans les tests, sans serveur).
   static bool actualiserAuServeur = true;
 
   @override
-  State<EcranEditeurCatalogue> createState() => _EcranEditeurCatalogueState();
+  State<EcranEditeurCatalogue> createState() => EtatEditeurCatalogue();
 }
 
-class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
+/// État public : la console d'administration (fenêtre Windows) appelle ses actions depuis le panneau de droite.
+class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   Brouillon? b;
   Map<String, dynamic>? publie;
   bool _publication = false;
@@ -48,13 +55,44 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
         publie = d;
         b = x;
       });
+      widget.auChangement?.call();
     }
   }
 
   void _modifie() {
     CatalogueCommun.instance.enregistrerBrouillon(b!);
     setState(() {});
+    widget.auChangement?.call();
   }
+
+  /// Numéro de la dernière version publiée (0 : aucune).
+  int get numeroPublie => _numero;
+  bool get enPublication => _publication;
+
+  Future<void> repartir() => _repartir();
+  Future<void> nouveauRayon() async {
+    final b = this.b;
+    if (b == null) return;
+    final nom = await demanderTexte(context, titre: 'Nouveau rayon', valider: 'Ajouter');
+    if (nom == null || nom.trim().isEmpty) return;
+    b.ajouterRayon(nom);
+    _modifie();
+  }
+
+  Future<void> depuisTexte() async {
+    if (b != null && await ajouterDepuisTexte(context, b!)) _modifie();
+  }
+
+  Future<void> cleSignature() async {
+    if (b != null) await _cleSignature(b!);
+  }
+
+  Future<void> generaliser() async {
+    if (b != null && !_publication && b!.modifications > 0) await _publier(b!);
+  }
+
+  /// Ce qui changera à la prochaine généralisation.
+  Recapitulatif? get recapitulatif => b == null ? null : Recapitulatif.entre(publie ?? const {}, b!.versJson());
 
   int get _numero => ((publie?['numero'] as num?) ?? 0).toInt();
 
@@ -67,7 +105,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
         sousTitre: 'Emplettes · outil de l\'éditeur',
         titre: 'Catalogue commun',
         actions: [
-          if (b != null) ...[
+          if (b != null && !widget.actionsAPart) ...[
             ActionLigne(Icons.restore, 'Repartir d\'un catalogue', () => _repartir()),
             ActionLigne(Icons.add, '+ Nouveau rayon', () async {
               final nom = await demanderTexte(context, titre: 'Nouveau rayon', valider: 'Ajouter');
@@ -158,7 +196,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
               ],
             ),
       bas: [
-        if (b != null)
+        if (b != null && !widget.actionsAPart)
           BarreAction(
             boutons: [
               Bouton(
@@ -206,6 +244,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     if (ok != true || !mounted) return;
     final nouveau = c.repartirDe(j, modifications: k.startsWith('p') ? ((j['changements'] as num?) ?? 1).toInt() : 1);
     setState(() => b = nouveau);
+    widget.auChangement?.call();
     Nav.message(context, 'Brouillon repris de « ${choix[k]} »');
   }
 
@@ -224,6 +263,7 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     if (CatalogueCommun.instance.graineSignature == null && await _demanderPhrase() == null) return;
     if (!mounted) return;
     setState(() => _publication = true);
+    widget.auChangement?.call();
     var fait = false;
     try {
       fait = await CatalogueCommun.instance.publierBrouillon(b);
@@ -233,10 +273,12 @@ class _EcranEditeurCatalogueState extends State<EcranEditeurCatalogue> {
     if (!mounted) return;
     if (fait) {
       setState(() => _publication = false);
+      widget.auChangement?.call();
       await _charger();
       if (mounted) Nav.message(context, 'Version v$_numero généralisée : chaque foyer la reçoit à son prochain lancement');
     } else {
       setState(() => _publication = false);
+      widget.auChangement?.call();
       Nav.message(context,
           'Rien n\'est publié (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : le brouillon est gardé, réessayez');
     }

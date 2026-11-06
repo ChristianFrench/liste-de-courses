@@ -157,11 +157,11 @@ jobs:
         with:
           name: Emplettes Installation
           path: build/installation/Emplettes-Installation.exe
-      - name: Compiler l'outil de l'éditeur du catalogue commun (Windows seulement)
+      - name: Compiler la console d'administration (Windows seulement, fenêtre large)
         shell: bash
         run: |
           set +e
-          sed -i 's/window\.Create(L"[^"]*"/window.Create(L"Emplettes \\u00e9diteur du catalogue"/' windows/runner/main.cpp
+          python outils/fenetre_editeur.py
           flutter build windows --release --dart-define-from-file=definitions-editeur.json --dart-define=OUTIL_EDITEUR=true > compilation-editeur.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python outils/annoter.py compilation-editeur.log "Compilation outil de l'éditeur"; else tail -n 5 compilation-editeur.log; fi

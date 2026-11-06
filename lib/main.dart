@@ -25,6 +25,8 @@ Future<void> main() async {
   // Outil de l'éditeur du catalogue commun : rien d'autre que son écran (ni foyer, ni partage).
   if (outilEditeur) {
     if (Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
+    // Le code secret est demandé à chaque lancement.
+    CatalogueCommun.instance.verrouiller();
     runApp(const OutilEditeurApp());
     return;
   }
@@ -47,7 +49,7 @@ class OutilEditeurApp extends StatelessWidget {
   const OutilEditeurApp({super.key});
 
   @override
-  Widget build(BuildContext context) => const ListeDeCoursesApp(accueil: EcranOutilEditeur(), titre: 'Emplettes · éditeur du catalogue');
+  Widget build(BuildContext context) => const ListeDeCoursesApp(accueil: EcranOutilEditeur(), titre: 'Emplettes · administration');
 }
 
 class ListeDeCoursesApp extends StatelessWidget {
@@ -106,6 +108,8 @@ class FormatTelephone extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = MediaQuery.of(context);
     final bornee = media.copyWith(textScaler: media.textScaler.clamp(minScaleFactor: 1.0, maxScaleFactor: 1.15));
+    // Console d'administration (Windows) : toute la largeur de la fenêtre.
+    if (outilEditeur) return child;
     final navigateurPc = kIsWeb && media.size.width > 600;
     if (!navigateurPc && (kIsWeb || defaultTargetPlatform != TargetPlatform.windows)) {
       return MediaQuery(data: bornee, child: child);

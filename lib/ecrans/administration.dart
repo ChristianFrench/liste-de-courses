@@ -1,0 +1,438 @@
+import 'package:flutter/material.dart';
+
+import '../composants/composants.dart';
+import '../composants/icone.dart';
+import '../donnees/catalogue_commun.dart';
+import '../donnees/modele.dart';
+import '../main.dart' show tailleTelephone;
+import '../theme.dart';
+import 'editeur_catalogue.dart';
+
+// Console d'administration d'Emplettes (06/11/2026, Aristide) : application Windows seule, en fenêtre large,
+// ouverte par le code d'éditeur (secret GitHub CODE_EDITEUR). Mêmes composants graphiques que l'application.
+// À gauche, le menu des fonctions d'administration ; à droite, la fonction choisie :
+// - Ressources techniques : les composants installés sur le VPS OVH (à venir, quand le serveur sera installé) ;
+// - Utilisateurs : foyers, appareils et suivi des activités (à venir) ;
+// - Contenu : catalogue des produits (à gauche la vue du téléphone, à droite les actions de maintenance),
+//   catalogue des marques (à venir) ;
+// - Apparence : palette de la console.
+
+enum Rubrique { ressources, utilisateurs, produits, marques, apparence }
+
+class _Entree {
+  const _Entree(this.rubrique, this.titre, this.icone);
+  final Rubrique rubrique;
+  final String titre;
+  final IconData icone;
+}
+
+const _groupes = <(String, List<_Entree>)>[
+  ('Ressources techniques', [_Entree(Rubrique.ressources, 'Composants sur OVH', Icons.dns_outlined)]),
+  ('Utilisateurs', [_Entree(Rubrique.utilisateurs, 'Foyers et activités', Icons.groups_outlined)]),
+  ('Contenu', [
+    _Entree(Rubrique.produits, 'Catalogue des produits', Icons.inventory_2_outlined),
+    _Entree(Rubrique.marques, 'Catalogue des marques', Icons.sell_outlined),
+  ]),
+  ('Réglages', [_Entree(Rubrique.apparence, 'Apparence', Icons.palette_outlined)]),
+];
+
+class ConsoleAdministration extends StatefulWidget {
+  const ConsoleAdministration({super.key, this.depart = Rubrique.produits});
+  final Rubrique depart;
+
+  @override
+  State<ConsoleAdministration> createState() => _ConsoleAdministrationState();
+}
+
+class _ConsoleAdministrationState extends State<ConsoleAdministration> {
+  late Rubrique rubrique = widget.depart;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Charte.fond,
+      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _Menu(choisie: rubrique, onChoix: (r) => setState(() => rubrique = r)),
+        VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
+        Expanded(
+          child: switch (rubrique) {
+            Rubrique.produits => const PageCatalogueProduits(),
+            Rubrique.ressources => const _PageAVenir(
+                titre: 'Composants sur OVH',
+                chemin: 'Ressources techniques',
+                texte: 'Quand le serveur OVH sera installé, chaque composant aura ici son état (en marche ou arrêté), '
+                    'sa charge et ses derniers incidents.',
+                elements: [
+                  ('Serveur VPS', 'Processeur, mémoire, disque, mises à jour', Icons.dns_outlined),
+                  ('Serveur de messages (MQTT)', 'Clients connectés, messages par heure', Icons.swap_horiz),
+                  ('Notifications (ntfy)', 'Messages envoyés aux foyers', Icons.notifications_none),
+                  ('Relais de mail', 'Mails envoyés, refusés', Icons.mail_outline),
+                  ('Site web', 'Visites, téléchargements', Icons.public),
+                  ('Sauvegardes', 'Dernière sauvegarde de la nuit, copie OVH', Icons.save_outlined),
+                ],
+              ),
+            Rubrique.utilisateurs => const _PageAVenir(
+                titre: 'Foyers et activités',
+                chemin: 'Utilisateurs',
+                texte: 'Le nombre de foyers et d\'appareils, et le suivi de leur activité, sans rien lire de leurs listes : '
+                    'les données des foyers sont chiffrées avec leur code.',
+                elements: [
+                  ('Foyers', 'Nombre de foyers, appareils par foyer', Icons.groups_outlined),
+                  ('Activité', 'Connexions du jour, de la semaine, du mois', Icons.show_chart),
+                  ('Propositions de catalogue', 'Foyers qui ont déposé des changements', Icons.inventory_2_outlined),
+                ],
+              ),
+            Rubrique.marques => const _PageAVenir(
+                titre: 'Catalogue des marques',
+                chemin: 'Contenu',
+                texte: 'Même disposition que le catalogue des produits : la vue du téléphone à gauche, les actions de '
+                    'maintenance des marques à droite.',
+                elements: [
+                  ('Marques par secteur', 'Ajouter, renommer, fusionner les doublons', Icons.sell_outlined),
+                  ('Marques des distributeurs', 'Enseignes et leurs marques propres', Icons.storefront_outlined),
+                ],
+              ),
+            Rubrique.apparence => const _PageApparence(),
+          },
+        ),
+      ]),
+    );
+  }
+}
+
+/// Le menu de gauche : l'image d'Emplettes, puis les fonctions groupées, puis « Verrouiller ».
+class _Menu extends StatelessWidget {
+  const _Menu({required this.choisie, required this.onChoix});
+  final Rubrique choisie;
+  final ValueChanged<Rubrique> onChoix;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 270,
+      color: Charte.fondBandeau,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 18, 16, 14),
+          child: Row(children: [
+            const ImageEmplettes('complet', taille: 52),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text('Emplettes', style: Charte.texte(20, gras: true, couleur: Charte.encreNiveau)),
+                Text('Administration', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+              ]),
+            ),
+          ]),
+        ),
+        Expanded(
+          child: ListView(padding: EdgeInsets.zero, children: [
+            for (final (titre, entrees) in _groupes) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                child: Text(titre.toUpperCase(), style: Charte.texte(12.5, gras: true, couleur: Charte.texteSecondaire)),
+              ),
+              for (final e in entrees)
+                Material(
+                  color: e.rubrique == choisie ? Charte.niveau(1) : Colors.transparent,
+                  child: InkWell(
+                    key: ValueKey('rubrique-${e.rubrique.name}'),
+                    onTap: () => onChoix(e.rubrique),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 9, 12, 9),
+                      child: Row(children: [
+                        Icone(e.icone, size: 22, color: Charte.cadre),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(e.titre,
+                              style: Charte.texte(15.5, gras: e.rubrique == choisie, couleur: Charte.encre)),
+                        ),
+                      ]),
+                    ),
+                  ),
+                ),
+            ],
+          ]),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(14),
+          child: Bouton(
+            key: const ValueKey('verrouiller'),
+            texte: 'Verrouiller',
+            icone: Icons.lock_outline,
+            onTap: CatalogueCommun.instance.verrouiller,
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+/// Titre d'une page de la console : le chemin en petit, puis le titre.
+class _TitrePage extends StatelessWidget {
+  const _TitrePage(this.chemin, this.titre);
+  final String chemin, titre;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.fromLTRB(28, 22, 28, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(chemin, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          Text(titre, style: Charte.texte(26, gras: true, couleur: Charte.encreNiveau)),
+        ]),
+      );
+}
+
+/// Contenu › Catalogue des produits : à gauche la vue du téléphone (l'écran de l'éditeur, tel qu'il se
+/// présente sur un téléphone), à droite les actions de maintenance et ce qui changera à la généralisation.
+class PageCatalogueProduits extends StatefulWidget {
+  const PageCatalogueProduits({super.key});
+
+  @override
+  State<PageCatalogueProduits> createState() => _PageCatalogueProduitsState();
+}
+
+class _PageCatalogueProduitsState extends State<PageCatalogueProduits> {
+  final _editeur = GlobalKey<EtatEditeurCatalogue>();
+  final _telephone = GlobalKey<NavigatorState>();
+
+  void _rafraichir() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      // Vue du téléphone : l'écran 390 × 844 de l'application, réduit à la hauteur de la fenêtre.
+      Container(
+        color: Charte.niveau(4),
+        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
+        child: FittedBox(
+          child: Container(
+            width: tailleTelephone.width + 16,
+            height: tailleTelephone.height + 16,
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(color: const Color(0xFF2B2B2B), borderRadius: BorderRadius.circular(30)),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(size: tailleTelephone, padding: EdgeInsets.zero, viewPadding: EdgeInsets.zero),
+                child: Navigator(
+                  key: _telephone,
+                  onGenerateRoute: (_) => MaterialPageRoute(
+                    builder: (_) => EcranEditeurCatalogue(key: _editeur, auChangement: _rafraichir, actionsAPart: true),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+      VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
+      Expanded(child: _Maintenance(editeur: _editeur)),
+    ]);
+  }
+}
+
+/// Panneau de droite du catalogue des produits : état du brouillon, actions, changements à généraliser.
+class _Maintenance extends StatelessWidget {
+  const _Maintenance({required this.editeur});
+  final GlobalKey<EtatEditeurCatalogue> editeur;
+
+  @override
+  Widget build(BuildContext context) {
+    final e = editeur.currentState;
+    final b = e?.b;
+    final recap = e?.recapitulatif;
+    final numero = e?.numeroPublie ?? 0;
+    Widget action(String cle, IconData icone, String texte, String detail, VoidCallback? onTap) => Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Carte(
+            key: ValueKey('maintenance-$cle'),
+            onTap: onTap,
+            child: Row(children: [
+              Icone(icone, size: 26, color: Charte.cadre),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(texte, style: Charte.texte(16, gras: true)),
+                  Text(detail, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                ]),
+              ),
+            ]),
+          ),
+        );
+    return ListView(padding: const EdgeInsets.only(bottom: 24), children: [
+      const _TitrePage('Contenu', 'Catalogue des produits'),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          if (b != null)
+            Wrap(spacing: 10, runSpacing: 10, children: [
+              _Chiffre('Version publiée', numero == 0 ? 'aucune' : 'v$numero'),
+              _Chiffre('Rayons', '${b.catalogue.rayons.length}'),
+              _Chiffre('Secteurs', '${b.catalogue.rayons.fold(0, (n, r) => n + r.secteurs.length)}'),
+              _Chiffre('Produits', '${b.nbProduits}'),
+              _Chiffre('À généraliser', b.modifications == 0 ? 'rien' : '${b.modifications}'),
+            ]),
+          const SizedBox(height: 22),
+          Text('Maintenance', style: Charte.texte(18, gras: true, couleur: Charte.encreNiveau)),
+          const SizedBox(height: 10),
+          LayoutBuilder(builder: (context, c) {
+            final colonnes = c.maxWidth > 700 ? 2 : 1;
+            final cartes = [
+              action('repartir', Icons.restore, 'Repartir d\'un catalogue', 'Une version gardée ou la proposition d\'un foyer',
+                  e == null ? null : e.repartir),
+              action('rayon', Icons.add, 'Nouveau rayon', 'Les secteurs s\'ajoutent depuis le rayon, à gauche',
+                  e == null ? null : e.nouveauRayon),
+              action('texte', Icons.notes, 'Ajouter depuis un texte', 'Rayons, secteurs et produits collés d\'un texte',
+                  e == null ? null : e.depuisTexte),
+              action('cle', Icons.key_outlined, 'Clé de signature', 'La clé publique qui authentifie vos versions',
+                  e == null ? null : e.cleSignature),
+            ];
+            final largeur = (c.maxWidth - (colonnes - 1) * 10) / colonnes;
+            return Wrap(spacing: 10, children: [for (final w in cartes) SizedBox(width: largeur, child: w)]);
+          }),
+          const SizedBox(height: 14),
+          Text('À généraliser', style: Charte.texte(18, gras: true, couleur: Charte.encreNiveau)),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Charte.blanc,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Charte.separateurZone),
+            ),
+            child: recap == null || recap.vide
+                ? Text('Rien n\'a changé depuis la version publiée.', style: Charte.texte(15, couleur: Charte.texteSecondaire))
+                : RecapitulatifVue(recap),
+          ),
+          const SizedBox(height: 16),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 320,
+              child: Bouton(
+                key: const ValueKey('generaliser'),
+                texte: e?.enPublication == true ? 'Envoi…' : 'Généraliser (v${numero + 1})',
+                icone: Icons.public,
+                plein: true,
+                hauteur: 46,
+                onTap: e == null || e.enPublication || (b?.modifications ?? 0) == 0 ? null : e.generaliser,
+              ),
+            ),
+          ),
+        ]),
+      ),
+    ]);
+  }
+}
+
+/// Un chiffre clé dans une petite case : le nombre en gros, son libellé en dessous.
+class _Chiffre extends StatelessWidget {
+  const _Chiffre(this.libelle, this.valeur);
+  final String libelle, valeur;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: 124,
+        padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+        decoration: BoxDecoration(color: Charte.niveau(3), borderRadius: BorderRadius.circular(10)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(valeur, style: Charte.texte(24, gras: true, couleur: Charte.encreNiveau)),
+          Text(libelle, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
+        ]),
+      );
+}
+
+/// Fonction prévue, pas encore construite : ce qu'elle montrera.
+class _PageAVenir extends StatelessWidget {
+  const _PageAVenir({required this.titre, required this.chemin, required this.texte, required this.elements});
+  final String titre, chemin, texte;
+  final List<(String, String, IconData)> elements;
+
+  @override
+  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.only(bottom: 24), children: [
+        _TitrePage(chemin, titre),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(texte, style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 18),
+            Wrap(spacing: 12, runSpacing: 12, children: [
+              for (final (t, d, i) in elements)
+                Container(
+                  width: 300,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Charte.blanc,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Charte.separateurZone),
+                  ),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Icone(i, size: 26, color: Charte.cadre),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(t, style: Charte.texte(16, gras: true)),
+                        const SizedBox(height: 2),
+                        Text(d, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                        const SizedBox(height: 8),
+                        Text('À venir', style: Charte.texte(13, gras: true, couleur: Charte.cadre)),
+                      ]),
+                    ),
+                  ]),
+                ),
+            ]),
+          ]),
+        ),
+      ]);
+}
+
+/// Réglages › Apparence : la palette de la console (celle de l'application, en partie).
+class _PageApparence extends StatelessWidget {
+  const _PageApparence();
+
+  @override
+  Widget build(BuildContext context) => ListView(padding: const EdgeInsets.only(bottom: 24), children: [
+        const _TitrePage('Réglages', 'Apparence'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: SizedBox(
+              width: 420,
+              child: ChoixDeroulant<String>(
+                key: const ValueKey('palette-console'),
+                libelle: 'Palette de la console',
+                valeur: Charte.palette.nom,
+                choix: {for (final p in toutesLesPalettes) p.nom: p.nom},
+                apercus: {for (final p in toutesLesPalettes) p.nom: EchantillonPalette(p)},
+                apercuADroite: true,
+                onChange: (v) {
+                  Etat.instance.choisirApparence(v);
+                  Charte.choisirPalette(v);
+                },
+              ),
+            ),
+          ),
+        ),
+      ]);
+}
+
+/// Échantillon d'une palette : ses quatre niveaux, du plus foncé au plus clair.
+class EchantillonPalette extends StatelessWidget {
+  const EchantillonPalette(this.palette, {super.key});
+  final Palette palette;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: palette.accent)),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(3),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            for (final t in Charte.eclaircis) Container(width: 22, height: 22, color: Color.lerp(palette.accentFonce, Charte.blanc, t)),
+          ]),
+        ),
+      );
+}
