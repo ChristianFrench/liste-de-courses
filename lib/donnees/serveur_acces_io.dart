@@ -74,6 +74,17 @@ class AccesServeur {
       username: utilisateur,
       identities: motDePasse == null ? identites : null,
       onPasswordRequest: motDePasse == null ? null : () => motDePasse,
+      // Certains serveurs (Debian chez OVH) demandent le mot de passe en « clavier interactif ».
+      onUserInfoRequest: motDePasse == null
+          ? null
+          : (demande) {
+              final textes = [for (final q in demande.prompts) q.promptText.toLowerCase()];
+              if (textes.any((t) => t.contains('new') || t.contains('nouveau'))) {
+                throw Exception('Le serveur demande de changer le mot de passe de ${utilisateur} : faites-le une fois '
+                    'dans PowerShell (ssh $utilisateur@$hote), puis reposez la clé avec le nouveau');
+              }
+              return [for (final _ in demande.prompts) motDePasse];
+            },
       onVerifyHostKey: (type, empreinteRecue) {
         final e = '$type ${base64.encode(empreinteRecue)}';
         if (empreinte == null || empreinte.isEmpty) {

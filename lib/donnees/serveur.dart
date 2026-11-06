@@ -125,7 +125,7 @@ class Serveur extends ChangeNotifier {
 
   static String _message(Object e) {
     final t = '$e'.replaceFirst('Exception: ', '');
-    if (t.contains('SSHAuthFail') || t.contains('auth')) return 'Connexion refusée : clé non posée ou mot de passe faux';
+    if (t.contains('SSHAuthFail') || t.contains('SSHAuthAbort')) return 'Connexion refusée ($t) : clé non posée ou mot de passe faux';
     if (t.contains('SocketException') || t.contains('Connection refused') || t.contains('timed out')) {
       return 'Serveur injoignable ($hoteActuel)';
     }
