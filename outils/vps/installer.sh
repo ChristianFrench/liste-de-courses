@@ -34,7 +34,8 @@ secret() { # secret VAR "Question" : saisi deux fois, non affiché
   done
   printf -v "$1" '%s' "$a"
 }
-aleatoire() { tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${1:-32}"; }
+# Avec « set -o pipefail », tr reçoit SIGPIPE quand head s'arrête : le « || true » évite l'arrêt silencieux du script.
+aleatoire() { (LC_ALL=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${1:-32}") || true; }
 
 [ "$(id -u)" = 0 ] || stop "lancez le script avec sudo : sudo bash installer.sh"
 grep -q '^VERSION_ID="12"' /etc/os-release || stop "ce script est prévu pour Debian 12."
@@ -86,7 +87,8 @@ apt-get -y -q install ca-certificates curl gnupg jq rsync ufw fail2ban unattende
   nginx certbot mosquitto mosquitto-clients python3 dnsutils
 timedatectl set-timezone Europe/Paris || true
 if ! swapon --show | grep -q /swapfile; then
-  fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null && swapon /swapfile
+  [ -f /swapfile ] || { fallocate -l 1G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null; }
+  swapon /swapfile || true
   grep -q '^/swapfile' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
 fi
 cat > /etc/apt/apt.conf.d/20auto-upgrades <<'EOF'
