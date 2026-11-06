@@ -197,7 +197,7 @@ void main() {
     }
     expect(e.produit(utilise), isNotNull, reason: 'dans une liste : pas retiré');
     expect(e.nouveautesCatalogue?['version'], 10);
-    expect(e.nouveautesCatalogue?['lignes'], ['2 rayons', '2 secteurs', '3 produits']);
+    expect(e.nouveautesCatalogue?['lignes'], ['2 rayons, 2 secteurs, 3 produits', '3 modifications sur 3 produits']);
     expect(e.appliquerCatalogueCommun(version(10)), isEmpty, reason: 'déjà ajoutée');
     // Le même nom dans deux secteurs : deux produits, chacun dans son secteur.
     final v11 = version(11);

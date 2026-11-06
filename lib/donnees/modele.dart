@@ -3361,7 +3361,11 @@ class Etat extends ChangeNotifier {
       final rj = (j['rayons'] as List).cast<Map>();
       final sj = [for (final r in rj) ...(r['secteurs'] as List).cast<Map>()];
       final np = sj.fold(0, (n, x) => n + (x['produits'] as List).length);
-      final resume = ['${rj.length} rayons', '${sj.length} secteurs', '$np produits'];
+      final n = lignes.length;
+      final resume = [
+        '${rj.length} rayons, ${sj.length} secteurs, $np produits',
+        if (n > 0) '$n modification${n > 1 ? 's' : ''} sur $np produits',
+      ];
       nouveautesCatalogue = {'version': version, 'date': j['date'], 'lignes': resume, 'total': resume.length};
     }
     modifie();
