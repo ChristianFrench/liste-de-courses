@@ -1,5 +1,7 @@
 name: Voix de la vidéo (Piper, voix française Siwis)
 on: workflow_dispatch
+permissions:
+  contents: write
 jobs:
   voix:
     runs-on: ubuntu-latest
@@ -21,7 +23,12 @@ jobs:
               print(cle, 'ok')
           PY
           cp MODEL_CARD voix/ 2>/dev/null || true
-      - uses: actions/upload-artifact@v4
-        with:
-          name: voix
-          path: voix/
+      - name: Déposer sur la branche « video-voix » (les artefacts ne sont pas lisibles depuis la session)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan video-voix
+          git rm -rq --cached .
+          git add -f voix
+          git commit -qm "Voix de la vidéo pour ${GITHUB_SHA::7}"
+          git push -qf origin HEAD:refs/heads/video-voix
