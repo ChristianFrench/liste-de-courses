@@ -296,7 +296,14 @@ class _Maintenance extends StatelessWidget {
               border: Border.all(color: Charte.separateurZone),
             ),
             child: recap == null || recap.vide
-                ? Text('Rien n\'a changé depuis la version publiée.', style: Charte.texte(15, couleur: Charte.texteSecondaire))
+                ? Text(
+                    (b?.modifications ?? 0) == 0
+                        ? 'Rien n\'a changé depuis la version publiée.'
+                        // 06/11/2026 : des modifications sans ajout, retrait ni déplacement (ordre, images, noms…)
+                        // laissaient croire qu'il n'y avait rien à généraliser.
+                        : '${b!.modifications} modification${b.modifications > 1 ? 's' : ''} : ordre, images ou noms corrigés, '
+                            'sans rayon, secteur ni produit ajouté, retiré ou déplacé.',
+                    style: Charte.texte(15, couleur: Charte.texteSecondaire))
                 : RecapitulatifVue(recap),
           ),
           const SizedBox(height: 16),
