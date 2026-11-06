@@ -164,7 +164,7 @@ VISITE = [  # (capture, titre, texte, points)
     ('11 Magasins', 'Les magasins', 'Les magasins du foyer, et les parcours appris dans chacun.',
      ['Tous partagent le même catalogue.']),
     ('12 Catalogue', 'Le catalogue', 'Plus de 2 000 produits rangés par rayons et secteurs, le même dans tous les magasins.',
-     ['On peut ajouter ses produits et ses marques.', 'Un petit + signale ce que le foyer a ajouté.']),
+     ['On peut ajouter ses produits et ses marques.', 'Un petit + signale ce que le foyer a ajouté.', 'Il s\'améliore pour tous les foyers : sa version s\'affiche dans Gérer.']),
     ('10 Gerer', 'Gérer', 'Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, le catalogue, l\'apparence, les sauvegardes.',
      ['Le foyer se partage avec un simple code.']),
 ]
@@ -197,13 +197,13 @@ VISITE_DETAIL = [  # visite détaillée, 20 étapes (04/11/2026, Aristide)
     ('09 Course-passee', 'Les courses passées', 'Chaque course garde ses articles, son montant et son ticket de caisse.',
      ['« Voir le ticket », « Consulter ».', 'Une course passée peut redevenir une liste ou une liste type.']),
     ('17 Collaboration', 'Le foyer', 'Plusieurs membres, plusieurs appareils, les mêmes listes. On rejoint le foyer avec son code de partage, sans compte ni mot de passe.',
-     ['Les données sont chiffrées avec le code du foyer.', 'Les modifications faites sans réseau se partagent au retour.', 'Notifications et mails aux membres.']),
+     ['Les données sont chiffrées avec le code du foyer.', 'Les modifications faites sans réseau se partagent au retour.', 'Un message au foyer arrive en notification, même application fermée.', 'Les invitations et les résumés partent par mail.']),
     ('10 Gerer', 'L\'onglet Gérer', 'Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, les catalogues, l\'apparence, les données.',
      ['Les réglages sont rangés par rubriques, comme les listes.']),
     ('11 Magasins', 'Les magasins', 'Les magasins du foyer, partagés par tous, avec les parcours appris dans chacun.',
      ['Les grandes enseignes sont proposées d\'office.', 'Le parcours d\'un magasin se recommence ou se corrige.']),
     ('12 Produits', 'Le catalogue des produits', 'Plus de 2 000 produits rangés en rayons et secteurs, le même catalogue dans tous les magasins.',
-     ['On ajoute ses produits, on les renomme, on les déplace.', 'Un petit signe distingue ce que le foyer a ajouté ou modifié.']),
+     ['On ajoute ses produits, on les renomme, on les déplace.', 'Un petit signe distingue ce que le foyer a ajouté ou modifié.', 'Chaque nouvelle version du catalogue s\'ajoute au foyer, sans rien retirer de ce qui lui sert.']),
     ('13 Marques', 'Le catalogue des marques', 'Les marques rangées par secteur : celles proposées dans le volet de l\'article.',
      ['On y ajoute ou retire des marques.', 'Le nombre de marques s\'affiche pour chaque secteur.']),
     ('15 Palettes', 'L\'apparence', '17 palettes de couleurs pour l\'application, une autre pour les promotions et mesures, et un aperçu immédiat.',
@@ -251,7 +251,7 @@ TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes su
         <div class="telechargement">
           <div class="tete"><img src="icones/mobile-phone.png" alt=""><h3>Android</h3></div>
           <p>Le fichier APK à installer sur le téléphone.</p>
-          <ol class="note" style="margin:0;padding-left:18px"><li>Touchez « Télécharger l'APK ».</li><li>Ouvrez le fichier téléchargé.</li><li>Android demande d'autoriser l'installation depuis le navigateur : acceptez.</li></ol>
+          <ol class="note" style="margin:0;padding-left:18px"><li>Touchez « Télécharger l'APK ».</li><li>Ouvrez le fichier téléchargé.</li><li>Android demande d'autoriser l'installation depuis le navigateur : acceptez.</li><li>Au premier lancement, acceptez les notifications : les messages du foyer arriveront directement.</li></ol>
           <a class="bouton plein" href="{APK}">Télécharger l'APK</a>
         </div>
         <div class="telechargement">
@@ -276,9 +276,11 @@ TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes su
 # ------------------------------------------------------------------ Aide
 QUESTIONS = [
     ('Faut-il créer un compte ?', 'Non. On utilise Emplettes seul sur son appareil, ou en foyer : un code de partage suffit pour rejoindre les autres membres.'),
-    ('Mes listes sont-elles envoyées quelque part ?', 'Seul, rien ne quitte l\'appareil. En foyer, les listes passent d\'un appareil à l\'autre chiffrées avec le code du foyer.'),
+    ('Mes listes sont-elles envoyées quelque part ?', 'Seul, rien ne quitte l\'appareil. En foyer, les listes passent d\'un appareil à l\'autre par le serveur d\'Emplettes, chiffrées avec le code du foyer : le serveur ne peut pas les lire.'),
     ('L\'application marche-t-elle sans réseau ?', 'Oui. Tout est enregistré sur l\'appareil ; les changements partent vers le foyer dès que le réseau revient.'),
     ('Comment la liste suit-elle l\'ordre du magasin ?', 'Pendant les courses, l\'ordre dans lequel vous cochez les articles apprend votre parcours dans ce magasin. Les fois suivantes, la liste se range dans cet ordre.'),
+    ('Comment être prévenu d\'un message du foyer ?', 'Sur Android, acceptez les notifications au premier lancement : les messages arrivent même application fermée. Dans le navigateur : Gérer › Foyer › Messages › « Recevoir les notifications sur cet appareil ».'),
+    ('Le catalogue change-t-il ?', 'Oui : il s\'améliore pour tous les foyers. Chaque nouvelle version s\'ajoute à votre catalogue au lancement, sans retirer ce qui sert à vos listes. Sa version s\'affiche dans Gérer.'),
     ('Comment garder mes données en sécurité ?', 'Une copie est faite à chaque étape importante. « Sauvegarder maintenant » (Gérer › Paramètres › Données › Sauvegardes) donne un fichier à garder ailleurs.'),
 ]
 AIDE = titre_page('icones/open-book.png', 'Aide', 'Mode d\'emploi, dépliant, questions fréquentes.') + f'''<main>

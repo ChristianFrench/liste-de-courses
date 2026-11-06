@@ -313,7 +313,7 @@ class MenuGerer extends StatelessWidget {
             ecran(Icons.menu_book_outlined, 'Catalogue des produits',
                 '${etat.libelleVersion(etat.numeroCatalogueCommun)} · ${etat.produits.length} produits', const EcranCatalogue()),
             ecran(Icons.sell_outlined, 'Catalogue des marques',
-                '${etat.libelleVersion(etat.versionCatalogueMarques)} · ${etat.marques.length} marques', const EcranMarques()),
+                '${etat.libelleVersion(etat.versionCatalogueMarques)} · ${etat.nbMarquesConnues} marque${etat.nbMarquesConnues > 1 ? 's' : ''}', const EcranMarques()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
             ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures', const EcranTypesPackaging(lots: false)),
             ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings', const EcranTypesPackaging()),

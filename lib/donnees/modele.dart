@@ -4019,6 +4019,13 @@ class Etat extends ChangeNotifier {
     return '${origineRayon(rn)}/${origineSecteur(rn, s.nom)}';
   }
 
+  /// Nombre de marques connues (catalogue des marques, ajouts du foyer, marques des produits), pour Gérer.
+  int get nbMarquesConnues => {
+        for (final l in marquesType.values) ...l.map((n) => n.toLowerCase()),
+        for (final m in marquesSecteurs.values) ...(m['+'] ?? const <String>[]).map((n) => n.toLowerCase()),
+        for (final m in marques) m.nom.toLowerCase(),
+      }.length;
+
   /// Marques d'un secteur : celles du catalogue des marques, celles ajoutées par le foyer et celles des
   /// produits du secteur, sans celles que le foyer a retirées ; par ordre alphabétique.
   List<String> marquesDuSecteur(Secteur s) {
