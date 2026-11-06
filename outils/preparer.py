@@ -1,6 +1,6 @@
 """Ajuste les fichiers générés par « flutter create » (nom affiché, fenêtre Windows au format téléphone).
 Lancé automatiquement par GitHub Actions ; rien à faire à la main."""
-import pathlib, re, sys
+import os, pathlib, re, sys
 
 NOM = "Emplettes"
 LARGEUR, HAUTEUR = 390, 844   # format de référence de la spécification IHM, en points
@@ -67,8 +67,54 @@ if chemins.parent.parent.exists():
     print(f"créé : {chemins}")
 gradle = pathlib.Path("android/app/build.gradle.kts")
 if gradle.exists():
-    gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n}\n',
+    gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n'
+                      '    implementation("com.google.firebase:firebase-messaging:24.1.0")\n}\n',
                       encoding="utf-8")
+
+# Android : notifications du foyer par Firebase (06/11/2026). Le service qui les affiche, sa petite icône,
+# l'autorisation d'Android 13, et la configuration du projet Firebase lue dans le secret GitHub
+# GOOGLE_SERVICES_JSON (sans lui, Firebase ne démarre pas et l'application fonctionne sans notifications).
+dossier_kotlin = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses")
+if dossier_kotlin.exists():
+    (dossier_kotlin / "NotificationsEmplettes.kt").write_text(
+        pathlib.Path("outils/android/NotificationsEmplettes.kt").read_text(encoding="utf-8"), encoding="utf-8")
+    dessins = pathlib.Path("android/app/src/main/res/drawable")
+    dessins.mkdir(exist_ok=True)
+    (dessins / "ic_notification.xml").write_text(
+        pathlib.Path("outils/android/ic_notification.xml").read_text(encoding="utf-8"), encoding="utf-8")
+    remplacer("android/app/src/main/AndroidManifest.xml",
+              r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>', regex=True)
+    remplacer("android/app/src/main/AndroidManifest.xml",
+              r"(\s*</application>)",
+              r'''
+        <service
+            android:name=".NotificationsEmplettes"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>\1''', regex=True)
+    config = os.environ.get("GOOGLE_SERVICES_JSON", "").strip()
+    if config:
+        import json
+        from xml.sax.saxutils import escape
+        j = json.loads(config)
+        client = next(c for c in j["client"]
+                      if c["client_info"]["android_client_info"]["package_name"] == "fr.listecourses.liste_de_courses")
+        valeurs = {
+            "google_app_id": client["client_info"]["mobilesdk_app_id"],
+            "gcm_defaultSenderId": j["project_info"]["project_number"],
+            "google_api_key": client["api_key"][0]["current_key"],
+            "project_id": j["project_info"]["project_id"],
+        }
+        if j["project_info"].get("storage_bucket"):
+            valeurs["google_storage_bucket"] = j["project_info"]["storage_bucket"]
+        lignes = "".join(f'    <string name="{k}" translatable="false">{escape(v)}</string>\n' for k, v in valeurs.items())
+        pathlib.Path("android/app/src/main/res/values/firebase.xml").write_text(
+            f'<?xml version="1.0" encoding="utf-8"?>\n<resources>\n{lignes}</resources>\n', encoding="utf-8")
+        print("créé : android/app/src/main/res/values/firebase.xml (projet " + valeurs["project_id"] + ")")
+    else:
+        print("GOOGLE_SERVICES_JSON absent : version sans notifications Firebase")
 activite = pathlib.Path("android/app/src/main/kotlin/fr/listecourses/liste_de_courses/MainActivity.kt")
 if activite.exists():
     activite.write_text(pathlib.Path("outils/android/MainActivity.kt").read_text(encoding="utf-8"), encoding="utf-8")

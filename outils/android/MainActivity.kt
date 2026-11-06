@@ -1,13 +1,19 @@
 package fr.listecourses.liste_de_courses
 
+import android.Manifest
 import android.content.ComponentName
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.google.firebase.FirebaseApp
+import com.google.firebase.messaging.FirebaseMessaging
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
@@ -42,7 +48,37 @@ class MainActivity : FlutterActivity() {
             }
         }
         enAttente = copier(intent)
+        // Notifications du foyer par Firebase (NotificationsEmplettes.kt) : abonnement au canal du membre.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "fr.listecourses/notifications").setMethodCallHandler { appel, resultat ->
+            try {
+                when (appel.method) {
+                    // Firebase configuré dans cette version (secret GitHub GOOGLE_SERVICES_JSON) ?
+                    "disponible" -> resultat.success(FirebaseApp.getApps(this).isNotEmpty())
+                    "autorisees" -> resultat.success(autorisees())
+                    "autoriser" -> {
+                        if (Build.VERSION.SDK_INT >= 33 && !autorisees()) {
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 7)
+                        }
+                        resultat.success(autorisees())
+                    }
+                    "abonner" -> FirebaseMessaging.getInstance().subscribeToTopic(appel.arguments as String)
+                        .addOnCompleteListener { resultat.success(it.isSuccessful) }
+                    "desabonner" -> FirebaseMessaging.getInstance().unsubscribeFromTopic(appel.arguments as String)
+                        .addOnCompleteListener { resultat.success(it.isSuccessful) }
+                    "essai" -> {
+                        NotificationsEmplettes.afficher(this, "Emplettes", appel.arguments as String, 1)
+                        resultat.success(true)
+                    }
+                    else -> resultat.notImplemented()
+                }
+            } catch (e: Exception) {
+                resultat.error("notifications", e.message, null)
+            }
+        }
     }
+
+    private fun autorisees(): Boolean = Build.VERSION.SDK_INT < 33 ||
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)

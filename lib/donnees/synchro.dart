@@ -19,6 +19,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'catalogue_commun.dart' show CatalogueCommun;
 import 'chiffrement.dart';
 import 'client_mqtt.dart';
+import 'notifications_telephone.dart';
 import 'modele.dart';
 import 'sauvegarde.dart';
 import 'stockage.dart';
@@ -639,6 +640,8 @@ class Synchro extends ChangeNotifier {
           certificatRefuse = null;
           derniereErreur = null;
           _noter('Connecté à ${serveur.hote}');
+          // Android : abonnement aux notifications du foyer par Firebase (code ou personne ont pu changer).
+          unawaited(NotificationsTelephone.instance.mettreAJour());
           if (_annuaire case final cle?) {
             t.publier('ldc/annuaire/$cle', jsonEncode({'cree': DateTime.now().millisecondsSinceEpoch}), retenu: true);
             _annuaire = null;

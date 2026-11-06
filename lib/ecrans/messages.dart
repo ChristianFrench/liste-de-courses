@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../composants/composants.dart';
 import '../donnees/messages.dart';
 import '../donnees/modele.dart';
+import '../donnees/notifications_telephone.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
 import '../theme.dart';
@@ -44,6 +45,19 @@ class _EcranCollaborationState extends State<EcranCollaboration> {
 
   Future<void> _recevoir() async {
     final m = MessagesFoyer.instance;
+    // Android avec Firebase (06/11/2026) : Emplettes reçoit lui-même les notifications, sans l'appli ntfy.
+    final t = NotificationsTelephone.instance;
+    await t.mettreAJour();
+    if (t.disponible ?? false) {
+      if (!mounted) return;
+      Nav.message(
+          context,
+          t.erreur ??
+              (t.autorisees
+                  ? 'Les notifications du foyer arrivent sur ce téléphone'
+                  : 'Autorisez les notifications d\'Emplettes dans les réglages du téléphone'));
+      return;
+    }
     // Android : l'appli ntfy s'ouvre sur le canal ; sinon (ou sans l'appli), la page du canal dans le navigateur.
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
       try {

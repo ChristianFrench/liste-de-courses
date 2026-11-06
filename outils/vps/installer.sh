@@ -243,6 +243,13 @@ if [ "$(grep -c '^web-push-' /etc/emplettes/ntfy-webpush.yml 2>/dev/null)" = 2 ]
 web-push-file: \"/var/lib/ntfy/webpush.db\"
 web-push-email-address: \"$COURRIEL\""
 fi
+# Notifications Android d'Emplettes par Firebase (06/11/2026) : clé privée du projet Firebase, déposée à la main
+# dans /etc/emplettes/firebase.json ; ntfy publie alors chaque message aussi sur le sujet Firebase du même nom.
+FIREBASE=""
+if [ -s /etc/emplettes/firebase.json ]; then
+  install -m 640 -o root -g ntfy /etc/emplettes/firebase.json /etc/ntfy/firebase.json
+  FIREBASE='firebase-key-file: "/etc/ntfy/firebase.json"'
+fi
 cat > /etc/ntfy/server.yml <<EOF
 # ntfy d'Emplettes (https://ntfy.$DOMAINE) : messages gardés 48 h, pas de pièces jointes.
 base-url: "https://ntfy.$DOMAINE"
@@ -254,6 +261,7 @@ upstream-base-url: "https://ntfy.sh"
 visitor-request-limit-burst: 60
 visitor-request-limit-replenish: "5s"
 visitor-message-daily-limit: 2000
+$FIREBASE
 $WEBPUSH
 EOF
 systemctl enable ntfy >/dev/null 2>&1; systemctl restart ntfy

@@ -20,6 +20,8 @@ env:
   MQTT_MOT_DE_PASSE_VPS: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
   RELAIS_CLE: ${{ secrets.RELAIS_CLE }}
   VPS_HOTE: ${{ secrets.VPS_HOTE }}
+  # Notifications Android par Firebase : contenu du fichier google-services.json du projet Firebase.
+  GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
   CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,windows .
 
 jobs:
