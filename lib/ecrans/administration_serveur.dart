@@ -120,10 +120,11 @@ Future<void> reglerServeur(BuildContext context) async {
         TextField(controller: compte, style: Charte.texte(16), decoration: const InputDecoration(labelText: 'Compte')),
       ]),
     ),
-    plein: 'Enregistrer',
-    contour: 'Annuler',
+    // confirmer() rend true pour le bouton à contour.
+    plein: 'Annuler',
+    contour: 'Enregistrer',
   );
-  if (ok != false && ok != null) {
+  if (ok == true) {
     s.deconnecter();
     s.domaine = domaine.text;
     s.hote = hote.text;

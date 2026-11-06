@@ -25,8 +25,8 @@ class Serveur extends ChangeNotifier {
   String get domaine => _reglage('serveur_domaine') ?? 'emplettes.eu';
   set domaine(String v) => _definir('serveur_domaine', v.trim());
 
-  /// Adresse de connexion : l'IP tant que le domaine ne pointe pas encore vers le serveur.
-  String get hote => _reglage('serveur_hote') ?? '213.198.33.5';
+  /// Adresse de connexion : le domaine (qui pointe vers le serveur), ou l'IP mise dans les réglages.
+  String get hote => _reglage('serveur_hote') ?? domaine;
   set hote(String v) => _definir('serveur_hote', v.trim());
 
   String get utilisateur => _reglage('serveur_utilisateur') ?? 'debian';
