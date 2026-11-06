@@ -3160,6 +3160,12 @@ class Etat extends ChangeNotifier {
   List<String> appliquerCatalogueCommun(Map<String, dynamic> j) {
     Sauvegarde.instance.jalon('Catalogue commun reçu');
     final version = (j['version'] as num? ?? 0).toInt();
+    // Version déjà appliquée par une version d'Emplettes qui ne retenait pas son numéro : il est repris.
+    final numero = (j['numero'] as num? ?? 0).toInt();
+    if (version == versionCatalogueCommun && numero > 0 && numeroCatalogueCommun != numero) {
+      numeroCatalogueCommun = numero;
+      modifie();
+    }
     if (version <= versionCatalogueCommun || magasins.isEmpty) return const [];
     // Rayons et secteurs renommés par le foyer : les noms d'origine du catalogue commun deviennent les siens.
     if (renommages.isNotEmpty) {
