@@ -715,7 +715,7 @@ Future<void> montrerNouveautes(BuildContext context) async {
         shrinkWrap: true,
         children: [
           Text(
-            'Le catalogue commun a été mis à jour ; ceci est maintenant dans votre catalogue.',
+            'Le catalogue commun passe en ${Etat.instance.libelleVersion(Etat.instance.numeroCatalogueCommun).toLowerCase()} :',
             style: Charte.texte(14, couleur: Charte.texteSecondaire),
           ),
           const SizedBox(height: 8),

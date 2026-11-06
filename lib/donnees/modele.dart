@@ -3357,7 +3357,19 @@ class Etat extends ChangeNotifier {
     versionCatalogueCommun = version;
     numeroCatalogueCommun = (j['numero'] as num? ?? 0).toInt();
     if (lignes.isNotEmpty) {
-      nouveautesCatalogue = {'version': version, 'date': j['date'], 'lignes': lignes.take(200).toList(), 'total': lignes.length};
+      // 06/11/2026 (Aristide) : un résumé en nombres plutôt que la liste de chaque produit.
+      final nr = lignes.where((l) => l.startsWith('Nouveau rayon : ')).length;
+      final ns = lignes.where((l) => l.startsWith('Nouveau secteur : ')).length;
+      final np = lignes.where((l) => l.contains(' : ') && !l.startsWith('Nouveau rayon : ') && !l.startsWith('Nouveau secteur : ')).length;
+      String nb(int n, String un, String plusieurs) => '$n ${n > 1 ? plusieurs : un}';
+      final resume = [
+        if (np > 0) nb(np, 'produit ajouté', 'produits ajoutés'),
+        if (ns > 0) nb(ns, 'secteur ajouté', 'secteurs ajoutés'),
+        if (nr > 0) nb(nr, 'rayon ajouté', 'rayons ajoutés'),
+        if (renommes > 0) nb(renommes, 'nom corrigé', 'noms corrigés'),
+        if (retires > 0) nb(retires, 'élément retiré', 'éléments retirés'),
+      ];
+      nouveautesCatalogue = {'version': version, 'date': j['date'], 'lignes': resume, 'total': resume.length};
     }
     modifie();
     return lignes;
