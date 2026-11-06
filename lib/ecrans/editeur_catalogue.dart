@@ -10,7 +10,7 @@ import '../donnees/signature.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
-// Outil de l'éditeur du catalogue commun (page web à part depuis le 05/11/2026 ; voir main.dart, OUTIL_EDITEUR).
+// Outil de l'éditeur du catalogue commun (application Windows à part depuis le 06/11/2026 ; voir main.dart, OUTIL_EDITEUR).
 // Les modifications forment un brouillon gardé dans le navigateur ; « Généraliser » publie une version numérotée
 // pour tous les foyers.
 

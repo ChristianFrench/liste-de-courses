@@ -5,9 +5,8 @@ import 'modele.dart';
 /// Version de démonstration (compilée avec --dart-define=DEMONSTRATION=true, publiée à part sur
 /// …/liste-de-courses/demo/) : base séparée, sans partage, sans mail direct, remplie d'exemples.
 const demonstration = bool.fromEnvironment('DEMONSTRATION');
-
-/// Outil de l'éditeur du catalogue commun (05/11/2026, compilé avec --dart-define=OUTIL_EDITEUR=true, publié à
-/// part sur …/liste-de-courses/editeur/) : base séparée, seulement l'écran du catalogue commun.
+/// Outil de l'éditeur du catalogue commun (compilé avec --dart-define=OUTIL_EDITEUR=true) : depuis le 06/11/2026
+/// application Windows seule (installateur Emplettes-Editeur-Installation.exe), données dans le sous-dossier « editeur ».
 const outilEditeur = bool.fromEnvironment('OUTIL_EDITEUR');
 
 /// Foyer de démonstration (30/10/2026) : quatre membres, trois magasins avec leur parcours appris,

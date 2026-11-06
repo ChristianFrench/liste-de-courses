@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
+
+import 'dossier_application.dart';
 import 'package:sqlite3/common.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 /// Dossier des bases : [dossier] (essais) ou celui de l'application.
 Future<String> preparerDossierBases(String? dossier) async {
-  final d = dossier != null ? Directory(dossier) : await getApplicationSupportDirectory();
+  final d = dossier != null ? Directory(dossier) : await dossierApplication();
   if (!d.existsSync()) d.createSync(recursive: true);
   return d.path;
 }

@@ -22,7 +22,7 @@ import 'synchro.dart';
 //   renommes  [{type: rayon|secteur|produit, rayon?, ancien, nouveau}], cumulés d'une version à l'autre
 //   retires   [{type, rayon?, nom}], cumulés
 //
-// 05/11/2026 (Aristide) : le catalogue commun est tenu dans un outil à part (page web de l'éditeur, main.dart
+// 05/11/2026 (Aristide) : le catalogue commun est tenu dans un outil à part (application Windows de l'éditeur, main.dart
 // avec OUTIL_EDITEUR) ; l'application n'a plus de menu d'éditeur. Chaque version porte un numéro (« numero ») ;
 // les 5 dernières restent sur le serveur (« ldc/catalogue-versions/<numéro> »), l'éditeur peut repartir de
 // l'une d'elles. Les foyers ne s'envoient plus leurs ajouts : chacun garde ses modifications, réappliquées à

@@ -6,7 +6,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_selector/file_selector.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'dossier_application.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'demonstration.dart';
@@ -237,7 +238,7 @@ Uri lienMail(Etat etat, Liste l) => _mailto(destinataires(etat), _sujetListe(eta
 // ------------------------------------------------------------ Tickets PDF
 
 Future<File> fichierTicket(String ticketId) async {
-  final d = Directory('${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}tickets');
+  final d = Directory('${(await dossierApplication()).path}${Platform.pathSeparator}tickets');
   if (!d.existsSync()) d.createSync(recursive: true);
   return File('${d.path}${Platform.pathSeparator}$ticketId.pdf');
 }

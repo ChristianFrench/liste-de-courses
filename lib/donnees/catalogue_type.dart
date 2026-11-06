@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:path_provider/path_provider.dart';
+
+import 'dossier_application.dart';
 
 // Catalogue type : rayons, secteurs et produits proposés à la création d'un magasin.
 // Livré avec l'application (assets/catalogue_type.json) ; l'application « Gestion du catalogue »
@@ -101,7 +102,7 @@ class CatalogueType {
 
   /// Fichier modifié par « Gestion du catalogue », dans le dossier de données de l'application.
   static Future<File> fichierLocal() async {
-    final d = await getApplicationSupportDirectory();
+    final d = await dossierApplication();
     if (!d.existsSync()) d.createSync(recursive: true);
     return File('${d.path}${Platform.pathSeparator}$nomFichier');
   }

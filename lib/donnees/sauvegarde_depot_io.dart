@@ -4,6 +4,9 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'dossier_application.dart';
+import 'demonstration.dart';
+
 // Où sont rangées les copies de sauvegarde (Android et Windows ; le navigateur : sauvegarde_depot_web.dart).
 // Windows : Documents\Emplettes, hors du dossier de l'application.
 // Android : dans l'application, et une copie de chaque fichier dans Documents/Emplettes du téléphone
@@ -19,9 +22,9 @@ Future<Directory> _dossier() async {
   if (dossierSauvegardesEssai != null) {
     base = dossierSauvegardesEssai!;
   } else if (Platform.isWindows) {
-    base = '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}Emplettes';
+    base = '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}${outilEditeur ? 'Emplettes editeur' : 'Emplettes'}';
   } else {
-    base = '${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}sauvegardes';
+    base = '${(await dossierApplication()).path}${Platform.pathSeparator}sauvegardes';
   }
   final d = Directory(base);
   if (!d.existsSync()) d.createSync(recursive: true);
@@ -75,7 +78,7 @@ Future<void> effacerCopie(String nom) async {
 /// applications (Drive, mail, Fichiers…). Rend vrai si le fichier est parti.
 Future<bool> exporterFichier(String nom, String contenu) async {
   if (Platform.isAndroid) {
-    final d = Directory('${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}envoi');
+    final d = Directory('${(await dossierApplication()).path}${Platform.pathSeparator}envoi');
     if (!d.existsSync()) d.createSync(recursive: true);
     final f = File('${d.path}${Platform.pathSeparator}$nom');
     await f.writeAsString(contenu, flush: true);
