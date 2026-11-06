@@ -11,6 +11,8 @@ jobs:
           P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
         run: |
           sudo apt-get -qq install -y mosquitto-clients > /dev/null
+          echo "== sujets retenus sous ldc/ (noms et tailles seulement)"
+          mosquitto_sub -d -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t 'ldc/#' -W 15 -F '%t %l %r' 2>&1 | grep -v '^Client.*PUBLISH\|PINGREQ\|PINGRESP' | sed -E 's/(ldc\/[^/ ]+\/[^/ ]{4})[^/ ]*/\1…/' | sort | uniq -c | sort -rn | head -40 || true
           for t in ldc/catalogue-commun 'ldc/catalogue-versions/+'; do
             echo "== $t"
             mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t "$t" -v -W 10 -F '%t %l' > /tmp/m.txt 2>&1 || true
