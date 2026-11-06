@@ -659,6 +659,9 @@ class Etat extends ChangeNotifier {
   /// Version du catalogue commun déjà ajoutée au foyer (0 : catalogue livré avec l'application),
   /// et ses nouveautés, montrées une fois sur chaque appareil.
   int versionCatalogueCommun = 0;
+
+  /// Numéro de la version du catalogue commun appliquée (« v7 » de la console), affiché dans Gérer.
+  int numeroCatalogueCommun = 0;
   Map<String, dynamic>? nouveautesCatalogue;
 
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
@@ -1222,6 +1225,7 @@ class Etat extends ChangeNotifier {
     lotsCompletes = options?['lots'] == 1;
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
     versionCatalogueCommun = (options?['catalogueCommun'] as num? ?? 0).toInt();
+    numeroCatalogueCommun = (options?['catalogueCommunNumero'] as num? ?? 0).toInt();
     nouveautesCatalogue = (options?['nouveautesCatalogue'] as Map?)?.cast<String, dynamic>();
     imagesChoisies
       ..clear()
@@ -1366,6 +1370,7 @@ class Etat extends ChangeNotifier {
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
             if (versionCatalogueCommun > 0) 'catalogueCommun': versionCatalogueCommun,
+            if (numeroCatalogueCommun > 0) 'catalogueCommunNumero': numeroCatalogueCommun,
             if (nouveautesCatalogue != null) 'nouveautesCatalogue': nouveautesCatalogue,
           },
         },
@@ -3311,6 +3316,7 @@ class Etat extends ChangeNotifier {
     if (renommes > 0) lignes.add('$renommes nom${renommes > 1 ? 's' : ''} corrigé${renommes > 1 ? 's' : ''}');
     if (retires > 0) lignes.add('$retires élément${retires > 1 ? 's' : ''} retiré${retires > 1 ? 's' : ''} du catalogue');
     versionCatalogueCommun = version;
+    numeroCatalogueCommun = (j['numero'] as num? ?? 0).toInt();
     if (lignes.isNotEmpty) {
       nouveautesCatalogue = {'version': version, 'date': j['date'], 'lignes': lignes.take(200).toList(), 'total': lignes.length};
     }

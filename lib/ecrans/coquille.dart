@@ -311,7 +311,7 @@ class MenuGerer extends StatelessWidget {
           GroupeRetractable(cle: 'gerer/courses', titre: 'Courses', icone: Icons.shopping_cart_outlined, enfants: [
             ecran(Icons.storefront_outlined, 'Magasins', '$n magasin${n > 1 ? 's' : ''}', const EcranMagasins()),
             ecran(Icons.menu_book_outlined, 'Catalogue des produits',
-                '${etat.libelleVersion(etat.versionCatalogueCommun)} · ${etat.produits.length} produits', const EcranCatalogue()),
+                '${etat.libelleVersion(etat.numeroCatalogueCommun)} · ${etat.produits.length} produits', const EcranCatalogue()),
             ecran(Icons.sell_outlined, 'Catalogue des marques',
                 '${etat.libelleVersion(etat.versionCatalogueMarques)} · ${etat.marques.length} marques', const EcranMarques()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
