@@ -306,6 +306,28 @@ class _Maintenance extends StatelessWidget {
                     style: Charte.texte(15, couleur: Charte.texteSecondaire))
                 : RecapitulatifVue(recap),
           ),
+          if (e?.absenteDuServeur == true) ...[
+            const SizedBox(height: 14),
+            Text(
+                'La version v$numero n\'est pas sur le serveur (publiée avant le passage au serveur OVH) : '
+                'les foyers ne la reçoivent pas. Renvoyez-la.',
+                style: Charte.texte(15, gras: true, couleur: Charte.rouge)),
+            const SizedBox(height: 10),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: SizedBox(
+                width: 320,
+                child: Bouton(
+                  key: const ValueKey('renvoyer'),
+                  texte: e!.enPublication ? 'Envoi…' : 'Renvoyer v$numero au serveur',
+                  icone: Icons.cloud_upload_outlined,
+                  plein: true,
+                  hauteur: 46,
+                  onTap: e.enPublication ? null : e.renvoyer,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerLeft,

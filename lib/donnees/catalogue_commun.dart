@@ -354,10 +354,31 @@ class CatalogueCommun extends ChangeNotifier {
 
   /// Relit sur le serveur la dernière version publiée (pour l'outil, qui n'a pas de foyer à tenir à jour).
   Future<Map<String, dynamic>?> actualiser() async {
-    final j = await recuperer();
+    // 06/11/2026 : la v1 publiée par une console encore réglée sur l'ancien serveur n'était pas sur le serveur OVH ;
+    // l'outil retient ce qu'il a trouvé sur le serveur pour le dire et proposer de la renvoyer.
+    final r = await _avecServeur<(Map<String, dynamic>?,)>((t, messages) async {
+      try {
+        final m = await messages.firstWhere((m) => m.$1 == sujet && m.$2.isNotEmpty).timeout(const Duration(seconds: 8));
+        return (await SignatureEditeur.verifie(m.$2) ? deballer(m.$2) : null,);
+      } on TimeoutException {
+        return (null,);
+      }
+    });
+    final j = r?.$1;
+    numeroServeur = r == null ? null : ((j?['numero'] as num?) ?? 0).toInt();
     if (j != null) _definir('catalogue_commun', jsonEncode(j));
     notifyListeners();
     return j;
+  }
+
+  /// Numéro de la version trouvée sur le serveur à la dernière lecture (0 : aucune ; null : serveur non joint).
+  int? numeroServeur;
+
+  /// Renvoie au serveur la dernière version publiée depuis cet outil (absente du serveur).
+  Future<bool> renvoyer() async {
+    final ok = await publier(await dernier());
+    if (ok) await actualiser();
+    return ok;
   }
 
   /// Dernier catalogue commun connu (reçu ou publié), sinon le catalogue livré avec l'application.

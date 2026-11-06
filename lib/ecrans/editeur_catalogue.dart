@@ -87,6 +87,31 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     if (b != null) await _cleSignature(b!);
   }
 
+  /// La dernière version publiée depuis cet outil manque sur le serveur (publiée ailleurs, ou effacée).
+  bool get absenteDuServeur {
+    final n = CatalogueCommun.instance.numeroServeur;
+    return n != null && _numero > n;
+  }
+
+  Future<void> renvoyer() async {
+    if (_publication) return;
+    if (CatalogueCommun.instance.graineSignature == null && await _demanderPhrase() == null) return;
+    if (!mounted) return;
+    setState(() => _publication = true);
+    widget.auChangement?.call();
+    final ok = await CatalogueCommun.instance.renvoyer();
+    if (!mounted) return;
+    setState(() => _publication = false);
+    await _charger();
+    if (mounted) {
+      Nav.message(
+          context,
+          ok
+              ? 'Version v$_numero renvoyée au serveur : chaque foyer la reçoit à son prochain lancement'
+              : 'Rien n\'est envoyé (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : réessayez');
+    }
+  }
+
   Future<void> generaliser() async {
     if (b != null && !_publication && b!.modifications > 0) await _publier(b!);
   }
