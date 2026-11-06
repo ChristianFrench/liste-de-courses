@@ -25,9 +25,10 @@ dependencies:
   crypto: ^3.0.7
   http: ^1.2.2
   cryptography: ^2.9.0
+  dartssh2: ^4.1.0
+  xterm: ^4.0.0
 
 dev_dependencies:
-  basic_utils: ^5.7.0
   flutter_test:
     sdk: flutter
 

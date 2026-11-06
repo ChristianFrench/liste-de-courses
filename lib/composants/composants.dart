@@ -1464,7 +1464,7 @@ Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
 
 /// Saisie d'un texte court ; renvoie null si annulée.
 Future<String?> demanderTexte(BuildContext context,
-    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider'}) {
+    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider', bool masque = false}) {
   final controleur = TextEditingController(text: initial);
   return volet<String>(
     context,
@@ -1473,15 +1473,16 @@ Future<String?> demanderTexte(BuildContext context,
       contenu: TextField(
         controller: controleur,
         autofocus: true,
+        obscureText: masque,
         style: Charte.texte(16),
         decoration: InputDecoration(labelText: libelle, hintText: aide),
-        onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        onSubmitted: (v) => Navigator.of(ctx).pop(masque ? v : v.trim()),
       ),
       boutons: [
         Row(children: [
           Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop())),
           const SizedBox(width: 10),
-          Expanded(child: Bouton(texte: valider, plein: true, onTap: () => Navigator.of(ctx).pop(controleur.text.trim()))),
+          Expanded(child: Bouton(texte: valider, plein: true, onTap: () => Navigator.of(ctx).pop(masque ? controleur.text : controleur.text.trim()))),
         ]),
       ],
     ),

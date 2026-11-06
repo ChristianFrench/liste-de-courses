@@ -6,18 +6,19 @@ import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
 import '../main.dart' show tailleTelephone;
 import '../theme.dart';
+import 'administration_serveur.dart';
 import 'editeur_catalogue.dart';
 
 // Console d'administration d'Emplettes (06/11/2026, Aristide) : application Windows seule, en fenêtre large,
 // ouverte par le code d'éditeur (secret GitHub CODE_EDITEUR). Mêmes composants graphiques que l'application.
 // À gauche, le menu des fonctions d'administration ; à droite, la fonction choisie :
-// - Ressources techniques : les composants installés sur le VPS OVH (à venir, quand le serveur sera installé) ;
+// - Serveur OVH : initialisation (étapes et état), suivi technique, console shell (administration_serveur.dart) ;
 // - Utilisateurs : foyers, appareils et suivi des activités (à venir) ;
 // - Contenu : catalogue des produits (à gauche la vue du téléphone, à droite les actions de maintenance),
 //   catalogue des marques (à venir) ;
 // - Apparence : palette de la console.
 
-enum Rubrique { ressources, utilisateurs, produits, marques, apparence }
+enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, marques, apparence }
 
 class _Entree {
   const _Entree(this.rubrique, this.titre, this.icone);
@@ -27,7 +28,11 @@ class _Entree {
 }
 
 const _groupes = <(String, List<_Entree>)>[
-  ('Ressources techniques', [_Entree(Rubrique.ressources, 'Composants sur OVH', Icons.dns_outlined)]),
+  ('Serveur OVH', [
+    _Entree(Rubrique.initialisation, 'Initialisation', Icons.checklist),
+    _Entree(Rubrique.suivi, 'Suivi technique', Icons.monitor_heart_outlined),
+    _Entree(Rubrique.shell, 'Console shell', Icons.terminal),
+  ]),
   ('Utilisateurs', [_Entree(Rubrique.utilisateurs, 'Foyers et activités', Icons.groups_outlined)]),
   ('Contenu', [
     _Entree(Rubrique.produits, 'Catalogue des produits', Icons.inventory_2_outlined),
@@ -47,30 +52,32 @@ class ConsoleAdministration extends StatefulWidget {
 class _ConsoleAdministrationState extends State<ConsoleAdministration> {
   late Rubrique rubrique = widget.depart;
 
+  /// Commande à taper en ouvrant la console shell (depuis l'initialisation ou le suivi).
+  String? _commande;
+
+  void _shell(String commande) => setState(() {
+        _commande = commande;
+        rubrique = Rubrique.shell;
+      });
+
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Charte.fond,
       child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _Menu(choisie: rubrique, onChoix: (r) => setState(() => rubrique = r)),
+        _Menu(
+            choisie: rubrique,
+            onChoix: (r) => setState(() {
+                  _commande = null;
+                  rubrique = r;
+                })),
         VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
         Expanded(
           child: switch (rubrique) {
             Rubrique.produits => const PageCatalogueProduits(),
-            Rubrique.ressources => const _PageAVenir(
-                titre: 'Composants sur OVH',
-                chemin: 'Ressources techniques',
-                texte: 'Quand le serveur OVH sera installé, chaque composant aura ici son état (en marche ou arrêté), '
-                    'sa charge et ses derniers incidents.',
-                elements: [
-                  ('Serveur VPS', 'Processeur, mémoire, disque, mises à jour', Icons.dns_outlined),
-                  ('Serveur de messages (MQTT)', 'Clients connectés, messages par heure', Icons.swap_horiz),
-                  ('Notifications (ntfy)', 'Messages envoyés aux foyers', Icons.notifications_none),
-                  ('Relais de mail', 'Mails envoyés, refusés', Icons.mail_outline),
-                  ('Site web', 'Visites, téléchargements', Icons.public),
-                  ('Sauvegardes', 'Dernière sauvegarde de la nuit, copie OVH', Icons.save_outlined),
-                ],
-              ),
+            Rubrique.initialisation => PageInitialisation(ouvrirShell: _shell),
+            Rubrique.suivi => PageSuivi(ouvrirShell: _shell),
+            Rubrique.shell => PageShell(key: ValueKey(_commande), commande: _commande),
             Rubrique.utilisateurs => const _PageAVenir(
                 titre: 'Foyers et activités',
                 chemin: 'Utilisateurs',
@@ -168,21 +175,6 @@ class _Menu extends StatelessWidget {
   }
 }
 
-/// Titre d'une page de la console : le chemin en petit, puis le titre.
-class _TitrePage extends StatelessWidget {
-  const _TitrePage(this.chemin, this.titre);
-  final String chemin, titre;
-
-  @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(28, 22, 28, 12),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(chemin, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          Text(titre, style: Charte.texte(26, gras: true, couleur: Charte.encreNiveau)),
-        ]),
-      );
-}
-
 /// Contenu › Catalogue des produits : à gauche la vue du téléphone (l'écran de l'éditeur, tel qu'il se
 /// présente sur un téléphone), à droite les actions de maintenance et ce qui changera à la généralisation.
 class PageCatalogueProduits extends StatefulWidget {
@@ -263,7 +255,7 @@ class _Maintenance extends StatelessWidget {
           ),
         );
     return ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-      const _TitrePage('Contenu', 'Catalogue des produits'),
+      const TitrePageAdmin('Contenu', 'Catalogue des produits'),
       Padding(
         padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -353,7 +345,7 @@ class _PageAVenir extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-        _TitrePage(chemin, titre),
+        TitrePageAdmin(chemin, titre),
         Padding(
           padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -395,7 +387,7 @@ class _PageApparence extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-        const _TitrePage('Réglages', 'Apparence'),
+        const TitrePageAdmin('Réglages', 'Apparence'),
         Padding(
           padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
           child: Align(

@@ -9,7 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/serveur.dart';
+import 'package:liste_de_courses/donnees/serveur_acces_io.dart' as io;
 import 'package:liste_de_courses/ecrans/administration.dart';
+import 'package:liste_de_courses/ecrans/administration_serveur.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/ecrans/outil_editeur.dart';
 import 'package:liste_de_courses/main.dart';
@@ -34,6 +37,8 @@ Future<void> _capture(String nom) async {
 void main() {
   setUpAll(() async {
     await _police('Atkinson', ['assets/polices/AtkinsonHyperlegible-Regular.ttf', 'assets/polices/AtkinsonHyperlegible-Bold.ttf']);
+    // Captures : une police à chasse fixe à la place de Consolas (police de Windows)
+    await _police('Consolas', ['/mnt/skills/examples/canvas-design/canvas-fonts/IBMPlexMono-Regular.ttf']);
     await _police('MaterialIcons', ['${Platform.environment['FLUTTER_ROOT'] ?? ''}/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf']);
   });
 
@@ -43,6 +48,19 @@ void main() {
     e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
     Nav.i.reinitialiser();
     EcranEditeurCatalogue.actualiserAuServeur = false;
+    PageSuivi.automatique = false;
+    PageShell.ouvrirAuto = false;
+    io.AccesServeur.dossierEssai = Directory.systemTemp.createTempSync('console').path;
+    // Une lecture du suivi comme celle d'un serveur installé (sortie de la commande de suivi).
+    Serveur.instance.dernierSuivi = Serveur.lireSuivi([
+      'uptime=up 3 days, 4 hours', 'charge=0.08 0.05 0.01', 'coeurs=2', 'memoire=812/3911', 'disque=6120/39250',
+      for (final x in Serveur.services) 'service.$x=active',
+      'majs=3', 'redemarrage=non', 'installe=oui',
+      'certificat.emplettes.eu=Feb  4 09:12:00 2027 GMT', 'certificat.mqtt.emplettes.eu=Feb  4 09:12:01 2027 GMT',
+      'certificat.ntfy.emplettes.eu=Feb  4 09:12:02 2027 GMT',
+      'clients_mqtt=5', 'clients_web=1', 'sauvegarde=emplettes-2026-11-06.tar.gz', 'bannis=2',
+    ].join('\n'));
+    Serveur.instance.suiviLe = DateTime(2026, 11, 6, 10, 5);
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -78,7 +96,9 @@ void main() {
     await _capture('3-Catalogue-modifie');
 
     for (final (r, nom) in [
-      (Rubrique.ressources, '4-Ressources-techniques'),
+      (Rubrique.initialisation, '4-Initialisation'),
+      (Rubrique.suivi, '4b-Suivi-technique'),
+      (Rubrique.shell, '4c-Console-shell'),
       (Rubrique.utilisateurs, '5-Utilisateurs'),
       (Rubrique.marques, '6-Catalogue-des-marques'),
       (Rubrique.apparence, '7-Apparence'),
@@ -101,3 +121,4 @@ void main() {
     await _capture('1-Connexion');
   });
 }
+
