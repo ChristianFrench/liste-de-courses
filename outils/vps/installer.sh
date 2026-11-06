@@ -228,9 +228,11 @@ systemctl enable mosquitto >/dev/null 2>&1; systemctl restart mosquitto
 vert "8/10 Notifications : ntfy"
 if ! command -v ntfy >/dev/null; then
   install -d -m 755 /etc/apt/keyrings
-  curl -fsSL https://archive.heckel.io/apt/pubkey.txt | gpg --dearmor --yes -o /etc/apt/keyrings/archive.heckel.io.gpg
-  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/archive.heckel.io.gpg] https://archive.heckel.io/apt debian main" \
-    > /etc/apt/sources.list.d/archive.heckel.io.list
+  # Dépôt officiel de ntfy (archive.ntfy.sh depuis septembre 2025 ; l'ancien archive.heckel.io ne répond plus).
+  rm -f /etc/apt/sources.list.d/archive.heckel.io.list /etc/apt/keyrings/archive.heckel.io.gpg
+  curl -fsSL -o /etc/apt/keyrings/ntfy.gpg https://archive.ntfy.sh/apt/keyring.gpg
+  echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/ntfy.gpg] https://archive.ntfy.sh/apt stable main" \
+    > /etc/apt/sources.list.d/ntfy.list
   apt-get update -q && apt-get -y -q install ntfy
 fi
 install -d -m 750 -o ntfy -g ntfy /var/cache/ntfy /var/lib/ntfy
