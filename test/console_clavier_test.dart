@@ -54,7 +54,7 @@ void main() {
     await tester.pump();
     expect(copie, contains('MQTT_HOTE_VPS'));
     expect(tape.toString(), isEmpty);
-    expect(find.byType(Scrollbar), findsOneWidget);
+    expect(find.byType(RawScrollbar), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     await tester.pump(const Duration(seconds: 2));
   });
