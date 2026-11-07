@@ -830,13 +830,15 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
       Padding(
         padding: const EdgeInsets.fromLTRB(20, 12, 12, 10),
         child: Row(children: [
-          SizedBox(
-            width: 380,
-            child: TextField(
-              key: const ValueKey('console-recherche'),
-              style: Charte.texte(15),
-              decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
-              onChanged: (v) => setState(() => recherche = v),
+          Flexible(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: TextField(
+                key: const ValueKey('console-recherche'),
+                style: Charte.texte(15),
+                decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
+                onChanged: (v) => setState(() => recherche = v),
+              ),
             ),
           ),
           const SizedBox(width: 6),
@@ -855,14 +857,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               icon: Icone(toutOuvert ? Icons.unfold_less : Icons.unfold_more, size: 26, color: Charte.cadre),
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Clic droit : actions de l\'élément · Double-clic ou F2 : renommer · Suppr : retirer · Entrée : ajouter dedans · '
-              'Glisser-déposer : déplacer un produit, un secteur ou un rayon · Ctrl+clic : plusieurs produits',
-              style: Charte.texte(12.5, couleur: Charte.texteSecondaire),
-            ),
-          ),
+          const Spacer(),
           // 07/11/2026 (Aristide) : ajouter à partir d'un texte toujours à portée, pas seulement au clic droit.
           const SizedBox(width: 12),
           _Bouton(
@@ -890,6 +885,15 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
             },
           ),
         ]),
+      ),
+      // Aide sur sa propre ligne : à côté des boutons, elle était écrasée quand la fenêtre est étroite.
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 0, 16, 8),
+        child: Text(
+          'Clic droit : actions de l\'élément · Double-clic ou F2 : renommer · Suppr : retirer · Entrée : ajouter dedans · '
+          'Glisser-déposer : déplacer un produit, un secteur ou un rayon · Ctrl+clic : plusieurs produits',
+          style: Charte.texte(12.5, couleur: Charte.texteSecondaire),
+        ),
       ),
       Expanded(
         child: Container(
