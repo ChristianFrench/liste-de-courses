@@ -1347,6 +1347,22 @@ void main() {
       expect(find.text('Retirer le produit'), findsOneWidget, reason: 'le volet est celui du produit touché');
       await tester.tapAt(const Offset(10, 10));
       await tester.pumpAndSettle();
+      // 07/11/2026 : historique. L'ajout est en cours ; Généraliser attend la validation.
+      expect(find.text('Valider (1)'), findsOneWidget);
+      await _toucher(tester, find.byKey(const ValueKey('valider')));
+      await _toucher(tester, find.text('Valider').last);
+      expect(find.text('Valider (0)'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pumpAndSettle();
+      await _actionTitre(tester, 'Historique');
+      expect(find.text('POINT DE DÉPART · VALIDÉE'), findsOneWidget);
+      await _toucher(tester, find.byTooltip('Modifier Point de départ · validée'));
+      await _toucher(tester, find.text('Revenir à cette étape'));
+      await _toucher(tester, find.text('Revenir').last);
+      expect(find.text('POINT DE DÉPART · VALIDÉE'), findsOneWidget);
+      expect(find.textContaining('VALIDÉE'), findsOneWidget, reason: 'l\'étape suivante est abandonnée');
+      await _toucher(tester, find.byTooltip('Retour'));
+      expect(find.text('ANIMALERIE'), findsNothing, reason: 'retour au point de départ');
       await _ciblesTactiles(tester);
     });
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,6 +7,7 @@ import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
+import '../donnees/journal_catalogue.dart';
 import '../donnees/modele.dart';
 import '../donnees/signature.dart';
 import '../navigation.dart';
@@ -38,6 +41,15 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   Map<String, dynamic>? publie;
   bool _publication = false;
 
+  /// Historique : étapes validées et gestes en cours (07/11/2026, Aristide).
+  JournalCatalogue journal = JournalCatalogue([], []);
+
+  /// Le brouillon au geste précédent, pour noter ce que fait le suivant.
+  Map<String, dynamic>? _avant;
+
+  /// Nombre de gestes en cours, pas encore validés.
+  int get enCours => journal.enCours.length;
+
   @override
   void initState() {
     super.initState();
@@ -54,15 +66,83 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       setState(() {
         publie = d;
         b = x;
+        journal = c.journal();
+        // Premier usage : le point de départ est le brouillon tel qu'il est.
+        if (journal.etapes.isEmpty) {
+          journal.valider('Point de départ', CatalogueCommun.emballer(x.versJson()),
+              numero: x.modifications == 0 && _numero > 0 ? _numero : null);
+          c.enregistrerJournal(journal);
+        }
+        _avant = x.versJson();
       });
       widget.auChangement?.call();
     }
   }
 
   void _modifie() {
-    CatalogueCommun.instance.enregistrerBrouillon(b!);
+    final c = CatalogueCommun.instance;
+    c.enregistrerBrouillon(b!);
+    final apres = b!.versJson();
+    if (_avant != null) journal.noter(gestesEntre(_avant!, apres));
+    _avant = apres;
+    c.enregistrerJournal(journal);
     setState(() {});
     widget.auChangement?.call();
+  }
+
+  /// « Valider les modifications » : les gestes en cours deviennent une étape nommée, point de sauvegarde.
+  Future<void> valider() async {
+    final b = this.b;
+    if (b == null || enCours == 0) return;
+    final defaut = JournalCatalogue.nomParDefaut(DateTime.now());
+    final nom = await demanderTexte(context, titre: 'Valider les modifications', libelle: 'Nom de l\'étape', initial: defaut, valider: 'Valider');
+    if (nom == null || !mounted) return;
+    final e = journal.valider(nom.trim().isEmpty ? defaut : nom.trim(), CatalogueCommun.emballer(b.versJson()));
+    CatalogueCommun.instance.enregistrerJournal(journal);
+    setState(() {});
+    widget.auChangement?.call();
+    Nav.message(context, 'Étape « ${e.nom} » validée : ${_pluriel(e.gestes.length, 'modification')}');
+  }
+
+  /// Revient à l'étape [i] de l'historique : tout ce qui l'a suivie est abandonné. Rend vrai si c'est fait.
+  Future<bool> revenirA(int i) async {
+    final e = journal.etapes[i];
+    final suivantes = journal.etapes.length - 1 - i;
+    final perdu = [
+      if (suivantes > 0) _pluriel(suivantes, 'étape suivante'),
+      if (enCours > 0) _pluriel(enCours, 'modification en cours'),
+    ].join(' et ');
+    final ok = await confirmer(
+      context,
+      titre: 'Revenir à « ${e.nom} » ?',
+      icone: Icons.history,
+      contenu: Text(
+        perdu.isEmpty ? 'Le catalogue est déjà à cette étape.' : 'Toutes les modifications qui ont suivi sont abandonnées : $perdu.',
+        style: Charte.texte(16),
+      ),
+      plein: 'Annuler',
+      contour: 'Revenir',
+    );
+    if (ok != true || !mounted) return false;
+    final c = CatalogueCommun.instance;
+    final j = CatalogueCommun.deballer(journal.revenirA(i));
+    // Revenue à la version publiée : rien à généraliser ; sinon il y a à généraliser.
+    j['modifications'] = e.numero != null && e.numero == _numero ? 0 : ((j['modifications'] as num? ?? 0).toInt()).clamp(1, 1 << 30);
+    final nouveau = Brouillon.lire(j);
+    c.enregistrerBrouillon(nouveau);
+    c.enregistrerJournal(journal);
+    setState(() {
+      b = nouveau;
+      _avant = nouveau.versJson();
+    });
+    widget.auChangement?.call();
+    Nav.message(context, 'Catalogue revenu à « ${e.nom} »');
+    return true;
+  }
+
+  Future<void> historique() async {
+    await Nav.aller<void>(context, EcranHistoriqueCatalogue(editeur: this));
+    if (mounted) setState(() {});
   }
 
   /// Numéro de la dernière version publiée (0 : aucune).
@@ -114,7 +194,13 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   }
 
   Future<void> generaliser() async {
-    if (b != null && !_publication && b!.modifications > 0) await _publier(b!);
+    if (b == null || _publication || b!.modifications == 0) return;
+    // 07/11/2026 (Aristide) : n'est généralisable que ce qui est validé.
+    if (enCours > 0) {
+      Nav.message(context, 'Validez d\'abord les ${_pluriel(enCours, 'modification')} en cours');
+      return;
+    }
+    await _publier(b!);
   }
 
   /// Ce qui changera à la prochaine généralisation.
@@ -259,6 +345,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
               if (await ajouterDepuisTexte(context, b)) _modifie();
             }),
             ActionLigne(Icons.key_outlined, 'Clé de signature', () => _cleSignature(b)),
+            ActionLigne(Icons.history, 'Historique', historique),
           ],
         ],
       ),
@@ -272,7 +359,8 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
                   child: Text(
                     '${_numero == 0 ? 'Aucune version publiée : catalogue livré avec l\'application' : 'Version publiée : v$_numero du ${_date((publie!['version'] as num).toInt())}'}.\n'
                     'Brouillon : ${_pluriel(b.catalogue.rayons.length, 'rayon')}, ${_pluriel(b.nbProduits, 'produit')}, '
-                    '${b.modifications == 0 ? 'aucune modification.' : '${_pluriel(b.modifications, 'modification')} à généraliser.'}',
+                    '${b.modifications == 0 ? 'aucune modification.' : '${_pluriel(b.modifications, 'modification')} à généraliser.'}\n'
+                    '${enCours == 0 ? 'Rien en cours : tout est validé.' : '${_pluriel(enCours, 'modification')} en cours, à valider.'}',
                     style: Charte.texte(14, couleur: Charte.texteSecondaire),
                   ),
                 ),
@@ -284,11 +372,17 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
           BarreAction(
             boutons: [
               Bouton(
+                key: const ValueKey('valider'),
+                texte: 'Valider ($enCours)',
+                icone: Icons.check,
+                onTap: enCours == 0 ? null : valider,
+              ),
+              Bouton(
                 key: const ValueKey('generaliser'),
                 texte: _publication ? 'Envoi…' : 'Généraliser (v${_numero + 1})',
                 icone: Icons.public,
                 plein: true,
-                onTap: _publication || b.modifications == 0 ? null : () => _publier(b),
+                onTap: _publication || b.modifications == 0 || enCours > 0 ? null : generaliser,
               ),
             ],
           ),
@@ -328,6 +422,9 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     );
     if (ok != true || !mounted) return;
     final nouveau = c.repartirDe(j, modifications: k.startsWith('p') ? ((j['changements'] as num?) ?? 1).toInt() : 1);
+    journal.noter(['Repris de « ${choix[k]} »', ...gestesEntre(_avant ?? const {}, nouveau.versJson())]);
+    _avant = nouveau.versJson();
+    c.enregistrerJournal(journal);
     setState(() => b = nouveau);
     widget.auChangement?.call();
     Nav.message(context, 'Brouillon repris de « ${choix[k]} »');
@@ -360,6 +457,8 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       setState(() => _publication = false);
       widget.auChangement?.call();
       await _charger();
+      journal.generalisee(_numero);
+      CatalogueCommun.instance.enregistrerJournal(journal);
       if (mounted) Nav.message(context, 'Version v$_numero généralisée : chaque foyer la reçoit à son prochain lancement');
     } else {
       setState(() => _publication = false);
@@ -546,54 +645,6 @@ class RecapitulatifVue extends StatelessWidget {
 String _date(int ms) {
   final d = DateTime.fromMillisecondsSinceEpoch(ms);
   return '${jjmmaaaa(d)} à ${heure(d)}';
-}
-
-/// Un secteur du catalogue commun : ses produits, à renommer ou retirer.
-class EcranEditeurSecteur extends StatefulWidget {
-  const EcranEditeurSecteur({super.key, required this.b, required this.r, required this.s});
-  final Brouillon b;
-  final CatRayon r;
-  final CatSecteur s;
-
-  @override
-  State<EcranEditeurSecteur> createState() => _EcranEditeurSecteurState();
-}
-
-class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
-  void _modifie() {
-    CatalogueCommun.instance.enregistrerBrouillon(widget.b);
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final b = widget.b, r = widget.r, s = widget.s;
-    final produits = [...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase()));
-    return PageBase(
-      entete: EnTeteFenetre(
-        retour: true,
-        icone: Icons.public,
-        sousTitre: 'Catalogue commun › ${r.nom}',
-        titre: s.nom,
-        actions: actionsSecteurEditeur(context, b, r, s, _modifie, quitter: () => Navigator.of(context).pop()),
-      ),
-      corps: ListView(
-        padding: const EdgeInsets.only(bottom: 16),
-        children: [
-          if (produits.isEmpty)
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('Aucun produit dans ce secteur.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            ),
-          for (final p in produits)
-            LigneMenu(
-              titre: p.nom,
-              onTap: () => menuActions(context, titre: 'Produit ${p.nom}', actions: actionsProduitEditeur(context, b, s, p, _modifie)),
-            ),
-        ],
-      ),
-    );
-  }
 }
 
 /// Actions d'un produit du catalogue commun.
@@ -868,4 +919,147 @@ class _GuetteurNouveautesState extends State<GuetteurNouveautes> {
 
   @override
   Widget build(BuildContext context) => widget.child;
+}
+
+/// Ce qu'un geste a changé, de [avant] à [apres] (brouillons), en lignes lisibles pour l'historique.
+List<String> gestesEntre(Map<String, dynamic> avant, Map<String, dynamic> apres) {
+  Map<String, dynamic> sans(Map<String, dynamic> j) => Map.of(j)..remove('modifications');
+  if (jsonEncode(sans(avant)) == jsonEncode(sans(apres))) return const [];
+  const types = {'rayon': 'Rayon', 'secteur': 'Secteur', 'produit': 'Produit'};
+  final ra = (avant['renommes'] as List? ?? const []).length;
+  final rb = (apres['renommes'] as List? ?? const []);
+  if (rb.length > ra) {
+    return [
+      for (final o in rb.sublist(ra).cast<Map>()) '${types[o['type']] ?? 'Élément'} renommé : ${o['ancien']} → ${o['nouveau']}',
+    ];
+  }
+  final x = Recapitulatif.entre(avant, apres);
+  // Un secteur passé d'un rayon à un autre : une ligne, pas ses produits un à un.
+  String sec(String c) => c.split(' › ').last;
+  final deplaces = <String>[];
+  final ajoutes = [...x.secteursAjoutes], retires = [...x.secteursRetires];
+  for (final a in [...ajoutes]) {
+    final de = retires.where((r) => sec(r) == sec(a)).firstOrNull;
+    if (de == null) continue;
+    deplaces.add('Secteur déplacé : ${sec(a)}, de ${de.split(' › ').first} vers ${a.split(' › ').first}');
+    ajoutes.remove(a);
+    retires.remove(de);
+  }
+  final cibles = {for (final l in deplaces) l.split(', de ').first.replaceFirst('Secteur déplacé : ', '')};
+  final lignes = [
+    for (final n in x.rayonsAjoutes) 'Rayon ajouté : $n',
+    for (final n in x.rayonsRetires) 'Rayon retiré : $n',
+    ...deplaces,
+    for (final n in ajoutes) 'Secteur ajouté : $n',
+    for (final n in retires) 'Secteur retiré : $n',
+    for (final n in x.produitsAjoutes) 'Produit ajouté : $n',
+    for (final n in x.produitsRetires) 'Produit retiré : $n',
+    for (final n in x.produitsDeplaces)
+      if (!cibles.contains(sec(n))) 'Produit déplacé : $n',
+  ];
+  if (lignes.isEmpty) return const ['Ordre ou image modifiés'];
+  const max = 12;
+  return lignes.length <= max ? lignes : [...lignes.take(max), '… et ${lignes.length - max} autres changements'];
+}
+
+/// L'historique des modifications du catalogue commun : les gestes en cours, puis les étapes validées (la plus
+/// récente en haut) ; le crayon d'une étape propose d'y revenir (07/11/2026, Aristide).
+class EcranHistoriqueCatalogue extends StatefulWidget {
+  const EcranHistoriqueCatalogue({super.key, required this.editeur});
+  final EtatEditeurCatalogue editeur;
+
+  @override
+  State<EcranHistoriqueCatalogue> createState() => _EcranHistoriqueCatalogueState();
+}
+
+class _EcranHistoriqueCatalogueState extends State<EcranHistoriqueCatalogue> {
+  String _date(DateTime d) => JournalCatalogue.nomParDefaut(d);
+
+  List<Widget> _gestes(List<GesteCatalogue> gestes) => [
+        if (gestes.isEmpty)
+          FeuilleArbre(
+            profondeur: 2,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text('Aucune modification.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+          ),
+        for (final g in gestes.reversed)
+          FeuilleArbre(
+            profondeur: 2,
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(0, 6, 12, 6),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                for (final l in g.lignes) Text(l, style: Charte.texte(15)),
+                Text(_date(g.date), style: Charte.texte(12, couleur: Charte.texteSecondaire)),
+              ]),
+            ),
+          ),
+      ];
+
+  @override
+  Widget build(BuildContext context) {
+    final e = widget.editeur;
+    final j = e.journal;
+    final plis = Retractables.i;
+    Widget niveau(String cle, String nom, List<GesteCatalogue> gestes, {VoidCallback? crayon, bool parDefaut = false}) {
+      final ouvert = plis.ouvert(cle, parDefaut: parDefaut);
+      return NiveauArbre(
+        cle: cle,
+        niveau: 2,
+        profondeur: 1,
+        nom: nom,
+        nombre: gestes.length,
+        ouvert: ouvert,
+        onTap: () => setState(() => plis.basculer(cle, parDefaut: parDefaut)),
+        onCrayon: crayon,
+        enfants: _gestes(gestes),
+      );
+    }
+
+    return PageBase(
+      entete: const EnTeteFenetre(retour: true, icone: Icons.history, sousTitre: 'Catalogue commun', titre: 'Historique'),
+      corps: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+          child: Text(
+            'En cours : modifications enregistrées, pas encore validées. Une étape validée est un point de sauvegarde ; '
+            'seul ce qui est validé se généralise. Revenir à une étape abandonne tout ce qui l\'a suivie.',
+            style: Charte.texte(14, couleur: Charte.texteSecondaire),
+          ),
+        ),
+        ColonneDebord(children: [
+          niveau('historique/en-cours', 'En cours', j.enCours, parDefaut: true),
+          for (var i = j.etapes.length - 1; i >= 0; i--)
+            niveau(
+              'historique/${j.etapes[i].date.toIso8601String()}',
+              '${j.etapes[i].nom} · ${j.etapes[i].numero != null ? 'généralisée v${j.etapes[i].numero}' : 'validée'}',
+              j.etapes[i].gestes,
+              crayon: () => menuActions(context, titre: 'Étape ${j.etapes[i].nom}', actions: [
+                ActionLigne(Icons.history, 'Revenir à cette étape', () async {
+                  if (await e.revenirA(i) && mounted) setState(() {});
+                }, danger: true),
+              ]),
+            ),
+        ]),
+      ]),
+      bas: [
+        BarreAction(boutons: [
+          Bouton(
+            key: const ValueKey('historique-valider'),
+            texte: 'Valider les modifications (${e.enCours})',
+            icone: Icons.check,
+            plein: true,
+            onTap: e.enCours == 0
+                ? null
+                : () async {
+                    await e.valider();
+                    if (mounted) setState(() {});
+                  },
+          ),
+        ]),
+      ],
+    );
+  }
 }

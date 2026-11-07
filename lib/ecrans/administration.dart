@@ -281,6 +281,12 @@ class _Maintenance extends StatelessWidget {
                   e == null ? null : e.depuisTexte),
               action('cle', Icons.key_outlined, 'Clé de signature', 'La clé publique qui authentifie vos versions',
                   e == null ? null : e.cleSignature),
+              // 07/11/2026 (Aristide) : valider (point de sauvegarde) est distinct de généraliser.
+              action('valider', Icons.check, 'Valider les modifications',
+                  e == null || e.enCours == 0 ? 'Rien en cours' : '${e.enCours} en cours : elles deviennent une étape de l\'historique',
+                  e == null || e.enCours == 0 ? null : e.valider),
+              action('historique', Icons.history, 'Historique', 'Les étapes validées ; revenir à l\'une d\'elles',
+                  e == null ? null : e.historique),
             ];
             final largeur = (c.maxWidth - (colonnes - 1) * 10) / colonnes;
             return Wrap(spacing: 10, children: [for (final w in cartes) SizedBox(width: largeur, child: w)]);
@@ -339,10 +345,15 @@ class _Maintenance extends StatelessWidget {
                 icone: Icons.public,
                 plein: true,
                 hauteur: 46,
-                onTap: e == null || e.enPublication || (b?.modifications ?? 0) == 0 ? null : e.generaliser,
+                onTap: e == null || e.enPublication || (b?.modifications ?? 0) == 0 || e.enCours > 0 ? null : e.generaliser,
               ),
             ),
           ),
+          if ((e?.enCours ?? 0) > 0) ...[
+            const SizedBox(height: 8),
+            Text('${e!.enCours} modification${e.enCours > 1 ? 's' : ''} en cours : validez-les avant de généraliser.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ],
         ]),
       ),
     ]);

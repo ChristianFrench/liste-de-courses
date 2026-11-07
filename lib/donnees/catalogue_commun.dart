@@ -1,3 +1,4 @@
+import 'journal_catalogue.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -459,6 +460,10 @@ class CatalogueCommun extends ChangeNotifier {
   }
 
   void enregistrerBrouillon(Brouillon b) => _definir('catalogue_brouillon', jsonEncode(b.versJson()));
+
+  /// Historique des modifications de l'éditeur (étapes validées et gestes en cours), propre à cet appareil.
+  JournalCatalogue journal() => JournalCatalogue.lire(_reglage('catalogue_journal'));
+  void enregistrerJournal(JournalCatalogue j) => _definir('catalogue_journal', j.ecrire());
 
   void abandonnerBrouillon() => Etat.instance.stockageFoyer?.effacerReglage('catalogue_brouillon');
 
