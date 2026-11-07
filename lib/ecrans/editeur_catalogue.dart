@@ -605,12 +605,13 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          secteur != null
-              ? 'Un produit par ligne : ils vont dans ${secteur.nom}. Une ligne finie par « : » ouvre un autre secteur.'
-              : rayon != null
-              ? 'Une ligne finie par « : » donne le secteur du rayon ${rayon.nom} (« Chats : »), puis un produit par ligne.'
-              : 'Une ligne finie par « : » donne le secteur : « Animalerie / Chats : » (rayon / secteur), '
-                    'ou « Fruits : » pour un secteur existant. Puis un produit par ligne.',
+          (secteur != null
+                  ? 'Un produit par ligne : ils vont dans ${secteur.nom}. « Secteur Chats » ouvre un autre secteur.'
+                  : rayon != null
+                  ? '« Secteur Chats » donne le secteur du rayon ${rayon.nom}, puis un produit par ligne.'
+                  : '« Secteur Chats » (ou « Chats : ») donne le secteur, puis un produit par ligne. Un secteur '
+                        'existant est trouvé dans son rayon.') +
+              ' « Rayon Animalerie » en tête de ligne fixe le rayon, créé s\'il n\'existe pas, des secteurs qui suivent.',
           style: Charte.texte(14, couleur: Charte.texteSecondaire),
         ),
         Align(
@@ -631,7 +632,7 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
           minLines: 6,
           maxLines: 12,
           style: Charte.texte(15),
-          decoration: const InputDecoration(labelText: 'Produits à ajouter', hintText: 'Animalerie / Chats :\nCroquettes\nLitière'),
+          decoration: const InputDecoration(labelText: 'Produits à ajouter', hintText: 'Rayon Animalerie\nSecteur Chats\nCroquettes\nLitière'),
         ),
       ],
     ),

@@ -6,6 +6,7 @@ import 'dart:math' show Random;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
+import 'affichage.dart';
 import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
@@ -679,6 +680,9 @@ class Etat extends ChangeNotifier {
 
   /// Images des secteurs dans les listes (Apparence, 02/11/2026) ; propre à l'appareil.
   bool iconesListes = true;
+
+  /// Débordement des images de secteur dans les listes : 'normal', 'reduit' ou 'aucun' (07/11/2026) ; propre à l'appareil.
+  String debordIcones = 'normal';
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;
   set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
@@ -1225,6 +1229,8 @@ class Etat extends ChangeNotifier {
     delaiArchives = (options?['delaiArchives'] as num? ?? 0).toInt();
     apparence = options?['apparence'] as String?;
     iconesListes = options?['iconesListes'] as bool? ?? true;
+    debordIcones = options?['debordIcones'] as String? ?? 'normal';
+    taillePictoListes = tailleDebord(debordIcones);
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
@@ -1370,6 +1376,7 @@ class Etat extends ChangeNotifier {
             if (delaiArchives > 0) 'delaiArchives': delaiArchives,
             if (apparence != null) 'apparence': apparence,
             if (!iconesListes) 'iconesListes': false,
+            if (debordIcones != 'normal') 'debordIcones': debordIcones,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
@@ -4245,6 +4252,14 @@ class Etat extends ChangeNotifier {
 
   void montrerIconesListes(bool oui) {
     iconesListes = oui;
+    modifie();
+  }
+
+  static double tailleDebord(String d) => switch (d) { 'reduit' => 32, 'aucun' => 26, _ => 40 };
+
+  void choisirDebordIcones(String d) {
+    debordIcones = d;
+    taillePictoListes = tailleDebord(d);
     modifie();
   }
 

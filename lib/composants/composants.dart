@@ -5,6 +5,7 @@ import 'icone.dart';
 import '../theme.dart';
 import 'entete.dart' show glisserOnglet;
 import 'pictogramme.dart';
+import '../donnees/affichage.dart';
 
 export 'entete.dart';
 export 'recherche.dart';
@@ -484,6 +485,7 @@ class TitreGroupe extends StatelessWidget {
       this.couleur,
       this.pictoDebordant,
       this.pictoGauche = 14,
+      this.pictoTaille,
       this.fond,
       this.tailleSigne = 46,
       this.signeAuDessus = false,
@@ -510,6 +512,9 @@ class TitreGroupe extends StatelessWidget {
   /// Position de l'image depuis le bord gauche : 14 en courses (empiète un peu sur la colonne des coches),
   /// 4 en préparation (pas de coches, image cadrée à gauche).
   final double pictoGauche;
+
+  /// Taille de l'image du secteur (par défaut [taillePictoListes], le choix de l'Apparence).
+  final double? pictoTaille;
 
   /// Couleur de fond propre (bandeau d'un univers) ; sinon la couleur d'accent.
   final Color? couleur;
@@ -566,7 +571,7 @@ class TitreGroupe extends StatelessWidget {
         child: Stack(clipBehavior: Clip.none, children: [
          Container(
           constraints: BoxConstraints(minHeight: grand ? Charte.ligneListe : 0),
-          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? pictoGauche + 48 : 16), 4, 14, 4),
+          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? pictoGauche + (pictoTaille ?? taillePictoListes) + 8 : 16), 4, 14, 4),
           child: Row(children: [
             if (signe != null) ...[signe, const SizedBox(width: 10)],
             Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
@@ -591,10 +596,11 @@ class TitreGroupe extends StatelessWidget {
 /// Bandeau de secteur et ses articles, avec l'image du secteur plus haute que le bandeau : dessinée par-dessus
 /// les lignes, elle déborde un peu au-dessus et davantage au-dessous (01/11/2026, Aristide : un peu de « fun »).
 class SectionDebordante extends StatelessWidget {
-  const SectionDebordante({super.key, required this.picto, required this.enfants, this.gauche = 14});
+  const SectionDebordante({super.key, required this.picto, required this.enfants, this.gauche = 14, this.taille});
   final String? picto;
   final List<Widget> enfants;
   final double gauche;
+  final double? taille;
 
   @override
   Widget build(BuildContext context) => Stack(clipBehavior: Clip.none, children: [
@@ -603,9 +609,9 @@ class SectionDebordante extends StatelessWidget {
           Positioned(
             left: gauche,
             top: 1, // 01/11/2026 (Aristide) : le débord est en bas, pas en haut
-            width: 40,
-            height: 40,
-            child: IgnorePointer(child: Pictogramme(picto, taille: 40, key: ValueKey('picto-$picto'))),
+            width: taille ?? taillePictoListes,
+            height: taille ?? taillePictoListes,
+            child: IgnorePointer(child: Pictogramme(picto, taille: taille ?? taillePictoListes, key: ValueKey('picto-$picto'))),
           ),
       ]);
 }

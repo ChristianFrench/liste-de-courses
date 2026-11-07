@@ -537,6 +537,13 @@ void main() {
     expect(b.produit('Graines')?.$2.nom, 'Oiseaux');
     // Depuis un rayon : le secteur inconnu y est créé.
     expect(lireTexteCatalogue(b, 'Poissons :\nAquarium\n', rayonDefaut: 'Animalerie').groupes.single.rayon, 'Animalerie');
+    // Mots « Rayon » et « Secteur » (07/11/2026, Aristide).
+    final l3 = lireTexteCatalogue(b, 'Rayon Bricolage\nVis\nSecteur Colles\nColle forte\nSecteur Fruits\nKiwis\nRayon : Animalerie\nSecteur Chats :\nPâtée\n');
+    expect(l3.groupes.map((g) => '${g.rayon}/${g.secteur}'), ['Bricolage/Bricolage', 'Bricolage/Colles', 'Bricolage/Fruits', 'Animalerie/Chats']);
+    expect(l3.groupes.first.rayonNeuf, isTrue);
+    expect(l3.groupes.last.secteurNeuf, isFalse);
+    expect(lireTexteCatalogue(b, 'Secteur Fruits\nKiwis\n').groupes.single.rayon, 'Fruits et légumes');
+    expect(lireTexteCatalogue(b, 'Secteur Animalerie / Lapins\nFoin\n').groupes.single.secteur, 'Lapins');
     // Déplacer un secteur, supprimer un rayon non vide.
     b.deplacerSecteur(b.rayon('Animalerie')!, b.secteur(b.rayon('Animalerie')!, 'Oiseaux')!, b.rayon('Fruits et légumes')!);
     expect(b.produit('Graines')?.$1.nom, 'Fruits et légumes');

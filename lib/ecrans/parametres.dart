@@ -142,13 +142,28 @@ class EcranApparence extends _EcranVivant {
                 coche: etat.iconesListes,
                 onChange: etat.montrerIconesListes,
               ),
+              const SizedBox(height: 14),
+              // 07/11/2026 (Aristide) : taille du débord des images, utilisable seulement avec les icônes.
+              IgnorePointer(
+                ignoring: !etat.iconesListes,
+                child: Opacity(
+                  opacity: etat.iconesListes ? 1 : 0.4,
+                  child: ChoixDeroulant<String>(
+                    key: const ValueKey('debord-icones'),
+                    libelle: 'Débordement des icônes',
+                    valeur: etat.debordIcones,
+                    choix: const {'normal': 'Normal', 'reduit': 'Réduit', 'aucun': 'Aucun'},
+                    onChange: etat.choisirDebordIcones,
+                  ),
+                ),
+              ),
             ]),
           ),
         ]),
         GroupeRetractable(cle: 'apparence/apercu', titre: 'Aperçu', icone: Icons.visibility_outlined, enfants: [
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: _ExempleListe(icones: etat.iconesListes, cadres: cadres, palette: Charte.palette.nom),
+            child: _ExempleListe(icones: etat.iconesListes, taille: Etat.tailleDebord(etat.debordIcones), cadres: cadres, palette: Charte.palette.nom),
           ),
         ]),
       ]),
@@ -162,8 +177,9 @@ class EcranApparence extends _EcranVivant {
 class _ExempleListe extends StatelessWidget {
   // Les choix sont passés en paramètres : l'aperçu se redessine dès que l'un change (la case des icônes
   // ne le rafraîchissait pas, 03/11/2026).
-  const _ExempleListe({required this.icones, required this.cadres, required this.palette});
+  const _ExempleListe({required this.icones, required this.taille, required this.cadres, required this.palette});
   final bool icones;
+  final double taille;
   final (int, int, int) cadres;
   final String palette;
 
@@ -197,10 +213,10 @@ class _ExempleListe extends StatelessWidget {
     List<Widget> section(String rayon, String secteur, List<Widget> lignes) {
       final picto = icones ? cleSecteur(rayon, secteur) : null;
       final enfants = [
-        TitreGroupe(nom: secteur, pictoDebordant: picto, pictoGauche: 4, nombre: lignes.length),
+        TitreGroupe(nom: secteur, pictoDebordant: picto, pictoGauche: 4, pictoTaille: taille, nombre: lignes.length),
         ...lignes,
       ];
-      return picto == null ? enfants : [SectionDebordante(picto: picto, gauche: 4, enfants: enfants)];
+      return picto == null ? enfants : [SectionDebordante(picto: picto, gauche: 4, taille: taille, enfants: enfants)];
     }
 
     return Column(key: const ValueKey('exemple-apparence'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [

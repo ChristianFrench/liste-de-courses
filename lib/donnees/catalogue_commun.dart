@@ -850,48 +850,66 @@ class GroupeLu {
   final connus = <String>[];
 }
 
-/// Titre : ligne qui finit par « : » (« Animalerie / Chats : », ou « Fruits : » si ce secteur existe ;
-/// un secteur inconnu sans rayon va dans [rayonDefaut], sinon son rayon est à choisir).
-/// Les autres lignes sont des produits ; puces et numéros sont enlevés. Sans titre au-dessus, les
-/// produits vont dans « Divers ».
+/// Titre : ligne qui finit par « : » ou qui commence par « Secteur » (« Animalerie / Chats : »,
+/// « Secteur Chats », ou « Fruits : » si ce secteur existe ; un secteur inconnu sans rayon va dans le rayon
+/// courant ou [rayonDefaut], sinon son rayon est à choisir). Une ligne qui commence par « Rayon » fixe le rayon
+/// courant (créé s'il n'existe pas) pour les secteurs qui suivent ; ses produits sans secteur vont dans un
+/// secteur du nom du rayon (07/11/2026, Aristide). Les autres lignes sont des produits ; puces et numéros sont
+/// enlevés. Sans titre au-dessus, les produits vont dans « Divers ».
 LectureCatalogue lireTexteCatalogue(Brouillon b, String texte, {String? rayonDefaut}) {
   final lu = LectureCatalogue();
   GroupeLu? courant;
+  String? rayonCourant;
   final vus = <String>{};
   CatSecteur? cible(GroupeLu g) {
     final r = g.rayon.isEmpty ? null : b.rayon(g.rayon);
     return r == null ? null : b.secteur(r, g.secteur);
   }
 
+  GroupeLu groupe(String rn, String sn) {
+    final r = b.rayon(rn);
+    final s = r == null ? null : b.secteur(r, sn);
+    final g = GroupeLu(r?.nom ?? rn, s?.nom ?? sn, rayonNeuf: r == null, secteurNeuf: s == null);
+    lu.groupes.add(g);
+    return g;
+  }
+
+  final motCle = RegExp(r'^(rayon|secteur)\b\s*:?\s*(.*?)\s*:?$', caseSensitive: false);
   for (final brut in const LineSplitter().convert(texte)) {
     final ligne = brut.trim();
     if (ligne.isEmpty) continue;
-    if (ligne.endsWith(':')) {
-      final titre = ligne.substring(0, ligne.length - 1).trim();
+    final m = motCle.firstMatch(ligne);
+    if (m != null && m.group(2)!.isNotEmpty && m.group(1)!.toLowerCase() == 'rayon') {
+      final n = m.group(2)!;
+      rayonCourant = b.rayon(n)?.nom ?? n[0].toUpperCase() + n.substring(1);
+      courant = null;
+      continue;
+    }
+    final estSecteur = m != null && m.group(2)!.isNotEmpty;
+    if (estSecteur || ligne.endsWith(':')) {
+      final titre = estSecteur ? m.group(2)! : ligne.substring(0, ligne.length - 1).trim();
       final parties = titre.split(RegExp(r'\s*[/›>]\s*'));
-      String rn, sn;
       if (parties.length >= 2) {
-        rn = parties.first;
-        sn = parties.sublist(1).join(' ');
-      } else {
-        final x = b.secteurPartout(titre);
-        if (x == null && rayonDefaut == null) {
-          // Secteur inconnu, rayon non dit : on le demandera (pas de nouveau rayon d'office).
-          courant = GroupeLu('', titre, secteurNeuf: true, rayonAChoisir: true);
-          lu.groupes.add(courant);
-          continue;
-        }
-        rn = x?.$1.nom ?? rayonDefaut!;
-        sn = x?.$2.nom ?? titre;
+        courant = groupe(parties.first, parties.sublist(1).join(' '));
+        continue;
       }
-      final r = b.rayon(rn);
-      final s = r == null ? null : b.secteur(r, sn);
-      courant = GroupeLu(r?.nom ?? rn, s?.nom ?? sn, rayonNeuf: r == null, secteurNeuf: s == null);
-      lu.groupes.add(courant);
+      if (rayonCourant != null) {
+        courant = groupe(rayonCourant, titre);
+        continue;
+      }
+      final x = b.secteurPartout(titre);
+      if (x == null && rayonDefaut == null) {
+        // Secteur inconnu, rayon non dit : on le demandera (pas de nouveau rayon d'office).
+        courant = GroupeLu('', titre, secteurNeuf: true, rayonAChoisir: true);
+        lu.groupes.add(courant);
+        continue;
+      }
+      courant = groupe(x?.$1.nom ?? rayonDefaut!, x?.$2.nom ?? titre);
       continue;
     }
     final nom = ligne.replaceFirst(RegExp(r'^([-•*·–]|\d+[.)])\s*'), '').trim();
     if (nom.isEmpty) continue;
+    if (courant == null && rayonCourant != null) courant = groupe(rayonCourant, rayonCourant);
     if (courant == null) {
       // Produits sans titre : secteur « Divers » du rayon donné, ou d'un rayon Divers existant, sinon à choisir.
       final r = rayonDefaut != null ? b.rayon(rayonDefaut) : b.rayon('Divers');
