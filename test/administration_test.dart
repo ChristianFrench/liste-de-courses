@@ -8,6 +8,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter/gestures.dart' show kSecondaryButton;
+import 'package:liste_de_courses/composants/composants.dart' show voletsEnFenetre;
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/serveur.dart';
 import 'package:liste_de_courses/donnees/serveur_acces_io.dart' as io;
@@ -80,35 +82,82 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(find.text('Catalogue des produits'), findsWidgets);
-    expect(find.text('FRUITS ET LÉGUMES'), findsOneWidget, reason: 'l\'arbre des rayons, à gauche');
-    // 07/11/2026 : grand écran. Un secteur choisi montre ses produits en tableau ; Iconographie à côté.
+    voletsEnFenetre = true;
+    expect(find.text('Fruits et légumes'), findsOneWidget, reason: 'le cadre du catalogue');
+    expect(find.text('Catalogue commun'), findsOneWidget, reason: 'le titre commun');
+    // 07/11/2026 (2e version) : un seul cadre ; rayon puis secteur dépliés, les produits dessous.
     await tester.tap(find.byKey(const ValueKey('console-rayon-Fruits et légumes')));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('console-secteur-Fruits et légumes/Fruits')));
+    await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
-    expect(find.text('Fruits et légumes › Fruits'), findsOneWidget);
-    await _capture('2a-Catalogue-grand-ecran');
-    await tester.tap(find.byKey(const ValueKey('rubrique-iconographie')));
-    await tester.pumpAndSettle();
-    expect(find.text('Iconographie des rayons et secteurs'), findsOneWidget);
-    await _capture('2b-Iconographie');
-    await tester.tap(find.byKey(const ValueKey('icono-tout')));
-    await tester.pumpAndSettle();
-    await _capture('2c-Iconographie-tout');
-    await tester.tap(find.byKey(const ValueKey('rubrique-produits')));
-    await tester.pumpAndSettle();
-    expect(find.byKey(const ValueKey('maintenance-repartir')), findsOneWidget, reason: 'les actions, à droite');
-    expect(find.byKey(const ValueKey('generaliser')), findsOneWidget);
+    expect(find.text('Abricots'), findsOneWidget);
     await _capture('2-Catalogue-des-produits');
 
-    // Une action de droite s'ouvre (nouveau rayon) et modifie la vue de gauche
-    await tester.tap(find.byKey(const ValueKey('maintenance-rayon')));
+    // Clic droit sur un produit : son menu ; renommer sur place.
+    await tester.tap(find.byKey(const ValueKey('console-produit-Fruits/Abricots')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField).last, 'Animalerie');
-    await tester.tap(find.text('Ajouter').last);
+    expect(find.text('Retirer le produit (Suppr)'), findsOneWidget);
+    await _capture('2a-Menu-produit');
+    await tester.tap(find.text('Renommer (F2)'));
     await tester.pumpAndSettle();
-    expect(find.text('Rayons ajoutés (1)'), findsOneWidget, reason: 'le récapitulatif suit le brouillon');
-    await _capture('3-Catalogue-modifie');
+    await tester.enterText(find.byKey(const ValueKey('renommage')), 'Abricots secs');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+    expect(find.text('Abricots secs'), findsOneWidget);
+    expect(find.byKey(const ValueKey('pastille-en-cours')), findsOneWidget);
+
+    // Glisser un produit sur un autre secteur : il y est déplacé.
+    await tester.tap(find.byKey(const ValueKey('console-secteur-Fruits et légumes/Fruits')));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('console-secteur-Fruits et légumes/Fruits secs et graines')));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+    final source = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key as ValueKey<String>).value.startsWith('console-produit-Fruits secs et graines/')).first;
+    final nom = (tester.widget(source).key as ValueKey<String>).value.split('/').last;
+    final g = await tester.startGesture(tester.getCenter(source));
+    await g.moveBy(const Offset(0, -20));
+    await tester.pump();
+    await g.moveTo(tester.getCenter(find.byKey(const ValueKey('console-secteur-Fruits et légumes/Légumes'))));
+    await tester.pump();
+    await g.up();
+    await tester.pumpAndSettle();
+    expect(find.byKey(ValueKey('console-produit-Légumes/$nom')), findsOneWidget, reason: 'déplacé à la souris');
+
+    // Le menu ☰ : historique en fenêtre, iconographie en fenêtre, valider avec confirmation.
+    await tester.tap(find.byKey(const ValueKey('console-menu')));
+    await tester.pumpAndSettle();
+    await _capture('2b-Menu-general');
+    await tester.tap(find.textContaining('Iconographie…').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Iconographie des rayons et secteurs'), findsOneWidget);
+    await _capture('2c-Iconographie');
+    await tester.tap(find.byKey(const ValueKey('icono-fermer')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('console-menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Valider les modifications').last);
+    await tester.pumpAndSettle();
+    await _capture('2d-Valider');
+    await tester.tap(find.text('Valider').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('console-menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Historique…'));
+    await tester.pumpAndSettle();
+    expect(find.text('Historique des modifications'), findsOneWidget);
+    await _capture('3-Historique');
+    await tester.tap(find.byKey(const ValueKey('historique-fermer')));
+    await tester.pumpAndSettle();
+
+    // Barre latérale repliée
+    await tester.tap(find.byKey(const ValueKey('menu-replier')));
+    await tester.pumpAndSettle();
+    await _capture('3b-Menu-replie');
+    await tester.tap(find.byKey(const ValueKey('menu-replier')));
+    await tester.pumpAndSettle();
 
     for (final (r, nom) in [
       (Rubrique.initialisation, '4-Initialisation'),

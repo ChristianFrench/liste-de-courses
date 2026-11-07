@@ -6,16 +6,17 @@ import '../composants/icone.dart';
 import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
+import '../donnees/journal_catalogue.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'editeur_catalogue.dart';
 
-// Catalogue commun en grand écran, dans la console Windows (07/11/2026, Aristide) : à gauche l'arbre des rayons et
-// des secteurs, au centre les produits du secteur choisi en tableau (sélection multiple, glisser-déposer vers un
-// secteur de l'arbre, Entrée / F2 / Suppr), ou l'iconographie des rayons et secteurs à compléter avant de généraliser.
+// Catalogue commun en grand écran, dans la console Windows (07/11/2026, Aristide, 2e version) :
+// - en haut, un titre commun : le catalogue, ses chiffres, ce qui est en cours, le bouton Généraliser et le menu ☰
+//   des actions qui ne modifient pas le catalogue (historique, iconographie, valider, clé de signature…) ;
+// - dessous, un seul cadre sur toute la largeur : rayons, secteurs et produits ; clic droit = actions de l'élément,
+//   double-clic ou F2 = renommer sur place, tout changement d'emplacement se fait à la souris (glisser-déposer).
 // Le téléphone garde son écran ; les gestes passent par l'état de l'éditeur ([EtatEditeurCatalogue]) et son journal.
-
-enum ModeCatalogue { produits, iconographie }
 
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
@@ -44,6 +45,7 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
             if (f.isEmpty || c.replaceAll('-', ' ').contains(f)) c
         ];
         return Dialog(
+          backgroundColor: Charte.blanc,
           child: SizedBox(
             width: 760,
             height: 620,
@@ -101,10 +103,40 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
   );
 }
 
+/// Ce que l'on fait glisser : un rayon, un secteur (avec son rayon) ou des produits.
+class _Glisse {
+  _Glisse.rayon(this.rayon)
+      : secteur = null,
+        produits = const [];
+  _Glisse.secteur(this.rayon, this.secteur) : produits = const [];
+  _Glisse.produits(this.produits)
+      : rayon = null,
+        secteur = null;
+  final CatRayon? rayon;
+  final CatSecteur? secteur;
+  final List<CatProduit> produits;
+  bool get estRayon => secteur == null && produits.isEmpty;
+  bool get estSecteur => secteur != null;
+  bool get estProduits => produits.isNotEmpty;
+  String get libelle => estProduits
+      ? (produits.length == 1 ? produits.single.nom : _pluriel(produits.length, 'produit'))
+      : estSecteur
+          ? secteur!.nom
+          : rayon!.nom;
+}
+
+/// Une ligne du cadre : un rayon, un secteur ou un produit.
+class _Ligne {
+  _Ligne(this.r, [this.s, this.p]);
+  final CatRayon r;
+  final CatSecteur? s;
+  final CatProduit? p;
+  Object get objet => p ?? s ?? r;
+}
+
 class CatalogueLarge extends StatefulWidget {
-  const CatalogueLarge({super.key, required this.editeur, required this.mode});
+  const CatalogueLarge({super.key, required this.editeur});
   final EtatEditeurCatalogue editeur;
-  final ModeCatalogue mode;
 
   @override
   State<CatalogueLarge> createState() => _CatalogueLargeState();
@@ -112,25 +144,42 @@ class CatalogueLarge extends StatefulWidget {
 
 class _CatalogueLargeState extends State<CatalogueLarge> {
   String recherche = '';
-  CatSecteur? secteur;
-  final selection = <CatProduit>{};
-  final ouverts = <CatRayon>{};
-  final _focus = FocusNode(debugLabel: 'produits');
-  bool toutesLesIcones = false;
-  CatSecteur? _survole;
+  final rayonsOuverts = <CatRayon>{};
+  final secteursOuverts = <CatSecteur>{};
+
+  /// Rayon ou secteur choisi (clic) ; produits choisis (clic, Ctrl+clic).
+  Object? choisi;
+  final produitsChoisis = <CatProduit>{};
+
+  /// Élément renommé sur place, et son champ.
+  Object? _edite;
+  final _champ = TextEditingController();
+  final _focus = FocusNode(debugLabel: 'catalogue');
+  Object? _survole;
 
   EtatEditeurCatalogue get e => widget.editeur;
   Brouillon get b => e.b!;
 
   @override
+  void initState() {
+    super.initState();
+    e.ouvrirIconographie = () => montrerIconographie(context, e);
+  }
+
+  @override
   void dispose() {
+    _champ.dispose();
     _focus.dispose();
     super.dispose();
   }
 
   void _modifie() {
     e.modifie();
-    setState(() {});
+    if (mounted) setState(() {});
+  }
+
+  void _message(String t) {
+    if (mounted) Nav.message(context, t);
   }
 
   (CatRayon, CatSecteur)? _ou(CatProduit p) {
@@ -149,8 +198,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     return null;
   }
 
-  String get _filtre => recherche.trim().toLowerCase();
-
   // ---------------------------------------------------------------- gestes
 
   Future<void> _choisirImage(String cle, String nom) async {
@@ -160,145 +207,503 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     _modifie();
   }
 
-  void _fixer(String cle, String picto) {
-    b.choisirImage(cle, picto);
+  Future<void> _nouveauSecteur(CatRayon r) async {
+    final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
+    if (nom == null || nom.trim().isEmpty || !mounted) return;
+    final s = b.ajouterSecteur(r, nom);
+    rayonsOuverts.add(r);
+    choisi = s;
     _modifie();
   }
 
-  Future<void> _nouveauProduit() async {
-    final s = secteur;
-    if (s == null) return;
+  Future<void> _nouveauProduit(CatSecteur s) async {
     final nom = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', valider: 'Ajouter');
     if (nom == null || nom.trim().isEmpty || !mounted) return;
     if (!b.ajouterProduit(s, nom)) {
-      Nav.message(context, '« ${nom.trim()} » est déjà dans ce secteur');
+      _message('« ${nom.trim()} » est déjà dans ce secteur');
       return;
     }
+    secteursOuverts.add(s);
     _modifie();
   }
 
-  Future<void> _renommer() async {
-    if (selection.length != 1) return;
-    final p = selection.single;
-    final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
-    if (nom == null || !mounted) return;
-    b.renommerProduit(p, nom);
+  void _commencerRenommage(Object o) {
+    _champ.text = switch (o) { CatRayon r => r.nom, CatSecteur s => s.nom, CatProduit p => p.nom, _ => '' };
+    _champ.selection = TextSelection(baseOffset: 0, extentOffset: _champ.text.length);
+    setState(() => _edite = o);
+  }
+
+  void _finirRenommage({bool garder = true}) {
+    final o = _edite;
+    if (o == null) return;
+    final nom = _champ.text.trim();
+    setState(() => _edite = null);
+    if (!garder || nom.isEmpty) return;
+    switch (o) {
+      case CatRayon r when nom != r.nom:
+        if (b.rayon(nom) != null) return _message('Le rayon « $nom » existe déjà');
+        b.renommerRayon(r, nom);
+      case CatSecteur s when nom != s.nom:
+        final r = _rayonDe(s);
+        if (r == null) return;
+        if (b.secteur(r, nom) != null) return _message('Le secteur « $nom » existe déjà dans ${r.nom}');
+        b.renommerSecteur(r, s, nom);
+      case CatProduit p when nom != p.nom:
+        final o = _ou(p);
+        if (o != null && b.produitDans(o.$2, nom) != null) return _message('« $nom » est déjà dans ${o.$2.nom}');
+        b.renommerProduit(p, nom);
+      default:
+        return;
+    }
     _modifie();
+    _focus.requestFocus();
   }
 
-  Future<void> _retirer() async {
-    if (selection.isEmpty) return;
-    if (selection.length > 1) {
-      final ok = await confirmer(
-        context,
-        titre: 'Retirer ${_pluriel(selection.length, 'produit')} ?',
-        icone: Icons.delete_outline,
-        contenu: Text('Les foyers ne retirent que ce qu\'ils n\'utilisent pas.', style: Charte.texte(16)),
-        plein: 'Annuler',
-        contour: 'Retirer',
-      );
-      if (ok != true || !mounted) return;
-    }
-    for (final p in [...selection]) {
-      final o = _ou(p);
-      if (o != null) b.retirerProduit(o.$2, p);
-    }
-    selection.clear();
-    _modifie();
-  }
-
-  /// Déplace les produits dans [vers] ; rend le nombre déplacé.
-  int _deplacer(Iterable<CatProduit> produits, CatSecteur vers) {
-    var n = 0;
-    for (final p in [...produits]) {
-      final o = _ou(p);
-      if (o != null && b.deplacerProduit(o.$2, p, vers)) n++;
-    }
-    selection.clear();
-    if (n > 0) _modifie();
-    final r = _rayonDe(vers);
-    if (mounted) {
-      Nav.message(context, n == 0 ? 'Rien à déplacer (déjà dans ${vers.nom})' : '${_pluriel(n, 'produit')} déplacé${n > 1 ? 's' : ''} vers ${r?.nom ?? ''} › ${vers.nom}');
-    }
-    return n;
-  }
-
-  Future<void> _deplacerVers() async {
-    if (selection.isEmpty) return;
-    final choix = <CatSecteur, String>{
-      for (final r in b.catalogue.rayons)
-        for (final s in r.secteurs) s: '${r.nom} › ${s.nom}',
-    };
-    final vers = await choisirDansListe<CatSecteur>(context, titre: 'Déplacer ${_pluriel(selection.length, 'produit')} vers', choix: choix);
-    if (vers == null || !mounted) return;
-    _deplacer(selection, vers);
-  }
-
-  // ---------------------------------------------------------------- arbre
-
-  Widget _arbre() {
-    final f = _filtre;
-    bool produitTrouve(CatSecteur s) => f.length >= 2 && s.produits.any((p) => p.nom.toLowerCase().contains(f));
-    final lignes = <Widget>[];
-    for (final r in b.catalogue.rayons) {
-      final secteurs = [
-        for (final s in r.secteurs)
-          if (f.isEmpty || r.nom.toLowerCase().contains(f) || s.nom.toLowerCase().contains(f) || produitTrouve(s)) s
-      ];
-      if (f.isNotEmpty && secteurs.isEmpty && !r.nom.toLowerCase().contains(f)) continue;
-      final ouvert = f.isNotEmpty || ouverts.contains(r);
-      lignes.add(_ligneRayon(r, ouvert));
-      if (ouvert) {
-        for (final s in secteurs) {
-          lignes.add(_ligneSecteur(r, s));
+  Future<void> _supprimer(Object o) async {
+    switch (o) {
+      case CatRayon r:
+        final n = r.secteurs.fold(0, (n, s) => n + s.produits.length);
+        if (!await _confirmer('Supprimer le rayon ${r.nom} ?', 'Avec ${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(n, 'produit')}.')) {
+          return;
         }
-      }
+        b.retirerRayon(r);
+      case CatSecteur s:
+        final r = _rayonDe(s);
+        if (r == null || !await _confirmer('Supprimer le secteur ${s.nom} ?', 'Avec ${_pluriel(s.produits.length, 'produit')}.')) return;
+        b.retirerSecteur(r, s);
+      case CatProduit _:
+        final l = produitsChoisis.isNotEmpty ? [...produitsChoisis] : [o];
+        if (l.length > 1 && !await _confirmer('Retirer ${_pluriel(l.length, 'produit')} ?', '')) return;
+        for (final p in l) {
+          final x = _ou(p);
+          if (x != null) b.retirerProduit(x.$2, p);
+        }
+        produitsChoisis.clear();
     }
-    final toutOuvert = ouverts.length == b.catalogue.rayons.length;
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
-        child: TextField(
-          key: const ValueKey('console-recherche'),
-          style: Charte.texte(15),
-          decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
-          onChanged: (v) => setState(() => recherche = v),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(10, 0, 10, 6),
-        child: Row(children: [
-          TextButton.icon(
-            key: const ValueKey('console-nouveau-rayon'),
-            onPressed: e.nouveauRayon,
-            icon: Icone(Icons.add, size: 20, color: Charte.cadre),
-            label: Text('Nouveau rayon', style: Charte.texte(14, couleur: Charte.cadre)),
+    choisi = null;
+    _modifie();
+  }
+
+  Future<bool> _confirmer(String titre, String detail) async {
+    final ok = await confirmer(
+      context,
+      titre: titre,
+      icone: Icons.delete_outline,
+      contenu: Text('$detail Les foyers ne retirent que ce qu\'ils n\'utilisent pas.'.trim(), style: Charte.texte(16)),
+      plein: 'Annuler',
+      contour: 'Supprimer',
+    );
+    return ok == true && mounted;
+  }
+
+  /// Dépose [g] sur la ligne [cible] ; rend vrai si quelque chose a changé.
+  void _deposer(_Glisse g, _Ligne cible) {
+    var fait = '';
+    if (g.estProduits) {
+      final vers = cible.s;
+      if (vers == null) return;
+      var n = 0;
+      for (final p in g.produits) {
+        final o = _ou(p);
+        if (o != null && b.deplacerProduit(o.$2, p, vers)) n++;
+      }
+      produitsChoisis.clear();
+      if (n == 0) return _message('Déjà dans ${vers.nom}');
+      secteursOuverts.add(vers);
+      fait = '${_pluriel(n, 'produit')} déplacé${n > 1 ? 's' : ''} vers ${cible.r.nom} › ${vers.nom}';
+    } else if (g.estSecteur) {
+      final s = g.secteur!, de = _rayonDe(s);
+      if (de == null || identical(cible.s, s)) return;
+      final vers = cible.r;
+      if (!identical(de, vers)) {
+        b.deplacerSecteur(de, s, vers);
+        fait = '${s.nom} déplacé dans ${vers.nom}';
+      }
+      // Déposé sur un secteur : il se place avant lui.
+      final avant = cible.s;
+      if (avant != null && cible.p == null) {
+        final noms = [for (final x in vers.secteurs) if (!identical(x, s)) x.nom];
+        noms.insert(noms.indexOf(avant.nom), s.nom);
+        b.ordonnerSecteurs(vers, noms);
+        if (fait.isEmpty) fait = '${s.nom} placé avant ${avant.nom}';
+      }
+      rayonsOuverts.add(vers);
+      if (fait.isEmpty) return;
+    } else if (g.estRayon) {
+      final r = g.rayon!;
+      if (identical(r, cible.r) || cible.s != null) return;
+      final noms = [for (final x in b.catalogue.rayons) if (!identical(x, r)) x.nom];
+      noms.insert(noms.indexOf(cible.r.nom), r.nom);
+      b.ordonnerRayons(noms);
+      fait = '${r.nom} placé avant ${cible.r.nom}';
+    }
+    _modifie();
+    _message(fait);
+  }
+
+  bool _accepte(_Glisse g, _Ligne cible) {
+    if (g.estProduits) return cible.s != null && g.produits.any((p) => !cible.s!.produits.contains(p));
+    if (g.estSecteur) return cible.p == null && !identical(cible.s, g.secteur);
+    return cible.s == null && !identical(cible.r, g.rayon);
+  }
+
+  // ---------------------------------------------------------------- menus
+
+  Future<void> _menu(Offset ou, _Ligne? l) async {
+    final o = l?.objet;
+    if (o is CatProduit && !produitsChoisis.contains(o)) {
+      produitsChoisis
+        ..clear()
+        ..add(o);
+    }
+    if (o != null && o is! CatProduit) {
+      produitsChoisis.clear();
+      choisi = o;
+    }
+    setState(() {});
+    PopupMenuItem<String> item(String v, IconData i, String t, {bool actif = true}) => PopupMenuItem(
+          value: v,
+          enabled: actif,
+          height: 40,
+          child: Row(children: [Icone(i, size: 20, color: Charte.cadre), const SizedBox(width: 10), Text(t, style: Charte.texte(15))]),
+        );
+    final n = produitsChoisis.length;
+    final List<PopupMenuEntry<String>> items = switch (o) {
+      CatRayon r => [
+          item('secteur', Icons.add, 'Nouveau secteur…'),
+          item('texte', Icons.notes, 'Ajouter depuis un texte…'),
+          item('renommer', Icons.edit_outlined, 'Renommer (F2)'),
+          item('icone', Icons.image_outlined, 'Changer l\'icône…'),
+          if (r.secteurs.length > 1) item('ordre', Icons.drag_handle, 'Ordre des secteurs…'),
+          const PopupMenuDivider(),
+          item('supprimer', Icons.delete_outline, 'Supprimer le rayon (Suppr)'),
+        ],
+      CatSecteur _ => [
+          item('produit', Icons.add, 'Nouveau produit… (Entrée)'),
+          item('texte', Icons.notes, 'Ajouter depuis un texte…'),
+          item('renommer', Icons.edit_outlined, 'Renommer (F2)'),
+          item('icone', Icons.image_outlined, 'Changer l\'icône…'),
+          const PopupMenuDivider(),
+          item('supprimer', Icons.delete_outline, 'Supprimer le secteur (Suppr)'),
+        ],
+      CatProduit _ => [
+          item('renommer', Icons.edit_outlined, 'Renommer (F2)', actif: n == 1),
+          const PopupMenuDivider(),
+          item('supprimer', Icons.delete_outline, n > 1 ? 'Retirer $n produits (Suppr)' : 'Retirer le produit (Suppr)'),
+        ],
+      _ => [
+          item('rayon', Icons.add, 'Nouveau rayon…'),
+          item('texte', Icons.notes, 'Ajouter depuis un texte…'),
+        ],
+    };
+    final v = await showMenu<String>(context: context, position: RelativeRect.fromLTRB(ou.dx, ou.dy, ou.dx, ou.dy), items: items);
+    if (v == null || !mounted) return;
+    switch ((v, o)) {
+      case ('secteur', CatRayon r):
+        await _nouveauSecteur(r);
+      case ('produit', CatSecteur s):
+        await _nouveauProduit(s);
+      case ('texte', CatRayon r):
+        if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
+      case ('texte', CatSecteur s):
+        if (await ajouterDepuisTexte(context, b, rayon: _rayonDe(s), secteur: s)) _modifie();
+      case ('texte', _):
+        if (await ajouterDepuisTexte(context, b)) _modifie();
+      case ('rayon', _):
+        await e.nouveauRayon();
+        if (mounted) setState(() {});
+      case ('renommer', final Object x):
+        _commencerRenommage(x);
+      case ('icone', CatRayon r):
+        await _choisirImage(cleChoixRayon(r.nom), r.nom);
+      case ('icone', CatSecteur s):
+        await _choisirImage(cleChoixSecteur(_rayonDe(s)?.nom ?? '', s.nom), s.nom);
+      case ('ordre', CatRayon r):
+        final noms = await ordonner(context, titre: 'Ordre des secteurs · ${r.nom}', noms: [for (final s in r.secteurs) s.nom]);
+        if (noms == null) return;
+        b.ordonnerSecteurs(r, noms);
+        _modifie();
+      case ('supprimer', final Object x):
+        await _supprimer(x);
+    }
+  }
+
+  Future<void> _menuGeneral(String v) async {
+    switch (v) {
+      case 'historique':
+        await montrerHistorique(context, e);
+      case 'iconographie':
+        await montrerIconographie(context, e);
+      case 'valider':
+        await e.valider();
+      case 'generaliser':
+        await e.generaliser();
+      case 'repartir':
+        await e.repartir();
+      case 'cle':
+        await e.cleSignature();
+      case 'renvoyer':
+        await e.renvoyer();
+    }
+    if (mounted) setState(() {});
+  }
+
+  // ---------------------------------------------------------------- titre
+
+  Widget _titre() {
+    final p = e.publie;
+    final numero = e.numeroPublie;
+    final date = p?['date'] as String?;
+    final secteurs = b.catalogue.rayons.fold(0, (n, r) => n + r.secteurs.length);
+    final manquantes = sansIcone(b);
+    Widget pastille(String cle, String libelle, String valeur, {bool fort = false}) => Container(
+          key: ValueKey('pastille-$cle'),
+          margin: const EdgeInsets.only(left: 8),
+          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
+          decoration: BoxDecoration(
+            color: fort ? Charte.clair(Charte.accent, 0.6) : Charte.blanc,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Charte.separateurZone),
           ),
-          const Spacer(),
-          Tooltip(
-            message: toutOuvert ? 'Tout replier' : 'Tout déplier',
-            child: IconButton(
-              key: const ValueKey('console-tout'),
-              onPressed: () => setState(() => toutOuvert ? ouverts.clear() : ouverts.addAll(b.catalogue.rayons)),
-              icon: Icone(toutOuvert ? Icons.unfold_less : Icons.unfold_more, size: 24, color: Charte.cadre),
-            ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+            Text(valeur, style: Charte.texte(17, gras: true, couleur: Charte.encreNiveau)),
+            Text(libelle, style: Charte.texte(12, couleur: Charte.texteSecondaire)),
+          ]),
+        );
+    PopupMenuItem<String> item(String v, IconData i, String t, {bool actif = true}) => PopupMenuItem(
+          value: v,
+          enabled: actif,
+          height: 42,
+          child: Row(children: [Icone(i, size: 22, color: Charte.cadre), const SizedBox(width: 12), Text(t, style: Charte.texte(15))]),
+        );
+    return Container(
+      color: Charte.fondBandeau,
+      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Icone(Icons.public, size: 34, color: Charte.cadre),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Catalogue commun', style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
+              Text(
+                [
+                  numero == 0 ? 'Aucune version publiée' : 'Version publiée v$numero${date == null ? '' : ' du ${date.substring(8, 10)}/${date.substring(5, 7)}/${date.substring(0, 4)}'}',
+                  _pluriel(b.catalogue.rayons.length, 'rayon'),
+                  _pluriel(secteurs, 'secteur'),
+                  _pluriel(b.nbProduits, 'produit'),
+                  if (manquantes > 0) '$manquantes sans icône',
+                ].join(' · '),
+                style: Charte.texte(14, couleur: Charte.texteSecondaire),
+              ),
+            ]),
+          ),
+          pastille('en-cours', 'en cours', '${e.enCours}', fort: e.enCours > 0),
+          pastille('etapes', 'étapes', '${e.journal.etapes.length}'),
+          pastille('a-generaliser', 'à généraliser', b.modifications == 0 ? 'rien' : '${b.modifications}'),
+          const SizedBox(width: 12),
+          _Bouton(
+            key: const ValueKey('generaliser'),
+            texte: e.enPublication ? 'Envoi…' : 'Généraliser (v${numero + 1})',
+            icone: Icons.public,
+            plein: true,
+            onTap: e.enPublication || b.modifications == 0 || e.enCours > 0 ? null : () => _menuGeneral('generaliser'),
+          ),
+          const SizedBox(width: 4),
+          PopupMenuButton<String>(
+            key: const ValueKey('console-menu'),
+            tooltip: 'Menu',
+            icon: Icone(Icons.menu, size: 28, color: Charte.cadre),
+            onSelected: _menuGeneral,
+            itemBuilder: (_) => [
+              item('historique', Icons.history, 'Historique…'),
+              item('iconographie', Icons.image_outlined, 'Iconographie…${manquantes > 0 ? ' ($manquantes sans icône)' : ''}'),
+              item('valider', Icons.check, 'Valider les modifications (${e.enCours})…', actif: e.enCours > 0),
+              item('generaliser', Icons.public, 'Généraliser (v${numero + 1})…', actif: b.modifications > 0 && e.enCours == 0),
+              const PopupMenuDivider(),
+              item('repartir', Icons.restore, 'Repartir d\'un catalogue…'),
+              item('cle', Icons.key_outlined, 'Clé de signature…'),
+              if (e.absenteDuServeur) item('renvoyer', Icons.cloud_upload_outlined, 'Renvoyer v$numero au serveur'),
+            ],
           ),
         ]),
-      ),
-      Container(height: 1, color: Charte.separateurZone),
-      Expanded(child: ListView(padding: const EdgeInsets.only(bottom: 16), children: lignes)),
-    ]);
+        if (e.enCours > 0)
+          Padding(
+            padding: const EdgeInsets.only(top: 6, left: 46),
+            child: Text('${_pluriel(e.enCours, 'modification')} en cours : validez-les (menu ☰) avant de généraliser.',
+                style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
+          ),
+        if (e.absenteDuServeur)
+          Padding(
+            padding: const EdgeInsets.only(top: 6, left: 46),
+            child: Text('La version v$numero n\'est pas sur le serveur : renvoyez-la (menu ☰).',
+                style: Charte.texte(13.5, gras: true, couleur: Charte.rouge)),
+          ),
+      ]),
+    );
   }
 
-  Widget _crayon(String cle, String nom, VoidCallback onTap) => Tooltip(
-        message: 'Modifier $nom',
-        child: InkResponse(
-          key: ValueKey('crayon-$cle'),
-          onTap: onTap,
-          radius: 18,
-          child: Padding(padding: const EdgeInsets.all(5), child: Icone(Icons.edit_outlined, size: 20, color: Charte.encreNiveau)),
+  // ---------------------------------------------------------------- cadre du catalogue
+
+  List<_Ligne> _lignes() {
+    final f = recherche.trim().toLowerCase();
+    final cherche = f.length >= 2;
+    final l = <_Ligne>[];
+    for (final r in b.catalogue.rayons) {
+      final rTrouve = cherche && r.nom.toLowerCase().contains(f);
+      final sous = <_Ligne>[];
+      for (final s in r.secteurs) {
+        final sTrouve = cherche && s.nom.toLowerCase().contains(f);
+        final produits = [for (final p in s.produits) if (cherche && p.nom.toLowerCase().contains(f)) p];
+        if (cherche && !rTrouve && !sTrouve && produits.isEmpty) continue;
+        sous.add(_Ligne(r, s));
+        if (cherche ? produits.isNotEmpty : secteursOuverts.contains(s)) {
+          final montres = cherche && !sTrouve ? produits : ([...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase())));
+          if (cherche && sTrouve && !secteursOuverts.contains(s) && produits.isEmpty) continue;
+          for (final p in montres) {
+            sous.add(_Ligne(r, s, p));
+          }
+        }
+      }
+      if (cherche && !rTrouve && sous.isEmpty) continue;
+      l.add(_Ligne(r));
+      if (cherche || rayonsOuverts.contains(r)) l.addAll(sous);
+    }
+    return l;
+  }
+
+  Widget _libelle(Object o, String nom, TextStyle style) {
+    if (!identical(_edite, o)) return Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
+    return CallbackShortcuts(
+      bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => _finirRenommage(garder: false)},
+      child: SizedBox(
+        height: 30,
+        child: TextField(
+          key: const ValueKey('renommage'),
+          controller: _champ,
+          autofocus: true,
+          style: style,
+          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 6)),
+          onSubmitted: (_) => _finirRenommage(),
+          onTapOutside: (_) => _finirRenommage(),
         ),
-      );
+      ),
+    );
+  }
+
+  Widget _rangee(_Ligne l) {
+    final o = l.objet;
+    final niveau = l.p != null ? 3 : (l.s != null ? 2 : 1);
+    final selection = o is CatProduit ? produitsChoisis.contains(o) : identical(choisi, o);
+    final survol = identical(_survole, o);
+    final hauteur = niveau == 1 ? 42.0 : (niveau == 2 ? 38.0 : 32.0);
+    final fond = survol
+        ? Charte.accent
+        : selection
+            ? Charte.fondSelection
+            : (niveau == 1 ? Charte.niveau(2) : niveau == 2 ? Charte.niveau(3) : Charte.blanc);
+    final ouvert = niveau == 1 ? (recherche.trim().length >= 2 || rayonsOuverts.contains(l.r)) : secteursOuverts.contains(l.s);
+    Widget contenu;
+    switch (niveau) {
+      case 1:
+        final r = l.r;
+        contenu = Row(children: [
+          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
+          _icone(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), 30, () => _choisirImage(cleChoixRayon(r.nom), r.nom), r.nom),
+          const SizedBox(width: 8),
+          Expanded(child: _libelle(r, r.nom, Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
+          Text(_pluriel(r.secteurs.length, 'secteur'), style: Charte.texte(13, couleur: Charte.encreNiveau)),
+          const SizedBox(width: 8),
+        ]);
+      case 2:
+        final s = l.s!;
+        contenu = Row(children: [
+          const SizedBox(width: 30),
+          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 20, color: Charte.encreNiveau),
+          _icone(b.images[cleChoixSecteur(l.r.nom, s.nom)] ?? cleSecteur(l.r.nom, s.nom), 26,
+              () => _choisirImage(cleChoixSecteur(l.r.nom, s.nom), s.nom), s.nom),
+          const SizedBox(width: 8),
+          Expanded(child: _libelle(s, s.nom, Charte.texte(14.5, gras: true))),
+          Text(_pluriel(s.produits.length, 'produit'), style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+          const SizedBox(width: 8),
+        ]);
+      default:
+        final p = l.p!;
+        contenu = Row(children: [
+          const SizedBox(width: 92),
+          Expanded(flex: 4, child: _libelle(p, p.nom, Charte.texte(14.5, gras: selection))),
+          Expanded(
+            flex: 3,
+            child: Text(p.formats.join(', '), maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(p.marques.take(4).join(', '),
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
+          ),
+        ]);
+    }
+    final rangee = Container(
+      height: hauteur,
+      padding: const EdgeInsets.only(left: 8, right: 8),
+      decoration: BoxDecoration(color: fond, border: Border(bottom: BorderSide(color: niveau == 3 ? Charte.separateurLigne : Charte.blanc))),
+      child: contenu,
+    );
+    final glisse = switch (niveau) {
+      1 => _Glisse.rayon(l.r),
+      2 => _Glisse.secteur(l.r, l.s),
+      _ => _Glisse.produits(produitsChoisis.contains(l.p) ? [...produitsChoisis] : [l.p!]),
+    };
+    final cible = DragTarget<_Glisse>(
+      onWillAcceptWithDetails: (d) {
+        final ok = _accepte(d.data, l);
+        if (ok) setState(() => _survole = o);
+        return ok;
+      },
+      onLeave: (_) => setState(() => _survole = null),
+      onAcceptWithDetails: (d) {
+        setState(() => _survole = null);
+        _deposer(d.data, l);
+      },
+      builder: (_, __, ___) => GestureDetector(
+        key: ValueKey(switch (niveau) { 1 => 'console-rayon-${l.r.nom}', 2 => 'console-secteur-${l.r.nom}/${l.s!.nom}', _ => 'console-produit-${l.s!.nom}/${l.p!.nom}' }),
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          _focus.requestFocus();
+          setState(() {
+            if (o is CatProduit) {
+              if (!HardwareKeyboard.instance.isControlPressed) produitsChoisis.clear();
+              produitsChoisis.contains(o) && HardwareKeyboard.instance.isControlPressed ? produitsChoisis.remove(o) : produitsChoisis.add(o);
+              choisi = null;
+            } else {
+              produitsChoisis.clear();
+              choisi = o;
+              if (o is CatRayon) rayonsOuverts.contains(o) ? rayonsOuverts.remove(o) : rayonsOuverts.add(o);
+              if (o is CatSecteur) secteursOuverts.contains(o) ? secteursOuverts.remove(o) : secteursOuverts.add(o);
+            }
+          });
+        },
+        onDoubleTap: () => _commencerRenommage(o),
+        onSecondaryTapDown: (d) => _menu(d.globalPosition, l),
+        child: rangee,
+      ),
+    );
+    return Draggable<_Glisse>(
+      data: glisse,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      feedback: Material(
+        elevation: 4,
+        borderRadius: BorderRadius.circular(8),
+        color: Charte.cadre,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          child: Text(glisse.libelle, style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+        ),
+      ),
+      childWhenDragging: Opacity(opacity: 0.4, child: rangee),
+      child: cible,
+    );
+  }
 
   Widget _icone(String? picto, double taille, VoidCallback onTap, String nom) => Tooltip(
         message: 'Icône de $nom',
@@ -317,289 +722,252 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         ),
       );
 
-  Widget _ligneRayon(CatRayon r, bool ouvert) => Material(
-        color: Charte.niveau(2),
-        child: InkWell(
-          key: ValueKey('console-rayon-${r.nom}'),
-          onTap: () => setState(() => ouverts.contains(r) ? ouverts.remove(r) : ouverts.add(r)),
-          child: Container(
-            height: 42,
-            padding: const EdgeInsets.only(left: 6, right: 4),
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.blanc))),
-            child: Row(children: [
-              Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
-              _icone(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), 30, () => _choisirImage(cleChoixRayon(r.nom), r.nom), r.nom),
-              const SizedBox(width: 6),
-              Expanded(
-                child: Text(r.nom.toUpperCase(),
-                    maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: true, couleur: Charte.encreNiveau)),
-              ),
-              Text('${r.secteurs.length}', style: Charte.texte(13, couleur: Charte.encreNiveau)),
-              _crayon('r-${r.nom}', r.nom, () => menuActions(context, titre: 'Rayon ${r.nom}', actions: e.actionsRayon(context, r))),
-            ]),
-          ),
-        ),
-      );
-
-  Widget _ligneSecteur(CatRayon r, CatSecteur s) {
-    final choisi = identical(secteur, s);
-    return DragTarget<List<CatProduit>>(
-      onWillAcceptWithDetails: (d) {
-        final ok = d.data.any((p) => !s.produits.contains(p));
-        if (ok) setState(() => _survole = s);
-        return ok;
-      },
-      onLeave: (_) => setState(() => _survole = null),
-      onAcceptWithDetails: (d) {
-        setState(() => _survole = null);
-        _deplacer(d.data, s);
-      },
-      builder: (context, _, __) => Material(
-        color: identical(_survole, s) ? Charte.accent : (choisi ? Charte.fondSelection : Charte.niveau(3)),
-        child: InkWell(
-          key: ValueKey('console-secteur-${r.nom}/${s.nom}'),
-          onTap: () => setState(() {
-            secteur = s;
-            selection.clear();
-            _focus.requestFocus();
-          }),
-          child: Container(
-            height: 38,
-            padding: const EdgeInsets.only(left: 30, right: 4),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: Charte.blanc),
-                left: BorderSide(color: choisi ? Charte.cadre : Colors.transparent, width: 4),
-              ),
-            ),
-            child: Row(children: [
-              _icone(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), 26,
-                  () => _choisirImage(cleChoixSecteur(r.nom, s.nom), s.nom), s.nom),
-              const SizedBox(width: 6),
-              Expanded(child: Text(s.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: choisi))),
-              Text('${s.produits.length}', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-              _crayon('s-${r.nom}/${s.nom}', s.nom, () async {
-                await menuActions(context, titre: 'Secteur ${s.nom}', actions: actionsSecteurEditeur(context, b, r, s, _modifie, quitter: () {
-                  if (identical(secteur, s)) setState(() => secteur = null);
-                }));
-              }),
-            ]),
-          ),
-        ),
-      ),
-    );
+  Future<void> _touche(String t) async {
+    final o = produitsChoisis.isNotEmpty ? produitsChoisis.first : choisi;
+    if (o == null || _edite != null) return;
+    switch (t) {
+      case 'F2':
+        if (produitsChoisis.length <= 1) _commencerRenommage(o);
+      case 'Suppr':
+        await _supprimer(o);
+      case 'Entrée':
+        if (o is CatSecteur) await _nouveauProduit(o);
+        if (o is CatRayon) await _nouveauSecteur(o);
+    }
   }
 
-  // ---------------------------------------------------------------- produits
-
-  Set<String> _publies() {
-    final j = e.publie;
-    if (j == null) return const {};
-    return {
-      for (final r in (j['rayons'] as List? ?? const []).cast<Map>())
-        for (final s in (r['secteurs'] as List? ?? const []).cast<Map>())
-          for (final p in (s['produits'] as List? ?? const []).cast<Map>()) '${s['nom']}/${p['nom']}'.toLowerCase()
-    };
-  }
-
-  Widget _produits() {
-    final f = _filtre;
-    final global = f.length >= 2;
-    final s = secteur;
-    final List<(CatRayon, CatSecteur, CatProduit)> lignes = global
-        ? [
-            for (final r in b.catalogue.rayons)
-              for (final x in r.secteurs)
-                for (final p in x.produits)
-                  if (p.nom.toLowerCase().contains(f)) (r, x, p)
-          ]
-        : s == null
-            ? []
-            : [for (final p in s.produits) (_rayonDe(s)!, s, p)];
-    lignes.sort((a, c) => a.$3.nom.toLowerCase().compareTo(c.$3.nom.toLowerCase()));
-    final publies = _publies();
-    final titre = global ? 'Recherche « ${recherche.trim()} »' : s == null ? 'Choisissez un secteur à gauche' : '${_rayonDe(s)?.nom ?? ''} › ${s.nom}';
-    final tous = lignes.isNotEmpty && lignes.every((l) => selection.contains(l.$3));
-
-    Widget cellule(String t, {int flex = 1, bool gras = false, Color? couleur}) => Expanded(
-          flex: flex,
-          child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: gras, couleur: couleur ?? Charte.encre)),
-        );
-
-    Widget ligne((CatRayon, CatSecteur, CatProduit) l) {
-      final (r, x, p) = l;
-      final choisi = selection.contains(p);
-      final nouveau = e.publie != null && !publies.contains('${x.nom}/${p.nom}'.toLowerCase());
-      final rangee = Container(
-        height: 36,
-        padding: const EdgeInsets.symmetric(horizontal: 8),
-        decoration: BoxDecoration(
-          color: choisi ? Charte.fondSelection : Charte.blanc,
-          border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
-        ),
+  Widget _cadre() {
+    final lignes = _lignes();
+    final toutOuvert = rayonsOuverts.length == b.catalogue.rayons.length;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 12, 10),
         child: Row(children: [
           SizedBox(
-            width: 36,
-            child: Checkbox(
-              value: choisi,
-              onChanged: (v) => setState(() => v == true ? selection.add(p) : selection.remove(p)),
+            width: 380,
+            child: TextField(
+              key: const ValueKey('console-recherche'),
+              style: Charte.texte(15),
+              decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
+              onChanged: (v) => setState(() => recherche = v),
             ),
           ),
-          cellule(p.nom, flex: 3, gras: choisi),
-          if (global) cellule('${r.nom} › ${x.nom}', flex: 4, couleur: Charte.texteSecondaire),
-          cellule(p.formats.join(', '), flex: 3, couleur: Charte.texteSecondaire),
-          cellule(p.marques.take(4).join(', '), flex: 3, couleur: Charte.texteSecondaire),
-          SizedBox(width: 70, child: Text(nouveau ? 'nouveau' : '', style: Charte.texte(12.5, gras: true, couleur: Charte.cadre))),
-        ]),
-      );
-      final donnees = choisi ? selection.toList() : [p];
-      return Draggable<List<CatProduit>>(
-        key: ValueKey('console-produit-${x.nom}/${p.nom}'),
-        data: donnees,
-        dragAnchorStrategy: pointerDragAnchorStrategy,
-        feedback: Material(
-          elevation: 4,
-          borderRadius: BorderRadius.circular(8),
-          color: Charte.cadre,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            child: Text(donnees.length == 1 ? donnees.single.nom : _pluriel(donnees.length, 'produit'),
-                style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+          const SizedBox(width: 6),
+          Tooltip(
+            message: toutOuvert ? 'Tout replier' : 'Tout déplier',
+            child: IconButton(
+              key: const ValueKey('console-tout'),
+              onPressed: () => setState(() {
+                if (toutOuvert) {
+                  rayonsOuverts.clear();
+                  secteursOuverts.clear();
+                } else {
+                  rayonsOuverts.addAll(b.catalogue.rayons);
+                }
+              }),
+              icon: Icone(toutOuvert ? Icons.unfold_less : Icons.unfold_more, size: 26, color: Charte.cadre),
+            ),
           ),
-        ),
-        childWhenDragging: Opacity(opacity: 0.4, child: rangee),
-        child: GestureDetector(
-          onTap: () => setState(() {
-            final ctrl = HardwareKeyboard.instance.isControlPressed;
-            if (!ctrl) selection.clear();
-            choisi && ctrl ? selection.remove(p) : selection.add(p);
-            _focus.requestFocus();
-          }),
-          onDoubleTap: () {
-            setState(() => selection
-              ..clear()
-              ..add(p));
-            _renommer();
-          },
-          child: rangee,
-        ),
-      );
-    }
-
-    final n = selection.length;
-    return CallbackShortcuts(
-      bindings: {
-        const SingleActivator(LogicalKeyboardKey.enter): _nouveauProduit,
-        const SingleActivator(LogicalKeyboardKey.numpadEnter): _nouveauProduit,
-        const SingleActivator(LogicalKeyboardKey.f2): _renommer,
-        const SingleActivator(LogicalKeyboardKey.delete): _retirer,
-      },
-      child: Focus(
-        focusNode: _focus,
-        autofocus: true,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 16, 18, 8),
-            child: Row(children: [
-              if (!global && s != null) ...[
-                Pictogramme(b.images[cleChoixSecteur(_rayonDe(s)?.nom ?? '', s.nom)] ?? cleSecteur(_rayonDe(s)?.nom ?? '', s.nom), taille: 36),
-                const SizedBox(width: 10),
-              ],
-              Expanded(child: Text(titre, style: Charte.texte(19, gras: true, couleur: Charte.encreNiveau))),
-              Text(_pluriel(lignes.length, 'produit'), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            ]),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(14, 0, 14, 10),
-            child: Wrap(spacing: 8, runSpacing: 8, children: [
-              _Bouton(
-                key: const ValueKey('console-nouveau-produit'),
-                texte: 'Nouveau produit (Entrée)',
-                icone: Icons.add,
-                onTap: s == null || global ? null : _nouveauProduit,
-              ),
-              _Bouton(
-                texte: 'Depuis un texte',
-                icone: Icons.notes,
-                onTap: () async {
-                  final r = s == null ? null : _rayonDe(s);
-                  if (await ajouterDepuisTexte(context, b, rayon: global ? null : r, secteur: global ? null : s)) _modifie();
-                },
-              ),
-              _Bouton(key: const ValueKey('console-renommer'), texte: 'Renommer (F2)', icone: Icons.edit_outlined, onTap: n == 1 ? _renommer : null),
-              _Bouton(
-                key: const ValueKey('console-deplacer'),
-                texte: n > 0 ? 'Déplacer ($n)' : 'Déplacer',
-                icone: Icons.drive_file_move_outline,
-                onTap: n > 0 ? _deplacerVers : null,
-              ),
-              _Bouton(
-                key: const ValueKey('console-retirer'),
-                texte: n > 0 ? 'Retirer ($n) (Suppr)' : 'Retirer (Suppr)',
-                icone: Icons.delete_outline,
-                onTap: n > 0 ? _retirer : null,
-              ),
-            ]),
-          ),
-          Container(
-            height: 34,
-            padding: const EdgeInsets.symmetric(horizontal: 8),
-            color: Charte.niveau(2),
-            child: Row(children: [
-              SizedBox(
-                width: 36,
-                child: Checkbox(
-                  key: const ValueKey('console-tout-cocher'),
-                  value: tous,
-                  onChanged: lignes.isEmpty
-                      ? null
-                      : (v) => setState(() => v == true ? selection.addAll([for (final l in lignes) l.$3]) : selection.clear()),
-                ),
-              ),
-              cellule('Produit', flex: 3, gras: true),
-              if (global) cellule('Rayon › secteur', flex: 4, gras: true),
-              cellule('Mesure et packaging', flex: 3, gras: true),
-              cellule('Marques', flex: 3, gras: true),
-              const SizedBox(width: 70),
-            ]),
-          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: lignes.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(18),
-                    child: Text(
-                      global ? 'Aucun produit ne correspond.' : s == null ? '' : 'Aucun produit dans ce secteur.',
-                      style: Charte.texte(15, couleur: Charte.texteSecondaire),
-                    ),
-                  )
-                : ListView.builder(itemCount: lignes.length, itemBuilder: (_, i) => ligne(lignes[i])),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 6, 18, 10),
             child: Text(
-              'Clic : choisir · Ctrl+clic : ajouter à la sélection · Double-clic : renommer · '
-              'Glisser un produit (ou la sélection) sur un secteur à gauche pour l\'y déplacer.',
+              'Clic droit : actions de l\'élément · Double-clic ou F2 : renommer · Suppr : retirer · Entrée : ajouter dedans · '
+              'Glisser-déposer : déplacer un produit, un secteur ou un rayon · Ctrl+clic : plusieurs produits',
               style: Charte.texte(12.5, couleur: Charte.texteSecondaire),
             ),
           ),
         ]),
       ),
-    );
+      Expanded(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          decoration: BoxDecoration(border: Border.all(color: Charte.separateurZone), borderRadius: BorderRadius.circular(8)),
+          clipBehavior: Clip.antiAlias,
+          child: CallbackShortcuts(
+            bindings: {
+              const SingleActivator(LogicalKeyboardKey.f2): () => _touche('F2'),
+              const SingleActivator(LogicalKeyboardKey.delete): () => _touche('Suppr'),
+              const SingleActivator(LogicalKeyboardKey.enter): () => _touche('Entrée'),
+              const SingleActivator(LogicalKeyboardKey.numpadEnter): () => _touche('Entrée'),
+            },
+            child: Focus(
+              focusNode: _focus,
+              autofocus: true,
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onSecondaryTapDown: (d) => _menu(d.globalPosition, null),
+                child: ListView.builder(
+                  key: const ValueKey('console-cadre'),
+                  itemCount: lignes.length,
+                  itemBuilder: (_, i) => _rangee(lignes[i]),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ]);
   }
 
-  // ---------------------------------------------------------------- iconographie
+  @override
+  Widget build(BuildContext context) {
+    if (e.b == null) return const Center(child: CircularProgressIndicator());
+    // Scaffold : pour les messages en bas de l'écran.
+    return Scaffold(
+      backgroundColor: Charte.fond,
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _titre(),
+        Container(height: 1, color: Charte.separateurZone),
+        Expanded(child: _cadre()),
+      ]),
+    );
+  }
+}
 
-  Widget _iconographie() {
+// ---------------------------------------------------------------- historique (fenêtre)
+
+/// L'historique en fenêtre : les étapes à gauche (et ce qui est en cours), le détail de la ligne choisie à droite,
+/// « Repartir de cette étape » avec confirmation.
+Future<void> montrerHistorique(BuildContext context, EtatEditeurCatalogue e) {
+  int? choix = e.enCours > 0 ? -1 : (e.journal.etapes.isEmpty ? null : e.journal.etapes.length - 1);
+  return showDialog<void>(
+    context: context,
+    builder: (ctx) => StatefulBuilder(builder: (ctx, maj) {
+      final j = e.journal;
+      String date(DateTime d) => JournalCatalogue.nomParDefaut(d);
+      Widget ligne(int i) {
+        final enCours = i < 0;
+        final et = enCours ? null : j.etapes[i];
+        final gestes = enCours ? j.enCours : et!.gestes;
+        final etat = enCours ? 'en cours' : (et!.numero != null ? 'généralisée v${et.numero}' : 'validée');
+        final actif = choix == i;
+        return Material(
+          color: actif ? Charte.fondSelection : Colors.transparent,
+          child: InkWell(
+            key: ValueKey('historique-ligne-$i'),
+            onTap: () => maj(() => choix = i),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(14, 8, 12, 8),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(enCours ? 'Modifications en cours' : et!.nom, style: Charte.texte(15, gras: true)),
+                Text('${enCours ? '' : '${date(et!.date)} · '}$etat · ${_pluriel(gestes.length, 'modification')}',
+                    style: Charte.texte(12.5, couleur: enCours ? Charte.cadre : Charte.texteSecondaire)),
+              ]),
+            ),
+          ),
+        );
+      }
+
+      final c = choix;
+      final gestes = c == null ? const <GesteCatalogue>[] : (c < 0 ? j.enCours : j.etapes[c].gestes);
+      return Dialog(
+        backgroundColor: Charte.blanc,
+        child: SizedBox(
+          width: 1000,
+          height: 640,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 10),
+              child: Text('Historique des modifications', style: Charte.texte(19, gras: true)),
+            ),
+            Container(height: 1, color: Charte.separateurZone),
+            Expanded(
+              child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                SizedBox(
+                  width: 360,
+                  child: ListView(children: [
+                    if (j.enCours.isNotEmpty) ligne(-1),
+                    for (var i = j.etapes.length - 1; i >= 0; i--) ligne(i),
+                  ]),
+                ),
+                VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
+                Expanded(
+                  child: c == null
+                      ? const SizedBox()
+                      : ListView(padding: const EdgeInsets.all(16), children: [
+                          if (gestes.isEmpty) Text('Aucune modification.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                          for (final g in gestes.reversed)
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 10),
+                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                for (final l in g.lignes) Text(l, style: Charte.texte(15)),
+                                Text(date(g.date), style: Charte.texte(12, couleur: Charte.texteSecondaire)),
+                              ]),
+                            ),
+                        ]),
+                ),
+              ]),
+            ),
+            Container(height: 1, color: Charte.separateurZone),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                if (c != null && c < 0)
+                  _Bouton(
+                    key: const ValueKey('historique-valider'),
+                    texte: 'Valider ces modifications',
+                    icone: Icons.check,
+                    onTap: () async {
+                      await e.valider();
+                      maj(() => choix = j.etapes.length - 1);
+                    },
+                  ),
+                if (c != null && c >= 0)
+                  _Bouton(
+                    key: const ValueKey('historique-repartir'),
+                    texte: 'Repartir de cette étape',
+                    icone: Icons.history,
+                    onTap: () async {
+                      if (await e.revenirA(c)) maj(() => choix = j.etapes.length - 1);
+                    },
+                  ),
+                const SizedBox(width: 10),
+                _Bouton(key: const ValueKey('historique-fermer'), texte: 'Fermer', onTap: () => Navigator.of(ctx).pop()),
+              ]),
+            ),
+          ]),
+        ),
+      );
+    }),
+  );
+}
+
+// ---------------------------------------------------------------- iconographie (fenêtre)
+
+Future<void> montrerIconographie(BuildContext context, EtatEditeurCatalogue e) => showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Charte.blanc,
+        child: SizedBox(width: 1100, height: 760, child: PanneauIconographie(editeur: e)),
+      ),
+    );
+
+/// Rayons et secteurs avec l'état de leur icône, des propositions à cliquer et la bibliothèque.
+class PanneauIconographie extends StatefulWidget {
+  const PanneauIconographie({super.key, required this.editeur});
+  final EtatEditeurCatalogue editeur;
+
+  @override
+  State<PanneauIconographie> createState() => _PanneauIconographieState();
+}
+
+class _PanneauIconographieState extends State<PanneauIconographie> {
+  bool tout = false;
+  Brouillon get b => widget.editeur.b!;
+
+  void _fixer(String cle, String? picto) {
+    b.choisirImage(cle, picto);
+    widget.editeur.modifie();
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final lignes = <(String cle, String nom, String? rayon, EtatIcone etat, String? actuelle, List<String> produits)>[];
     for (final r in b.catalogue.rayons) {
-      lignes.add((
-        cleChoixRayon(r.nom),
-        r.nom,
-        null,
-        etatIconeRayon(r.nom, b.images),
-        b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom),
-        [for (final s in r.secteurs) s.nom],
-      ));
+      lignes.add((cleChoixRayon(r.nom), r.nom, null, etatIconeRayon(r.nom, b.images), b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom),
+          [for (final s in r.secteurs) s.nom]));
       for (final s in r.secteurs) {
         lignes.add((
           cleChoixSecteur(r.nom, s.nom),
@@ -614,20 +982,15 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     bool aCompleter(EtatIcone x) => x == EtatIcone.aucune || x == EtatIcone.approchee;
     final nAucune = lignes.where((l) => l.$4 == EtatIcone.aucune).length;
     final nApprochee = lignes.where((l) => l.$4 == EtatIcone.approchee).length;
-    final vues = [for (final l in lignes) if (toutesLesIcones || aCompleter(l.$4)) l];
-    const libelles = {
-      EtatIcone.choisie: 'choisie',
-      EtatIcone.exacte: 'livrée',
-      EtatIcone.approchee: 'approchée',
-      EtatIcone.aucune: 'aucune',
-    };
+    final vues = [for (final l in lignes) if (tout || aCompleter(l.$4)) l];
+    const libelles = {EtatIcone.choisie: 'choisie', EtatIcone.exacte: 'livrée', EtatIcone.approchee: 'approchée', EtatIcone.aucune: 'aucune'};
 
     Widget ligne((String, String, String?, EtatIcone, String?, List<String>) l) {
       final (cle, nom, rayon, etat, actuelle, produits) = l;
-      final propositions = [for (final c in propositionsIcone(nom, produits)) if (c != actuelle) c].take(5).toList();
+      final propositions = [for (final c in propositionsIcone(nom, produits, max: 8)) if (c != actuelle) c].take(7).toList();
       return Container(
         key: ValueKey('icono-$cle'),
-        padding: const EdgeInsets.fromLTRB(16, 6, 16, 6),
+        padding: const EdgeInsets.fromLTRB(16, 6, 8, 6),
         decoration: BoxDecoration(
           color: rayon == null ? Charte.niveau(3) : Charte.blanc,
           border: Border(bottom: BorderSide(color: Charte.separateurLigne)),
@@ -637,17 +1000,17 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
             width: 52,
             height: 52,
             child: Center(
-              child: actuelle != null
-                  ? Pictogramme(actuelle, taille: 46)
-                  : Icone(Icons.hide_image_outlined, size: 30, color: Charte.texteSecondaire),
+              child: actuelle != null ? Pictogramme(actuelle, taille: 46) : Icone(Icons.hide_image_outlined, size: 30, color: Charte.texteSecondaire),
             ),
           ),
           const SizedBox(width: 12),
           SizedBox(
-            width: 170,
+            width: 260,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
               Text(rayon == null ? nom.toUpperCase() : nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true)),
               Text('${rayon == null ? 'Rayon' : 'Secteur de $rayon'} · ${libelles[etat]}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Charte.texte(12.5, gras: etat == EtatIcone.aucune, couleur: etat == EtatIcone.aucune ? Charte.rouge : Charte.texteSecondaire)),
             ]),
           ),
@@ -660,19 +1023,25 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
                     key: ValueKey('proposition-$cle-$c'),
                     borderRadius: BorderRadius.circular(8),
                     onTap: () => _fixer(cle, c),
-                    child: Padding(padding: const EdgeInsets.all(3), child: Pictogramme(c, taille: 38)),
+                    child: Padding(padding: const EdgeInsets.all(4), child: Pictogramme(c, taille: 42)),
                   ),
                 ),
-              if (propositions.isEmpty)
-                Text('Aucune proposition', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+              if (propositions.isEmpty) Text('Aucune proposition', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
             ]),
           ),
-          const SizedBox(width: 8),
+          if (etat == EtatIcone.choisie)
+            Tooltip(
+              message: 'Revenir à l\'icône automatique',
+              child: IconButton(onPressed: () => _fixer(cle, null), icon: Icone(Icons.undo, size: 24, color: Charte.cadre)),
+            ),
           Tooltip(
             message: 'Bibliothèque',
             child: IconButton(
               key: ValueKey('bibliotheque-$cle'),
-              onPressed: () => _choisirImage(cle, nom),
+              onPressed: () async {
+                final c = await choisirDansBibliotheque(context, titre: 'Icône de $nom');
+                if (c != null && mounted) _fixer(cle, c == imageAutomatique ? null : c);
+              },
               icon: Icone(Icons.photo_library_outlined, size: 26, color: Charte.cadre),
             ),
           ),
@@ -699,14 +1068,14 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           ChoiceChip(
             key: const ValueKey('icono-a-completer'),
             label: Text('À compléter (${nAucune + nApprochee})'),
-            selected: !toutesLesIcones,
-            onSelected: (_) => setState(() => toutesLesIcones = false),
+            selected: !tout,
+            onSelected: (_) => setState(() => tout = false),
           ),
           ChoiceChip(
             key: const ValueKey('icono-tout'),
             label: Text('Tous (${lignes.length})'),
-            selected: toutesLesIcones,
-            onSelected: (_) => setState(() => toutesLesIcones = true),
+            selected: tout,
+            onSelected: (_) => setState(() => tout = true),
           ),
         ]),
       ),
@@ -719,31 +1088,26 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               )
             : ListView.builder(itemCount: vues.length, itemBuilder: (_, i) => ligne(vues[i])),
       ),
+      Container(height: 1, color: Charte.separateurZone),
+      Padding(
+        padding: const EdgeInsets.all(12),
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: _Bouton(key: const ValueKey('icono-fermer'), texte: 'Fermer', onTap: () => Navigator.of(context).pop()),
+        ),
+      ),
     ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (e.b == null) return const Center(child: CircularProgressIndicator());
-    if (secteur != null && _rayonDe(secteur!) == null) secteur = null;
-    return Material(
-      color: Charte.fond,
-      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        SizedBox(width: 300, child: _arbre()),
-        VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
-        Expanded(child: widget.mode == ModeCatalogue.produits ? _produits() : _iconographie()),
-      ]),
-    );
   }
 }
 
-/// [Bouton] à la largeur de son libellé (dans une rangée ou un Wrap, où la largeur n'est pas bornée).
+/// [Bouton] à la largeur de son libellé (dans une rangée, où la largeur n'est pas bornée).
 class _Bouton extends StatelessWidget {
-  const _Bouton({super.key, required this.texte, required this.onTap, this.icone});
+  const _Bouton({super.key, required this.texte, required this.onTap, this.icone, this.plein = false});
   final String texte;
   final VoidCallback? onTap;
   final IconData? icone;
+  final bool plein;
 
   @override
-  Widget build(BuildContext context) => IntrinsicWidth(child: Bouton(texte: texte, icone: icone, onTap: onTap, taille: 15));
+  Widget build(BuildContext context) => IntrinsicWidth(child: Bouton(texte: texte, icone: icone, onTap: onTap, plein: plein, taille: 15));
 }

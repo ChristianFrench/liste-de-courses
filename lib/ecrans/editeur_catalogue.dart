@@ -22,11 +22,10 @@ String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 class EcranEditeurCatalogue extends StatefulWidget {
   const EcranEditeurCatalogue(
-      {super.key, this.auChangement, this.actionsAPart = false, this.large = false, this.mode = ModeCatalogue.produits, this.versIconographie});
+      {super.key, this.auChangement, this.actionsAPart = false, this.large = false, this.versIconographie});
 
   /// Console Windows : disposition grand écran ([CatalogueLarge]) au lieu de l'écran du téléphone (07/11/2026).
   final bool large;
-  final ModeCatalogue mode;
 
   /// Ouvre l'iconographie (proposé quand des rayons ou secteurs n'ont pas d'icône à la généralisation).
   final VoidCallback? versIconographie;
@@ -55,6 +54,9 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
 
   /// Le brouillon au geste précédent, pour noter ce que fait le suivant.
   Map<String, dynamic>? _avant;
+
+  /// Console grand écran : ouvre la fenêtre de l'iconographie (« Compléter » avant de généraliser).
+  VoidCallback? ouvrirIconographie;
 
   /// Nombre de gestes en cours, pas encore validés.
   int get enCours => journal.enCours.length;
@@ -104,7 +106,8 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     final b = this.b;
     if (b == null || enCours == 0) return;
     final defaut = JournalCatalogue.nomParDefaut(DateTime.now());
-    final nom = await demanderTexte(context, titre: 'Valider les modifications', libelle: 'Nom de l\'étape', initial: defaut, valider: 'Valider');
+    final nom = await demanderTexte(context,
+        titre: 'Valider ${_pluriel(enCours, 'modification')} ?', aide: 'Nom de l\'étape (par défaut le jour et l\'heure)', libelle: 'Nom de l\'étape', initial: defaut, valider: 'Valider');
     if (nom == null || !mounted) return;
     final e = journal.valider(nom.trim().isEmpty ? defaut : nom.trim(), CatalogueCommun.emballer(b.versJson()));
     CatalogueCommun.instance.enregistrerJournal(journal);
@@ -333,7 +336,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   @override
   Widget build(BuildContext context) {
     final b = this.b;
-    if (widget.large) return CatalogueLarge(editeur: this, mode: widget.mode);
+    if (widget.large) return CatalogueLarge(editeur: this);
     return PageBase(
       entete: EnTeteFenetre(
         icone: Icons.public,
@@ -459,7 +462,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       );
       if (!mounted || generaliser == null) return;
       if (!generaliser) {
-        widget.versIconographie?.call();
+        (ouvrirIconographie ?? widget.versIconographie)?.call();
         return;
       }
     }

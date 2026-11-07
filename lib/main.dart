@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'composants/composants.dart' show voletsEnFenetre;
 import 'donnees/sauvegarde.dart';
 import 'donnees/catalogue_commun.dart';
 import 'donnees/demonstration.dart';
@@ -27,6 +28,7 @@ Future<void> main() async {
     if (Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
     // Le code secret est demandé à chaque lancement.
     CatalogueCommun.instance.verrouiller();
+    voletsEnFenetre = true;
     runApp(const OutilEditeurApp());
     return;
   }

@@ -1277,10 +1277,28 @@ class Lien extends StatelessWidget {
   }
 }
 
+/// Volets en fenêtres modales centrées (console d'administration sur PC).
+bool voletsEnFenetre = false;
+
 /// Volet du bas : toutes les fenêtres de l'application s'ouvrent ainsi, avec la poignée en haut.
 /// Il remonte avec le clavier, ne dépasse pas la largeur d'un téléphone sur grand écran ;
 /// [fermable] faux : seuls ses boutons le ferment (saisies longues qu'un geste maladroit ferait perdre).
 Future<T?> volet<T>(BuildContext context, {required WidgetBuilder builder, bool fermable = true}) {
+  // Console Windows (07/11/2026, Aristide) : fenêtres modales au centre, pas de volet du bas.
+  if (voletsEnFenetre) {
+    return showDialog<T>(
+      context: context,
+      barrierDismissible: fermable,
+      barrierColor: Charte.voile,
+      builder: (ctx) => Dialog(
+        backgroundColor: Charte.blanc,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 560, maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          child: Padding(padding: const EdgeInsets.only(top: 20), child: builder(ctx)),
+        ),
+      ),
+    );
+  }
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: true,

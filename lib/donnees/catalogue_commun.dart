@@ -603,6 +603,16 @@ class Brouillon {
     return true;
   }
 
+  /// Nouvel ordre des rayons (par leurs noms ; console, glisser-déposer).
+  void ordonnerRayons(List<String> noms) {
+    final avant = [for (final r in catalogue.rayons) r.nom];
+    catalogue.rayons = [
+      for (final n in noms) ...catalogue.rayons.where((r) => r.nom == n),
+      ...catalogue.rayons.where((r) => !noms.contains(r.nom)),
+    ];
+    if ([for (final r in catalogue.rayons) r.nom].join('\n') != avant.join('\n')) modifications++;
+  }
+
   /// Nouvel ordre des secteurs du rayon [r] (par leurs noms).
   void ordonnerSecteurs(CatRayon r, List<String> noms) {
     final avant = [for (final s in r.secteurs) s.nom];
