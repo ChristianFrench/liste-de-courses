@@ -96,6 +96,29 @@ void main() {
     expect(find.text('Abricots'), findsOneWidget);
     await _capture('2-Catalogue-des-produits');
 
+    // Glisser vers le bas du cadre : la liste défile toute seule ; le geste annulé arrête le défilement.
+    final position = tester.state<ScrollableState>(
+        find.descendant(of: find.byKey(const ValueKey('console-cadre')), matching: find.byType(Scrollable)).first).position;
+    final cadre = tester.getRect(find.byKey(const ValueKey('console-cadre')));
+    final geste = await tester.startGesture(tester.getCenter(find.byKey(const ValueKey('console-produit-Fruits/Ananas'))));
+    await tester.pump(const Duration(milliseconds: 50));
+    await geste.moveBy(const Offset(0, 30));
+    await tester.pump(const Duration(milliseconds: 50));
+    await geste.moveTo(Offset(cadre.center.dx, cadre.bottom - 8));
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 16));
+    }
+    expect(position.pixels, greaterThan(100));
+    await geste.moveTo(cadre.center);
+    await tester.pump(const Duration(milliseconds: 50));
+    final arrete = position.pixels;
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(position.pixels, arrete);
+    await geste.cancel();
+    await tester.pumpAndSettle();
+    position.jumpTo(0);
+    await tester.pumpAndSettle();
+
     // Clic droit sur un produit : son menu ; renommer sur place.
     await tester.tap(find.byKey(const ValueKey('console-produit-Fruits/Abricots')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -181,9 +183,48 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   @override
   void dispose() {
+    _arreterDefilement();
+    _defilement.dispose();
     _champ.dispose();
     _focus.dispose();
     super.dispose();
+  }
+
+  // ---------------------------------------------------------------- défilement pendant un glisser-déposer
+  // 07/11/2026 (Aristide) : en approchant le haut ou le bas du cadre, la liste défile, plus vite près du bord.
+
+  final _defilement = ScrollController();
+  final _cleCadre = GlobalKey();
+  Timer? _minuterie;
+  double _vitesse = 0;
+
+  void _suivreGlisse(Offset global) {
+    final boite = _cleCadre.currentContext?.findRenderObject() as RenderBox?;
+    if (boite == null || !boite.hasSize) return;
+    final y = boite.globalToLocal(global).dy;
+    const zone = 60.0, max = 22.0;
+    final h = boite.size.height;
+    _vitesse = y < zone
+        ? -max * ((zone - y.clamp(-zone, zone)) / zone).clamp(0.15, 1.0)
+        : y > h - zone
+            ? max * ((y.clamp(h - zone, h + zone) - (h - zone)) / zone).clamp(0.15, 1.0)
+            : 0;
+    if (_vitesse == 0) {
+      _arreterDefilement();
+    } else {
+      _minuterie ??= Timer.periodic(const Duration(milliseconds: 16), (_) {
+        if (!_defilement.hasClients || _vitesse == 0) return;
+        final p = _defilement.position;
+        final cible = (p.pixels + _vitesse).clamp(p.minScrollExtent, p.maxScrollExtent);
+        if (cible != p.pixels) _defilement.jumpTo(cible);
+      });
+    }
+  }
+
+  void _arreterDefilement() {
+    _minuterie?.cancel();
+    _minuterie = null;
+    _vitesse = 0;
   }
 
   void _modifie() {
@@ -794,6 +835,10 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     return Draggable<_Glisse>(
       data: glisse,
       dragAnchorStrategy: pointerDragAnchorStrategy,
+      onDragUpdate: (d) => _suivreGlisse(d.globalPosition),
+      onDragEnd: (_) => _arreterDefilement(),
+      onDraggableCanceled: (_, __) => _arreterDefilement(),
+      onDragCompleted: _arreterDefilement,
       feedback: Material(
         elevation: 4,
         borderRadius: BorderRadius.circular(8),
@@ -913,6 +958,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
       ),
       Expanded(
         child: Container(
+          key: _cleCadre,
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           decoration: BoxDecoration(border: Border.all(color: Charte.separateurZone), borderRadius: BorderRadius.circular(8)),
           clipBehavior: Clip.antiAlias,
@@ -931,6 +977,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
                 onSecondaryTapDown: (d) => _menu(d.globalPosition, null),
                 child: ListView.builder(
                   key: const ValueKey('console-cadre'),
+                  controller: _defilement,
                   itemCount: lignes.length,
                   itemBuilder: (_, i) => _rangee(lignes[i]),
                 ),
