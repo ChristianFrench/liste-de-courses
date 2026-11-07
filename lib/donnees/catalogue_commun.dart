@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 
 import 'catalogue_type.dart';
 import 'images_choisies.dart';
+import 'images_perso.dart';
 import 'modele.dart';
 import 'signature.dart';
 import 'synchro.dart';
@@ -497,8 +498,13 @@ class CatalogueCommun extends ChangeNotifier {
 
 /// Le catalogue commun en cours de modification par l'éditeur.
 class Brouillon {
-  Brouillon(this.catalogue, this.images, this.renommes, this.retires, this.version, this.modifications, {Set<String>? bloques})
-      : bloques = bloques ?? {};
+  Brouillon(this.catalogue, this.images, this.renommes, this.retires, this.version, this.modifications,
+      {Set<String>? bloques, Map<String, ImagePerso>? imagesPerso})
+      : bloques = bloques ?? {},
+        imagesPerso = imagesPerso ?? {};
+
+  /// Images ajoutées à la bibliothèque par l'éditeur (07/11/2026) ; elles partent avec le catalogue.
+  final Map<String, ImagePerso> imagesPerso;
   final CatalogueType catalogue;
   final Map<String, String> images;
   final List<Map<String, dynamic>> renommes, retires;
@@ -518,6 +524,7 @@ class Brouillon {
         (j['version'] as num? ?? 0).toInt(),
         (j['modifications'] as num? ?? 0).toInt(),
         bloques: {for (final x in (j['bloques'] as List? ?? const [])) '$x'},
+        imagesPerso: lireImagesPerso(j['imagesPerso']),
       );
 
   Map<String, dynamic> versJson() => {
@@ -528,7 +535,40 @@ class Brouillon {
         if (retires.isNotEmpty) 'retires': retires,
         if (bloques.isNotEmpty) 'bloques': bloques.toList()..sort(),
         if (modifications > 0) 'modifications': modifications,
+        if (imagesPerso.isNotEmpty) 'imagesPerso': imagesPersoVersJson(imagesPerso),
       };
+
+  /// Pour les étapes de l'historique : sans les images ajoutées (lourdes), qui ne reviennent pas en arrière.
+  Map<String, dynamic> versJsonSansImages() => versJson()..remove('imagesPerso');
+
+  /// Ajoute (ou remplace) une image de la bibliothèque ; rend sa clé.
+  String ajouterImagePerso(String texte, Uint8List png) {
+    final cle = clePerso(texte);
+    imagesPerso[cle] = ImagePerso(texte.trim(), base64Encode(png));
+    modifications++;
+    return cle;
+  }
+
+  /// Change le texte d'une image ajoutée (sa clé suit, ainsi que les rayons et secteurs qui l'utilisent).
+  String renommerImagePerso(String cle, String texte) {
+    final i = imagesPerso[cle];
+    final nouvelle = clePerso(texte);
+    if (i == null || texte.trim().isEmpty || (nouvelle != cle && imagesPerso.containsKey(nouvelle))) return cle;
+    imagesPerso.remove(cle);
+    imagesPerso[nouvelle] = ImagePerso(texte.trim(), i.png);
+    for (final e in images.entries.toList()) {
+      if (e.value == cle) images[e.key] = nouvelle;
+    }
+    modifications++;
+    return nouvelle;
+  }
+
+  /// Retire une image ajoutée ; les rayons et secteurs qui l'utilisaient reprennent leur image automatique.
+  void retirerImagePerso(String cle) {
+    if (imagesPerso.remove(cle) == null) return;
+    images.removeWhere((_, v) => v == cle);
+    modifications++;
+  }
 
   static String _bas(String t) => t.trim().toLowerCase();
 

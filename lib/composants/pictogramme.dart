@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../donnees/images_choisies.dart';
+import '../donnees/images_perso.dart';
 import '../donnees/pictos.dart';
 import '../donnees/pictos_emoji.dart';
 import '../donnees/pictos_fluent.dart';
@@ -62,9 +63,20 @@ List<String> get pictosBibliotheque => [for (final c in pictosEmoji) if (c.start
 List<String> get pictosBibliothequeFluent => pictosFluent.toList();
 
 /// D'où vient une image : « Fluent 3D (Microsoft) » ou « Noto 3D (Google) ».
-String origineImage(String cle) => cle.startsWith('fluent--') ? 'Fluent 3D (Microsoft)' : 'Noto 3D (Google)';
+String origineImage(String cle) => cle.startsWith('perso--')
+    ? 'Image ajoutée'
+    : cle.startsWith('fluent--')
+        ? 'Fluent 3D (Microsoft)'
+        : 'Noto 3D (Google)';
 
-bool _dispo(String c) => pictosDisponibles.contains(c) || pictosEmoji.contains(c) || pictosFluent.contains(c);
+/// Nom lisible d'une image (le texte associé pour une image ajoutée).
+String nomImage(String cle) => imagesPerso[cle]?.texte ?? cle.split('--').last.replaceAll('-', ' ');
+
+/// Images ajoutées par l'éditeur (07/11/2026, Aristide), par ordre alphabétique de leur texte.
+List<String> get pictosPerso => imagesPerso.keys.toList()..sort((a, b) => nomImage(a).toLowerCase().compareTo(nomImage(b).toLowerCase()));
+
+bool _dispo(String c) =>
+    pictosDisponibles.contains(c) || pictosEmoji.contains(c) || pictosFluent.contains(c) || imagesPerso.containsKey(c);
 
 String? cleRayon(String nom) {
   final s = _slug(nom);
@@ -100,7 +112,17 @@ class Pictogramme extends StatelessWidget {
   final double taille;
 
   @override
-  Widget build(BuildContext context) => cle == null
+  Widget build(BuildContext context) {
+    if (cle != null && cle!.startsWith('perso--')) {
+      final o = octetsImagePerso(cle!);
+      return o == null
+          ? SizedBox(width: taille, height: taille)
+          : Image.memory(o, width: taille, height: taille, filterQuality: FilterQuality.medium, gaplessPlayback: true, excludeFromSemantics: true);
+    }
+    return _image();
+  }
+
+  Widget _image() => cle == null
       ? SizedBox(width: taille, height: taille)
       // 01/11/2026 (Aristide) : rayons et secteurs en Noto 3D, comme les icônes, pour un ensemble homogène.
       : Image.asset(
@@ -166,6 +188,7 @@ Future<String?> choisirPictogramme(BuildContext context, {required String titre}
             grille(ctx, pictosBibliotheque),
             intertitre('Bibliothèque Fluent 3D'),
             grille(ctx, pictosBibliothequeFluent),
+            if (imagesPerso.isNotEmpty) ...[intertitre('Images ajoutées'), grille(ctx, pictosPerso)],
             intertitre('Images du catalogue'),
             grille(ctx, autres),
           ],
@@ -233,8 +256,8 @@ EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images)
 /// Toutes les images que l'on peut choisir (Noto 3D, Fluent 3D, réserve, catalogue), sans doublon, par ordre
 /// alphabétique du nom (la même chose en Noto 3D et en Fluent 3D côte à côte).
 List<String> get toutesLesImages {
-  String nom(String c) => c.split('--').last;
-  return {...pictosEmoji, ...pictosDisponibles, ...pictosFluent}.toList()
+  String nom(String c) => clePerso(nomImage(c)).substring(7);
+  return {...pictosEmoji, ...pictosDisponibles, ...pictosFluent, ...imagesPerso.keys}.toList()
     ..sort((a, b) => nom(a) != nom(b) ? nom(a).compareTo(nom(b)) : a.compareTo(b));
 }
 

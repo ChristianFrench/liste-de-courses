@@ -9,6 +9,7 @@ import '../donnees/catalogue_type.dart';
 import '../donnees/journal_catalogue.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'console_images.dart';
 import 'editeur_catalogue.dart';
 
 // Catalogue commun en grand écran, dans la console Windows (07/11/2026, Aristide, 2e version) :
@@ -33,7 +34,7 @@ int sansIcone(Brouillon b) {
 }
 
 /// La bibliothèque entière, avec un champ de recherche ; rend l'image choisie, [imageAutomatique], ou null.
-Future<String?> choisirDansBibliotheque(BuildContext context, {required String titre}) {
+Future<String?> choisirDansBibliotheque(BuildContext context, {required String titre, Future<String?> Function()? ajouter}) {
   var filtre = '';
   return showDialog<String>(
     context: context,
@@ -42,7 +43,7 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
         final f = filtre.trim().toLowerCase();
         final images = [
           for (final c in toutesLesImages)
-            if (f.isEmpty || c.replaceAll('-', ' ').contains(f)) c
+            if (f.isEmpty || c.replaceAll('-', ' ').contains(f) || nomImage(c).toLowerCase().contains(f)) c
         ];
         return Dialog(
           backgroundColor: Charte.blanc,
@@ -66,6 +67,18 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
                   ),
                   const SizedBox(width: 12),
                   _Bouton(texte: 'Image automatique', onTap: () => Navigator.of(ctx).pop(imageAutomatique)),
+                  if (ajouter != null) ...[
+                    const SizedBox(width: 8),
+                    _Bouton(
+                      key: const ValueKey('bibliotheque-ajouter'),
+                      texte: 'Ajouter une image…',
+                      icone: Icons.add_photo_alternate_outlined,
+                      onTap: () async {
+                        final c = await ajouter();
+                        if (c != null && ctx.mounted) Navigator.of(ctx).pop(c);
+                      },
+                    ),
+                  ],
                 ]),
                 const SizedBox(height: 10),
                 Text(_pluriel(images.length, 'image'), style: Charte.texte(13, couleur: Charte.texteSecondaire)),
@@ -75,7 +88,7 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 96, mainAxisExtent: 92),
                     itemCount: images.length,
                     itemBuilder: (_, i) => Tooltip(
-                      message: '${images[i].split('--').last.replaceAll('-', ' ')} · ${origineImage(images[i])}',
+                      message: '${nomImage(images[i])} · ${origineImage(images[i])}',
                       child: InkWell(
                         key: ValueKey('biblio-${images[i]}'),
                         borderRadius: BorderRadius.circular(10),
@@ -85,7 +98,7 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
                           child: Column(children: [
                             Pictogramme(images[i], taille: 52),
                             const SizedBox(height: 2),
-                            Text(images[i].split('--').last.replaceAll('-', ' '),
+                            Text(nomImage(images[i]),
                                 maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(11, couleur: Charte.texteSecondaire)),
                           ]),
                         ),
@@ -201,7 +214,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
   // ---------------------------------------------------------------- gestes
 
   Future<void> _choisirImage(String cle, String nom) async {
-    final c = await choisirDansBibliotheque(context, titre: 'Icône de $nom');
+    final c = await choisirDansBibliotheque(context, titre: 'Icône de $nom', ajouter: () => ajouterImageBibliotheque(context, e));
     if (c == null || !mounted) return;
     b.choisirImage(cle, c == imageAutomatique ? null : c);
     _modifie();
@@ -513,6 +526,8 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         await montrerHistorique(context, e);
       case 'iconographie':
         await montrerIconographie(context, e);
+      case 'images':
+        await montrerImagesAjoutees(context, e);
       case 'valider':
         await e.valider();
       case 'generaliser':
@@ -597,6 +612,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
             itemBuilder: (_) => [
               item('historique', Icons.history, 'Historique…'),
               item('iconographie', Icons.image_outlined, 'Iconographie…${manquantes > 0 ? ' ($manquantes sans icône)' : ''}'),
+              item('images', Icons.add_photo_alternate_outlined, 'Images ajoutées…${b.imagesPerso.isEmpty ? '' : ' (${b.imagesPerso.length})'}'),
               item('valider', Icons.check, 'Valider les modifications (${e.enCours})…', actif: e.enCours > 0),
               item('generaliser', Icons.public, 'Généraliser (v${numero + 1})…', actif: b.modifications > 0 && e.enCours == 0),
               const PopupMenuDivider(),
@@ -1135,7 +1151,7 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
             child: Row(children: [
               for (final c in propositions)
                 Tooltip(
-                  message: '${c.split('--').last.replaceAll('-', ' ')} · ${origineImage(c)}',
+                  message: '${nomImage(c)} · ${origineImage(c)}',
                   child: InkWell(
                     key: ValueKey('proposition-$cle-$c'),
                     borderRadius: BorderRadius.circular(8),
@@ -1156,7 +1172,8 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
             child: IconButton(
               key: ValueKey('bibliotheque-$cle'),
               onPressed: () async {
-                final c = await choisirDansBibliotheque(context, titre: 'Icône de $nom');
+                final c = await choisirDansBibliotheque(context,
+                    titre: 'Icône de $nom', ajouter: () => ajouterImageBibliotheque(context, widget.editeur));
                 if (c != null && mounted) _fixer(cle, c == imageAutomatique ? null : c);
               },
               icon: Icone(Icons.photo_library_outlined, size: 26, color: Charte.cadre),

@@ -1,4 +1,8 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:liste_de_courses/donnees/images_perso.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/journal_catalogue.dart';
@@ -66,5 +70,31 @@ void main() {
     expect(s.nom, 'Frais');
     expect([for (final p in s.produits) p.nom], ['Ail']);
     expect([for (final x in b.rayon('Épicerie')!.secteurs) x.nom], ['Pâtes', 'Frais']);
+  });
+
+  test('images ajoutées : mise à la taille, bibliothèque, historique', () {
+    // Un carré rouge sur un grand fond blanc : fond transparent, carré centré et agrandi dans 96 × 96.
+    final src = img.Image(width: 300, height: 200);
+    img.fill(src, color: img.ColorRgb8(255, 255, 255));
+    img.fillRect(src, x1: 100, y1: 50, x2: 160, y2: 110, color: img.ColorRgb8(220, 30, 30));
+    final png = preparerImagePerso(Uint8List.fromList(img.encodePng(src)))!;
+    final r = img.decodePng(png)!;
+    expect([r.width, r.height], [96, 96]);
+    expect(r.getPixel(2, 2).a, 0);
+    expect(r.getPixel(48, 48).r, greaterThan(200));
+    expect(preparerImagePerso(Uint8List.fromList([1, 2, 3])), isNull);
+
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes']}}));
+    final avant = b.versJson();
+    final cle = b.ajouterImagePerso('Pot de miel', png);
+    expect(cle, 'perso--pot-de-miel');
+    b.choisirImage('frais', cle);
+    expect(gestesEntre(avant, b.versJson()), contains('Image ajoutée à la bibliothèque : Pot de miel'));
+    expect(b.versJsonSansImages().containsKey('imagesPerso'), isFalse);
+    expect(Brouillon.lire(b.versJson()).imagesPerso[cle]!.texte, 'Pot de miel');
+    final nouvelle = b.renommerImagePerso(cle, 'Miel');
+    expect(b.images['frais'], nouvelle);
+    b.retirerImagePerso(nouvelle);
+    expect(b.images.containsKey('frais'), isFalse);
   });
 }

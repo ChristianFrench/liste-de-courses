@@ -7,6 +7,7 @@ import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
+import '../donnees/images_perso.dart';
 import '../donnees/journal_catalogue.dart';
 import 'console_catalogue.dart';
 import '../donnees/modele.dart';
@@ -80,11 +81,12 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
         journal = c.journal();
         // Premier usage : le point de départ est le brouillon tel qu'il est.
         if (journal.etapes.isEmpty) {
-          journal.valider('Point de départ', CatalogueCommun.emballer(x.versJson()),
+          journal.valider('Point de départ', CatalogueCommun.emballer(x.versJsonSansImages()),
               numero: x.modifications == 0 && _numero > 0 ? _numero : null);
           c.enregistrerJournal(journal);
         }
         _avant = x.versJson();
+        remplacerImagesPerso(x.imagesPerso);
       });
       widget.auChangement?.call();
     }
@@ -94,6 +96,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     final c = CatalogueCommun.instance;
     c.enregistrerBrouillon(b!);
     final apres = b!.versJson();
+    remplacerImagesPerso(b!.imagesPerso);
     if (_avant != null) journal.noter(gestesEntre(_avant!, apres));
     _avant = apres;
     c.enregistrerJournal(journal);
@@ -109,7 +112,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     final nom = await demanderTexte(context,
         titre: 'Valider ${_pluriel(enCours, 'modification')} ?', aide: 'Nom de l\'étape (par défaut le jour et l\'heure)', libelle: 'Nom de l\'étape', initial: defaut, valider: 'Valider');
     if (nom == null || !mounted) return;
-    final e = journal.valider(nom.trim().isEmpty ? defaut : nom.trim(), CatalogueCommun.emballer(b.versJson()));
+    final e = journal.valider(nom.trim().isEmpty ? defaut : nom.trim(), CatalogueCommun.emballer(b.versJsonSansImages()));
     CatalogueCommun.instance.enregistrerJournal(journal);
     setState(() {});
     widget.auChangement?.call();
@@ -140,6 +143,8 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     final j = CatalogueCommun.deballer(journal.revenirA(i));
     // Revenue à la version publiée : rien à généraliser ; sinon il y a à généraliser.
     j['modifications'] = e.numero != null && e.numero == _numero ? 0 : ((j['modifications'] as num? ?? 0).toInt()).clamp(1, 1 << 30);
+    // Les images ajoutées ne reviennent pas en arrière : elles restent dans la bibliothèque.
+    if (b != null && b!.imagesPerso.isNotEmpty) j['imagesPerso'] = imagesPersoVersJson(b!.imagesPerso);
     final nouveau = Brouillon.lire(j);
     c.enregistrerBrouillon(nouveau);
     c.enregistrerJournal(journal);
@@ -996,7 +1001,17 @@ List<String> gestesEntre(Map<String, dynamic> avant, Map<String, dynamic> apres)
   for (final k in {...ia.keys, ...ib.keys}) {
     if (ia[k] == ib[k]) continue;
     final quoi = '$k'.replaceAll('--', ' › ').replaceAll('-', ' ');
-    lignes.add(ib[k] == null ? 'Icône remise automatique : $quoi' : 'Icône choisie : $quoi → ${'${ib[k]}'.split('--').last.replaceAll('-', ' ')}');
+    lignes.add(ib[k] == null ? 'Icône remise automatique : $quoi' : 'Icône choisie : $quoi → ${nomImage('${ib[k]}')}');
+  }
+  final pa = (avant['imagesPerso'] as Map? ?? const {}), pb = (apres['imagesPerso'] as Map? ?? const {});
+  String texte(Object? o) => '${(o as Map?)?['t'] ?? ''}';
+  for (final k in {...pa.keys, ...pb.keys}) {
+    if (jsonEncode(pa[k]) == jsonEncode(pb[k])) continue;
+    lignes.add(pb[k] == null
+        ? 'Image retirée de la bibliothèque : ${texte(pa[k])}'
+        : pa[k] == null
+            ? 'Image ajoutée à la bibliothèque : ${texte(pb[k])}'
+            : 'Image de la bibliothèque remplacée : ${texte(pb[k])}');
   }
   if (lignes.isEmpty) return const ['Ordre modifié'];
   const max = 12;

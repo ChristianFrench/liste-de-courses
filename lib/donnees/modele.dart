@@ -10,6 +10,7 @@ import 'affichage.dart';
 import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
+import 'images_perso.dart';
 import 'moderation.dart';
 import 'sauvegarde.dart';
 import 'images_choisies.dart';
@@ -1240,6 +1241,11 @@ class Etat extends ChangeNotifier {
     imagesChoisies
       ..clear()
       ..addAll(Map<String, String>.from(options?['images'] as Map? ?? {}));
+    // Images ajoutées à la bibliothèque par l'éditeur, reçues avec le catalogue commun.
+    try {
+      final ip = _actif?.reglage('images_perso');
+      remplacerImagesPerso(ip == null || ip.isEmpty ? {} : lireImagesPerso(jsonDecode(ip)));
+    } catch (_) {}
     typesPromotion = [
       for (final t in (j['typesPromotion'] as List).cast<Map>())
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
@@ -3322,6 +3328,9 @@ class Etat extends ChangeNotifier {
     for (final e in (j['images'] as Map? ?? const {}).entries) {
       imagesChoisies.putIfAbsent(e.key as String, () => e.value as String);
     }
+    // Images ajoutées par l'éditeur : la bibliothèque reçue remplace la précédente (vide si elle n'en a pas).
+    remplacerImagesPerso(lireImagesPerso(j['imagesPerso']));
+    stockageFoyer?.definirReglage('images_perso', jsonEncode(j['imagesPerso'] ?? const {}));
 
     // 3. Retirés par l'éditeur, s'ils ne servent pas au foyer.
     var retires = 0;

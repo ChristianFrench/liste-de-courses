@@ -15,6 +15,7 @@ import 'package:liste_de_courses/donnees/serveur.dart';
 import 'package:liste_de_courses/donnees/serveur_acces_io.dart' as io;
 import 'package:liste_de_courses/ecrans/administration.dart';
 import 'package:liste_de_courses/ecrans/administration_serveur.dart';
+import 'package:liste_de_courses/ecrans/console_images.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/ecrans/outil_editeur.dart';
 import 'package:liste_de_courses/main.dart';
@@ -136,6 +137,29 @@ void main() {
     expect(find.text('Iconographie des rayons et secteurs'), findsOneWidget);
     await _capture('2c-Iconographie');
     await tester.tap(find.byKey(const ValueKey('icono-fermer')));
+    await tester.pumpAndSettle();
+
+    // Images ajoutées : une image collée, mise à la taille, avec son texte.
+    lirePressePapiersImage = () async => File('assets/icone.png').readAsBytesSync();
+    await tester.tap(find.byKey(const ValueKey('console-menu')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.textContaining('Images ajoutées').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('images-ajouter')));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      await tester.tap(find.byKey(const ValueKey('image-coller')));
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    });
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const ValueKey('image-texte')), 'Panier Emplettes');
+    await tester.pumpAndSettle();
+    await _capture('2e-Ajout-image');
+    await tester.tap(find.byKey(const ValueKey('image-ajouter')));
+    await tester.pumpAndSettle();
+    expect(find.text('Panier Emplettes'), findsOneWidget);
+    await _capture('2f-Images-ajoutees');
+    await tester.tap(find.byKey(const ValueKey('images-fermer')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('console-menu')));
     await tester.pumpAndSettle();
