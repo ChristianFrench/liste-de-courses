@@ -863,6 +863,32 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               style: Charte.texte(12.5, couleur: Charte.texteSecondaire),
             ),
           ),
+          // 07/11/2026 (Aristide) : ajouter à partir d'un texte toujours à portée, pas seulement au clic droit.
+          const SizedBox(width: 12),
+          _Bouton(
+            key: const ValueKey('console-texte'),
+            texte: 'Ajouter à partir d\'un texte',
+            icone: Icons.notes,
+            onTap: () async {
+              final o = choisi;
+              final ok = switch (o) {
+                CatSecteur s => await ajouterDepuisTexte(context, b, rayon: _rayonDe(s), secteur: s),
+                CatRayon r => await ajouterDepuisTexte(context, b, rayon: r),
+                _ => await ajouterDepuisTexte(context, b),
+              };
+              if (ok) _modifie();
+            },
+          ),
+          const SizedBox(width: 8),
+          _Bouton(
+            key: const ValueKey('console-nouveau-rayon'),
+            texte: 'Nouveau rayon',
+            icone: Icons.add,
+            onTap: () async {
+              await e.nouveauRayon();
+              if (mounted) setState(() {});
+            },
+          ),
         ]),
       ),
       Expanded(
