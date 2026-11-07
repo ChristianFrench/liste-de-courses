@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../donnees/images_choisies.dart';
 import '../donnees/pictos.dart';
 import '../donnees/pictos_emoji.dart';
+import '../donnees/pictos_fluent.dart';
 import 'icone.dart';
 
 // Images des rayons et des secteurs (assets/pictos/png), retrouvées par le nom.
@@ -57,7 +58,13 @@ List<String> get pictosReserve => [for (final c in pictosDisponibles) if (c.star
 /// nom croise le catalogue).
 List<String> get pictosBibliotheque => [for (final c in pictosEmoji) if (c.startsWith('bibliotheque--')) c];
 
-bool _dispo(String c) => pictosDisponibles.contains(c) || pictosEmoji.contains(c);
+/// Bibliothèque Fluent 3D (Microsoft, licence MIT), du même style (07/11/2026, Aristide).
+List<String> get pictosBibliothequeFluent => pictosFluent.toList();
+
+/// D'où vient une image : « Fluent 3D (Microsoft) » ou « Noto 3D (Google) ».
+String origineImage(String cle) => cle.startsWith('fluent--') ? 'Fluent 3D (Microsoft)' : 'Noto 3D (Google)';
+
+bool _dispo(String c) => pictosDisponibles.contains(c) || pictosEmoji.contains(c) || pictosFluent.contains(c);
 
 String? cleRayon(String nom) {
   final s = _slug(nom);
@@ -97,7 +104,11 @@ class Pictogramme extends StatelessWidget {
       ? SizedBox(width: taille, height: taille)
       // 01/11/2026 (Aristide) : rayons et secteurs en Noto 3D, comme les icônes, pour un ensemble homogène.
       : Image.asset(
-          pictosEmoji.contains(cle) ? 'assets/pictos/noto3d/$cle.png' : 'assets/pictos/png/$cle.png',
+          cle!.startsWith('fluent--')
+              ? 'assets/pictos/fluent3d/${cle!.substring(8)}.webp'
+              : pictosEmoji.contains(cle)
+                  ? 'assets/pictos/noto3d/$cle.png'
+                  : 'assets/pictos/png/$cle.png',
           width: taille, height: taille, filterQuality: FilterQuality.medium, excludeFromSemantics: true);
 }
 
@@ -153,6 +164,8 @@ Future<String?> choisirPictogramme(BuildContext context, {required String titre}
             if (reserve.isNotEmpty) ...[intertitre('Images de réserve'), grille(ctx, reserve)],
             intertitre('Bibliothèque Noto 3D'),
             grille(ctx, pictosBibliotheque),
+            intertitre('Bibliothèque Fluent 3D'),
+            grille(ctx, pictosBibliothequeFluent),
             intertitre('Images du catalogue'),
             grille(ctx, autres),
           ],
@@ -217,8 +230,13 @@ EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images)
   return cleSecteur(rayon, nom) != null ? EtatIcone.approchee : EtatIcone.aucune;
 }
 
-/// Toutes les images que l'on peut choisir (Noto 3D, réserve, catalogue), sans doublon, par ordre alphabétique.
-List<String> get toutesLesImages => {...pictosEmoji, ...pictosDisponibles}.toList()..sort();
+/// Toutes les images que l'on peut choisir (Noto 3D, Fluent 3D, réserve, catalogue), sans doublon, par ordre
+/// alphabétique du nom (la même chose en Noto 3D et en Fluent 3D côte à côte).
+List<String> get toutesLesImages {
+  String nom(String c) => c.split('--').last;
+  return {...pictosEmoji, ...pictosDisponibles, ...pictosFluent}.toList()
+    ..sort((a, b) => nom(a) != nom(b) ? nom(a).compareTo(nom(b)) : a.compareTo(b));
+}
 
 /// Mots significatifs d'un nom (sans accents, sans « et », « de »…, sans le pluriel).
 Set<String> _mots(String t) => {
@@ -248,7 +266,8 @@ List<String> propositionsIcone(String nom, Iterable<String> produits, {int max =
     if (n > 0) scores[c] = n;
   }
   final l = scores.keys.toList()..sort((a, b) => scores[b]!.compareTo(scores[a]!) != 0 ? scores[b]!.compareTo(scores[a]!) : a.compareTo(b));
-  // Une même image en plusieurs familles (rayon--secteur et bibliothèque--) : une seule fois.
+  // Une même image en plusieurs familles (rayon--secteur et bibliothèque--) : une seule fois ; mais le dessin
+  // Fluent 3D d'un même sujet est proposé à côté du Noto 3D.
   final vues = <String>{};
-  return [for (final c in l) if (vues.add(c.split('--').last)) c].take(max).toList();
+  return [for (final c in l) if (vues.add('${c.startsWith('fluent--')}${c.split('--').last}')) c].take(max).toList();
 }

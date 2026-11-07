@@ -75,7 +75,7 @@ Future<String?> choisirDansBibliotheque(BuildContext context, {required String t
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(maxCrossAxisExtent: 96, mainAxisExtent: 92),
                     itemCount: images.length,
                     itemBuilder: (_, i) => Tooltip(
-                      message: images[i].split('--').last.replaceAll('-', ' '),
+                      message: '${images[i].split('--').last.replaceAll('-', ' ')} · ${origineImage(images[i])}',
                       child: InkWell(
                         key: ValueKey('biblio-${images[i]}'),
                         borderRadius: BorderRadius.circular(10),
@@ -1018,7 +1018,7 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
             child: Row(children: [
               for (final c in propositions)
                 Tooltip(
-                  message: c.split('--').last.replaceAll('-', ' '),
+                  message: '${c.split('--').last.replaceAll('-', ' ')} · ${origineImage(c)}',
                   child: InkWell(
                     key: ValueKey('proposition-$cle-$c'),
                     borderRadius: BorderRadius.circular(8),
