@@ -8,6 +8,7 @@ import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
 import '../donnees/journal_catalogue.dart';
+import 'console_catalogue.dart';
 import '../donnees/modele.dart';
 import '../donnees/signature.dart';
 import '../navigation.dart';
@@ -20,7 +21,15 @@ import '../theme.dart';
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 class EcranEditeurCatalogue extends StatefulWidget {
-  const EcranEditeurCatalogue({super.key, this.auChangement, this.actionsAPart = false});
+  const EcranEditeurCatalogue(
+      {super.key, this.auChangement, this.actionsAPart = false, this.large = false, this.mode = ModeCatalogue.produits, this.versIconographie});
+
+  /// Console Windows : disposition grand écran ([CatalogueLarge]) au lieu de l'écran du téléphone (07/11/2026).
+  final bool large;
+  final ModeCatalogue mode;
+
+  /// Ouvre l'iconographie (proposé quand des rayons ou secteurs n'ont pas d'icône à la généralisation).
+  final VoidCallback? versIconographie;
 
   /// Prévenu à chaque modification du brouillon (panneau de droite de la console).
   final VoidCallback? auChangement;
@@ -218,23 +227,10 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   /// 07/11/2026 (Aristide) : arbre comme Gérer › Catalogue. Le bandeau déplie ou replie (chevron), le crayon
   /// ouvre les actions de ce rayon ou de ce secteur ; les produits se déplient sous leur secteur, sur le même écran,
   /// et un toucher sur un produit ouvre ses actions.
-  Widget _rayon(BuildContext context, Brouillon b, CatRayon r) {
-    final plis = Retractables.i;
-    final ouvert = plis.ouvert(_cleR(r), parDefaut: false);
-    return NiveauArbre(
-      cle: _cleR(r),
-      niveau: 2,
-      profondeur: 1,
-      nom: r.nom,
-      tailleSigne: 38,
-      signe: Pictogramme(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), taille: 36),
-      nombre: r.secteurs.length,
-      ouvert: ouvert,
-      onTap: () => setState(() => plis.basculer(_cleR(r), parDefaut: false)),
-      onCrayon: () => menuActions(
-        context,
-        titre: 'Rayon ${r.nom}',
-        actions: [
+  /// Actions d'un rayon (volet du crayon, ici et dans la console grand écran).
+  List<ActionLigne> actionsRayon(BuildContext context, CatRayon r) {
+    final b = this.b!;
+    return [
           ActionLigne(Icons.add, '+ Nouveau secteur', () async {
             final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
             if (nom == null || nom.trim().isEmpty) return;
@@ -269,8 +265,26 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
             b.retirerRayon(r);
             _modifie();
           }),
-        ],
-      ),
+    ];
+  }
+
+  /// Enregistre le brouillon après un geste et le note au journal.
+  void modifie() => _modifie();
+
+  Widget _rayon(BuildContext context, Brouillon b, CatRayon r) {
+    final plis = Retractables.i;
+    final ouvert = plis.ouvert(_cleR(r), parDefaut: false);
+    return NiveauArbre(
+      cle: _cleR(r),
+      niveau: 2,
+      profondeur: 1,
+      nom: r.nom,
+      tailleSigne: 38,
+      signe: Pictogramme(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), taille: 36),
+      nombre: r.secteurs.length,
+      ouvert: ouvert,
+      onTap: () => setState(() => plis.basculer(_cleR(r), parDefaut: false)),
+      onCrayon: () => menuActions(context, titre: 'Rayon ${r.nom}', actions: actionsRayon(context, r)),
       enfants: [
         if (ouvert)
           for (final s in r.secteurs) _secteur(context, b, r, s),
@@ -319,6 +333,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   @override
   Widget build(BuildContext context) {
     final b = this.b;
+    if (widget.large) return CatalogueLarge(editeur: this, mode: widget.mode);
     return PageBase(
       entete: EnTeteFenetre(
         icone: Icons.public,
@@ -431,6 +446,23 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   }
 
   Future<void> _publier(Brouillon b) async {
+    // 07/11/2026 (Aristide) : avant de généraliser, avertir des rayons et secteurs sans icône.
+    final manquantes = sansIcone(b);
+    if (manquantes > 0) {
+      final generaliser = await confirmer(
+        context,
+        titre: '${_pluriel(manquantes, 'rayon ou secteur')} sans icône',
+        icone: Icons.hide_image_outlined,
+        contenu: Text('Vous pouvez compléter l\'iconographie avant de généraliser.', style: Charte.texte(16)),
+        plein: 'Compléter',
+        contour: 'Généraliser quand même',
+      );
+      if (!mounted || generaliser == null) return;
+      if (!generaliser) {
+        widget.versIconographie?.call();
+        return;
+      }
+    }
     final recap = Recapitulatif.entre(publie ?? const {}, b.versJson());
     final ok = await confirmer(
       context,
@@ -957,7 +989,13 @@ List<String> gestesEntre(Map<String, dynamic> avant, Map<String, dynamic> apres)
     for (final n in x.produitsDeplaces)
       if (!cibles.contains(sec(n))) 'Produit déplacé : $n',
   ];
-  if (lignes.isEmpty) return const ['Ordre ou image modifiés'];
+  final ia = (avant['images'] as Map? ?? const {}), ib = (apres['images'] as Map? ?? const {});
+  for (final k in {...ia.keys, ...ib.keys}) {
+    if (ia[k] == ib[k]) continue;
+    final quoi = '$k'.replaceAll('--', ' › ').replaceAll('-', ' ');
+    lignes.add(ib[k] == null ? 'Icône remise automatique : $quoi' : 'Icône choisie : $quoi → ${'${ib[k]}'.split('--').last.replaceAll('-', ' ')}');
+  }
+  if (lignes.isEmpty) return const ['Ordre modifié'];
   const max = 12;
   return lignes.length <= max ? lignes : [...lignes.take(max), '… et ${lignes.length - max} autres changements'];
 }

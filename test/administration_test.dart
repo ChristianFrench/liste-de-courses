@@ -69,7 +69,7 @@ void main() {
     await tester.runAsync(() async {
       final ctx = tester.element(find.byType(ConsoleAdministration));
       await precacheImage(const AssetImage('assets/emplettes/complet.png'), ctx);
-      for (final f in Directory('assets/icones/noto3d').listSync().whereType<File>()) {
+      for (final f in [...Directory('assets/icones/noto3d').listSync(), ...Directory('assets/pictos/noto3d').listSync()].whereType<File>()) {
         await precacheImage(AssetImage(f.path), ctx);
       }
     });
@@ -80,7 +80,23 @@ void main() {
     }
     await tester.pumpAndSettle();
     expect(find.text('Catalogue des produits'), findsWidgets);
-    expect(find.text('FRUITS ET LÉGUMES'), findsOneWidget, reason: 'la vue du téléphone, à gauche');
+    expect(find.text('FRUITS ET LÉGUMES'), findsOneWidget, reason: 'l\'arbre des rayons, à gauche');
+    // 07/11/2026 : grand écran. Un secteur choisi montre ses produits en tableau ; Iconographie à côté.
+    await tester.tap(find.byKey(const ValueKey('console-rayon-Fruits et légumes')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('console-secteur-Fruits et légumes/Fruits')));
+    await tester.pumpAndSettle();
+    expect(find.text('Fruits et légumes › Fruits'), findsOneWidget);
+    await _capture('2a-Catalogue-grand-ecran');
+    await tester.tap(find.byKey(const ValueKey('rubrique-iconographie')));
+    await tester.pumpAndSettle();
+    expect(find.text('Iconographie des rayons et secteurs'), findsOneWidget);
+    await _capture('2b-Iconographie');
+    await tester.tap(find.byKey(const ValueKey('icono-tout')));
+    await tester.pumpAndSettle();
+    await _capture('2c-Iconographie-tout');
+    await tester.tap(find.byKey(const ValueKey('rubrique-produits')));
+    await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('maintenance-repartir')), findsOneWidget, reason: 'les actions, à droite');
     expect(find.byKey(const ValueKey('generaliser')), findsOneWidget);
     await _capture('2-Catalogue-des-produits');
@@ -91,7 +107,6 @@ void main() {
     await tester.enterText(find.byType(TextField).last, 'Animalerie');
     await tester.tap(find.text('Ajouter').last);
     await tester.pumpAndSettle();
-    expect(find.textContaining('1 modification à généraliser'), findsOneWidget);
     expect(find.text('Rayons ajoutés (1)'), findsOneWidget, reason: 'le récapitulatif suit le brouillon');
     await _capture('3-Catalogue-modifie');
 

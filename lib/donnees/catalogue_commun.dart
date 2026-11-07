@@ -660,6 +660,16 @@ class Brouillon {
     return true;
   }
 
+  /// Déplace un produit dans un autre secteur (console, glisser-déposer) ; les foyers le rangent dans son nouveau
+  /// secteur. Rend faux s'il y est déjà.
+  bool deplacerProduit(CatSecteur de, CatProduit p, CatSecteur vers) {
+    if (identical(de, vers) || produitDans(vers, p.nom) != null) return false;
+    de.produits.remove(p);
+    vers.produits.add(p);
+    modifications++;
+    return true;
+  }
+
   /// Déplace un secteur dans un autre rayon (fusionné avec un secteur du même nom s'il y en a un).
   /// Les foyers rangent ses produits dans le nouveau secteur ; l'ancien, vide, est retiré.
   void deplacerSecteur(CatRayon de, CatSecteur s, CatRayon vers) {

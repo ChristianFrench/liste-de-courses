@@ -4,9 +4,9 @@ import '../composants/composants.dart';
 import '../composants/icone.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/modele.dart';
-import '../main.dart' show tailleTelephone;
 import '../theme.dart';
 import 'administration_serveur.dart';
+import 'console_catalogue.dart';
 import 'editeur_catalogue.dart';
 
 // Console d'administration d'Emplettes (06/11/2026, Aristide) : application Windows seule, en fenêtre large,
@@ -18,7 +18,7 @@ import 'editeur_catalogue.dart';
 //   catalogue des marques (à venir) ;
 // - Apparence : palette de la console.
 
-enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, marques, apparence }
+enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, iconographie, marques, apparence }
 
 class _Entree {
   const _Entree(this.rubrique, this.titre, this.icone);
@@ -36,6 +36,7 @@ const _groupes = <(String, List<_Entree>)>[
   ('Utilisateurs', [_Entree(Rubrique.utilisateurs, 'Foyers et activités', Icons.groups_outlined)]),
   ('Contenu', [
     _Entree(Rubrique.produits, 'Catalogue des produits', Icons.inventory_2_outlined),
+    _Entree(Rubrique.iconographie, 'Iconographie', Icons.image_outlined),
     _Entree(Rubrique.marques, 'Catalogue des marques', Icons.sell_outlined),
   ]),
   ('Réglages', [_Entree(Rubrique.apparence, 'Apparence', Icons.palette_outlined)]),
@@ -74,7 +75,10 @@ class _ConsoleAdministrationState extends State<ConsoleAdministration> {
         VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
         Expanded(
           child: switch (rubrique) {
-            Rubrique.produits => const PageCatalogueProduits(),
+            Rubrique.produits || Rubrique.iconographie => PageCatalogueProduits(
+                mode: rubrique == Rubrique.iconographie ? ModeCatalogue.iconographie : ModeCatalogue.produits,
+                onMode: (m) => setState(() => rubrique = m == ModeCatalogue.iconographie ? Rubrique.iconographie : Rubrique.produits),
+              ),
             Rubrique.initialisation => PageInitialisation(ouvrirShell: _shell),
             Rubrique.suivi => PageSuivi(ouvrirShell: _shell),
             Rubrique.shell => PageShell(key: ValueKey(_commande), commande: _commande),
@@ -178,7 +182,9 @@ class _Menu extends StatelessWidget {
 /// Contenu › Catalogue des produits : à gauche la vue du téléphone (l'écran de l'éditeur, tel qu'il se
 /// présente sur un téléphone), à droite les actions de maintenance et ce qui changera à la généralisation.
 class PageCatalogueProduits extends StatefulWidget {
-  const PageCatalogueProduits({super.key});
+  const PageCatalogueProduits({super.key, this.mode = ModeCatalogue.produits, this.onMode});
+  final ModeCatalogue mode;
+  final ValueChanged<ModeCatalogue>? onMode;
 
   @override
   State<PageCatalogueProduits> createState() => _PageCatalogueProduitsState();
@@ -186,7 +192,6 @@ class PageCatalogueProduits extends StatefulWidget {
 
 class _PageCatalogueProduitsState extends State<PageCatalogueProduits> {
   final _editeur = GlobalKey<EtatEditeurCatalogue>();
-  final _telephone = GlobalKey<NavigatorState>();
 
   void _rafraichir() {
     if (mounted) setState(() {});
@@ -194,42 +199,30 @@ class _PageCatalogueProduitsState extends State<PageCatalogueProduits> {
 
   @override
   Widget build(BuildContext context) {
+    // 07/11/2026 (Aristide) : la console n'imite plus le téléphone ; le catalogue prend la largeur du PC.
     return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      // Vue du téléphone : l'écran 390 × 844 de l'application, réduit à la hauteur de la fenêtre.
-      Container(
-        color: Charte.niveau(4),
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-        child: FittedBox(
-          child: Container(
-            width: tailleTelephone.width + 16,
-            height: tailleTelephone.height + 16,
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(color: const Color(0xFF2B2B2B), borderRadius: BorderRadius.circular(30)),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: MediaQuery(
-                data: MediaQuery.of(context).copyWith(size: tailleTelephone, padding: EdgeInsets.zero, viewPadding: EdgeInsets.zero),
-                child: Navigator(
-                  key: _telephone,
-                  onGenerateRoute: (_) => MaterialPageRoute(
-                    builder: (_) => EcranEditeurCatalogue(key: _editeur, auChangement: _rafraichir, actionsAPart: true),
-                  ),
-                ),
-              ),
-            ),
-          ),
+      Expanded(
+        child: EcranEditeurCatalogue(
+          key: _editeur,
+          auChangement: _rafraichir,
+          actionsAPart: true,
+          large: true,
+          mode: widget.mode,
+          versIconographie: () => widget.onMode?.call(ModeCatalogue.iconographie),
         ),
       ),
       VerticalDivider(width: 1, thickness: 1, color: Charte.separateurZone),
-      Expanded(child: _Maintenance(editeur: _editeur)),
+      SizedBox(width: 300, child: _Maintenance(editeur: _editeur, mode: widget.mode, onMode: widget.onMode)),
     ]);
   }
 }
 
 /// Panneau de droite du catalogue des produits : état du brouillon, actions, changements à généraliser.
 class _Maintenance extends StatelessWidget {
-  const _Maintenance({required this.editeur});
+  const _Maintenance({required this.editeur, required this.mode, this.onMode});
   final GlobalKey<EtatEditeurCatalogue> editeur;
+  final ModeCatalogue mode;
+  final ValueChanged<ModeCatalogue>? onMode;
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +248,7 @@ class _Maintenance extends StatelessWidget {
           ),
         );
     return ListView(padding: const EdgeInsets.only(bottom: 24), children: [
-      const TitrePageAdmin('Contenu', 'Catalogue des produits'),
+      TitrePageAdmin('Contenu', mode == ModeCatalogue.iconographie ? 'Iconographie' : 'Catalogue des produits'),
       Padding(
         padding: const EdgeInsets.fromLTRB(28, 0, 28, 0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -285,6 +278,12 @@ class _Maintenance extends StatelessWidget {
               action('valider', Icons.check, 'Valider les modifications',
                   e == null || e.enCours == 0 ? 'Rien en cours' : '${e.enCours} en cours : elles deviennent une étape de l\'historique',
                   e == null || e.enCours == 0 ? null : e.valider),
+              if (b != null)
+                mode == ModeCatalogue.produits
+                    ? action('iconographie', Icons.image_outlined, 'Iconographie',
+                        '${sansIcone(b)} sans icône : propositions et bibliothèque Noto 3D', () => onMode?.call(ModeCatalogue.iconographie))
+                    : action('produits', Icons.inventory_2_outlined, 'Produits', 'Revenir aux produits des secteurs',
+                        () => onMode?.call(ModeCatalogue.produits)),
               action('historique', Icons.history, 'Historique', 'Les étapes validées ; revenir à l\'une d\'elles',
                   e == null ? null : e.historique),
             ];

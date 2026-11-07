@@ -1,4 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/composants/pictogramme.dart';
+import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/journal_catalogue.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 
@@ -8,7 +10,7 @@ Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<Str
           {
             'nom': e.key,
             'secteurs': [
-              for (final s in e.value.entries) {'nom': s.key, 'produits': [for (final p in s.value) {'nom': p}]}
+              for (final s in e.value.entries) {'nom': s.key, 'taille': 1, 'produits': [for (final p in s.value) {'nom': p, 'taille': 1}]}
             ]
           }
       ],
@@ -40,5 +42,15 @@ void main() {
     expect(relu.revenirA(0), 'i0');
     expect(relu.etapes, hasLength(1));
     expect(relu.enCours, isEmpty);
+  });
+
+  test('console : produit déplacé, icônes proposées et état', () {
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes'], 'Légumes': []}}));
+    final fruits = b.catalogue.rayons.single.secteurs.first, legumes = b.catalogue.rayons.single.secteurs.last;
+    expect(b.deplacerProduit(fruits, fruits.produits.single, legumes), isTrue);
+    expect(legumes.produits.single.nom, 'Pommes');
+    expect(propositionsIcone('Chats', ['Croquettes']), isNotEmpty);
+    expect(etatIconeSecteur('Animaux', 'Chats', const {}), EtatIcone.exacte);
+    expect(etatIconeSecteur('Animaux', 'Chats', {cleChoixSecteur('Animaux', 'Chats'): 'reserve--cafe'}), EtatIcone.choisie);
   });
 }

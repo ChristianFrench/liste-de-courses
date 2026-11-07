@@ -196,3 +196,59 @@ class ImageModifiable extends StatelessWidget {
         ),
       );
 }
+
+// ------------------------------------------------------------ Iconographie (console, 07/11/2026)
+
+/// D'où vient l'icône d'un rayon ou d'un secteur.
+enum EtatIcone { choisie, exacte, approchee, aucune }
+
+/// [images] : les images choisies par l'éditeur (clé de choix → pictogramme).
+EtatIcone etatIconeRayon(String nom, Map<String, String> images) {
+  if (images.containsKey(cleChoixRayon(nom))) return EtatIcone.choisie;
+  final s = _slug(nom);
+  if (_dispo(s) || (_alias[s] != null && _dispo(_alias[s]!))) return EtatIcone.exacte;
+  return cleRayon(nom) != null ? EtatIcone.approchee : EtatIcone.aucune;
+}
+
+EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images) {
+  if (images.containsKey(cleChoixSecteur(rayon, nom))) return EtatIcone.choisie;
+  final r = cleRayon(rayon) ?? _slug(rayon);
+  if (_dispo('$r--${_slug(nom)}') || _dispo('${_slug(rayon)}--${_slug(nom)}')) return EtatIcone.exacte;
+  return cleSecteur(rayon, nom) != null ? EtatIcone.approchee : EtatIcone.aucune;
+}
+
+/// Toutes les images que l'on peut choisir (Noto 3D, réserve, catalogue), sans doublon, par ordre alphabétique.
+List<String> get toutesLesImages => {...pictosEmoji, ...pictosDisponibles}.toList()..sort();
+
+/// Mots significatifs d'un nom (sans accents, sans « et », « de »…, sans le pluriel).
+Set<String> _mots(String t) => {
+      for (final m in _slug(t).split('-'))
+        if (m.length >= 3 && !const {'les', 'des', 'aux', 'pour', 'avec', 'sans', 'autres', 'divers'}.contains(m))
+          m.length > 4 && (m.endsWith('s') || m.endsWith('x')) ? m.substring(0, m.length - 1) : m
+    };
+
+/// Jusqu'à [max] images proposées pour un rayon ou un secteur : celles dont le nom partage le plus de mots avec
+/// son [nom] (poids 3) et avec ses [produits] (poids 1).
+List<String> propositionsIcone(String nom, Iterable<String> produits, {int max = 5}) {
+  final duNom = _mots(nom);
+  final desProduits = <String, int>{};
+  for (final p in produits) {
+    for (final m in _mots(p)) {
+      desProduits[m] = (desProduits[m] ?? 0) + 1;
+    }
+  }
+  final scores = <String, int>{};
+  for (final c in toutesLesImages) {
+    final mc = _mots(c.split('--').last);
+    var n = 0;
+    for (final m in mc) {
+      if (duNom.contains(m)) n += 30;
+      n += (desProduits[m] ?? 0).clamp(0, 5);
+    }
+    if (n > 0) scores[c] = n;
+  }
+  final l = scores.keys.toList()..sort((a, b) => scores[b]!.compareTo(scores[a]!) != 0 ? scores[b]!.compareTo(scores[a]!) : a.compareTo(b));
+  // Une même image en plusieurs familles (rayon--secteur et bibliothèque--) : une seule fois.
+  final vues = <String>{};
+  return [for (final c in l) if (vues.add(c.split('--').last)) c].take(max).toList();
+}
