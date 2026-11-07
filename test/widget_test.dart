@@ -1339,6 +1339,14 @@ void main() {
       await tester.scrollUntilVisible(find.text('ANIMALERIE'), 300,
           scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
       expect(find.text('ANIMALERIE'), findsOneWidget);
+      // 07/11/2026 : le rayon puis le secteur se déplient sur le même écran, les produits apparaissent.
+      await _toucher(tester, find.text('ANIMALERIE'));
+      await _toucher(tester, find.text('CHATS'));
+      expect(find.text('Croquettes'), findsOneWidget);
+      await _toucher(tester, find.text('Croquettes'));
+      expect(find.text('Retirer le produit'), findsOneWidget, reason: 'le volet est celui du produit touché');
+      await tester.tapAt(const Offset(10, 10));
+      await tester.pumpAndSettle();
       await _ciblesTactiles(tester);
     });
 

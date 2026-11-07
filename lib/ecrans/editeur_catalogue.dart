@@ -105,10 +105,11 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     await _charger();
     if (mounted) {
       Nav.message(
-          context,
-          ok
-              ? 'Version v$_numero renvoyée au serveur : chaque foyer la reçoit à son prochain lancement'
-              : 'Rien n\'est envoyé (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : réessayez');
+        context,
+        ok
+            ? 'Version v$_numero renvoyée au serveur : chaque foyer la reçoit à son prochain lancement'
+            : 'Rien n\'est envoyé (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : réessayez',
+      );
     }
   }
 
@@ -121,6 +122,114 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
 
   int get _numero => ((publie?['numero'] as num?) ?? 0).toInt();
 
+  static String _cleR(CatRayon r) => 'editeur-r/${r.nom}';
+  static String _cleS(CatRayon r, CatSecteur s) => 'editeur-s/${r.nom}/${s.nom}';
+  List<String> _cles(Brouillon b) => [
+    for (final r in b.catalogue.rayons) ...[_cleR(r), for (final s in r.secteurs) _cleS(r, s)],
+  ];
+  bool _toutOuvert(Brouillon b) => _cles(b).every((c) => Retractables.i.ouvert(c, parDefaut: false));
+
+  /// 07/11/2026 (Aristide) : arbre comme Gérer › Catalogue. Le bandeau déplie ou replie (chevron), le crayon
+  /// ouvre les actions de ce rayon ou de ce secteur ; les produits se déplient sous leur secteur, sur le même écran,
+  /// et un toucher sur un produit ouvre ses actions.
+  Widget _rayon(BuildContext context, Brouillon b, CatRayon r) {
+    final plis = Retractables.i;
+    final ouvert = plis.ouvert(_cleR(r), parDefaut: false);
+    return NiveauArbre(
+      cle: _cleR(r),
+      niveau: 2,
+      profondeur: 1,
+      nom: r.nom,
+      tailleSigne: 38,
+      signe: Pictogramme(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), taille: 36),
+      nombre: r.secteurs.length,
+      ouvert: ouvert,
+      onTap: () => setState(() => plis.basculer(_cleR(r), parDefaut: false)),
+      onCrayon: () => menuActions(
+        context,
+        titre: 'Rayon ${r.nom}',
+        actions: [
+          ActionLigne(Icons.add, '+ Nouveau secteur', () async {
+            final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
+            if (nom == null || nom.trim().isEmpty) return;
+            b.ajouterSecteur(r, nom);
+            _modifie();
+          }),
+          if (r.secteurs.length > 1)
+            ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
+              final noms = await ordonner(context, titre: 'Ordre des secteurs · ${r.nom}', noms: [for (final s in r.secteurs) s.nom]);
+              if (noms == null) return;
+              b.ordonnerSecteurs(r, noms);
+              _modifie();
+            }),
+          ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
+            if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
+          }),
+          ActionLigne(Icons.edit_outlined, 'Renommer le rayon', () async {
+            final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
+            if (nom == null) return;
+            b.renommerRayon(r, nom);
+            _modifie();
+          }),
+          ActionLigne(Icons.delete_outline, 'Supprimer le rayon', () async {
+            if (r.secteurs.isNotEmpty &&
+                !await _confirmerSuppression(
+                  context,
+                  'le rayon ${r.nom}',
+                  '${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(r.secteurs.fold(0, (n, s) => n + s.produits.length), 'produit')}',
+                )) {
+              return;
+            }
+            b.retirerRayon(r);
+            _modifie();
+          }),
+        ],
+      ),
+      enfants: [
+        if (ouvert)
+          for (final s in r.secteurs) _secteur(context, b, r, s),
+      ],
+    );
+  }
+
+  Widget _secteur(BuildContext context, Brouillon b, CatRayon r, CatSecteur s) {
+    final plis = Retractables.i;
+    final ouvert = plis.ouvert(_cleS(r, s), parDefaut: false);
+    final produits = ouvert ? ([...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase()))) : const <CatProduit>[];
+    return NiveauArbre(
+      cle: _cleS(r, s),
+      niveau: 3,
+      profondeur: 2,
+      nom: s.nom,
+      tailleSigne: 32,
+      signe: Pictogramme(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), taille: 30),
+      nombre: s.produits.length,
+      ouvert: ouvert,
+      onTap: () => setState(() => plis.basculer(_cleS(r, s), parDefaut: false)),
+      onCrayon: () => menuActions(context, titre: 'Secteur ${s.nom}', actions: actionsSecteurEditeur(context, b, r, s, _modifie)),
+      enfants: [
+        if (produits.isEmpty)
+          FeuilleArbre(
+            profondeur: 3,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Text('Aucun produit dans ce secteur.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+          ),
+        for (final p in produits)
+          FeuilleArbre(
+            profondeur: 3,
+            child: LigneMenu(
+              key: ValueKey('editeur-p/${r.nom}/${s.nom}/${p.nom}'),
+              titre: p.nom,
+              fond: Charte.niveau(4),
+              onTap: () => menuActions(context, titre: 'Produit ${p.nom}', actions: actionsProduitEditeur(context, b, s, p, _modifie)),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final b = this.b;
@@ -129,6 +238,14 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
         icone: Icons.public,
         sousTitre: 'Emplettes · outil de l\'éditeur',
         titre: 'Catalogue commun',
+        // 07/11/2026 (Aristide) : tout déplier, tout replier (rayons et secteurs).
+        droite: b == null
+            ? null
+            : boutonEnTete(
+                _toutOuvert(b) ? Icons.unfold_less : Icons.unfold_more,
+                _toutOuvert(b) ? 'Tout replier' : 'Tout déplier',
+                () => setState(() => Retractables.i.tous(_cles(b), !_toutOuvert(b))),
+              ),
         actions: [
           if (b != null && !widget.actionsAPart) ...[
             ActionLigne(Icons.restore, 'Repartir d\'un catalogue', () => _repartir()),
@@ -159,65 +276,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
                     style: Charte.texte(14, couleur: Charte.texteSecondaire),
                   ),
                 ),
-                for (final r in b.catalogue.rayons)
-                  GroupeRetractable(
-                    cle: 'editeur/${r.nom}',
-                    parDefaut: false,
-                    titre: r.nom,
-                    image: b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom),
-                    nombre: r.secteurs.length,
-                    actions: [
-                      ActionLigne(Icons.chevron_right, '+ Nouveau secteur', () async {
-                          final nom = await demanderTexte(context, titre: 'Nouveau secteur · ${r.nom}', valider: 'Ajouter');
-                          if (nom == null || nom.trim().isEmpty) return;
-                          b.ajouterSecteur(r, nom);
-                          _modifie();
-                        }),
-                      if (r.secteurs.length > 1)
-                        ActionLigne(Icons.drag_handle, 'Changer l\'ordre des secteurs', () async {
-                          final noms = await ordonner(context, titre: 'Ordre des secteurs · ${r.nom}', noms: [for (final s in r.secteurs) s.nom]);
-                          if (noms == null) return;
-                          b.ordonnerSecteurs(r, noms);
-                          _modifie();
-                        }),
-                      ActionLigne(Icons.chevron_right, 'Depuis un texte', () async {
-                          if (await ajouterDepuisTexte(context, b, rayon: r)) _modifie();
-                        }),
-                      ActionLigne(Icons.chevron_right, 'Renommer', () async {
-                          final nom = await demanderTexte(context, titre: 'Nom du rayon', initial: r.nom);
-                          if (nom == null) return;
-                          b.renommerRayon(r, nom);
-                          _modifie();
-                        }),
-                      ActionLigne(Icons.chevron_right, 'Supprimer', () async {
-                          if (r.secteurs.isNotEmpty &&
-                              !await _confirmerSuppression(
-                                context,
-                                'le rayon ${r.nom}',
-                                '${_pluriel(r.secteurs.length, 'secteur')} et ${_pluriel(r.secteurs.fold(0, (n, s) => n + s.produits.length), 'produit')}',
-                              )) {
-                            return;
-                          }
-                          b.retirerRayon(r);
-                          _modifie();
-                        }),
-                    ],
-                    enfants: [
-                      for (final s in r.secteurs)
-                        LigneMenu(
-                          titre: s.nom,
-                          gauche: Pictogramme(b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom), taille: 32),
-                          sousTitre: _pluriel(s.produits.length, 'produit'),
-                          onTap: () => menuActions(context, titre: s.nom, actions: [
-                            ActionLigne(Icons.list, 'Voir et modifier les produits', () async {
-                              await Nav.aller<void>(context, EcranEditeurSecteur(b: b, r: r, s: s));
-                              if (mounted) setState(() {});
-                            }),
-                            ...actionsSecteurEditeur(context, b, r, s, _modifie),
-                          ]),
-                        ),
-                    ],
-                  ),
+                ColonneDebord(children: [for (final r in b.catalogue.rayons) _rayon(context, b, r)]),
               ],
             ),
       bas: [
@@ -248,7 +307,8 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       for (var i = 0; i < versions.length; i++)
         'v$i': 'Version v${versions[i]['numero'] ?? '?'} du ${_date(((versions[i]['version'] as num?) ?? 0).toInt())}',
       for (var i = 0; i < propositions.length; i++)
-        'p$i': 'Foyer n° ${propositions[i]['foyer'] ?? '?'} · ${_pluriel(((propositions[i]['changements'] as num?) ?? 0).toInt(), 'changement')} '
+        'p$i':
+            'Foyer n° ${propositions[i]['foyer'] ?? '?'} · ${_pluriel(((propositions[i]['changements'] as num?) ?? 0).toInt(), 'changement')} '
             '· ${'${propositions[i]['date'] ?? ''}'.replaceFirst('T', ' à ')}',
     };
     if (choix.isEmpty) {
@@ -304,8 +364,10 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     } else {
       setState(() => _publication = false);
       widget.auChangement?.call();
-      Nav.message(context,
-          'Rien n\'est publié (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : le brouillon est gardé, réessayez');
+      Nav.message(
+        context,
+        'Rien n\'est publié (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : le brouillon est gardé, réessayez',
+      );
     }
   }
 
@@ -321,7 +383,10 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     if (phrase == null || !mounted) return null;
     final cle = await CatalogueCommun.instance.definirPhrase(phrase);
     if (cle == null && mounted) {
-      Nav.message(context, phrase.trim().length < 8 ? 'Phrase trop courte (8 caractères au moins)' : 'Ce n\'est pas la phrase de l\'éditeur');
+      Nav.message(
+        context,
+        phrase.trim().length < 8 ? 'Phrase trop courte (8 caractères au moins)' : 'Ce n\'est pas la phrase de l\'éditeur',
+      );
     }
     return cle;
   }
@@ -333,17 +398,21 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       context,
       titre: 'Clé de signature',
       icone: Icons.key_outlined,
-      contenu: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(
-          clePubliqueEditeur.isEmpty
-              ? 'Envoyez cette clé à Claude : elle n\'est pas secrète. Une fois dans l\'application, seuls les catalogues '
-                  'signés par votre phrase seront acceptés.'
-              : 'Cette clé est celle de l\'application : vos versions sont reconnues par tous les foyers.',
-          style: Charte.texte(15),
-        ),
-        const SizedBox(height: 10),
-        SelectableText(cle, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-      ]),
+      contenu: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            clePubliqueEditeur.isEmpty
+                ? 'Envoyez cette clé à Claude : elle n\'est pas secrète. Une fois dans l\'application, seuls les catalogues '
+                      'signés par votre phrase seront acceptés.'
+                : 'Cette clé est celle de l\'application : vos versions sont reconnues par tous les foyers.',
+            style: Charte.texte(15),
+          ),
+          const SizedBox(height: 10),
+          SelectableText(cle, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        ],
+      ),
       plein: 'Fermer',
       contour: 'Copier',
     );
@@ -353,14 +422,28 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
 
 /// Ce qui change entre la dernière version publiée et le brouillon (comparaison par noms).
 class Recapitulatif {
-  Recapitulatif(this.rayonsAjoutes, this.rayonsRetires, this.secteursAjoutes, this.secteursRetires, this.produitsAjoutes,
-      this.produitsRetires, this.produitsDeplaces, this.renommes);
+  Recapitulatif(
+    this.rayonsAjoutes,
+    this.rayonsRetires,
+    this.secteursAjoutes,
+    this.secteursRetires,
+    this.produitsAjoutes,
+    this.produitsRetires,
+    this.produitsDeplaces,
+    this.renommes,
+  );
   final List<String> rayonsAjoutes, rayonsRetires, secteursAjoutes, secteursRetires, produitsAjoutes, produitsRetires, produitsDeplaces;
   final int renommes;
 
   bool get vide =>
-      rayonsAjoutes.isEmpty && rayonsRetires.isEmpty && secteursAjoutes.isEmpty && secteursRetires.isEmpty &&
-      produitsAjoutes.isEmpty && produitsRetires.isEmpty && produitsDeplaces.isEmpty && renommes == 0;
+      rayonsAjoutes.isEmpty &&
+      rayonsRetires.isEmpty &&
+      secteursAjoutes.isEmpty &&
+      secteursRetires.isEmpty &&
+      produitsAjoutes.isEmpty &&
+      produitsRetires.isEmpty &&
+      produitsDeplaces.isEmpty &&
+      renommes == 0;
 
   factory Recapitulatif.entre(Map<String, dynamic> avant, Map<String, dynamic> apres) {
     ({Set<String> rayons, Set<String> secteurs, Map<String, Set<String>> produits}) lire(Map<String, dynamic> j) {
@@ -421,33 +504,40 @@ class RecapitulatifVue extends StatelessWidget {
         ? const SizedBox.shrink()
         : Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('$titre (${noms.length})', style: Charte.texte(15, gras: true)),
-              for (final n in noms.take(12)) Text('· $n', style: Charte.texte(14)),
-              if (noms.length > 12) Text('· et ${noms.length - 12} autres', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('$titre (${noms.length})', style: Charte.texte(15, gras: true)),
+                for (final n in noms.take(12)) Text('· $n', style: Charte.texte(14)),
+                if (noms.length > 12) Text('· et ${noms.length - 12} autres', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+              ],
+            ),
           );
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 420),
       child: SingleChildScrollView(
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-          Text(
-            r.vide
-                ? 'Aucune différence avec la version publiée.'
-                : 'Par rapport à la version publiée. Chaque foyer la reçoit à son prochain lancement et garde ses '
-                    'propres modifications ; ce qui sert à ses listes n\'est jamais retiré.',
-            style: Charte.texte(15, couleur: Charte.texteSecondaire),
-          ),
-          const SizedBox(height: 10),
-          bloc('Rayons ajoutés', r.rayonsAjoutes),
-          bloc('Rayons retirés', r.rayonsRetires),
-          bloc('Secteurs ajoutés', r.secteursAjoutes),
-          bloc('Secteurs retirés', r.secteursRetires),
-          bloc('Produits ajoutés', r.produitsAjoutes),
-          bloc('Produits déplacés', r.produitsDeplaces),
-          bloc('Produits retirés', r.produitsRetires),
-          if (r.renommes > 0) Text('Noms corrigés : ${r.renommes}', style: Charte.texte(15, gras: true)),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              r.vide
+                  ? 'Aucune différence avec la version publiée.'
+                  : 'Par rapport à la version publiée. Chaque foyer la reçoit à son prochain lancement et garde ses '
+                        'propres modifications ; ce qui sert à ses listes n\'est jamais retiré.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire),
+            ),
+            const SizedBox(height: 10),
+            bloc('Rayons ajoutés', r.rayonsAjoutes),
+            bloc('Rayons retirés', r.rayonsRetires),
+            bloc('Secteurs ajoutés', r.secteursAjoutes),
+            bloc('Secteurs retirés', r.secteursRetires),
+            bloc('Produits ajoutés', r.produitsAjoutes),
+            bloc('Produits déplacés', r.produitsDeplaces),
+            bloc('Produits retirés', r.produitsRetires),
+            if (r.renommes > 0) Text('Noms corrigés : ${r.renommes}', style: Charte.texte(15, gras: true)),
+          ],
+        ),
       ),
     );
   }
@@ -498,18 +588,7 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
           for (final p in produits)
             LigneMenu(
               titre: p.nom,
-              onTap: () => menuActions(context, titre: p.nom, actions: [
-                ActionLigne(Icons.edit_outlined, 'Renommer', () async {
-                  final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
-                  if (nom == null) return;
-                  b.renommerProduit(p, nom);
-                  _modifie();
-                }),
-                ActionLigne(Icons.delete_outline, 'Retirer', () {
-                  b.retirerProduit(s, p);
-                  _modifie();
-                }, danger: true),
-              ]),
+              onTap: () => menuActions(context, titre: 'Produit ${p.nom}', actions: actionsProduitEditeur(context, b, s, p, _modifie)),
             ),
         ],
       ),
@@ -517,45 +596,64 @@ class _EcranEditeurSecteurState extends State<EcranEditeurSecteur> {
   }
 }
 
+/// Actions d'un produit du catalogue commun.
+List<ActionLigne> actionsProduitEditeur(BuildContext context, Brouillon b, CatSecteur s, CatProduit p, VoidCallback modifie) => [
+  ActionLigne(Icons.edit_outlined, 'Renommer le produit', () async {
+    final nom = await demanderTexte(context, titre: 'Nom du produit', initial: p.nom);
+    if (nom == null) return;
+    b.renommerProduit(p, nom);
+    modifie();
+  }),
+  ActionLigne(Icons.delete_outline, 'Retirer le produit', () {
+    b.retirerProduit(s, p);
+    modifie();
+  }, danger: true),
+];
+
 /// Actions d'un secteur du catalogue commun ; [quitter] ferme l'écran du secteur quand il est déplacé ou retiré.
-List<ActionLigne> actionsSecteurEditeur(BuildContext context, Brouillon b, CatRayon r, CatSecteur s, VoidCallback modifie,
-        {VoidCallback? quitter}) =>
-    [
-      ActionLigne(Icons.add, '+ Nouveau produit', () async {
-        final nom = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', valider: 'Ajouter');
-        if (nom == null || nom.trim().isEmpty || !context.mounted) return;
-        if (!b.ajouterProduit(s, nom)) {
-          Nav.message(context, '« ${nom.trim()} » est déjà dans ce secteur');
-          return;
-        }
-        modifie();
-      }),
-      ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
-        if (await ajouterDepuisTexte(context, b, rayon: r, secteur: s)) modifie();
-      }),
-      ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () async {
-        final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
-        if (nom == null) return;
-        b.renommerSecteur(r, s, nom);
-        modifie();
-      }),
-      ActionLigne(Icons.drive_file_move_outline, 'Déplacer dans un autre rayon', () async {
-        final vers = await _choisirRayon(context, b, titre: 'Déplacer ${s.nom} vers', sauf: r);
-        if (vers == null || !context.mounted) return;
-        b.deplacerSecteur(r, s, vers);
-        modifie();
-        quitter?.call();
-        Nav.message(context, '${s.nom} déplacé dans ${vers.nom}');
-      }),
-      ActionLigne(Icons.delete_outline, 'Supprimer le secteur', () async {
-        if (s.produits.isNotEmpty && !await _confirmerSuppression(context, 'le secteur ${s.nom}', _pluriel(s.produits.length, 'produit'))) {
-          return;
-        }
-        b.retirerSecteur(r, s);
-        modifie();
-        quitter?.call();
-      }, danger: true),
-    ];
+List<ActionLigne> actionsSecteurEditeur(
+  BuildContext context,
+  Brouillon b,
+  CatRayon r,
+  CatSecteur s,
+  VoidCallback modifie, {
+  VoidCallback? quitter,
+}) => [
+  ActionLigne(Icons.add, '+ Nouveau produit', () async {
+    final nom = await demanderTexte(context, titre: 'Nouveau produit · ${s.nom}', valider: 'Ajouter');
+    if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+    if (!b.ajouterProduit(s, nom)) {
+      Nav.message(context, '« ${nom.trim()} » est déjà dans ce secteur');
+      return;
+    }
+    modifie();
+  }),
+  ActionLigne(Icons.notes, 'Ajouter depuis un texte', () async {
+    if (await ajouterDepuisTexte(context, b, rayon: r, secteur: s)) modifie();
+  }),
+  ActionLigne(Icons.edit_outlined, 'Renommer le secteur', () async {
+    final nom = await demanderTexte(context, titre: 'Nom du secteur', initial: s.nom);
+    if (nom == null) return;
+    b.renommerSecteur(r, s, nom);
+    modifie();
+  }),
+  ActionLigne(Icons.drive_file_move_outline, 'Déplacer dans un autre rayon', () async {
+    final vers = await _choisirRayon(context, b, titre: 'Déplacer ${s.nom} vers', sauf: r);
+    if (vers == null || !context.mounted) return;
+    b.deplacerSecteur(r, s, vers);
+    modifie();
+    quitter?.call();
+    Nav.message(context, '${s.nom} déplacé dans ${vers.nom}');
+  }),
+  ActionLigne(Icons.delete_outline, 'Supprimer le secteur', () async {
+    if (s.produits.isNotEmpty && !await _confirmerSuppression(context, 'le secteur ${s.nom}', _pluriel(s.produits.length, 'produit'))) {
+      return;
+    }
+    b.retirerSecteur(r, s);
+    modifie();
+    quitter?.call();
+  }, danger: true),
+];
 
 Future<bool> _confirmerSuppression(BuildContext context, String quoi, String contenu) async {
   final ok = await confirmer(
@@ -632,7 +730,10 @@ Future<bool> ajouterDepuisTexte(BuildContext context, Brouillon b, {CatRayon? ra
           minLines: 6,
           maxLines: 12,
           style: Charte.texte(15),
-          decoration: const InputDecoration(labelText: 'Produits à ajouter', hintText: 'Rayon Animalerie\nSecteur Chats\nCroquettes\nLitière'),
+          decoration: const InputDecoration(
+            labelText: 'Produits à ajouter',
+            hintText: 'Rayon Animalerie\nSecteur Chats\nCroquettes\nLitière',
+          ),
         ),
       ],
     ),
