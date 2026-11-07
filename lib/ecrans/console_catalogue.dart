@@ -349,7 +349,20 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   // ---------------------------------------------------------------- menus
 
+  /// Un menu est ouvert : le clic droit sur une ligne arrive aussi au cadre, qui ne doit pas ouvrir le sien.
+  bool _menuOuvert = false;
+
   Future<void> _menu(Offset ou, _Ligne? l) async {
+    if (_menuOuvert) return;
+    _menuOuvert = true;
+    try {
+      await _menuDe(ou, l);
+    } finally {
+      _menuOuvert = false;
+    }
+  }
+
+  Future<void> _menuDe(Offset ou, _Ligne? l) async {
     final o = l?.objet;
     if (o is CatProduit && !produitsChoisis.contains(o)) {
       produitsChoisis
@@ -375,6 +388,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           item('renommer', Icons.edit_outlined, 'Renommer (F2)'),
           item('icone', Icons.image_outlined, 'Changer l\'icône…'),
           if (r.secteurs.length > 1) item('ordre', Icons.drag_handle, 'Ordre des secteurs…'),
+          if (b.catalogue.rayons.length > 1) item('enSecteur', Icons.low_priority, 'Transformer en secteur d\'un autre rayon…'),
           const PopupMenuDivider(),
           item('supprimer', Icons.delete_outline, 'Supprimer le rayon (Suppr)'),
         ],
@@ -383,6 +397,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           item('texte', Icons.notes, 'Ajouter depuis un texte…'),
           item('renommer', Icons.edit_outlined, 'Renommer (F2)'),
           item('icone', Icons.image_outlined, 'Changer l\'icône…'),
+          item('enRayon', Icons.vertical_align_top, 'Transformer en rayon'),
           const PopupMenuDivider(),
           item('supprimer', Icons.delete_outline, 'Supprimer le secteur (Suppr)'),
         ],
@@ -423,9 +438,73 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         if (noms == null) return;
         b.ordonnerSecteurs(r, noms);
         _modifie();
+      case ('enRayon', CatSecteur s):
+        _secteurEnRayon(s);
+      case ('enSecteur', CatRayon r):
+        await _rayonEnSecteur(r);
       case ('supprimer', final Object x):
         await _supprimer(x);
     }
+  }
+
+  /// Un secteur devient un rayon du même nom (avec un secteur du même nom qui garde ses produits).
+  void _secteurEnRayon(CatSecteur s) {
+    final r = _rayonDe(s);
+    if (r == null) return;
+    final image = b.images[cleChoixSecteur(r.nom, s.nom)];
+    final nr = b.secteurEnRayon(r, s);
+    if (image != null) {
+      b.images.putIfAbsent(cleChoixRayon(nr.nom), () => image);
+      b.images.putIfAbsent(cleChoixSecteur(nr.nom, s.nom), () => image);
+    }
+    rayonsOuverts.add(nr);
+    choisi = nr;
+    _modifie();
+    _message('« ${s.nom} » est maintenant un rayon');
+  }
+
+  /// Un rayon devient un secteur d'un autre rayon, choisi dans la liste ; ses secteurs y sont réunis.
+  Future<void> _rayonEnSecteur(CatRayon r) async {
+    final autres = [for (final x in b.catalogue.rayons) if (!identical(x, r)) x];
+    final noms = [for (final s in r.secteurs) s.nom];
+    final vers = await showDialog<CatRayon>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        backgroundColor: Charte.blanc,
+        title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('« ${r.nom} » devient un secteur de…', style: Charte.texte(18, gras: true)),
+          if (noms.length > 1 || (noms.length == 1 && noms.single != r.nom)) ...[
+            const SizedBox(height: 6),
+            Text('Ses produits (${noms.join(', ')}) seront réunis dans le secteur « ${r.nom} ».',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+          ],
+        ]),
+        children: [
+          SizedBox(
+            width: 480,
+            height: 420,
+            child: ListView(children: [
+              for (final x in autres)
+                ListTile(
+                  key: ValueKey('vers-rayon-${x.nom}'),
+                  leading: Pictogramme(b.images[cleChoixRayon(x.nom)] ?? cleRayon(x.nom), taille: 28),
+                  title: Text(x.nom, style: Charte.texte(15)),
+                  onTap: () => Navigator.of(ctx).pop(x),
+                ),
+            ]),
+          ),
+        ],
+      ),
+    );
+    if (vers == null || !mounted) return;
+    final image = b.images[cleChoixRayon(r.nom)];
+    final s = b.rayonEnSecteur(r, vers);
+    if (image != null) b.images.putIfAbsent(cleChoixSecteur(vers.nom, s.nom), () => image);
+    rayonsOuverts.add(vers);
+    secteursOuverts.add(s);
+    choisi = s;
+    _modifie();
+    _message('« ${r.nom} » est maintenant un secteur de ${vers.nom}');
   }
 
   Future<void> _menuGeneral(String v) async {
@@ -583,7 +662,15 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           controller: _champ,
           autofocus: true,
           style: style,
-          decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 6)),
+          // 07/11/2026 (Aristide) : renommage en place sans cadre, le texte reste où il était.
+          decoration: const InputDecoration(
+            isDense: true,
+            filled: false,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+            focusedBorder: InputBorder.none,
+            contentPadding: EdgeInsets.symmetric(vertical: 6),
+          ),
           onSubmitted: (_) => _finirRenommage(),
           onTapOutside: (_) => _finirRenommage(),
         ),

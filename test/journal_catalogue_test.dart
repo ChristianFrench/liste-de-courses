@@ -53,4 +53,18 @@ void main() {
     expect(etatIconeSecteur('Animaux', 'Chats', const {}), EtatIcone.exacte);
     expect(etatIconeSecteur('Animaux', 'Chats', {cleChoixSecteur('Animaux', 'Chats'): 'reserve--cafe'}), EtatIcone.choisie);
   });
+
+  test('console : secteur en rayon, rayon en secteur', () {
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes'], 'Légumes': ['Ail']}, 'Épicerie': {'Pâtes': ['Penne']}}));
+    final frais = b.rayon('Frais')!;
+    final r = b.secteurEnRayon(frais, b.secteur(frais, 'Fruits')!);
+    expect([for (final x in b.catalogue.rayons) x.nom], ['Frais', 'Fruits', 'Épicerie']);
+    expect(r.secteurs.single.nom, 'Fruits');
+    expect(r.secteurs.single.produits.single.nom, 'Pommes');
+    final s = b.rayonEnSecteur(b.rayon('Frais')!, b.rayon('Épicerie')!);
+    expect(b.rayon('Frais'), isNull);
+    expect(s.nom, 'Frais');
+    expect([for (final p in s.produits) p.nom], ['Ail']);
+    expect([for (final x in b.rayon('Épicerie')!.secteurs) x.nom], ['Pâtes', 'Frais']);
+  });
 }

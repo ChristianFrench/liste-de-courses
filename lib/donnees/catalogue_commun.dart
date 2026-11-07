@@ -680,6 +680,36 @@ class Brouillon {
     return true;
   }
 
+  /// Le secteur [s] du rayon [r] devient un rayon du même nom, placé juste après [r], avec un secteur du même nom
+  /// qui garde ses produits (07/11/2026, Aristide). S'il existe déjà un rayon de ce nom, le secteur y est rangé.
+  CatRayon secteurEnRayon(CatRayon r, CatSecteur s) {
+    var nouveau = rayon(s.nom);
+    if (nouveau == null) {
+      nouveau = CatRayon(s.nom);
+      catalogue.rayons.insert(catalogue.rayons.indexOf(r) + 1, nouveau);
+      _retirerRetire('rayon', s.nom);
+    }
+    deplacerSecteur(r, s, nouveau);
+    return nouveau;
+  }
+
+  /// Le rayon [r] devient un secteur du même nom dans le rayon [vers] ; les produits de tous ses secteurs y sont
+  /// réunis (07/11/2026, Aristide). Les foyers rangent ces produits dans le nouveau secteur.
+  CatSecteur rayonEnSecteur(CatRayon r, CatRayon vers) {
+    final cible = secteur(vers, r.nom) ?? (CatSecteur(r.nom, 1)..let(vers.secteurs.add));
+    _retirerRetire('secteur', r.nom);
+    for (final s in [...r.secteurs]) {
+      cible.produits.addAll(s.produits.where((p) => produitDans(cible, p.nom) == null));
+      if (s.formats.isNotEmpty && cible.formats.isEmpty) cible.formats = [...s.formats];
+      r.secteurs.remove(s);
+      retires.add({'type': 'secteur', 'rayon': r.nom, 'nom': s.nom});
+    }
+    catalogue.rayons.remove(r);
+    retires.add({'type': 'rayon', 'nom': r.nom});
+    modifications++;
+    return cible;
+  }
+
   /// Déplace un secteur dans un autre rayon (fusionné avec un secteur du même nom s'il y en a un).
   /// Les foyers rangent ses produits dans le nouveau secteur ; l'ancien, vide, est retiré.
   void deplacerSecteur(CatRayon de, CatSecteur s, CatRayon vers) {

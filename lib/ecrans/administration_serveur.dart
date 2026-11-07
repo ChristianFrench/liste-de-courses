@@ -702,9 +702,17 @@ class _PageShellState extends State<PageShell> {
           // Un clic n'importe où dans la zone noire lui donne le clavier.
           child: Listener(
             onPointerDown: (_) => _focus.requestFocus(),
-            child: Scrollbar(
+            // 07/11/2026 (Aristide) : la barre de défilement par défaut, fine et grise, ne se voyait pas sur le noir.
+            child: RawScrollbar(
               controller: _defilement,
               thumbVisibility: true,
+              trackVisibility: true,
+              interactive: true,
+              thickness: 12,
+              radius: const Radius.circular(6),
+              thumbColor: const Color(0x99FFFFFF),
+              trackColor: const Color(0x1FFFFFFF),
+              trackBorderColor: const Color(0x00000000),
               child: TerminalView(
                 c.terminal,
                 controller: _selection,

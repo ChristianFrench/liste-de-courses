@@ -99,6 +99,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('console-produit-Fruits/Abricots')), buttons: kSecondaryButton);
     await tester.pumpAndSettle();
     expect(find.text('Retirer le produit (Suppr)'), findsOneWidget);
+    expect(find.text('Nouveau rayon…'), findsNothing); // un seul menu, pas celui du cadre par-dessus
     await _capture('2a-Menu-produit');
     await tester.tap(find.text('Renommer (F2)'));
     await tester.pumpAndSettle();
