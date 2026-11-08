@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'catalogue_type.dart';
 import 'images_choisies.dart';
 import 'images_perso.dart';
+import 'univers.dart';
 import 'moderation.dart';
 import 'modele.dart';
 import 'signature.dart';
@@ -573,9 +574,14 @@ class CatalogueCommun extends ChangeNotifier {
 /// Le catalogue commun en cours de modification par l'éditeur.
 class Brouillon {
   Brouillon(this.catalogue, this.images, this.renommes, this.retires, this.version, this.modifications,
-      {Set<String>? bloques, Map<String, ImagePerso>? imagesPerso})
+      {Set<String>? bloques, Map<String, ImagePerso>? imagesPerso, Map<String, List<String>>? univers})
       : bloques = bloques ?? {},
-        imagesPerso = imagesPerso ?? {};
+        imagesPerso = imagesPerso ?? {},
+        univers = univers ?? copieUnivers(universParDefaut);
+
+  /// Univers (domaines) et leurs rayons, dans l'ordre (08/11/2026, Aristide) ; un rayon absent va dans
+  /// « Autres rayons ».
+  final Map<String, List<String>> univers;
 
   /// Images ajoutées à la bibliothèque par l'éditeur (07/11/2026) ; elles partent avec le catalogue.
   final Map<String, ImagePerso> imagesPerso;
@@ -599,6 +605,7 @@ class Brouillon {
         (j['modifications'] as num? ?? 0).toInt(),
         bloques: {for (final x in (j['bloques'] as List? ?? const [])) '$x'},
         imagesPerso: lireImagesPerso(j['imagesPerso']),
+        univers: lireUnivers(j['univers']),
       );
 
   Map<String, dynamic> versJson() => {
@@ -610,7 +617,53 @@ class Brouillon {
         if (bloques.isNotEmpty) 'bloques': bloques.toList()..sort(),
         if (modifications > 0) 'modifications': modifications,
         if (imagesPerso.isNotEmpty) 'imagesPerso': imagesPersoVersJson(imagesPerso),
+        'univers': universVersJson(univers),
       };
+
+  /// Univers d'un rayon du brouillon.
+  String universDe(String rayon) {
+    for (final e in univers.entries) {
+      if (e.value.contains(rayon)) return e.key;
+    }
+    return autresRayons;
+  }
+
+  /// Range le rayon dans l'univers [u] (créé s'il est nouveau) ; « Autres rayons » le sort de tout univers.
+  /// Un univers resté vide disparaît.
+  void changerUnivers(String rayon, String u) {
+    u = u.trim();
+    if (u.isEmpty || universDe(rayon) == u) return;
+    for (final l in univers.values) {
+      l.remove(rayon);
+    }
+    if (u != autresRayons) univers.putIfAbsent(u, () => []).add(rayon);
+    univers.removeWhere((_, l) => l.isEmpty);
+    modifications++;
+  }
+
+  void renommerUnivers(String ancien, String nouveau) {
+    nouveau = nouveau.trim();
+    if (nouveau.isEmpty || nouveau == ancien || nouveau == autresRayons || univers.containsKey(nouveau) || !univers.containsKey(ancien)) {
+      return;
+    }
+    final m = {for (final e in univers.entries) (e.key == ancien ? nouveau : e.key): e.value};
+    univers
+      ..clear()
+      ..addAll(m);
+    modifications++;
+  }
+
+  void ordonnerUnivers(List<String> noms) {
+    final m = {for (final n in noms) if (univers[n] case final l?) n: l};
+    for (final e in univers.entries) {
+      m.putIfAbsent(e.key, () => e.value);
+    }
+    if (m.keys.join('\n') == univers.keys.join('\n')) return;
+    univers
+      ..clear()
+      ..addAll(m);
+    modifications++;
+  }
 
   /// Pour les étapes de l'historique : sans les images ajoutées (lourdes), qui ne reviennent pas en arrière.
   Map<String, dynamic> versJsonSansImages() => versJson()..remove('imagesPerso');
@@ -737,6 +790,10 @@ class Brouillon {
   void renommerRayon(CatRayon r, String nom) {
     if (nom.trim().isEmpty || nom.trim() == r.nom || rayon(nom) != null) return;
     renommes.add({'type': 'rayon', 'ancien': r.nom, 'nouveau': nom.trim()});
+    for (final l in univers.values) {
+      final i = l.indexOf(r.nom);
+      if (i >= 0) l[i] = nom.trim();
+    }
     r.nom = nom.trim();
     modifications++;
   }

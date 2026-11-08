@@ -11,6 +11,7 @@ import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
 import 'images_perso.dart';
+import 'univers.dart';
 import 'moderation.dart';
 import 'sauvegarde.dart';
 import 'images_choisies.dart';
@@ -1248,6 +1249,13 @@ class Etat extends ChangeNotifier {
       final ip = _actif?.reglage('images_perso');
       remplacerImagesPerso(ip == null || ip.isEmpty ? {} : lireImagesPerso(jsonDecode(ip)));
     } catch (_) {}
+    // Univers (domaines) reçus avec le catalogue commun (08/11/2026) ; sinon ceux d'origine.
+    try {
+      final u = _actif?.reglage('univers_catalogue');
+      remplacerUnivers(u == null || u.isEmpty ? null : lireUnivers(jsonDecode(u)));
+    } catch (_) {
+      remplacerUnivers(null);
+    }
     typesPromotion = [
       for (final t in (j['typesPromotion'] as List).cast<Map>())
         TypePromotion(t['id'] as String, t['code'] as String, t['nom'] as String, t['exemple'] as String? ?? '',
@@ -3437,6 +3445,11 @@ class Etat extends ChangeNotifier {
     // Images ajoutées par l'éditeur : la bibliothèque reçue remplace la précédente (vide si elle n'en a pas).
     remplacerImagesPerso(lireImagesPerso(j['imagesPerso']));
     stockageFoyer?.definirReglage('images_perso', jsonEncode(j['imagesPerso'] ?? const {}));
+    // Univers (domaines) : ceux du catalogue s'il en porte, sinon on garde ceux qu'on a.
+    if (lireUnivers(j['univers']) case final u?) {
+      remplacerUnivers(u);
+      stockageFoyer?.definirReglage('univers_catalogue', jsonEncode(j['univers']));
+    }
 
     // 3. Retirés par l'éditeur, s'ils ne servent pas au foyer.
     var retires = 0;

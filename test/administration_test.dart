@@ -95,6 +95,16 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Abricots'), findsOneWidget);
     await _capture('2-Catalogue-des-produits');
+    // 08/11/2026 : les domaines du catalogue commun, en-têtes au-dessus de leurs rayons.
+    expect(find.byKey(const ValueKey('console-domaine-Produits frais')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('console-rayon-Fruits et légumes')), buttons: kSecondaryButton);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Changer de domaine…'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('vers-domaine-nouveau')), findsOneWidget);
+    await _capture('2g-Changer-de-domaine');
+    await tester.tap(find.byKey(const ValueKey('vers-domaine-Produits frais')));
+    await tester.pumpAndSettle();
 
     // Glisser vers le bas du cadre : la liste défile toute seule ; le geste annulé arrête le défilement.
     final position = tester.state<ScrollableState>(

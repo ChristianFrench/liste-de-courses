@@ -12,6 +12,7 @@ import '../donnees/journal_catalogue.dart';
 import 'console_catalogue.dart';
 import '../donnees/modele.dart';
 import '../donnees/signature.dart';
+import '../donnees/univers.dart';
 import '../navigation.dart';
 import '../theme.dart';
 
@@ -1012,6 +1013,30 @@ List<String> gestesEntre(Map<String, dynamic> avant, Map<String, dynamic> apres)
         : pa[k] == null
             ? 'Image ajoutée à la bibliothèque : ${texte(pb[k])}'
             : 'Image de la bibliothèque remplacée : ${texte(pb[k])}');
+  }
+  // Univers (domaines) : rayon changé de domaine, domaine ajouté, retiré (08/11/2026).
+  Map<String, String> domaines(Object? j) => {
+        for (final e in (lireUnivers(j) ?? const <String, List<String>>{}).entries)
+          for (final r in e.value) r: e.key,
+      };
+  if (avant['univers'] != null && apres['univers'] != null && jsonEncode(avant['univers']) != jsonEncode(apres['univers'])) {
+    final da = domaines(avant['univers']), db = domaines(apres['univers']);
+    final ua = (lireUnivers(avant['univers']) ?? const {}).keys.toSet(), ub = (lireUnivers(apres['univers']) ?? const {}).keys.toSet();
+    final renomme = ua.difference(ub).length == 1 && ub.difference(ua).length == 1;
+    if (renomme) {
+      lignes.add('Domaine renommé : ${ua.difference(ub).single} → ${ub.difference(ua).single}');
+    } else {
+      for (final u in ub.difference(ua)) {
+        lignes.add('Domaine ajouté : $u');
+      }
+      for (final u in ua.difference(ub)) {
+        lignes.add('Domaine retiré : $u');
+      }
+    }
+    for (final r in {...da.keys, ...db.keys}) {
+      if (renomme || da[r] == db[r] || x.rayonsAjoutes.contains(r) || x.rayonsRetires.contains(r)) continue;
+      lignes.add('Rayon $r : domaine ${da[r] ?? autresRayons} → ${db[r] ?? autresRayons}');
+    }
   }
   if (lignes.isEmpty) return const ['Ordre modifié'];
   const max = 12;

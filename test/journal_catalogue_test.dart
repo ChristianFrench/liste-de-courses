@@ -115,4 +115,34 @@ void main() {
     expect(etatIconeRayon('Saisonnier', const {}), EtatIcone.exacte);
     expect(cleRayon('Entretien / Droguerie'), 'entretien-droguerie');
   });
+
+  test('domaines dans le catalogue commun', () {
+    final b = Brouillon.lire(cat({'Boucherie': {'Viande': ['Steak']}, 'Glaces': {'Bâtonnets': []}, 'Neuf': {'Truc': []}}));
+    // Sans « univers » dans le catalogue : ceux d'origine.
+    expect(b.universDe('Boucherie'), 'Produits frais');
+    expect(b.universDe('Neuf'), autresRayons);
+    final avant = b.versJson();
+    b.changerUnivers('Neuf', 'Maison');
+    expect(b.universDe('Neuf'), 'Maison');
+    expect(gestesEntre(avant, b.versJson()), contains('Domaine ajouté : Maison'));
+    final a2 = b.versJson();
+    b.changerUnivers('Glaces', 'Produits frais');
+    expect(gestesEntre(a2, b.versJson()), contains('Rayon Glaces : domaine Surgelés → Produits frais'));
+    b.renommerUnivers('Maison', 'Bazar');
+    expect(b.universDe('Neuf'), 'Bazar');
+    b.renommerRayon(b.rayon('Neuf')!, 'Nouveau');
+    expect(b.universDe('Nouveau'), 'Bazar');
+    b.ordonnerUnivers(['Bazar']);
+    expect(b.univers.keys.first, 'Bazar');
+    b.changerUnivers('Nouveau', autresRayons);
+    expect(b.univers.containsKey('Bazar'), isFalse, reason: 'domaine vide retiré');
+    // Aller-retour JSON et application côté foyer.
+    final relu = Brouillon.lire(b.versJson());
+    expect(relu.universDe('Glaces'), 'Produits frais');
+    expect(relu.univers.keys.toList(), b.univers.keys.toList());
+    remplacerUnivers(lireUnivers(b.versJson()['univers']));
+    expect(universDuRayon('Glaces'), 'Produits frais');
+    remplacerUnivers(null);
+    expect(universDuRayon('Glaces'), 'Surgelés');
+  });
 }

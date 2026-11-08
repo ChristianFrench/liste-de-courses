@@ -11,6 +11,7 @@ import '../donnees/catalogue_type.dart';
 import '../donnees/journal_catalogue.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import '../donnees/univers.dart';
 import 'console_images.dart';
 import 'editeur_catalogue.dart';
 
@@ -142,8 +143,11 @@ class _Glisse {
 
 /// Une ligne du cadre : un rayon, un secteur ou un produit.
 class _Ligne {
-  _Ligne(this.r, [this.s, this.p]);
+  _Ligne(this.r, [this.s, this.p, this.domaine]);
   final CatRayon r;
+
+  /// Premier rayon d'un domaine : son en-tête est dessiné au-dessus (08/11/2026).
+  final String? domaine;
   final CatSecteur? s;
   final CatProduit? p;
   Object get objet => p ?? s ?? r;
@@ -389,6 +393,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
       final noms = [for (final x in b.catalogue.rayons) if (!identical(x, r)) x.nom];
       noms.insert(noms.indexOf(cible.r.nom), r.nom);
       b.ordonnerRayons(noms);
+      b.changerUnivers(r.nom, b.universDe(cible.r.nom));
       fait = '${r.nom} placé avant ${cible.r.nom}';
     }
     _modifie();
@@ -441,6 +446,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           item('texte', Icons.notes, 'Ajouter depuis un texte…'),
           item('renommer', Icons.edit_outlined, 'Renommer (F2)'),
           item('icone', Icons.image_outlined, 'Changer l\'icône…'),
+          item('domaine', Icons.workspaces_outline, 'Changer de domaine…'),
           if (r.secteurs.length > 1) item('ordre', Icons.drag_handle, 'Ordre des secteurs…'),
           if (b.catalogue.rayons.length > 1) item('enSecteur', Icons.low_priority, 'Transformer en secteur d\'un autre rayon…'),
           const PopupMenuDivider(),
@@ -465,7 +471,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           item('texte', Icons.notes, 'Ajouter depuis un texte…'),
         ],
     };
-    final v = await showMenu<String>(context: context, position: RelativeRect.fromLTRB(ou.dx, ou.dy, ou.dx, ou.dy), items: items);
+    final v = await showMenu<String>(context: context, constraints: const BoxConstraints(minWidth: 220, maxWidth: 440), position: RelativeRect.fromLTRB(ou.dx, ou.dy, ou.dx, ou.dy), items: items);
     if (v == null || !mounted) return;
     switch ((v, o)) {
       case ('secteur', CatRayon r):
@@ -496,6 +502,8 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         _secteurEnRayon(s);
       case ('enSecteur', CatRayon r):
         await _rayonEnSecteur(r);
+      case ('domaine', CatRayon r):
+        await _changerDomaine(r);
       case ('supprimer', final Object x):
         await _supprimer(x);
     }
@@ -679,13 +687,136 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     );
   }
 
+  // ---------------------------------------------------------------- domaines (08/11/2026, Aristide)
+
+  /// Range le rayon dans un domaine choisi dans la liste, ou dans un nouveau domaine.
+  Future<void> _changerDomaine(CatRayon r) async {
+    const nouveau = '\u0000nouveau';
+    final actuel = b.universDe(r.nom);
+    final u = await showDialog<String>(
+      context: context,
+      builder: (ctx) => SimpleDialog(
+        backgroundColor: Charte.blanc,
+        title: Text('Domaine du rayon « ${r.nom} »', style: Charte.texte(18, gras: true)),
+        children: [
+          SizedBox(
+            width: 440,
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              for (final x in [...b.univers.keys, autresRayons])
+                ListTile(
+                  key: ValueKey('vers-domaine-$x'),
+                  leading: SizedBox(width: 32, child: Center(child: _signeDomaine(x, 28))),
+                  title: Text(x, style: Charte.texte(15, gras: x == actuel)),
+                  trailing: x == actuel ? Icone(Icons.check, size: 20, color: Charte.cadre) : null,
+                  onTap: () => Navigator.of(ctx).pop(x),
+                ),
+              ListTile(
+                key: const ValueKey('vers-domaine-nouveau'),
+                leading: SizedBox(width: 32, child: Center(child: Icone(Icons.add, size: 24, color: Charte.cadre))),
+                title: Text('Nouveau domaine…', style: Charte.texte(15)),
+                onTap: () => Navigator.of(ctx).pop(nouveau),
+              ),
+            ]),
+          ),
+        ],
+      ),
+    );
+    if (u == null || !mounted) return;
+    var vers = u;
+    if (u == nouveau) {
+      final nom = await demanderTexte(context, titre: 'Nouveau domaine', valider: 'Créer');
+      if (nom == null || nom.trim().isEmpty || !mounted) return;
+      vers = nom.trim();
+    }
+    if (vers == actuel) return;
+    b.changerUnivers(r.nom, vers);
+    choisi = r;
+    _modifie();
+    _message('${r.nom} rangé dans « $vers »');
+  }
+
+  Widget _signeDomaine(String u, double taille) => cleUnivers(u) != null
+      ? Pictogramme(cleUnivers(u), taille: taille)
+      : Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: taille * 0.85, color: Charte.encreNiveau);
+
+  Future<void> _menuDomaine(Offset ou, String u) async {
+    PopupMenuItem<String> item(String v, IconData i, String t, {bool actif = true}) => PopupMenuItem(
+          value: v,
+          enabled: actif,
+          height: 40,
+          child: Row(children: [Icone(i, size: 20, color: Charte.cadre), const SizedBox(width: 10), Text(t, style: Charte.texte(15))]),
+        );
+    final v = await showMenu<String>(context: context, constraints: const BoxConstraints(minWidth: 220, maxWidth: 440), position: RelativeRect.fromLTRB(ou.dx, ou.dy, ou.dx, ou.dy), items: [
+      item('renommer', Icons.edit_outlined, 'Renommer le domaine…', actif: u != autresRayons),
+      item('ordre', Icons.drag_handle, 'Ordre des domaines…', actif: b.univers.length > 1),
+    ]);
+    if (v == null || !mounted) return;
+    switch (v) {
+      case 'renommer':
+        final nom = await demanderTexte(context, titre: 'Nom du domaine', initial: u, valider: 'Renommer');
+        if (nom == null || !mounted) return;
+        b.renommerUnivers(u, nom);
+        _modifie();
+      case 'ordre':
+        final noms = await ordonner(context, titre: 'Ordre des domaines', noms: [...b.univers.keys]);
+        if (noms == null) return;
+        b.ordonnerUnivers(noms);
+        _modifie();
+    }
+  }
+
+  /// En-tête d'un domaine au-dessus de son premier rayon ; on y dépose un rayon pour l'y ranger.
+  Widget _avecDomaine(_Ligne l) {
+    final u = l.domaine;
+    if (u == null) return _rangee(l);
+    final n = b.catalogue.rayons.where((x) => b.universDe(x.nom) == u).length;
+    final entete = DragTarget<_Glisse>(
+      onWillAcceptWithDetails: (d) {
+        final ok = d.data.estRayon && b.universDe(d.data.rayon!.nom) != u;
+        if (ok) setState(() => _survole = u);
+        return ok;
+      },
+      onLeave: (_) => setState(() => _survole = null),
+      onAcceptWithDetails: (d) {
+        setState(() => _survole = null);
+        b.changerUnivers(d.data.rayon!.nom, u);
+        _modifie();
+        _message('${d.data.rayon!.nom} rangé dans « $u »');
+      },
+      builder: (_, __, ___) => GestureDetector(
+        key: ValueKey('console-domaine-$u'),
+        behavior: HitTestBehavior.opaque,
+        onSecondaryTapDown: (d) => _menuDomaine(d.globalPosition, u),
+        child: Container(
+          height: 46,
+          padding: const EdgeInsets.symmetric(horizontal: 10),
+          decoration: BoxDecoration(
+            color: _survole == u ? Charte.accent : Charte.cadre,
+            border: Border(bottom: BorderSide(color: Charte.blanc), top: BorderSide(color: Charte.blanc, width: 4)),
+          ),
+          child: Row(children: [
+            SizedBox(width: 36, child: Center(child: _signeDomaine(u, 32))),
+            const SizedBox(width: 10),
+            Expanded(child: Text(u.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
+            Text(_pluriel(n, 'rayon'), style: Charte.texte(13, couleur: Charte.blanc)),
+          ]),
+        ),
+      ),
+    );
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [entete, _rangee(l)]);
+  }
+
   // ---------------------------------------------------------------- cadre du catalogue
 
   List<_Ligne> _lignes() {
     final f = recherche.trim().toLowerCase();
     final cherche = f.length >= 2;
     final l = <_Ligne>[];
-    for (final r in b.catalogue.rayons) {
+    // Rayons regroupés par domaine, dans l'ordre des domaines (08/11/2026, Aristide).
+    String? dernier;
+    for (final r in [
+      for (final u in [...b.univers.keys, autresRayons]) ...b.catalogue.rayons.where((x) => b.universDe(x.nom) == u),
+    ]) {
       final rTrouve = cherche && r.nom.toLowerCase().contains(f);
       final sous = <_Ligne>[];
       for (final s in r.secteurs) {
@@ -702,7 +833,9 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         }
       }
       if (cherche && !rTrouve && sous.isEmpty) continue;
-      l.add(_Ligne(r));
+      final u = b.universDe(r.nom);
+      l.add(_Ligne(r, null, null, u == dernier ? null : u));
+      dernier = u;
       if (cherche || rayonsOuverts.contains(r)) l.addAll(sous);
     }
     return l;
@@ -979,7 +1112,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
                   key: const ValueKey('console-cadre'),
                   controller: _defilement,
                   itemCount: lignes.length,
-                  itemBuilder: (_, i) => _rangee(lignes[i]),
+                  itemBuilder: (_, i) => _avecDomaine(lignes[i]),
                 ),
               ),
             ),

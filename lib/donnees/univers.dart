@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-// Univers : regroupement des rayons au-dessus d'eux, seulement pour présenter le catalogue
+// Univers (domaines) : regroupement des rayons au-dessus d'eux, seulement pour présenter le catalogue
 // (Gérer › Catalogue). Absent des listes et des courses (31/10/2026).
+// 08/11/2026 (Aristide) : ils font partie du catalogue commun (« univers ») ; l'éditeur les règle dans la console.
+// Faute de catalogue reçu, l'application garde ceux d'origine ci-dessous.
 
-const universDesRayons = <String, List<String>>{
+const universParDefaut = <String, List<String>>{
   'Produits frais': [
     'Fruits et légumes', 'Boucherie', 'Volaille', 'Poissonnerie', 'Crèmerie', 'Fromagerie', 'Charcuterie', 'Traiteur', //
     'Boulangerie', 'Viennoiserie et pâtisserie',
@@ -20,6 +22,34 @@ const universDesRayons = <String, List<String>>{
   'Culture, papeterie et jouets': ['Loisirs'],
   'Espace saisonnier': ['Saisonnier'],
 };
+
+final _univers = copieUnivers(universParDefaut);
+
+/// Univers en vigueur (ceux du catalogue commun reçu, sinon ceux d'origine), dans leur ordre.
+Map<String, List<String>> get universDesRayons => _univers;
+
+Map<String, List<String>> copieUnivers(Map<String, List<String>> m) => {for (final e in m.entries) e.key: [...e.value]};
+
+/// Remplace les univers en vigueur ; vide ou absent : ceux d'origine.
+void remplacerUnivers(Map<String, List<String>>? m) {
+  _univers
+    ..clear()
+    ..addAll(copieUnivers(m == null || m.isEmpty ? universParDefaut : m));
+}
+
+/// Univers lus dans le catalogue commun : [{nom, rayons: [...]}, ...] ; null s'il n'y en a pas.
+Map<String, List<String>>? lireUnivers(Object? j) {
+  if (j is! List) return null;
+  final m = <String, List<String>>{
+    for (final o in j)
+      if (o is Map && o['nom'] is String) o['nom'] as String: [for (final r in (o['rayons'] as List? ?? const [])) '$r'],
+  };
+  return m.isEmpty ? null : m;
+}
+
+List<Map<String, Object>> universVersJson(Map<String, List<String>> m) => [
+      for (final e in m.entries) {'nom': e.key, 'rayons': [...e.value]},
+    ];
 
 /// Univers d'un rayon ; « Autres rayons » pour un rayon créé par un foyer sans univers choisi.
 /// Univers d'un rayon ; [choisis] : univers choisis par le foyer pour ses rayons ajoutés.
