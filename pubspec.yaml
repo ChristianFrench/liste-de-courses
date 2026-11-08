@@ -49,6 +49,7 @@ flutter:
     - assets/icones/noto3d/
     - assets/pictos/noto3d/
     - assets/pictos/fluent3d/
+    - assets/pictos/maison/
   fonts:
     - family: Atkinson
       fonts:

@@ -5,6 +5,7 @@ import '../donnees/images_perso.dart';
 import '../donnees/pictos.dart';
 import '../donnees/pictos_composes.dart';
 import '../donnees/pictos_emoji.dart';
+import '../donnees/pictos_maison.dart';
 import '../donnees/pictos_fluent.dart';
 import 'icone.dart';
 
@@ -80,6 +81,7 @@ bool _dispo(String c) =>
     pictosDisponibles.contains(c) ||
     pictosEmoji.contains(c) ||
     pictosComposes.contains(c) ||
+    pictosMaison.contains(c) ||
     pictosFluent.contains(c) ||
     imagesPerso.containsKey(c);
 
@@ -87,7 +89,7 @@ String? cleRayon(String nom) {
   final s = _slug(nom);
   final choisie = imagesChoisies[s];
   if (choisie != null && _dispo(choisie)) return choisie;
-  if (pictosDisponibles.contains(s)) return s;
+  if (pictosMaison.contains(s) || pictosDisponibles.contains(s)) return s;
   final a = _alias[s];
   if (a != null && pictosDisponibles.contains(a)) return a;
   return pictosDisponibles.contains('reserve--$s') ? 'reserve--$s' : null;
@@ -132,7 +134,10 @@ class Pictogramme extends StatelessWidget {
       ? SizedBox(width: taille, height: taille)
       // 01/11/2026 (Aristide) : rayons et secteurs en Noto 3D, comme les icônes, pour un ensemble homogène.
       : Image.asset(
-          cle!.startsWith('fluent--')
+          // 08/11/2026 (Aristide) : icônes « maison » des rayons, prioritaires sur Noto 3D.
+          pictosMaison.contains(cle)
+              ? 'assets/pictos/maison/$cle.png'
+              : cle!.startsWith('fluent--')
               ? 'assets/pictos/fluent3d/${cle!.substring(8)}.webp'
               : pictosEmoji.contains(cle) || pictosComposes.contains(cle)
                   ? 'assets/pictos/noto3d/$cle.png'
@@ -263,7 +268,7 @@ EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images)
 /// alphabétique du nom (la même chose en Noto 3D et en Fluent 3D côte à côte).
 List<String> get toutesLesImages {
   String nom(String c) => clePerso(nomImage(c)).substring(7);
-  return {...pictosEmoji, ...pictosComposes, ...pictosDisponibles, ...pictosFluent, ...imagesPerso.keys}.toList()
+  return {...pictosEmoji, ...pictosComposes, ...pictosMaison, ...pictosDisponibles, ...pictosFluent, ...imagesPerso.keys}.toList()
     ..sort((a, b) => nom(a) != nom(b) ? nom(a).compareTo(nom(b)) : a.compareTo(b));
 }
 

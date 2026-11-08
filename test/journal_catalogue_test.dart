@@ -104,4 +104,10 @@ void main() {
     expect(cleSecteur('Volaille', 'Rôtisserie'), 'volaille--rotisserie');
     expect(etatIconeSecteur('Traiteur', 'Traiteur au comptoir', const {}), EtatIcone.exacte);
   });
+
+  test('icônes maison des rayons', () {
+    expect(cleRayon('Saisonnier'), 'saisonnier');
+    expect(etatIconeRayon('Saisonnier', const {}), EtatIcone.exacte);
+    expect(cleRayon('Entretien / Droguerie'), 'entretien-droguerie');
+  });
 }
