@@ -452,7 +452,7 @@ class Aides {
       'Les rayons, les secteurs et les produits d\'origine ne changent pas.\n'
       'Touchez un secteur : « Voir et modifier les produits » affiche ses produits, « + Nouveau produit » demande le nom, '
       'sa marque éventuelle, sa mesure et son packaging. Le produit s\'appelle « nom marque » (ex. « Camembert Président »). '
-      'Sur un produit d\'origine, « Créer le même produit d\'une marque » crée de même un nouveau produit.\n'
+      'Sur un produit d\'origine, « Ajouter une marque au produit » la rattache au produit (« Camembert · Président ») sans créer de produit.\n'
       'Un petit + signale un produit ajouté par le foyer ; « Produits ajoutés » (en touchant le titre) les rassemble pour les modifier ou les supprimer. '
       'Toucher le bandeau d\'un rayon propose un nouveau secteur ou de changer l\'ordre des secteurs.\n$_gestes';
 

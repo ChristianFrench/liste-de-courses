@@ -7,6 +7,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqlite3/sqlite3.dart';
+import 'package:liste_de_courses/composants/recherche.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/donnees/moderation.dart';
@@ -651,5 +652,55 @@ void main() {
     b.fermer();
     c.fermer();
     dossier.deleteSync(recursive: true);
+  });
+
+  test('marques = déclinaisons du produit : pas de produit de marque, reprise, partage par l\'usage', () {
+    final e = Etat.instance..enregistrementActif = false;
+    e.lire(parLeModele(demo()));
+    final p = e.produits.firstWhere((x) => !e.estAjoute(x) && e.secteurCatalogue(x.id) != null && x.marqueIds.isEmpty);
+    final nb = e.produits.length;
+    final l = e.creerListe(e.magasins.first.id, [LigneListe(produitId: p.id)]);
+    expect(e.changerMarque(l, p, 'Yaos'), same(p), reason: 'la ligne garde le produit générique');
+    expect(e.produits.length, nb, reason: 'aucun produit « ${p.nom} Yaos »');
+    expect(e.marque(e.ligne(l, p.id)!.marqueId)?.nom, 'Yaos');
+    expect(e.declinaisons(p), ['Yaos']);
+    expect(e.marquesProposees(e.ligne(l, p.id), p), contains('Yaos'), reason: 'les marques du produit');
+    // « yao » trouve la déclinaison par sa marque.
+    expect(chercherMarques([p], 'yao'), [(p, 'Yaos')]);
+    e.changerMarque(l, p, null);
+    expect(e.ligne(l, p.id)!.marqueId, isNull);
+
+    // Partage : seulement ce qui a été acheté.
+    expect(e.declinaisonsAchetees(), isEmpty);
+    e.changerMarque(l, p, 'Yaos');
+    e.ligne(l, p.id)!.cocheLe = DateTime.now();
+    l.statut = StatutListe.terminee;
+    final s = e.secteurCatalogue(p.id)!;
+    final cle = '${e.rayon(s.rayonId)!.nom}/${s.nom}/${p.nom}';
+    final miennes = e.declinaisonsAchetees();
+    expect(miennes, {cle: ['Yaos']});
+
+    // Un autre foyer les reçoit : la marque se rattache au même produit, rien n'est créé.
+    e.lire(parLeModele(demo()));
+    final p2 = e.produits.firstWhere((x) => x.nom == p.nom && e.secteurCatalogue(x.id)?.nom == s.nom);
+    final nb2 = e.produits.length;
+    expect(e.appliquerDeclinaisons({'autre': jsonDecode(jsonEncode(miennes)) as Map<String, dynamic>}), 1);
+    expect(e.declinaisons(p2), ['Yaos']);
+    expect(e.produits.length, nb2);
+    expect(e.appliquerDeclinaisons({'autre': {cle: ['http://pub.example']}}), 0, reason: 'nom refusé');
+    e.foyersBloques.add('bloque');
+    expect(e.appliquerDeclinaisons({'bloque': {cle: ['Danone']}}), 0, reason: 'foyer bloqué');
+
+    // Reprise des anciens produits de marque : « X Lactel » ajouté devient X avec Lactel sur ses lignes.
+    final ancien = e.creerProduit('${p2.nom} Lactel', secteur: e.secteurCatalogue(p2.id));
+    e.ajouterMarque(ancien, 'Lactel');
+    final l2 = e.creerListe(e.magasins.first.id, [LigneListe(produitId: ancien.id, quantite: 2)]);
+    expect(e.reprendreProduitsDeMarque(), 1);
+    expect(e.ligne(l2, ancien.id), isNull);
+    expect(e.ligne(l2, p2.id)?.quantite, 2);
+    expect(e.marque(e.ligne(l2, p2.id)?.marqueId)?.nom, 'Lactel');
+    expect(e.declinaisons(p2), containsAll(['Lactel', 'Yaos']));
+    expect(e.produitsVisibles.contains(ancien), isFalse, reason: 'l\'ancien produit est masqué');
+    expect(e.reprendreProduitsDeMarque(), 0, reason: 'une seule fois');
   });
 }

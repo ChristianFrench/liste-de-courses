@@ -610,10 +610,10 @@ void main() {
       await _toucher(tester, find.text('CRÈMERIE').last);
       // Toucher un produit : ses actions dans un volet, plus de page (02/11/2026).
       await _toucher(tester, find.text('Lait demi-écrémé'));
-      expect(find.text('Créer le même produit d\'une marque'), findsOneWidget, reason: 'actions du produit');
+      expect(find.text('Ajouter une marque au produit'), findsOneWidget, reason: 'actions du produit');
       await _ciblesTactiles(tester);
       await _fermerVolet(tester);
-      expect(find.text('Créer le même produit d\'une marque'), findsNothing);
+      expect(find.text('Ajouter une marque au produit'), findsNothing);
       expect(find.text('CRÈMERIE', skipOffstage: false), findsWidgets, reason: 'secteur toujours déplié');
 
       await _rubrique(tester, 'Types de promotion');
@@ -662,7 +662,7 @@ void main() {
       expect(etat.ligne(l, lait.id)!.consigne, 'bien frais');
       expect(find.textContaining('« bien frais »', findRichText: true), findsOneWidget, reason: 'la consigne suit le nom');
 
-      // La marque : liste déroulante des marques du secteur ; l'article devient « Lait demi-écrémé Lactel »
+      // La marque : liste déroulante des marques du secteur ; la ligne porte Lactel
       etat.lireMarquesType({
         'secteurs': {etat.cleSecteur(etat.secteurCatalogue(lait.id)!): ['Lactel', 'Candia']}
       });
@@ -671,7 +671,11 @@ void main() {
       await _toucher(tester, find.byKey(const ValueKey('choix-marque')));
       await _toucher(tester, find.text('Lactel').last);
       await _toucher(tester, find.text('Valider'));
-      final lactel = etat.produits.firstWhere((p) => p.nom == 'Lait demi-écrémé Lactel');
+      // 08/11/2026 : la marque est une déclinaison : la ligne reste « Lait demi-écrémé », avec Lactel.
+      expect(etat.produits.where((p) => p.nom == 'Lait demi-écrémé Lactel'), isEmpty, reason: 'pas de produit de marque');
+      final lactel = lait;
+      expect(etat.marque(etat.ligne(l, lait.id)?.marqueId)?.nom, 'Lactel');
+      expect(etat.declinaisons(lait), contains('Lactel'), reason: 'Lactel est rattachée au produit');
       expect(etat.ligne(l, lactel.id)?.consigne, 'bien frais', reason: 'la ligne garde sa consigne');
       etat.marquesType = {};
 
@@ -1177,7 +1181,7 @@ void main() {
       // Produit d'origine : ni « Modifier » ni « Supprimer », mais « Avec une marque ».
       await _toucher(tester, find.text('Lait demi-écrémé'));
       expect(find.text('Modifier'), findsNothing);
-      expect(find.text('Créer le même produit d\'une marque'), findsOneWidget);
+      expect(find.text('Ajouter une marque au produit'), findsOneWidget);
       await _fermerVolet(tester);
       // Tout à droite du secteur : ses marques
       await _toucher(tester, find.byTooltip('Marques de Crèmerie'));

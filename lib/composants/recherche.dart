@@ -50,7 +50,10 @@ List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte
     final motsNom = nom.split(' ');
     final nature = etat.naturesOff[p.nom.toLowerCase()]?.marques ?? const <String>[];
     final s = etat.secteurCatalogue(p.id);
+    // 08/11/2026 : les déclinaisons du produit (marques déjà achetées) se trouvent aussi par la marque seule.
+    final decl = etat.declinaisons(p);
     final marques = <String>{
+      ...decl,
       ...nature,
       if (s != null) ...parSecteur.putIfAbsent(s.id, () => etat.marquesDuSecteur(s)),
     };
@@ -72,7 +75,7 @@ List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte
       }
       // La marque seule (« président ») : seulement pour les natures qui la portent (sinon tout le secteur viendrait).
       if (!ok || !dansMarque) continue;
-      final deNature = nature.contains(m);
+      final deNature = nature.contains(m) || decl.contains(m);
       if (dansNom == 0 && !deNature) continue;
       if (meilleur == null || dansNom > meilleur.$2 || (deNature && !meilleur.$3)) meilleur = (m, dansNom, deNature);
     }
@@ -190,11 +193,23 @@ class _ChampRechercheState extends State<ChampRecherche> {
           final produits = widget.produits();
           final trouves = chercherProduits(produits, t);
           final existe = trouves.any((p) => normaliser(p.nom) == normaliser(t));
-          final res = <Object>[...(_tout ? trouves : trouves.take(premiersResultats))];
-          if (!_tout && trouves.length > premiersResultats) res.add(_VoirPlus(trouves.length - premiersResultats));
+          // 08/11/2026 (Aristide) : « yaou » propose chaque produit générique, puis ses déclinaisons de marque
+          // (« Yaourt nature · Yaos »), qui s'ajoutent à la liste d'un seul geste.
+          final etat = Etat.instance;
+          final articles = <Object>[
+            for (final p in trouves) ...[
+              p,
+              if (widget.onMarque != null)
+                for (final m in etat.declinaisons(p)) (p, m),
+            ],
+          ];
+          final res = <Object>[...(_tout ? articles : articles.take(premiersResultats))];
+          if (!_tout && articles.length > premiersResultats) res.add(_VoirPlus(articles.length - premiersResultats));
           // Les marques quand le texte tapé en contient une (et que les articles trouvés laissent la place).
-          if (widget.onMarque != null && trouves.length < premiersResultats) {
-            res.addAll(chercherMarques(produits, t, max: premiersResultats - trouves.length.clamp(0, 2)));
+          if (widget.onMarque != null && articles.length < premiersResultats) {
+            for (final o in chercherMarques(produits, t, max: premiersResultats - articles.length.clamp(0, 2))) {
+              if (!res.contains(o)) res.add(o);
+            }
           }
           // 02/11/2026 (Aristide) : un nom déjà au catalogue peut se créer dans un autre secteur (frais / libre-service).
           if (widget.onNouveau != null) res.add(existe ? _AutreSecteur(t) : t);

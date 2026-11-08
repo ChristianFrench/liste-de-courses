@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'catalogue_type.dart';
 import 'images_choisies.dart';
 import 'images_perso.dart';
+import 'moderation.dart';
 import 'modele.dart';
 import 'signature.dart';
 import 'synchro.dart';
@@ -239,7 +240,77 @@ class CatalogueCommun extends ChangeNotifier {
     } catch (e) {
       debugPrint('Catalogue commun : $e');
     } finally {
-      _veille ??= Timer.periodic(const Duration(minutes: 10), (_) => _redeposer());
+      _veille ??= Timer.periodic(const Duration(minutes: 10), (_) {
+        _redeposer();
+        echangerDeclinaisons(lire: false);
+      });
+    }
+    await echangerDeclinaisons();
+  }
+
+  // ------------------------------------------------------------ Déclinaisons de marque (08/11/2026)
+  //
+  // Enrichies par l'usage, sans passer par l'éditeur : chaque foyer dépose les marques qu'il a achetées sur
+  // des produits du catalogue (« Rayon/Secteur/Produit » → marques), chaque application rattache celles des
+  // autres foyers aux mêmes produits.
+
+  static const sujetDeclinaisons = 'ldc/declinaisons';
+  static String sujetDeclinaisonsDe(String id) => '$sujetDeclinaisons/$id';
+
+  /// Dépôt du foyer tel qu'il est parti (texte JSON).
+  String? _declinaisonsDeposees;
+
+  /// Les déclinaisons retenues sur le serveur, par foyer (les messages retenus arrivent d'un coup : on lit
+  /// jusqu'à 2 secondes de calme).
+  static Future<Map<String, Map<String, dynamic>>> _collecterDeclinaisons(Stream<(String, String)> messages) async {
+    final lots = <String, Map<String, dynamic>>{};
+    final prefixe = '$sujetDeclinaisons/';
+    try {
+      await for (final m in messages.timeout(const Duration(seconds: 2))) {
+        if (!m.$1.startsWith(prefixe) || m.$2.isEmpty) continue;
+        if (_lire(m.$2) case final j?) lots[m.$1.substring(prefixe.length)] = j;
+      }
+    } on TimeoutException {
+      // fin des messages retenus
+    }
+    return lots;
+  }
+
+  /// Console : les déclinaisons déposées par tous les foyers, ou null sans liaison avec le serveur.
+  Future<Map<String, Map<String, dynamic>>?> lireDeclinaisons() async {
+    try {
+      return await _avecServeur((t, messages) => _collecterDeclinaisons(messages), abonnement: '$sujetDeclinaisons/#');
+    } catch (e) {
+      erreur = '$e';
+      return null;
+    }
+  }
+
+  /// Lit les déclinaisons des foyers ([lire]) et dépose celles du foyer si elles ont changé.
+  Future<void> echangerDeclinaisons({bool lire = true}) async {
+    final etat = Etat.instance;
+    if (etat.stockageFoyer == null || etat.magasins.isEmpty) return;
+    final miennes = etat.declinaisonsAchetees();
+    final texte = miennes.isEmpty ? '' : jsonEncode(miennes);
+    final deja = _declinaisonsDeposees ?? _reglage('declinaisons_deposees') ?? '';
+    if (!lire && texte == deja) return;
+    final id = etat.identifiantApports();
+    try {
+      await _avecServeur<bool>((t, messages) async {
+        if (lire) {
+          final lots = await _collecterDeclinaisons(messages)..remove(id);
+          if (lots.isNotEmpty) etat.appliquerDeclinaisons(lots);
+        }
+        if (texte != deja) {
+          t.publier(sujetDeclinaisonsDe(id), miennes.isEmpty ? '' : emballer(miennes), retenu: true);
+          _declinaisonsDeposees = texte;
+          _definir('declinaisons_deposees', texte);
+          await Future<void>.delayed(const Duration(seconds: 2));
+        }
+        return true;
+      }, abonnement: '$sujetDeclinaisons/#');
+    } catch (e) {
+      debugPrint('Déclinaisons de marque : $e');
     }
   }
 
@@ -868,6 +939,8 @@ class Brouillon {
       final x = e.secteurCatalogue(p.id);
       if (x != null) (placesFoyer[_bas(p.nom)] ??= {}).add('${_bas(e.rayon(x.rayonId)?.nom ?? '')}/${_bas(x.nom)}');
     }
+    // Déclinaisons achetées par le foyer (08/11/2026) : « Rayon/Secteur/Produit » → marques.
+    final achetees = e.declinaisonsAchetees();
     for (final p in e.produits) {
       if (e.estRecu(p)) continue;
       final x = e.secteurCatalogue(p.id);
@@ -896,6 +969,12 @@ class Brouillon {
         cp.formats = formats;
         modifications++;
       }
+      for (final mq in achetees['${r.nom}/${x.nom}/${p.nom}'] ?? const <String>[]) {
+        if (!cp.marques.any((m) => _bas(m) == _bas(mq))) {
+          cp.marques.add(mq);
+          modifications++;
+        }
+      }
     }
 
     // 4. Images choisies.
@@ -903,6 +982,169 @@ class Brouillon {
       if (images[cle] != picto) choisirImage(cle, picto);
     }
     return modifications - avant;
+  }
+
+  // ---------------------------------------------------------- Marques (08/11/2026, console)
+  //
+  // Une marque est une déclinaison d'un produit générique (« Yaourt nature · Yaos ») : la liste [CatProduit.marques]
+  // de chaque produit. Les foyers l'enrichissent par l'usage ; l'éditeur surveille (doublons, fusion, retrait).
+
+  /// Chaque marque et les produits qui la portent, par ordre alphabétique des marques.
+  Map<String, List<(CatRayon, CatSecteur, CatProduit)>> marquesDesProduits() {
+    final res = <String, List<(CatRayon, CatSecteur, CatProduit)>>{};
+    final noms = <String, String>{}; // minuscules → nom retenu
+    for (final x in catalogue.tousLesProduits) {
+      for (final m in x.$3.marques) {
+        if (m.trim().isEmpty) continue;
+        final n = noms.putIfAbsent(_bas(m), () => m.trim());
+        res.putIfAbsent(n, () => []).add(x);
+      }
+    }
+    final cles = res.keys.toList()..sort((a, b) => Moderation.normaliser(a).compareTo(Moderation.normaliser(b)));
+    return {for (final k in cles) k: res[k]!};
+  }
+
+  /// Renomme une marque sur tous les produits ; vers une marque qui existe déjà, c'est une fusion.
+  /// Rend le nombre de produits touchés.
+  int renommerMarque(String ancien, String nouveau) {
+    final n = nouveau.trim();
+    if (n.isEmpty || (_bas(n) == _bas(ancien) && n == ancien.trim())) return 0;
+    var k = 0;
+    for (final (_, _, p) in catalogue.tousLesProduits) {
+      if (!p.marques.any((m) => _bas(m) == _bas(ancien))) continue;
+      p.marques.removeWhere((m) => _bas(m) == _bas(ancien) || _bas(m) == _bas(n));
+      p.marques.add(n);
+      k++;
+    }
+    if (k > 0) modifications++;
+    return k;
+  }
+
+  /// Retire une marque de tous les produits ; rend le nombre de produits touchés.
+  int retirerMarque(String nom) {
+    var k = 0;
+    for (final (_, _, p) in catalogue.tousLesProduits) {
+      final avant = p.marques.length;
+      p.marques.removeWhere((m) => _bas(m) == _bas(nom));
+      if (p.marques.length != avant) k++;
+    }
+    if (k > 0) modifications++;
+    return k;
+  }
+
+  /// Déclinaisons déposées par les foyers (« Rayon/Secteur/Produit » → marques, par foyer) encore absentes du
+  /// brouillon : (rayon, secteur, produit, marque, nombre de foyers).
+  List<(CatRayon, CatSecteur, CatProduit, String, int)> declinaisonsNouvelles(Map<String, Map<String, dynamic>> lots) {
+    final compte = <String, Set<String>>{};
+    final cibles = <String, (CatRayon, CatSecteur, CatProduit, String)>{};
+    for (final MapEntry(key: foyer, value: j) in lots.entries) {
+      if (bloques.contains(foyer)) continue;
+      for (final e in j.entries) {
+        final parts = e.key.split('/');
+        if (parts.length != 3 || e.value is! List) continue;
+        final cr = rayon(parts[0]);
+        final cs = cr == null ? null : secteur(cr, parts[1]);
+        final cp = cs == null ? null : produitDans(cs, parts[2]);
+        if (cp == null) continue;
+        for (final mq in (e.value as List).take(20).whereType<String>()) {
+          if (mq.trim().isEmpty || Moderation.nomRefuse(mq, marque: true) != null) continue;
+          if (cp.marques.any((m) => _bas(m) == _bas(mq)) || _bas(cp.nom).contains(_bas(mq))) continue;
+          final cle = '${_bas(parts[0])}/${_bas(parts[1])}/${_bas(parts[2])}/${_bas(mq)}';
+          cibles.putIfAbsent(cle, () => (cr!, cs!, cp, mq.trim()));
+          compte.putIfAbsent(cle, () => {}).add(foyer);
+        }
+      }
+    }
+    return [for (final e in cibles.entries) (e.value.$1, e.value.$2, e.value.$3, e.value.$4, compte[e.key]!.length)]
+      ..sort((a, b) => b.$5 != a.$5 ? b.$5.compareTo(a.$5) : a.$4.toLowerCase().compareTo(b.$4.toLowerCase()));
+  }
+
+  /// Ajoute au brouillon les déclinaisons des foyers (elles partent avec le catalogue commun) ; rend leur nombre.
+  int integrerDeclinaisons(Map<String, Map<String, dynamic>> lots) {
+    final l = declinaisonsNouvelles(lots);
+    for (final (_, _, p, m, _) in l) {
+      if (!p.marques.any((x) => _bas(x) == _bas(m))) p.marques.add(m);
+    }
+    if (l.isNotEmpty) modifications++;
+    return l.length;
+  }
+
+  /// Ce que la console propose d'examiner, trouvé automatiquement : marques presque identiques, produits
+  /// dont le nom porte une marque alors que le générique existe dans le même secteur, produits en double dans
+  /// un secteur. [connues] : autres marques à reconnaître dans les noms (catalogue des marques par secteur).
+  List<AExaminer> aExaminer({Iterable<String> connues = const [], Set<String> acceptes = const {}}) {
+    final res = <AExaminer>[];
+    // 1. Marques en double (accents, pluriel, majuscules, une lettre).
+    final marques = marquesDesProduits();
+    final noms = marques.keys.toList();
+    for (var i = 0; i < noms.length; i++) {
+      for (var j = i + 1; j < noms.length; j++) {
+        final a = noms[i], b = noms[j];
+        if (Moderation.normaliser(a) != Moderation.normaliser(b) && !Moderation.presque(a, b)) continue;
+        // On garde la plus portée.
+        final (garde, part) = marques[a]!.length >= marques[b]!.length ? (a, b) : (b, a);
+        res.add(AExaminer('m:${_bas(part)}>${_bas(garde)}', TypeExamen.marques,
+            '« $part » ressemble à « $garde »', 'Fusionner « $part » dans « $garde » (${marques[part]!.length} produit(s))',
+            marque: part, cible: garde));
+      }
+    }
+    // 2. Produit portant une marque dont le générique est dans le même secteur.
+    final toutes = <String>{for (final n in noms) _bas(n), for (final n in connues) if (n.trim().length > 1) _bas(n)};
+    for (final (r, s, p) in catalogue.tousLesProduits) {
+      final nom = _bas(p.nom);
+      for (final m in toutes) {
+        if (!nom.endsWith(' $m')) continue;
+        final g = produitDans(s, nom.substring(0, nom.length - m.length - 1).trim());
+        if (g == null || identical(g, p)) continue;
+        final mq = p.nom.trim().substring(p.nom.trim().length - m.length);
+        res.add(AExaminer('p:${_bas(s.nom)}/$nom', TypeExamen.produitDeMarque, '« ${p.nom} » (${r.nom} › ${s.nom})',
+            'Convertir en « ${g.nom} · $mq » et retirer « ${p.nom} »',
+            rayon: r, secteur: s, produit: p, generique: g, marque: mq));
+        break;
+      }
+    }
+    // 3. Produits en double dans un secteur.
+    for (final r in catalogue.rayons) {
+      for (final s in r.secteurs) {
+        for (var i = 0; i < s.produits.length; i++) {
+          for (var j = i + 1; j < s.produits.length; j++) {
+            final a = s.produits[i], b = s.produits[j];
+            if (Moderation.normaliser(a.nom) != Moderation.normaliser(b.nom) && !Moderation.presque(a.nom, b.nom)) continue;
+            final (garde, part) = a.listes >= b.listes ? (a, b) : (b, a);
+            res.add(AExaminer('d:${_bas(s.nom)}/${_bas(part.nom)}>${_bas(garde.nom)}', TypeExamen.produits,
+                '« ${part.nom} » et « ${garde.nom} » (${r.nom} › ${s.nom})', 'Retirer « ${part.nom} », garder « ${garde.nom} »',
+                rayon: r, secteur: s, produit: part, generique: garde));
+          }
+        }
+      }
+    }
+    return [for (final x in res) if (!acceptes.contains(x.cle)) x];
+  }
+
+  /// Applique la correction proposée ; rend la ligne à noter dans l'historique.
+  String corriger(AExaminer x) {
+    switch (x.type) {
+      case TypeExamen.marques:
+        final n = renommerMarque(x.marque!, x.cible!);
+        return 'Marque « ${x.marque} » fusionnée dans « ${x.cible} » ($n produit(s))';
+      case TypeExamen.produitDeMarque:
+        final g = x.generique!, p = x.produit!;
+        if (!g.marques.any((m) => _bas(m) == _bas(x.marque!))) g.marques.add(x.marque!);
+        for (final m in p.marques) {
+          if (_bas(m) != _bas(x.marque!) && !g.marques.any((y) => _bas(y) == _bas(m))) g.marques.add(m);
+        }
+        g.listes += p.listes;
+        retirerProduit(x.secteur!, p);
+        return '« ${p.nom} » converti en « ${g.nom} · ${x.marque} »';
+      case TypeExamen.produits:
+        final g = x.generique!, p = x.produit!;
+        for (final m in p.marques) {
+          if (!g.marques.any((y) => _bas(y) == _bas(m))) g.marques.add(m);
+        }
+        g.listes += p.listes;
+        retirerProduit(x.secteur!, p);
+        return 'Doublon « ${p.nom} » retiré, « ${g.nom} » gardé (${x.secteur!.nom})';
+    }
   }
 
   void choisirImage(String cle, String? picto) {
@@ -1033,4 +1275,21 @@ int ajouterLecture(Brouillon b, LectureCatalogue lu) {
     }
   }
   return n;
+}
+
+// ------------------------------------------------------------ À examiner (console, 08/11/2026)
+
+enum TypeExamen { marques, produitDeMarque, produits }
+
+/// Un cas trouvé par la console : sa clé (pour « Accepter »), son titre et la correction proposée.
+class AExaminer {
+  AExaminer(this.cle, this.type, this.titre, this.correction,
+      {this.rayon, this.secteur, this.produit, this.generique, this.marque, this.cible});
+  final String cle;
+  final TypeExamen type;
+  final String titre, correction;
+  final CatRayon? rayon;
+  final CatSecteur? secteur;
+  final CatProduit? produit, generique;
+  final String? marque, cible;
 }

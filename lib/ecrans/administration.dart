@@ -7,6 +7,7 @@ import '../donnees/modele.dart';
 import '../theme.dart';
 import 'administration_serveur.dart';
 import 'console_catalogue.dart';
+import 'console_marques.dart';
 import 'editeur_catalogue.dart';
 
 // Console d'administration d'Emplettes (06/11/2026, Aristide) : application Windows seule, en fenêtre large,
@@ -15,7 +16,7 @@ import 'editeur_catalogue.dart';
 // - Serveur OVH : initialisation (étapes et état), suivi technique, console shell (administration_serveur.dart) ;
 // - Utilisateurs : foyers, appareils et suivi des activités (à venir) ;
 // - Contenu : catalogue des produits (à gauche la vue du téléphone, à droite les actions de maintenance),
-//   catalogue des marques (à venir) ;
+//   catalogue des marques (console_marques.dart, 08/11/2026) ;
 // - Apparence : palette de la console.
 
 enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, marques, apparence }
@@ -94,16 +95,7 @@ class _ConsoleAdministrationState extends State<ConsoleAdministration> {
                   ('Propositions de catalogue', 'Foyers qui ont déposé des changements', Icons.inventory_2_outlined),
                 ],
               ),
-            Rubrique.marques => const _PageAVenir(
-                titre: 'Catalogue des marques',
-                chemin: 'Contenu',
-                texte: 'Même disposition que le catalogue des produits : la vue du téléphone à gauche, les actions de '
-                    'maintenance des marques à droite.',
-                elements: [
-                  ('Marques par secteur', 'Ajouter, renommer, fusionner les doublons', Icons.sell_outlined),
-                  ('Marques des distributeurs', 'Enseignes et leurs marques propres', Icons.storefront_outlined),
-                ],
-              ),
+            Rubrique.marques => const PageCatalogueMarques(),
             Rubrique.apparence => const _PageApparence(),
           },
         ),

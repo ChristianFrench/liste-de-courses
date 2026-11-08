@@ -29,7 +29,7 @@ void main() {
     final semaine = enVie['Courses de la semaine']!;
     expect(semaine.lignes.where((g) => g.promotion != null).length, 3);
     expect(semaine.lignes.where((g) => g.consigne != null).length, 2);
-    expect(semaine.lignes.any((g) => etat.produit(g.produitId)?.nom == 'Camembert Président'), isTrue);
+    expect(semaine.lignes.any((g) => etat.produit(g.produitId)?.nom == 'Camembert' && etat.marque(g.marqueId)?.nom == 'Président'), isTrue);
     final depannage = enVie['Dépannage']!;
     expect(depannage.nbCoches, 4);
     expect(depannage.parcoursId, isNotNull);

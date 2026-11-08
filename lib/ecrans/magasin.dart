@@ -40,7 +40,7 @@ List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? liste
         if (await demanderSuppression(context, p, 'le produit ${p.nom}') && depuisFiche && context.mounted) Navigator.of(context).pop();
       }, danger: true),
     ],
-    ActionLigne(Icons.sell_outlined, 'Créer le même produit d\'une marque', () => produitDeMarque(context, p)),
+    ActionLigne(Icons.sell_outlined, 'Ajouter une marque au produit', () => produitDeMarque(context, p)),
     // 02/11/2026 (Aristide) : déplacer le produit, mettre à jour ses mesures et packagings.
     if (etat.secteurCatalogue(p.id) != null)
       ActionLigne(Icons.drive_file_move_outline, 'Déplacer le produit', () => deplacerProduit(context, p)),
@@ -110,7 +110,7 @@ class EcranFicheProduit extends StatelessWidget {
                   child: Text(
                       ajoute
                           ? 'Ajouté par le foyer : il peut être modifié.'
-                          : 'Produit du catalogue d\'origine : il ne se modifie pas. « Créer le même produit d\'une marque » en fait un nouveau produit.',
+                          : 'Produit du catalogue d\'origine : il ne se modifie pas. « Ajouter une marque au produit » lui rattache une marque.',
                       style: Charte.texte(14, couleur: Charte.texteSecondaire)),
                 ),
               ]),

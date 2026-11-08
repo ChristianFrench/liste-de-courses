@@ -189,7 +189,7 @@ Future<void> deplacerProduit(BuildContext context, Produit p) async {
   if (context.mounted) Nav.message(context, '« ${p.nom} » rangé dans ${etat.secteur(secteurId)?.nom ?? ''}');
 }
 
-/// Le même produit d'une marque (02/11/2026, Aristide) : seulement les marques de son secteur, ou une autre.
+/// Ajouter une marque au produit (02/11/2026 ; 08/11/2026 : déclinaison du produit, plus de produit à part).
 Future<void> produitDeMarque(BuildContext context, Produit p) async {
   final etat = Etat.instance;
   final s = etat.secteurCatalogue(p.id);
@@ -207,8 +207,8 @@ Future<void> produitDeMarque(BuildContext context, Produit p) async {
     nom = t.trim();
     if (s != null) etat.ajouterMarqueSecteur(s, nom);
   }
-  final q = etat.produitDeMarque(p, nom);
-  if (context.mounted) Nav.message(context, '« ${q.nom} » est au catalogue');
+  etat.produitDeMarque(p, nom);
+  if (context.mounted) Nav.message(context, '« ${p.nom} · $nom » est au catalogue');
 }
 
 /// Mettre à jour les mesures et packagings d'un produit (02/11/2026, Aristide).

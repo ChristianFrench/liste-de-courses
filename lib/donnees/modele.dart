@@ -877,6 +877,8 @@ class Etat extends ChangeNotifier {
     await appliquerFormats();
     completerLots();
     harmoniserCatalogue();
+    // 08/11/2026 : les anciens produits de marque (« Camembert Président ») deviennent des déclinaisons.
+    reprendreProduitsDeMarque();
     // Historique de plus de trois mois (réglable) vers les archives, et archives trop anciennes supprimées.
     if (archiverAnciennes() | purgerArchives()) enregistrer();
     // Appareil partagé (tablette, PC de la famille) : on dit qui l'utilise à chaque lancement.
@@ -1672,28 +1674,12 @@ class Etat extends ChangeNotifier {
     return q;
   }
 
-  /// Le même produit d'une marque, hors de toute liste (catalogue, 02/11/2026) : « Camembert » → « Camembert
-  /// Président », créé au besoin avec les mêmes mesures et packagings, rangé aux mêmes endroits.
+  /// Ajoute une marque au produit, hors de toute liste (catalogue ; 08/11/2026 : déclinaison, plus de produit
+  /// « Camembert Président » à part). Rend le produit.
   Produit produitDeMarque(Produit p, String marqueNom) {
     final mq = marqueNom.trim();
-    var racine = p.nom;
-    for (final id in p.marqueIds) {
-      final n = marque(id)?.nom;
-      if (n != null && racine.toLowerCase().endsWith(' ${n.toLowerCase()}')) racine = racine.substring(0, racine.length - n.length - 1);
-    }
-    final nom = mq.isEmpty ? racine : '$racine $mq';
-    var q = _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
-    if (q == null) {
-      q = Produit(nouvelId('p'), nom, [], [...p.packagingIds], 0);
-      produits.add(q);
-      _marquerAjoute(q);
-      for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
-        emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
-      }
-    }
-    if (mq.isNotEmpty) ajouterMarque(q, mq);
-    modifie();
-    return q;
+    if (mq.isNotEmpty) ajouterMarque(p, mq);
+    return p;
   }
 
   /// Mesures et packagings d'un produit du catalogue (02/11/2026).
@@ -1720,72 +1706,186 @@ class Etat extends ChangeNotifier {
     return '${p.nom} $mq';
   }
 
-  /// Marques proposées pour un article : celles de son secteur dans le catalogue des marques, celles du
-  /// produit et de ses variantes (« Camembert Président »…).
+  /// Marques proposées pour un article (08/11/2026, dans cet ordre) : celles déjà rattachées au produit
+  /// (achetées par un foyer), celles de son secteur, les marques distributeur de l'enseigne du magasin, puis
+  /// celles de sa nature d'après Open Food Facts. Chaque groupe par ordre alphabétique, sans doublon.
   List<String> marquesProposees(LigneListe? g, Produit p, {String? magasinId}) {
     final racine = nomSansMarque(g, p).toLowerCase();
     final s = secteurCatalogue(p.id);
-    final duSecteur = [
-      if (s != null) ...marquesDuSecteur(s),
-      if (magasinId != null) ...marquesDistributeurPour(magasin(magasinId), s),
-    ];
     final ids = <String>{
       ...p.marqueIds,
       for (final q in produits)
-        if (q.nom.toLowerCase() == racine || q.nom.toLowerCase().startsWith('$racine ')) ...q.marqueIds,
+        if (q.id != p.id && (q.nom.toLowerCase() == racine || q.nom.toLowerCase().startsWith('$racine '))) ...q.marqueIds,
     };
-    final noms = <String>{for (final n in duSecteur) n};
-    // Marques de la nature d'après Open Food Facts (« Pâte à tartiner chocolat » : Nutella, Nocciolata…).
-    for (final n in naturesOff[racine]?.marques ?? const <String>[]) {
-      if (!noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
+    List<String> trie(Iterable<String> l) => l.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final groupes = [
+      trie([for (final id in ids) if (marque(id)?.nom case final n?) n]),
+      trie(s == null ? const <String>[] : marquesDuSecteur(s)),
+      if (magasinId != null) marquesDistributeurPour(magasin(magasinId), s),
+      trie(naturesOff[racine]?.marques ?? const <String>[]),
+    ];
+    final noms = <String>[];
+    for (final l in groupes) {
+      for (final n in l) {
+        if (n.trim().isNotEmpty && !noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
+      }
     }
-    for (final id in ids) {
-      final n = marque(id)?.nom;
-      if (n != null && !noms.any((x) => x.toLowerCase() == n.toLowerCase())) noms.add(n);
-    }
-    return noms.toList()..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return noms;
   }
 
-  /// Change la marque d'un article de la liste : « Camembert » devient l'article « Camembert Président »
-  /// (créé au besoin, rangé aux mêmes endroits) ; sans marque, il redevient « Camembert ».
-  /// La ligne garde sa quantité, son packaging, sa promotion et sa consigne. Rend l'article de la ligne.
+  /// Change la marque d'un article de la liste (08/11/2026, Aristide) : la marque est une déclinaison du
+  /// produit générique, pas un produit à part. « Camembert » reste l'article de la ligne, la ligne porte
+  /// « Président », et Président est rattachée au produit (proposée ensuite à la recherche : « Camembert ·
+  /// Président »). Sans marque, la ligne redevient « Camembert ». Rend l'article de la ligne.
   Produit changerMarque(Liste l, Produit p, String? marqueNom) {
     final g = ligne(l, p.id);
     if (g == null) return p;
     final mq = (marqueNom ?? '').trim();
-    final racine = nomSansMarque(g, p);
-    final nom = mq.isEmpty ? racine : '$racine $mq';
-    var q = nom.toLowerCase() == p.nom.toLowerCase() ? p : _trouve(produits, (x) => x.nom.toLowerCase() == nom.toLowerCase());
-    if (q == null) {
-      q = Produit(nouvelId('p'), nom, [...p.marqueIds], [...p.packagingIds], 0);
-      produits.add(q);
-      _marquerAjoute(q);
-      for (final e in emplacements.where((e) => e.produitId == p.id).toList()) {
-        emplacements.add(Emplacement(e.magasinId, q.id, e.secteurId));
-      }
-    }
-    if (mq.isNotEmpty) ajouterMarque(q, mq);
-    final m = mq.isEmpty ? null : _trouve(marques, (x) => x.nom.toLowerCase() == mq.toLowerCase());
-    if (q.id != p.id) {
-      final i = l.lignes.indexOf(g);
-      if (ligne(l, q.id) != null) {
-        l.lignes.removeAt(i);
-      } else {
-        q.nbUtilisations++;
-        l.lignes[i] = LigneListe(
-            produitId: q.id,
-            marqueId: m?.id,
-            packagingId: g.packagingId,
-            quantite: g.quantite,
-            promotion: g.promotion,
-            consigne: g.consigne);
-      }
+    if (mq.isEmpty) {
+      g.marqueId = null;
     } else {
-      g.marqueId = m?.id;
+      final m = marqueNommee(mq);
+      if (!p.marqueIds.contains(m.id)) p.marqueIds.add(m.id);
+      g.marqueId = m.id;
     }
     _toucheConstruction(l);
     modifie();
-    return q;
+    return p;
+  }
+
+  /// Marques rattachées au produit (achetées par le foyer ou par d'autres foyers), sans celle que son nom
+  /// porte déjà : ce sont ses déclinaisons proposées à la recherche.
+  List<String> declinaisons(Produit p) {
+    final nom = p.nom.toLowerCase();
+    final res = <String>[];
+    for (final id in p.marqueIds) {
+      final n = marque(id)?.nom;
+      if (n == null || n.trim().isEmpty || nom.contains(n.toLowerCase())) continue;
+      if (!res.any((x) => x.toLowerCase() == n.toLowerCase())) res.add(n);
+    }
+    return res..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  }
+
+  /// Reprise des anciens produits de marque (08/11/2026) : « Camembert Président », produit ajouté ou reçu
+  /// dont le générique « Camembert » existe, devient le générique avec la marque Président sur ses lignes
+  /// (listes, historique, listes types) ; Président est rattachée à Camembert, l'ancien produit est masqué.
+  /// Rend le nombre de produits repris.
+  int reprendreProduitsDeMarque() {
+    var n = 0;
+    final parNom = <String, Produit>{};
+    for (final p in produits) {
+      parNom.putIfAbsent(p.nom.trim().toLowerCase(), () => p);
+    }
+    for (final q in [...produits]) {
+      if (!estAjoute(q) && !estRecu(q)) continue;
+      if (masques.contains(q.id)) continue;
+      final nomQ = q.nom.trim().toLowerCase();
+      Produit? p;
+      Marque? m;
+      for (final id in q.marqueIds) {
+        final mq = marque(id);
+        if (mq == null) continue;
+        final b = mq.nom.trim().toLowerCase();
+        if (b.isEmpty || !nomQ.endsWith(' $b')) continue;
+        final g = parNom[nomQ.substring(0, nomQ.length - b.length - 1).trim()];
+        if (g != null && g.id != q.id) {
+          p = g;
+          m = mq;
+          break;
+        }
+      }
+      if (p == null || m == null) continue;
+      void reprendre(List<LigneListe> lignes) {
+        for (var i = 0; i < lignes.length; i++) {
+          final g = lignes[i];
+          if (g.produitId != q.id) continue;
+          if (lignes.any((x) => x.produitId == p!.id)) {
+            final x = lignes.firstWhere((x) => x.produitId == p!.id);
+            x.marqueId ??= m!.id;
+            lignes.removeAt(i--);
+          } else {
+            lignes[i] = LigneListe(
+                produitId: p!.id,
+                marqueId: m!.id,
+                packagingId: g.packagingId,
+                quantite: g.quantite,
+                promotion: g.promotion,
+                cochePar: g.cochePar,
+                cocheLe: g.cocheLe,
+                consigne: g.consigne);
+          }
+        }
+      }
+
+      for (final l in listes) {
+        reprendre(l.lignes);
+      }
+      for (final t in listesTypes) {
+        reprendre(t.lignes);
+      }
+      if (!p.marqueIds.contains(m.id)) p.marqueIds.add(m.id);
+      p.nbUtilisations += q.nbUtilisations;
+      masques.add(q.id);
+      n++;
+    }
+    if (n > 0) modifie();
+    return n;
+  }
+
+  /// Déclinaisons achetées par le foyer, à partager avec tous les foyers (08/11/2026, Aristide :
+  /// « l'enrichissement doit être fait par l'usage et non centralisé ») : pour chaque produit rangé coché avec
+  /// une marque dans des courses terminées, « Rayon/Secteur/Produit » → marques. Trié : même texte à
+  /// données égales.
+  Map<String, List<String>> declinaisonsAchetees() {
+    final decl = <String, Set<String>>{};
+    for (final l in listes) {
+      if (l.statut != StatutListe.terminee) continue;
+      for (final g in l.lignes) {
+        if (!g.coche) continue;
+        final mq = marque(g.marqueId)?.nom;
+        final p = produit(g.produitId);
+        if (mq == null || p == null || Moderation.nomRefuse(mq, marque: true) != null) continue;
+        if (p.nom.toLowerCase().contains(mq.toLowerCase()) || p.nom.contains('/') || Moderation.nomRefuse(p.nom) != null) continue;
+        final s = secteurCatalogue(p.id);
+        final r = s == null ? null : rayon(s.rayonId);
+        if (s == null || r == null || r.nom.contains('/') || s.nom.contains('/')) continue;
+        if (estExclu(exclusCommun, rayon: r.nom, secteur: s.nom, produit: p.nom)) continue;
+        decl.putIfAbsent('${r.nom}/${s.nom}/${p.nom}', () => {}).add(mq);
+      }
+    }
+    final cles = (decl.keys.toList()..sort()).take(Moderation.plafondProduits);
+    return {for (final c in cles) c: (decl[c]!.toList()..sort())};
+  }
+
+  /// Rattache aux produits les déclinaisons déposées par les foyers ([lots] : « Rayon/Secteur/Produit » →
+  /// marques), après les règles contre les mauvais usages : foyer bloqué ou dépôt trop gros écarté, noms
+  /// refusés ignorés. Une marque se rattache au produit du même nom dans le même secteur, rien n'est créé.
+  /// Rend le nombre de marques rattachées.
+  int appliquerDeclinaisons(Map<String, Map<String, dynamic>> lots) {
+    var n = 0;
+    String bas(String t) => Moderation.normaliser(t);
+    for (final MapEntry(key: foyer, value: j) in lots.entries) {
+      if (foyersBloques.contains(foyer) || j.length > Moderation.plafondProduits) continue;
+      for (final e in j.entries) {
+        final parts = e.key.split('/');
+        if (parts.length != 3 || parts.any((x) => x.trim().isEmpty || Moderation.nomRefuse(x) != null) || e.value is! List) continue;
+        final ref = _trouve(rayonsCatalogue, (r) => bas(r.nom) == bas(parts[0]));
+        final s = ref == null ? null : _trouve(secteursDu(ref.id), (x) => bas(x.nom) == bas(parts[1]));
+        final p = s == null ? null : _trouve(_tousDuSecteur(s), (x) => bas(x.nom) == bas(parts[2]));
+        if (p == null) continue;
+        for (final mq in (e.value as List).take(20).whereType<String>()) {
+          if (mq.trim().isEmpty || Moderation.nomRefuse(mq, marque: true) != null) continue;
+          if (p.nom.toLowerCase().contains(mq.trim().toLowerCase())) continue;
+          final m = marqueNommee(mq);
+          if (!p.marqueIds.contains(m.id)) {
+            p.marqueIds.add(m.id);
+            n++;
+          }
+        }
+      }
+    }
+    if (n > 0) modifie();
+    return n;
   }
 
   void definirConsigne(Liste l, String produitId, String? consigne) {
@@ -3305,6 +3405,12 @@ class Etat extends ChangeNotifier {
           if (p != null) {
             // Ajouté par le foyer, maintenant au catalogue commun : il en fait partie.
             produitsPerso.remove(p.id);
+            // 08/11/2026 : les marques du catalogue commun s'ajoutent aux déclinaisons du produit.
+            for (final mq in (pj['marques'] as List? ?? const []).whereType<String>()) {
+              if (mq.trim().isEmpty) continue;
+              final m = marqueNommee(mq);
+              if (!p.marqueIds.contains(m.id)) p.marqueIds.add(m.id);
+            }
           } else {
             final id = 'pc-${_cleNom(nom)}';
             p = Produit(plusieurs && _trouve(produits, (x) => x.id == id) != null ? 'pc-${_cleNom(sn)}-${_cleNom(nom)}' : id, nom, [], [], 0);
