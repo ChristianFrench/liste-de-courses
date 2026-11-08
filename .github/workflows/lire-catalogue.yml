@@ -27,4 +27,11 @@ jobs:
           if t.startswith('gz:'): t = gzip.decompress(base64.b64decode(t[3:])).decode()
           j = json.loads(t)
           print({k: j.get(k) for k in ('version', 'numero', 'date')}, 'rayons', len(j.get('rayons', [])))
+          # Liste des rayons et secteurs publiés (catalogue commun, public).
+          print('== LISTE')
+          for r in j.get('rayons', []):
+              print('R|' + r.get('nom', ''))
+              for s in r.get('secteurs', []):
+                  print('S|' + s.get('nom', ''))
+          print('== FIN')
           PY
