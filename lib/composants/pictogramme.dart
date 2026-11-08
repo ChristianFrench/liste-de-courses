@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../donnees/images_choisies.dart';
 import '../donnees/images_perso.dart';
 import '../donnees/pictos.dart';
+import '../donnees/pictos_composes.dart';
 import '../donnees/pictos_emoji.dart';
 import '../donnees/pictos_fluent.dart';
 import 'icone.dart';
@@ -76,7 +77,11 @@ String nomImage(String cle) => imagesPerso[cle]?.texte ?? cle.split('--').last.r
 List<String> get pictosPerso => imagesPerso.keys.toList()..sort((a, b) => nomImage(a).toLowerCase().compareTo(nomImage(b).toLowerCase()));
 
 bool _dispo(String c) =>
-    pictosDisponibles.contains(c) || pictosEmoji.contains(c) || pictosFluent.contains(c) || imagesPerso.containsKey(c);
+    pictosDisponibles.contains(c) ||
+    pictosEmoji.contains(c) ||
+    pictosComposes.contains(c) ||
+    pictosFluent.contains(c) ||
+    imagesPerso.containsKey(c);
 
 String? cleRayon(String nom) {
   final s = _slug(nom);
@@ -93,6 +98,7 @@ String? cleSecteur(String rayon, String nom) {
   final choisie = imagesChoisies['${_slug(rayon)}--$s'];
   if (choisie != null && _dispo(choisie)) return choisie;
   final r = cleRayon(rayon) ?? _slug(rayon);
+  if (pictosComposes.contains('$r--$s')) return '$r--$s';
   if (pictosDisponibles.contains('$r--$s')) return '$r--$s';
   for (final c in pictosDisponibles) {
     if (c.endsWith('--$s')) return c;
@@ -128,7 +134,7 @@ class Pictogramme extends StatelessWidget {
       : Image.asset(
           cle!.startsWith('fluent--')
               ? 'assets/pictos/fluent3d/${cle!.substring(8)}.webp'
-              : pictosEmoji.contains(cle)
+              : pictosEmoji.contains(cle) || pictosComposes.contains(cle)
                   ? 'assets/pictos/noto3d/$cle.png'
                   : 'assets/pictos/png/$cle.png',
           width: taille, height: taille, filterQuality: FilterQuality.medium, excludeFromSemantics: true);
@@ -257,7 +263,7 @@ EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images)
 /// alphabétique du nom (la même chose en Noto 3D et en Fluent 3D côte à côte).
 List<String> get toutesLesImages {
   String nom(String c) => clePerso(nomImage(c)).substring(7);
-  return {...pictosEmoji, ...pictosDisponibles, ...pictosFluent, ...imagesPerso.keys}.toList()
+  return {...pictosEmoji, ...pictosComposes, ...pictosDisponibles, ...pictosFluent, ...imagesPerso.keys}.toList()
     ..sort((a, b) => nom(a) != nom(b) ? nom(a).compareTo(nom(b)) : a.compareTo(b));
 }
 

@@ -97,4 +97,11 @@ void main() {
     b.retirerImagePerso(nouvelle);
     expect(b.images.containsKey('frais'), isFalse);
   });
+
+  test('secteurs au comptoir : icône composée (libre-service + sonnette)', () {
+    expect(cleSecteur('Fromagerie', 'Fromages au comptoir'), 'fromagerie--fromages-au-comptoir');
+    expect(cleSecteur('Boucherie', 'Viandes et volailles au comptoir'), 'boucherie--viandes-et-volailles-au-comptoir');
+    expect(cleSecteur('Volaille', 'Rôtisserie'), 'volaille--rotisserie');
+    expect(etatIconeSecteur('Traiteur', 'Traiteur au comptoir', const {}), EtatIcone.exacte);
+  });
 }

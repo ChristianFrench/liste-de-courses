@@ -127,7 +127,6 @@ const pictosEmoji = <String>{
   'viennoiserie-et-patisserie--patisserie',
   'viennoiserie-et-patisserie--viennoiserie',
   'volaille',
-  'volaille--rotisserie',
   'volaille--volaille-libre-service',
   'reserve--ampoule',
   'reserve--baguette',
