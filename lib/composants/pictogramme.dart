@@ -105,7 +105,11 @@ String? cleSecteur(String rayon, String nom) {
   final s = _slug(nom);
   final choisie = imagesChoisies['${_slug(rayon)}--$s'];
   if (choisie != null && _dispo(choisie)) return choisie;
-  final r = cleRayon(rayon) ?? _slug(rayon);
+  // Icônes « maison » des secteurs (08/11/2026, 130 images d'Aristide), prioritaires.
+  final rs = _slug(rayon);
+  if (pictosMaison.contains('$rs--$s')) return '$rs--$s';
+  final r = cleRayon(rayon) ?? rs;
+  if (pictosMaison.contains('$r--$s')) return '$r--$s';
   if (pictosComposes.contains('$r--$s')) return '$r--$s';
   if (pictosDisponibles.contains('$r--$s')) return '$r--$s';
   for (final c in pictosDisponibles) {

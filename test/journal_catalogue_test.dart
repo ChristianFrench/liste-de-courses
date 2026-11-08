@@ -114,6 +114,12 @@ void main() {
     expect(cleUnivers(autresRayons), isNull);
     expect(etatIconeRayon('Saisonnier', const {}), EtatIcone.exacte);
     expect(cleRayon('Entretien / Droguerie'), 'entretien-droguerie');
+    // Secteurs (130 images d'Aristide, 08/11/2026).
+    expect(cleSecteur('Fruits et légumes', 'Fruits'), 'fruits-et-legumes--fruits');
+    expect(cleSecteur('Poissonnerie', 'Poissonnerie au comptoir'), 'poissonnerie--poissonnerie-au-comptoir');
+    expect(cleSecteur('Entretien et  Droguerie', 'Lessives et soin du linge'), 'entretien-et-droguerie--lessives-et-soin-du-linge');
+    expect(cleSecteur('Entretien / Droguerie', 'Papier'), 'entretien-droguerie--papier');
+    expect(etatIconeSecteur('Saisonnier', 'NOËL', const {}), EtatIcone.exacte);
   });
 
   test('domaines dans le catalogue commun', () {

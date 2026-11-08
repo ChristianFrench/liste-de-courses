@@ -34,4 +34,7 @@ jobs:
               for s in r.get('secteurs', []):
                   print('S|' + s.get('nom', ''))
           print('== FIN')
+          print('== IMAGES CHOISIES')
+          for k, v in sorted((j.get('images') or {}).items()):
+              print('I|' + k + ' = ' + str(v))
           PY

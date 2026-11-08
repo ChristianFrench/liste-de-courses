@@ -14,8 +14,16 @@ def cle(nom):
 
 os.makedirs('assets/pictos/maison', exist_ok=True)
 cles = []
-for f in sorted(glob.glob('outils/icones_maison/*.png')):
-    c = cle(os.path.basename(f)[:-4])
+# Rayons et univers : outils/icones_maison/<nom>.png ; secteurs (08/11/2026, 130 images d'Aristide) :
+# outils/icones_maison/secteurs/<clé du rayon>/<clé du secteur>.png → clé « <rayon>--<secteur> ».
+sources = [(cle(os.path.basename(f)[:-4]), f) for f in sorted(glob.glob('outils/icones_maison/*.png'))]
+for f in sorted(glob.glob('outils/icones_maison/secteurs/*/*.png')):
+    r, s = cle(os.path.basename(os.path.dirname(f))), cle(os.path.basename(f)[:-4])
+    sources.append((f'{r}--{s}', f))
+    # « Entretien / Droguerie » d'origine, « Entretien et Droguerie » depuis la version 2 du catalogue.
+    if r == 'entretien-et-droguerie':
+        sources.append((f'entretien-droguerie--{s}', f))
+for c, f in sources:
     im = Image.open(f).convert('RGBA')
     boite = im.getchannel('A').point(lambda a: 255 if a > 16 else 0).getbbox()
     if boite:
