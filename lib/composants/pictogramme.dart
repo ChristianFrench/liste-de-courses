@@ -95,6 +95,12 @@ String? cleRayon(String nom) {
   return pictosDisponibles.contains('reserve--$s') ? 'reserve--$s' : null;
 }
 
+/// Image d'un univers (08/11/2026, Aristide : 9 images « maison »), ou null pour garder l'icône Material.
+String? cleUnivers(String nom) {
+  final c = 'univers-${_slug(nom)}';
+  return pictosMaison.contains(c) ? c : null;
+}
+
 String? cleSecteur(String rayon, String nom) {
   final s = _slug(nom);
   final choisie = imagesChoisies['${_slug(rayon)}--$s'];

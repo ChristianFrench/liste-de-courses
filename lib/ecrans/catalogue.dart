@@ -2,7 +2,7 @@ import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
-import '../composants/pictogramme.dart' show Pictogramme, cleRayon, cleSecteur, cleChoixRayon, cleChoixSecteur;
+import '../composants/pictogramme.dart' show Pictogramme, cleUnivers, cleRayon, cleSecteur, cleChoixRayon, cleChoixSecteur;
 import '../composants/signe_perso.dart';
 import '../donnees/sauvegarde.dart';
 import '../donnees/modele.dart';
@@ -828,7 +828,9 @@ class _EcranCatalogueState extends State<EcranCatalogue> {
         cle: 'univers-$u',
         niveau: 1,
         nom: etat.nomUnivers(u),
-        signe: Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 40, color: Charte.encreNiveau),
+        signe: cleUnivers(u) != null
+            ? Pictogramme(cleUnivers(u), taille: 40)
+            : Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: 40, color: Charte.encreNiveau),
         nombre: rayonsU.length,
         ouvert: uOuvert,
         onTap: () => plis.basculer(_cleU(u)),

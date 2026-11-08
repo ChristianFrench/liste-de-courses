@@ -6,6 +6,7 @@ import 'package:liste_de_courses/donnees/images_perso.dart';
 import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/journal_catalogue.dart';
+import 'package:liste_de_courses/donnees/univers.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 
 Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<String, dynamic>> renommes = const []}) => {
@@ -107,6 +108,10 @@ void main() {
 
   test('icônes maison des rayons', () {
     expect(cleRayon('Saisonnier'), 'saisonnier');
+    for (final u in universDesRayons.keys) {
+      expect(cleUnivers(u), isNotNull, reason: u);
+    }
+    expect(cleUnivers(autresRayons), isNull);
     expect(etatIconeRayon('Saisonnier', const {}), EtatIcone.exacte);
     expect(cleRayon('Entretien / Droguerie'), 'entretien-droguerie');
   });
