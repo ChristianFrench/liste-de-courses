@@ -236,7 +236,11 @@ class CatalogueCommun extends ChangeNotifier {
         await Future<void>.delayed(const Duration(seconds: 2));
         return true;
       });
-      if (ok != null) notifyListeners();
+      if (ok != null) {
+        notifyListeners();
+        // Serveur joint : les déclinaisons de marque des foyers, sans faire attendre l'ouverture.
+        unawaited(echangerDeclinaisons());
+      }
     } catch (e) {
       debugPrint('Catalogue commun : $e');
     } finally {
@@ -245,7 +249,6 @@ class CatalogueCommun extends ChangeNotifier {
         echangerDeclinaisons(lire: false);
       });
     }
-    await echangerDeclinaisons();
   }
 
   // ------------------------------------------------------------ Déclinaisons de marque (08/11/2026)

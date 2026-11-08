@@ -127,7 +127,7 @@ class _PageCatalogueMarquesState extends State<PageCatalogueMarques> {
   @override
   Widget build(BuildContext context) {
     final b = this.b;
-    if (b == null) return const Center(child: CircularProgressIndicator());
+    if (b == null) return Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)));
     final marques = b.marquesDesProduits();
     final nbRattachements = marques.values.fold(0, (n, l) => n + l.length);
     final nouvelles = b.declinaisonsNouvelles(foyers ?? const {});
@@ -195,20 +195,24 @@ class _PageCatalogueMarquesState extends State<PageCatalogueMarques> {
         const SizedBox(width: 12),
         Expanded(child: Text(texte, style: Charte.texte(15))),
         const SizedBox(width: 8),
-        Bouton(
+        SizedBox(
+          width: 200,
+          child: Bouton(
           key: const ValueKey('marques-relire'),
           texte: 'Relire les foyers',
           icone: Icons.refresh,
           onTap: _lecture ? null : _lireFoyers,
-        ),
+        )),
         const SizedBox(width: 8),
-        Bouton(
+        SizedBox(
+          width: 140,
+          child: Bouton(
           key: const ValueKey('marques-integrer'),
           texte: 'Intégrer',
           plein: true,
           icone: Icons.download_done,
           onTap: nouvelles.isEmpty ? null : _integrer,
-        ),
+        )),
       ]),
     );
   }
@@ -299,15 +303,18 @@ class _PageCatalogueMarquesState extends State<PageCatalogueMarques> {
                       const SizedBox(height: 2),
                       Text(x.correction, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
                       const SizedBox(height: 8),
-                      Wrap(spacing: 8, runSpacing: 6, children: [
-                        Bouton(
+                      Row(children: [
+                        SizedBox(
+                          width: 130,
+                          child: Bouton(
                           texte: 'Corriger',
                           plein: true,
                           hauteur: 34,
                           taille: 14,
                           onTap: () => _modifie([b!.corriger(x)]),
-                        ),
-                        Bouton(texte: 'Accepter', hauteur: 34, taille: 14, onTap: () => _accepter(x)),
+                        )),
+                        const SizedBox(width: 8),
+                        SizedBox(width: 130, child: Bouton(texte: 'Accepter', hauteur: 34, taille: 14, onTap: () => _accepter(x))),
                       ]),
                     ]),
                   );

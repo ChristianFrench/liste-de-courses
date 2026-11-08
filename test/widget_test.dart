@@ -679,10 +679,10 @@ void main() {
       expect(etat.ligne(l, lactel.id)?.consigne, 'bien frais', reason: 'la ligne garde sa consigne');
       etat.marquesType = {};
 
-      // 8 : appui long : retiré (produit ajouté par le foyer : par son menu)
+      // 8 : appui long : retiré (produit d'origine : directement ; un produit ajouté passe par son menu)
       await tester.longPress(find.descendant(of: find.byKey(ValueKey('condense-${lactel.id}')), matching: find.byType(RichText)).first);
       await tester.pumpAndSettle();
-      await _toucher(tester, find.text('Retirer de la liste'));
+      if (find.text('Retirer de la liste').evaluate().isNotEmpty) await _toucher(tester, find.text('Retirer de la liste'));
       expect(etat.ligne(l, lactel.id), isNull);
       await tester.pump(const Duration(seconds: 6));
     });
@@ -704,7 +704,8 @@ void main() {
       expect(find.byKey(const ValueKey('option-recherche-0')), findsNothing, reason: 'moins de trois lettres');
       await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'jamb');
       await tester.pumpAndSettle();
-      expect(find.text('Frais › Charcuterie'), findsOneWidget);
+      // Le produit générique d'abord, puis ses déclinaisons de marque (08/11/2026), dans le même secteur.
+      expect(find.text('Frais › Charcuterie'), findsWidgets);
       await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
       await tester.pumpAndSettle();
       expect(_nbEnPreparation(tester), 1);
