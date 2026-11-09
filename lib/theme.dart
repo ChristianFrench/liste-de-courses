@@ -235,9 +235,9 @@ class Charte {
         hintStyle: const TextStyle(fontFamily: police, color: texteSecondaire),
         // Modèle unique des zones de saisie (29/10/2026) : le libellé posé sur le trait du haut, toujours visible.
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        // 03/11/2026 (Aristide) : libellé plus grand (posé sur le trait, il s'affiche aux 3/4 de cette taille).
-        labelStyle: const TextStyle(fontFamily: police, fontSize: 22, fontWeight: FontWeight.w600, color: texteSecondaire),
-        floatingLabelStyle: const TextStyle(fontFamily: police, fontSize: 22, fontWeight: FontWeight.w600, color: texteSecondaire),
+        // Libellé posé sur le trait (affiché aux 3/4 de cette taille) : 09/11/2026 (Aristide) plus petit, sans graisse.
+        labelStyle: const TextStyle(fontFamily: police, fontSize: 18, fontWeight: FontWeight.w400, color: texteSecondaire),
+        floatingLabelStyle: const TextStyle(fontFamily: police, fontSize: 18, fontWeight: FontWeight.w400, color: texteSecondaire),
       ),
     );
   }

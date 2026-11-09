@@ -1121,6 +1121,12 @@ class ChoixDeroulant<T> extends StatelessWidget {
   final ValueChanged<T> onChange;
   final String? libelle;
 
+  /// 09/11/2026 (Aristide) : l'aperçu (palette…) reste dans le cadre, sans toucher ses traits.
+  static Widget _contenu(Widget apercu) => ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 18, maxWidth: 120),
+        child: FittedBox(fit: BoxFit.scaleDown, child: apercu),
+      );
+
   @override
   Widget build(BuildContext context) {
     return InputDecorator(
@@ -1145,10 +1151,10 @@ class ChoixDeroulant<T> extends StatelessWidget {
                         ? Row(children: [
                             Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
                             const SizedBox(width: 10),
-                            apercus![e.key]!,
+                            _contenu(apercus![e.key]!),
                           ])
                         : Row(children: [
-                            apercus![e.key]!,
+                            _contenu(apercus![e.key]!),
                             const SizedBox(width: 10),
                             Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
                           ]),
