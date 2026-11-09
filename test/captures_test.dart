@@ -149,8 +149,8 @@ void main() {
     await tester.tapAt(const Offset(195, 20));
     await tester.pumpAndSettle();
     // Le rayon se déplie, puis le secteur touché déplie ses produits sur place
-    await _toucher(tester, find.text('FRAIS'));
-    await _toucher(tester, find.text('CRÈMERIE'));
+    await _toucher(tester, find.text('Frais'));
+    await _toucher(tester, find.text('Crèmerie'));
     await _capture('15 Catalogue-Secteur');
     await _toucher(tester, find.byTooltip('Modifier Crèmerie'));
     await _toucher(tester, find.text('+ Nouveau produit'));

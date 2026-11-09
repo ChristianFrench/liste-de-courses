@@ -574,7 +574,7 @@ class TitreGroupe extends StatelessWidget {
           padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? pictoGauche + (pictoTaille ?? taillePictoListes) + 8 : 16), 4, 14, 4),
           child: Row(children: [
             if (signe != null) ...[signe, const SizedBox(width: 10)],
-            Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
+            Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
             if (ajoute) Text(' +', style: blanc),
             if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: encre)),
             if (droite != null) Text(droite!, style: blanc),
@@ -1446,7 +1446,7 @@ Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
                         height: 36,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         alignment: Alignment.centerLeft,
-                        child: Text((noms[nom] ?? nom).toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                        child: Text(noms[nom] ?? nom, maxLines: 1, overflow: TextOverflow.ellipsis,
                             style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
                       ),
                     );
@@ -2089,7 +2089,7 @@ class NiveauArbre extends StatelessWidget {
             height: _hauteur,
             padding: EdgeInsets.fromLTRB(gauche + (signe == null ? 8 : tailleSigne + 8), 0, 4, 0),
             child: Row(children: [
-              Expanded(child: Text(nom.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
+              Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
               if (ajoute) Text(' +', style: style),
               if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: style)),
               // 02/11/2026 (Aristide) : le bouton propre au niveau (marques du secteur) avant le crayon et le chevron.

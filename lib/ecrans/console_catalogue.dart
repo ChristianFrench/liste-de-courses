@@ -797,7 +797,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           child: Row(children: [
             SizedBox(width: 36, child: Center(child: _signeDomaine(u, 32))),
             const SizedBox(width: 10),
-            Expanded(child: Text(u.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
+            Expanded(child: Text(u, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
             Text(_pluriel(n, 'rayon'), style: Charte.texte(13, couleur: Charte.blanc)),
           ]),
         ),
@@ -1320,7 +1320,7 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
           SizedBox(
             width: 260,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-              Text(rayon == null ? nom.toUpperCase() : nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true)),
+              Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true)),
               Text('${rayon == null ? 'Rayon' : 'Secteur de $rayon'} · ${libelles[etat]}',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
