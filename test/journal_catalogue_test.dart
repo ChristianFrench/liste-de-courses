@@ -56,7 +56,8 @@ void main() {
     expect(legumes.produits.single.nom, 'Pommes');
     expect(propositionsIcone('Chats', ['Croquettes']), isNotEmpty);
     expect(etatIconeSecteur('Animaux', 'Chats', const {}), EtatIcone.exacte);
-    expect(etatIconeSecteur('Animaux', 'Chats', {cleChoixSecteur('Animaux', 'Chats'): 'reserve--cafe'}), EtatIcone.choisie);
+    expect(etatIconeSecteur('Animaux', 'Chats', {cleChoixSecteur('Animaux', 'Chats'): 'reserve--cafe'}), EtatIcone.exacte, reason: 'image maison avant le choix');
+    expect(etatIconeSecteur('Divers', 'Truc', {cleChoixSecteur('Divers', 'Truc'): 'reserve--cafe'}), EtatIcone.choisie);
   });
 
   test('console : secteur en rayon, rayon en secteur', () {
@@ -120,6 +121,9 @@ void main() {
     expect(cleSecteur('Entretien et  Droguerie', 'Lessives et soin du linge'), 'entretien-et-droguerie--lessives-et-soin-du-linge');
     expect(cleSecteur('Entretien / Droguerie', 'Papier'), 'entretien-droguerie--papier');
     expect(etatIconeSecteur('Saisonnier', 'NOËL', const {}), EtatIcone.exacte);
+    // Les images maison passent avant les choix faits à la main (09/11/2026).
+    expect(iconeSecteur('Saisonnier', 'Halloween', const {'saisonnier--halloween': 'bibliotheque--citrouille'}), 'saisonnier--halloween');
+    expect(iconeRayon('Saisonnier', const {'saisonnier': 'perso--saisons'}), 'saisonnier');
   });
 
   test('domaines dans le catalogue commun', () {

@@ -87,9 +87,11 @@ bool _dispo(String c) =>
 
 String? cleRayon(String nom) {
   final s = _slug(nom);
+  // 09/11/2026 (Aristide) : ses images « maison » passent avant les images choisies à la main.
+  if (pictosMaison.contains(s)) return s;
   final choisie = imagesChoisies[s];
   if (choisie != null && _dispo(choisie)) return choisie;
-  if (pictosMaison.contains(s) || pictosDisponibles.contains(s)) return s;
+  if (pictosDisponibles.contains(s)) return s;
   final a = _alias[s];
   if (a != null && pictosDisponibles.contains(a)) return a;
   return pictosDisponibles.contains('reserve--$s') ? 'reserve--$s' : null;
@@ -101,15 +103,32 @@ String? cleUnivers(String nom) {
   return pictosMaison.contains(c) ? c : null;
 }
 
+/// Image « maison » d'un rayon ou d'un secteur (images d'Aristide), qui passe avant tout choix.
+String? cleMaisonRayon(String rayon) => pictosMaison.contains(_slug(rayon)) ? _slug(rayon) : null;
+
+String? cleMaisonSecteur(String rayon, String nom) {
+  final rs = _slug(rayon), s = _slug(nom);
+  if (pictosMaison.contains('$rs--$s')) return '$rs--$s';
+  final r = cleRayon(rayon) ?? rs;
+  return pictosMaison.contains('$r--$s') ? '$r--$s' : null;
+}
+
+/// Icône affichée dans l'éditeur : maison, sinon le choix de l'éditeur ([images]), sinon l'automatique.
+String? iconeRayon(String rayon, Map<String, String> images) => cleMaisonRayon(rayon) ?? images[cleChoixRayon(rayon)] ?? cleRayon(rayon);
+
+String? iconeSecteur(String rayon, String nom, Map<String, String> images) =>
+    cleMaisonSecteur(rayon, nom) ?? images[cleChoixSecteur(rayon, nom)] ?? cleSecteur(rayon, nom);
+
 String? cleSecteur(String rayon, String nom) {
   final s = _slug(nom);
-  final choisie = imagesChoisies['${_slug(rayon)}--$s'];
-  if (choisie != null && _dispo(choisie)) return choisie;
-  // Icônes « maison » des secteurs (08/11/2026, 130 images d'Aristide), prioritaires.
+  // Icônes « maison » des secteurs (08/11/2026, 130 images d'Aristide) : avant tout, même avant les images
+  // choisies à la main (09/11/2026, Aristide).
   final rs = _slug(rayon);
   if (pictosMaison.contains('$rs--$s')) return '$rs--$s';
   final r = cleRayon(rayon) ?? rs;
   if (pictosMaison.contains('$r--$s')) return '$r--$s';
+  final choisie = imagesChoisies['$rs--$s'];
+  if (choisie != null && _dispo(choisie)) return choisie;
   if (pictosComposes.contains('$r--$s')) return '$r--$s';
   if (pictosDisponibles.contains('$r--$s')) return '$r--$s';
   for (final c in pictosDisponibles) {
@@ -261,6 +280,7 @@ enum EtatIcone { choisie, exacte, approchee, aucune }
 
 /// [images] : les images choisies par l'éditeur (clé de choix → pictogramme).
 EtatIcone etatIconeRayon(String nom, Map<String, String> images) {
+  if (cleMaisonRayon(nom) != null) return EtatIcone.exacte;
   if (images.containsKey(cleChoixRayon(nom))) return EtatIcone.choisie;
   final s = _slug(nom);
   if (_dispo(s) || (_alias[s] != null && _dispo(_alias[s]!))) return EtatIcone.exacte;
@@ -268,6 +288,7 @@ EtatIcone etatIconeRayon(String nom, Map<String, String> images) {
 }
 
 EtatIcone etatIconeSecteur(String rayon, String nom, Map<String, String> images) {
+  if (cleMaisonSecteur(rayon, nom) != null) return EtatIcone.exacte;
   if (images.containsKey(cleChoixSecteur(rayon, nom))) return EtatIcone.choisie;
   final r = cleRayon(rayon) ?? _slug(rayon);
   if (_dispo('$r--${_slug(nom)}') || _dispo('${_slug(rayon)}--${_slug(nom)}')) return EtatIcone.exacte;

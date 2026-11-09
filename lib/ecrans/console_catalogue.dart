@@ -549,7 +549,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               for (final x in autres)
                 ListTile(
                   key: ValueKey('vers-rayon-${x.nom}'),
-                  leading: Pictogramme(b.images[cleChoixRayon(x.nom)] ?? cleRayon(x.nom), taille: 28),
+                  leading: Pictogramme(iconeRayon(x.nom, b.images), taille: 28),
                   title: Text(x.nom, style: Charte.texte(15)),
                   onTap: () => Navigator.of(ctx).pop(x),
                 ),
@@ -886,7 +886,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         final r = l.r;
         contenu = Row(children: [
           Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
-          _icone(b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom), 30, () => _choisirImage(cleChoixRayon(r.nom), r.nom), r.nom),
+          _icone(iconeRayon(r.nom, b.images), 30, () => _choisirImage(cleChoixRayon(r.nom), r.nom), r.nom),
           const SizedBox(width: 8),
           Expanded(child: _libelle(r, r.nom, Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
           Text(_pluriel(r.secteurs.length, 'secteur'), style: Charte.texte(13, couleur: Charte.encreNiveau)),
@@ -897,7 +897,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         contenu = Row(children: [
           const SizedBox(width: 30),
           Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 20, color: Charte.encreNiveau),
-          _icone(b.images[cleChoixSecteur(l.r.nom, s.nom)] ?? cleSecteur(l.r.nom, s.nom), 26,
+          _icone(iconeSecteur(l.r.nom, s.nom, b.images), 26,
               () => _choisirImage(cleChoixSecteur(l.r.nom, s.nom), s.nom), s.nom),
           const SizedBox(width: 8),
           Expanded(child: _libelle(s, s.nom, Charte.texte(14.5, gras: true))),
@@ -1279,7 +1279,7 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
   Widget build(BuildContext context) {
     final lignes = <(String cle, String nom, String? rayon, EtatIcone etat, String? actuelle, List<String> produits)>[];
     for (final r in b.catalogue.rayons) {
-      lignes.add((cleChoixRayon(r.nom), r.nom, null, etatIconeRayon(r.nom, b.images), b.images[cleChoixRayon(r.nom)] ?? cleRayon(r.nom),
+      lignes.add((cleChoixRayon(r.nom), r.nom, null, etatIconeRayon(r.nom, b.images), iconeRayon(r.nom, b.images),
           [for (final s in r.secteurs) s.nom]));
       for (final s in r.secteurs) {
         lignes.add((
@@ -1287,7 +1287,7 @@ class _PanneauIconographieState extends State<PanneauIconographie> {
           s.nom,
           r.nom,
           etatIconeSecteur(r.nom, s.nom, b.images),
-          b.images[cleChoixSecteur(r.nom, s.nom)] ?? cleSecteur(r.nom, s.nom),
+          iconeSecteur(r.nom, s.nom, b.images),
           [for (final p in s.produits) p.nom],
         ));
       }
