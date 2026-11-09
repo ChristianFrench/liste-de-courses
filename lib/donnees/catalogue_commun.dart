@@ -1245,19 +1245,25 @@ class Brouillon {
   /// réveillon ») : rayons, secteurs et produits (09/11/2026, Aristide). Rend le nombre de noms changés.
   int corrigerMajuscules() {
     var n = 0;
+    // Aussi les espaces en double (« Entretien et  Droguerie »).
+    String? corrige(String nom) {
+      final c = enMajuscules(nom) ? ecritureNormale(nom) : nom.trim().replaceAll(RegExp(r'\s{2,}'), ' ');
+      return c == nom ? null : c;
+    }
+
     for (final r in catalogue.rayons) {
-      if (enMajuscules(r.nom)) {
-        renommerRayon(r, ecritureNormale(r.nom));
+      if (corrige(r.nom) case final c?) {
+        renommerRayon(r, c);
         n++;
       }
       for (final x in r.secteurs) {
-        if (enMajuscules(x.nom)) {
-          renommerSecteur(r, x, ecritureNormale(x.nom));
+        if (corrige(x.nom) case final c?) {
+          renommerSecteur(r, x, c);
           n++;
         }
         for (final p in x.produits) {
-          if (enMajuscules(p.nom)) {
-            renommerProduit(p, ecritureNormale(p.nom));
+          if (corrige(p.nom) case final c?) {
+            renommerProduit(p, c);
             n++;
           }
         }
@@ -1276,7 +1282,12 @@ class Brouillon {
   static String ecritureNormale(String t) {
     var x = t.trim().toLowerCase();
     if (x.isEmpty) return x;
+    x = x.replaceAll(RegExp(r'\s{2,}'), ' ');
     x = x[0].toUpperCase() + x.substring(1);
+    x = x.replaceAll('nouvel an', 'Nouvel An').replaceAll('Nouvel an', 'Nouvel An');
+    for (final f in ['noël', 'pâques', 'halloween', 'chandeleur']) {
+      x = x.replaceAll(f, f[0].toUpperCase() + f.substring(1));
+    }
     return x.replaceAllMapped(RegExp(r'(saint|sainte)-(\w)', caseSensitive: false, unicode: true),
         (m) => '${m[1]![0].toUpperCase()}${m[1]!.substring(1)}-${m[2]!.toUpperCase()}');
   }

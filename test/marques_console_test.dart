@@ -75,14 +75,18 @@ void main() {
             {'nom': 'SAINT-VALENTIN', 'taille': 1, 'produits': []},
             {'nom': 'FÊTE DES MÈRES', 'taille': 1, 'produits': [{'nom': 'BOUQUET', 'taille': 1}]},
             {'nom': 'Plein air et camping', 'taille': 1, 'produits': []},
+            {'nom': 'NOUVEL AN ET RÉVEILLON', 'taille': 1, 'produits': []},
+            {'nom': 'Entretien et  Droguerie', 'taille': 1, 'produits': []},
           ]
         }
       ]
     });
-    expect(b.corrigerMajuscules(), 4);
+    expect(b.corrigerMajuscules(), 6);
     final r = b.catalogue.rayons.single;
     expect(r.nom, 'Saisonnier');
-    expect(r.secteurs.map((s) => s.nom), ['Saint-Valentin', 'Fête des mères', 'Plein air et camping']);
+    expect(r.secteurs.map((s) => s.nom),
+        ['Saint-Valentin', 'Fête des mères', 'Plein air et camping', 'Nouvel An et réveillon', 'Entretien et Droguerie']);
+    expect(Brouillon.ecritureNormale('JOYEUX NOËL ET PÂQUES'), 'Joyeux Noël et Pâques');
     expect(r.secteurs[1].produits.single.nom, 'Bouquet');
     expect(b.corrigerMajuscules(), 0);
     expect(b.renommes.first, {'type': 'rayon', 'ancien': 'SAISONNIER', 'nouveau': 'Saisonnier'});
