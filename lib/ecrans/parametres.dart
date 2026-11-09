@@ -88,6 +88,8 @@ Future<void> _neuf(BuildContext context) async {
   if (context.mounted) Nav.message(context, 'Foyer neuf');
 }
 
+const _nomsSaisons = {'printemps': 'Printemps', 'ete': 'Été', 'automne': 'Automne', 'hiver': 'Hiver'};
+
 /// Gérer › Paramètres › Apparence : palettes de couleurs.
 class EcranApparence extends _EcranVivant {
   const EcranApparence({super.key});
@@ -116,6 +118,26 @@ class EcranApparence extends _EcranVivant {
                   etat.choisirApparence(v);
                   Charte.choisirPalette(v);
                 },
+              ),
+              const SizedBox(height: 14),
+              // 09/11/2026 (Aristide) : quatre photos de fond, une par saison, au choix ou selon la date.
+              ChoixDeroulant<String>(
+                key: const ValueKey('saison-fond'),
+                libelle: 'Photo de fond',
+                valeur: etat.saisonFond,
+                choix: {
+                  'auto': 'Selon la saison (${_nomsSaisons[Etat.saisonDu(DateTime.now())]!.toLowerCase()})',
+                  for (final s in _nomsSaisons.keys) s: _nomsSaisons[s]!,
+                },
+                apercus: {
+                  for (final s in ['auto', ..._nomsSaisons.keys])
+                    s: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.asset('assets/fonds/${s == 'auto' ? Etat.saisonDu(DateTime.now()) : s}-vignette.jpg', width: 64, height: 32, fit: BoxFit.cover),
+                    ),
+                },
+                apercuADroite: true,
+                onChange: etat.choisirSaisonFond,
               ),
               const SizedBox(height: 14),
               ChoixDeroulant<String>(

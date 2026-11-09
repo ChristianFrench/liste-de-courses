@@ -692,6 +692,31 @@ class Etat extends ChangeNotifier {
 
   /// Débordement des images de secteur dans les listes : 'normal', 'reduit' ou 'aucun' (07/11/2026) ; propre à l'appareil.
   String debordIcones = 'normal';
+
+  /// Photo de fond des bandeaux (09/11/2026, Aristide) : 'auto' (selon la saison du jour), 'printemps', 'ete',
+  /// 'automne' ou 'hiver'.
+  String saisonFond = 'auto';
+
+  /// Prévient les bandeaux (souvent construits une fois pour toutes) d'un changement de photo de fond.
+  static final fondChange = ValueNotifier<String>('auto');
+
+  /// Saison d'une date : printemps au 20 mars, été au 21 juin, automne au 22 septembre, hiver au 21 décembre.
+  static String saisonDu(DateTime d) {
+    final j = d.month * 100 + d.day;
+    if (j >= 1221 || j < 320) return 'hiver';
+    if (j < 621) return 'printemps';
+    if (j < 922) return 'ete';
+    return 'automne';
+  }
+
+  /// L'image de fond des bandeaux, selon le choix d'Apparence (en automatique, change le jour de la saison).
+  String get photoFond => 'assets/fonds/${saisonFond == 'auto' ? saisonDu(DateTime.now()) : saisonFond}.jpg';
+
+  void choisirSaisonFond(String s) {
+    saisonFond = s;
+    fondChange.value = s;
+    modifie();
+  }
   ListeSuivie<Rayon> _rayons = ListeSuivie([]);
   List<Rayon> get rayons => _rayons;
   set rayons(List<Rayon> l) => _rayons = l is ListeSuivie<Rayon> ? l : ListeSuivie(l);
@@ -1241,6 +1266,8 @@ class Etat extends ChangeNotifier {
     apparence = options?['apparence'] as String?;
     iconesListes = options?['iconesListes'] as bool? ?? true;
     debordIcones = options?['debordIcones'] as String? ?? 'normal';
+    saisonFond = options?['saisonFond'] as String? ?? 'auto';
+    fondChange.value = saisonFond;
     taillePictoListes = tailleDebord(debordIcones);
     formatsAppliques = options?['formats'] == 1;
     lotsCompletes = options?['lots'] == 1;
@@ -1401,6 +1428,7 @@ class Etat extends ChangeNotifier {
             if (apparence != null) 'apparence': apparence,
             if (!iconesListes) 'iconesListes': false,
             if (debordIcones != 'normal') 'debordIcones': debordIcones,
+            if (saisonFond != 'auto') 'saisonFond': saisonFond,
             if (formatsAppliques) 'formats': 1,
             if (lotsCompletes) 'lots': 1,
             if (magasinsEnseignes) 'magasinsEnseignes': 1,

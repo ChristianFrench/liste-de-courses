@@ -105,8 +105,12 @@ class EcranAccueil extends StatelessWidget {
 class _EnTetePhoto extends StatelessWidget {
   const _EnTetePhoto();
 
+  // 09/11/2026 : la photo de fond suit le choix d'Apparence, même sur un bandeau déjà construit.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<String>(valueListenable: Etat.fondChange, builder: (context, _, __) => _construire(context));
+
+  Widget _construire(BuildContext context) {
     final haut = MediaQuery.of(context).padding.top;
     return GestureDetector(
           // Comme sur les bandeaux des autres fenêtres : glisser passe à l'onglet voisin.
@@ -116,7 +120,7 @@ class _EnTetePhoto extends StatelessWidget {
           },
           child: Stack(
           children: [
-            Positioned.fill(child: Image.asset('assets/accueil_photo.jpg', fit: BoxFit.cover, alignment: Alignment.topCenter)),
+            Positioned.fill(child: Image.asset(Etat.instance.photoFond, fit: BoxFit.cover, alignment: Alignment.topCenter)),
             // Voile léger (la photo reste claire) ; une ombre portée garde le texte blanc lisible.
             const Positioned.fill(
               child: DecoratedBox(

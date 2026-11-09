@@ -91,8 +91,8 @@ void main() {
     await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
     await tester.runAsync(() async {
       final ctx = tester.element(find.byType(Scaffold).first);
-      for (final f in ['icone_ronde', 'accueil_photo', 'emplettes/complet', 'emplettes/liste_crayon', 'emplettes/liste_chariot', 'emplettes/filtre']) {
-        await precacheImage(AssetImage('assets/$f.${f == 'accueil_photo' ? 'jpg' : 'png'}'), ctx);
+      for (final f in ['icone_ronde', 'fonds/ete', 'emplettes/complet', 'emplettes/liste_crayon', 'emplettes/liste_chariot', 'emplettes/filtre']) {
+        await precacheImage(AssetImage('assets/$f.${f == 'fonds/ete' ? 'jpg' : 'png'}'), ctx);
       }
       for (final c in pictosDisponibles) {
         await precacheImage(AssetImage('assets/pictos/png/$c.png'), ctx);

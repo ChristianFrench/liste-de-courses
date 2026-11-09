@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../ecrans/partage.dart' show montrerEtatSynchro;
 import '../navigation.dart';
@@ -49,8 +50,12 @@ class EnTeteFenetre extends StatelessWidget {
   /// Hauteur d'un bouton de l'en-tête (deuxième ligne).
   static const hauteurBouton = 44.0;
 
+  // 09/11/2026 : la photo de fond suit le choix d'Apparence, même sur un bandeau déjà construit.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<String>(valueListenable: Etat.fondChange, builder: (context, _, __) => _construire(context));
+
+  Widget _construire(BuildContext context) {
     const bouton = boutonEnTete;
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -63,10 +68,10 @@ class EnTeteFenetre extends StatelessWidget {
       // (la couleur pleine est réservée aux bandeaux des groupes de listes).
       // Deux lignes : le titre en entier (sur deux lignes au besoin), puis le sous-titre et les boutons.
       child: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF3A4A3A),
+        decoration: BoxDecoration(
+          color: const Color(0xFF3A4A3A),
           image: DecorationImage(
-            image: AssetImage('assets/accueil_photo.jpg'),
+            image: AssetImage(Etat.instance.photoFond),
             fit: BoxFit.cover,
             alignment: Alignment(0, -0.35),
             colorFilter: ColorFilter.mode(Color(0x38000000), BlendMode.darken),

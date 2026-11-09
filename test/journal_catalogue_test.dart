@@ -7,6 +7,7 @@ import 'package:liste_de_courses/composants/pictogramme.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart';
 import 'package:liste_de_courses/donnees/journal_catalogue.dart';
 import 'package:liste_de_courses/donnees/univers.dart';
+import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 
 Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<String, dynamic>> renommes = const []}) => {
@@ -23,6 +24,16 @@ Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<Str
     };
 
 void main() {
+  test('photo de fond selon la saison (09/11/2026)', () {
+    expect(Etat.saisonDu(DateTime(2026, 3, 19)), 'hiver');
+    expect(Etat.saisonDu(DateTime(2026, 3, 20)), 'printemps');
+    expect(Etat.saisonDu(DateTime(2026, 6, 21)), 'ete');
+    expect(Etat.saisonDu(DateTime(2026, 9, 21)), 'ete');
+    expect(Etat.saisonDu(DateTime(2026, 9, 22)), 'automne');
+    expect(Etat.saisonDu(DateTime(2026, 12, 21)), 'hiver');
+    expect(Etat.saisonDu(DateTime(2027, 1, 5)), 'hiver');
+  });
+
   test('noms des versions du catalogue : complément 3.1, majeure 4.0 (09/11/2026)', () {
     expect(CatalogueCommun.libelleDe({'numero': 3}), '3');
     expect(CatalogueCommun.libelleDe({'numero': 4, 'libelle': '3.1'}), '3.1');

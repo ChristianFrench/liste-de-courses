@@ -38,7 +38,7 @@ flutter:
   assets:
     - assets/icone_ronde.png
     - assets/emplettes/
-    - assets/accueil_photo.jpg
+    - assets/fonds/
     - assets/donnees_maquette.json
     - assets/catalogue_type.json
     - assets/catalogue_demo.txt
