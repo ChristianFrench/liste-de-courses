@@ -1488,13 +1488,14 @@ Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
 
 /// Saisie d'un texte court ; renvoie null si annulée.
 Future<String?> demanderTexte(BuildContext context,
-    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider', bool masque = false}) {
-  final controleur = TextEditingController(text: initial);
+    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider', bool masque = false, Key? cleChamp}) {
+  final controleur = TextEditingController(text: initial)..selection = TextSelection(baseOffset: 0, extentOffset: initial.length);
   return volet<String>(
     context,
     builder: (ctx) => corpsVolet(
       titre: titre,
       contenu: TextField(
+        key: cleChamp,
         controller: controleur,
         autofocus: true,
         obscureText: masque,

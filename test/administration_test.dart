@@ -137,8 +137,10 @@ void main() {
     await _capture('2a-Menu-produit');
     await tester.tap(find.text('Renommer (F2)'));
     await tester.pumpAndSettle();
+    // 09/11/2026 : dans une fenêtre, plus sur place.
+    expect(find.text('Renommer le produit'), findsOneWidget);
     await tester.enterText(find.byKey(const ValueKey('renommage')), 'Abricots secs');
-    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.tap(find.text('Renommer').last);
     await tester.pumpAndSettle();
     expect(find.text('Abricots secs'), findsOneWidget);
     expect(find.byKey(const ValueKey('pastille-en-cours')), findsOneWidget);

@@ -19,7 +19,7 @@ import 'editeur_catalogue.dart';
 // - en haut, un titre commun : le catalogue, ses chiffres, ce qui est en cours, le bouton Généraliser et le menu ☰
 //   des actions qui ne modifient pas le catalogue (historique, iconographie, valider, clé de signature…) ;
 // - dessous, un seul cadre sur toute la largeur : rayons, secteurs et produits ; clic droit = actions de l'élément,
-//   double-clic ou F2 = renommer sur place, tout changement d'emplacement se fait à la souris (glisser-déposer).
+//   double-clic ou F2 = renommer (dans une fenêtre depuis le 09/11/2026), tout changement d'emplacement se fait à la souris (glisser-déposer).
 // Le téléphone garde son écran ; les gestes passent par l'état de l'éditeur ([EtatEditeurCatalogue]) et son journal.
 
 String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
@@ -170,9 +170,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
   Object? choisi;
   final produitsChoisis = <CatProduit>{};
 
-  /// Élément renommé sur place, et son champ.
-  Object? _edite;
-  final _champ = TextEditingController();
   final _focus = FocusNode(debugLabel: 'catalogue');
   Object? _survole;
 
@@ -189,7 +186,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
   void dispose() {
     _arreterDefilement();
     _defilement.dispose();
-    _champ.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -285,30 +281,37 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     _modifie();
   }
 
-  void _commencerRenommage(Object o) {
-    _champ.text = switch (o) { CatRayon r => r.nom, CatSecteur s => s.nom, CatProduit p => p.nom, _ => '' };
-    _champ.selection = TextSelection(baseOffset: 0, extentOffset: _champ.text.length);
-    setState(() => _edite = o);
-  }
-
-  void _finirRenommage({bool garder = true}) {
-    final o = _edite;
-    if (o == null) return;
-    final nom = _champ.text.trim();
-    setState(() => _edite = null);
-    if (!garder || nom.isEmpty) return;
+  /// Renommer (09/11/2026, Aristide : « le renommage en place est très difficile ») : dans une fenêtre.
+  Future<void> _commencerRenommage(Object o) async {
+    final (type, actuel) = switch (o) {
+      CatRayon r => ('le rayon', r.nom),
+      CatSecteur s => ('le secteur', s.nom),
+      CatProduit p => ('le produit', p.nom),
+      _ => ('', ''),
+    };
+    if (actuel.isEmpty) return;
+    final saisi = await demanderTexte(context,
+        titre: 'Renommer $type', initial: actuel, valider: 'Renommer', cleChamp: const ValueKey('renommage'));
+    if (!mounted) return;
+    final nom = (saisi ?? '').trim();
+    if (nom.isEmpty || nom == actuel) {
+      _focus.requestFocus();
+      return;
+    }
     switch (o) {
-      case CatRayon r when nom != r.nom:
-        if (b.rayon(nom) != null) return _message('Le rayon « $nom » existe déjà');
+      case CatRayon r:
+        if (b.rayon(nom) != null && !identical(b.rayon(nom), r)) return _message('Le rayon « $nom » existe déjà');
         b.renommerRayon(r, nom);
-      case CatSecteur s when nom != s.nom:
+      case CatSecteur s:
         final r = _rayonDe(s);
         if (r == null) return;
-        if (b.secteur(r, nom) != null) return _message('Le secteur « $nom » existe déjà dans ${r.nom}');
+        if (b.secteur(r, nom) != null && !identical(b.secteur(r, nom), s)) return _message('Le secteur « $nom » existe déjà dans ${r.nom}');
         b.renommerSecteur(r, s, nom);
-      case CatProduit p when nom != p.nom:
+      case CatProduit p:
         final o = _ou(p);
-        if (o != null && b.produitDans(o.$2, nom) != null) return _message('« $nom » est déjà dans ${o.$2.nom}');
+        if (o != null && b.produitDans(o.$2, nom) != null && !identical(b.produitDans(o.$2, nom), p)) {
+          return _message('« $nom » est déjà dans ${o.$2.nom}');
+        }
         b.renommerProduit(p, nom);
       default:
         return;
@@ -841,32 +844,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     return l;
   }
 
-  Widget _libelle(Object o, String nom, TextStyle style) {
-    if (!identical(_edite, o)) return Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
-    return CallbackShortcuts(
-      bindings: {const SingleActivator(LogicalKeyboardKey.escape): () => _finirRenommage(garder: false)},
-      child: SizedBox(
-        height: 30,
-        child: TextField(
-          key: const ValueKey('renommage'),
-          controller: _champ,
-          autofocus: true,
-          style: style,
-          // 07/11/2026 (Aristide) : renommage en place sans cadre, le texte reste où il était.
-          decoration: const InputDecoration(
-            isDense: true,
-            filled: false,
-            border: InputBorder.none,
-            enabledBorder: InputBorder.none,
-            focusedBorder: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 6),
-          ),
-          onSubmitted: (_) => _finirRenommage(),
-          onTapOutside: (_) => _finirRenommage(),
-        ),
-      ),
-    );
-  }
+  Widget _libelle(Object o, String nom, TextStyle style) => Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
 
   Widget _rangee(_Ligne l) {
     final o = l.objet;
@@ -1005,7 +983,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   Future<void> _touche(String t) async {
     final o = produitsChoisis.isNotEmpty ? produitsChoisis.first : choisi;
-    if (o == null || _edite != null) return;
+    if (o == null) return;
     switch (t) {
       case 'F2':
         if (produitsChoisis.length <= 1) _commencerRenommage(o);
