@@ -236,6 +236,16 @@ jobs:
           exit $code
       - name: Ouverture sans réseau (service worker hors_ligne.js)
         run: python3 outils/web/hors_ligne.py build/web
+      - name: Démonstration - embarquer le dernier catalogue commun publié (public, signé)
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null || true
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 15 > assets/catalogue_demo.txt || true
+          echo "catalogue embarqué : $(wc -c < assets/catalogue_demo.txt) octets"
+          [ -s assets/catalogue_demo.txt ] || echo "::warning::Démonstration : catalogue commun non lu, elle garde le catalogue de base"
       - name: Compiler la version de démonstration (foyer d'exemples, sans partage)
         run: |
           set +e

@@ -39,7 +39,11 @@ Future<void> main() async {
   Sauvegarde.actif = !demonstration;
   runApp(const ListeDeCoursesApp());
   if (!kIsWeb) TicketRecu.demarrer();
-  if (demonstration) return;
+  if (demonstration) {
+    // Le catalogue commun du moment, embarqué à la compilation (rien n'est échangé avec le serveur).
+    CatalogueCommun.instance.appliquerDemonstration();
+    return;
+  }
   // Partage du foyer entre appareils (si cet appareil partage)
   Synchro.instance.demarrer();
   // Catalogue commun : les nouveautés publiées par l'éditeur s'ajoutent au foyer

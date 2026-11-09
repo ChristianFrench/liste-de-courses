@@ -213,6 +213,21 @@ class CatalogueCommun extends ChangeNotifier {
   /// Au lancement : lit le catalogue commun et l'ajoute au foyer s'il est nouveau, puis dépose le catalogue du
   /// foyer comme proposition pour l'éditeur s'il a changé. Ensuite, toutes les 10 minutes, redépose la
   /// proposition si elle a changé.
+  /// Démonstration (09/11/2026) : elle ne joint pas le serveur ; le dernier catalogue commun publié est
+  /// embarqué à la compilation (assets/catalogue_demo.txt, rempli par la CI, vide en local) et appliqué à
+  /// chaque ouverture, pour que la démonstration montre le catalogue, les domaines et les icônes du moment.
+  Future<void> appliquerDemonstration() async {
+    if (Etat.instance.stockageFoyer == null) return;
+    try {
+      final commun = (await rootBundle.loadString('assets/catalogue_demo.txt')).trim();
+      if (commun.isEmpty) return;
+      await _appliquerCommun(commun);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Catalogue de la démonstration : $e');
+    }
+  }
+
   Future<void> verifier() async {
     final etat = Etat.instance;
     if (etat.stockageFoyer == null) return;
