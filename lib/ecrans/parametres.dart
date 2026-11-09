@@ -220,12 +220,15 @@ class _ExempleListe extends StatelessWidget {
     }
 
     return Column(key: const ValueKey('exemple-apparence'), crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      ...section('Frais', 'Fruits et légumes', [
+      // Rayons et secteurs du catalogue commun (V2 et suivantes), avec leurs icônes maison.
+      ...section('Fruits et légumes', 'Fruits', [
         ligne('Pommes Golden', 1, [code('kg', mesure)]),
         ligne('Bananes', 2, [code('PX1,99€', promo)]),
       ]),
-      ...section('Frais', 'Crèmerie', [
+      ...section('Crèmerie', 'Yaourts et desserts', [
         ligne('Yaourts nature', 1, [code('LOT3+1', promo), code('×12', lot)]),
+      ]),
+      ...section('Crèmerie', 'Lait', [
         ligne('Lait demi-écrémé', 2, [code('1l', mesure), code('×6', lot)]),
       ]),
     ]);
