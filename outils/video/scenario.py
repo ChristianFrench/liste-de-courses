@@ -107,3 +107,15 @@ with wave.open(os.path.join(SORTIE, 'son.wav'), 'w') as w:
     w.writeframes((son * 32767).astype(np.int16).tobytes())
 json.dump(dict(total=round(total, 3), segments=segments), open(os.path.join(SORTIE, 'timeline.json'), 'w'), ensure_ascii=False, indent=1)
 print(f'{len(segments)} segments, {total:.1f} s')
+
+# Sous-titres (09/11/2026, Aristide) : le texte dit par la voix, au moment où il est dit → emplettes.vtt,
+# proposé comme piste « Français » sur le site (activable par le bouton du lecteur, absent par défaut).
+textes = dict(json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'narration.json'))))
+def hms(s):
+    return f'{int(s // 3600):02d}:{int(s % 3600 // 60):02d}:{s % 60:06.3f}'
+with open(os.path.join(SORTIE, 'emplettes.vtt'), 'w') as f:
+    f.write('WEBVTT\n\n')
+    for i, ((debut, v), seg) in enumerate(zip(pistes, segments), 1):
+        texte = textes.get(seg['voix'])
+        if texte:
+            f.write(f'{i}\n{hms(debut)} --> {hms(debut + len(v) / TAUX + 0.4)}\n{texte}\n\n')

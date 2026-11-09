@@ -307,8 +307,8 @@ AIDE = titre_page('icones/open-book.png', 'Aide', 'Mode d\'emploi, dépliant, qu
     <div class="large">
       {bandeau('icones/clapper-board.png', 'Vidéo de démonstration')}
       <p class="intro">Moins de trois minutes pour voir Emplettes en action : préparer à plusieurs, faire les courses, et profiter de son expérience.</p>
-      <video class="film paysage" controls preload="none" poster="video/affiche.jpg" src="video/emplettes.mp4"></video>
-      <video class="film vertical" controls preload="none" poster="video/affiche-vertical.jpg" src="video/emplettes-vertical.mp4"></video>
+      <video class="film paysage" controls preload="none" poster="video/affiche.jpg" src="video/emplettes.mp4"><track kind="subtitles" srclang="fr" label="Français" src="video/emplettes.vtt"></video>
+      <video class="film vertical" controls preload="none" poster="video/affiche-vertical.jpg" src="video/emplettes-vertical.mp4"><track kind="subtitles" srclang="fr" label="Français" src="video/emplettes.vtt"></video>
       <p class="note"><a href="video/emplettes.mp4" download>Télécharger la vidéo</a> · voix de synthèse Piper (Siwis, CC BY 4.0).</p>
     </div>
   </section>

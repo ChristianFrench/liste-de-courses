@@ -6,7 +6,8 @@
 :root{--encre:#375042;--bande:#CCD7D1;--fond:#EEF3EF;--accent:#3F7D5A}
 *{box-sizing:border-box;margin:0}
 html,body{width:var(--L);height:var(--H);overflow:hidden;background:var(--fond);font-family:A,sans-serif;color:var(--encre)}
-#scene{position:absolute;inset:0;background:radial-gradient(circle at 30% 40%,#fff 0,#EEF3EF 55%,#DCE6DF 100%)}
+/* 09/11/2026 (Aristide) : la photo de fond de l'application derrière toute la vidéo, voilée pour la lisibilité. */
+#scene{position:absolute;inset:0;background:linear-gradient(rgba(245,249,246,.80),rgba(245,249,246,.80)),url(images/fond.jpg) center/cover}
 .tel{position:absolute;width:calc(var(--th)*390/844);height:var(--th);border-radius:calc(var(--th)*0.055);background:#1d2a23;
   padding:calc(var(--th)*0.014);box-shadow:0 18px 50px rgba(30,50,40,.28)}
 .ecran{position:relative;width:100%;height:100%;border-radius:calc(var(--th)*0.045);overflow:hidden;background:#fff}
@@ -18,7 +19,7 @@ html,body{width:var(--L);height:var(--H);overflow:hidden;background:var(--fond);
 .surligne{position:absolute;left:0;right:0;height:5.5%;background:rgba(255,214,90,.35);border-top:2px solid #e8b400;border-bottom:2px solid #e8b400;transform:translateY(-50%)}
 #texte{position:absolute;font-weight:700;line-height:1.25}
 #partie{position:absolute;font-size:var(--fp);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700}
-.titre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:var(--encre);color:#fff;text-align:center;padding:0 8%}
+.titre{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:linear-gradient(rgba(36,54,44,.82),rgba(36,54,44,.82)),url(images/fond.jpg) center/cover;color:#fff;text-align:center;padding:0 8%}
 .titre .num{width:var(--tn);height:var(--tn);border-radius:50%;background:#7CB98F;color:var(--encre);display:flex;align-items:center;justify-content:center;font-size:calc(var(--tn)*.55);font-weight:700}
 .titre .t{font-size:var(--tt);font-weight:700}
 .html{position:absolute;left:0;top:0;width:390px;height:844px;transform-origin:0 0;font-family:A,sans-serif}
