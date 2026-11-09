@@ -33,6 +33,8 @@ jobs:
               print('R|' + r.get('nom', ''))
               for s in r.get('secteurs', []):
                   print('S|' + s.get('nom', ''))
+                  for pr in s.get('produits', []):
+                      print('P|' + (pr.get('nom', '') if isinstance(pr, dict) else str(pr)))
           print('== FIN')
           print('== IMAGES CHOISIES')
           for k, v in sorted((j.get('images') or {}).items()):
