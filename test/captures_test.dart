@@ -199,6 +199,18 @@ void main() {
         continue; // rubrique absente des données de démonstration
       }
       await _capture(nom);
+      if (nom == '27 Apparence') {
+        // L'image de fond choisie s'affiche un instant, puis se ferme seule sans quitter Apparence.
+        await _toucher(tester, find.byKey(const ValueKey('saison-fond')));
+        await tester.tap(find.text('Hiver').last);
+        await tester.pump(const Duration(milliseconds: 600));
+        expect(find.byKey(const ValueKey('apercu-fond')), findsOneWidget);
+        await _capture('27 Apparence-Image');
+        await tester.pump(const Duration(seconds: 2));
+        await tester.pumpAndSettle();
+        expect(find.byKey(const ValueKey('apercu-fond')), findsNothing);
+        expect(find.text('Images de fond'), findsOneWidget, reason: 'toujours dans Apparence');
+      }
     }
     await _toucher(tester, _onglet('Gérer'));
     await _toucher(tester, _onglet('Gérer'));

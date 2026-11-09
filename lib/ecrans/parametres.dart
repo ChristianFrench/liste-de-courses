@@ -90,15 +90,17 @@ Future<void> _neuf(BuildContext context) async {
 
 /// L'image de fond choisie, montrée un instant dans un cadre (se ferme seule, ou d'un toucher).
 void _montrerFond(BuildContext context, String image) {
-  final nav = Navigator.of(context);
-  var ouvert = true;
+  // Le cadre se ferme par son propre navigateur (celui de la fenêtre de dialogue), jamais celui de l'onglet.
+  BuildContext? cadre;
   showDialog<void>(
     context: context,
     barrierColor: const Color(0x55000000),
     builder: (ctx) => GestureDetector(
       onTap: () => Navigator.of(ctx).pop(),
       child: Center(
-        child: Container(
+        child: Builder(builder: (c) {
+          cadre = c;
+          return Container(
           key: const ValueKey('apercu-fond'),
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
@@ -107,12 +109,14 @@ void _montrerFond(BuildContext context, String image) {
             boxShadow: const [BoxShadow(color: Color(0x66000000), blurRadius: 12)],
           ),
           child: ClipRRect(borderRadius: BorderRadius.circular(4), child: AspectRatio(aspectRatio: 2, child: Image.asset(image, fit: BoxFit.cover))),
-        ),
+        );
+        }),
       ),
     ),
-  ).whenComplete(() => ouvert = false);
+  ).whenComplete(() => cadre = null);
   Future<void>.delayed(const Duration(milliseconds: 1800), () {
-    if (ouvert) nav.pop();
+    final c = cadre;
+    if (c != null && c.mounted) Navigator.of(c).pop();
   });
 }
 

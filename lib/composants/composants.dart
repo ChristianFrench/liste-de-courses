@@ -266,12 +266,14 @@ class CaseACocher extends StatelessWidget {
     return Container(
       width: taille,
       height: taille,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: coche ? Charte.accent : Charte.blanc,
         borderRadius: BorderRadius.circular(3),
         border: Border.all(color: coche ? Charte.accent : Charte.cadre, width: Charte.traitCadre),
       ),
-      child: coche ? Icone(Icons.check, size: taille - 4, color: Charte.blanc) : null,
+      // 09/11/2026 (Aristide) : la coche plus petite, bien à l'intérieur de la case.
+      child: coche ? Icone(Icons.check, size: taille * 0.6, color: Charte.blanc) : null,
     );
   }
 }
