@@ -19,7 +19,9 @@ class Icone extends StatelessWidget {
     // 09/11/2026 (Aristide) : ses symboles (chevrons, coche, croix, menus, poignées) à la place des icônes au trait.
     final symbole = icon == null ? null : iconesSymboles[icon];
     if (symbole != null) {
-      final image = Image.asset('assets/icones/symboles/${symbole.$1}.png', width: t, height: t, filterQuality: FilterQuality.medium);
+      // 09/11/2026 (Aristide) : chevrons et flèches (déplier, replier, ouvrir, retour) plus petits, dans la même place.
+      final r = symbole.$1.startsWith('chevron') || symbole.$1.startsWith('fleche') ? t * 0.7 : t;
+      final image = Center(child: Image.asset('assets/icones/symboles/${symbole.$1}.png', width: r, height: r, filterQuality: FilterQuality.medium));
       return Semantics(
         label: semanticLabel,
         child: SizedBox(width: t, height: t, child: symbole.$2 ? Transform.flip(flipX: true, child: image) : image),
