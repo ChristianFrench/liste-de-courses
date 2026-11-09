@@ -74,7 +74,7 @@ class ImageEmplettes extends StatelessWidget {
 }
 
 /// Icône Material → symbole d'Aristide (assets/icones/symboles/<nom>.png), et retourné en miroir ou non.
-const iconesSymboles = <IconData, (String, bool)>{
+final iconesSymboles = <IconData, (String, bool)>{
   Icons.expand_more: ('chevron-bas', false),
   Icons.expand_less: ('chevron-haut', false),
   Icons.chevron_right: ('chevron-droite', false),
