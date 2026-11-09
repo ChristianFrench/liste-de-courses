@@ -15,9 +15,18 @@ class Icone extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = size ?? IconTheme.of(context).size ?? 24;
+    // 09/11/2026 (Aristide) : ses symboles (chevrons, coche, croix, menus, poignées) à la place des icônes au trait.
+    final symbole = icon == null ? null : iconesSymboles[icon];
+    if (symbole != null) {
+      final image = Image.asset('assets/icones/symboles/${symbole.$1}.png', width: t, height: t, filterQuality: FilterQuality.medium);
+      return Semantics(
+        label: semanticLabel,
+        child: SizedBox(width: t, height: t, child: symbole.$2 ? Transform.flip(flipX: true, child: image) : image),
+      );
+    }
     final nom = icon == null ? null : iconesNoto[icon];
     if (nom == null) return Icon(icon, size: size, color: color, shadows: shadows, semanticLabel: semanticLabel);
-    final t = size ?? IconTheme.of(context).size ?? 24;
     return Semantics(
       label: semanticLabel,
       child: SizedBox(
@@ -63,3 +72,23 @@ class ImageEmplettes extends StatelessWidget {
   Widget build(BuildContext context) => Image.asset('assets/emplettes/$nom.png',
       width: taille, height: taille, fit: BoxFit.contain, filterQuality: FilterQuality.medium);
 }
+
+/// Icône Material → symbole d'Aristide (assets/icones/symboles/<nom>.png), et retourné en miroir ou non.
+const iconesSymboles = <IconData, (String, bool)>{
+  Icons.expand_more: ('chevron-bas', false),
+  Icons.expand_less: ('chevron-haut', false),
+  Icons.chevron_right: ('chevron-droite', false),
+  Icons.chevron_left: ('chevron-droite', true),
+  Icons.check: ('coche', false),
+  Icons.close: ('croix-fermeture', false),
+  Icons.menu: ('menu-hamburger', false),
+  Icons.more_vert: ('menu-vertical', false),
+  Icons.drag_handle: ('poignee-horizontale', false),
+  Icons.drag_indicator: ('poignee-verticale', false),
+  Icons.unfold_more: ('fleche-bas', false),
+  Icons.unfold_less: ('fleche-haut', false),
+  Icons.check_box: ('case-cochee', false),
+  Icons.check_box_outline_blank: ('case-vide', false),
+  Icons.radio_button_checked: ('radio-selectionne', false),
+  Icons.radio_button_unchecked: ('radio-vide', false),
+};

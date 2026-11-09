@@ -47,6 +47,7 @@ flutter:
     - assets/natures_off.json
     - assets/pictos/png/
     - assets/icones/noto3d/
+    - assets/icones/symboles/
     - assets/pictos/noto3d/
     - assets/pictos/fluent3d/
     - assets/pictos/maison/

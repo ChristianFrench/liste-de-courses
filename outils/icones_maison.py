@@ -56,3 +56,21 @@ for f in sorted(glob.glob('outils/icones_maison/ihm/*.png')):
     carre.save(f'assets/icones/noto3d/{os.path.basename(f)}', optimize=True)
     n += 1
 print(n, "icônes de l'interface")
+
+# Symboles de l'interface (09/11/2026, 15 images d'Aristide) : chevrons, coche, croix, menus, poignées…
+# outils/icones_maison/symboles/<nom>.png → assets/icones/symboles/<nom>.png (96 × 96) ; correspondance avec les
+# icônes Material dans lib/composants/icone.dart (iconesSymboles).
+os.makedirs('assets/icones/symboles', exist_ok=True)
+n = 0
+for f in sorted(glob.glob('outils/icones_maison/symboles/*.png')):
+    im = Image.open(f).convert('RGBA')
+    boite = im.getchannel('A').point(lambda a: 255 if a > 16 else 0).getbbox()
+    if boite:
+        im = im.crop(boite)
+    e = 88 / max(im.size)
+    im = im.resize((max(1, round(im.width * e)), max(1, round(im.height * e))), Image.LANCZOS)
+    carre = Image.new('RGBA', (96, 96), (0, 0, 0, 0))
+    carre.alpha_composite(im, ((96 - im.width) // 2, (96 - im.height) // 2))
+    carre.save(f'assets/icones/symboles/{os.path.basename(f)}', optimize=True)
+    n += 1
+print(n, "symboles de l'interface")
