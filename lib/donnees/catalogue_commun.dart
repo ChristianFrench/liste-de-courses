@@ -571,13 +571,31 @@ class CatalogueCommun extends ChangeNotifier {
     return b;
   }
 
-  /// Numéro de la prochaine version : celui de la dernière publiée, plus un.
+  /// Numéro de la prochaine version : celui de la dernière publiée, plus un (compteur interne, sujets du serveur).
   Future<int> prochainNumero() async => (((await dernier())['numero'] as num?) ?? 0).toInt() + 1;
 
-  Future<bool> publierBrouillon(Brouillon b) async {
+  /// Nom affiché d'une version (09/11/2026, Aristide) : « 3.1 » pour un complément, « 4.0 » pour une version
+  /// majeure. Les versions publiées avant n'ont que leur numéro (« 3 »).
+  static String libelleDe(Map<String, dynamic>? j) {
+    if (j == null) return '0';
+    final l = j['libelle'];
+    if (l is String && l.isNotEmpty) return l;
+    return '${(j['numero'] as num? ?? 0).toInt()}';
+  }
+
+  /// Nom de la version qui suit [dernier] : majeure « (n+1).0 », sinon complément « n.(m+1) ».
+  static String libelleSuivant(String dernier, {bool majeure = false}) {
+    final p = dernier.split('.');
+    final n = int.tryParse(p.first) ?? 0, m = p.length > 1 ? int.tryParse(p[1]) ?? 0 : 0;
+    return majeure || n == 0 ? '${n + 1}.0' : '$n.${m + 1}';
+  }
+
+  Future<bool> publierBrouillon(Brouillon b, {bool majeure = false}) async {
+    final d = await dernier();
     final j = b.versJson()
       ..['version'] = DateTime.now().millisecondsSinceEpoch
-      ..['numero'] = await prochainNumero()
+      ..['numero'] = ((d['numero'] as num?) ?? 0).toInt() + 1
+      ..['libelle'] = libelleSuivant(libelleDe(d), majeure: majeure)
       ..['date'] = DateTime.now().toIso8601String().substring(0, 16);
     j.remove('modifications');
     final ok = await publier(j);

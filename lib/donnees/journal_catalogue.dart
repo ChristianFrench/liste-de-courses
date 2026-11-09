@@ -20,7 +20,7 @@ class GesteCatalogue {
 }
 
 class EtapeCatalogue {
-  EtapeCatalogue(this.nom, this.date, this.gestes, this.instantane, {this.numero});
+  EtapeCatalogue(this.nom, this.date, this.gestes, this.instantane, {this.numero, this.libelle});
   final String nom;
   final DateTime date;
   final List<GesteCatalogue> gestes;
@@ -31,12 +31,19 @@ class EtapeCatalogue {
   /// Numéro de la version généralisée qui la contient, ou null (validée seulement).
   int? numero;
 
+  /// Nom de cette version (« 3.1 »), ou null (versions d'avant le 09/11/2026 : le numéro).
+  String? libelle;
+
+  /// « v3.1 » (ou « v3 » pour les anciennes).
+  String get version => 'v${libelle ?? numero}';
+
   Map<String, dynamic> versJson() => {
         'nom': nom,
         'd': date.toIso8601String(),
         'g': [for (final g in gestes) g.versJson()],
         'i': instantane,
         if (numero != null) 'v': numero,
+        if (libelle != null) 'l': libelle,
       };
   factory EtapeCatalogue.lire(Map j) => EtapeCatalogue(
         '${j['nom']}',
@@ -44,6 +51,7 @@ class EtapeCatalogue {
         [for (final g in (j['g'] as List? ?? const [])) GesteCatalogue.lire(g as Map)],
         '${j['i']}',
         numero: (j['v'] as num?)?.toInt(),
+        libelle: j['l'] as String?,
       );
 }
 
@@ -79,8 +87,8 @@ class JournalCatalogue {
   }
 
   /// Fige les gestes en cours en une étape ; [instantane] est le brouillon emballé à ce moment.
-  EtapeCatalogue valider(String nom, String instantane, {DateTime? date, int? numero}) {
-    final e = EtapeCatalogue(nom, date ?? DateTime.now(), [...enCours], instantane, numero: numero);
+  EtapeCatalogue valider(String nom, String instantane, {DateTime? date, int? numero, String? libelle}) {
+    final e = EtapeCatalogue(nom, date ?? DateTime.now(), [...enCours], instantane, numero: numero, libelle: libelle);
     etapes.add(e);
     enCours.clear();
     if (etapes.length > maxEtapes) etapes.removeRange(0, etapes.length - maxEtapes);
@@ -95,9 +103,11 @@ class JournalCatalogue {
   }
 
   /// Après une généralisation : les étapes validées pas encore publiées sont dans la version [numero].
-  void generalisee(int numero) {
+  void generalisee(int numero, [String? libelle]) {
     for (final e in etapes) {
-      e.numero ??= numero;
+      if (e.numero != null) continue;
+      e.numero = numero;
+      e.libelle = libelle;
     }
   }
 

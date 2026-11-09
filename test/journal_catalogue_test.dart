@@ -23,6 +23,19 @@ Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<Str
     };
 
 void main() {
+  test('noms des versions du catalogue : complément 3.1, majeure 4.0 (09/11/2026)', () {
+    expect(CatalogueCommun.libelleDe({'numero': 3}), '3');
+    expect(CatalogueCommun.libelleDe({'numero': 4, 'libelle': '3.1'}), '3.1');
+    expect(CatalogueCommun.libelleSuivant('3'), '3.1');
+    expect(CatalogueCommun.libelleSuivant('3.1'), '3.2');
+    expect(CatalogueCommun.libelleSuivant('3.9'), '3.10');
+    expect(CatalogueCommun.libelleSuivant('3.2', majeure: true), '4.0');
+    expect(CatalogueCommun.libelleSuivant('0'), '1.0', reason: 'première version');
+    final e = EtapeCatalogue('x', DateTime(2026), const [], '', numero: 4, libelle: '3.1');
+    expect(EtapeCatalogue.lire(e.versJson()).version, 'v3.1');
+    expect(EtapeCatalogue('y', DateTime(2026), const [], '', numero: 2).version, 'v2');
+  });
+
   test('gestes lisibles : ajout, renommage, secteur déplacé', () {
     final a = cat({'Frais': {'Fruits': ['Pommes']}, 'Épicerie': {}});
     expect(gestesEntre(a, a), isEmpty);

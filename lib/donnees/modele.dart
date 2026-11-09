@@ -665,6 +665,13 @@ class Etat extends ChangeNotifier {
 
   /// Numéro de la version du catalogue commun appliquée (« v7 » de la console), affiché dans Gérer.
   int numeroCatalogueCommun = 0;
+
+  /// Nom de la version du catalogue commun (« 3.1 », 09/11/2026) ; vide pour les versions qui n'en ont pas.
+  String nomVersionCatalogueCommun = '';
+
+  /// « Version 3.1 » (ou « Version 3 », « Version d'origine »).
+  String get libelleCatalogueCommun =>
+      nomVersionCatalogueCommun.isNotEmpty ? 'Version $nomVersionCatalogueCommun' : libelleVersion(numeroCatalogueCommun);
   Map<String, dynamic>? nouveautesCatalogue;
 
   /// Types de packaging proposés partout (Paramètres) : pack de 6, de 5…
@@ -1240,6 +1247,7 @@ class Etat extends ChangeNotifier {
     magasinsEnseignes = options?['magasinsEnseignes'] == 1;
     versionCatalogueCommun = (options?['catalogueCommun'] as num? ?? 0).toInt();
     numeroCatalogueCommun = (options?['catalogueCommunNumero'] as num? ?? 0).toInt();
+    nomVersionCatalogueCommun = options?['catalogueCommunLibelle'] as String? ?? '';
     nouveautesCatalogue = (options?['nouveautesCatalogue'] as Map?)?.cast<String, dynamic>();
     imagesChoisies
       ..clear()
@@ -1398,6 +1406,7 @@ class Etat extends ChangeNotifier {
             if (magasinsEnseignes) 'magasinsEnseignes': 1,
             if (versionCatalogueCommun > 0) 'catalogueCommun': versionCatalogueCommun,
             if (numeroCatalogueCommun > 0) 'catalogueCommunNumero': numeroCatalogueCommun,
+            if (nomVersionCatalogueCommun.isNotEmpty) 'catalogueCommunLibelle': nomVersionCatalogueCommun,
             if (nouveautesCatalogue != null) 'nouveautesCatalogue': nouveautesCatalogue,
           },
         },
@@ -3491,6 +3500,7 @@ class Etat extends ChangeNotifier {
     if (retires > 0) lignes.add('$retires élément${retires > 1 ? 's' : ''} retiré${retires > 1 ? 's' : ''} du catalogue');
     versionCatalogueCommun = version;
     numeroCatalogueCommun = (j['numero'] as num? ?? 0).toInt();
+    nomVersionCatalogueCommun = j['libelle'] as String? ?? '';
     {
       // 06/11/2026 (Aristide) : pas la liste des modifications, le total de chaque élément du catalogue reçu.
       final rj = (j['rayons'] as List).cast<Map>();

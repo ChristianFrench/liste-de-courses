@@ -83,7 +83,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
         // Premier usage : le point de départ est le brouillon tel qu'il est.
         if (journal.etapes.isEmpty) {
           journal.valider('Point de départ', CatalogueCommun.emballer(x.versJsonSansImages()),
-              numero: x.modifications == 0 && _numero > 0 ? _numero : null);
+              numero: x.modifications == 0 && _numero > 0 ? _numero : null, libelle: x.modifications == 0 && _numero > 0 ? libellePublie : null);
           c.enregistrerJournal(journal);
         }
         _avant = x.versJson();
@@ -205,7 +205,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       Nav.message(
         context,
         ok
-            ? 'Version v$_numero renvoyée au serveur : chaque foyer la reçoit à son prochain lancement'
+            ? 'Version v$libellePublie renvoyée au serveur : chaque foyer la reçoit à son prochain lancement'
             : 'Rien n\'est envoyé (${CatalogueCommun.instance.erreur ?? 'le serveur ne répond pas'}) : réessayez',
       );
     }
@@ -225,6 +225,11 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   Recapitulatif? get recapitulatif => b == null ? null : Recapitulatif.entre(publie ?? const {}, b!.versJson());
 
   int get _numero => ((publie?['numero'] as num?) ?? 0).toInt();
+
+  /// Nom de la version publiée (« 3.1 », ou « 3 » pour les anciennes) et des deux suivantes possibles.
+  String get libellePublie => CatalogueCommun.libelleDe(publie);
+  String get libelleComplement => CatalogueCommun.libelleSuivant(libellePublie);
+  String get libelleMajeure => CatalogueCommun.libelleSuivant(libellePublie, majeure: true);
 
   static String _cleR(CatRayon r) => 'editeur-r/${r.nom}';
   static String _cleS(CatRayon r, CatSecteur s) => 'editeur-s/${r.nom}/${s.nom}';
@@ -381,7 +386,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
                   child: Text(
-                    '${_numero == 0 ? 'Aucune version publiée : catalogue livré avec l\'application' : 'Version publiée : v$_numero du ${_date((publie!['version'] as num).toInt())}'}.\n'
+                    '${_numero == 0 ? 'Aucune version publiée : catalogue livré avec l\'application' : 'Version publiée : v$libellePublie du ${_date((publie!['version'] as num).toInt())}'}.\n'
                     'Brouillon : ${_pluriel(b.catalogue.rayons.length, 'rayon')}, ${_pluriel(b.nbProduits, 'produit')}, '
                     '${b.modifications == 0 ? 'aucune modification.' : '${_pluriel(b.modifications, 'modification')} à généraliser.'}\n'
                     '${enCours == 0 ? 'Rien en cours : tout est validé.' : '${_pluriel(enCours, 'modification')} en cours, à valider.'}',
@@ -403,7 +408,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
               ),
               Bouton(
                 key: const ValueKey('generaliser'),
-                texte: _publication ? 'Envoi…' : 'Généraliser (v${_numero + 1})',
+                texte: _publication ? 'Envoi…' : 'Généraliser…',
                 icone: Icons.public,
                 plein: true,
                 onTap: _publication || b.modifications == 0 || enCours > 0 ? null : generaliser,
@@ -423,7 +428,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     if (!mounted) return;
     final choix = <String, String>{
       for (var i = 0; i < versions.length; i++)
-        'v$i': 'Version v${versions[i]['numero'] ?? '?'} du ${_date(((versions[i]['version'] as num?) ?? 0).toInt())}',
+        'v$i': 'Version v${CatalogueCommun.libelleDe(versions[i])} du ${_date(((versions[i]['version'] as num?) ?? 0).toInt())}',
       for (var i = 0; i < propositions.length; i++)
         'p$i':
             'Foyer n° ${propositions[i]['foyer'] ?? '?'} · ${_pluriel(((propositions[i]['changements'] as num?) ?? 0).toInt(), 'changement')} '
@@ -473,15 +478,9 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       }
     }
     final recap = Recapitulatif.entre(publie ?? const {}, b.versJson());
-    final ok = await confirmer(
-      context,
-      titre: 'Généraliser la version v${_numero + 1} ?',
-      icone: Icons.public,
-      contenu: RecapitulatifVue(recap),
-      plein: 'Annuler',
-      contour: 'Généraliser',
-    );
-    if (ok != true || !mounted) return;
+    // 09/11/2026 (Aristide) : un complément fait « 3.1 », les versions en « x.0 » sont réservées aux majeures.
+    final majeure = await choisirNatureVersion(context, recap, complement: libelleComplement, majeure: libelleMajeure);
+    if (majeure == null || !mounted) return;
     // Le catalogue part signé : la phrase est demandée une fois sur cet appareil.
     if (CatalogueCommun.instance.graineSignature == null && await _demanderPhrase() == null) return;
     if (!mounted) return;
@@ -489,7 +488,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
     widget.auChangement?.call();
     var fait = false;
     try {
-      fait = await CatalogueCommun.instance.publierBrouillon(b);
+      fait = await CatalogueCommun.instance.publierBrouillon(b, majeure: majeure);
     } catch (e) {
       CatalogueCommun.instance.erreur = '$e';
     }
@@ -498,9 +497,9 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
       setState(() => _publication = false);
       widget.auChangement?.call();
       await _charger();
-      journal.generalisee(_numero);
+      journal.generalisee(_numero, libellePublie);
       CatalogueCommun.instance.enregistrerJournal(journal);
-      if (mounted) Nav.message(context, 'Version v$_numero généralisée : chaque foyer la reçoit à son prochain lancement');
+      if (mounted) Nav.message(context, 'Version v$libellePublie généralisée : chaque foyer la reçoit à son prochain lancement');
     } else {
       setState(() => _publication = false);
       widget.auChangement?.call();
@@ -747,6 +746,27 @@ List<ActionLigne> actionsSecteurEditeur(
   }, danger: true),
 ];
 
+/// Généraliser : complément (« 3.1 », par défaut) ou version majeure (« 4.0 ») ; null si annulé (09/11/2026, Aristide).
+Future<bool?> choisirNatureVersion(BuildContext context, Recapitulatif recap, {required String complement, required String majeure}) {
+  return volet<bool>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: 'Généraliser le catalogue ?',
+      contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+        RecapitulatifVue(recap),
+        const SizedBox(height: 12),
+        Text('Un complément devient la version v$complement ; une version majeure devient la v$majeure.',
+            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+      ]),
+      boutons: [
+        Bouton(key: const ValueKey('generaliser-annuler'), texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
+        Bouton(key: const ValueKey('generaliser-majeure'), texte: 'Majeure v$majeure', onTap: () => Navigator.of(ctx).pop(true)),
+        Bouton(key: const ValueKey('generaliser-complement'), texte: 'Complément v$complement', icone: Icons.public, plein: true, onTap: () => Navigator.of(ctx).pop(false)),
+      ],
+    ),
+  );
+}
+
 Future<bool> _confirmerSuppression(BuildContext context, String quoi, String contenu) async {
   final ok = await confirmer(
     context,
@@ -909,7 +929,7 @@ Future<void> montrerNouveautes(BuildContext context) async {
         shrinkWrap: true,
         children: [
           Text(
-            'Le catalogue commun passe en ${Etat.instance.libelleVersion(Etat.instance.numeroCatalogueCommun).toLowerCase()} :',
+            'Le catalogue commun passe en ${Etat.instance.libelleCatalogueCommun.toLowerCase()} :',
             style: Charte.texte(14, couleur: Charte.texteSecondaire),
           ),
           const SizedBox(height: 8),
@@ -1115,7 +1135,7 @@ class _EcranHistoriqueCatalogueState extends State<EcranHistoriqueCatalogue> {
           for (var i = j.etapes.length - 1; i >= 0; i--)
             niveau(
               'historique/${j.etapes[i].date.toIso8601String()}',
-              '${j.etapes[i].nom} · ${j.etapes[i].numero != null ? 'généralisée v${j.etapes[i].numero}' : 'validée'}',
+              '${j.etapes[i].nom} · ${j.etapes[i].numero != null ? 'généralisée ${j.etapes[i].version}' : 'validée'}',
               j.etapes[i].gestes,
               crayon: () => menuActions(context, titre: 'Étape ${j.etapes[i].nom}', actions: [
                 ActionLigne(Icons.history, 'Revenir à cette étape', () async {

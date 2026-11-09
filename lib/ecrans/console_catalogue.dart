@@ -595,7 +595,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   Widget _titre() {
     final p = e.publie;
-    final numero = e.numeroPublie;
+    final numero = e.numeroPublie, libelle = e.libellePublie;
     final date = p?['date'] as String?;
     final secteurs = b.catalogue.rayons.fold(0, (n, r) => n + r.secteurs.length);
     final manquantes = sansIcone(b);
@@ -631,7 +631,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               Text('Catalogue commun', style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
               Text(
                 [
-                  numero == 0 ? 'Aucune version publiée' : 'Version publiée v$numero${date == null ? '' : ' du ${date.substring(8, 10)}/${date.substring(5, 7)}/${date.substring(0, 4)}'}',
+                  numero == 0 ? 'Aucune version publiée' : 'Version publiée v$libelle${date == null ? '' : ' du ${date.substring(8, 10)}/${date.substring(5, 7)}/${date.substring(0, 4)}'}',
                   _pluriel(b.catalogue.rayons.length, 'rayon'),
                   _pluriel(secteurs, 'secteur'),
                   _pluriel(b.nbProduits, 'produit'),
@@ -647,7 +647,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           const SizedBox(width: 12),
           _Bouton(
             key: const ValueKey('generaliser'),
-            texte: e.enPublication ? 'Envoi…' : 'Généraliser (v${numero + 1})',
+            texte: e.enPublication ? 'Envoi…' : 'Généraliser…',
             icone: Icons.public,
             plein: true,
             onTap: e.enPublication || b.modifications == 0 || e.enCours > 0 ? null : () => _menuGeneral('generaliser'),
@@ -663,11 +663,11 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               item('iconographie', Icons.image_outlined, 'Iconographie…${manquantes > 0 ? ' ($manquantes sans icône)' : ''}'),
               item('images', Icons.add_photo_alternate_outlined, 'Images ajoutées…${b.imagesPerso.isEmpty ? '' : ' (${b.imagesPerso.length})'}'),
               item('valider', Icons.check, 'Valider les modifications (${e.enCours})…', actif: e.enCours > 0),
-              item('generaliser', Icons.public, 'Généraliser (v${numero + 1})…', actif: b.modifications > 0 && e.enCours == 0),
+              item('generaliser', Icons.public, 'Généraliser…', actif: b.modifications > 0 && e.enCours == 0),
               const PopupMenuDivider(),
               item('repartir', Icons.restore, 'Repartir d\'un catalogue…'),
               item('cle', Icons.key_outlined, 'Clé de signature…'),
-              if (e.absenteDuServeur) item('renvoyer', Icons.cloud_upload_outlined, 'Renvoyer v$numero au serveur'),
+              if (e.absenteDuServeur) item('renvoyer', Icons.cloud_upload_outlined, 'Renvoyer v$libelle au serveur'),
             ],
           ),
         ]),
@@ -680,7 +680,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         if (e.absenteDuServeur)
           Padding(
             padding: const EdgeInsets.only(top: 6, left: 46),
-            child: Text('La version v$numero n\'est pas sur le serveur : renvoyez-la (menu ☰).',
+            child: Text('La version v$libelle n\'est pas sur le serveur : renvoyez-la (menu ☰).',
                 style: Charte.texte(13.5, gras: true, couleur: Charte.rouge)),
           ),
       ]),
@@ -1152,7 +1152,7 @@ Future<void> montrerHistorique(BuildContext context, EtatEditeurCatalogue e) {
         final enCours = i < 0;
         final et = enCours ? null : j.etapes[i];
         final gestes = enCours ? j.enCours : et!.gestes;
-        final etat = enCours ? 'en cours' : (et!.numero != null ? 'généralisée v${et.numero}' : 'validée');
+        final etat = enCours ? 'en cours' : (et!.numero != null ? 'généralisée ${et.version}' : 'validée');
         final actif = choix == i;
         return Material(
           color: actif ? Charte.fondSelection : Colors.transparent,
