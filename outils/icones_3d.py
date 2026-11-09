@@ -1,4 +1,5 @@
 """Icônes et images de rayons/secteurs en relief, à partir des emojis Noto 3D (Google, SIL OFL) et Fluent 3D (Microsoft, MIT).
+# Les icônes de l'interface refaites par Aristide (outils/icones_maison/ihm/) : relancer ensuite outils/icones_maison.py.
 - icônes : assets/icones/<famille>/<nom Noto>.png (outils/icones_noto.json) ;
 - rayons et secteurs : assets/pictos/<famille>/<clé>.png (outils/pictos_emoji.txt : « clé emoji » par ligne).
 Usage : python3 outils/icones_3d.py <noto-emoji>/3D/png/128 <fluent-emoji-3d>/package/assets <iconify-noto>/package/chars.json
