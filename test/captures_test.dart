@@ -137,7 +137,7 @@ void main() {
     await _toucher(tester, _onglet('Courses'));
     await _toucher(tester, _onglet('Courses'));
     // Historique et archives : en fin de l'onglet Courses, dans la même liste
-    await _toucher(tester, find.text('HISTORIQUE'));
+    await _toucher(tester, find.text('Historique').last);
     await _capture('11 Historique-Courses');
 
     await _toucher(tester, _onglet('Gérer'));
