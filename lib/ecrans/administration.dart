@@ -151,7 +151,7 @@ class _Menu extends StatelessWidget {
                   ? Divider(height: 18, indent: 12, endIndent: 12, color: Charte.separateurZone)
                   : Padding(
                       padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                      child: Text(titre.toUpperCase(), style: Charte.texte(12.5, gras: true, couleur: Charte.texteSecondaire)),
+                      child: Text(titre, style: Charte.texte(12.5, gras: true, couleur: Charte.texteSecondaire)),
                     ),
               for (final e in entrees)
                 Tooltip(

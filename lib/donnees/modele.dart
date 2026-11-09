@@ -3539,8 +3539,10 @@ class Etat extends ChangeNotifier {
   static Set<String> exclusDu(Map<String, dynamic> j) => {
         for (final o in (j['retires'] as List? ?? const []).cast<Map>())
           cleExclue(o['type'] as String, o['nom'] as String, rayon: o['rayon'] as String?, secteur: o['secteur'] as String?),
+        // Un changement de casse seul (09/11/2026) n'exclut pas le nom : c'est le même, mieux écrit.
         for (final o in (j['renommes'] as List? ?? const []).cast<Map>())
-          cleExclue(o['type'] as String, o['ancien'] as String, rayon: o['rayon'] as String?, secteur: o['secteur'] as String?),
+          if ('${o['ancien']}'.trim().toLowerCase() != '${o['nouveau']}'.trim().toLowerCase())
+            cleExclue(o['type'] as String, o['ancien'] as String, rayon: o['rayon'] as String?, secteur: o['secteur'] as String?),
       };
 
   /// Retiré ou renommé par l'éditeur (un produit retiré sans secteur l'est dans tous les secteurs).

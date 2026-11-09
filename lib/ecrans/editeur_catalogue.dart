@@ -86,6 +86,13 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
               numero: x.modifications == 0 && _numero > 0 ? _numero : null, libelle: x.modifications == 0 && _numero > 0 ? libellePublie : null);
           c.enregistrerJournal(journal);
         }
+        // 09/11/2026 (Aristide) : plus de noms tout en majuscules ; la correction est un geste de l'historique.
+        final n = x.corrigerMajuscules();
+        if (n > 0) {
+          c.enregistrerBrouillon(x);
+          journal.noter(['$n nom${n > 1 ? 's' : ''} en majuscules mis en écriture normale']);
+          c.enregistrerJournal(journal);
+        }
         _avant = x.versJson();
         remplacerImagesPerso(x.imagesPerso);
       });

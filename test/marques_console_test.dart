@@ -65,4 +65,26 @@ void main() {
     expect(reste.any((e) => e.type == TypeExamen.produitDeMarque), isFalse);
     expect(b.aExaminer(acceptes: {for (final e in reste) e.cle}), isEmpty);
   });
+
+  test('noms en majuscules remis en écriture normale (09/11/2026)', () {
+    final b = Brouillon.lire({
+      'rayons': [
+        {
+          'nom': 'SAISONNIER',
+          'secteurs': [
+            {'nom': 'SAINT-VALENTIN', 'taille': 1, 'produits': []},
+            {'nom': 'FÊTE DES MÈRES', 'taille': 1, 'produits': [{'nom': 'BOUQUET', 'taille': 1}]},
+            {'nom': 'Plein air et camping', 'taille': 1, 'produits': []},
+          ]
+        }
+      ]
+    });
+    expect(b.corrigerMajuscules(), 4);
+    final r = b.catalogue.rayons.single;
+    expect(r.nom, 'Saisonnier');
+    expect(r.secteurs.map((s) => s.nom), ['Saint-Valentin', 'Fête des mères', 'Plein air et camping']);
+    expect(r.secteurs[1].produits.single.nom, 'Bouquet');
+    expect(b.corrigerMajuscules(), 0);
+    expect(b.renommes.first, {'type': 'rayon', 'ancien': 'SAISONNIER', 'nouveau': 'Saisonnier'});
+  });
 }

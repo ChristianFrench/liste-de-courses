@@ -821,7 +821,8 @@ class Brouillon {
   }
 
   void renommerRayon(CatRayon r, String nom) {
-    if (nom.trim().isEmpty || nom.trim() == r.nom || rayon(nom) != null) return;
+    // 09/11/2026 : un changement de casse seul (« SAISONNIER » → « Saisonnier ») est permis.
+    if (nom.trim().isEmpty || nom.trim() == r.nom || (rayon(nom) != null && !identical(rayon(nom), r))) return;
     renommes.add({'type': 'rayon', 'ancien': r.nom, 'nouveau': nom.trim()});
     for (final l in univers.values) {
       final i = l.indexOf(r.nom);
@@ -832,7 +833,7 @@ class Brouillon {
   }
 
   void renommerSecteur(CatRayon r, CatSecteur s, String nom) {
-    if (nom.trim().isEmpty || nom.trim() == s.nom || secteur(r, nom) != null) return;
+    if (nom.trim().isEmpty || nom.trim() == s.nom || (secteur(r, nom) != null && !identical(secteur(r, nom), s))) return;
     renommes.add({'type': 'secteur', 'rayon': r.nom, 'ancien': s.nom, 'nouveau': nom.trim()});
     s.nom = nom.trim();
     modifications++;
@@ -840,7 +841,7 @@ class Brouillon {
 
   void renommerProduit(CatProduit p, String nom) {
     final s = _secteurDe(p);
-    if (s == null || nom.trim().isEmpty || nom.trim() == p.nom || produitDans(s, nom) != null) return;
+    if (s == null || nom.trim().isEmpty || nom.trim() == p.nom || (produitDans(s, nom) != null && !identical(produitDans(s, nom), p))) return;
     renommes.add({'type': 'produit', 'secteur': s.nom, 'ancien': p.nom, 'nouveau': nom.trim()});
     p.nom = nom.trim();
     modifications++;
@@ -1238,6 +1239,46 @@ class Brouillon {
         retirerProduit(x.secteur!, p);
         return 'Doublon « ${p.nom} » retiré, « ${g.nom} » gardé (${x.secteur!.nom})';
     }
+  }
+
+  /// Noms écrits tout en majuscules (« NOUVEL AN ET RÉVEILLON ») remis en écriture normale (« Nouvel an et
+  /// réveillon ») : rayons, secteurs et produits (09/11/2026, Aristide). Rend le nombre de noms changés.
+  int corrigerMajuscules() {
+    var n = 0;
+    for (final r in catalogue.rayons) {
+      if (enMajuscules(r.nom)) {
+        renommerRayon(r, ecritureNormale(r.nom));
+        n++;
+      }
+      for (final x in r.secteurs) {
+        if (enMajuscules(x.nom)) {
+          renommerSecteur(r, x, ecritureNormale(x.nom));
+          n++;
+        }
+        for (final p in x.produits) {
+          if (enMajuscules(p.nom)) {
+            renommerProduit(p, ecritureNormale(p.nom));
+            n++;
+          }
+        }
+      }
+    }
+    return n;
+  }
+
+  /// Tout en majuscules (au moins trois lettres).
+  static bool enMajuscules(String t) {
+    final lettres = t.runes.map(String.fromCharCode).where((c) => c.toLowerCase() != c.toUpperCase()).toList();
+    return lettres.length >= 3 && lettres.every((c) => c == c.toUpperCase());
+  }
+
+  /// « SAINT-VALENTIN » → « Saint-Valentin », « FÊTE DES MÈRES » → « Fête des mères ».
+  static String ecritureNormale(String t) {
+    var x = t.trim().toLowerCase();
+    if (x.isEmpty) return x;
+    x = x[0].toUpperCase() + x.substring(1);
+    return x.replaceAllMapped(RegExp(r'(saint|sainte)-(\w)', caseSensitive: false, unicode: true),
+        (m) => '${m[1]![0].toUpperCase()}${m[1]!.substring(1)}-${m[2]!.toUpperCase()}');
   }
 
   void choisirImage(String cle, String? picto) {
