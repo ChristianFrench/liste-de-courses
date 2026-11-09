@@ -13,12 +13,21 @@ import 'listes.dart';
 class EcranAccueil extends StatelessWidget {
   const EcranAccueil({super.key});
 
+  /// Groupes de l'accueil, pour « Tout replier » / « Tout déplier » du bandeau.
+  static List<String> get cles => [
+        'accueil/preparation',
+        'accueil/instance',
+        if (Etat.instance.coursesEnCours != null) 'accueil/courses',
+        if (Etat.instance.coursesEnInstance.isNotEmpty) 'accueil/terminees',
+      ];
+
   @override
   Widget build(BuildContext context) {
     final etat = Etat.instance;
     final enPreparation = etat.listesStatut(StatutListe.enConstruction);
     final enCours = etat.coursesEnCours;
     final pretes = etat.listesStatut(StatutListe.prete);
+    final terminees = etat.coursesEnInstance;
     // L'en-tête et la photo restent en haut ; seules les listes défilent.
     // Faire défiler les listes replie « Comment ça marche » pour leur laisser la place.
     // L'accueil n'a pas de bandeau de titre : la photo (version, synchronisation, aide) en tient lieu.
@@ -39,6 +48,7 @@ class EcranAccueil extends StatelessWidget {
           children: [
             GroupeRetractable(
               cle: 'accueil/preparation',
+              pliable: true,
               titre: 'En préparation',
               icone: Icons.checklist,
               nombre: enPreparation.length,
@@ -58,8 +68,9 @@ class EcranAccueil extends StatelessWidget {
             // Listes prêtes : en instance de courses.
             GroupeRetractable(
               cle: 'accueil/instance',
+              pliable: true,
               titre: 'À faire',
-              icone: Icons.shopping_cart_outlined,
+              emplettes: 'liste_a_faire',
               nombre: pretes.length,
               vide: 'Aucune liste prête pour les courses.',
               enfants: [
@@ -75,6 +86,7 @@ class EcranAccueil extends StatelessWidget {
             if (enCours != null)
               GroupeRetractable(
                 cle: 'accueil/courses',
+              pliable: true,
                 titre: 'Courses en cours',
                 icone: Icons.pause_circle_outline,
                 nombre: 1,
@@ -89,6 +101,16 @@ class EcranAccueil extends StatelessWidget {
                         'sur ${enCours.lignes.length}',
                   ),
                 ],
+              ),
+            // 09/11/2026 (Aristide) : les courses terminées, comme dans l'onglet Courses.
+            if (terminees.isNotEmpty)
+              GroupeRetractable(
+                cle: 'accueil/terminees',
+                pliable: true,
+                titre: 'Terminées',
+                emplettes: 'liste_terminee',
+                nombre: terminees.length,
+                enfants: [for (final c in terminees) ligneTerminee(context, c)],
               ),
             const SizedBox(height: 12),
           ],
@@ -148,6 +170,17 @@ class _EnTetePhoto extends StatelessWidget {
                             style: _surPhoto(Charte.texte(12.5, couleur: const Color(0xEEFFFFFF)))),
                       ),
                       const BoutonSynchro(),
+                      // 09/11/2026 (Aristide) : déplier / replier d'un coup tous les groupes de l'accueil.
+                      ListenableBuilder(
+                        listenable: Retractables.i,
+                        builder: (context, _) {
+                          final ferme = Retractables.i.tousFermes(EcranAccueil.cles);
+                          return KeyedSubtree(
+                              key: const ValueKey('accueil-tout'),
+                              child: boutonEnTete(ferme ? Icons.unfold_more : Icons.unfold_less, ferme ? 'Tout déplier' : 'Tout replier',
+                                  () => Retractables.i.tous(EcranAccueil.cles, ferme)));
+                        },
+                      ),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
                     ],
@@ -284,10 +317,8 @@ class _Etapes extends StatelessWidget {
               children: [
                 // 01/11/2026 (Aristide) : une icône à la place du numéro.
                 // 03/11/2026 : les images d'Emplettes pour préparer et faire les courses.
-                if (i != 1)
-                  ImageEmplettes(ImageEmplettes.pourIcone(_icones[i]), taille: 52)
-                else
-                  Icone(_icones[i], size: 52),
+                // 09/11/2026 (Aristide) : la liste validée attend les courses : chariot vide et liste non cochée.
+                ImageEmplettes(i == 1 ? 'liste_a_faire' : ImageEmplettes.pourIcone(_icones[i]), taille: 52),
                 const SizedBox(height: 6),
                 Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],

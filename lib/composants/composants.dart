@@ -666,9 +666,13 @@ class GroupeRetractable extends StatelessWidget {
     this.ajoute = false,
     this.actions = const [],
     this.pliable = false,
+    this.emplettes,
   });
   final String cle;
   final bool ajoute;
+
+  /// Image d'Emplettes du bandeau (assets/emplettes/<nom>.png), prioritaire sur [icone].
+  final String? emplettes;
 
   /// Déplier / replier en touchant le bandeau (chevron), état gardé par [cle] ; [parDefaut] : ouvert au départ
   /// (01/11/2026, Aristide : Historique et Archives, repliés par défaut).
@@ -700,7 +704,10 @@ class GroupeRetractable extends StatelessWidget {
 
   Widget _construire(BuildContext context, bool ouvert) {
     // 03/11/2026 (Aristide) : les groupes de listes à préparer et à faire prennent les images d'Emplettes.
-    final signe = image != null
+    // 09/11/2026 (Aristide) : « À faire » = chariot vide et liste non cochée ; « Terminées » = liste cochée.
+    final signe = emplettes != null
+        ? ImageEmplettes(emplettes!, taille: 46)
+        : image != null
         ? Pictogramme(image!, taille: 46)
         : icone == Icons.checklist || icone == Icons.shopping_cart_outlined
             ? ImageEmplettes(ImageEmplettes.pourIcone(icone), taille: 46)
@@ -726,7 +733,8 @@ class GroupeRetractable extends StatelessWidget {
           ajoute: ajoute,
           grand: true,
           image: image,
-          icone: icone,
+          // L'image d'Emplettes est dessinée par-dessus : le bandeau lui réserve la même place qu'à une icône.
+          icone: icone ?? (emplettes != null ? Icons.circle_outlined : null),
           signeAuDessus: true,
           ouvert: pliable ? ouvert : null,
           onTap: pliable
@@ -771,8 +779,6 @@ class TitreSection extends StatelessWidget {
 }
 
 // ----------------------------------------------------------------- Boutons
-
-/// Action « Tout replier » / « Tout déplier » des groupes [cles] (menu de l'en-tête).
 
 class Bouton extends StatelessWidget {
   const Bouton({

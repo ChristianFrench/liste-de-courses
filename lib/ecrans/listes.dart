@@ -48,7 +48,7 @@ class SousEcranPreparer extends StatelessWidget {
           GroupeRetractable(
             cle: 'preparer/pretes',
             titre: 'Prêtes pour les courses',
-            icone: Icons.shopping_cart_outlined,
+            emplettes: 'liste_a_faire',
             nombre: pretes.length,
             vide: 'Aucune liste prête.',
             enfants: [
@@ -578,7 +578,7 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
           pliable: true,
           parDefaut: true,
           titre: 'À faire',
-          icone: Icons.shopping_cart_outlined,
+          emplettes: 'liste_a_faire',
           nombre: pretes.length,
           vide: 'Aucune liste prête.',
           enfants: [
@@ -610,48 +610,12 @@ class _SousEcranCoursesState extends State<SousEcranCourses> {
             pliable: true,
             parDefaut: true,
             titre: 'Terminées',
-            icone: Icons.receipt_long_outlined,
+            emplettes: 'liste_terminee',
             nombre: enInstance.length,
-            enfants: [for (final c in enInstance) _ligneTerminee(context, c)],
+            enfants: [for (final c in enInstance) ligneTerminee(context, c)],
           ),
         ...groupesPasses(context, etat),
       ],
-    );
-  }
-
-  /// Une course terminée : l'icône de ticket s'il est joint ; glisser à droite la passe dans l'historique.
-  Widget _ligneTerminee(BuildContext context, Course c) {
-    final t = etat.ticketDe(c.id);
-    final titre = '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}';
-    final historique = ActionLigne(Icons.history, 'Mettre en historique', () {
-      etat.mettreEnHistorique(c);
-      Nav.message(context, 'Course passée dans l\'historique', annuler: () => etat.remettreSansTicket(c));
-    });
-    return Glissable(
-      key: ValueKey('glisser-${c.id}'),
-      titre: titre,
-      detail: [
-        '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
-        if (etat.membre(c.membreId)?.nomAffiche case final qui? when qui.isNotEmpty) 'par $qui',
-        t == null ? 'sans ticket' : 'ticket joint · ${euros(t.montant)}',
-      ].join(' · '),
-      auToucher: true,
-      versDroite: historique,
-      actions: [
-        if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
-        if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
-        historique,
-        if (etat.liste(c.id) != null) consulterListe(context, c.id),
-      ],
-      child: LigneMenu(
-        titre: titre,
-        sousTitre: t == null ? '${c.nbArticles} art.' : '${c.nbArticles} art. · ${euros(t.montant)}',
-        droite: t == null
-            ? null
-            : const Padding(
-                padding: EdgeInsets.only(right: 4),
-                child: Icone(Icons.receipt_long_outlined, key: ValueKey('ticket-joint'), size: 26, semanticLabel: 'Ticket joint')),
-      ),
     );
   }
 
@@ -796,4 +760,41 @@ String? quandParcours(Etat etat, Parcours p) {
   final d = etat.dateParcours(p);
   if (d == null) return null;
   return etat.datesParcours.containsKey(p.id) ? 'le ${jjmm(d)} à ${deux(d.hour)}h${deux(d.minute)}' : 'le ${jjmm(d)}';
+}
+
+/// Une course terminée (onglet Courses et accueil) : glisser à droite la met en historique.
+Widget ligneTerminee(BuildContext context, Course c) {
+  final etat = Etat.instance;
+  final t = etat.ticketDe(c.id);
+  final titre = '${jjmm(c.dateCourses)} · ${etat.magasin(c.magasinId)?.nom ?? ''}';
+  final historique = ActionLigne(Icons.history, 'Mettre en historique', () {
+    etat.mettreEnHistorique(c);
+    Nav.message(context, 'Course passée dans l\'historique', annuler: () => etat.remettreSansTicket(c));
+  });
+  return Glissable(
+    key: ValueKey('glisser-${c.id}'),
+    titre: titre,
+    detail: [
+      '${c.nbArticles} article${c.nbArticles > 1 ? 's' : ''}',
+      if (etat.membre(c.membreId)?.nomAffiche case final qui? when qui.isNotEmpty) 'par $qui',
+      t == null ? 'sans ticket' : 'ticket joint · ${euros(t.montant)}',
+    ].join(' · '),
+    auToucher: true,
+    versDroite: historique,
+    actions: [
+      if (t != null) ActionLigne(Icons.attach_file, 'Voir le ticket', () => ouvrirTicketPdf(context, t)),
+      if (t == null) ActionLigne(Icons.upload_file_outlined, 'Joindre le ticket PDF', () => joindreTicket(context, etat, c)),
+      historique,
+      if (etat.liste(c.id) != null) consulterListe(context, c.id),
+    ],
+    child: LigneMenu(
+      titre: titre,
+      sousTitre: t == null ? '${c.nbArticles} art.' : '${c.nbArticles} art. · ${euros(t.montant)}',
+      droite: t == null
+          ? null
+          : const Padding(
+              padding: EdgeInsets.only(right: 4),
+              child: Icone(Icons.receipt_long_outlined, key: ValueKey('ticket-joint'), size: 26, semanticLabel: 'Ticket joint')),
+    ),
+  );
 }
