@@ -1,11 +1,11 @@
-name: Outil Trier les recettes Keep
+name: Outils recettes Keep
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['outils/trier_recettes_keep/**']
+    paths: ['outils/trier_recettes_keep/**', 'outils/voir_recettes/**']
 jobs:
-  compiler:
+  trier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,3 +19,22 @@ jobs:
         with:
           name: Trier-recettes-Keep
           path: outils/trier_recettes_keep/Trier-recettes-Keep.exe
+  voir:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - name: Compiler la visionneuse
+        working-directory: outils/voir_recettes
+        shell: bash
+        run: |
+          flutter create --org fr.listecourses --project-name voir_recettes --platforms windows .
+          sed -i 's/L"voir_recettes"/L"Mes recettes"/' windows/runner/main.cpp
+          flutter build windows --release
+          cd build/windows/x64/runner/Release && mv voir_recettes.exe "Voir-recettes-Keep.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Voir-recettes-Keep
+          path: outils/voir_recettes/build/windows/x64/runner/Release
