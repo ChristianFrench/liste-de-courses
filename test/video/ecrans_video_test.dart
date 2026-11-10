@@ -99,8 +99,9 @@ void main() {
     await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
     await tester.runAsync(() async {
       final ctx = tester.element(find.byType(Scaffold).first);
-      for (final f in Directory('assets/icones/noto3d').listSync().whereType<File>()) {
-        await precacheImage(AssetImage(f.path), ctx);
+      // 10/11/2026 : toutes les images (pictos maison, symboles, images d'Emplettes, fonds), sinon certaines manquent sur les écrans.
+      for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
+        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
       }
     });
     await tester.pumpAndSettle();

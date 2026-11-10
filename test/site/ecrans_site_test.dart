@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/demonstration.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
-import 'package:liste_de_courses/donnees/pictos.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
@@ -91,14 +90,9 @@ void main() {
     await tester.pumpWidget(RepaintBoundary(key: _cle, child: const ListeDeCoursesApp()));
     await tester.runAsync(() async {
       final ctx = tester.element(find.byType(Scaffold).first);
-      for (final f in ['icone_ronde', 'fonds/ete', 'emplettes/complet', 'emplettes/liste_crayon', 'emplettes/liste_chariot', 'emplettes/filtre']) {
-        await precacheImage(AssetImage('assets/$f.${f == 'fonds/ete' ? 'jpg' : 'png'}'), ctx);
-      }
-      for (final c in pictosDisponibles) {
-        await precacheImage(AssetImage('assets/pictos/png/$c.png'), ctx);
-      }
-      for (final f in Directory('assets/icones/noto3d').listSync().whereType<File>()) {
-        await precacheImage(AssetImage(f.path), ctx);
+      // 10/11/2026 : toutes les images (pictos maison, symboles, images d'Emplettes, fonds), sinon certaines manquent sur les écrans.
+      for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
+        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
       }
     });
     await tester.pumpAndSettle();
