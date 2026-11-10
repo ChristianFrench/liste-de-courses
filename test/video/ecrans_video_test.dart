@@ -217,7 +217,7 @@ void main() {
       await _toucher(tester, _onglet('Gérer'));
       await _toucher(tester, _onglet('Gérer'));
       await _toucher(tester, find.text('Catalogue des produits'));
-      await _toucher(tester, find.text('FRUITS ET LÉGUMES').first);
+      await _toucher(tester, find.text('Fruits et légumes').first);
       await _capture('v18 Catalogue');
     });
     await _essayer('Nouveautés', () async {
