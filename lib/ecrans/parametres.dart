@@ -316,7 +316,7 @@ class EcranDonnees extends _EcranVivant {
       ),
       LigneMenu(
         icone: Icons.playlist_add_check,
-        titre: 'Préliste',
+        titre: 'Mes achats habituels',
         sousTitre: 'Produits présents ${etat.prelistePresencesMin} fois sur les ${etat.prelisteSur} dernières courses',
         onTap: () => _reglerPreliste(context, etat),
       ),
@@ -359,12 +359,12 @@ Future<void> _reglerPreliste(BuildContext context, Etat etat) async {
     context,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, maj) => corpsVolet(
-        titre: 'Règle de la préliste',
+        titre: 'Mes achats habituels',
         contenu: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Un produit entre dans la préliste s\'il figure au moins', style: Charte.texte(15)),
+            Text('Un article fait partie de vos achats habituels s\'il figure au moins', style: Charte.texte(15)),
             _Compteur(valeur: presences, min: 1, max: sur, onChange: (v) => maj(() => presences = v)),
             Text('fois sur les dernières courses du magasin, au nombre de', style: Charte.texte(15)),
             _Compteur(valeur: sur, min: presences, max: 20, onChange: (v) => maj(() => sur = v)),

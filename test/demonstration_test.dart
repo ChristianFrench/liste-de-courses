@@ -34,5 +34,8 @@ void main() {
     expect(depannage.nbCoches, 4);
     expect(depannage.parcoursId, isNotNull);
     expect(enVie['Anniversaire de Léa']!.statut, StatutListe.prete);
+    // Mes achats habituels (10/11/2026) : les courses de la démo en donnent dans le magasin le plus fréquenté.
+    final habituel = [for (final m in etat.magasins) etat.preliste(m.id).length]..sort();
+    expect(habituel.last, greaterThan(3));
   });
 }

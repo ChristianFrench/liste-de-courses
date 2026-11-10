@@ -155,12 +155,6 @@ void main() {
   setUp(_donnees);
 
   group('Règles', () {
-    test('préliste : au moins 3 présences sur 6', () {
-      final ids = Etat.instance.preliste('mg1').map((g) => g.produitId).toSet();
-      expect(ids, containsAll(<String>['p1', 'p2', 'p3', 'p4', 'p15', 'p16', 'p17', 'p19', 'p5', 'p7']));
-      expect(ids, isNot(contains('p18')));
-    });
-
     test('7. ordre du parcours ; changer de parcours change l\'ordre ; « Non placé » en dernier', () {
       final e = Etat.instance;
       final l = e.liste('l4')!;
@@ -364,6 +358,38 @@ void main() {
       e.deplacerRayonParcours(p, rayons.length - 1, 0);
       expect(e.secteur(p.etapes.first)!.rayonId, rayons.last.id);
       expect(e.rayonsDuParcours(p).first.id, rayons.last.id);
+    });
+
+    test('parcours lissé : un écart isolé ne change rien, une erreur du premier passage se corrige', () {
+      // Premier passage erroné : c avant b. Un seul passage contraire ne suffit pas.
+      expect(Etat.lisserParcours(['a', 'c', 'b', 'd'], [['a', 'c', 'b', 'd'], ['a', 'b', 'c', 'd']]), ['a', 'c', 'b', 'd']);
+      // Deux passages b avant c contre un : b repasse devant c.
+      expect(Etat.lisserParcours(['a', 'c', 'b', 'd'], [['a', 'c', 'b', 'd'], ['a', 'b', 'c', 'd'], ['a', 'b', 'c', 'd']]),
+          ['a', 'b', 'c', 'd']);
+      // Un oubli rattrapé (a revisité à la fin) une seule fois : l'ordre reste.
+      expect(Etat.lisserParcours(['a', 'b', 'c'], [['a', 'b', 'c'], ['a', 'b', 'c'], ['b', 'c', 'a']]), ['a', 'b', 'c']);
+      // Un secteur peut remonter de plusieurs places.
+      expect(Etat.lisserParcours(['a', 'b', 'c', 'd'], [['d', 'a', 'b', 'c'], ['d', 'a', 'b', 'c']]), ['d', 'a', 'b', 'c']);
+      // Un seul passage : rien ne bouge.
+      expect(Etat.lisserParcours(['a', 'b'], [['b', 'a']]), ['a', 'b']);
+    });
+
+    test('mes achats habituels : articles achetés au moins N fois sur les M dernières courses', () {
+      final e = Etat.instance;
+      final mag = e.magasins.first.id;
+      final courses = e.dernieresCourses(mag, nombre: e.prelisteSur);
+      final nb = e.achatsRecents(mag);
+      final pl = e.preliste(mag);
+      if (courses.isEmpty) {
+        expect(pl, isEmpty);
+        return;
+      }
+      final seuil = e.prelistePresencesMin < courses.length ? e.prelistePresencesMin : courses.length;
+      expect(pl.every((g) => nb[g.produitId]! >= seuil), isTrue);
+      expect(nb.entries.where((x) => x.value >= seuil && e.produit(x.key) != null).length, pl.length);
+      for (var i = 1; i < pl.length; i++) {
+        expect(nb[pl[i - 1].produitId]! >= nb[pl[i].produitId]!, isTrue, reason: 'les plus fréquents d\'abord');
+      }
     });
 
     test('parcours appris : ordre des articles cochés, puis secteurs nouveaux insérés à leur place', () {

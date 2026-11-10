@@ -262,6 +262,7 @@ class _Etapes extends StatelessWidget {
       [
         'Dans l\'onglet Préparer, touchez « + Nouvelle liste », choisissez le magasin, puis comment commencer :',
         '• Liste type : une de vos listes types, ou la liste complète du magasin, rayon par rayon.',
+        '• Mes achats habituels : les articles que vous achetez régulièrement dans ce magasin, à décocher si besoin.',
         '• Liste personnalisée : vous reprenez des articles d\'une de vos dernières courses.',
         '• Liste depuis un texte : vous collez le texte d\'un mail ou d\'un message, les articles sont reconnus dans le catalogue.',
         'Tapez le début du nom d\'un article dans le champ de recherche et touchez-le : il s\'ajoute à la liste, '

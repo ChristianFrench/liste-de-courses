@@ -587,6 +587,11 @@ class Etat extends ChangeNotifier {
   /// Date et heure du dernier apprentissage ou de la fusion de chaque parcours (03/11/2026).
   Map<String, DateTime> datesParcours = {};
 
+  /// 10/11/2026 (Aristide) : ordre des secteurs des derniers passages de chaque parcours (5 au plus),
+  /// pour lisser l'ordre appris (voir [lisserParcours]).
+  Map<String, List<List<String>>> passagesParcours = {};
+  static const maxPassages = 5;
+
   /// Produits ajoutés (« a ») ou modifiés (« m ») par le foyer, par rapport au catalogue de départ.
   Map<String, String> produitsPerso = {};
 
@@ -1242,6 +1247,10 @@ class Etat extends ChangeNotifier {
       for (final e in (options?['datesParcours'] as Map? ?? {}).entries)
         if (_date(e.value) case final d?) e.key as String: d
     };
+    passagesParcours = {
+      for (final e in (options?['passagesParcours'] as Map? ?? {}).entries)
+        e.key as String: [for (final p in (e.value as List? ?? const [])) _ids(p)]
+    };
     produitsPerso = {for (final e in (options?['produitsPerso'] as Map? ?? {}).entries) e.key as String: e.value as String};
     marquesSecteurs = {
       for (final e in (options?['marquesSecteurs'] as Map? ?? {}).entries)
@@ -1406,6 +1415,7 @@ class Etat extends ChangeNotifier {
             if (parcoursAppris.isNotEmpty) 'parcoursAppris': parcoursAppris.toList(),
             if (parcoursFusionnes.isNotEmpty) 'parcoursFusionnes': parcoursFusionnes.toList(),
             if (datesParcours.isNotEmpty) 'datesParcours': {for (final e in datesParcours.entries) e.key: e.value.toIso8601String()},
+            if (passagesParcours.isNotEmpty) 'passagesParcours': passagesParcours,
             if (produitsPerso.isNotEmpty) 'produitsPerso': produitsPerso,
             if (marquesSecteurs.isNotEmpty) 'marquesSecteurs': marquesSecteurs,
             if (statutsMembres.isNotEmpty) 'statutsMembres': statutsMembres,
@@ -2185,14 +2195,47 @@ class Etat extends ChangeNotifier {
 
   Map<String, int> frequencesDu(String magasinId) => frequences[magasinId] ?? const {};
 
-  List<LigneListe> preliste(String magasinId) => [
-        for (final e in frequencesDu(magasinId).entries)
-          if (e.value >= prelistePresencesMin && produit(e.key) != null)
-            LigneListe(
-              produitId: e.key,
-              packagingId: produit(e.key)!.packagingIds.isNotEmpty ? produit(e.key)!.packagingIds.first : null,
-            )
-      ];
+  /// 10/11/2026 (Aristide) : « Mes achats habituels » : les articles achetés au moins [prelistePresencesMin] fois
+  /// sur les [prelisteSur] dernières courses du magasin (seuil réduit s'il y a moins de courses), avec la
+  /// quantité et le packaging de leur dernier achat ; les plus fréquents d'abord.
+  List<LigneListe> preliste(String magasinId) {
+    final courses = dernieresCourses(magasinId, nombre: prelisteSur);
+    if (courses.isEmpty) return [];
+    final seuil = prelistePresencesMin < courses.length ? prelistePresencesMin : courses.length;
+    final nb = <String, int>{};
+    final derniere = <String, LigneListe>{};
+    for (final c in courses) {
+      // Les articles achetés : ceux cochés (les manquants ne comptent pas) ; liste sans coche : tous.
+      final lignes = c.lignes.any((g) => g.coche) ? c.lignes.where((g) => g.coche) : c.lignes;
+      for (final g in lignes) {
+        if (produit(g.produitId) == null) continue;
+        nb[g.produitId] = (nb[g.produitId] ?? 0) + 1;
+        derniere.putIfAbsent(g.produitId, () => g);
+      }
+    }
+    final ids = nb.keys.where((id) => nb[id]! >= seuil).toList()..sort((a, b) => nb[b]!.compareTo(nb[a]!));
+    return [
+      for (final id in ids)
+        LigneListe(
+            produitId: id,
+            marqueId: derniere[id]!.marqueId,
+            packagingId: derniere[id]!.packagingId,
+            quantite: derniere[id]!.quantite,
+            consigne: derniere[id]!.consigne)
+    ];
+  }
+
+  /// Nombre de fois où chaque article a été acheté sur les dernières courses (pour « Mes achats habituels »).
+  Map<String, int> achatsRecents(String magasinId) {
+    final res = <String, int>{};
+    for (final c in dernieresCourses(magasinId, nombre: prelisteSur)) {
+      final lignes = c.lignes.any((g) => g.coche) ? c.lignes.where((g) => g.coche) : c.lignes;
+      for (final g in lignes) {
+        res[g.produitId] = (res[g.produitId] ?? 0) + 1;
+      }
+    }
+    return res;
+  }
 
   // ------------------------------------------------------------ Parcours
 
@@ -2263,6 +2306,9 @@ class Etat extends ChangeNotifier {
     parcoursFusionnes.add(p.id);
     datesParcours[p.id] = DateTime.now();
     datesParcours.remove(autre.id);
+    // Les passages des deux parcours servent au lissage du parcours fusionné (les plus récents gardés).
+    final passages = [...?passagesParcours[p.id], ...?passagesParcours.remove(autre.id)];
+    if (passages.isNotEmpty) passagesParcours[p.id] = passages.sublist(passages.length > maxPassages ? passages.length - maxPassages : 0);
     if (parcoursAppris.contains(autre.id)) parcoursAppris.add(p.id);
     modifie();
     supprimer(autre);
@@ -2401,11 +2447,46 @@ class Etat extends ChangeNotifier {
       parcours.add(p);
       parcoursAppris.add(p.id);
       datesParcours[p.id] = DateTime.now();
+      passagesParcours[p.id] = [suite];
       return p;
     }
-    existant.etapes = insererSecteurs(existant.etapes, suite);
+    final passages = [...?passagesParcours[existant.id], suite];
+    if (passages.length > maxPassages) passages.removeRange(0, passages.length - maxPassages);
+    passagesParcours[existant.id] = passages;
+    existant.etapes = lisserParcours(insererSecteurs(existant.etapes, suite), passages);
     datesParcours[existant.id] = DateTime.now();
     return existant;
+  }
+
+  /// 10/11/2026 (Aristide) : lissage de l'ordre appris sur les derniers passages. Un secteur passe devant
+  /// celui qui le précède si, dans au moins 2 passages et dans la majorité de ceux où les deux ont été visités,
+  /// il a été visité avant lui. Un écart isolé (un oubli rattrapé, un retour en arrière) ne déplace donc rien ;
+  /// une erreur du premier passage se corrige au bout de 3 ou 4 passages.
+  static List<String> lisserParcours(List<String> etapes, List<List<String>> passages) {
+    if (passages.length < 2) return etapes;
+    int avant(String a, String b) {
+      var n = 0;
+      for (final p in passages) {
+        final i = p.indexOf(a), j = p.indexOf(b);
+        if (i >= 0 && j >= 0 && i < j) n++;
+      }
+      return n;
+    }
+    final res = <String>[];
+    for (final s in etapes) {
+      var pos = res.length;
+      while (pos > 0) {
+        final g = res[pos - 1];
+        final pour = avant(s, g), contre = avant(g, s);
+        if (pour >= 2 && pour > contre) {
+          pos--;
+        } else {
+          break;
+        }
+      }
+      res.insert(pos, s);
+    }
+    return res;
   }
 
   /// Insère dans [etapes] les secteurs de [suite] qui n'y sont pas, à leur place relative.

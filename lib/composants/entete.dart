@@ -383,6 +383,8 @@ class Aides {
       'Nouvelle liste simple : vous tapez le début du nom des articles, ils s\'ajoutent les uns sous les autres, sans rayons ni secteurs. '
       'À la fin, la liste peut être rangée par rayons et secteurs.\n'
       'Depuis une liste type : une liste enregistrée sous un nom (ex. « Petit-déjeuner »), ou une liste vide.\n'
+      'Mes achats habituels : les articles que vous achetez régulièrement dans ce magasin (réglage dans Gérer › Paramètres › Données), '
+      'tous cochés ; décochez ceux dont vous n\'avez pas besoin cette fois.\n'
       'Depuis une course passée : une de vos dernières courses ; cochez les articles à reprendre.\n'
       'Depuis un texte : collez le texte d\'une liste (mail, message, note) ; les articles sont reconnus dans le catalogue, '
       'vous décochez ceux à ne pas garder.\n'

@@ -179,6 +179,57 @@ class _EcranPrelisteState extends State<EcranPreliste> {
     _creer(lignes.values.toList(), marques: marques);
   }
 
+  /// 10/11/2026 (Aristide) : « Mes achats habituels » : les articles achetés régulièrement dans ce magasin,
+  /// tous cochés d'avance ; on décoche ceux dont on n'a pas besoin cette fois.
+  Future<void> _achatsHabituels() async {
+    final lignes = etat.preliste(magasinId);
+    final nb = etat.achatsRecents(magasinId);
+    final courses = etat.dernieresCourses(magasinId, nombre: etat.prelisteSur).length;
+    if (lignes.isEmpty) {
+      Nav.message(context, courses == 0 ? 'Aucune course passée dans ce magasin.' : 'Aucun article acheté assez souvent dans ce magasin.');
+      return;
+    }
+    final seuil = etat.prelistePresencesMin < courses ? etat.prelistePresencesMin : courses;
+    final choisis = <int>{for (var i = 0; i < lignes.length; i++) i};
+    final ok = await modale(
+      context,
+      titre: 'Mes achats habituels',
+      icone: Icons.restart_alt,
+      oui: 'Créer la liste',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Achetés au moins $seuil fois sur vos $courses dernières courses ici · décochez ceux dont vous n\'avez pas besoin.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Lien(choisis.length == lignes.length ? 'Tout décocher' : 'Tout cocher', onTap: () => maj(() {
+              if (choisis.length == lignes.length) {
+                choisis.clear();
+              } else {
+                choisis.addAll([for (var i = 0; i < lignes.length; i++) i]);
+              }
+            })),
+          ),
+          for (var i = 0; i < lignes.length; i++)
+            if (etat.produit(lignes[i].produitId) case final p?)
+              CaseModale(
+                key: ValueKey('habituel-${p.id}'),
+                texte: '${p.nom}${lignes[i].quantite > 1 ? ' × ${lignes[i].quantite}' : ''}',
+                aide: [
+                  '${nb[p.id] ?? 0} fois sur $courses',
+                  if (etat.complement(lignes[i], p).isNotEmpty) etat.complement(lignes[i], p),
+                ].join(' · '),
+                coche: choisis.contains(i),
+                onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+                encadree: false,
+              ),
+        ],
+      ),
+    );
+    if (ok && mounted) _creer([for (var i = 0; i < lignes.length; i++) if (choisis.contains(i)) lignes[i]]);
+  }
+
   /// Liste personnalisée : les articles d'une course passée, aucun coché d'avance ; on coche ceux à reprendre.
   Future<void> _voirCourse(Liste ancienne) async {
     final lignes = etat.lignesReprises(ancienne);
@@ -268,7 +319,7 @@ class _EcranPrelisteState extends State<EcranPreliste> {
             cle: 'preliste/depart',
             titre: 'Type de liste',
             icone: Icons.playlist_add,
-            nombre: 7,
+            nombre: 8,
             enfants: [
               LigneMenu(
                 icone: Icons.search,
@@ -287,6 +338,13 @@ class _EcranPrelisteState extends State<EcranPreliste> {
                 titre: 'Depuis une liste type',
                 sousTitre: 'Une de vos listes types, ou une liste vide',
                 onTap: () => _choisirListeType(),
+              ),
+              LigneMenu(
+                key: const ValueKey('achats-habituels'),
+                icone: Icons.restart_alt,
+                titre: 'Mes achats habituels',
+                sousTitre: 'Les articles achetés au moins ${etat.prelistePresencesMin} fois sur vos ${etat.prelisteSur} dernières courses ici',
+                onTap: _achatsHabituels,
               ),
               LigneMenu(
                 icone: Icons.history,
