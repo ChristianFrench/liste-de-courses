@@ -210,7 +210,7 @@ class _EnTetePhoto extends StatelessWidget {
             ),
             // 10/11/2026 (Aristide) : déplier / replier d'un coup tous les groupes, en bas à droite du bandeau.
             Positioned(
-              right: 2,
+              right: 0,
               bottom: 0,
               child: ListenableBuilder(
                 listenable: Retractables.i,
@@ -225,7 +225,7 @@ class _EnTetePhoto extends StatelessWidget {
                           radius: 18,
                           // Étroit, collé au coin : ne chevauche pas « Je fais mes courses ».
                           child: SizedBox(
-                              width: 26,
+                              width: 30,
                               height: 30,
                               child: Icone(ferme ? Icons.unfold_more : Icons.unfold_less,
                                   size: 22, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
