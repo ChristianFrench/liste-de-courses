@@ -1,0 +1,21 @@
+name: Outil Trier les recettes Keep
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['outils/trier_recettes_keep/**']
+jobs:
+  compiler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+      - name: Compiler pour Windows
+        working-directory: outils/trier_recettes_keep
+        run: GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o Trier-recettes-Keep.exe .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Trier-recettes-Keep
+          path: outils/trier_recettes_keep/Trier-recettes-Keep.exe
