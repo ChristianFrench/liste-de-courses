@@ -170,17 +170,6 @@ class _EnTetePhoto extends StatelessWidget {
                             style: _surPhoto(Charte.texte(12.5, couleur: const Color(0xEEFFFFFF)))),
                       ),
                       const BoutonSynchro(),
-                      // 09/11/2026 (Aristide) : déplier / replier d'un coup tous les groupes de l'accueil.
-                      ListenableBuilder(
-                        listenable: Retractables.i,
-                        builder: (context, _) {
-                          final ferme = Retractables.i.tousFermes(EcranAccueil.cles);
-                          return KeyedSubtree(
-                              key: const ValueKey('accueil-tout'),
-                              child: boutonEnTete(ferme ? Icons.unfold_more : Icons.unfold_less, ferme ? 'Tout déplier' : 'Tout replier',
-                                  () => Retractables.i.tous(EcranAccueil.cles, ferme)));
-                        },
-                      ),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
                     ],
@@ -217,6 +206,32 @@ class _EnTetePhoto extends StatelessWidget {
                   // 03/11/2026 (Aristide) : plus de titre « Comment ça marche » ni de trait au-dessus.
                   const _Etapes(),
                 ],
+              ),
+            ),
+            // 10/11/2026 (Aristide) : déplier / replier d'un coup tous les groupes, en bas à droite du bandeau.
+            Positioned(
+              right: 2,
+              bottom: 0,
+              child: ListenableBuilder(
+                listenable: Retractables.i,
+                builder: (context, _) {
+                  final ferme = Retractables.i.tousFermes(EcranAccueil.cles);
+                  return KeyedSubtree(
+                      key: const ValueKey('accueil-tout'),
+                      child: Tooltip(
+                        message: ferme ? 'Tout déplier' : 'Tout replier',
+                        child: InkResponse(
+                          onTap: () => Retractables.i.tous(EcranAccueil.cles, ferme),
+                          radius: 18,
+                          // Étroit, collé au coin : ne chevauche pas « Je fais mes courses ».
+                          child: SizedBox(
+                              width: 26,
+                              height: 30,
+                              child: Icone(ferme ? Icons.unfold_more : Icons.unfold_less,
+                                  size: 22, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
+                        ),
+                      ));
+                },
               ),
             ),
           ],
