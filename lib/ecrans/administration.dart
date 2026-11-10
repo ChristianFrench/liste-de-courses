@@ -8,6 +8,7 @@ import '../theme.dart';
 import 'administration_serveur.dart';
 import 'console_catalogue.dart';
 import 'console_marques.dart';
+import 'console_recettes.dart';
 import 'editeur_catalogue.dart';
 
 // Console d'administration d'Emplettes (06/11/2026, Aristide) : application Windows seule, en fenêtre large,
@@ -16,10 +17,10 @@ import 'editeur_catalogue.dart';
 // - Serveur OVH : initialisation (étapes et état), suivi technique, console shell (administration_serveur.dart) ;
 // - Utilisateurs : foyers, appareils et suivi des activités (à venir) ;
 // - Contenu : catalogue des produits (à gauche la vue du téléphone, à droite les actions de maintenance),
-//   catalogue des marques (console_marques.dart, 08/11/2026) ;
+//   catalogue des marques (console_marques.dart, 08/11/2026), catalogue des recettes (console_recettes.dart) ;
 // - Apparence : palette de la console.
 
-enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, marques, apparence }
+enum Rubrique { initialisation, suivi, shell, utilisateurs, produits, marques, recettes, apparence }
 
 class _Entree {
   const _Entree(this.rubrique, this.titre, this.icone);
@@ -38,6 +39,7 @@ const _groupes = <(String, List<_Entree>)>[
   ('Contenu', [
     _Entree(Rubrique.produits, 'Catalogue des produits', Icons.inventory_2_outlined),
     _Entree(Rubrique.marques, 'Catalogue des marques', Icons.sell_outlined),
+    _Entree(Rubrique.recettes, 'Catalogue des recettes', Icons.menu_book_outlined),
   ]),
   ('Réglages', [_Entree(Rubrique.apparence, 'Apparence', Icons.palette_outlined)]),
 ];
@@ -96,6 +98,7 @@ class _ConsoleAdministrationState extends State<ConsoleAdministration> {
                 ],
               ),
             Rubrique.marques => const PageCatalogueMarques(),
+            Rubrique.recettes => const PageRecettes(),
             Rubrique.apparence => const _PageApparence(),
           },
         ),

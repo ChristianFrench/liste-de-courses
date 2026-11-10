@@ -225,6 +225,7 @@ void main() {
       (Rubrique.shell, '4c-Console-shell'),
       (Rubrique.utilisateurs, '5-Utilisateurs'),
       (Rubrique.marques, '6-Catalogue-des-marques'),
+      (Rubrique.recettes, '6b-Catalogue-des-recettes'),
       (Rubrique.apparence, '7-Apparence'),
     ]) {
       await tester.tap(find.byKey(ValueKey('rubrique-${r.name}')));
