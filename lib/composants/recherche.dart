@@ -11,17 +11,28 @@ const lettresRecherche = 3;
 /// Résultats montrés d'abord ; « Voir plus » montre les autres (31/10/2026 : affichage moins encombré).
 const premiersResultats = 8;
 
+/// 10/11/2026 (Aristide) : petits mots sans grand sens, ignorés dans les noms et dans le texte tapé
+/// (« pou » ne ramène plus tous les « … pour chat »). « sans » reste : « sans sel », « sans gluten ».
+const motsOutils = {'a', 'au', 'aux', 'avec', 'd', 'de', 'des', 'du', 'en', 'et', 'l', 'la', 'le', 'les', 'ou', 'par', 'pour', 'sur', 'un', 'une'};
+
+/// Mots d'un texte normalisé, sans les mots outils (tous gardés s'il n'y a que des mots outils).
+List<String> motsUtiles(String n) {
+  final mots = n.split(' ').where((m) => m.isNotEmpty).toList();
+  final utiles = mots.where((m) => !motsOutils.contains(m)).toList();
+  return utiles.isEmpty ? mots : utiles;
+}
+
 /// Articles dont un mot commence par le texte tapé (sans tenir compte des accents ni des majuscules) ;
 /// chaque mot tapé doit commencer un mot du nom. Ceux dont le nom commence par le texte viennent d'abord,
 /// puis les plus achetés par le foyer, puis les plus courants en magasin (popularité Open Food Facts).
 List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int max = 40}) {
-  final q = normaliser(texte).split(' ').where((m) => m.isNotEmpty).toList();
+  final q = motsUtiles(normaliser(texte));
   if (q.isEmpty || normaliser(texte).length < lettresRecherche) return [];
   final etat = Etat.instance;
   final res = <(Produit, bool)>[];
   for (final p in produits) {
     final n = normaliser(p.nom);
-    final mots = n.split(' ');
+    final mots = motsUtiles(n);
     if (q.every((m) => mots.any((x) => x.startsWith(m)))) res.add((p, n.startsWith(q.first)));
   }
   res.sort((a, b) {
@@ -41,13 +52,13 @@ List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int ma
 /// Camembert · Président. Ceux qui reprennent des mots du nom d'abord, puis la nature, l'usage, la popularité.
 List<(Produit, String)> chercherMarques(Iterable<Produit> produits, String texte, {int max = 6}) {
   final etat = Etat.instance;
-  final q = normaliser(texte).split(' ').where((m) => m.isNotEmpty).toList();
+  final q = motsUtiles(normaliser(texte));
   if (q.isEmpty || normaliser(texte).length < lettresRecherche) return [];
   final parSecteur = <String, List<String>>{};
   final res = <(Produit, String, int, bool)>[];
   for (final p in produits) {
     final nom = normaliser(p.nom);
-    final motsNom = nom.split(' ');
+    final motsNom = motsUtiles(nom);
     final nature = etat.naturesOff[p.nom.toLowerCase()]?.marques ?? const <String>[];
     final s = etat.secteurCatalogue(p.id);
     // 08/11/2026 : les déclinaisons du produit (marques déjà achetées) se trouvent aussi par la marque seule.
