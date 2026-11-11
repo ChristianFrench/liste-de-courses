@@ -114,8 +114,12 @@ class _PageRecettesState extends State<PageRecettes> {
       );
 
   Widget _aucune(BaseRecettes b) => Center(
-        child: Text(b.recettes.isEmpty ? 'Aucune recette : importez un dossier Keep.' : 'Choisissez une recette à gauche.',
-            style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Image.asset('assets/recettes/recettes-de-cuisine.png', width: 128, height: 128),
+          const SizedBox(height: 12),
+          Text(b.recettes.isEmpty ? 'Aucune recette : importez un dossier Keep.' : 'Choisissez une recette à gauche.',
+              style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+        ]),
       );
 
   Widget _liste(BaseRecettes b) {
@@ -134,7 +138,9 @@ class _PageRecettesState extends State<PageRecettes> {
           padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
           child: Row(children: [
             Icone(ouvert ? Icons.expand_more : Icons.chevron_right, color: Charte.cadre),
-            const SizedBox(width: 6),
+            const SizedBox(width: 4),
+            Image.asset(iconeTypeRecette(type), width: 36, height: 36),
+            const SizedBox(width: 10),
             Expanded(child: Text(type, style: Charte.texte(16, gras: true, couleur: Charte.encreNiveau))),
             Text('${visibles.length}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
           ]),
@@ -196,6 +202,17 @@ class _PageRecettesState extends State<PageRecettes> {
   }
 }
 
+/// Icône d'un type de recette (images d'Aristide, 11/11/2026) ; « recettes-de-cuisine » pour les autres.
+String iconeTypeRecette(String type) {
+  final t = type.toLowerCase();
+  if (t.startsWith('dessert')) return 'assets/recettes/desserts.png';
+  if (t.startsWith('entr')) return 'assets/recettes/entrees.png';
+  if (t.contains('accompagnement')) return 'assets/recettes/plats-accompagnement.png';
+  if (t.startsWith('plat')) return 'assets/recettes/plats-complets.png';
+  if (t.startsWith('sauce')) return 'assets/recettes/sauces.png';
+  return 'assets/recettes/recettes-de-cuisine.png';
+}
+
 Widget _vignette(BaseRecettes b, Recette r, double taille) {
   final f = r.photos.isEmpty ? null : b.photo(r.photos.first);
   return ClipRRect(
@@ -204,7 +221,7 @@ Widget _vignette(BaseRecettes b, Recette r, double taille) {
       width: taille,
       height: taille,
       child: f == null || !f.existsSync()
-          ? Container(color: Charte.placeholder, child: Icone(Icons.restaurant_menu, color: Charte.texteSecondaire))
+          ? Image.asset(iconeTypeRecette(r.types.isEmpty ? '' : r.types.first), fit: BoxFit.contain)
           : Image.file(f, fit: BoxFit.cover, cacheWidth: (taille * 2).round()),
     ),
   );
@@ -238,7 +255,11 @@ class FicheRecette extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                       decoration: BoxDecoration(color: Charte.blanc, borderRadius: BorderRadius.circular(12), border: Border.all(color: Charte.cadre)),
-                      child: Text(t, style: Charte.texte(13, couleur: Charte.cadre)),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Image.asset(iconeTypeRecette(t), width: 18, height: 18),
+                        const SizedBox(width: 5),
+                        Text(t, style: Charte.texte(13, couleur: Charte.cadre)),
+                      ]),
                     ),
                   Text(
                       '${r.ingredients.length} ingrédient${r.ingredients.length > 1 ? 's' : ''} · ${r.photos.length} photo${r.photos.length > 1 ? 's' : ''}'
