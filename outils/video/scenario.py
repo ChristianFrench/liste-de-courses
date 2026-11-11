@@ -58,7 +58,7 @@ SEGMENTS = [
     ('19', 'Et il s\'améliore pour tous les foyers.', [tel('v19 Nouveautes', [tap(3.0, 195, 777)])], 0),
     ('20', 'Inviter un proche : un code, sans compte ni mot de passe.', [dict(type='mail')], 0),
     ('21', 'Un message au foyer, reçu même application fermée.', [dict(type='notif')], 0),
-    ('22', 'Emplettes : gratuit, sur Android, Windows et dans le navigateur.', [dict(type='fin')], 0),
+    ('22', 'Emplettes, sur Android et sur Windows. Essayez la démonstration sur emplettes.eu.', [dict(type='fin')], 0),
 ]
 
 AVANT, APRES = 0.5, 1.1  # silence avant et après chaque voix

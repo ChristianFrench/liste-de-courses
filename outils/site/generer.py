@@ -76,7 +76,6 @@ BAS = f'''<footer>
       <ul>
         <li><a href="{APK}">Android (APK)</a></li>
         <li><a href="{EXE}">Windows</a></li>
-        <li><a href="web/">Application web</a></li>
         <li><a href="telecharger.html">Installer pas à pas</a></li>
       </ul>
     </div>
@@ -244,7 +243,7 @@ window.VISITE_DETAIL = {json.dumps([dict(f=f, t=t, x=x, p=p) for f, t, x, p in V
 '''
 
 # ------------------------------------------------------------------ Télécharger
-TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes sur téléphone Android, sur PC Windows ou dans le navigateur.') + f'''<main>
+TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes sur téléphone Android ou sur PC Windows.') + f'''<main>
   <section>
     <div class="large">
       <div class="telechargements">
@@ -259,12 +258,6 @@ TELECHARGER = titre_page('icones/inbox-tray.png', 'Télécharger', 'Emplettes su
           <p>Un programme d'installation, qui sert aussi aux mises à jour.</p>
           <ol class="note" style="margin:0;padding-left:18px"><li>Téléchargez et ouvrez « Emplettes-Installation.exe ».</li><li>Si Windows affiche « Windows a protégé votre ordinateur » : « Informations complémentaires » › « Exécuter quand même ».</li><li>Pour mettre à jour, refaites la même chose : vos listes et votre foyer sont conservés.</li></ol>
           <a class="bouton plein" href="{EXE}">Télécharger pour Windows</a>
-        </div>
-        <div class="telechargement">
-          <div class="tete"><img src="icones/globe-showing-europe-africa.png" alt=""><h3>iPhone, iPad, navigateur</h3></div>
-          <p>Rien à installer : l'application s'ouvre dans le navigateur, même sans réseau ensuite.</p>
-          <ol class="note" style="margin:0;padding-left:18px"><li>Ouvrez l'application web.</li><li>iPhone et iPad : Partager › « Sur l'écran d'accueil ».</li><li>Sur Android, préférez l'APK : la version web garde ses propres données, à part de celles de l'application.</li></ol>
-          <a class="bouton plein" href="web/">Ouvrir l'application web</a>
         </div>
       </div>
       <p class="note" id="version">Version en essai.</p>
@@ -359,7 +352,6 @@ ESSAYER = titre_page('icones/check-mark-button.png', 'Essayer', 'La démonstrati
       <div class="petit-ecran-seulement">
         <div class="boutons">
           <a class="bouton plein" href="demo/">Ouvrir la démonstration</a>
-          <a class="bouton" href="web/">Ouvrir l'application</a>
         </div>
       </div>
     </div>
@@ -370,7 +362,7 @@ ESSAYER = titre_page('icones/check-mark-button.png', 'Essayer', 'La démonstrati
 CONTENUS = {
     'index.html': ('Emplettes', 'Emplettes : la liste de courses du foyer, préparée à plusieurs, faite dans l\'ordre des rayons.', ACCUEIL),
     'decouvrir.html': ('Découvrir · Emplettes', 'Les écrans d\'Emplettes, un par un.', DECOUVRIR),
-    'telecharger.html': ('Télécharger · Emplettes', 'Emplettes pour Android, Windows et navigateur.', TELECHARGER),
+    'telecharger.html': ('Télécharger · Emplettes', 'Emplettes pour Android et Windows.', TELECHARGER),
     'aide.html': ('Aide · Emplettes', 'Mode d\'emploi, dépliant et questions fréquentes.', AIDE),
     'essayer.html': ('Essayer · Emplettes', 'La démonstration d\'Emplettes.', ESSAYER),
 }
