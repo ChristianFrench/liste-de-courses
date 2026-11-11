@@ -40,6 +40,7 @@ extension FoyerDemonstration on Etat {
 
     // Ordre de visite propre à chaque magasin : les rayons mélangés une fois pour toutes.
     final ordreMagasin = <String, Map<String, int>>{};
+    final rangDansSecteurs = {for (var i = 0; i < secteurs.length; i++) secteurs[i].id: i};
     int rangSecteur(Magasin m, String produitId) {
       final ordre = ordreMagasin.putIfAbsent(m.id, () {
         final rs = rayons.where((r) => r.magasinId == m.id).toList()..shuffle(hasard);
@@ -50,7 +51,7 @@ extension FoyerDemonstration on Etat {
       final s = secteurDe(m.id, produitId);
       if (s == null) return 1 << 20;
       final rang = ordre[s.rayonId] ?? 999;
-      return rang * 1000 + secteurs.indexOf(s) % 1000;
+      return rang * 1000 + (rangDansSecteurs[s.id] ?? 0) % 1000;
     }
 
     Liste nouvelle(Magasin m, String? nom, StatutListe statut, List<String> noms, DateTime le, Membre par) {

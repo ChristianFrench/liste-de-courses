@@ -896,7 +896,22 @@ class Etat extends ChangeNotifier {
     _foyer = Stockage.ouvrir(_chemin(baseFoyer));
   }
 
+  // Ouverture en un seul enregistrement (11/11/2026) : chaque modification de la préparation (magasins du
+  // foyer neuf, exemples, démonstration, lots, formats…) réécrivait toute la base ; le premier lancement de la
+  // démonstration en était ralenti de plusieurs secondes.
   Future<void> _ouvrirActif() async {
+    final dejaEnLot = _enLot;
+    _enLot = true;
+    _modifieEnAttente = false;
+    try {
+      await _ouvrirActifEnLot();
+    } finally {
+      _enLot = dejaEnLot;
+      if (_modifieEnAttente && !dejaEnLot) modifie();
+    }
+  }
+
+  Future<void> _ouvrirActifEnLot() async {
     final s = _actif!;
     if (s.vide) {
       lire(_depart(await _donneesDemo()));
@@ -2594,37 +2609,56 @@ class Etat extends ChangeNotifier {
     if (taille <= 0) return 0;
     catalogue ??= await CatalogueType.lireJson();
     final parNom = {for (final p in produits) p.nom.toLowerCase(): p};
+    // Index locaux (11/11/2026) : sans eux, chaque produit parcourait tous les emplacements, et le premier
+    // lancement de la démonstration (six magasins de 2 300 produits) calculait une dizaine de secondes.
+    final homonymes = <String, List<Produit>>{};
+    for (final p in produits) {
+      homonymes.putIfAbsent(p.nom.toLowerCase(), () => []).add(p);
+    }
+    final ici = <String, Emplacement>{};
+    for (final e in emplacements) {
+      if (e.magasinId == m.id) ici.putIfAbsent(e.produitId, () => e);
+    }
+    final rayonsIci = {for (final x in rayons.reversed) if (x.magasinId == m.id) x.nom: x};
     var n = 0;
     for (final r in (catalogue['rayons'] as List).cast<Map>()) {
       final secteursR = (r['secteurs'] as List).cast<Map>().where((s) => (s['taille'] as num) <= taille).toList();
       if (secteursR.isEmpty) continue;
-      final rayon = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == r['nom']) ??
-          (Rayon(nouvelId('r'), m.id, r['nom'] as String)..let(rayons.add));
+      final rayon = rayonsIci[r['nom']] ??
+          (Rayon(nouvelId('r'), m.id, r['nom'] as String)..let(rayons.add)..let((x) => rayonsIci[x.nom] = x));
+      final secteursIci = {for (final x in secteurs.reversed) if (x.rayonId == rayon.id) x.nom: x};
       for (final s in secteursR) {
-        final secteur = _trouve(secteurs, (x) => x.rayonId == rayon.id && x.nom == s['nom']) ??
-            (Secteur(nouvelId('s'), rayon.id, s['nom'] as String)..let(secteurs.add));
+        final secteur = secteursIci[s['nom']] ??
+            (Secteur(nouvelId('s'), rayon.id, s['nom'] as String)..let(secteurs.add)..let((x) => secteursIci[x.nom] = x));
         for (final p in (s['produits'] as List).cast<Map>()) {
           if ((p['taille'] as num) > taille) continue;
           final nom = p['nom'] as String;
+          final cle = nom.toLowerCase();
           // Une même nature peut être dans deux secteurs (libre-service et à la coupe) : un produit par secteur.
-          Produit? connu = parNom[nom.toLowerCase()];
+          Produit? connu = parNom[cle];
           if (connu != null) {
-            final ici = _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == connu!.id);
-            if (ici != null && ici.secteurId != secteur.id) {
-              connu = _trouve(produits, (x) =>
-                  x.nom.toLowerCase() == nom.toLowerCase() &&
-                  _trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == x.id && e.secteurId != secteur.id) == null);
+            final e = ici[connu.id];
+            if (e != null && e.secteurId != secteur.id) {
+              connu = _trouve(homonymes[cle] ?? const <Produit>[], (x) {
+                final ex = ici[x.id];
+                return ex == null || ex.secteurId == secteur.id;
+              });
             }
           }
-          final produit = connu ?? (Produit(nouvelId('p'), nom, [], [], 0)..let(produits.add));
-          parNom.putIfAbsent(nom.toLowerCase(), () => produit);
+          final produit = connu ??
+              (Produit(nouvelId('p'), nom, [], [], 0)
+                ..let(produits.add)
+                ..let((x) => homonymes.putIfAbsent(cle, () => []).add(x)));
+          parNom.putIfAbsent(cle, () => produit);
           if (produit.packagingIds.isEmpty) {
             for (final f in (p['formats'] as List? ?? const []).cast<String>()) {
               produit.packagingIds.add(_packagingNomme(f).id);
             }
           }
-          if (_trouve(emplacements, (e) => e.magasinId == m.id && e.produitId == produit.id) == null) {
-            emplacements.add(Emplacement(m.id, produit.id, secteur.id));
+          if (!ici.containsKey(produit.id)) {
+            final e = Emplacement(m.id, produit.id, secteur.id);
+            emplacements.add(e);
+            ici[produit.id] = e;
             n++;
           }
         }

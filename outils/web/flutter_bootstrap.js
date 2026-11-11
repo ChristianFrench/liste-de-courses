@@ -5,8 +5,21 @@
 // garde l'application sur l'appareil pour qu'elle s'ouvre sans réseau.
 _flutter.loader.load();
 
+// Mise en réserve (plus de 30 Mo) seulement une fois l'application affichée : au premier lancement, elle
+// partageait le réseau avec le chargement de l'application et retardait son ouverture (11/11/2026).
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('hors_ligne.js').catch((e) => console.warn('hors_ligne.js :', e));
+  let inscrit = false;
+  const inscrire = () => {
+    if (inscrit) return;
+    inscrit = true;
+    navigator.serviceWorker.register('hors_ligne.js').catch((e) => console.warn('hors_ligne.js :', e));
+  };
+  if (navigator.serviceWorker.controller) {
+    inscrire(); // déjà en réserve : vérifier tout de suite s'il y a une nouvelle version
+  } else {
+    window.addEventListener('flutter-first-frame', () => setTimeout(inscrire, 3000));
+    setTimeout(inscrire, 60000);
+  }
 }
 // Demande au navigateur de ne pas effacer la base (IndexedDB) quand la place manque.
 if (navigator.storage && navigator.storage.persist) {
