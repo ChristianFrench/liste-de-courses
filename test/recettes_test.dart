@@ -66,4 +66,51 @@ void main() {
     source.deleteSync(recursive: true);
     dest.deleteSync(recursive: true);
   });
+
+  test('import Keep avec recettes-normalisees.json : quantité / nom / précision, étapes, remarques', () async {
+    final source = Directory.systemTemp.createTempSync('keepn');
+    final dest = Directory.systemTemp.createTempSync('basen');
+    File('${source.path}/Ecrase.json').writeAsStringSync(jsonEncode({
+      'title': 'ecrase',
+      'textContent': 'patates, huile. Cuire.',
+      'createdTimestampUsec': 42,
+      'labels': [
+        {'name': 'Recettes Plats'}
+      ],
+    }));
+    File('${source.path}/$fichierNormalise').writeAsStringSync(jsonEncode([
+      {
+        'fichier': 'Ecrase.json',
+        'titre': 'Écrasé de pommes de terre',
+        'types': ['Plats', 'Plats Accompagnement'],
+        'ingredients': [
+          {'nom': 'Pommes de terre', 'quantite': '1 kg', 'precision': 'type Charlotte'},
+          {'nom': 'Huile d\'olive', 'quantite': '', 'precision': ''},
+        ],
+        'etapes': ['Cuire les pommes de terre.', 'Écraser à la fourchette.'],
+        'conseils': [],
+        'remarques': ['Quantité d\'huile à préciser.'],
+        'memo': false,
+        'texte_origine': 'patates, huile. Cuire.',
+      }
+    ]));
+    final b = BaseRecettes(dest);
+    final bilan = await b.importerKeep(source);
+    expect(bilan.ajoutees, 1);
+    expect(bilan.normalisees, 1);
+    final r = b.recettes.single;
+    expect(r.id, 'keep-42');
+    expect(r.titre, 'Écrasé de pommes de terre');
+    expect(r.types, ['Plats', 'Plats accompagnement']);
+    expect(r.detail.first.quantite, '1 kg');
+    expect(r.ingredients, ['1 kg Pommes de terre (type Charlotte)', 'Huile d\'olive']);
+    expect(r.etapes, hasLength(2));
+    expect(r.remarques, hasLength(1));
+    final relue = (await BaseRecettes.ouvrir(dossier: dest)).recettes.single;
+    expect(relue.detail.last.nom, 'Huile d\'olive');
+    expect(relue.etapes.last, 'Écraser à la fourchette.');
+    expect(relue.texteOrigine, contains('patates'));
+    source.deleteSync(recursive: true);
+    dest.deleteSync(recursive: true);
+  });
 }

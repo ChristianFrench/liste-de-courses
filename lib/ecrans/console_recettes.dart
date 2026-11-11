@@ -282,10 +282,7 @@ class FicheRecette extends StatelessWidget {
           child: TabBarView(children: [
             _photos(),
             _ingredients(),
-            SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
-              child: SelectableText(r.preparation.isEmpty ? '—' : r.preparation, style: Charte.texte(16).copyWith(height: 1.45)),
-            ),
+            _recette(),
           ]),
         ),
       ]),
@@ -309,10 +306,103 @@ class FicheRecette extends StatelessWidget {
     ]);
   }
 
+  Widget _titre(String t) => Padding(
+        padding: const EdgeInsets.only(top: 18, bottom: 8),
+        child: Text(t, style: Charte.texte(16, gras: true, couleur: Charte.encreNiveau)),
+      );
+
+  /// Onglet Recette : étapes numérotées, conseils, remarques à confirmer, texte Keep d'origine (replié).
+  Widget _recette() {
+    final r = recette;
+    if (r.etapes.isEmpty) {
+      return SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(22, 16, 22, 22),
+        child: SelectableText(r.preparation.isEmpty ? '—' : r.preparation, style: Charte.texte(16).copyWith(height: 1.45)),
+      );
+    }
+    return ListView(padding: const EdgeInsets.fromLTRB(22, 8, 22, 22), children: [
+      for (var k = 0; k < r.etapes.length; k++)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 28,
+              height: 28,
+              alignment: Alignment.center,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(color: Charte.cadre, shape: BoxShape.circle),
+              child: Text('${k + 1}', style: Charte.texte(14, gras: true, couleur: Charte.blanc)),
+            ),
+            Expanded(child: Padding(padding: const EdgeInsets.only(top: 3), child: SelectableText(r.etapes[k], style: Charte.texte(16).copyWith(height: 1.4)))),
+          ]),
+        ),
+      if (r.conseils.isNotEmpty) ...[
+        _titre('Conseils'),
+        for (final c in r.conseils) _puce(c),
+      ],
+      if (r.remarques.isNotEmpty)
+        Container(
+          margin: const EdgeInsets.only(top: 18),
+          padding: const EdgeInsets.fromLTRB(14, 10, 14, 12),
+          decoration: BoxDecoration(
+            color: Charte.clair(Charte.orange, 0.88),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Charte.orange),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('À confirmer', style: Charte.texte(15, gras: true, couleur: Charte.orange)),
+            const SizedBox(height: 6),
+            for (final m in r.remarques) _puce(m),
+          ]),
+        ),
+      if (r.texteOrigine != null && r.texteOrigine!.trim().isNotEmpty)
+        Padding(
+          padding: const EdgeInsets.only(top: 14),
+          child: ExpansionTile(
+            tilePadding: EdgeInsets.zero,
+            title: Text('Texte d\'origine (Google Keep)', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            children: [
+              Align(
+                alignment: Alignment.centerLeft,
+                child: SelectableText(r.texteOrigine!.trim(), style: Charte.texte(14, couleur: Charte.texteSecondaire).copyWith(height: 1.4)),
+              ),
+            ],
+          ),
+        ),
+    ]);
+  }
+
+  Widget _puce(String t) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(padding: const EdgeInsets.only(top: 8, right: 10), child: Container(width: 6, height: 6, decoration: BoxDecoration(color: Charte.cadre, shape: BoxShape.circle))),
+          Expanded(child: SelectableText(t, style: Charte.texte(16))),
+        ]),
+      );
+
   Widget _ingredients() {
     final r = recette;
+    if (r.detail.isNotEmpty) {
+      // Recette normalisée : quantité · nom · précision, en colonnes.
+      return ListView(padding: const EdgeInsets.fromLTRB(22, 12, 22, 22), children: [
+        for (final i in r.detail)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 7),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(width: 150, child: SelectableText(i.quantite.isEmpty ? '—' : i.quantite, style: Charte.texte(16, couleur: Charte.texteSecondaire))),
+              Expanded(
+                child: SelectableText.rich(TextSpan(children: [
+                  TextSpan(text: i.nom, style: Charte.texte(16, gras: true)),
+                  if (i.precision.isNotEmpty) TextSpan(text: '  ${i.precision}', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                ])),
+              ),
+            ]),
+          ),
+      ]);
+    }
     if (r.ingredients.isEmpty) {
-      return Center(child: Text('Pas de liste d\'ingrédients : tout est dans l\'onglet Recette.', style: Charte.texte(15, couleur: Charte.texteSecondaire)));
+      return Center(child: Text(r.memo ? 'Mémo sans ingrédients : voir l\'onglet Recette.' : 'Pas de liste d\'ingrédients : tout est dans l\'onglet Recette.', style: Charte.texte(15, couleur: Charte.texteSecondaire)));
     }
     return ListView(padding: const EdgeInsets.fromLTRB(22, 16, 22, 22), children: [
       if (r.titreIngredients != null)

@@ -18,6 +18,12 @@ class Recette {
     required this.preparation,
     required this.photos,
     this.modifieeLe,
+    this.detail = const [],
+    this.etapes = const [],
+    this.conseils = const [],
+    this.remarques = const [],
+    this.texteOrigine,
+    this.memo = false,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -34,6 +40,16 @@ class Recette {
   List<String> photos;
   DateTime? modifieeLe;
 
+  // Recette normalisée (11/11/2026, recettes-normalisees.json du Fil de génération) : ingrédients en
+  // quantité / nom / précision, étapes numérotées, conseils, remarques à confirmer, texte d'origine.
+  List<IngredientRecette> detail;
+  List<String> etapes, conseils, remarques;
+  String? texteOrigine;
+
+  /// Mémo (temps de cuisson…) plutôt que recette : pas d'ingrédients.
+  bool memo;
+  bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
+
   Map<String, dynamic> versJson() => {
         'id': id,
         'titre': titre,
@@ -43,6 +59,12 @@ class Recette {
         'preparation': preparation,
         'photos': photos,
         if (modifieeLe != null) 'modifieeLe': modifieeLe!.toIso8601String(),
+        if (detail.isNotEmpty) 'detail': [for (final i in detail) i.versJson()],
+        if (etapes.isNotEmpty) 'etapes': etapes,
+        if (conseils.isNotEmpty) 'conseils': conseils,
+        if (remarques.isNotEmpty) 'remarques': remarques,
+        if (texteOrigine != null) 'texteOrigine': texteOrigine,
+        if (memo) 'memo': true,
       };
 
   factory Recette.lire(Map j) => Recette(
@@ -54,7 +76,28 @@ class Recette {
         preparation: j['preparation'] as String? ?? '',
         photos: [...((j['photos'] as List?) ?? const []).cast<String>()],
         modifieeLe: DateTime.tryParse(j['modifieeLe'] as String? ?? ''),
+        detail: [for (final i in (j['detail'] as List? ?? const []).cast<Map>()) IngredientRecette.lire(i)],
+        etapes: _textes(j['etapes']),
+        conseils: _textes(j['conseils']),
+        remarques: _textes(j['remarques']),
+        texteOrigine: j['texteOrigine'] as String?,
+        memo: j['memo'] == true,
       );
+}
+
+List<String> _textes(Object? l) => [for (final x in (l as List? ?? const [])) if ('$x'.trim().isNotEmpty) '$x'.trim()];
+
+/// Ingrédient d'une recette normalisée : « 3 gousses » · « Ail » · « écrasé ».
+class IngredientRecette {
+  IngredientRecette(this.nom, {this.quantite = '', this.precision = ''});
+  final String nom, quantite, precision;
+
+  factory IngredientRecette.lire(Map j) =>
+      IngredientRecette('${j['nom'] ?? ''}'.trim(), quantite: '${j['quantite'] ?? ''}'.trim(), precision: '${j['precision'] ?? ''}'.trim());
+  Map<String, dynamic> versJson() => {'nom': nom, if (quantite.isNotEmpty) 'quantite': quantite, if (precision.isNotEmpty) 'precision': precision};
+
+  /// Une ligne : « 3 gousses Ail (écrasé) ».
+  String get texte => [if (quantite.isNotEmpty) quantite, nom, if (precision.isNotEmpty) '($precision)'].join(' ');
 }
 
 /// Sans accents ni majuscules.
@@ -115,12 +158,16 @@ String typeDuLibelle(String libelle) {
   return t.replaceFirst('Entree', 'Entrée');
 }
 
+/// Fichier des recettes normalisées, posé à côté des notes Keep (ou dans le dossier parent).
+const fichierNormalise = 'recettes-normalisees.json';
+
 /// Bilan d'un import.
 class BilanImport {
-  int ajoutees = 0, misesAJour = 0, ignorees = 0, photos = 0;
+  int ajoutees = 0, misesAJour = 0, ignorees = 0, photos = 0, normalisees = 0;
   final erreurs = <String>[];
   @override
   String toString() => '$ajoutees ajoutée(s), $misesAJour mise(s) à jour, $photos photo(s)'
+      '${normalisees > 0 ? ', $normalisees normalisée(s)' : ''}'
       '${ignorees > 0 ? ', $ignorees note(s) sans libellé « Recette » ignorée(s)' : ''}'
       '${erreurs.isNotEmpty ? ', ${erreurs.length} erreur(s)' : ''}';
 }
@@ -173,7 +220,26 @@ class BaseRecettes {
   Future<BilanImport> importerKeep(Directory source, {bool toutes = false}) async {
     final bilan = BilanImport();
     await dossier.create(recursive: true);
-    final fichiers = source.listSync().whereType<File>().where((f) => f.path.toLowerCase().endsWith('.json')).toList()
+    // Recettes normalisées (11/11/2026) : recettes-normalisees.json dans le dossier importé ou son parent,
+    // rattachées aux notes par le nom du fichier Keep.
+    final normalisees = <String, Map>{};
+    for (final d in [source, source.parent]) {
+      final n = File('${d.path}${Platform.pathSeparator}$fichierNormalise');
+      if (!n.existsSync()) continue;
+      try {
+        for (final r in (jsonDecode(await n.readAsString()) as List).cast<Map>()) {
+          if (r['fichier'] is String) normalisees[r['fichier'] as String] = r;
+        }
+        bilan.normalisees = normalisees.length;
+      } catch (_) {
+        bilan.erreurs.add('$fichierNormalise illisible');
+      }
+      break;
+    }
+    final fichiers = source.listSync().whereType<File>().where((f) {
+      final n = f.uri.pathSegments.last;
+      return n.toLowerCase().endsWith('.json') && n != fichierNormalise;
+    }).toList()
       ..sort((a, b) => a.path.compareTo(b.path));
     for (final f in fichiers) {
       Map<String, dynamic> j;
@@ -192,7 +258,7 @@ class BaseRecettes {
       }
       final titre = '${j['title'] ?? ''}'.trim().isEmpty ? '(sans titre)' : '${j['title']}'.trim();
       final id = j['createdTimestampUsec'] != null ? 'keep-${j['createdTimestampUsec']}' : 'keep-${_norm(titre)}';
-      var texte = '${j['textContent'] ?? ''}';
+      final texte = '${j['textContent'] ?? ''}';
       // Une liste à cocher : ses cases sont les ingrédients.
       final cases = [for (final c in (j['listContent'] as List? ?? const []).cast<Map>()) '${c['text'] ?? ''}'.trim()]
         ..removeWhere((t) => t.isEmpty);
@@ -229,6 +295,21 @@ class BaseRecettes {
         photos: photos,
         modifieeLe: edite == null ? null : DateTime.fromMicrosecondsSinceEpoch(edite),
       );
+      final nz = normalisees[f.uri.pathSegments.last];
+      if (nz != null) {
+        r.titre = '${nz['titre'] ?? r.titre}'.trim().isEmpty ? r.titre : '${nz['titre']}'.trim();
+        final t = [for (final x in _textes(nz['types'])) typeDuLibelle(x)];
+        if (t.isNotEmpty) r.types = t.toSet().toList();
+        r.detail = [for (final i in (nz['ingredients'] as List? ?? const []).cast<Map>()) IngredientRecette.lire(i)]..removeWhere((i) => i.nom.isEmpty);
+        r.ingredients = [for (final i in r.detail) i.texte];
+        r.titreIngredients = r.detail.isEmpty ? null : 'Ingrédients';
+        r.etapes = _textes(nz['etapes']);
+        r.conseils = _textes(nz['conseils']);
+        r.remarques = _textes(nz['remarques']);
+        r.texteOrigine = nz['texte_origine'] as String? ?? texte;
+        r.memo = nz['memo'] == true;
+        if (r.etapes.isNotEmpty) r.preparation = [for (var k = 0; k < r.etapes.length; k++) '${k + 1}. ${r.etapes[k]}'].join('\n');
+      }
       final i = recettes.indexWhere((x) => x.id == id);
       if (i >= 0) {
         recettes[i] = r;
