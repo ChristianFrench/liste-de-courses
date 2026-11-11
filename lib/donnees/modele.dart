@@ -915,6 +915,9 @@ class Etat extends ChangeNotifier {
     final s = _actif!;
     if (s.vide) {
       lire(_depart(await _donneesDemo()));
+      // Démonstration : seulement ses trois magasins (11/11/2026). Chacun porte une copie du catalogue
+      // entier ; les autres alourdissaient chaque ouverture sans jamais servir.
+      if (demonstration) magasins.removeWhere((m) => !const ['Intermarché', 'Carrefour', 'Lidl'].contains(m.nom));
       final catalogue = await CatalogueType.lireJson();
       for (final m in magasins) {
         await appliquerModele(m, tailleComplete, catalogue: catalogue);

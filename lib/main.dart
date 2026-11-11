@@ -21,7 +21,8 @@ Future<void> main() async {
   await Etat.instance.charger();
   await Etat.instance.chargerMarquesType();
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
-  await Etat.instance.ajouterMagasinsEnseignes();
+  // Démonstration : ses trois magasins seulement (les magasins par enseigne alourdiraient chaque ouverture).
+  if (!demonstration) await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
   // Outil de l'éditeur du catalogue commun : rien d'autre que son écran (ni foyer, ni partage).
   if (outilEditeur) {
