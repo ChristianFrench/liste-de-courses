@@ -221,7 +221,12 @@ class CatalogueCommun extends ChangeNotifier {
     try {
       final commun = (await rootBundle.loadString('assets/catalogue_demo.txt')).trim();
       if (commun.isEmpty) return;
+      // Déjà appliqué à une ouverture précédente : ni vérification de signature ni relecture (11/11/2026,
+      // quelques secondes gagnées à chaque ouverture sur téléphone).
+      final empreinte = '${commun.length}:${commun.hashCode}';
+      if (_reglage('demo_catalogue_applique') == empreinte) return;
       await _appliquerCommun(commun);
+      _definir('demo_catalogue_applique', empreinte);
       notifyListeners();
     } catch (e) {
       debugPrint('Catalogue de la démonstration : $e');
