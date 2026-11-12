@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/icone.dart';
 import '../donnees/recettes.dart';
-import '../navigation.dart';
 import '../theme.dart';
 import 'administration_serveur.dart' show TitrePageAdmin;
 
@@ -29,7 +27,6 @@ class _PageRecettesState extends State<PageRecettes> {
   Recette? choisie;
   final ouverts = <String>{};
   String recherche = '';
-  bool _import = false;
 
   @override
   void initState() {
@@ -38,7 +35,10 @@ class _PageRecettesState extends State<PageRecettes> {
       base = widget.base;
     } else {
       BaseRecettes.ouvrir().then((b) async {
-        // Illustrations livrées avec la console : posées sans rien demander.
+        // Recettes reformulées et illustrations livrées avec la console : posées sans rien demander.
+        try {
+          await b.appliquerRecettesFournies();
+        } catch (_) {}
         try {
           await b.appliquerIllustrationsFournies();
         } catch (_) {}
@@ -50,51 +50,13 @@ class _PageRecettesState extends State<PageRecettes> {
     }
   }
 
-  Future<void> _importer() async {
-    final b = base;
-    if (b == null) return;
-    final chemin = await getDirectoryPath(confirmButtonText: 'Importer ce dossier');
-    if (chemin == null || !mounted) return;
-    setState(() => _import = true);
-    try {
-      final bilan = await b.importerKeep(Directory(chemin));
-      try {
-        await b.appliquerIllustrationsFournies();
-      } catch (_) {}
-      if (!mounted) return;
-      Nav.message(context, 'Import : $bilan');
-    } catch (e) {
-      if (mounted) Nav.message(context, 'Import impossible : $e');
-    } finally {
-      if (mounted) setState(() => _import = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final b = base;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      TitrePageAdmin(
-        'Contenu',
-        'Catalogue des recettes',
-        droite: SizedBox(
-          width: 260,
-          child: FilledButton.icon(
-            key: const ValueKey('recettes-importer'),
-            onPressed: b == null || _import ? null : _importer,
-            icon: const Icon(Icons.download),
-            label: Text(_import ? 'Import en cours…' : 'Importer un dossier Keep…'),
-          ),
-        ),
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(28, 0, 28, 10),
-        child: Text(
-          'Base séparée, sans lien avec le catalogue publié. On importe le dossier dézippé de Google Takeout (Keep) : '
-          'les notes libellées « Recettes … » sont lues, une recette déjà importée est mise à jour.',
-          style: Charte.texte(14, couleur: Charte.texteSecondaire),
-        ),
-      ),
+      // 12/11/2026 (Aristide) : plus de bouton d'import Keep ; les recettes reformulées et leurs illustrations
+      // sont livrées avec la console et posées à l'ouverture.
+      const TitrePageAdmin('Contenu', 'Catalogue des recettes'),
       Expanded(
         child: b == null
             ? Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)))
@@ -124,7 +86,7 @@ class _PageRecettesState extends State<PageRecettes> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           Image.asset('assets/recettes/recettes-de-cuisine.png', width: 128, height: 128),
           const SizedBox(height: 12),
-          Text(b.recettes.isEmpty ? 'Aucune recette : importez un dossier Keep.' : 'Choisissez une recette à gauche.',
+          Text(b.recettes.isEmpty ? 'Aucune recette.' : 'Choisissez une recette à gauche.',
               style: Charte.texte(16, couleur: Charte.texteSecondaire)),
         ]),
       );

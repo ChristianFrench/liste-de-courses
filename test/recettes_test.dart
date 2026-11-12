@@ -148,4 +148,35 @@ void main() {
     fourni.deleteSync(recursive: true);
     dest.deleteSync(recursive: true);
   });
+
+  test('recettes reformulées livrées avec la console : texte remplacé, photos Keep retirées, une fois', () async {
+    final fourni = Directory.systemTemp.createTempSync('fournies');
+    final dest = Directory.systemTemp.createTempSync('basef');
+    File('${dest.path}/vieille.jpg').writeAsBytesSync([1]);
+    File('${fourni.path}/recettes-fournies.json').writeAsStringSync(jsonEncode({
+      'version': 1,
+      'recettes': [
+        {'id': 'keep-1', 'titre': 'Mousse au chocolat', 'types': ['Dessert'], 'ingredients': ['200 g Chocolat'],
+         'preparation': '1. Fondre.', 'photos': [], 'etapes': ['Faire fondre le chocolat.']},
+        {'id': 'keep-3', 'titre': 'Nouvelle', 'types': ['Plats'], 'ingredients': [], 'preparation': '', 'photos': []},
+      ],
+    }));
+    final b = BaseRecettes(dest)
+      ..recettes.add(Recette(id: 'keep-1', titre: 'mousse', types: const ['Dessert'], ingredients: const ['choco'],
+          preparation: 'brut', photos: const ['vieille.jpg'], illustration: 'illustration-x.jpg'));
+    File('${dest.path}/illustration-x.jpg').writeAsBytesSync([2]);
+    expect(await b.appliquerRecettesFournies(fourni), 2);
+    expect(b.recettes, hasLength(2));
+    expect(b.recettes.first.titre, 'Mousse au chocolat');
+    expect(b.recettes.first.etapes.single, 'Faire fondre le chocolat.');
+    expect(b.recettes.first.photos, isEmpty);
+    expect(b.recettes.first.illustration, 'illustration-x.jpg');
+    expect(File('${dest.path}/vieille.jpg').existsSync(), isFalse);
+    expect(File('${dest.path}/illustration-x.jpg').existsSync(), isTrue);
+    final relue = await BaseRecettes.ouvrir(dossier: dest);
+    expect(relue.versionFournie, 1);
+    expect(await relue.appliquerRecettesFournies(fourni), 0);
+    fourni.deleteSync(recursive: true);
+    dest.deleteSync(recursive: true);
+  });
 }

@@ -198,13 +198,17 @@ class BaseRecettes {
   final Directory dossier;
   final List<Recette> recettes;
 
+  /// Version des recettes livrées avec la console déjà appliquée (0 : aucune).
+  int versionFournie = 0;
+
   static Future<BaseRecettes> ouvrir({Directory? dossier}) async {
     final d = dossier ?? Directory('${(await dossierApplication()).path}${Platform.pathSeparator}recettes');
     final f = File('${d.path}${Platform.pathSeparator}recettes.json');
     if (!f.existsSync()) return BaseRecettes(d);
     try {
       final j = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
-      return BaseRecettes(d, [for (final r in (j['recettes'] as List? ?? const []).cast<Map>()) Recette.lire(r)]);
+      return BaseRecettes(d, [for (final r in (j['recettes'] as List? ?? const []).cast<Map>()) Recette.lire(r)])
+        ..versionFournie = (j['fournies'] as num?)?.toInt() ?? 0;
     } catch (_) {
       return BaseRecettes(d);
     }
@@ -215,6 +219,7 @@ class BaseRecettes {
     final f = File('${dossier.path}${Platform.pathSeparator}recettes.json');
     await f.writeAsString(const JsonEncoder.withIndent(' ').convert({
       'version': 1,
+      if (versionFournie > 0) 'fournies': versionFournie,
       'recettes': [for (final r in recettes) r.versJson()],
     }));
   }
@@ -310,6 +315,55 @@ class BaseRecettes {
       n++;
     }
     if (n > 0) await enregistrer();
+    return n;
+  }
+
+  /// Recettes reformulées livrées avec la console (12/11/2026, Aristide : « tous les textes des recettes doivent
+  /// être reformulés ») : recettes-fournies.json remplace le texte des recettes de même identifiant et ajoute les
+  /// autres ; les anciennes photos Keep sont retirées (« supprimez les anciennes »), seule l'illustration reste.
+  /// Appliqué une fois par version du fichier.
+  Future<int> appliquerRecettesFournies([Directory? dossierSource]) async {
+    final d = dossierSource ?? dossierFourni;
+    final f = File('${d.path}${Platform.pathSeparator}recettes-fournies.json');
+    if (!f.existsSync()) return 0;
+    final Map j;
+    try {
+      j = jsonDecode(await f.readAsString()) as Map;
+    } catch (_) {
+      return 0;
+    }
+    final version = (j['version'] as num?)?.toInt() ?? 1;
+    if (version <= versionFournie) return 0;
+    var n = 0;
+    for (final m in (j['recettes'] as List? ?? const []).cast<Map>()) {
+      final r = Recette.lire(m);
+      final i = recettes.indexWhere((x) => x.id == r.id);
+      if (i >= 0) {
+        r
+          ..illustration = recettes[i].illustration
+          ..illustrationFournie = recettes[i].illustrationFournie;
+        recettes[i] = r;
+      } else {
+        recettes.add(r);
+      }
+      n++;
+    }
+    // Plus de photos Keep : fichiers retirés de la base, sauf les illustrations en usage.
+    final gardees = {for (final r in recettes) if (r.illustration != null) r.illustration!};
+    for (final r in recettes) {
+      r.photos = [];
+    }
+    if (dossier.existsSync()) {
+      for (final x in dossier.listSync().whereType<File>()) {
+        final nom = x.uri.pathSegments.last;
+        if (nom == 'recettes.json' || gardees.contains(nom)) continue;
+        try {
+          x.deleteSync();
+        } catch (_) {}
+      }
+    }
+    versionFournie = version;
+    await enregistrer();
     return n;
   }
 
