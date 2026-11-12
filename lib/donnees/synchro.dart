@@ -17,6 +17,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 
 import 'catalogue_commun.dart' show CatalogueCommun;
+import 'reparation.dart' show homonymesCatalogue, CorrectionHomonymes;
 import 'chiffrement.dart';
 import 'client_mqtt.dart';
 import 'notifications_telephone.dart';
@@ -627,6 +628,15 @@ class Synchro extends ChangeNotifier {
         _noter('Emplacements replacés envoyés aux autres appareils');
       });
     }
+    // Les homonymes corrigés à l'ouverture (avant la connexion, donc sans journal) partent une fois.
+    if (base.reglage('homonymes_envoyes_1211') != '1' && homonymesCatalogue.isNotEmpty) {
+      _sansPanne('l\'envoi des homonymes replacés', () {
+        final noms = homonymesCatalogue.keys.toSet();
+        final ids = {for (final p in _etat.produits) if (noms.contains(p.nom.trim().toLowerCase())) p.id};
+        base.toutJournaliser(base.lire(), tables: {'emplacement'}, produits: ids);
+        base.definirReglage('homonymes_envoyes_1211', '1');
+      });
+    }
     final t = _transport = TransportChiffre(fabrique(serveur), code ?? '');
     _abonnements
       ..add(t.messages.listen((m) => _sansPanne('la réception (${m.$1.split('/').skip(2).join('/')})', () => _recevoir(m.$1, m.$2))))
@@ -1030,6 +1040,8 @@ class Synchro extends ChangeNotifier {
     if (lot.isEmpty) return;
     try {
       final n = _etat.integrerDistant(lot);
+      // Un appareil qui n'a pas encore la correction peut renvoyer deux homonymes dans le même secteur.
+      _etat.corrigerHomonymes();
       recus += n;
       if (ouverture case final o? when !o.finie) o.recues += n;
       final ignores = _base?.ignores ?? 0, attente = _base?.nbEnAttente ?? 0;

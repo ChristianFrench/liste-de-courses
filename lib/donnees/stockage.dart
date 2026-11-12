@@ -938,7 +938,7 @@ class Stockage {
   }
 
   /// Note tout le contenu de l'état comme à envoyer (premier appareil du partage), ou seulement [tables].
-  void toutJournaliser(Map<String, dynamic> etat, {Set<String>? tables}) {
+  void toutJournaliser(Map<String, dynamic> etat, {Set<String>? tables, Set<String>? produits}) {
     final lignes = _lignes(etat);
     final requetes = <String, CommonPreparedStatement>{};
     CommonPreparedStatement requete(String sql) => requetes[sql] ??= _db.prepare(sql);
@@ -947,6 +947,7 @@ class Stockage {
       for (final t in _tables) {
         if (tables != null && !tables.contains(t.nom)) continue;
         for (final l in lignes[t.nom]!) {
+          if (produits != null && !produits.contains(l['produit_id'])) continue;
           _journaliser(t.nom, [for (final c in t.cle) l[c]], l, requete);
         }
       }

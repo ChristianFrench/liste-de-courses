@@ -130,3 +130,80 @@ extension ReparationEmplacements on Etat {
     return (copies: parCopies, catalogue: parCatalogue, restants: aPlacer.length);
   }
 }
+
+// Homonymes du catalogue (12/11/2026, Aristide : « Crevettes cuites » deux fois en libre-service, aucune au
+// comptoir, sur l'APK, l'exe et le web ; l'éditeur, lui, est juste). Les appareils du foyer avaient replacé
+// les deux produits de même nom dans un ordre différent ; la synchronisation a mêlé les deux résultats.
+// Correction déterministe (même résultat sur tous les appareils une fois leurs bases d'accord) : par nom, les
+// produits du catalogue (ordre des identifiants) gardent chacun un secteur distinct du catalogue ; ceux qui en
+// partagent un vont dans les secteurs du catalogue restés sans ce produit.
+
+/// Nom (en minuscules) → secteurs d'ici où le catalogue commun le range, quand il y en a plusieurs.
+Map<String, List<String>> homonymesCatalogue = {};
+
+extension CorrectionHomonymes on Etat {
+  /// Retient les noms que le [catalogue] range dans plusieurs secteurs.
+  void retenirHomonymes(Map<String, dynamic> catalogue) {
+    final rayonNom = {for (final r in rayons) r.id: r.nom};
+    final secteurParNoms = <String, String>{};
+    for (final s in secteurs) {
+      if (rayonNom[s.rayonId] case final rn?) secteurParNoms.putIfAbsent('$rn|${s.nom}', () => s.id);
+    }
+    final parNom = <String, List<String>>{};
+    for (final r in (catalogue['rayons'] as List? ?? const []).whereType<Map>()) {
+      final ro = r['nom'] as String? ?? '';
+      final rayonIci = renommages['r:$ro'] ?? ro;
+      for (final s in (r['secteurs'] as List? ?? const []).whereType<Map>()) {
+        final so = s['nom'] as String? ?? '';
+        final cible = secteurParNoms['$rayonIci|${renommages['s:$ro/$so'] ?? so}'];
+        if (cible == null) continue;
+        for (final p in (s['produits'] as List? ?? const [])) {
+          final nom = (p is Map ? p['nom'] as String? : p as String?)?.trim().toLowerCase();
+          if (nom == null || nom.isEmpty) continue;
+          final l = parNom.putIfAbsent(nom, () => []);
+          if (!l.contains(cible)) l.add(cible);
+        }
+      }
+    }
+    homonymesCatalogue = {for (final e in parNom.entries) if (e.value.length > 1) e.key: e.value};
+  }
+
+  /// Rend le nombre de produits replacés.
+  int corrigerHomonymes() {
+    if (homonymesCatalogue.isEmpty) return 0;
+    final parNom = <String, List<Produit>>{};
+    for (final p in produits) {
+      final nom = p.nom.trim().toLowerCase();
+      if (homonymesCatalogue.containsKey(nom) && !estAjoute(p)) parNom.putIfAbsent(nom, () => []).add(p);
+    }
+    final empl = {for (final e in emplacements) e.produitId: e};
+    var n = 0;
+    for (final MapEntry(key: nom, value: ps) in parNom.entries) {
+      if (ps.length < 2) continue;
+      final attendus = homonymesCatalogue[nom]!;
+      ps.sort((a, b) => a.id.compareTo(b.id));
+      final pris = <String>{};
+      final libres = <Produit>[];
+      for (final p in ps) {
+        final s = empl[p.id]?.secteurId;
+        if (s != null && attendus.contains(s) && pris.add(s)) continue;
+        libres.add(p);
+      }
+      final manquants = [for (final s in attendus) if (!pris.contains(s)) s];
+      for (var i = 0; i < libres.length && i < manquants.length; i++) {
+        final e = empl[libres[i].id];
+        if (e == null) {
+          emplacements.add(Emplacement(magasinCommun, libres[i].id, manquants[i]));
+        } else {
+          e.secteurId = manquants[i];
+        }
+        n++;
+      }
+    }
+    if (n > 0) {
+      modifie();
+      noter('Homonymes du catalogue : $n produit(s) replacé(s) dans leur secteur');
+    }
+    return n;
+  }
+}

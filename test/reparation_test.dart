@@ -1,6 +1,7 @@
 // 12/11/2026 : la conversion vers la structure commune avait effacé tous les emplacements des bases existantes
 // (magasin fictif « Structure commune » absent). Cause corrigée, et réparation à l'ouverture.
 
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -69,5 +70,28 @@ void main() {
     expect(emplacementsPerdus(etat), isFalse);
     await etat.charger(dossier: dossier);
     expect(etat.emplacements.length, r2.catalogue);
+  });
+
+  test('homonymes rangés deux fois dans le même secteur : chacun reprend son secteur du catalogue', () async {
+    final dossier = Directory.systemTemp.createTempSync('homonymes');
+    final etat = Etat.instance;
+    await etat.charger(dossier: dossier);
+    final catalogue = jsonDecode(File('assets/catalogue_type.json').readAsStringSync()) as Map<String, dynamic>;
+    etat.retenirHomonymes(catalogue);
+    expect(homonymesCatalogue['crevettes cuites']?.length, 2);
+    final crevettes = etat.produits.where((p) => p.nom == 'Crevettes cuites').toList();
+    final attendu = {for (final p in crevettes) p.id: etat.secteurCatalogue(p.id)!.id};
+    expect(attendu.values.toSet().length, 2);
+    // Ce que la synchronisation avait mêlé : les deux en libre-service.
+    final libreService = attendu.values.firstWhere((s) => etat.secteur(s)!.nom.contains('libre'));
+    for (final p in crevettes) {
+      etat.placer(magasinCommun, p.id, libreService);
+    }
+    expect(etat.corrigerHomonymes(), 1);
+    expect({for (final p in crevettes) etat.secteurCatalogue(p.id)!.id}.length, 2);
+    expect(etat.corrigerHomonymes(), 0);
+    await etat.enregistrer();
+    await etat.charger(dossier: dossier);
+    expect({for (final p in crevettes) etat.secteurCatalogue(p.id)!.id}.length, 2);
   });
 }

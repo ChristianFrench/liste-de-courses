@@ -36,6 +36,15 @@ Future<void> main() async {
     await annoncerEtape('Réparation des secteurs', 0.6);
     await reparerEmplacementsPerdus();
   }
+  // 12/11/2026 : produits de même nom (libre-service / au comptoir) rangés deux fois dans le même secteur.
+  if (!outilEditeur && Etat.instance.stockageFoyer != null) {
+    try {
+      Etat.instance.retenirHomonymes(await CatalogueCommun.instance.dernier());
+      Etat.instance.corrigerHomonymes();
+    } catch (e) {
+      Etat.instance.noter('Homonymes du catalogue : $e');
+    }
+  }
   // Les images de l'accueil se décodent pendant la suite de la préparation.
   final images = ouvertureAffichee ? preparerImages() : Future<void>.value();
   Etat.instance.avertir = MessagesFoyer.instance.avertir;

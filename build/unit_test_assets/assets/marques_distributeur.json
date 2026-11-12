@@ -1,0 +1,320 @@
+{
+ "enseignes": {
+  "Intermarché": [
+   {
+    "marque": "Chabrior",
+    "categorie": "Petit-déjeuner / Biscuits",
+    "cibles": [
+     "Petit-déjeuner",
+     "Biscuits et sucré/Biscuits et gâteaux"
+    ]
+   },
+   {
+    "marque": "Paquito",
+    "categorie": "Jus de fruits",
+    "cibles": [
+     "Eaux et boissons sans alcool/Jus de fruits"
+    ]
+   },
+   {
+    "marque": "Pâturages",
+    "categorie": "Produits laitiers",
+    "cibles": [
+     "Crèmerie",
+     "Fromagerie"
+    ]
+   },
+   {
+    "marque": "Monique Ranou",
+    "categorie": "Charcuterie",
+    "cibles": [
+     "Charcuterie"
+    ]
+   },
+   {
+    "marque": "Monique Ranou",
+    "categorie": "Traiteur",
+    "cibles": [
+     "Traiteur"
+    ]
+   },
+   {
+    "marque": "Pommette",
+    "categorie": "Bébé",
+    "cibles": [
+     "Bébé"
+    ]
+   },
+   {
+    "marque": "Apta",
+    "categorie": "Hygiène / Santé",
+    "cibles": [
+     "Hygiène",
+     "Parfumerie et soins",
+     "Parapharmacie"
+    ]
+   },
+   {
+    "marque": "Labell",
+    "categorie": "Hygiène / Entretien",
+    "cibles": [
+     "Hygiène",
+     "Parfumerie et soins",
+     "Entretien / Droguerie"
+    ]
+   },
+   {
+    "marque": "Canaillou",
+    "categorie": "Animaux",
+    "cibles": [
+     "Animaux"
+    ]
+   },
+   {
+    "marque": "Saint Éloi",
+    "categorie": "Conserves de légumes",
+    "cibles": [
+     "Épicerie salée/Conserves"
+    ]
+   },
+   {
+    "marque": "Planteur des Tropiques",
+    "categorie": "Café",
+    "cibles": [
+     "Petit-déjeuner/Café"
+    ]
+   },
+   {
+    "marque": "Expert Club",
+    "categorie": "Vins",
+    "cibles": [
+     "Cave/Vins"
+    ]
+   },
+   {
+    "marque": "Itinéraire des Saveurs",
+    "categorie": "Produits du monde",
+    "cibles": [
+     "Cuisine du monde"
+    ]
+   },
+   {
+    "marque": "Bouton d'Or",
+    "categorie": "Épicerie salée",
+    "cibles": [
+     "Épicerie salée"
+    ]
+   },
+   {
+    "marque": "Top Budget",
+    "categorie": "Premier prix",
+    "cibles": [
+     "*"
+    ]
+   }
+  ],
+  "Carrefour": [
+   {
+    "marque": "Carrefour Bio",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Companino",
+    "categorie": "Animaux",
+    "cibles": [
+     "Animaux"
+    ]
+   },
+   {
+    "marque": "Reflets de France",
+    "categorie": "Produits régionaux",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Carrefour Extra",
+    "categorie": "Produits premium",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Carrefour Sensation",
+    "categorie": "Produits premium",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Végétal",
+    "categorie": "Produits végétaux",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Carrefour Essential",
+    "categorie": "Premier prix",
+    "cibles": [
+     "*"
+    ]
+   }
+  ],
+  "Leclerc": [
+   {
+    "marque": "Bio Village",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Mots d'Enfants",
+    "categorie": "Bébé",
+    "cibles": [
+     "Bébé"
+    ]
+   },
+   {
+    "marque": "Tous Mes Amis",
+    "categorie": "Animaux",
+    "cibles": [
+     "Animaux"
+    ]
+   },
+   {
+    "marque": "Clair",
+    "categorie": "Entretien",
+    "cibles": [
+     "Entretien / Droguerie"
+    ]
+   },
+   {
+    "marque": "Manava",
+    "categorie": "Hygiène / Beauté",
+    "cibles": [
+     "Hygiène",
+     "Parfumerie et soins"
+    ]
+   },
+   {
+    "marque": "Végé",
+    "categorie": "Produits végétaux",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Délisse",
+    "categorie": "Produits laitiers",
+    "cibles": [
+     "Crèmerie",
+     "Fromagerie"
+    ]
+   },
+   {
+    "marque": "Tables du Monde",
+    "categorie": "Produits du monde",
+    "cibles": [
+     "Cuisine du monde"
+    ]
+   },
+   {
+    "marque": "Plantation",
+    "categorie": "Café",
+    "cibles": [
+     "Petit-déjeuner/Café"
+    ]
+   },
+   {
+    "marque": "Eco+",
+    "categorie": "Premier prix",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Nos Régions ont du Talent",
+    "categorie": "Produits régionaux",
+    "cibles": [
+     "*"
+    ]
+   }
+  ],
+  "Système U": [
+   {
+    "marque": "U Bio",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "U Saveurs",
+    "categorie": "Produits festifs",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "U Tout Petits",
+    "categorie": "Bébé",
+    "cibles": [
+     "Bébé"
+    ]
+   }
+  ],
+  "Auchan": [
+   {
+    "marque": "Mieux Vivre Bio",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Pouce",
+    "categorie": "Premier prix",
+    "cibles": [
+     "*"
+    ]
+   }
+  ],
+  "Casino": [
+   {
+    "marque": "Casino Bio",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Casino Délices",
+    "categorie": "Produits premium",
+    "cibles": [
+     "*"
+    ]
+   }
+  ],
+  "Monoprix": [
+   {
+    "marque": "Monoprix Bio",
+    "categorie": "Bio",
+    "cibles": [
+     "*"
+    ]
+   },
+   {
+    "marque": "Monoprix Gourmet",
+    "categorie": "Produits premium",
+    "cibles": [
+     "*"
+    ]
+   }
+  ]
+ }
+}
