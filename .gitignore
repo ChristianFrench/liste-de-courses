@@ -5,3 +5,4 @@ definitions.json
 test/apercus/
 test/video/ecrans/
 build/
+pubspec.lock
