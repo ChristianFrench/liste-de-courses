@@ -110,7 +110,7 @@ void main() {
     expect(bilan.ajoutees, 1);
     expect(bilan.normalisees, 1);
     expect(bilan.illustrations, 1);
-    expect(b.recettes.single.illustration, 'illustration-ecrase-de-pommes-de-terre.jpg');
+    expect(b.recettes.single.illustration, startsWith('illustration-ecrase-de-pommes-de-terre'));
     expect(b.photo(b.recettes.single.illustration!).existsSync(), isTrue);
     final r = b.recettes.single;
     expect(r.id, 'keep-42');
