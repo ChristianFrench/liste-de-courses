@@ -280,10 +280,19 @@ class Stockage {
     final foyer = f.first;
     final foyerId = foyer['id'] as String;
     final moi = reglage('membre_courant');
-    List<String> liens(String table, String colonne, String parent, String id, {String ordre = 'rowid'}) => [
-          for (final r in _db.select('SELECT $colonne FROM $table WHERE $parent = ? ORDER BY $ordre', [id]))
-            r[colonne] as String
-        ];
+    // Liens lus en une seule requête par table (12/11/2026) : une requête par produit (2 300 produits, deux
+    // tables) prenait près d'une seconde à chaque ouverture dans le navigateur.
+    final groupes = <String, Map<String, List<String>>>{};
+    List<String> liens(String table, String colonne, String parent, String id, {String ordre = 'rowid'}) {
+      final g = groupes.putIfAbsent('$table/$colonne/$parent/$ordre', () {
+        final m = <String, List<String>>{};
+        for (final r in _db.select('SELECT $parent AS p, $colonne AS c FROM $table ORDER BY $ordre')) {
+          m.putIfAbsent(r['p'] as String, () => []).add(r['c'] as String);
+        }
+        return m;
+      });
+      return [...?g[id]];
+    }
 
     etat['foyer'] = {'id': foyerId, 'nom': foyer['nom'], 'dateCreation': (foyer['cree_le'] as String).substring(0, 10)};
     etat['membres'] = [

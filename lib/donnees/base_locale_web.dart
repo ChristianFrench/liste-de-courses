@@ -22,6 +22,16 @@ Future<String> preparerDossierBases(String? dossier) async {
   return '';
 }
 
+@JS('retirerEcranOuverture')
+external void _retirerEcranOuverture();
+
+/// L'écran d'ouverture de la page (icône, « Ouverture… », posé par index.html) s'efface à la première image.
+void retirerEcranOuverture() {
+  try {
+    _retirerEcranOuverture();
+  } catch (_) {}
+}
+
 String cheminBase(String dossier, String nom) => '/$nom';
 
 CommonDatabase ouvrirBase(String chemin) => _sqlite!.open(chemin);

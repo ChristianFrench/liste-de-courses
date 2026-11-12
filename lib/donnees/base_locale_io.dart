@@ -12,6 +12,9 @@ Future<String> preparerDossierBases(String? dossier) async {
   return d.path;
 }
 
+/// Rien à retirer hors du navigateur.
+void retirerEcranOuverture() {}
+
 String cheminBase(String dossier, String nom) => '$dossier${Platform.pathSeparator}$nom';
 
 CommonDatabase ouvrirBase(String chemin) => sqlite3.open(chemin);

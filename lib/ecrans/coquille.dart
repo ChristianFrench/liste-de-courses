@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../composants/barre_ouverture.dart';
+import 'ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
 import '../donnees/modele.dart';
@@ -115,7 +116,8 @@ class Coquille extends StatelessWidget {
         onPopInvokedWithResult: (aFerme, _) {
           if (!aFerme) nav.retour();
         },
-        child: Scaffold(
+        child: Stack(children: [
+          Scaffold(
           backgroundColor: Charte.fond,
           body: IndexedStack(
             index: nav.onglet,
@@ -129,15 +131,23 @@ class Coquille extends StatelessWidget {
           ),
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
+          // Synchronisation de l'ouverture (12/11/2026, Aristide) : la fenêtre de progression au milieu de
+          // l'écran, à la place de la barre sur la photo ; l'application reste utilisable dessous.
+          IgnorePointer(
+            child: ValueListenableBuilder(
+              valueListenable: ouvertureEnCours,
+              builder: (context, o, _) => o == null ? const SizedBox.shrink() : FenetreOuverture(texte: o.texte, valeur: o.valeur),
+            ),
+          ),
+        ]),
       ),
       ))))),
     );
   }
 }
 
-/// Mise à jour faite à l'ouverture : plus de fenêtre (01/11/2026, Aristide), une barre de progression légère
-/// sur la photo de l'accueil, au-dessus de « Comment ça marche » ([BarreOuverture]) : « Synchronisation » en
-/// foyer, « Initialisation » pour un appareil seul.
+/// Synchronisation faite à l'ouverture, en foyer : la fenêtre de progression ([FenetreOuverture]) au milieu de
+/// l'écran (12/11/2026, Aristide, à la place de la barre sur la photo de l'accueil). Appareil seul : rien.
 class GuetteurMiseAJour extends StatefulWidget {
   const GuetteurMiseAJour({super.key, required this.child});
   final Widget child;
@@ -175,6 +185,12 @@ class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
   void _avancer() {
     if (!mounted) return;
     final o = Synchro.instance.ouverture;
+    // Appareil seul : la base est déjà lue (fenêtre de l'écran d'ouverture), rien de plus à montrer.
+    if (!_foyer) {
+      _minuteur?.cancel();
+      ouvertureEnCours.value = null;
+      return;
+    }
     final brut = _progres;
     _affiche = brut >= 1 ? 1 : (brut > _affiche ? brut : _affiche + (0.95 - _affiche).clamp(0.0, 1.0) * 0.004);
     final valeur = _affiche;

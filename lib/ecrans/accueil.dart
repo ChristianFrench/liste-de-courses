@@ -1,7 +1,6 @@
 import '../composants/icone.dart';
 import 'package:flutter/material.dart';
 
-import '../composants/barre_ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../theme.dart';
@@ -201,8 +200,9 @@ class _EnTetePhoto extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // Place toujours réservée : la barre d'ouverture n'agrandit pas la photo (02/11/2026, Aristide).
-                  const SizedBox(height: 30, child: BarreOuverture()),
+                  // 12/11/2026 (Aristide) : plus de barre d'ouverture sur la photo, une fenêtre de progression à la
+                  // place ; l'espace est gardé pour ne pas changer la photo.
+                  const SizedBox(height: 30),
                   // 03/11/2026 (Aristide) : plus de titre « Comment ça marche » ni de trait au-dessus.
                   const _Etapes(),
                 ],

@@ -9,23 +9,34 @@ import 'donnees/catalogue_commun.dart';
 import 'donnees/demonstration.dart';
 import 'donnees/messages.dart';
 import 'donnees/modele.dart';
+import 'donnees/base_locale.dart' show retirerEcranOuverture;
+import 'donnees/ouverture.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
+import 'ecrans/ouverture.dart';
 import 'ecrans/outil_editeur.dart';
 import 'navigation.dart';
 import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // 12/11/2026 (Aristide) : l'écran d'abord, avec une fenêtre de progression, puis la lecture de la base.
+  if (!outilEditeur) {
+    ouvertureAffichee = true;
+    runApp(const ListeDeCoursesApp(accueil: EcranOuverture()));
+    WidgetsBinding.instance.addPostFrameCallback((_) => retirerEcranOuverture());
+    // Sans attendre l'image : la base se charge (fichiers, sqlite) pendant que l'écran se dessine.
+    etapeOuverture.value = (texte: 'Ouverture de la base', valeur: 0.25);
+  }
   await Etat.instance.charger();
-  await Etat.instance.chargerMarquesType();
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
   // Démonstration : ses trois magasins seulement (les magasins par enseigne alourdiraient chaque ouverture).
   if (!demonstration) await Etat.instance.ajouterMagasinsEnseignes();
   if (Etat.instance.apparence != null) Charte.choisirPalette(Etat.instance.apparence!);
   // Outil de l'éditeur du catalogue commun : rien d'autre que son écran (ni foyer, ni partage).
   if (outilEditeur) {
+    await Etat.instance.chargerMarquesType();
     if (Synchro.instance.mode == '') await Synchro.instance.choisirSeul();
     // Le code secret est demandé à chaque lancement.
     CatalogueCommun.instance.verrouiller();
@@ -38,7 +49,12 @@ Future<void> main() async {
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
   // Sauvegarde aux jalons (pas dans la démonstration)
   Sauvegarde.actif = !demonstration;
+  await annoncerEtape('Affichage', 0.95);
+  ouvertureAffichee = false;
   runApp(const ListeDeCoursesApp());
+  // Marques et natures Open Food Facts (12/11/2026) : utiles à la recherche seulement, lues après la première
+  // image au lieu de retarder l'ouverture (0,4 s dans le navigateur).
+  WidgetsBinding.instance.addPostFrameCallback((_) => Future<void>.delayed(const Duration(milliseconds: 300), Etat.instance.chargerMarquesType));
   if (!kIsWeb) TicketRecu.demarrer();
   if (demonstration) {
     // Le catalogue commun du moment, embarqué à la compilation (rien n'est échangé avec le serveur).

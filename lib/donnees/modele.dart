@@ -10,6 +10,7 @@ import 'affichage.dart';
 import 'base_locale.dart';
 import 'catalogue_type.dart';
 import 'demonstration.dart';
+import 'ouverture.dart';
 import 'images_perso.dart';
 import 'univers.dart';
 import 'moderation.dart';
@@ -797,6 +798,7 @@ class Etat extends ChangeNotifier {
           return;
         }
         _foyer = Stockage.ouvrir(_chemin(baseFoyer));
+        await annoncerEtape('Vérification de la base', 0.35);
         await _reparerSiAbimee();
         await _reprendreDemonstration();
         await _ouvrirActif();
@@ -918,6 +920,7 @@ class Etat extends ChangeNotifier {
   Future<void> _ouvrirActifEnLot() async {
     final s = _actif!;
     if (s.vide) {
+      await annoncerEtape(demonstration ? 'Préparation du foyer d\u2019exemple' : 'Préparation du foyer', 0.35);
       lire(_depart(await _donneesDemo()));
       // Démonstration : seulement les trois magasins de son exemple (11/11/2026).
       if (demonstration) magasins.removeWhere((m) => !const ['Intermarché', 'Carrefour', 'Lidl'].contains(m.nom));
@@ -927,8 +930,10 @@ class Etat extends ChangeNotifier {
       if (demonstration) remplirDemonstration();
       s.ecrire(versJson());
     } else {
+      await annoncerEtape('Lecture de vos listes', 0.5);
       lire(s.lire());
     }
+    await annoncerEtape('Préparation', 0.75);
     // Types de mesure vides (types reçus avant leurs libellés, ou foyer rejoint) : on les reprend du catalogue.
     await reparerTypesMesure();
     await appliquerFormats();
