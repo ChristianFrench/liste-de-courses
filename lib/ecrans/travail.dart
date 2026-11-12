@@ -11,7 +11,7 @@ import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'catalogue.dart' show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces;
+import 'catalogue.dart' show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces, secteursOrdreCatalogue;
 
 // Écrans de travail (barre d'onglets masquée) : préliste (2), construction (3) et son volet
 // « Promotion visée » (4), liste complète (7), courses par secteur (8) et son dialogue (9).
@@ -568,7 +568,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   children: simple
                       ? [for (final g in l.lignes) _ligne(l, g)]
                       : [
-                          for (final x in etat.etapes(l, etat.parcoursPourCourses(l.magasinId, etat.moi.id)?.id))
+                          // 12/11/2026 (Aristide) : en préparation, les secteurs dans l'ordre du catalogue (univers,
+                          // rayons, secteurs), pas dans celui du parcours, qui ne sert qu'aux courses.
+                          for (final x in etat.etapes(l, null, ordreBase: secteursOrdreCatalogue(etat)))
                            ...sectionSecteur(pictoEtape(x), 4, [
                             TitreGroupe(
                               nom: x.nom,

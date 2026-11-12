@@ -1347,6 +1347,17 @@ class SigneAjoute extends StatelessWidget {
 // ------------------------------------------------------------ Rayons et secteurs ajoutés (26/10/2026)
 
 /// Rayons visibles, dans l'ordre choisi par le foyer (ceux qu'il n'a pas placés gardent leur ordre, à la suite).
+/// Les secteurs dans l'ordre où le catalogue les montre : univers, rayons (ordre du foyer), secteurs.
+List<String> secteursOrdreCatalogue(Etat etat) {
+  final ranges = _rayonsRanges(etat);
+  return [
+    for (final u in [...universDesRayons.keys, autresRayons])
+      for (final r in ranges)
+        if (universDuRayon(r.nom, etat.universRayons) == u)
+          for (final s in etat.secteursDu(r.id)) s.id,
+  ];
+}
+
 List<Rayon> _rayonsRanges(Etat etat) {
   final l = etat.rayonsVisibles;
   if (etat.ordreRayons.isEmpty) return l;

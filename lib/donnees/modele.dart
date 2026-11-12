@@ -2389,8 +2389,12 @@ class Etat extends ChangeNotifier {
 
   /// Étapes des courses : secteurs ayant au moins un article, dans l'ordre du parcours
   /// (sans parcours : ordre des rayons), puis « Non placé » (règle 9).
-  List<Etape> etapes(Liste l, String? parcoursId) {
+  /// [ordreBase] : ordre des secteurs sans parcours (préparation : celui du catalogue).
+  List<Etape> etapes(Liste l, String? parcoursId, {List<String>? ordreBase}) {
     final ordre = <String>[...(unParcours(parcoursId)?.etapes ?? const <String>[])];
+    for (final id in ordreBase ?? const <String>[]) {
+      if (!ordre.contains(id)) ordre.add(id);
+    }
     for (final s in secteursDuMagasin(l.magasinId)) {
       if (!ordre.contains(s.id)) ordre.add(s.id);
     }
