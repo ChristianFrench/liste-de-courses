@@ -62,6 +62,8 @@ Name: "bureau"; Description: "Mettre une icône sur le Bureau"; Flags: checkedon
 [Files]
 Source: "{#Source}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "editeur.ico"; DestDir: "{app}"; Flags: ignoreversion
+; Illustrations des recettes d'Aristide (12/11/2026), posées par la console à l'ouverture du catalogue des recettes
+Source: "..\recettes\illustrations\*"; DestDir: "{app}\recettes-illustrations"; Flags: ignoreversion
 
 [InstallDelete]
 ; Les fichiers de la version précédente sont remplacés en entier (pas de restes d'une ancienne compilation)

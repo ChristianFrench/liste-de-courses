@@ -52,6 +52,9 @@ class Recette {
 
   /// Illustration d'Aristide (12/11/2026), fichier rangé avec les photos ; montrée avant les photos Keep.
   String? illustration;
+
+  /// Illustration fournie avec la console déjà posée (« nom:taille ») : on ne la recopie pas à chaque ouverture.
+  String? illustrationFournie;
   bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
 
   Map<String, dynamic> versJson() => {
@@ -70,6 +73,7 @@ class Recette {
         if (texteOrigine != null) 'texteOrigine': texteOrigine,
         if (memo) 'memo': true,
         if (illustration != null) 'illustration': illustration,
+        if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
   factory Recette.lire(Map j) => Recette(
@@ -88,7 +92,7 @@ class Recette {
         texteOrigine: j['texteOrigine'] as String?,
         memo: j['memo'] == true,
         illustration: j['illustration'] as String?,
-      );
+      )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 
 List<String> _textes(Object? l) => [for (final x in (l as List? ?? const [])) if ('$x'.trim().isNotEmpty) '$x'.trim()];
@@ -233,6 +237,88 @@ class BaseRecettes {
     return {for (final k in cles) k: m[k]!..sort((a, b) => _norm(a.titre).compareTo(_norm(b.titre)))};
   }
 
+  /// Images d'un dossier (et de ses sous-dossiers), par slug du nom de fichier.
+  static Map<String, File> _imagesDu(Directory d) {
+    final m = <String, File>{};
+    for (final f in d.listSync(recursive: true).whereType<File>()) {
+      final x = RegExp(r'^(.*)\.(jpe?g|png|webp)$', caseSensitive: false).firstMatch(f.uri.pathSegments.last);
+      if (x != null) m[slugRecette(x.group(1)!)] = f;
+    }
+    return m;
+  }
+
+  /// Copie [image] dans la base comme illustration de [r] (nom horodaté : l'ancienne image en cache n'est pas reprise).
+  Future<void> _poserIllustration(Recette r, File image) async {
+    final ext = image.path.split('.').last.toLowerCase();
+    final nom = 'illustration-${slugRecette(r.titre)}-${DateTime.now().millisecondsSinceEpoch}.$ext';
+    await image.copy(photo(nom).path);
+    final avant = r.illustration;
+    r.illustration = nom;
+    if (avant != null && avant != nom) {
+      try {
+        photo(avant).deleteSync();
+      } catch (_) {}
+    }
+  }
+
+  /// Remplace les illustrations (12/11/2026, Aristide « je veux simplement changer les illustrations ») : chaque
+  /// image du dossier dont le nom est le titre de la recette (« mousse-au-chocolat.jpg », accents et majuscules
+  /// indifférents) devient son illustration. Rend (illustrations posées, images sans recette).
+  Future<(int, List<String>)> importerIllustrations(Directory dossier) async {
+    final images = _imagesDu(dossier);
+    final utilisees = <String>{};
+    var n = 0;
+    for (final r in recettes) {
+      final cle = slugRecette(r.titre);
+      final f = images[cle];
+      if (f == null) continue;
+      await _poserIllustration(r, f);
+      utilisees.add(cle);
+      n++;
+    }
+    await enregistrer();
+    return (n, [for (final e in images.entries) if (!utilisees.contains(e.key)) e.value.uri.pathSegments.last]);
+  }
+
+  /// Dossier des illustrations livrées avec la console (installateur : <programme>\recettes-illustrations).
+  static Directory get dossierFourni =>
+      Directory('${File(Platform.resolvedExecutable).parent.path}${Platform.pathSeparator}recettes-illustrations');
+
+  /// Pose les illustrations livrées avec la console (12/11/2026, Aristide : « vous l'intégrez dans le catalogue
+  /// des recettes ») : illustrations.json associe l'identifiant de la recette (note Keep) à son image. Une image
+  /// déjà posée n'est pas recopiée ; une image fournie plus récente (autre taille) remplace l'ancienne.
+  Future<int> appliquerIllustrationsFournies([Directory? dossier]) async {
+    final d = dossier ?? dossierFourni;
+    final index = File('${d.path}${Platform.pathSeparator}illustrations.json');
+    if (!index.existsSync()) return 0;
+    final Map carte;
+    try {
+      carte = jsonDecode(await index.readAsString()) as Map;
+    } catch (_) {
+      return 0;
+    }
+    var n = 0;
+    for (final r in recettes) {
+      final nom = carte[r.id];
+      if (nom is! String) continue;
+      final f = File('${d.path}${Platform.pathSeparator}$nom');
+      if (!f.existsSync()) continue;
+      final marque = '$nom:${f.lengthSync()}';
+      if (r.illustrationFournie == marque && r.illustration != null && photo(r.illustration!).existsSync()) continue;
+      await _poserIllustration(r, f);
+      r.illustrationFournie = marque;
+      n++;
+    }
+    if (n > 0) await enregistrer();
+    return n;
+  }
+
+  /// Change l'illustration d'une seule recette.
+  Future<void> changerIllustration(Recette r, File image) async {
+    await _poserIllustration(r, image);
+    await enregistrer();
+  }
+
   /// Importe les notes Keep (.json) du dossier [source] dont un libellé contient « recette » ; leurs photos sont
   /// copiées dans la base. Une recette déjà importée (même note) est mise à jour. [toutes] : aussi les notes
   /// sans libellé « Recette ».
@@ -257,15 +343,11 @@ class BaseRecettes {
     }
     // Illustrations (12/11/2026) : <slug du titre>.jpg/.png dans un dossier « Illustrations » du dossier importé
     // ou de son parent.
-    final illustrations = <String, File>{};
+    var illustrations = <String, File>{};
     for (final d in [source, source.parent]) {
       final dir = d.listSync().whereType<Directory>().where((x) => _norm(x.uri.pathSegments.where((p) => p.isNotEmpty).last) == 'illustrations');
       if (dir.isEmpty) continue;
-      for (final f in dir.first.listSync().whereType<File>()) {
-        final n = f.uri.pathSegments.last;
-        final m = RegExp(r'^(.*)\.(jpe?g|png|webp)$', caseSensitive: false).firstMatch(n);
-        if (m != null) illustrations[slugRecette(m.group(1)!)] = f;
-      }
+      illustrations = _imagesDu(dir.first);
       break;
     }
     final fichiers = source.listSync().whereType<File>().where((f) {
@@ -344,15 +426,13 @@ class BaseRecettes {
       }
       final ill = illustrations[slugRecette(r.titre)] ?? illustrations[slugRecette(titre)];
       if (ill != null) {
-        final nom = 'illustration-${ill.uri.pathSegments.last}';
-        final dest = photo(nom);
-        if (!dest.existsSync() || dest.lengthSync() != ill.lengthSync()) await ill.copy(dest.path);
-        r.illustration = nom;
+        await _poserIllustration(r, ill);
         bilan.illustrations++;
       } else {
         // Réimport sans dossier d'illustrations : on garde celle déjà rangée.
         final avant = recettes.where((x) => x.id == id).firstOrNull;
         r.illustration = avant?.illustration;
+        r.illustrationFournie = avant?.illustrationFournie;
       }
       final i = recettes.indexWhere((x) => x.id == id);
       if (i >= 0) {

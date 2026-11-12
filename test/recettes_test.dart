@@ -127,4 +127,25 @@ void main() {
     source.deleteSync(recursive: true);
     dest.deleteSync(recursive: true);
   });
+
+  test('illustrations livrées avec la console : posées par identifiant, une seule fois', () async {
+    final fourni = Directory.systemTemp.createTempSync('fourni');
+    final dest = Directory.systemTemp.createTempSync('basei');
+    File('${fourni.path}/mousse.jpg').writeAsBytesSync([1, 2, 3]);
+    File('${fourni.path}/illustrations.json').writeAsStringSync(jsonEncode({'keep-1': 'mousse.jpg'}));
+    final b = BaseRecettes(dest)
+      ..recettes.addAll([
+        Recette(id: 'keep-1', titre: 'Mousse', types: const ['Dessert'], ingredients: const [], preparation: '', photos: const []),
+        Recette(id: 'keep-2', titre: 'Autre', types: const ['Plats'], ingredients: const [], preparation: '', photos: const []),
+      ]);
+    expect(await b.appliquerIllustrationsFournies(fourni), 1);
+    expect(b.recettes.first.illustration, isNotNull);
+    expect(b.photo(b.recettes.first.illustration!).existsSync(), isTrue);
+    expect(b.recettes.last.illustration, isNull);
+    expect(await b.appliquerIllustrationsFournies(fourni), 0);
+    final relue = await BaseRecettes.ouvrir(dossier: dest);
+    expect(await relue.appliquerIllustrationsFournies(fourni), 0);
+    fourni.deleteSync(recursive: true);
+    dest.deleteSync(recursive: true);
+  });
 }

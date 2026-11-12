@@ -37,7 +37,11 @@ class _PageRecettesState extends State<PageRecettes> {
     if (widget.base != null) {
       base = widget.base;
     } else {
-      BaseRecettes.ouvrir().then((b) {
+      BaseRecettes.ouvrir().then((b) async {
+        // Illustrations livrées avec la console : posées sans rien demander.
+        try {
+          await b.appliquerIllustrationsFournies();
+        } catch (_) {}
         if (mounted) setState(() => base = b);
       }, onError: (Object e) {
         // Sans dossier de données (tests) : une base vide, en mémoire.
@@ -54,6 +58,9 @@ class _PageRecettesState extends State<PageRecettes> {
     setState(() => _import = true);
     try {
       final bilan = await b.importerKeep(Directory(chemin));
+      try {
+        await b.appliquerIllustrationsFournies();
+      } catch (_) {}
       if (!mounted) return;
       Nav.message(context, 'Import : $bilan');
     } catch (e) {
