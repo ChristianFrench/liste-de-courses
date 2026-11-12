@@ -574,6 +574,35 @@ void main() {
     expect(((b.lire()['magasins'] as List).first as Map)['nom'], 'Nom donné par B');
   });
 
+  test('emplacements replacés avant la connexion : journalisés ensuite, ils partent et l\'emportent chez l\'autre', () {
+    final d = demo();
+    final a = Stockage.ouvrir(':memory:')..ecrire(parLeModele(d));
+    a.horloge = Horloge('A');
+    a.toutJournaliser(a.lire());
+    final b = Stockage.ouvrir(':memory:')..ecrire(parLeModele(vide(d)));
+    b.horloge = Horloge('B');
+    b.appliquer(envoi(a, 'A'));
+    final da = envoi(a, 'A').last['h'] as String;
+
+    // A, à l'ouverture et avant de se connecter (sans horloge), range un produit ailleurs.
+    a.horloge = null;
+    final ja = parLeModele(a.lire());
+    final e = (ja['emplacements'] as List).first as Map;
+    final autre = ((ja['secteurs'] as List).firstWhere((s) => s['id'] != e['secteurId']) as Map)['id'];
+    e['secteurId'] = autre;
+    a.ecrire(ja);
+    a.horloge = Horloge('A', dernier: da);
+    expect(envoi(a, 'A', da), isEmpty, reason: 'écrit sans horloge : rien n\'est parti');
+
+    // À la connexion : les emplacements sont journalisés une fois.
+    a.toutJournaliser(a.lire(), tables: {'emplacement'});
+    final deA = envoi(a, 'A', da);
+    expect(deA.map((o) => o['t']).toSet(), {'emplacement'});
+    b.appliquer(deA);
+    final eb = (b.lire()['emplacements'] as List).cast<Map>().firstWhere((x) => x['produitId'] == e['produitId']);
+    expect(eb['secteurId'], autre);
+  });
+
   test('l\'horloge avance toujours, même après une heure reçue d\'un appareil en avance', () {
     final h = Horloge('X');
     final a = h.suivante();

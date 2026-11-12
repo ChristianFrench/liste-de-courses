@@ -103,6 +103,10 @@ extension ReparationEmplacements on Etat {
       for (final p in aPlacer.values) {
         parNom.putIfAbsent(p.nom.trim().toLowerCase(), () => []).add(p.id);
       }
+      // Même ordre sur tous les appareils (l'ordre de la base, lui, diffère de l'un à l'autre).
+      for (final ids in parNom.values) {
+        ids.sort();
+      }
       for (final r in (catalogue['rayons'] as List? ?? const []).whereType<Map>()) {
         final ro = r['nom'] as String? ?? '';
         final rayonIci = renommages['r:$ro'] ?? ro;

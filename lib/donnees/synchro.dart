@@ -616,6 +616,17 @@ class Synchro extends ChangeNotifier {
       _noter(r, erreur: !r.endsWith('ok'));
       _sansPanne('la reprise après réparation', () => base.toutJournaliser(base.lire()));
     }
+    // 12/11/2026 : les emplacements replacés à l'ouverture (lib/donnees/reparation.dart) l'ont été avant la
+    // connexion, donc sans être journalisés : chaque appareil gardait les siens (deux produits de même nom,
+    // « Noix de Saint-Jacques » libre-service et au comptoir, rangés à l'inverse d'un appareil à l'autre).
+    // Ils partent une fois aux autres appareils ; le plus récent l'emporte partout.
+    if (base.reglage('reparation_emplacements_1211') == '1' && base.reglage('emplacements_envoyes_1211') != '1') {
+      _sansPanne('l\'envoi des emplacements replacés', () {
+        base.toutJournaliser(base.lire(), tables: {'emplacement'});
+        base.definirReglage('emplacements_envoyes_1211', '1');
+        _noter('Emplacements replacés envoyés aux autres appareils');
+      });
+    }
     final t = _transport = TransportChiffre(fabrique(serveur), code ?? '');
     _abonnements
       ..add(t.messages.listen((m) => _sansPanne('la réception (${m.$1.split('/').skip(2).join('/')})', () => _recevoir(m.$1, m.$2))))
