@@ -11,6 +11,7 @@ import 'donnees/messages.dart';
 import 'donnees/modele.dart';
 import 'donnees/base_locale.dart' show retirerEcranOuverture;
 import 'donnees/ouverture.dart';
+import 'donnees/reparation.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
@@ -30,6 +31,11 @@ Future<void> main() async {
     etapeOuverture.value = (texte: 'Ouverture de la base', valeur: 0.25);
   }
   await Etat.instance.charger();
+  // 12/11/2026 : emplacements effacés par la conversion de la version 511c095, replacés une fois.
+  if (!outilEditeur && Etat.instance.stockageFoyer != null && emplacementsPerdus(Etat.instance)) {
+    await annoncerEtape('Réparation des secteurs', 0.6);
+    await reparerEmplacementsPerdus();
+  }
   // Les images de l'accueil se décodent pendant la suite de la préparation.
   final images = ouvertureAffichee ? preparerImages() : Future<void>.value();
   Etat.instance.avertir = MessagesFoyer.instance.avertir;

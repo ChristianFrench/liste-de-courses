@@ -119,6 +119,12 @@ class Stockage {
     // Règle R5 abandonnée (12/11/2026) : les secteurs sont communs à tous les magasins, le parcours d'un
     // magasin désigne des secteurs du magasin fictif « commun ».
     db.execute('DROP TRIGGER IF EXISTS controle_secteur_parcours');
+    // Le magasin fictif de la structure commune doit exister dans toute base (12/11/2026) : une base d'avant
+    // ne l'avait pas, et l'enregistrement, qui le croyait déjà écrit, effaçait comme orphelins tous les
+    // emplacements des produits.
+    if (s._existe('magasin')) {
+      db.execute("INSERT OR IGNORE INTO magasin (id, nom, archive) VALUES ('$_magasinCommun', 'Structure commune', 0)");
+    }
     return s;
   }
 
