@@ -526,6 +526,7 @@ class Stockage {
     try {
       _db.execute('PRAGMA defer_foreign_keys = ON');
       final presents = <String>{};
+      final produitsAjoutes = <String>{};
       for (final t in _tables) {
         var aEcrire = lignes[t.nom]!;
         if (t.nom == 'parcours') {
@@ -540,6 +541,7 @@ class Stockage {
           presents.add(cle);
           final empreinte = _empreinte(t, ligne);
           if (_ecrit[cle] == empreinte) continue;
+          if (t.nom == 'ligne_liste' && !_ecrit.containsKey(cle)) produitsAjoutes.add(ligne['produit_id'] as String);
           if (t.nom == 'ligne_liste' && !_ecrit.containsKey(cle)) {
             // Un produit remis dans la liste compte comme une nouvelle entrée (R4).
             requete('UPDATE produit SET nb_utilisations = nb_utilisations + 1 WHERE id = ? '
@@ -576,6 +578,17 @@ class Stockage {
         }
         final morceaux = cle.split(_sep);
         _journaliser(morceaux.first, morceaux.sublist(1), null, requete);
+      }
+      // 12/11/2026 (Aristide) : un article ajouté à une liste part avec le secteur de son produit. L'emplacement
+      // est renvoyé même s'il n'a pas changé : l'appareil qui reçoit range l'article au même endroit, et son
+      // catalogue est remis d'accord pour ce produit.
+      if (horloge != null && produitsAjoutes.isNotEmpty) {
+        for (final e in lignes['emplacement']!) {
+          if (!produitsAjoutes.contains(e['produit_id'])) continue;
+          final cle = [e['produit_id'], e['magasin_id']];
+          requete('DELETE FROM synchro_objet WHERE tab = ? AND cle = ?').execute(['emplacement', jsonEncode(cle)]);
+          _journaliser('emplacement', cle, e, requete);
+        }
       }
       _db.execute('COMMIT');
     } catch (_) {

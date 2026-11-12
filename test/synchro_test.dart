@@ -603,6 +603,38 @@ void main() {
     expect(eb['secteurId'], autre);
   });
 
+  test('un article ajouté part avec le secteur de son produit : l\'autre appareil le range au même endroit', () {
+    final d = demo();
+    final a = Stockage.ouvrir(':memory:')..ecrire(parLeModele(d));
+    a.horloge = Horloge('A');
+    a.toutJournaliser(a.lire());
+    final b = Stockage.ouvrir(':memory:')..ecrire(parLeModele(vide(d)));
+    b.horloge = Horloge('B');
+    b.appliquer(envoi(a, 'A'));
+    final da = envoi(a, 'A').last['h'] as String;
+
+    // B range le produit ailleurs, sans que A le sache (rangements divergents).
+    final jb = parLeModele(b.lire());
+    final dansLaListe = {for (final g in (((jb['listes'] as List).first as Map)['lignes'] as List).cast<Map>()) g['produitId']};
+    final e = (jb['emplacements'] as List).cast<Map>().firstWhere((x) => !dansLaListe.contains(x['produitId']));
+    final chezA = e['secteurId'];
+    e['secteurId'] = ((jb['secteurs'] as List).firstWhere((s) => s['id'] != chezA) as Map)['id'];
+    b.horloge = null;
+    b.ecrire(jb);
+    b.horloge = Horloge('B');
+
+    // A ajoute ce produit à une liste.
+    final ja = parLeModele(a.lire());
+    final liste = (ja['listes'] as List).first as Map;
+    (liste['lignes'] as List).add({'produitId': e['produitId'], 'quantite': 1});
+    a.ecrire(parLeModele(ja));
+    final deA = envoi(a, 'A', da);
+    expect(deA.map((o) => o['t']).toSet(), containsAll(['ligne_liste', 'emplacement']));
+    b.appliquer(deA);
+    final eb = (b.lire()['emplacements'] as List).cast<Map>().firstWhere((x) => x['produitId'] == e['produitId']);
+    expect(eb['secteurId'], chezA);
+  });
+
   test('l\'horloge avance toujours, même après une heure reçue d\'un appareil en avance', () {
     final h = Horloge('X');
     final a = h.suivante();
