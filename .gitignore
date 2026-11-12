@@ -4,3 +4,4 @@ outils/__pycache__/
 definitions.json
 test/apercus/
 test/video/ecrans/
+build/
