@@ -188,6 +188,7 @@ class Sauvegarde {
     await copier('Avant restauration', forcer: true);
     final etat = Etat.instance;
     etat.lire(donnees);
+    etat.unifierStructure(); // copie d'avant le 12/11/2026 : un exemplaire de la structure par magasin
     await etat.enregistrer();
     etat.modifie();
   }

@@ -193,9 +193,7 @@ void main() {
     expect(e.produits.length, nb + 2);
     expect(e.estAjoute(perso), isFalse, reason: 'au catalogue commun maintenant');
     expect(e.secteurCatalogue(perso.id)?.nom, 'Chats');
-    for (final m in e.magasins) {
-      expect(e.rayons.where((r) => r.magasinId == m.id && r.nom == 'Animalerie'), hasLength(1));
-    }
+    expect(e.rayons.where((r) => r.nom == 'Animalerie'), hasLength(1), reason: 'un seul exemplaire pour tous les magasins');
     expect(e.produit(utilise), isNotNull, reason: 'dans une liste : pas retiré');
     expect(e.nouveautesCatalogue?['version'], 10);
     expect(e.nouveautesCatalogue?['lignes'], ['2 rayons, 2 secteurs, 3 produits', '3 modifications sur 3 produits']);

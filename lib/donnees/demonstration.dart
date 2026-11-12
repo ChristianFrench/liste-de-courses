@@ -43,7 +43,7 @@ extension FoyerDemonstration on Etat {
     final rangDansSecteurs = {for (var i = 0; i < secteurs.length; i++) secteurs[i].id: i};
     int rangSecteur(Magasin m, String produitId) {
       final ordre = ordreMagasin.putIfAbsent(m.id, () {
-        final rs = rayons.where((r) => r.magasinId == m.id).toList()..shuffle(hasard);
+        final rs = List.of(rayons)..shuffle(hasard);
         // Fruits et légumes à l'entrée, comme dans la plupart des magasins.
         rs.sort((a, b) => (b.nom.startsWith('Fruits') ? 1 : 0) - (a.nom.startsWith('Fruits') ? 1 : 0));
         return {for (var i = 0; i < rs.length; i++) rs[i].id: i};

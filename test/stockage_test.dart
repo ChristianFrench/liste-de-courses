@@ -151,7 +151,8 @@ void main() {
     final n = await e.appliquerModele(m, 2, catalogue: catalogue);
     expect(n, greaterThan(500));
     expect(e.rayonsDu(m.id).length, greaterThan(20));
-    expect(e.produits.where((p) => p.nom.toLowerCase() == 'lait demi-écrémé').length, lessThanOrEqualTo(1));
+    // Structure commune (12/11/2026) : une seconde application n'ajoute rien.
+    expect(await e.appliquerModele(m, 2, catalogue: catalogue), 0);
   });
 
   test('une nature à la coupe et en libre-service est rangée dans les deux secteurs', () async {
@@ -240,5 +241,62 @@ void main() {
     expect(e.aUnHistorique(e.magasin(mg.id)!), isTrue);
     e.restaurerMagasin(e.magasin(mg.id)!);
     expect(e.estArchive(mg.id), isFalse);
+  });
+
+  test('une base à une structure par magasin passe à la structure commune, parcours compris', () {
+    // Base d'avant le 12/11/2026 : le magasin 2 a sa propre copie des rayons, secteurs et emplacements.
+    final j = demo();
+    final rayons = (j['rayons'] as List).cast<Map>().toList();
+    final secteurs = (j['secteurs'] as List).cast<Map>().toList();
+    final emplacements = (j['emplacements'] as List).cast<Map>().toList();
+    for (final r in rayons) {
+      (j['rayons'] as List).add({'id': '${r['id']}b', 'magasinId': 'mg2', 'nom': r['nom']});
+    }
+    for (final x in secteurs) {
+      (j['secteurs'] as List).add({'id': '${x['id']}b', 'rayonId': '${x['rayonId']}b', 'nom': x['nom']});
+    }
+    for (final e in emplacements) {
+      (j['emplacements'] as List).add({'magasinId': 'mg2', 'produitId': e['produitId'], 'secteurId': '${e['secteurId']}b'});
+    }
+    final pc1 = (j['parcours'] as List).cast<Map>().first;
+    (j['parcours'] as List).add({...pc1, 'id': 'pc-mg2', 'magasinId': 'mg2', 'parDefaut': true,
+      'etapes': [for (final id in (pc1['etapes'] as List)) '${id}b']});
+    final chemin = '${dossier.path}/ancienne.db';
+    final ancienne = Stockage.ouvrir(chemin);
+    ancienne.ecrire(j);
+    ancienne.fermer();
+
+    final e = Etat.instance..enregistrementActif = false;
+    final s = Stockage.ouvrir(chemin);
+    e.lire(s.lire());
+    expect(e.unifierStructure(), isTrue, reason: 'à enregistrer');
+    expect(e.unifierStructure(), isFalse, reason: 'une seule fois');
+    expect(e.rayons.map((r) => r.nom).toList(), rayons.map((r) => r['nom']).toList(), reason: 'un exemplaire, dans l\'ordre');
+    expect(e.rayons.every((r) => r.magasinId == magasinCommun), isTrue);
+    expect(e.secteurs, hasLength(secteurs.length));
+    expect(e.emplacements, hasLength(emplacements.length), reason: 'un emplacement par produit');
+    for (final em in emplacements) {
+      final avant = secteurs.firstWhere((x) => x['id'] == em['secteurId'])['nom'];
+      expect(e.secteurDe('mg2', em['produitId'] as String)?.nom, avant);
+      expect(e.secteurDe('mg1', em['produitId'] as String)?.nom, avant);
+    }
+    final p2 = e.parcours.firstWhere((p) => p.id == 'pc-mg2');
+    final p1 = e.parcours.firstWhere((p) => p.id == pc1['id']);
+    expect(p2.etapes, p1.etapes, reason: 'même ordre, secteurs communs');
+    expect(p2.etapes.every((id) => e.secteur(id) != null), isTrue);
+    expect(e.secteursDuMagasin('mg2'), hasLength(secteurs.length));
+
+    // Enregistrée puis relue : rien ne revient.
+    s.ecrire(e.versJson());
+    expect(s.erreurs, isEmpty);
+    s.fermer();
+    final relue = Stockage.ouvrir(chemin);
+    final k = relue.lire();
+    expect((k['rayons'] as List), hasLength(rayons.length));
+    expect((k['emplacements'] as List), hasLength(emplacements.length));
+    expect((k['magasins'] as List).map((m) => m['id']), isNot(contains(magasinCommun)), reason: 'magasin fictif caché');
+    e.lire(k);
+    expect(e.unifierStructure(), isFalse);
+    relue.fermer();
   });
 }

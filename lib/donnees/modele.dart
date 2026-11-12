@@ -120,6 +120,10 @@ class MarqueDistributeur {
   final List<String> cibles;
 }
 
+/// Les rayons, secteurs et emplacements sont communs à tous les magasins (12/11/2026) : ils portent ce
+/// magasin fictif, jamais montré (une ligne « magasin » cachée dans la base, pour ses liens).
+const String magasinCommun = 'commun';
+
 class Rayon {
   Rayon(this.id, this.magasinId, this.nom);
   final String id;
@@ -844,7 +848,7 @@ class Etat extends ChangeNotifier {
   String resumeBase() {
     final m = magasinReference;
     final nonPlaces = m == null ? 0 : produits.where((p) => produitVisible(p) && secteurDe(m.id, p.id) == null).length;
-    return 'rayons ${rayonsCatalogue.length}, secteurs ${m == null ? 0 : secteurs.where((x) => rayon(x.rayonId)?.magasinId == m.id).length}, '
+    return 'rayons ${rayonsCatalogue.length}, secteurs ${secteurs.length}, '
         'produits ${produits.length} (ajoutés ${produitsAjoutes.length}), non placés $nonPlaces, '
         'emplacements ${emplacements.length}, structure ajoutée ${structurePerso.length}, listes ${listes.length}';
   }
@@ -915,13 +919,10 @@ class Etat extends ChangeNotifier {
     final s = _actif!;
     if (s.vide) {
       lire(_depart(await _donneesDemo()));
-      // Démonstration : seulement ses trois magasins (11/11/2026). Chacun porte une copie du catalogue
-      // entier ; les autres alourdissaient chaque ouverture sans jamais servir.
+      // Démonstration : seulement les trois magasins de son exemple (11/11/2026).
       if (demonstration) magasins.removeWhere((m) => !const ['Intermarché', 'Carrefour', 'Lidl'].contains(m.nom));
-      final catalogue = await CatalogueType.lireJson();
-      for (final m in magasins) {
-        await appliquerModele(m, tailleComplete, catalogue: catalogue);
-      }
+      // Une seule structure pour tous les magasins (12/11/2026).
+      if (magasins.isNotEmpty) await appliquerModele(magasins.first, tailleComplete, catalogue: await CatalogueType.lireJson());
       creerExemples(enregistrer: false);
       if (demonstration) remplirDemonstration();
       s.ecrire(versJson());
@@ -932,7 +933,8 @@ class Etat extends ChangeNotifier {
     await reparerTypesMesure();
     await appliquerFormats();
     completerLots();
-    harmoniserCatalogue();
+    // 12/11/2026 : une base à l'ancienne (un exemplaire de la structure par magasin) passe à la structure commune.
+    unifierStructure();
     // 08/11/2026 : les anciens produits de marque (« Camembert Président ») deviennent des déclinaisons.
     reprendreProduitsDeMarque();
     // Historique de plus de trois mois (réglable) vers les archives, et archives trop anciennes supprimées.
@@ -1108,6 +1110,8 @@ class Etat extends ChangeNotifier {
     final n = s.appliquer(objets);
     if (n > 0) {
       lire(s.lire());
+      // Objets venus d'un appareil pas encore à jour : rayons, secteurs et emplacements d'un magasin.
+      unifierStructure();
       _retrouverMoi(s);
     }
     return n;
@@ -1395,6 +1399,9 @@ class Etat extends ChangeNotifier {
       terminees2 = true;
       sansTicket.addAll([for (final c in historique) if (ticketDe(c.id) != null) c.id]);
     }
+    // 12/11/2026 : données à l'ancienne (une structure par magasin) ramenées tout de suite à la structure
+    // commune ; [unifierStructure] l'enregistre ensuite.
+    if (_unifier()) _structureAConvertir = true;
     notifyListeners();
   }
 
@@ -1527,16 +1534,19 @@ class Etat extends ChangeNotifier {
   Course? course(String? id) => _trouve(historique, (c) => c.id == id);
   Ticket? ticketDe(String courseId) => _trouve(tickets, (t) => t.listeId == courseId);
 
-  List<Rayon> rayonsDu(String magasinId) => rayons.where((r) => r.magasinId == magasinId).toList();
+  /// Rayons du catalogue : les mêmes pour tous les magasins ([magasinId] n'est gardé que pour les appels existants).
+  List<Rayon> rayonsDu(String magasinId) => List.of(rayons);
   List<Secteur> secteursDu(String rayonId) => secteurs.where((s) => s.rayonId == rayonId).toList();
   List<Secteur> secteursDuMagasin(String magasinId) {
     final ids = rayonsDu(magasinId).map((r) => r.id).toSet();
     return secteurs.where((s) => ids.contains(s.rayonId)).toList();
   }
 
-  final _indexEmplacements = Index<Emplacement>((e) => '${e.magasinId}\u0000${e.produitId}');
+  final _indexEmplacements = Index<Emplacement>((e) => e.produitId);
+
+  /// Secteur où est rangé le produit, le même dans tous les magasins.
   Secteur? secteurDe(String magasinId, String produitId) {
-    final e = _indexEmplacements.trouver(_emplacements, '$magasinId\u0000$produitId');
+    final e = _indexEmplacements.trouver(_emplacements, produitId);
     return e == null ? null : secteur(e.secteurId);
   }
 
@@ -1544,7 +1554,7 @@ class Etat extends ChangeNotifier {
 
   List<Produit> produitsDu(String magasinId, String secteurId) => [
         for (final e in emplacements)
-          if (e.magasinId == magasinId && e.secteurId == secteurId) produit(e.produitId)
+          if (e.secteurId == secteurId) produit(e.produitId)
       ].whereType<Produit>().toList();
 
   int nbProduitsRayon(String magasinId, String rayonId) =>
@@ -2593,11 +2603,8 @@ class Etat extends ChangeNotifier {
   /// Un nouveau magasin reçoit le catalogue du foyer (le même pour tous les magasins) ;
   /// le premier magasin du foyer, le catalogue de départ.
   Future<void> remplirMagasin(Magasin m) async {
-    if (magasins.any((x) => x.id != m.id && rayonsDu(x.id).isNotEmpty)) {
-      harmoniserCatalogue();
-    } else {
-      await appliquerModele(m, tailleComplete);
-    }
+    // 12/11/2026 : la structure est commune ; seul un foyer qui n'en a pas encore reçoit le catalogue de départ.
+    if (rayons.isEmpty) await appliquerModele(m, tailleComplete);
   }
 
   static const String fichierCatalogueType = 'assets/catalogue_type.json';
@@ -2620,19 +2627,19 @@ class Etat extends ChangeNotifier {
     }
     final ici = <String, Emplacement>{};
     for (final e in emplacements) {
-      if (e.magasinId == m.id) ici.putIfAbsent(e.produitId, () => e);
+      ici.putIfAbsent(e.produitId, () => e);
     }
-    final rayonsIci = {for (final x in rayons.reversed) if (x.magasinId == m.id) x.nom: x};
+    final rayonsIci = {for (final x in rayons.reversed) x.nom: x};
     var n = 0;
     for (final r in (catalogue['rayons'] as List).cast<Map>()) {
       final secteursR = (r['secteurs'] as List).cast<Map>().where((s) => (s['taille'] as num) <= taille).toList();
       if (secteursR.isEmpty) continue;
       final rayon = rayonsIci[r['nom']] ??
-          (Rayon(nouvelId('r'), m.id, r['nom'] as String)..let(rayons.add)..let((x) => rayonsIci[x.nom] = x));
+          (Rayon(_idRayon(r['nom'] as String), magasinCommun, r['nom'] as String)..let(rayons.add)..let((x) => rayonsIci[x.nom] = x));
       final secteursIci = {for (final x in secteurs.reversed) if (x.rayonId == rayon.id) x.nom: x};
       for (final s in secteursR) {
         final secteur = secteursIci[s['nom']] ??
-            (Secteur(nouvelId('s'), rayon.id, s['nom'] as String)..let(secteurs.add)..let((x) => secteursIci[x.nom] = x));
+            (Secteur(_idSecteur(rayon.nom, s['nom'] as String), rayon.id, s['nom'] as String)..let(secteurs.add)..let((x) => secteursIci[x.nom] = x));
         for (final p in (s['produits'] as List).cast<Map>()) {
           if ((p['taille'] as num) > taille) continue;
           final nom = p['nom'] as String;
@@ -2659,7 +2666,7 @@ class Etat extends ChangeNotifier {
             }
           }
           if (!ici.containsKey(produit.id)) {
-            final e = Emplacement(m.id, produit.id, secteur.id);
+            final e = Emplacement(magasinCommun, produit.id, secteur.id);
             emplacements.add(e);
             ici[produit.id] = e;
             n++;
@@ -2672,9 +2679,9 @@ class Etat extends ChangeNotifier {
   }
 
   Rayon ajouterRayon(String magasinId, String nom) {
-    final existant = _trouve(rayons, (r) => r.magasinId == magasinId && r.nom == nom);
-    if (existant != null) return existant; // un nom par magasin (contrainte de la base)
-    final r = Rayon(nouvelId('r'), magasinId, nom);
+    final existant = _trouve(rayons, (r) => r.nom == nom);
+    if (existant != null) return existant; // un nom par rayon (contrainte de la base)
+    final r = Rayon(_idRayon(nom), magasinCommun, nom);
     rayons.add(r);
     modifie();
     return r;
@@ -2683,7 +2690,7 @@ class Etat extends ChangeNotifier {
   Secteur ajouterSecteur(String rayonId, String nom) {
     final existant = _trouve(secteurs, (s) => s.rayonId == rayonId && s.nom == nom);
     if (existant != null) return existant; // un nom par rayon (contrainte de la base)
-    final s = Secteur(nouvelId('s'), rayonId, nom);
+    final s = Secteur(_idSecteur(rayon(rayonId)?.nom ?? rayonId, nom), rayonId, nom);
     secteurs.add(s);
     modifie();
     return s;
@@ -2692,32 +2699,37 @@ class Etat extends ChangeNotifier {
   // ------------------------------------------------------------ Catalogue unique (25/10/2026)
   //
   // Un seul catalogue pour le foyer : les mêmes rayons, secteurs et produits dans tous les magasins,
-  // chaque produit dans le même secteur partout. La base garde un exemplaire des rayons et secteurs
-  // par magasin ; l'application les tient identiques (mêmes noms).
+  // chaque produit dans le même secteur partout. Depuis le 12/11/2026, la base n'en garde qu'un exemplaire
+  // (magasin fictif [magasinCommun]) ; seul le parcours est propre à un magasin.
 
-  /// Magasin dont les rayons et secteurs servent à présenter le catalogue (ils sont les mêmes partout).
+  /// Identifiants tirés des noms : les mêmes sur tous les appareils.
+  static String _cleStructure(String t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9àâäçéèêëîïôöùûüœ]+'), '-');
+  String _idRayon(String nom) {
+    final id = 'rc-${_cleStructure(nom)}';
+    return rayon(id) == null ? id : nouvelId('rc');
+  }
+
+  String _idSecteur(String rayonNom, String nom) {
+    final id = 'sc-${_cleStructure(rayonNom)}/${_cleStructure(nom)}';
+    return secteur(id) == null ? id : nouvelId('sc');
+  }
+
+  /// Gardé pour les appels existants : le catalogue ne dépend plus d'un magasin.
   Magasin? get magasinReference => magasins.isEmpty ? null : magasins.first;
 
   /// Rayons du catalogue.
-  List<Rayon> get rayonsCatalogue => magasinReference == null ? [] : rayonsDu(magasinReference!.id);
+  List<Rayon> get rayonsCatalogue => List.of(rayons);
 
   /// Secteur du catalogue où est rangé le produit, ou null.
-  Secteur? secteurCatalogue(String produitId) => magasinReference == null ? null : secteurDe(magasinReference!.id, produitId);
+  Secteur? secteurCatalogue(String produitId) => secteurDe(magasinCommun, produitId);
 
-  /// Produits d'un secteur du catalogue (secteur du magasin de référence) ; sans ceux des autres foyers si le
-  /// catalogue est isolé.
+  /// Produits d'un secteur du catalogue ; sans ceux des autres foyers si le catalogue est isolé.
   List<Produit> produitsDuSecteur(Secteur s) => [for (final p in _tousDuSecteur(s)) if (produitVisible(p)) p];
 
-  List<Produit> _tousDuSecteur(Secteur s) => produitsDu(rayon(s.rayonId)?.magasinId ?? '', s.id);
+  List<Produit> _tousDuSecteur(Secteur s) => produitsDu(magasinCommun, s.id);
 
-  /// Le même secteur (mêmes noms de rayon et de secteur) dans le magasin [magasinId].
-  Secteur? secteurHomologue(String magasinId, Secteur s) {
-    final r = rayon(s.rayonId);
-    if (r == null) return null;
-    if (r.magasinId == magasinId) return s;
-    final r2 = _trouve(rayons, (x) => x.magasinId == magasinId && x.nom == r.nom);
-    return r2 == null ? null : _trouve(secteurs, (x) => x.rayonId == r2.id && x.nom == s.nom);
-  }
+  /// Le secteur est le même dans tous les magasins.
+  Secteur? secteurHomologue(String magasinId, Secteur s) => s;
 
   /// Produit ajouté par le foyer : lui seul peut être modifié ; le catalogue d'origine ne change pas.
   bool estAjoute(Produit p) => produitsPerso[p.id] == 'a';
@@ -2774,21 +2786,17 @@ class Etat extends ChangeNotifier {
     return p;
   }
 
-  /// Range le produit dans le secteur [secteurId] (ou son homologue) de tous les magasins.
-  /// [magasinId] n'est gardé que pour les appels existants : le rangement est le même partout.
+  /// Range le produit dans le secteur [secteurId], le même dans tous les magasins.
+  /// [magasinId] n'est gardé que pour les appels existants.
   void placer(String magasinId, String produitId, String secteurId) {
     final s = secteur(secteurId);
     final p = produit(produitId);
     if (s == null || p == null) return;
-    for (final m in magasins) {
-      final h = secteurHomologue(m.id, s);
-      if (h == null) continue;
-      final e = _indexEmplacements.trouver(_emplacements, '${m.id}\u0000$produitId');
-      if (e == null) {
-        emplacements.add(Emplacement(m.id, produitId, h.id));
-      } else {
-        e.secteurId = h.id;
-      }
+    final e = _indexEmplacements.trouver(_emplacements, produitId);
+    if (e == null) {
+      emplacements.add(Emplacement(magasinCommun, produitId, s.id));
+    } else {
+      e.secteurId = s.id;
     }
     // Pendant l'application du catalogue commun, un seul enregistrement à la fin (06/11/2026 : un par produit
     // bloquait le téléphone plusieurs minutes).
@@ -2804,7 +2812,7 @@ class Etat extends ChangeNotifier {
     produits.add(p);
     _marquerAjoute(p);
     if (secteur != null) {
-      placer(rayon(secteur.rayonId)?.magasinId ?? '', p.id, secteur.id);
+      placer(magasinCommun, p.id, secteur.id);
     } else {
       modifie();
     }
@@ -2817,79 +2825,105 @@ class Etat extends ChangeNotifier {
     modifie();
   }
 
-  /// Remet les magasins au même catalogue : chaque magasin reçoit les rayons et secteurs qui lui manquent
-  /// (identifiants tirés des noms, les mêmes sur tous les appareils), et chaque produit est rangé partout
-  /// dans le secteur où il l'est dans le plus de magasins. Rend vrai si quelque chose a changé.
-  bool harmoniserCatalogue() {
-    final mags = [...magasins]..sort((a, b) => a.id.compareTo(b.id));
-    if (mags.length < 2) return false;
-    var change = false;
-    String cle(String t) => t.toLowerCase().replaceAll(RegExp(r'[^a-z0-9àâäçéèêëîïôöùûüœ]+'), '-');
-    // Structure : l'union des rayons et secteurs de tous les magasins, dans l'ordre du premier.
-    final structure = <String, List<String>>{};
-    for (final m in mags) {
-      for (final r in rayonsDu(m.id)) {
-        final l = structure.putIfAbsent(r.nom, () => []);
-        for (final s in secteursDu(r.id)) {
-          if (!l.contains(s.nom)) l.add(s.nom);
-        }
+  /// Gardé pour les appels existants (tests) : voir [unifierStructure].
+  bool harmoniserCatalogue() => unifierStructure();
+
+  /// Une seule structure pour tous les magasins (12/11/2026). Une base où chaque magasin avait son exemplaire
+  /// des rayons, secteurs et emplacements (ou des objets reçus d'un appareil pas encore à jour) est ramenée
+  /// à un exemplaire commun : rayons et secteurs fusionnés par leurs noms (identifiants tirés des noms, les
+  /// mêmes sur tous les appareils), chaque produit rangé dans le secteur où il l'était dans le plus de
+  /// magasins (à égalité, le premier par ordre alphabétique), parcours et listes reportés sur les secteurs
+  /// communs. Rend vrai si quelque chose a changé.
+  bool unifierStructure() {
+    final c = _unifier() | _structureAConvertir;
+    _structureAConvertir = false;
+    if (c) modifie();
+    return c;
+  }
+
+  bool _structureAConvertir = false;
+
+  bool _unifier() {
+    final anciensRayons = rayons.where((r) => r.magasinId != magasinCommun).toList();
+    final anciensEmplacements = emplacements.where((e) => e.magasinId != magasinCommun).toList();
+    if (anciensRayons.isEmpty && anciensEmplacements.isEmpty) return false;
+    // Rayons : les communs d'abord, puis ceux des magasins dans l'ordre des magasins (le premier donne l'ordre).
+    final rangMagasin = {for (var i = 0; i < magasins.length; i++) magasins[i].id: i};
+    final ordre = [...rayons]..sort((a, b) {
+        int rang(Rayon r) => r.magasinId == magasinCommun ? -1 : rangMagasin[r.magasinId] ?? magasins.length;
+        return rang(a).compareTo(rang(b));
+      });
+    final ancienRayon = {for (final r in rayons) r.id: r};
+    final rayonParNom = <String, Rayon>{};
+    final secteurParNom = <String, Secteur>{}; // « rayon|secteur » → secteur commun
+    final versRayon = <String, String>{}, versSecteur = <String, String>{};
+    final nouveauxRayons = <Rayon>[], nouveauxSecteurs = <Secteur>[];
+    final idsPris = <String>{};
+    String libre(String id, String prefixe) => idsPris.add(id) ? id : (nouvelId(prefixe)..let(idsPris.add));
+    final parRayon = <String, List<Secteur>>{};
+    for (final x in secteurs) {
+      (parRayon[x.rayonId] ??= []).add(x);
+    }
+    for (final r in ordre) {
+      if (r.magasinId == magasinCommun) idsPris.add(r.id);
+    }
+    for (final x in secteurs) {
+      if (ancienRayon[x.rayonId]?.magasinId == magasinCommun) idsPris.add(x.id);
+    }
+    for (final r in ordre) {
+      final commun = rayonParNom.putIfAbsent(r.nom, () {
+        final c = r.magasinId == magasinCommun ? r : Rayon(libre('rc-${_cleStructure(r.nom)}', 'rc'), magasinCommun, r.nom);
+        nouveauxRayons.add(c);
+        return c;
+      });
+      versRayon[r.id] = commun.id;
+      for (final x in parRayon[r.id] ?? const <Secteur>[]) {
+        final cs = secteurParNom.putIfAbsent('${r.nom}|${x.nom}', () {
+          final c = r.magasinId == magasinCommun && commun.id == r.id
+              ? x
+              : Secteur(libre('sc-${_cleStructure(r.nom)}/${_cleStructure(x.nom)}', 'sc'), commun.id, x.nom);
+          nouveauxSecteurs.add(c);
+          return c;
+        });
+        versSecteur[x.id] = cs.id;
       }
     }
-    final parNom = <String, Secteur>{}; // « magasin|rayon|secteur » → secteur
-    for (final m in mags) {
-      for (final e in structure.entries) {
-        var r = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == e.key);
-        if (r == null) {
-          r = Rayon('r-${m.id}-${cle(e.key)}', m.id, e.key);
-          rayons.add(r);
-          change = true;
-        }
-        for (final sn in e.value) {
-          var s = _trouve(secteurs, (x) => x.rayonId == r!.id && x.nom == sn);
-          if (s == null) {
-            s = Secteur('s-${r.id}-${cle(sn)}', r.id, sn);
-            secteurs.add(s);
-            change = true;
-          }
-          parNom['${m.id}|${e.key}|$sn'] = s;
-        }
-      }
-    }
-    // Rangement : le plus fréquent ; à égalité, le premier par ordre alphabétique.
-    final rayonDe = {for (final r in rayons) r.id: r};
-    final secteurDeId = {for (final s in secteurs) s.id: s};
-    final parProduit = <String, Map<String, Emplacement>>{};
+    // Rangement : un emplacement commun déjà là l'emporte ; sinon le secteur le plus fréquent.
+    final votes = <String, Map<String, int>>{};
+    final retenu = <String, String>{};
     for (final e in emplacements) {
-      (parProduit[e.produitId] ??= {})[e.magasinId] = e;
-    }
-    final ids = {for (final m in mags) m.id};
-    for (final pe in parProduit.entries) {
-      final votes = <String, int>{};
-      for (final e in pe.value.values) {
-        if (!ids.contains(e.magasinId)) continue;
-        final s = secteurDeId[e.secteurId];
-        final r = s == null ? null : rayonDe[s.rayonId];
-        if (s == null || r == null) continue;
-        final k = '${r.nom}|${s.nom}';
-        votes[k] = (votes[k] ?? 0) + 1;
-      }
-      if (votes.isEmpty) continue;
-      final choix = (votes.entries.toList()..sort((a, b) => b.value != a.value ? b.value - a.value : a.key.compareTo(b.key))).first.key;
-      for (final m in mags) {
-        final cible = parNom['${m.id}|$choix'];
-        if (cible == null) continue;
-        final e = pe.value[m.id];
-        if (e == null) {
-          emplacements.add(Emplacement(m.id, pe.key, cible.id));
-          change = true;
-        } else if (e.secteurId != cible.id) {
-          e.secteurId = cible.id;
-          change = true;
-        }
+      final cible = versSecteur[e.secteurId];
+      if (cible == null) continue;
+      if (e.magasinId == magasinCommun) {
+        retenu[e.produitId] = cible;
+      } else {
+        final v = votes[e.produitId] ??= {};
+        v[cible] = (v[cible] ?? 0) + 1;
       }
     }
-    if (change) modifie();
-    return change;
+    for (final pv in votes.entries) {
+      if (retenu.containsKey(pv.key)) continue;
+      final choix = (pv.value.entries.toList()..sort((a, b) => b.value != a.value ? b.value - a.value : a.key.compareTo(b.key))).first.key;
+      retenu[pv.key] = choix;
+    }
+    rayons = nouveauxRayons;
+    secteurs = nouveauxSecteurs;
+    emplacements = [for (final e in retenu.entries) Emplacement(magasinCommun, e.key, e.value)];
+    // Parcours appris et reprises de listes : vers les secteurs communs (une étape en double disparaît).
+    for (final p in parcours) {
+      final vus = <String>{};
+      p.etapes = [
+        for (final id in p.etapes)
+          if (versSecteur[id] ?? (secteur(id) != null ? id : null) case final n?) if (vus.add(n)) n
+      ];
+    }
+    for (final l in listes) {
+      if (l.repriseRayonId != null) l.repriseRayonId = versRayon[l.repriseRayonId] ?? (rayon(l.repriseRayonId) != null ? l.repriseRayonId : null);
+      if (l.repriseSecteurId != null) {
+        l.repriseSecteurId = versSecteur[l.repriseSecteurId] ?? (secteur(l.repriseSecteurId) != null ? l.repriseSecteurId : null);
+      }
+    }
+    return true;
   }
 
   /// Produit présent dans une liste (en préparation, prête, en cours ou dans l'historique).
@@ -2944,9 +2978,9 @@ class Etat extends ChangeNotifier {
           '${aUnHistorique(objet) ? ' Son historique de courses part dans Courses › Archives.' : ''}';
     }
     if (objet is Rayon) {
-      return 'Avec ${n(secteursDu(objet.id).length, 'secteur')} ; ses produits deviennent « non placés » dans ce magasin.';
+      return 'Avec ${n(secteursDu(objet.id).length, 'secteur')} ; ses produits deviennent « non placés ».';
     }
-    if (objet is Secteur) return 'Ses ${n(produitsDu(rayon(objet.rayonId)?.magasinId ?? '', objet.id).length, 'produit')} deviennent « non placés » dans ce magasin.';
+    if (objet is Secteur) return 'Ses ${n(produitsDu(magasinCommun, objet.id).length, 'produit')} deviennent « non placés ».';
     return '';
   }
 
@@ -2975,11 +3009,8 @@ class Etat extends ChangeNotifier {
     if (objet is Magasin) {
       type = 'magasin';
       libelle = objet.nom;
-      final rayonsM = rayonsDu(objet.id).map((r) => r.id).toSet();
+      // 12/11/2026 : les rayons, secteurs et emplacements sont communs, ils restent.
       retirer('magasins', (o) => o['id'] == objet.id);
-      retirer('rayons', (o) => rayonsM.contains(o['id']));
-      retirerSecteurs(secteursDuMagasin(objet.id).map((s) => s.id).toSet());
-      retirer('emplacements', (o) => o['magasinId'] == objet.id);
       retirer('parcours', (o) => o['magasinId'] == objet.id);
       final archive = estArchive(objet.id);
       retirer('listes', (o) => o['magasinId'] == objet.id && (archive || o['statut'] != StatutListe.terminee.name));
@@ -2992,7 +3023,7 @@ class Etat extends ChangeNotifier {
       }
     } else if (objet is Rayon) {
       type = 'rayon';
-      libelle = '${objet.nom} · ${magasin(objet.magasinId)?.nom ?? ''}';
+      libelle = objet.nom;
       retirer('rayons', (o) => o['id'] == objet.id);
       retirerSecteurs(secteursDu(objet.id).map((s) => s.id).toSet());
     } else if (objet is Secteur) {
@@ -3031,7 +3062,7 @@ class Etat extends ChangeNotifier {
   String? restaurationImpossible(ElementCorbeille c) {
     final contenu = c.contenu;
     final ids = <String>{for (final l in contenu.values) for (final o in (l as List).cast<Map>()) if (o['id'] != null) o['id'] as String};
-    bool existe(String? id) => id == null || ids.contains(id) || magasin(id) != null || rayon(id) != null;
+    bool existe(String? id) => id == null || id == magasinCommun || ids.contains(id) || magasin(id) != null || rayon(id) != null;
     for (final o in (contenu['rayons'] as List? ?? []).cast<Map>()) {
       if (!existe(o['magasinId'] as String?)) return 'Restaurez d\'abord le magasin de ce rayon.';
     }
@@ -3058,6 +3089,7 @@ class Etat extends ChangeNotifier {
     });
     (j['corbeille'] as List).removeWhere((x) => (x as Map)['id'] == c.id);
     lire(j);
+    unifierStructure(); // élément mis à la corbeille avant le 12/11/2026 : rayons et secteurs d'un magasin
     enregistrer();
   }
 
@@ -3538,19 +3570,14 @@ class Etat extends ChangeNotifier {
       if (rayonNeuf) lignes.add('Nouveau rayon : $rn');
       structurePerso.remove(rn);
       structureRecue.remove(rn);
-      for (final m in magasins) {
-        if (_trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn) == null) rayons.add(Rayon('r-${m.id}-${_cleNom(rn)}', m.id, rn));
-      }
+      if (_trouve(rayons, (r) => r.nom == rn) == null) rayons.add(Rayon(_idRayon(rn), magasinCommun, rn));
       for (final sj in (rj['secteurs'] as List).cast<Map>()) {
         final sn = sj['nom'] as String;
         final ref = _trouve(rayonsCatalogue, (r) => r.nom == rn)!;
         if (!rayonNeuf && _trouve(secteursDu(ref.id), (x) => x.nom == sn) == null) lignes.add('Nouveau secteur : $rn › $sn');
         structurePerso.remove('$rn/$sn');
         structureRecue.remove('$rn/$sn');
-        for (final m in magasins) {
-          final r = _trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn)!;
-          if (_trouve(secteurs, (x) => x.rayonId == r.id && x.nom == sn) == null) secteurs.add(Secteur('s-${r.id}-${_cleNom(sn)}', r.id, sn));
-        }
+        if (_trouve(secteurs, (x) => x.rayonId == ref.id && x.nom == sn) == null) secteurs.add(Secteur(_idSecteur(rn, sn), ref.id, sn));
         final secteurRef = _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
         for (final pj in (sj['produits'] as List).cast<Map>()) {
           final nom = pj['nom'] as String;
@@ -3818,9 +3845,7 @@ class Etat extends ChangeNotifier {
     Rayon rayonNomme(String rn) {
       final ref = _trouve(rayonsCatalogue, (r) => bas(r.nom) == bas(rn));
       if (ref != null) return ref;
-      for (final m in magasins) {
-        if (_trouve(rayons, (r) => r.magasinId == m.id && r.nom == rn) == null) rayons.add(Rayon('r-${m.id}-${_cleNom(rn)}', m.id, rn));
-      }
+      if (_trouve(rayons, (r) => r.nom == rn) == null) rayons.add(Rayon(_idRayon(rn), magasinCommun, rn));
       structureRecue.add(rn);
       n++;
       return _trouve(rayonsCatalogue, (r) => r.nom == rn)!;
@@ -3829,12 +3854,7 @@ class Etat extends ChangeNotifier {
     Secteur secteurNomme(Rayon ref, String sn) {
       final s = _trouve(secteursDu(ref.id), (x) => bas(x.nom) == bas(sn));
       if (s != null) return s;
-      for (final m in magasins) {
-        final r = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == ref.nom);
-        if (r != null && _trouve(secteurs, (x) => x.rayonId == r.id && x.nom == sn) == null) {
-          secteurs.add(Secteur('s-${r.id}-${_cleNom(sn)}', r.id, sn));
-        }
-      }
+      secteurs.add(Secteur(_idSecteur(ref.nom, sn), ref.id, sn));
       structureRecue.add('${ref.nom}/$sn');
       n++;
       return _trouve(secteursDu(ref.id), (x) => x.nom == sn)!;
@@ -3955,10 +3975,7 @@ class Etat extends ChangeNotifier {
     final n = nom.trim();
     if (n.isEmpty || magasins.isEmpty) return null;
     if (_trouve(rayonsCatalogue, (r) => r.nom.toLowerCase() == n.toLowerCase()) != null) return null;
-    for (final m in magasins) {
-      final r = ajouterRayon(m.id, n);
-      ajouterSecteur(r.id, n);
-    }
+    ajouterSecteur(ajouterRayon(magasinCommun, n).id, n);
     structurePerso
       ..add(n)
       ..add('$n/$n');
@@ -3972,10 +3989,7 @@ class Etat extends ChangeNotifier {
     final n = nom.trim();
     if (n.isEmpty) return null;
     if (_trouve(secteursDu(r.id), (s) => s.nom.toLowerCase() == n.toLowerCase()) != null) return null;
-    for (final m in magasins) {
-      final ry = _trouve(rayons, (x) => x.magasinId == m.id && x.nom == r.nom);
-      if (ry != null) ajouterSecteur(ry.id, n);
-    }
+    ajouterSecteur(r.id, n);
     structurePerso.add('${r.nom}/$n');
     modifie();
     return _trouve(secteursDu(r.id), (s) => s.nom == n);
@@ -4475,7 +4489,7 @@ class Etat extends ChangeNotifier {
     final s = secteurDe(magasinId, produitId);
     if (s == null) return [];
     final n = <String, int>{};
-    for (final e in emplacements.where((e) => e.magasinId == magasinId && e.secteurId == s.id)) {
+    for (final e in emplacements.where((e) => e.secteurId == s.id)) {
       for (final k in produit(e.produitId)?.packagingIds ?? const <String>[]) {
         n[k] = (n[k] ?? 0) + 1;
       }

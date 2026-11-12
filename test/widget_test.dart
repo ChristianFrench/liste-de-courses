@@ -1416,9 +1416,7 @@ void main() {
       final etat = Etat.instance;
       final r = etat.ajouterRayonCatalogue('Animalerie', univers: 'Épicerie et boissons')!;
       expect(universDuRayon(r.nom, etat.universRayons), 'Épicerie et boissons', reason: 'univers choisi à la création');
-      for (final m in etat.magasins) {
-        expect(etat.rayons.where((x) => x.magasinId == m.id && x.nom == 'Animalerie'), hasLength(1));
-      }
+      expect(etat.rayons.where((x) => x.nom == 'Animalerie'), hasLength(1), reason: 'un seul exemplaire pour tous les magasins');
       expect(etat.rayonAjoute(r), isTrue);
       expect(etat.ajouterRayonCatalogue('animalerie'), isNull, reason: 'déjà là');
       final s = etat.ajouterSecteurCatalogue(r, 'Chats')!;

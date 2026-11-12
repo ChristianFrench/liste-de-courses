@@ -39,6 +39,9 @@ class _Ensemble {
 // Ordre d'écriture : un secteur doit exister avant l'emplacement ou l'étape qui le désigne
 // (déclencheurs R5, R6). Les lignes de liste passent avant les produits : le compteur d'un
 // produit déjà présent monte (R4), celui d'un produit importé garde sa valeur.
+/// Même valeur que magasinCommun (modele.dart).
+const _magasinCommun = 'commun';
+
 const _tables = [
   _Table('foyer', ['id'], _Retrait.aucun),
   _Table('membre', ['id'], _Retrait.effacer),
@@ -113,6 +116,9 @@ class Stockage {
     db.execute(_sqlSynchro);
     // Règle R2 abandonnée (01/11/2026) : un produit qui a servi, mais n'est plus dans aucune liste, peut être supprimé.
     db.execute('DROP TRIGGER IF EXISTS interdit_archivage_produit_utilise');
+    // Règle R5 abandonnée (12/11/2026) : les secteurs sont communs à tous les magasins, le parcours d'un
+    // magasin désigne des secteurs du magasin fictif « commun ».
+    db.execute('DROP TRIGGER IF EXISTS controle_secteur_parcours');
     return s;
   }
 
@@ -129,6 +135,7 @@ class Stockage {
       if (r.isNotEmpty) demo = jsonDecode(r.first['contenu'] as String) == 'oui' ? '1' : '0';
     }
     _db.execute(schemaV2);
+    _db.execute('DROP TRIGGER IF EXISTS controle_secteur_parcours'); // règle R5 abandonnée (12/11/2026)
     if (ancien != null) ecrire(ancien);
     if (demo != null) definirReglage('mode_demo', demo);
     if (_existe('objets')) _db.execute('ALTER TABLE objets RENAME TO objets_v1');
@@ -296,7 +303,7 @@ class Stockage {
         {'id': t['id'], 'code': t['code'], 'nom': t['libelle'], 'exemple': t['exemple'] ?? '', 'parametres': jsonDecode(t['parametres'] as String)}
     ];
     etat['magasins'] = [
-      for (final m in _db.select('SELECT * FROM magasin WHERE archive = 0 ORDER BY rowid'))
+      for (final m in _db.select("SELECT * FROM magasin WHERE archive = 0 AND id <> '$_magasinCommun' ORDER BY rowid"))
         {'id': m['id'], 'nom': m['nom'], 'enseigne': m['enseigne'] ?? '', 'ville': m['ville'] ?? ''}
     ];
     etat['rayons'] = [
@@ -705,6 +712,8 @@ class Stockage {
         'archive': 0,
       });
     }
+    // Magasin fictif qui porte la structure commune (rayons, secteurs, emplacements), jamais montré.
+    res['magasin']!.add({'id': _magasinCommun, 'nom': 'Structure commune', 'enseigne': null, 'ville': null, 'archive': 0});
     for (final m in liste('magasins')) {
       res['magasin']!.add({'id': m['id'], 'nom': m['nom'], 'enseigne': m['enseigne'], 'ville': m['ville'], 'archive': 0});
     }
