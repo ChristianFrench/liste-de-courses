@@ -181,8 +181,10 @@ remplacer("web/manifest.json", '"#0175C2"', '"#3F7D5A"')
 # Web : écran d'ouverture (12/11/2026). Le moteur de l'application met 2 à 3 secondes à démarrer dans le
 # navigateur, la page restait blanche : la fenêtre « Ouverture d'Emplettes » s'affiche tout de suite, l'application
 # la retire à sa première image (et montre la même par-dessus son écran). Les fichiers lus au démarrage (polices, sqlite3) sont demandés dès le début
-# au lieu d'attendre que le moteur les réclame un par un.
-OUVERTURE = """  <link rel="preload" href="sqlite3.wasm" as="fetch" crossorigin>
+# au lieu d'attendre que le moteur les réclame un par un. La largeur du téléphone est donnée tout de suite
+# (sans elle, la fenêtre s'affichait minuscule, à l'échelle d'un écran de PC, jusqu'au démarrage du moteur).
+OUVERTURE = """  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preload" href="sqlite3.wasm" as="fetch" crossorigin>
   <link rel="preload" href="assets/assets/polices/AtkinsonHyperlegible-Regular.ttf" as="fetch" crossorigin>
   <link rel="preload" href="assets/assets/polices/AtkinsonHyperlegible-Bold.ttf" as="fetch" crossorigin>
   <link rel="preload" href="assets/assets/polices/AtkinsonHyperlegible-Italic.ttf" as="fetch" crossorigin>

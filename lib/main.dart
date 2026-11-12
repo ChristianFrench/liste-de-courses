@@ -30,6 +30,8 @@ Future<void> main() async {
     etapeOuverture.value = (texte: 'Ouverture de la base', valeur: 0.25);
   }
   await Etat.instance.charger();
+  // Les images de l'accueil se décodent pendant la suite de la préparation.
+  final images = ouvertureAffichee ? preparerImages() : Future<void>.value();
   Etat.instance.avertir = MessagesFoyer.instance.avertir;
   // Démonstration : ses trois magasins seulement (les magasins par enseigne alourdiraient chaque ouverture).
   if (!demonstration) await Etat.instance.ajouterMagasinsEnseignes();
@@ -49,9 +51,11 @@ Future<void> main() async {
   // Catalogue Open Food Facts (écran d'essai) : chargé en arrière-plan ; pas dans le navigateur
   // Sauvegarde aux jalons (pas dans la démonstration)
   Sauvegarde.actif = !demonstration;
-  await annoncerEtape('Affichage', 0.95);
+  await annoncerEtape('Affichage', 0.9);
+  await images;
+  final avecOuverture = ouvertureAffichee;
   ouvertureAffichee = false;
-  runApp(const ListeDeCoursesApp());
+  runApp(ListeDeCoursesApp(accueil: avecOuverture ? const AttenteImages(child: Coquille()) : null));
   // Marques et natures Open Food Facts (12/11/2026) : utiles à la recherche seulement, lues après la première
   // image au lieu de retarder l'ouverture (0,4 s dans le navigateur).
   WidgetsBinding.instance.addPostFrameCallback((_) => Future<void>.delayed(const Duration(milliseconds: 300), Etat.instance.chargerMarquesType));
