@@ -24,7 +24,7 @@ List<String> motsUtiles(String n) {
 
 /// Articles dont un mot commence par le texte tapé (sans tenir compte des accents ni des majuscules) ;
 /// chaque mot tapé doit commencer un mot du nom. Ceux dont le nom commence par le texte viennent d'abord,
-/// puis les plus achetés par le foyer, puis les plus courants en magasin (popularité Open Food Facts).
+/// chaque groupe par ordre alphabétique.
 List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int max = 40}) {
   final q = motsUtiles(normaliser(texte));
   if (q.isEmpty || normaliser(texte).length < lettresRecherche) return [];
@@ -36,11 +36,10 @@ List<Produit> chercherProduits(Iterable<Produit> produits, String texte, {int ma
     if (q.every((m) => mots.any((x) => x.startsWith(m)))) res.add((p, n.startsWith(q.first)));
   }
   res.sort((a, b) {
+    // 12/11/2026 (Aristide) : par ordre alphabétique (ceux dont le nom commence par le texte d'abord).
     if (a.$2 != b.$2) return a.$2 ? -1 : 1;
-    final u = b.$1.nbUtilisations.compareTo(a.$1.nbUtilisations);
-    if (u != 0) return u;
-    final c = etat.popularite(b.$1).compareTo(etat.popularite(a.$1));
-    return c != 0 ? c : normaliser(a.$1.nom).compareTo(normaliser(b.$1.nom));
+    final c = normaliser(a.$1.nom).compareTo(normaliser(b.$1.nom));
+    return c != 0 ? c : (etat.secteurCatalogue(a.$1.id)?.nom ?? '').compareTo(etat.secteurCatalogue(b.$1.id)?.nom ?? '');
   });
   return [for (final r in res.take(max)) r.$1];
 }

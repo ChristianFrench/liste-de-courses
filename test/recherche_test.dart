@@ -23,10 +23,10 @@ void main() {
         'Pâte à tartiner noisette': {'n': 784, 'm': ['Nutella', 'Bonne Maman']},
       }
     });
-    // À habitudes égales, la nature la plus courante d'abord ; puis la plus achetée par le foyer l'emporte.
-    expect(chercherProduits([a, b], 'pâte à tar'), [b, a]);
-    a.nbUtilisations = 3;
-    expect(chercherProduits([a, b], 'pâte à tar'), [a, b]);
+    // 12/11/2026 (Aristide) : ordre alphabétique, quels que soient la popularité et l'usage.
+    expect(chercherProduits([b, a], 'pâte à tar'), [a, b]);
+    b.nbUtilisations = 3;
+    expect(chercherProduits([b, a], 'pâte à tar'), [a, b]);
     // « nut » : la nature qui porte la marque Nutella.
     final m = chercherMarques([a, b], 'nut');
     expect(m.single.$1, b);
