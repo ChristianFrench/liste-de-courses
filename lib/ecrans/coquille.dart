@@ -4,8 +4,6 @@ import 'dart:async';
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/material.dart';
 
-import '../composants/barre_ouverture.dart';
-import 'ouverture.dart';
 import '../composants/composants.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
 import '../donnees/modele.dart';
@@ -109,15 +107,14 @@ class Coquille extends StatelessWidget {
         if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: GuetteurQuiSuisJe(child: GuetteurMiseAJour(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
+      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
         onPopInvokedWithResult: (aFerme, _) {
           if (!aFerme) nav.retour();
         },
-        child: Stack(children: [
-          Scaffold(
+        child: Scaffold(
           backgroundColor: Charte.fond,
           body: IndexedStack(
             index: nav.onglet,
@@ -131,86 +128,10 @@ class Coquille extends StatelessWidget {
           ),
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
-          // Synchronisation de l'ouverture (12/11/2026, Aristide) : la fenêtre de progression au milieu de
-          // l'écran, à la place de la barre sur la photo ; l'application reste utilisable dessous.
-          IgnorePointer(
-            child: ValueListenableBuilder(
-              valueListenable: ouvertureEnCours,
-              builder: (context, o, _) => o == null ? const SizedBox.shrink() : FenetreOuverture(texte: o.texte, valeur: o.valeur),
-            ),
-          ),
-        ]),
       ),
-      ))))),
+      )))),
     );
   }
-}
-
-/// Synchronisation faite à l'ouverture, en foyer : la fenêtre de progression ([FenetreOuverture]) au milieu de
-/// l'écran (12/11/2026, Aristide, à la place de la barre sur la photo de l'accueil). Appareil seul : rien.
-class GuetteurMiseAJour extends StatefulWidget {
-  const GuetteurMiseAJour({super.key, required this.child});
-  final Widget child;
-
-  @override
-  State<GuetteurMiseAJour> createState() => _GuetteurMiseAJourState();
-}
-
-class _GuetteurMiseAJourState extends State<GuetteurMiseAJour> {
-  final _debut = DateTime.now();
-  Timer? _minuteur;
-  DateTime? _finie;
-
-  @override
-  void initState() {
-    super.initState();
-    _minuteur = Timer.periodic(const Duration(milliseconds: 100), (_) => _avancer());
-  }
-
-  @override
-  void dispose() {
-    _minuteur?.cancel();
-    super.dispose();
-  }
-
-  bool get _foyer => Synchro.instance.ouverture != null;
-
-  /// Appareil seul : la base est déjà lue, la barre fait un court passage d'une seconde.
-  double get _progres => _foyer ? Synchro.instance.progresOuverture : (DateTime.now().difference(_debut).inMilliseconds / 1000).clamp(0.0, 1.0);
-
-  /// Valeur affichée : elle ne recule jamais (03/11/2026, Aristide : la barre faisait des retours en arrière
-  /// à chaque paquet reçu) ; quand la synchronisation attend, elle avance encore doucement.
-  double _affiche = 0;
-
-  void _avancer() {
-    if (!mounted) return;
-    final o = Synchro.instance.ouverture;
-    // Appareil seul : la base est déjà lue (fenêtre de l'écran d'ouverture), rien de plus à montrer.
-    if (!_foyer) {
-      _minuteur?.cancel();
-      ouvertureEnCours.value = null;
-      return;
-    }
-    final brut = _progres;
-    _affiche = brut >= 1 ? 1 : (brut > _affiche ? brut : _affiche + (0.95 - _affiche).clamp(0.0, 1.0) * 0.004);
-    final valeur = _affiche;
-    if (valeur >= 1) {
-      _finie ??= DateTime.now();
-      // La barre pleine reste un instant, puis disparaît.
-      if (DateTime.now().difference(_finie!).inMilliseconds > 400) {
-        _minuteur?.cancel();
-        ouvertureEnCours.value = null;
-        return;
-      }
-    }
-    ouvertureEnCours.value = (
-      texte: !_foyer ? 'Initialisation' : (o != null && o.horsLigne ? 'Hors ligne' : 'Synchronisation'),
-      valeur: valeur,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) => widget.child;
 }
 
 /// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du
