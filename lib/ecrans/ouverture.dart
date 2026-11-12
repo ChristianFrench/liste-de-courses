@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -88,14 +89,50 @@ class EcranOuverture extends StatelessWidget {
             ),
           ),
         ]),
-        const Positioned.fill(child: ColoredBox(color: Color(0x22000000))),
-        ValueListenableBuilder(
-          valueListenable: etapeOuverture,
-          builder: (context, e, _) => FenetreOuverture(texte: e.texte, valeur: e.valeur),
-        ),
+        _FenetreDifferee(),
       ]),
     );
   }
+}
+
+/// Téléphone et PC (12/11/2026, Aristide) : pas de fenêtre qui apparaît pour disparaître aussitôt, elle ne se
+/// montre que si l'ouverture dure. Navigateur : tout de suite, elle prend la suite de celle de la page.
+class _FenetreDifferee extends StatefulWidget {
+  @override
+  State<_FenetreDifferee> createState() => _FenetreDiffereeState();
+}
+
+class _FenetreDiffereeState extends State<_FenetreDifferee> {
+  static bool _dejaMontree = kIsWeb;
+  Timer? _attente;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!_dejaMontree) {
+      _attente = Timer(const Duration(milliseconds: 700), () {
+        _dejaMontree = true;
+        if (mounted) setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _attente?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => !_dejaMontree
+      ? const SizedBox.shrink()
+      : Stack(children: [
+          const Positioned.fill(child: ColoredBox(color: Color(0x22000000))),
+          ValueListenableBuilder(
+            valueListenable: etapeOuverture,
+            builder: (context, e, _) => FenetreOuverture(texte: e.texte, valeur: e.valeur),
+          ),
+        ]);
 }
 
 /// Images de l'accueil et de la barre des onglets, décodées pendant la lecture de la base (12/11/2026,
