@@ -26,6 +26,15 @@ void main() {
     expect(prep3, contains('Haricots'));
     expect(typeDuLibelle('Recettes Plats Accompagnement'), 'Plats accompagnement');
     expect(typeDuLibelle('Recettes Entrée'), 'Entrée');
+    expect(slugRecette('Mousse au chocolat sans œufs'), 'mousse-au-chocolat-sans-oeufs');
+    expect(slugRecette("Écrasé de pommes de terre à l'huile d'olive"), 'ecrase-de-pommes-de-terre-a-l-huile-d-olive');
+    // Les desserts en dernier.
+    final base = BaseRecettes(Directory.systemTemp)
+      ..recettes.addAll([
+        for (final t in ['Dessert', 'Sauces', 'Entrée', 'Plats'])
+          Recette(id: t, titre: t, types: [t], ingredients: const [], preparation: '', photos: const []),
+      ]);
+    expect(base.parType().keys, ['Entrée', 'Plats', 'Sauces', 'Dessert']);
   });
 
   test('import Keep : notes « Recettes », photos copiées, mise à jour sans doublon', () async {
@@ -94,10 +103,15 @@ void main() {
         'texte_origine': 'patates, huile. Cuire.',
       }
     ]));
+    Directory('${source.path}/Illustrations').createSync();
+    File('${source.path}/Illustrations/ecrase-de-pommes-de-terre.jpg').writeAsBytesSync([9, 9]);
     final b = BaseRecettes(dest);
     final bilan = await b.importerKeep(source);
     expect(bilan.ajoutees, 1);
     expect(bilan.normalisees, 1);
+    expect(bilan.illustrations, 1);
+    expect(b.recettes.single.illustration, 'illustration-ecrase-de-pommes-de-terre.jpg');
+    expect(b.photo(b.recettes.single.illustration!).existsSync(), isTrue);
     final r = b.recettes.single;
     expect(r.id, 'keep-42');
     expect(r.titre, 'Écrasé de pommes de terre');

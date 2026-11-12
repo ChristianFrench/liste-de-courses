@@ -24,6 +24,7 @@ class Recette {
     this.remarques = const [],
     this.texteOrigine,
     this.memo = false,
+    this.illustration,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -48,6 +49,9 @@ class Recette {
 
   /// Mémo (temps de cuisson…) plutôt que recette : pas d'ingrédients.
   bool memo;
+
+  /// Illustration d'Aristide (12/11/2026), fichier rangé avec les photos ; montrée avant les photos Keep.
+  String? illustration;
   bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
 
   Map<String, dynamic> versJson() => {
@@ -65,6 +69,7 @@ class Recette {
         if (remarques.isNotEmpty) 'remarques': remarques,
         if (texteOrigine != null) 'texteOrigine': texteOrigine,
         if (memo) 'memo': true,
+        if (illustration != null) 'illustration': illustration,
       };
 
   factory Recette.lire(Map j) => Recette(
@@ -82,6 +87,7 @@ class Recette {
         remarques: _textes(j['remarques']),
         texteOrigine: j['texteOrigine'] as String?,
         memo: j['memo'] == true,
+        illustration: j['illustration'] as String?,
       );
 }
 
@@ -111,6 +117,14 @@ String _norm(String t) {
   }
   return b.toString();
 }
+
+/// Nom de fichier d'une illustration : « Écrasé de pommes de terre à l'huile d'olive » → ecrase-de-pommes-de-terre-a-l-huile-d-olive.
+String slugRecette(String titre) => _norm(titre.replaceAll('œ', 'oe').replaceAll('Œ', 'oe').replaceAll('æ', 'ae').replaceAll('Æ', 'ae'))
+    .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+    .replaceAll(RegExp(r'^-+|-+$'), '');
+
+/// Ordre des types (12/11/2026, Aristide) : ordre alphabétique, les desserts en dernier, puis « Autres ».
+int _rangType(String t) => _norm(t).startsWith('dessert') ? 1 : (t == 'Autres' ? 2 : 0);
 
 /// Découpe le texte d'une note : (titre des ingrédients, ingrédients, préparation).
 /// 1. La première ligne qui commence par « ingrédi… » (sans accents ni majuscules) est le titre des ingrédients.
@@ -163,11 +177,12 @@ const fichierNormalise = 'recettes-normalisees.json';
 
 /// Bilan d'un import.
 class BilanImport {
-  int ajoutees = 0, misesAJour = 0, ignorees = 0, photos = 0, normalisees = 0;
+  int ajoutees = 0, misesAJour = 0, ignorees = 0, photos = 0, normalisees = 0, illustrations = 0;
   final erreurs = <String>[];
   @override
   String toString() => '$ajoutees ajoutée(s), $misesAJour mise(s) à jour, $photos photo(s)'
       '${normalisees > 0 ? ', $normalisees normalisée(s)' : ''}'
+      '${illustrations > 0 ? ', $illustrations illustration(s)' : ''}'
       '${ignorees > 0 ? ', $ignorees note(s) sans libellé « Recette » ignorée(s)' : ''}'
       '${erreurs.isNotEmpty ? ', ${erreurs.length} erreur(s)' : ''}';
 }
@@ -210,7 +225,11 @@ class BaseRecettes {
         m.putIfAbsent(t, () => []).add(r);
       }
     }
-    final cles = m.keys.toList()..sort((a, b) => _norm(a).compareTo(_norm(b)));
+    final cles = m.keys.toList()
+      ..sort((a, b) {
+        final r = _rangType(a).compareTo(_rangType(b));
+        return r != 0 ? r : _norm(a).compareTo(_norm(b));
+      });
     return {for (final k in cles) k: m[k]!..sort((a, b) => _norm(a.titre).compareTo(_norm(b.titre)))};
   }
 
@@ -233,6 +252,19 @@ class BaseRecettes {
         bilan.normalisees = normalisees.length;
       } catch (_) {
         bilan.erreurs.add('$fichierNormalise illisible');
+      }
+      break;
+    }
+    // Illustrations (12/11/2026) : <slug du titre>.jpg/.png dans un dossier « Illustrations » du dossier importé
+    // ou de son parent.
+    final illustrations = <String, File>{};
+    for (final d in [source, source.parent]) {
+      final dir = d.listSync().whereType<Directory>().where((x) => _norm(x.uri.pathSegments.where((p) => p.isNotEmpty).last) == 'illustrations');
+      if (dir.isEmpty) continue;
+      for (final f in dir.first.listSync().whereType<File>()) {
+        final n = f.uri.pathSegments.last;
+        final m = RegExp(r'^(.*)\.(jpe?g|png|webp)$', caseSensitive: false).firstMatch(n);
+        if (m != null) illustrations[slugRecette(m.group(1)!)] = f;
       }
       break;
     }
@@ -309,6 +341,18 @@ class BaseRecettes {
         r.texteOrigine = nz['texte_origine'] as String? ?? texte;
         r.memo = nz['memo'] == true;
         if (r.etapes.isNotEmpty) r.preparation = [for (var k = 0; k < r.etapes.length; k++) '${k + 1}. ${r.etapes[k]}'].join('\n');
+      }
+      final ill = illustrations[slugRecette(r.titre)] ?? illustrations[slugRecette(titre)];
+      if (ill != null) {
+        final nom = 'illustration-${ill.uri.pathSegments.last}';
+        final dest = photo(nom);
+        if (!dest.existsSync() || dest.lengthSync() != ill.lengthSync()) await ill.copy(dest.path);
+        r.illustration = nom;
+        bilan.illustrations++;
+      } else {
+        // Réimport sans dossier d'illustrations : on garde celle déjà rangée.
+        final avant = recettes.where((x) => x.id == id).firstOrNull;
+        r.illustration = avant?.illustration;
       }
       final i = recettes.indexWhere((x) => x.id == id);
       if (i >= 0) {

@@ -214,7 +214,8 @@ String iconeTypeRecette(String type) {
 }
 
 Widget _vignette(BaseRecettes b, Recette r, double taille) {
-  final f = r.photos.isEmpty ? null : b.photo(r.photos.first);
+  final nom = r.illustration ?? (r.photos.isEmpty ? null : r.photos.first);
+  final f = nom == null ? null : b.photo(nom);
   return ClipRRect(
     borderRadius: BorderRadius.circular(6),
     child: SizedBox(
@@ -290,7 +291,9 @@ class FicheRecette extends StatelessWidget {
   }
 
   Widget _photos() {
-    final fichiers = [for (final p in recette.photos) base.photo(p)].where((f) => f.existsSync()).toList();
+    final fichiers = [
+      for (final p in [if (recette.illustration != null) recette.illustration!, ...recette.photos]) base.photo(p)
+    ].where((f) => f.existsSync()).toList();
     if (fichiers.isEmpty) return Center(child: Text('Pas de photo', style: Charte.texte(15, couleur: Charte.texteSecondaire)));
     return ListView(padding: const EdgeInsets.all(16), children: [
       for (final f in fichiers)
