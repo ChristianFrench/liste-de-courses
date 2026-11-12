@@ -1354,7 +1354,7 @@ List<String> secteursOrdreCatalogue(Etat etat) {
     for (final u in [...universDesRayons.keys, autresRayons])
       for (final r in ranges)
         if (universDuRayon(r.nom, etat.universRayons) == u)
-          for (final s in etat.secteursDu(r.id)) s.id,
+          for (final s in etat.secteursVisibles(r.id)) s.id,
   ];
 }
 

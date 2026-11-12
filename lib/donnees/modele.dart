@@ -3759,8 +3759,19 @@ class Etat extends ChangeNotifier {
   bool secteurVisible(Secteur s) => !catalogueIsole || !structureRecue.contains(cleSecteur(s));
 
   /// Rayons et secteurs du catalogue montrés au foyer.
-  List<Rayon> get rayonsVisibles => [for (final r in rayonsCatalogue) if (rayonVisible(r)) r];
-  List<Secteur> secteursVisibles(String rayonId) => [for (final s in secteursDu(rayonId)) if (secteurVisible(s)) s];
+  List<Rayon> get rayonsVisibles => _selonCatalogue([for (final r in rayonsCatalogue) if (rayonVisible(r)) r], (r) => 'r:${r.nom}');
+  List<Secteur> secteursVisibles(String rayonId) =>
+      _selonCatalogue([for (final s in secteursDu(rayonId)) if (secteurVisible(s)) s], (s) => 's:${rayon(s.rayonId)?.nom}/${s.nom}');
+
+  /// 12/11/2026 (Aristide) : rayons et secteurs dans l'ordre du catalogue commun (celui de l'éditeur), pas dans
+  /// celui de la base de l'appareil. Rang retenu à l'ouverture (reparation.dart, retenirCatalogue) ; les rayons et
+  /// secteurs ajoutés par les foyers viennent après, dans leur ordre.
+  Map<String, int> rangCatalogue = {};
+  List<T> _selonCatalogue<T>(List<T> l, String Function(T) cle) {
+    if (rangCatalogue.isEmpty) return l;
+    final initial = {for (var i = 0; i < l.length; i++) l[i]: i};
+    return l..sort((a, b) => (rangCatalogue[cle(a)] ?? 100000 + initial[a]!).compareTo(rangCatalogue[cle(b)] ?? 100000 + initial[b]!));
+  }
 
   /// Numéro court sous lequel l'éditeur voit le catalogue proposé par ce foyer (« AB12 »).
   String get numeroProposition => idApports == null ? '…' : idApports!.substring(0, 4).toUpperCase();

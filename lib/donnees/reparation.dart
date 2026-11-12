@@ -142,8 +142,10 @@ extension ReparationEmplacements on Etat {
 Map<String, List<String>> homonymesCatalogue = {};
 
 extension CorrectionHomonymes on Etat {
-  /// Retient les noms que le [catalogue] range dans plusieurs secteurs.
+  /// Retient l'ordre des rayons et secteurs du [catalogue] ([Etat.rangCatalogue]) et les noms qu'il range dans
+  /// plusieurs secteurs.
   void retenirHomonymes(Map<String, dynamic> catalogue) {
+    final rang = <String, int>{};
     final rayonNom = {for (final r in rayons) r.id: r.nom};
     final secteurParNoms = <String, String>{};
     for (final s in secteurs) {
@@ -153,9 +155,12 @@ extension CorrectionHomonymes on Etat {
     for (final r in (catalogue['rayons'] as List? ?? const []).whereType<Map>()) {
       final ro = r['nom'] as String? ?? '';
       final rayonIci = renommages['r:$ro'] ?? ro;
+      rang.putIfAbsent('r:$rayonIci', () => rang.length);
       for (final s in (r['secteurs'] as List? ?? const []).whereType<Map>()) {
         final so = s['nom'] as String? ?? '';
-        final cible = secteurParNoms['$rayonIci|${renommages['s:$ro/$so'] ?? so}'];
+        final secteurIci = renommages['s:$ro/$so'] ?? so;
+        rang.putIfAbsent('s:$rayonIci/$secteurIci', () => rang.length);
+        final cible = secteurParNoms['$rayonIci|$secteurIci'];
         if (cible == null) continue;
         for (final p in (s['produits'] as List? ?? const [])) {
           final nom = (p is Map ? p['nom'] as String? : p as String?)?.trim().toLowerCase();
@@ -165,6 +170,7 @@ extension CorrectionHomonymes on Etat {
         }
       }
     }
+    rangCatalogue = rang;
     homonymesCatalogue = {for (final e in parNom.entries) if (e.value.length > 1) e.key: e.value};
   }
 

@@ -94,4 +94,19 @@ void main() {
     await etat.charger(dossier: dossier);
     expect({for (final p in crevettes) etat.secteurCatalogue(p.id)!.id}.length, 2);
   });
+
+  test('rayons et secteurs dans l\'ordre du catalogue commun, quel que soit l\'ordre de la base', () async {
+    final dossier = Directory.systemTemp.createTempSync('ordre');
+    final etat = Etat.instance;
+    await etat.charger(dossier: dossier);
+    final catalogue = jsonDecode(File('assets/catalogue_type.json').readAsStringSync()) as Map<String, dynamic>;
+    final rj = (catalogue['rayons'] as List).cast<Map>().firstWhere((r) => (r['secteurs'] as List).length > 3);
+    final attendu = [for (final s in (rj['secteurs'] as List).cast<Map>()) s['nom']];
+    final inverses = etat.secteurs.reversed.toList();
+    etat.secteurs..clear()..addAll(inverses);
+    etat.retenirHomonymes(catalogue);
+    final r = etat.rayons.firstWhere((x) => x.nom == rj['nom']);
+    expect([for (final s in etat.secteursVisibles(r.id)) s.nom], attendu);
+    etat.rangCatalogue = {};
+  });
 }
