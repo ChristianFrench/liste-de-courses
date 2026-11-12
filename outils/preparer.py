@@ -70,6 +70,13 @@ if gradle.exists():
     gradle.write_text(gradle.read_text(encoding="utf-8") + '\ndependencies {\n    implementation("androidx.core:core:1.13.1")\n'
                       '    implementation("com.google.firebase:firebase-messaging:24.1.0")\n}\n',
                       encoding="utf-8")
+# 12/11/2026 : l'analyse « lint vital » de la version de publication plante dans un module tiers
+# (file_selector_android, erreur interne de l'outil lint, sans lien avec le code) ; elle est coupée.
+racine = pathlib.Path("android/build.gradle.kts")
+if racine.exists():
+    racine.write_text(racine.read_text(encoding="utf-8") +
+                      '\nsubprojects {\n    tasks.matching { it.name.startsWith("lintVital") }.configureEach { enabled = false }\n}\n',
+                      encoding="utf-8")
 
 # Android : notifications du foyer par Firebase (06/11/2026). Le service qui les affiche, sa petite icône,
 # l'autorisation d'Android 13, et la configuration du projet Firebase lue dans le secret GitHub
