@@ -1,0 +1,28 @@
+name: Wikidata - marques
+
+# Marques des secteurs non alimentaires d'après Wikidata (outils/wikidata/marques.py) ;
+# résultat déposé dans outils/wikidata/marques_wikidata.json, relu avant d'entrer au catalogue des marques.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extraire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Interroger Wikidata
+        timeout-minutes: 35
+        continue-on-error: true
+        run: python3 outils/wikidata/marques.py
+      - name: Déposer le résultat
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add outils/wikidata/marques_wikidata.json
+          git commit -m "Wikidata : marques des secteurs non alimentaires [skip ci]"
+          git pull --rebase origin main
+          git push origin HEAD:main

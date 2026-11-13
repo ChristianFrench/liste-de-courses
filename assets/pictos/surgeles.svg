@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<rect x="7" y="7" width="24" height="5" rx="1.5" fill="#1565C0"/>
+<path d="M8 11h22l-1.2 29c0 1.5-1 2.5-2.5 2.5H11.7c-1.5 0-2.5-1-2.5-2.5z" fill="#1E88E5"/>
+<rect x="12" y="19" width="14" height="13" rx="3.5" fill="#E3F2FD"/>
+<circle cx="15.8" cy="23.5" r="2.3" fill="#43A047"/><circle cx="21" cy="23" r="2.3" fill="#43A047"/><circle cx="18.3" cy="28" r="2.3" fill="#43A047"/><circle cx="23.2" cy="27.8" r="2.1" fill="#43A047"/>
+<path d="M11.5 15v6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none" opacity=".8"/>
+<circle cx="34" cy="32" r="10.5" fill="#E1F5FE"/><path d="M34 32L34.0 24.0M34.0 27.6l-2.0 -2.0M34.0 27.6l2.0 -2.0M34 32L40.9 28.0M37.8 29.8l0.7 -2.7M37.8 29.8l2.7 0.7M34 32L40.9 36.0M37.8 34.2l2.7 -0.7M37.8 34.2l0.7 2.7M34 32L34.0 40.0M34.0 36.4l2.0 2.0M34.0 36.4l-2.0 2.0M34 32L27.1 36.0M30.2 34.2l-0.7 2.7M30.2 34.2l-2.7 -0.7M34 32L27.1 28.0M30.2 29.8l-2.7 0.7M30.2 29.8l-0.7 -2.7" stroke="#29B6F6" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+</svg>

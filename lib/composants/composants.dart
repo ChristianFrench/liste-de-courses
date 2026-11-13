@@ -1,0 +1,2152 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'icone.dart';
+
+import '../theme.dart';
+import 'entete.dart' show glisserOnglet;
+import 'pictogramme.dart';
+import '../donnees/affichage.dart';
+
+export 'entete.dart';
+export 'recherche.dart';
+
+// Composants réutilisables (spécification IHM, chapitre 5).
+
+BorderSide get _bordCadre => BorderSide(color: Charte.cadre, width: Charte.traitCadre);
+BorderSide get _bordLigne => BorderSide(color: Charte.separateurLigne, width: Charte.traitSeparateur);
+BorderSide get _bordZone => BorderSide(color: Charte.separateurZone, width: Charte.traitSeparateur);
+
+/// Squelette commun à tous les écrans : en-tête, contenu, puis éléments du bas.
+class PageBase extends StatefulWidget {
+  const PageBase({super.key, required this.entete, required this.corps, this.haut = const [], this.bas = const []});
+  final Widget entete;
+  final List<Widget> haut;
+  final Widget corps;
+  final List<Widget> bas;
+
+  @override
+  State<PageBase> createState() => _PageBaseState();
+}
+
+class _PageBaseState extends State<PageBase> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Charte.fond,
+      body: SafeArea(
+        child: Builder(
+          // Glisser le doigt sur une zone libre de la fenêtre passe à l'onglet voisin, comme sur le bandeau
+          // (les lignes qui se glissent gardent leur geste : elles l'emportent).
+          builder: (context) => GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onHorizontalDragEnd: (d) {
+              final v = d.primaryVelocity ?? 0;
+              if (v.abs() > 200) glisserOnglet(context, v < 0 ? 1 : -1);
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [widget.entete, ...widget.haut, Expanded(child: widget.corps), ...widget.bas],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class BoutonIcone extends StatelessWidget {
+  const BoutonIcone({super.key, required this.icone, required this.onTap, required this.libelle, this.taille = 26, this.couleur});
+  final IconData icone;
+  final Color? couleur;
+  final VoidCallback? onTap;
+  final String libelle;
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: libelle,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: SizedBox(width: 44, height: 44, child: Icone(icone, size: taille, color: couleur ?? Charte.couleurIcone(icone))),
+      ),
+    );
+  }
+}
+
+/// Icône blanche sur un carré arrondi de couleur (menus, onglets).
+/// L'icône de tête d'un élément de liste, la même partout : un rond pâle, l'icône au trait dans la couleur de la palette.
+/// À la place de l'icône : des initiales ([texte]) ou l'image d'un rayon ou d'un secteur ([image]).
+class IconeRonde extends StatelessWidget {
+  const IconeRonde(this.icone, {super.key, this.texte, this.image, this.taille = 44});
+  final IconData? icone;
+  final String? texte;
+  final String? image;
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: taille,
+        height: taille,
+        alignment: Alignment.center,
+        decoration: image != null ? null : BoxDecoration(color: Charte.fondSelection, shape: BoxShape.circle),
+        child: image != null
+            ? Pictogramme(image, taille: taille)
+            : texte != null
+                ? Text(texte!, style: Charte.texte(taille * 0.32, gras: true, couleur: Charte.cadre))
+                : Icone(icone, size: taille * 0.55, color: Charte.cadre),
+      );
+}
+
+// ----------------------------------------------------------------- Puces
+
+class Puce {
+  const Puce(this.libelle, {this.compteur, this.termine = false, this.icone, this.image});
+  final String libelle;
+  final int? compteur;
+  final bool termine;
+  final IconData? icone;
+
+  /// Image du rayon ou du secteur (voir pictogramme.dart).
+  final String? image;
+}
+
+/// Liste horizontale défilante de puces ; la puce sélectionnée reste visible.
+class BandeauPuces extends StatefulWidget {
+  const BandeauPuces({
+    super.key,
+    required this.puces,
+    required this.selection,
+    required this.onChoix,
+    this.fond,
+    this.pastille = true,
+  });
+  final List<Puce> puces;
+  final int selection;
+  final ValueChanged<int> onChoix;
+  final Color? fond;
+
+  /// Puces en pastille (rayons) ou rectangulaires arrondies (secteurs, étapes).
+  final bool pastille;
+
+  @override
+  State<BandeauPuces> createState() => _BandeauPucesState();
+}
+
+class _BandeauPucesState extends State<BandeauPuces> {
+  final List<GlobalKey> _cles = [];
+
+  void _preparerCles() {
+    while (_cles.length < widget.puces.length) {
+      _cles.add(GlobalKey());
+    }
+  }
+
+  void _montrerSelection() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (widget.selection < 0 || widget.selection >= _cles.length) return;
+      final ctx = _cles[widget.selection].currentContext;
+      if (ctx != null) {
+        Scrollable.ensureVisible(ctx, alignment: 0.5, duration: const Duration(milliseconds: 200));
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _preparerCles();
+    _montrerSelection();
+  }
+
+  @override
+  void didUpdateWidget(covariant BandeauPuces ancien) {
+    super.didUpdateWidget(ancien);
+    _preparerCles();
+    if (ancien.selection != widget.selection) _montrerSelection();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final avecImages = widget.puces.any((p) => p.image != null);
+    final rayon = avecImages ? 14.0 : (widget.pastille ? 18.0 : 8.0);
+    return Container(
+      height: avecImages ? 72 : Charte.bandeauPuces,
+      decoration: BoxDecoration(color: widget.fond ?? Charte.fond, border: Border(bottom: _bordZone)),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Row(
+          children: [
+            for (var i = 0; i < widget.puces.length; i++)
+              _puce(widget.puces[i], i == widget.selection, rayon, () => widget.onChoix(i), _cles[i], avecImages),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _puce(Puce p, bool choisie, double rayon, VoidCallback onTap, Key cle, bool grande) {
+    final couleurTexte = choisie ? Charte.blanc : (p.termine ? Charte.texteBarre : Charte.encre);
+    final bord = p.termine && !choisie ? Charte.separateurZone : Charte.cadre;
+    return GestureDetector(
+      key: cle,
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Semantics(
+        button: true,
+        selected: choisie,
+        label: p.libelle,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+          child: Container(
+            height: grande ? 62 : 36,
+            padding: EdgeInsets.only(left: p.image != null ? 5 : 12, right: 12),
+            decoration: BoxDecoration(
+              color: choisie ? Charte.accent : Charte.blanc,
+              borderRadius: BorderRadius.circular(rayon),
+              border: Border.all(color: bord, width: Charte.traitCadre),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (p.image != null) ...[
+                  // Image en couleur sur un rond blanc, lisible même sur la puce choisie (fond noir).
+                  Container(
+                    width: 52,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: Pictogramme(p.image, taille: 44),
+                  ),
+                  const SizedBox(width: 8),
+                ],
+                if (p.icone != null) ...[
+                  Icone(p.icone, size: 16, color: couleurTexte),
+                  const SizedBox(width: 4),
+                ],
+                Text(p.libelle, style: Charte.texte(grande ? 17 : 15, gras: choisie, couleur: couleurTexte)),
+                if (p.termine && !choisie) ...[
+                  const SizedBox(width: 4),
+                  Icone(Icons.check, size: 15, color: couleurTexte),
+                ],
+                if (p.compteur != null && p.compteur! > 0) ...[
+                  const SizedBox(width: 6),
+                  Container(
+                    width: grande ? 26 : 20,
+                    height: grande ? 26 : 20,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: couleurTexte, width: 1.5),
+                    ),
+                    child: Text('${p.compteur}', style: Charte.texte(grande ? 13 : 11, gras: true, couleur: couleurTexte)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ----------------------------------------------------------------- Lignes
+
+class CaseACocher extends StatelessWidget {
+  const CaseACocher({super.key, required this.coche, this.taille = 22});
+  final bool coche;
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: taille,
+      height: taille,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: coche ? Charte.accent : Charte.blanc,
+        borderRadius: BorderRadius.circular(3),
+        border: Border.all(color: coche ? Charte.accent : Charte.cadre, width: Charte.traitCadre),
+      ),
+      // 09/11/2026 (Aristide) : la coche plus petite, bien à l'intérieur de la case.
+      child: coche ? Icone(Icons.check, size: taille * 0.6, color: Charte.blanc) : null,
+    );
+  }
+}
+
+class IconePromo extends StatelessWidget {
+  const IconePromo({super.key, required this.code, this.inverse = false});
+  final String code;
+  final bool inverse;
+
+  @override
+  Widget build(BuildContext context) {
+    final couleur = inverse ? Charte.blanc : Charte.cadre;
+    return Semantics(
+      label: 'Promotion $code',
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: couleur, width: 1.5),
+        ),
+        child: Text(code, style: Charte.texte(Charte.tCodePromo + 1, gras: true, couleur: couleur)),
+      ),
+    );
+  }
+}
+
+/// Bouton promotion d'une ligne cochée (34 × 30) : code du type si une promotion est visée,
+/// sinon « % » en pointillé. Zone tactile portée à 44.
+class BoutonPromo extends StatelessWidget {
+  const BoutonPromo({super.key, required this.code, required this.onTap, this.couleur, this.iconeVide, this.sujet = 'promotion'});
+  final String? code;
+  final Color? couleur; // couleur du type de promotion (ou du packaging)
+  final IconData? iconeVide; // dessinée quand rien n'est choisi (sinon « % »)
+  final String sujet;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final contenu = SizedBox(
+      width: 34,
+      height: 30,
+      child: Center(
+        child: code == null && iconeVide != null
+            ? Icone(iconeVide, size: 20, color: Charte.couleurIcone(iconeVide!))
+            : Text(code ?? '%',
+                style: Charte.texte(code == null ? 15 : Charte.tCodePromo + 2, gras: true, couleur: code == null ? Charte.rouge : Charte.encre)),
+      ),
+    );
+    return Semantics(
+      button: true,
+      label: code == null ? 'Indiquer : $sujet' : '$sujet $code',
+      child: InkWell(
+        onTap: onTap,
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Center(
+            child: code == null
+                ? CadrePointille(rayon: 6, epaisseur: 1.5, child: contenu)
+                : Container(
+                    decoration: BoxDecoration(
+                      color: couleur == null ? null : Color.alphaBlend(couleur!.withValues(alpha: 0.22), Charte.fond),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: couleur ?? Charte.encre, width: 1.5),
+                    ),
+                    child: contenu,
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AlerteQuantite extends StatelessWidget {
+  const AlerteQuantite({super.key, required this.requise});
+  final int requise;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icone(Icons.warning_amber_rounded, size: 15, color: Charte.couleurIcone(Icons.warning_amber_rounded)),
+          const SizedBox(width: 3),
+          Flexible(child: Text('Il en faut $requise pour la promotion', style: Charte.texte(12, gras: true))),
+        ],
+      ),
+    );
+  }
+}
+
+class SelecteurQuantite extends StatelessWidget {
+  const SelecteurQuantite({super.key, required this.quantite, required this.onChange});
+  final int quantite;
+  final ValueChanged<int> onChange;
+
+  /// Zone tactile de 44 × 44 ; le signe est dessiné dans le cadre de 34 de haut.
+  Widget _bouton(String signe, int valeur, String libelle) => Semantics(
+        button: true,
+        label: libelle,
+        child: InkWell(
+          onTap: () => onChange(valeur),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(child: Text(signe, style: Charte.texte(18, gras: true, couleur: Charte.cadre))),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 44,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+            left: 6,
+            right: 6,
+            top: 5,
+            bottom: 5,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: Charte.blanc,
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
+              ),
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _bouton('−', quantite - 1, 'Diminuer'),
+              SizedBox(
+                width: 18,
+                child: Text('$quantite', textAlign: TextAlign.center, style: Charte.texte(16, gras: true)),
+              ),
+              _bouton('+', quantite + 1, 'Augmenter'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Packaging ou promotion en clair (« Pack de 6 », « 3 dont 1 gratuit »), sur la couleur choisie dans Paramètres.
+/// Avec [onTap], c'est un bouton (préparation) ; [vide] : rien n'est encore choisi (« + Packaging », fond pâle).
+class Pastille extends StatelessWidget {
+  const Pastille(this.texte, {super.key, this.couleur, this.petite = false, this.onTap, this.vide = false});
+  final String texte;
+  final Color? couleur;
+  final bool petite;
+  final VoidCallback? onTap;
+  final bool vide;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = couleur;
+    final cadre = Container(
+      padding: EdgeInsets.symmetric(horizontal: petite ? 5 : 7, vertical: petite ? 0 : 1),
+      decoration: BoxDecoration(
+        color: c == null
+            ? Charte.fondBandeau
+            : Color.alphaBlend(c.withValues(alpha: vide ? 0.08 : 0.22), Charte.fond),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: c == null ? Charte.separateurZone : (vide ? c.withValues(alpha: 0.45) : c), width: 1.2),
+      ),
+      child: Text(texte,
+          style: Charte.texte(petite ? 11 : 13, gras: true, couleur: vide && c != null ? c : Charte.encre)),
+    );
+    if (onTap == null) return cadre;
+    // Zone tactile agrandie autour du cadre (même aspect que pendant les courses).
+    return Semantics(
+      button: true,
+      label: texte,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(6),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: 44),
+          child: Align(widthFactor: 1, child: cadre),
+        ),
+      ),
+    );
+  }
+}
+
+/// Titre de groupe : numéro d'ordre rond, nom du secteur ou du rayon, fond gris.
+class TitreGroupe extends StatelessWidget {
+  const TitreGroupe(
+      {super.key,
+      required this.nom,
+      this.numero,
+      this.nonPlace = false,
+      this.image,
+      this.fort = false,
+      this.droite,
+      this.avancement,
+      this.nombre,
+      this.icone,
+      this.ouvert,
+      this.focus = false,
+      this.ajoute = false,
+      this.grand = false,
+      this.marque,
+      this.couleur,
+      this.pictoDebordant,
+      this.pictoGauche = 14,
+      this.pictoTaille,
+      this.fond,
+      this.tailleSigne = 46,
+      this.signeAuDessus = false,
+      this.apres,
+      this.onTap});
+  final String nom;
+
+  /// Bouton placé avant le chevron (catalogue : le crayon qui ouvre les actions du niveau).
+  final Widget? apres;
+
+  /// Fond imposé (catalogue : univers, rayons et secteurs à des niveaux différents de la palette).
+  final Color? fond;
+
+  /// Taille de l'icône ou de l'image d'un bandeau [grand] (46 : elle déborde un peu vers le bas).
+  final double tailleSigne;
+
+  /// L'icône est dessinée par-dessus, par [GroupeRetractable], pour ne pas être recouverte par la ligne suivante :
+  /// le bandeau ne fait que lui garder sa place.
+  final bool signeAuDessus;
+
+  /// Image du secteur en début de bandeau (place réservée ; elle est dessinée par [SectionDebordante]).
+  final String? pictoDebordant;
+
+  /// Position de l'image depuis le bord gauche : 14 en courses (empiète un peu sur la colonne des coches),
+  /// 4 en préparation (pas de coches, image cadrée à gauche).
+  final double pictoGauche;
+
+  /// Taille de l'image du secteur (par défaut [taillePictoListes], le choix de l'Apparence).
+  final double? pictoTaille;
+
+  /// Couleur de fond propre (bandeau d'un univers) ; sinon la couleur d'accent.
+  final Color? couleur;
+
+  /// Petit signe après le nom (ex. : secteur qui a reçu des articles d'une liste rectificative).
+  final IconData? marque;
+
+  /// Bandeau des listes autres que les articles : plus haut, police plus grosse, avec icône ou image.
+  final bool grand;
+
+  /// Rayon ou secteur ajouté par le foyer : petit signe après le nom.
+  final bool ajoute;
+  final VoidCallback? onTap;
+  final String? droite;
+  /// Nombre d'articles ou d'éléments du groupe, à droite.
+  final int? nombre;
+
+  /// [image] et [icone] ne s'affichent que sur un bandeau [grand] ; [ouvert] (non nul) montre le chevron
+  /// de déploiement ; ne sont plus affichés : [numero], [avancement], [focus], [fort].
+  final String? numero;
+  final String? image;
+  final IconData? icone;
+  final (int, int)? avancement;
+  final bool? ouvert;
+  final bool focus;
+  final bool fort;
+  final bool nonPlace;
+
+  @override
+  Widget build(BuildContext context) {
+    // 01/11/2026 (Aristide) : fond clair (niveau 4 de la palette), texte dans la teinte la plus sombre ;
+    // texte blanc sur un fond imposé sombre.
+    final base = nonPlace ? Charte.texteSecondaire : (couleur ?? Charte.accent);
+    final couleurFond = fond ?? (nonPlace || couleur != null ? Charte.clair(base) : Charte.niveau(1));
+    final encre = couleurFond.computeLuminance() < 0.3 ? Charte.blanc : (nonPlace || couleur != null ? Charte.fonce(base) : Charte.encreNiveau);
+    final blanc = Charte.texte(grand ? 16 : 14, gras: true, couleur: encre);
+    // Icône ou image plus grande que la place réservée : elle déborde un peu sans changer la hauteur du bandeau.
+    // 01/11/2026 (Aristide) : plus grande ; elle ne dépasse pas en haut, le léger débord est en bas.
+    Widget deborde(Widget w) => SizedBox(
+        width: 34,
+        height: 30,
+        child: signeAuDessus ? null : OverflowBox(minWidth: 0, minHeight: 0, maxWidth: tailleSigne, maxHeight: tailleSigne, alignment: const Alignment(0, -0.8), child: w));
+    final signe = !grand
+        ? null
+        : image != null
+            ? deborde(Pictogramme(image!, taille: tailleSigne)) // sans rond (01/11/2026, Aristide)
+            : icone != null
+                ? deborde(Icone(icone, size: tailleSigne, color: encre))
+                : null;
+    return Material(
+      color: couleurFond,
+      child: InkWell(
+        onTap: onTap,
+        child: Stack(clipBehavior: Clip.none, children: [
+         Container(
+          constraints: BoxConstraints(minHeight: grand ? Charte.ligneListe : 0),
+          padding: EdgeInsets.fromLTRB(grand ? 12 : (pictoDebordant != null ? pictoGauche + (pictoTaille ?? taillePictoListes) + 8 : 16), 4, 14, 4),
+          child: Row(children: [
+            if (signe != null) ...[signe, const SizedBox(width: 10)],
+            Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: blanc)),
+            if (ajoute) Text(' +', style: blanc),
+            if (marque != null) Padding(padding: const EdgeInsets.only(left: 6), child: Icone(marque, size: 18, color: encre)),
+            if (droite != null) Text(droite!, style: blanc),
+            if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: blanc)),
+            if (apres != null) Padding(padding: const EdgeInsets.only(left: 6), child: apres),
+            if (ouvert != null)
+              Padding(
+                padding: const EdgeInsets.only(left: 6),
+                child: Icone(ouvert! ? Icons.expand_less : Icons.expand_more, size: 24, color: encre),
+              ),
+          ]),
+         ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Bandeau de secteur et ses articles, avec l'image du secteur plus haute que le bandeau : dessinée par-dessus
+/// les lignes, elle déborde un peu au-dessus et davantage au-dessous (01/11/2026, Aristide : un peu de « fun »).
+class SectionDebordante extends StatelessWidget {
+  const SectionDebordante({super.key, required this.picto, required this.enfants, this.gauche = 14, this.taille});
+  final String? picto;
+  final List<Widget> enfants;
+  final double gauche;
+  final double? taille;
+
+  @override
+  Widget build(BuildContext context) => Stack(clipBehavior: Clip.none, children: [
+        Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: enfants),
+        if (picto != null)
+          Positioned(
+            left: gauche,
+            top: 1, // 01/11/2026 (Aristide) : le débord est en bas, pas en haut
+            width: taille ?? taillePictoListes,
+            height: taille ?? taillePictoListes,
+            child: IgnorePointer(child: Pictogramme(picto, taille: taille ?? taillePictoListes, key: ValueKey('picto-$picto'))),
+          ),
+      ]);
+}
+
+/// Groupes rétractables ouverts ou fermés, gardés tant que l'application tourne.
+class Retractables extends ChangeNotifier {
+  Retractables._();
+  static final i = Retractables._();
+  final Map<String, bool> _etat = {};
+
+  bool ouvert(String cle, {bool parDefaut = true}) => _etat[cle] ?? parDefaut;
+  void basculer(String cle, {bool parDefaut = true}) {
+    _etat[cle] = !ouvert(cle, parDefaut: parDefaut);
+    notifyListeners();
+  }
+
+  /// Ouvre ou ferme d'un coup tous les groupes donnés (bouton « Tout réduire » / « Tout développer »).
+  void tous(Iterable<String> cles, bool ouvrir) {
+    for (final c in cles) {
+      _etat[c] = ouvrir;
+    }
+    notifyListeners();
+  }
+
+  /// Fixe l'état d'ouverture sans prévenir (à la création d'un écran).
+  void fixer(Iterable<String> cles, bool ouvrir) {
+    for (final c in cles) {
+      _etat[c] = ouvrir;
+    }
+  }
+
+  bool tousFermes(Iterable<String> cles, {bool parDefaut = true}) => cles.isNotEmpty && cles.every((c) => !ouvert(c, parDefaut: parDefaut));
+}
+
+/// Le modèle de toutes les listes de l'application : un mince bandeau (titre du groupe, nombre), puis les
+/// éléments du groupe, toujours visibles (plus rien ne se replie). [cle], [image], [icone] et [parDefaut]
+/// ne servent plus.
+class GroupeRetractable extends StatelessWidget {
+  const GroupeRetractable({
+    super.key,
+    required this.cle,
+    required this.titre,
+    required this.enfants,
+    this.image,
+    this.icone,
+    this.nombre,
+    this.vide,
+    this.parDefaut = true,
+    this.marge = 16,
+    this.ajoute = false,
+    this.actions = const [],
+    this.pliable = false,
+    this.emplettes,
+  });
+  final String cle;
+  final bool ajoute;
+
+  /// Image d'Emplettes du bandeau (assets/emplettes/<nom>.png), prioritaire sur [icone].
+  final String? emplettes;
+
+  /// Déplier / replier en touchant le bandeau (chevron), état gardé par [cle] ; [parDefaut] : ouvert au départ
+  /// (01/11/2026, Aristide : Historique et Archives, repliés par défaut).
+  final bool pliable;
+
+  /// Actions du groupe : toucher son bandeau les propose dans un volet.
+  final List<ActionLigne> actions;
+  final String titre;
+  final List<Widget> enfants;
+  final String? image;
+  final IconData? icone;
+  final int? nombre;
+  /// Texte affiché quand le groupe n'a aucun élément.
+  final String? vide;
+  final bool parDefaut;
+  final double marge;
+
+  @override
+  Widget build(BuildContext context) {
+    if (!pliable) return _construire(context, true);
+    return ListenableBuilder(
+      listenable: Retractables.i,
+      builder: (context, _) => _construire(context, Retractables.i.ouvert(cle, parDefaut: parDefaut)),
+    );
+  }
+
+  /// Débord de l'icône du bandeau sous le bandeau (46 px dans un bandeau de 40).
+  static const _debord = 10.0;
+
+  Widget _construire(BuildContext context, bool ouvert) {
+    // 03/11/2026 (Aristide) : les groupes de listes à préparer et à faire prennent les images d'Emplettes.
+    // 09/11/2026 (Aristide) : « À faire » = chariot vide et liste non cochée ; « Terminées » = liste cochée.
+    final signe = emplettes != null
+        ? ImageEmplettes(emplettes!, taille: 46)
+        : image != null
+        ? Pictogramme(image!, taille: 46)
+        : icone == Icons.checklist || icone == Icons.shopping_cart_outlined
+            ? ImageEmplettes(ImageEmplettes.pourIcone(icone), taille: 46)
+            : icone == Icons.pause_circle_outline
+                ? ImageEmplettes.interrompue(46)
+                : (icone != null ? Icone(icone, size: 46) : null);
+    // 01/11/2026 (Aristide) : l'icône qui déborde vers le bas reste au premier plan, par-dessus la ligne
+    // suivante ; replié, le groupe laisse la place de ce débord.
+    return Stack(clipBehavior: Clip.none, children: [
+      _colonne(context, ouvert, signe != null),
+      if (signe != null) Positioned(left: 6, top: 3, width: 46, height: 46, child: IgnorePointer(child: signe)),
+    ]);
+  }
+
+  Widget _colonne(BuildContext context, bool ouvert, bool avecSigne) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TitreGroupe(
+          key: pliable ? ValueKey('groupe-$cle') : null,
+          nom: titre,
+          nombre: nombre,
+          ajoute: ajoute,
+          grand: true,
+          image: image,
+          // L'image d'Emplettes est dessinée par-dessus : le bandeau lui réserve la même place qu'à une icône.
+          icone: icone ?? (emplettes != null ? Icons.circle_outlined : null),
+          signeAuDessus: true,
+          ouvert: pliable ? ouvert : null,
+          onTap: pliable
+              ? () => Retractables.i.basculer(cle, parDefaut: parDefaut)
+              : actions.isEmpty
+                  ? null
+                  : () => menuActions(context, titre: titre, actions: actions),
+        ),
+        if (ouvert) Padding(
+          padding: EdgeInsets.symmetric(horizontal: marge),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (enfants.isEmpty && vide != null)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Text(vide!, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+                ),
+              ...enfants,
+            ],
+          ),
+        ),
+        if (avecSigne && (!ouvert || (enfants.isEmpty && vide == null))) const SizedBox(height: _debord),
+      ],
+    );
+  }
+}
+
+class TitreSection extends StatelessWidget {
+  const TitreSection(this.texte, {super.key, this.haut = 16, this.cote = 16});
+  final String texte;
+  final double haut;
+  final double cote;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(cote, haut, cote, 8),
+      child: Text(texte.toUpperCase(), style: Charte.texte(12, couleur: Charte.texteSecondaire, espacement: 1.2)),
+    );
+  }
+}
+
+// ----------------------------------------------------------------- Boutons
+
+class Bouton extends StatelessWidget {
+  const Bouton({
+    super.key,
+    required this.texte,
+    required this.onTap,
+    this.plein = false,
+    this.pointille = false,
+    this.hauteur = 40,
+    this.icone,
+    this.iconeApres,
+    this.taille = 16,
+  });
+  final String texte;
+  final VoidCallback? onTap;
+  final bool plein;
+  final bool pointille;
+  final double hauteur;
+  final IconData? icone;
+  final IconData? iconeApres;
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) {
+    final actif = onTap != null;
+    // 01/11/2026 (Aristide) : bouton plein dans une teinte claire, bordé de la couleur d'accent.
+    final fond = plein ? Charte.clair(Charte.accent, actif ? 0.72 : 0.88) : Charte.blanc;
+    final texteCouleur = plein ? (actif ? Charte.fonce(Charte.accent) : Charte.desactive) : (actif ? Charte.cadre : Charte.desactive);
+    final contenu = Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Icône à gauche du libellé (boutons qui font avancer les listes et les courses).
+          if (icone != null) Icone(icone, size: texte.isEmpty ? 32 : 26, color: texteCouleur),
+          if (icone != null && texte.isNotEmpty) const SizedBox(width: 6),
+          if (texte.isNotEmpty)
+            Flexible(
+              child: Text(texte,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: Charte.texte(taille, gras: true, couleur: texteCouleur)),
+            ),
+          if (iconeApres != null && texte.isEmpty) Icone(iconeApres, size: 32, color: texteCouleur),
+        ],
+      ),
+    );
+    final forme = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+      side: pointille ? BorderSide.none : (plein ? BorderSide(color: actif ? Charte.accent : Charte.desactive, width: 1.5) : _bordCadre),
+    );
+    Widget bouton = Material(
+      color: fond,
+      shape: forme,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(onTap: onTap, child: SizedBox(height: hauteur, child: contenu)),
+    );
+    if (pointille) bouton = CadrePointille(child: bouton);
+    return Semantics(button: true, enabled: actif, child: bouton);
+  }
+}
+
+/// Bouton d'ÉTAT (un filtre qu'on allume ou éteint) : forme de gélule et interrupteur à gauche.
+/// Il se distingue des boutons d'ACTION ([Bouton], rectangles) : son libellé ne change pas,
+/// seul l'interrupteur montre s'il est allumé.
+class BoutonEtat extends StatelessWidget {
+  const BoutonEtat({super.key, required this.texte, required this.actif, required this.onTap, this.taille = 14, this.hauteur = 48, this.surPhoto = false});
+  final String texte;
+  final bool actif;
+  final VoidCallback onTap;
+  final double taille;
+  final double hauteur;
+
+  /// Posé sur la photo de la barre de titre : libellé blanc ombré.
+  final bool surPhoto;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        toggled: actif,
+        child: Material(
+          // Ni cadre ni fond : l'interrupteur seul dit l'état.
+          type: MaterialType.transparency,
+          shape: const StadiumBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: SizedBox(
+              height: hauteur,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(width: 2),
+                  // Interrupteur à la hauteur des icônes de l'application (24) ; tout le bouton reste sensible.
+                  ExcludeSemantics(
+                    child: IgnorePointer(
+                      child: SizedBox(
+                    width: 40,
+                    height: 24,
+                    child: FittedBox(
+                      child: Switch(
+                        value: actif,
+                        onChanged: (_) => onTap(),
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        activeThumbColor: Charte.blanc,
+                        activeTrackColor: Charte.accent,
+                        inactiveThumbColor: Charte.texteBarre,
+                        inactiveTrackColor: Charte.blanc,
+                        trackOutlineColor: WidgetStatePropertyAll(actif ? Charte.accent : Charte.texteBarre),
+                      ),
+                    ),
+                  ),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    // Une seule ligne : le libellé rapetisse plutôt que de passer à la ligne.
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(texte,
+                          maxLines: 1,
+                          style: surPhoto
+                              ? Charte.texte(taille, gras: actif, couleur: Charte.blanc)
+                                  .copyWith(shadows: const [Shadow(color: Color(0xCC000000), blurRadius: 6)])
+                              : Charte.texte(taille, gras: actif, couleur: Charte.encre)),
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+/// Un ou deux boutons pleine largeur en bas de l'écran (64 points).
+class BarreAction extends StatelessWidget {
+  const BarreAction({super.key, required this.boutons});
+  final List<Widget> boutons;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: Charte.barreAction,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(color: Charte.fondBandeau, border: Border(top: _bordZone)),
+      child: Row(
+        children: [
+          for (var i = 0; i < boutons.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(child: boutons[i]),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Écran en liste avec, en bas, la zone réservée aux décisions (juste au-dessus des onglets).
+class AvecDecision extends StatelessWidget {
+  const AvecDecision({super.key, required this.contenu, required this.boutons});
+  final Widget contenu;
+  final List<Widget> boutons;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [Expanded(child: contenu), BarreAction(boutons: boutons)],
+      );
+}
+
+/// Deux boutons accolés, un sélectionné.
+class Bascule extends StatelessWidget {
+  const Bascule({super.key, required this.options, required this.index, required this.onChange, this.hauteur = 48, this.douce = false});
+  final bool douce;
+  final List<String> options;
+  final int index;
+  final ValueChanged<int> onChange;
+  final double hauteur;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: hauteur,
+      // Un choix d'état : forme de gélule, comme [BoutonEtat] (les actions sont rectangulaires).
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(hauteur / 2),
+        border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        children: [
+          for (var i = 0; i < options.length; i++)
+            Expanded(
+              child: Semantics(
+                button: true,
+                selected: i == index,
+                child: Material(
+                  color: i == index ? (douce ? Charte.fondSelection : Charte.accent) : Charte.blanc,
+                  child: InkWell(
+                    onTap: () => onChange(i),
+                    child: Center(
+                      child: Text(options[i],
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: Charte.texte(16, gras: i == index, couleur: i == index && !douce ? Charte.blanc : Charte.encre)),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class BandeauHorsReseau extends StatelessWidget {
+  const BandeauHorsReseau({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 6, 8, 6),
+      child: CadrePointille(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          child: Row(
+            children: [
+              Icone(Icons.cloud_off_outlined, size: 18, color: Charte.couleurIcone(Icons.cloud_off_outlined)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Hors réseau : vos coches sont gardées et seront envoyées au retour du réseau.',
+                    style: Charte.texte(12)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ----------------------------------------------------------------- Divers
+
+class CadrePointille extends StatelessWidget {
+  const CadrePointille({super.key, required this.child, this.rayon = 8, this.epaisseur = 2, this.couleur = Charte.encre});
+  final Widget child;
+  final double rayon;
+  final double epaisseur;
+  final Color couleur;
+
+  @override
+  Widget build(BuildContext context) =>
+      CustomPaint(foregroundPainter: _PeintrePointille(rayon, couleur, epaisseur), child: child);
+}
+
+class _PeintrePointille extends CustomPainter {
+  _PeintrePointille(this.rayon, this.couleur, this.epaisseur);
+  final double rayon;
+  final Color couleur;
+  final double epaisseur;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final demi = epaisseur / 2;
+    final rect = Rect.fromLTWH(demi, demi, size.width - epaisseur, size.height - epaisseur);
+    final chemin = Path()..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(rayon)));
+    final pinceau = Paint()
+      ..color = couleur
+      ..strokeWidth = epaisseur
+      ..style = PaintingStyle.stroke;
+    for (final m in chemin.computeMetrics()) {
+      var d = 0.0;
+      while (d < m.length) {
+        canvas.drawPath(m.extractPath(d, d + 6), pinceau);
+        d += 10;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PeintrePointille ancien) =>
+      ancien.rayon != rayon || ancien.couleur != couleur || ancien.epaisseur != epaisseur;
+}
+
+class TraitPointille extends StatelessWidget {
+  const TraitPointille({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const SizedBox(height: 2, width: double.infinity, child: CustomPaint(painter: _PeintreTrait()));
+}
+
+class _PeintreTrait extends CustomPainter {
+  const _PeintreTrait();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final p = Paint()
+      ..color = Charte.encre
+      ..strokeWidth = 2;
+    var x = 0.0;
+    while (x < size.width) {
+      canvas.drawLine(Offset(x, 1), Offset(x + 6, 1), p);
+      x += 10;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter ancien) => false;
+}
+
+class ImageAbsente extends StatelessWidget {
+  const ImageAbsente({super.key, required this.texte, this.hauteur = 110});
+  final String texte;
+  final double hauteur;
+
+  @override
+  Widget build(BuildContext context) {
+    return CadrePointille(
+      couleur: const Color(0xFF999999),
+      epaisseur: 1.5,
+      child: Container(
+        height: hauteur,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(color: Charte.placeholder, borderRadius: BorderRadius.circular(8)),
+        padding: const EdgeInsets.all(8),
+        child: Text(texte, textAlign: TextAlign.center, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      ),
+    );
+  }
+}
+
+/// Liste déroulante, dans le même cadre que les zones de saisie, avec son libellé sur le trait du haut.
+class ChoixDeroulant<T> extends StatelessWidget {
+  const ChoixDeroulant({super.key, required this.valeur, required this.choix, required this.onChange, this.libelle, this.apercus, this.apercuADroite = false});
+  final T valeur;
+
+  /// Petit aperçu avant le libellé de chaque choix (échantillon d'une palette…).
+  final Map<T, Widget>? apercus;
+
+  /// Aperçu après le libellé, calé à droite (palettes : 02/11/2026, Aristide).
+  final bool apercuADroite;
+  final Map<T, String> choix;
+  final ValueChanged<T> onChange;
+  final String? libelle;
+
+  /// 09/11/2026 (Aristide) : l'aperçu (palette…) reste dans le cadre, sans toucher ses traits.
+  static Widget _contenu(Widget apercu) => ConstrainedBox(
+        constraints: const BoxConstraints(maxHeight: 18, maxWidth: 120),
+        child: FittedBox(fit: BoxFit.scaleDown, child: apercu),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return InputDecorator(
+      decoration: InputDecoration(labelText: libelle, contentPadding: const EdgeInsets.fromLTRB(12, 4, 6, 4)),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: choix.containsKey(valeur) ? valeur : null,
+          isExpanded: true,
+          isDense: true,
+          // La hauteur d'une liste dense suit iconSize : 32, pour une cible tactile suffisante.
+          iconSize: 32,
+          icon: Icone(Icons.expand_more, size: 24, color: Charte.couleurIcone(Icons.expand_more)),
+          style: Charte.texte(16),
+          dropdownColor: Charte.fond,
+          items: [
+            for (final e in choix.entries)
+              DropdownMenuItem<T>(
+                value: e.key,
+                child: apercus?[e.key] == null
+                    ? Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)
+                    : apercuADroite
+                        ? Row(children: [
+                            Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                            const SizedBox(width: 10),
+                            _contenu(apercus![e.key]!),
+                          ])
+                        : Row(children: [
+                            _contenu(apercus![e.key]!),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                          ]),
+              ),
+          ],
+          onChanged: (v) {
+            if (v != null) onChange(v);
+          },
+        ),
+      ),
+    );
+  }
+}
+
+/// Date choisie dans un calendrier, dans le même cadre que les zones de saisie.
+class ChampDate extends StatelessWidget {
+  const ChampDate({super.key, required this.libelle, required this.valeur, required this.onChange, this.premier, this.dernier});
+  final String libelle;
+  /// Vide : « Non renseignée ».
+  final DateTime? valeur;
+  final ValueChanged<DateTime> onChange;
+  final DateTime? premier;
+  final DateTime? dernier;
+
+  static const _jours = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+  /// « jeudi 29/10/2026 », avec « aujourd'hui » ou « demain » devant quand c'est le cas.
+  static String texte(DateTime d) {
+    String n(int x) => x.toString().padLeft(2, '0');
+    final auj = DateTime.now();
+    final ecart = DateTime(d.year, d.month, d.day).difference(DateTime(auj.year, auj.month, auj.day)).inDays;
+    final relatif = switch (ecart) { 0 => 'aujourd\'hui, ', 1 => 'demain, ', _ => '' };
+    return '$relatif${_jours[d.weekday - 1]} ${n(d.day)}/${n(d.month)}/${d.year}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: () async {
+        final d = await showDatePicker(
+          context: context,
+          initialDate: valeur ?? DateTime.now(),
+          firstDate: premier ?? DateTime(2020),
+          lastDate: dernier ?? DateTime(2100),
+          locale: const Locale('fr', 'FR'),
+          helpText: libelle,
+          cancelText: 'Annuler',
+          confirmText: 'OK',
+        );
+        if (d != null) onChange(DateTime(d.year, d.month, d.day, valeur?.hour ?? 0, valeur?.minute ?? 0));
+      },
+      child: InputDecorator(
+        decoration: InputDecoration(
+          labelText: libelle,
+          contentPadding: const EdgeInsets.fromLTRB(12, 10, 6, 10),
+          suffixIcon: Icone(Icons.calendar_month_outlined, color: Charte.couleurIcone(Icons.calendar_month_outlined)),
+        ),
+        child: Text(valeur == null ? 'Non renseignée' : texte(valeur!), style: Charte.texte(16)),
+      ),
+    );
+  }
+}
+
+/// Étiquette encadrée (rôle d'un membre, présence d'un ticket…).
+class Etiquette extends StatelessWidget {
+  const Etiquette(this.texte, {super.key, this.pointille = false, this.icone});
+  final String texte;
+  final bool pointille;
+  final IconData? icone;
+
+  @override
+  Widget build(BuildContext context) {
+    final contenu = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: pointille
+          ? null
+          : BoxDecoration(borderRadius: BorderRadius.circular(4), border: Border.all(color: Charte.cadre, width: 1.5)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(texte, style: Charte.texte(12, gras: !pointille)),
+          if (icone != null) ...[const SizedBox(width: 3), Icone(icone, size: 13, color: Charte.encre)],
+        ],
+      ),
+    );
+    return pointille ? CadrePointille(rayon: 4, epaisseur: 1.2, child: contenu) : contenu;
+  }
+}
+
+/// Petit bouton d'action secondaire (« Copier », « Restaurer »…), à bord fin.
+class Lien extends StatelessWidget {
+  const Lien(this.texte, {super.key, required this.onTap, this.taille = 16, this.italique = false});
+  final String texte;
+  final VoidCallback onTap;
+  final double taille;
+  final bool italique;
+
+  // Une action est toujours un bouton (jamais un texte souligné) : petit bouton à bord fin.
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      widthFactor: 1,
+      child: Material(
+        color: Charte.fond,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            alignment: Alignment.center,
+            child: Text(
+              texte,
+              style: Charte.texte(taille, couleur: Charte.cadre).copyWith(fontStyle: italique ? FontStyle.italic : FontStyle.normal),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Volets en fenêtres modales centrées (console d'administration sur PC).
+bool voletsEnFenetre = false;
+
+/// Volet du bas : toutes les fenêtres de l'application s'ouvrent ainsi, avec la poignée en haut.
+/// Il remonte avec le clavier, ne dépasse pas la largeur d'un téléphone sur grand écran ;
+/// [fermable] faux : seuls ses boutons le ferment (saisies longues qu'un geste maladroit ferait perdre).
+Future<T?> volet<T>(BuildContext context, {required WidgetBuilder builder, bool fermable = true}) {
+  // Console Windows (07/11/2026, Aristide) : fenêtres modales au centre, pas de volet du bas.
+  if (voletsEnFenetre) {
+    return showDialog<T>(
+      context: context,
+      barrierDismissible: fermable,
+      barrierColor: Charte.voile,
+      builder: (ctx) => Dialog(
+        backgroundColor: Charte.blanc,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 560, maxHeight: MediaQuery.of(ctx).size.height * 0.85),
+          child: Padding(padding: const EdgeInsets.only(top: 20), child: builder(ctx)),
+        ),
+      ),
+    );
+  }
+  return showModalBottomSheet<T>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: fermable,
+    enableDrag: fermable,
+    showDragHandle: true,
+    useSafeArea: true,
+    backgroundColor: Charte.blanc,
+    barrierColor: Charte.voile,
+    constraints: const BoxConstraints(maxWidth: 560),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+      child: SafeArea(top: false, child: builder(ctx)),
+    ),
+  );
+}
+
+/// Corps d'un volet : titre, contenu qui défile, puis les boutons (toujours visibles).
+Widget corpsVolet({required String titre, required Widget contenu, List<Widget> boutons = const []}) => Padding(
+      padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(titre, style: Charte.texte(20, gras: true)),
+          const SizedBox(height: 12),
+          Flexible(child: SingleChildScrollView(child: contenu)),
+          for (final b in boutons) ...[const SizedBox(height: 10), b],
+        ],
+      ),
+    );
+
+/// Change l'ordre d'une liste de noms (on fait glisser la poignée ≡) ; renvoie null si annulé.
+Future<List<String>?> ordonner(BuildContext context, {required String titre, required List<String> noms}) {
+  final ordre = [...noms];
+  return volet<List<String>>(
+    context,
+    fermable: false,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(titre, style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 4),
+            Text('Faites glisser la poignée ≡ pour déplacer un secteur.', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ReorderableListView.builder(
+                shrinkWrap: true,
+                buildDefaultDragHandles: false,
+                itemCount: ordre.length,
+                onReorderItem: (de, vers) => maj(() => ordre.insert(vers, ordre.removeAt(de))),
+                itemBuilder: (ctx, i) => Material(
+                  key: ValueKey('ordre-${ordre[i]}'),
+                  color: Charte.blanc,
+                  child: Container(
+                    height: Charte.ligneListe,
+                    decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                    child: Row(children: [
+                      Expanded(child: Text(ordre[i], maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                      ReorderableDragStartListener(
+                        index: i,
+                        child: Container(
+                          width: 44,
+                          height: Charte.ligneListe,
+                          alignment: Alignment.center,
+                          child: Icone(Icons.drag_handle, key: ValueKey('poignee-${ordre[i]}'), size: 26, color: Charte.cadre),
+                        ),
+                      ),
+                    ]),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(ordre)),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Comme [ordonner], avec des groupes : chaque élément glisse dans son groupe ou dans un autre ; il appartient
+/// au groupe dont le titre est au-dessus de lui. Renvoie groupe → éléments dans l'ordre, ou null si annulé.
+Future<Map<String, List<String>>?> ordonnerParGroupes(BuildContext context,
+    {required String titre, required Map<String, List<String>> groupes, Map<String, String> noms = const {}}) {
+  final ordre = <(bool, String)>[
+    for (final e in groupes.entries) ...[(true, e.key), for (final x in e.value) (false, x)]
+  ];
+  Map<String, List<String>> resultat() {
+    final r = <String, List<String>>{for (final g in groupes.keys) g: []};
+    var g = groupes.keys.first;
+    for (final (titre, nom) in ordre) {
+      if (titre) {
+        g = nom;
+      } else {
+        r[g]!.add(nom);
+      }
+    }
+    return r;
+  }
+
+  return volet<Map<String, List<String>>>(
+    context,
+    fermable: false,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 18, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(titre, style: Charte.texte(20, gras: true)),
+            const SizedBox(height: 4),
+            Text('Faites glisser la poignée ≡ pour déplacer un rayon, dans son univers ou sous un autre.',
+                style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            Flexible(
+              child: ReorderableListView.builder(
+                shrinkWrap: true,
+                buildDefaultDragHandles: false,
+                itemCount: ordre.length,
+                onReorderItem: (de, vers) => maj(() {
+                  ordre.insert(vers, ordre.removeAt(de));
+                  // Un élément glissé tout en haut va dans le premier groupe.
+                  if (!ordre.first.$1) {
+                    final i = ordre.indexWhere((x) => x.$1);
+                    ordre.insert(0, ordre.removeAt(i));
+                  }
+                }),
+                itemBuilder: (ctx, i) {
+                  final (estTitre, nom) = ordre[i];
+                  if (estTitre) {
+                    return Material(
+                      key: ValueKey('groupe-$nom'),
+                      // 02/11/2026 (Aristide) : les niveaux de la palette, comme le catalogue.
+                      color: Charte.niveau(1),
+                      child: Container(
+                        height: 36,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        alignment: Alignment.centerLeft,
+                        child: Text(noms[nom] ?? nom, maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
+                      ),
+                    );
+                  }
+                  return Material(
+                    key: ValueKey('ordre-$nom'),
+                    color: Charte.niveau(3),
+                    child: Container(
+                      height: Charte.ligneListe,
+                      padding: const EdgeInsets.only(left: 12),
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                      child: Row(children: [
+                        Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(17))),
+                        ReorderableDragStartListener(
+                          index: i,
+                          child: Container(
+                            width: 44,
+                            height: Charte.ligneListe,
+                            alignment: Alignment.center,
+                            child: Icone(Icons.drag_handle, key: ValueKey('poignee-$nom'), size: 26, color: Charte.cadre),
+                          ),
+                        ),
+                      ]),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Valider', plein: true, onTap: () => Navigator.of(ctx).pop(resultat())),
+            const SizedBox(height: 10),
+            Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop()),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+/// Saisie d'un texte court ; renvoie null si annulée.
+Future<String?> demanderTexte(BuildContext context,
+    {required String titre, String initial = '', String? aide, String libelle = 'Nom', String valider = 'Valider', bool masque = false, Key? cleChamp}) {
+  final controleur = TextEditingController(text: initial)..selection = TextSelection(baseOffset: 0, extentOffset: initial.length);
+  return volet<String>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: TextField(
+        key: cleChamp,
+        controller: controleur,
+        autofocus: true,
+        obscureText: masque,
+        style: Charte.texte(16),
+        decoration: InputDecoration(labelText: libelle, hintText: aide),
+        onSubmitted: (v) => Navigator.of(ctx).pop(masque ? v : v.trim()),
+      ),
+      boutons: [
+        Row(children: [
+          Expanded(child: Bouton(texte: 'Annuler', onTap: () => Navigator.of(ctx).pop())),
+          const SizedBox(width: 10),
+          Expanded(child: Bouton(texte: valider, plein: true, onTap: () => Navigator.of(ctx).pop(masque ? controleur.text : controleur.text.trim()))),
+        ]),
+      ],
+    ),
+  );
+}
+
+/// Choix dans une liste simple ; renvoie la clé choisie ou null.
+Future<T?> choisirDansListe<T>(BuildContext context, {required String titre, required Map<T, String> choix}) {
+  return volet<T>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final e in choix.entries)
+            InkWell(
+              onTap: () => Navigator.of(ctx).pop(e.key),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 36),
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
+                child: Text(e.value, style: Charte.texte(16)),
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
+// ----------------------------------------------------------------- Composants v0.2
+
+class SousOnglet {
+  const SousOnglet(this.libelle, this.icone);
+  final String libelle;
+  final IconData icone;
+}
+
+/// Boutons d'onglet accolés dans un cadre arrondi ; l'actif est plein.
+class SousOnglets extends StatelessWidget {
+  const SousOnglets({super.key, required this.onglets, required this.actif, required this.onChoix});
+  final List<SousOnglet> onglets;
+  final int actif;
+  final ValueChanged<int> onChoix;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(8, 10, 8, 8),
+      child: Container(
+        height: Charte.sousOnglets + 4, // 44 de zone tactile à l'intérieur du cadre de 2
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < onglets.length; i++) ...[
+              if (i > 0) Container(width: 1.5, color: Charte.cadre),
+              Expanded(
+                child: Semantics(
+                  button: true,
+                  selected: i == actif,
+                  label: onglets[i].libelle,
+                  child: Material(
+                    color: i == actif ? Charte.accent : Charte.blanc,
+                    child: InkWell(
+                      onTap: () => onChoix(i),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icone(onglets[i].icone, size: 18, color: i == actif ? Charte.blanc : Charte.cadre),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(onglets[i].libelle,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: Charte.texte(15, gras: i == actif, couleur: i == actif ? Charte.blanc : Charte.encre)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Carte : cadre 2, rayon 10 ; cliquable = chevron à droite.
+class Carte extends StatelessWidget {
+  const Carte({super.key, required this.child, this.onTap, this.chevron, this.fond, this.padding});
+  final Widget child;
+  final VoidCallback? onTap;
+  final bool? chevron;
+  final Color? fond;
+  final EdgeInsets? padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final avecChevron = chevron ?? onTap != null;
+    return Material(
+      color: fond ?? Charte.blanc,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: padding ?? const EdgeInsets.fromLTRB(14, 12, 8, 12),
+          child: Row(
+            children: [
+              Expanded(child: child),
+              if (avecChevron) Icone(Icons.chevron_right, size: 28, color: Charte.couleurIcone(Icons.chevron_right)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Ligne de menu : titre, sous-titre gris, chevron ; zone tactile 44 au moins.
+/// Action courte au bout d'un élément de liste (« Reprendre », « Partir ») : pilule pleine ou à contour.
+class BoutonAction extends StatelessWidget {
+  const BoutonAction(this.texte, {super.key, required this.onTap, this.plein = false});
+  final String texte;
+  final VoidCallback onTap;
+  final bool plein;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: texte,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: Container(
+            height: 44,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: plein ? Charte.accent : null,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: plein ? Charte.accent : Charte.cadre, width: 1.6),
+            ),
+            child: Text(texte, style: Charte.texte(15, gras: true, couleur: plein ? Charte.blanc : Charte.cadre)),
+          ),
+        ),
+      );
+}
+
+/// L'élément de liste standard, le même partout : une ligne de 30 points, le titre, son complément en petit
+/// à droite (coupé s'il est long : le détail s'ouvre au toucher), sans icône ni chevron.
+/// [icone] et [gauche] ne sont plus affichés.
+class LigneMenu extends StatelessWidget {
+  const LigneMenu(
+      {super.key, required this.titre, this.sousTitre, this.onTap, this.titreTaille = 16, this.gauche, this.droite, this.icone, this.apresTitre, this.fond, this.tailleGauche = 32, this.multiligne = false});
+
+  /// Titre et sous-titre sur plusieurs lignes au besoin, sans « … » (produits du catalogue, 02/11/2026).
+  final bool multiligne;
+  final String titre;
+
+  /// Fond de la ligne (catalogue : les secteurs) ; sinon le fond de l'application.
+  final Color? fond;
+
+  /// Place de l'icône ou de l'image de tête.
+  final double tailleGauche;
+
+  /// Petit signe après le titre (ex. : produit ajouté ou modifié par le foyer).
+  final Widget? apresTitre;
+  final IconData? icone;
+  final String? sousTitre;
+  final VoidCallback? onTap;
+  final double titreTaille;
+  final Widget? gauche;
+  final Widget? droite;
+
+  @override
+  Widget build(BuildContext context) {
+    final signe = gauche ?? (icone == null ? null : Icone(icone, size: 24, color: Charte.cadre));
+    return Material(
+      color: fond ?? Charte.fond,
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          constraints: const BoxConstraints(minHeight: Charte.ligneListe),
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+          child: Row(
+            children: [
+              if (signe != null) ...[SizedBox(width: tailleGauche, height: tailleGauche, child: FittedBox(child: signe)), const SizedBox(width: 10)],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(children: [
+                      Flexible(
+                          child: Text(titre,
+                              maxLines: multiligne ? null : 1, overflow: multiligne ? null : TextOverflow.ellipsis, style: Charte.texte(17))),
+                      if (apresTitre != null) ...[const SizedBox(width: 6), apresTitre!],
+                    ]),
+                    if (sousTitre != null && sousTitre!.isNotEmpty)
+                      Text(sousTitre!,
+                          maxLines: multiligne ? null : 1,
+                          overflow: multiligne ? null : TextOverflow.ellipsis,
+                          style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ],
+                ),
+              ),
+              if (droite != null) ...[const SizedBox(width: 8), droite!],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Bouton Pause : pastille contour, icône pause + « Pause ».
+class BoutonPause extends StatelessWidget {
+  const BoutonPause({super.key, required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: 'Pause',
+      child: Material(
+        color: Charte.fond,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(22),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox(
+            height: 44,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icone(Icons.pause, size: 18, color: Charte.couleurIcone(Icons.pause)),
+                  const SizedBox(width: 4),
+                  Text('Pause', style: Charte.texte(15, gras: true)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Fenêtre des étapes décisives (valider la liste, partir faire les courses, terminer…), en volet du bas :
+/// titre, ce qu'il faut savoir ou choisir, puis l'action (bouton plein) et l'annulation.
+/// Rend true si l'action est choisie. [icone] et [croix] ne sont plus affichés (ni icônes, ni croix : la poignée ferme).
+Future<bool> modale(
+  BuildContext context, {
+  required String titre,
+  IconData? icone,
+  required Widget Function(BuildContext context, StateSetter maj) contenu,
+  required String? oui,
+  String? non = 'Annuler',
+  bool croix = false,
+  bool fermable = true,
+}) async {
+  final r = await volet<bool>(
+    context,
+    fermable: fermable,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => corpsVolet(
+        titre: titre,
+        contenu: contenu(ctx, maj),
+        boutons: [
+          if (oui != null) Bouton(texte: oui, plein: true, onTap: () => Navigator.of(ctx).pop(true)),
+          if (non != null) Bouton(texte: non, onTap: () => Navigator.of(ctx).pop(false)),
+        ],
+      ),
+    ),
+  );
+  return r == true;
+}
+
+/// Case à cocher d'un réglage (ex. : « Enregistrer le parcours »). 03/11/2026 (Aristide) : entourée d'un cadre,
+/// comme les zones de saisie et les listes déroulantes ; [encadree] faux pour les cases d'un choix parmi
+/// plusieurs éléments (articles lus dans un mail…) ou d'un [GroupeCases].
+class CaseModale extends StatelessWidget {
+  const CaseModale({super.key, required this.texte, this.aide, required this.coche, required this.onChange, this.encadree = true});
+  final String texte;
+  final String? aide;
+  final bool coche;
+  final ValueChanged<bool> onChange;
+  final bool encadree;
+
+  @override
+  Widget build(BuildContext context) {
+    final ligne = InkWell(
+      onTap: () => onChange(!coche),
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        constraints: const BoxConstraints(minHeight: 48),
+        padding: EdgeInsets.symmetric(horizontal: encadree ? 12 : 0, vertical: 8),
+        child: Row(
+          children: [
+            CaseACocher(coche: coche, taille: 24),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(texte, style: Charte.texte(16)),
+                  if (aide != null) Text(aide!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (!encadree) return ligne;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Material(
+        color: Charte.blanc,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+          side: BorderSide(color: Charte.cadre, width: Charte.traitCadre),
+        ),
+        child: ligne,
+      ),
+    );
+  }
+}
+
+/// Plusieurs cases liées dans un seul cadre, le titre posé sur le bord comme le libellé des zones de saisie
+/// (03/11/2026, Aristide) : « Destinataires »…
+class GroupeCases extends StatelessWidget {
+  const GroupeCases({super.key, required this.titre, required this.cases});
+  final String titre;
+  final List<CaseModale> cases;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: InputDecorator(
+          decoration: InputDecoration(labelText: titre, contentPadding: const EdgeInsets.fromLTRB(12, 6, 12, 2)),
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            for (final c in cases)
+              CaseModale(key: c.key, texte: c.texte, aide: c.aide, coche: c.coche, onChange: c.onChange, encadree: false),
+          ]),
+        ),
+      );
+}
+
+/// Confirmation en volet du bas : bouton plein (rend false) et bouton contour (rend true) ; null si fermé.
+Future<bool?> confirmer(
+  BuildContext context, {
+  required String titre,
+  required Widget contenu,
+  required String plein,
+  required String contour,
+  IconData? icone,
+}) {
+  return volet<bool>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre,
+      contenu: contenu,
+      boutons: [
+        Bouton(texte: plein, plein: true, onTap: () => Navigator.of(ctx).pop(false)),
+        Bouton(texte: contour, onTap: () => Navigator.of(ctx).pop(true)),
+      ],
+    ),
+  );
+}
+
+// ------------------------------------------------------------ Gestes tactiles
+
+/// Action d'une ligne, proposée par glissement ou dans le menu de l'appui long.
+class ActionLigne {
+  const ActionLigne(this.icone, this.texte, this.faire, {this.danger = false});
+  final IconData icone;
+  final String texte;
+  final VoidCallback faire;
+
+  /// Suppression : fond rouge quand on glisse.
+  final bool danger;
+}
+
+/// Ligne qu'on fait glisser du doigt : vers la gauche [versGauche] (en général supprimer),
+/// vers la droite [versDroite] (l'action principale) ; un appui long ouvre le menu de toutes les [actions].
+class Glissable extends StatelessWidget {
+  const Glissable(
+      {required Key key, required this.child, this.versGauche, this.versDroite, this.titre, this.detail, this.auToucher = false, this.actions = const [], this.auDoubleToucher})
+      : super(key: key);
+  final Widget child;
+
+  /// Détail montré en tête du volet des actions.
+  final String? detail;
+
+  /// Toucher la ligne ouvre aussi le volet (détail et actions), comme l'appui long.
+  final bool auToucher;
+
+  /// 03/11/2026 (Aristide) : le double toucher fait directement l'action principale (préparer, faire les courses…).
+  final ActionLigne? auDoubleToucher;
+  final ActionLigne? versGauche;
+  final ActionLigne? versDroite;
+  final String? titre;
+  final List<ActionLigne> actions;
+
+  Widget _fond(ActionLigne a, bool aDroite) => Container(
+        color: a.danger ? Charte.rouge : Charte.accent,
+        alignment: aDroite ? Alignment.centerRight : Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Text(a.texte, style: Charte.texte(16, gras: true, couleur: Charte.blanc)),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    Widget w = child;
+    if (actions.isNotEmpty) {
+      w = GestureDetector(
+        onTap: auToucher ? () => menuActions(context, titre: titre, detail: detail, actions: actions) : null,
+        onDoubleTap: auDoubleToucher == null
+            ? null
+            : () {
+                HapticFeedback.selectionClick();
+                auDoubleToucher!.faire();
+              },
+        onLongPress: () {
+          HapticFeedback.mediumImpact();
+          menuActions(context, titre: titre, detail: detail, actions: actions);
+        },
+        child: w,
+      );
+    }
+    if (versGauche == null && versDroite == null) return w;
+    final gauche = versGauche, droite = versDroite;
+    return Dismissible(
+      key: key!,
+      direction: gauche != null && droite != null
+          ? DismissDirection.horizontal
+          : (gauche != null ? DismissDirection.endToStart : DismissDirection.startToEnd),
+      dismissThresholds: const {DismissDirection.endToStart: 0.35, DismissDirection.startToEnd: 0.35},
+      background: droite != null ? _fond(droite, false) : _fond(gauche!, true),
+      secondaryBackground: gauche != null && droite != null ? _fond(gauche, true) : null,
+      // La ligne revient toujours en place : c'est l'action (et la mise à jour des données) qui la fait disparaître.
+      confirmDismiss: (sens) async {
+        HapticFeedback.selectionClick();
+        final a = sens == DismissDirection.endToStart ? gauche : droite;
+        a?.faire();
+        return false;
+      },
+      child: w,
+    );
+  }
+}
+
+/// Volet d'une ligne (toucher ou appui long) : son détail éventuel, puis ses actions, sans icônes.
+Future<void> menuActions(BuildContext context, {String? titre, String? detail, required List<ActionLigne> actions}) async {
+  final choix = await volet<ActionLigne>(
+    context,
+    builder: (ctx) => corpsVolet(
+      titre: titre ?? '',
+      contenu: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (detail != null && detail.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(detail, style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            ),
+          for (final a in actions)
+            InkWell(
+              onTap: () => Navigator.of(ctx).pop(a),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 40),
+                alignment: Alignment.centerLeft,
+                decoration: BoxDecoration(border: Border(bottom: _bordLigne)),
+                child: Text(a.texte, style: Charte.texte(17, couleur: a.danger ? Charte.rouge : Charte.encre)),
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+  choix?.faire();
+}
+
+/// Retrait de chaque niveau d'une arborescence (catalogues des produits et des marques).
+const double retraitNiveau = 24;
+
+/// Liste dont chaque élément est peint après ceux qui le suivent : l'icône d'un bandeau qui déborde vers le bas
+/// reste au premier plan, par-dessus la ligne suivante (02/11/2026, Aristide).
+class ColonneDebord extends StatelessWidget {
+  const ColonneDebord({super.key, required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      verticalDirection: VerticalDirection.up,
+      children: children.reversed.toList());
+}
+
+/// Un niveau d'arborescence des catalogues (02/11/2026, Aristide : le même look pour les deux catalogues) :
+/// bandeau à la couleur du [niveau] de la palette (1 univers, 2 rayon, 3 secteur, du plus soutenu au plus clair),
+/// icône et texte décalés d'un cran par niveau, sans trait entre les bandeaux ; l'icône déborde un peu vers le
+/// bas, au premier plan. Un toucher long sur l'icône la change ([surSigneLong]), le crayon ouvre les actions du
+/// niveau ([onCrayon]) ; [droite] : bouton tout à droite (marques d'un secteur).
+class NiveauArbre extends StatelessWidget {
+  const NiveauArbre({
+    super.key,
+    required this.cle,
+    required this.niveau,
+    required this.nom,
+    required this.ouvert,
+    required this.onTap,
+    required this.enfants,
+    this.signe,
+    this.surSigneLong,
+    this.onCrayon,
+    this.droite,
+    this.ajoute = false,
+    this.nombre,
+    this.tailleSigne = 46,
+    int? profondeur,
+  }) : profondeur = profondeur ?? niveau;
+
+  /// Taille de l'icône : 46, elle déborde un peu vers le bas ; 34 ou moins, elle tient dans le bandeau (secteurs).
+  final double tailleSigne;
+  final String cle;
+  final int niveau;
+
+  /// Rang dans l'arborescence, pour le retrait (par défaut : [niveau]) ; le catalogue des marques commence aux
+  /// rayons, qui gardent leur couleur de rayon.
+  final int profondeur;
+  final String nom;
+  final bool ouvert;
+  final VoidCallback onTap;
+  final List<Widget> enfants;
+  final Widget? signe;
+  final VoidCallback? surSigneLong;
+  final VoidCallback? onCrayon;
+  final Widget? droite;
+  final bool ajoute;
+  final int? nombre;
+
+  static const _hauteur = 40.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final fond = Charte.niveau(niveau);
+    final encre = Charte.encreNiveau;
+    final style = Charte.texte(profondeur == 1 ? 17 : 16, gras: true, couleur: encre);
+    final gauche = 6 + (profondeur - 1) * retraitNiveau;
+    final bandeau = Stack(clipBehavior: Clip.none, children: [
+      Material(
+        key: ValueKey(cle),
+        color: fond,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: _hauteur,
+            padding: EdgeInsets.fromLTRB(gauche + (signe == null ? 8 : tailleSigne + 8), 0, 4, 0),
+            child: Row(children: [
+              Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style)),
+              if (ajoute) Text(' +', style: style),
+              if (nombre != null && nombre! > 0) Padding(padding: const EdgeInsets.only(left: 8), child: Text('$nombre', style: style)),
+              // 02/11/2026 (Aristide) : le bouton propre au niveau (marques du secteur) avant le crayon et le chevron.
+              if (droite != null) Padding(padding: const EdgeInsets.only(left: 2), child: droite),
+              if (onCrayon != null)
+                Tooltip(
+                  message: 'Modifier $nom',
+                  child: InkResponse(
+                    key: ValueKey('crayon-$cle'),
+                    onTap: onCrayon,
+                    radius: 20,
+                    child: Padding(padding: const EdgeInsets.all(6), child: Icone(Icons.edit_outlined, size: 22, color: encre)),
+                  ),
+                ),
+              Icone(ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: encre),
+            ]),
+          ),
+        ),
+      ),
+      if (signe != null)
+        Positioned(
+          left: gauche,
+          top: tailleSigne > _hauteur ? 2 : (_hauteur - tailleSigne) / 2,
+          width: tailleSigne,
+          height: tailleSigne,
+          child: GestureDetector(behavior: HitTestBehavior.opaque, onTap: onTap, onLongPress: surSigneLong, child: signe),
+        ),
+    ]);
+    return ColonneDebord(children: [bandeau, if (ouvert) ...enfants]);
+  }
+}
+
+/// Dernier niveau d'une arborescence des catalogues (produit, marque) : fond le plus clair de la palette,
+/// texte décalé sous celui de son secteur.
+class FeuilleArbre extends StatelessWidget {
+  const FeuilleArbre({super.key, required this.child, this.profondeur = 4});
+  final Widget child;
+  final int profondeur;
+
+  @override
+  Widget build(BuildContext context) => ColoredBox(
+        color: Charte.niveau(4),
+        child: Padding(padding: EdgeInsets.only(left: 6 + (profondeur - 1) * retraitNiveau + 8), child: child),
+      );
+}

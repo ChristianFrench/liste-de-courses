@@ -1,0 +1,97 @@
+"""Écrit assets/natures_off.json (lu par l'application) à partir de l'extraction Open Food Facts
+(outils/off/natures_off.json, écrite par extraire.py) : pour chaque nature du catalogue, sa popularité (nombre de
+produits vendus en France) et au plus 10 marques présentes dans au moins 3 produits. Les marques d'enseigne
+(U, Carrefour, Marque Repère, Pâturages…) en sont retirées : l'application les propose déjà selon le magasin."""
+import json, re, unicodedata
+
+
+def cle(m):
+    return re.sub(r"[^a-z0-9]", "", "".join(c for c in unicodedata.normalize("NFD", m.lower()) if unicodedata.category(c) != "Mn"))
+
+
+enseignes = json.load(open("assets/marques_distributeur.json", encoding="utf-8"))["enseignes"]
+exclues = {cle(e) for e in enseignes} | {cle(m["marque"]) for l in enseignes.values() for m in l}
+# Enseignes et marques de distributeur absentes de marques_distributeur.json, et non-marques fréquentes.
+exclues |= {cle(x) for x in [
+    "U", "U Bio", "Super U", "Hyper U", "Système U", "Carrefour Bio", "Carrefour Classic", "Carrefour Extra", "Carrefour Sensation",
+    "Carrefour Selection", "Auchan Bio", "Monoprix Bio", "Monoprix Gourmet", "E.Leclerc", "Leclerc", "Intermarché", "Lidl",
+    "Aldi", "Leader Price", "Franprix", "Netto", "Cora", "Match", "Simply", "Casino Bio", "Picard", "Thiriet", "Bio Village",
+    "Marque Repère", "Envia", "Délisse", "Pâturages", "Solevita", "Milbona", "Chabrior", "Deliciously Different",
+    "Nos Régions ont du Talent", "Reflets de France", "Saveurs de nos régions", "Eco+", "Top Budget", "Tous les jours",
+    "Simpl", "Ma Vie Sans Gluten", "Fair", "La Vie Claire", "Biocoop", "Naturalia",
+    "Bio c Bon", "Marks & Spencer", "Delhaize", "Belle France", "Grand Jury", "Cmi", "Sans marque", "Generique", "Aucune",
+    "Groupe Casino", "Groupe Carrefour", "CMI (Carrefour Marchandises Internationales)", "DLP (Distribution Leader Price)",
+    "Milsani", "Milsa", "Prix Mini", "Grand Frais", "Trader Joe's", "Migros", "Hema", "Auchan Production", "Monoprix Gourmet",
+    "Casino Délices", "Leader Price Bio", "Cora Bio", "Netto Bio", "Lidl Bio", "Bio Organic", "Combino", "Crownfield",
+    "Freshona", "Cien", "Kania", "Belbake", "Gelatelli", "Chef Select", "Deluxe", "Pilos", "Snack Day", "Sondey",
+    "Fin Carré", "Lupilu", "W5", "Solent", "Ocean Sea", "Nixe", "Alesto", "Vitasia", "Italiamo", "Duc de Coeur",
+    # hors alimentaire (Open Beauty, Products et Pet Food Facts) : marques d'enseigne et groupes industriels
+    "Cosmia", "Auchan Baby", "Kids", "Unilever", "Henkel", "Groupe SEB France", "L'Oreal Consumer products", "Up2Fashion",
+    "Les Cosmétiques Design Paris", "Better life", "Inventiv", "Nectar of Beauty", "Bio naïa",
+    # enseignes et appellations prises pour des marques (relu le 01/11/2026)
+    "Toupargel", "Dia", "Carrefour Original", "Metro Chef", "Marks And Spencer", "Bayonne", "Parma", "Comté", "Roquefort", "Lotte", "Terroir",
+]}
+# Natures dont Open Food Facts ne donne que des produits d'autre sorte (« Bar » → sirops Teisseire,
+# « Ficelle » → crêpes, « Rillettes » → rillettes de poisson) : pas de marques prises.
+sans_marques = {"Bar", "Lotte", "Ficelle", "Rillettes"}
+# Graphies accentuées perdues par l'extraction du 31/10/2026 (corrigé depuis dans extraire.py).
+accents = {"President": "Président", "Cote d'Or": "Côte d'Or", "Nestle": "Nestlé", "Herta": "Herta",
+           "kiabi": "Kiabi", "Van|Rysel": "Van Rysel", "royal canin": "Royal Canin", "handy bag": "Handy Bag"}
+ext = json.load(open("outils/off/natures_off.json", encoding="utf-8"))
+# Bases non alimentaires (extraire.py avec BASE=obf, opf, opff), ajoutées à Open Food Facts.
+sources = [ext["natures"]]
+for b in ("obf", "opf", "opff"):
+    try:
+        sources.append(json.load(open(f"outils/off/natures_{b}.json", encoding="utf-8"))["natures"])
+    except FileNotFoundError:
+        pass
+# Marques égarées : une marque presque toujours vue dans un autre univers (« Clous » → Ducros, épices ;
+# « Jeans » → Jean Rozé, viande ; « Bar » → Teisseire, sirops) n'est pas gardée pour cette nature (01/11/2026).
+src_univers = open("lib/donnees/univers.dart", encoding="utf-8").read()
+univers_du_rayon = {r: u for u, rs in re.findall(r"'([^']+)': \[(.*?)\]", src_univers, re.S) for r in re.findall(r"'([^']+)'", rs)}
+rayon_de = lambda chemin: chemin.replace("Entretien / Droguerie", "Entretien-Droguerie").split("/")[0].replace("Entretien-Droguerie", "Entretien / Droguerie")
+# Le frais et le surgelé vendent les mêmes marques (Père Dodu, Bonduelle) ; les petits pots sont de l'épicerie.
+rapproches = {"Surgelés": "Produits frais"}
+univers_de = lambda chemin: "Épicerie et boissons" if rayon_de(chemin) == "Bébé" else rapproches.get(
+    univers_du_rayon.get(rayon_de(chemin), "?"), univers_du_rayon.get(rayon_de(chemin), "?"))
+par_univers = {}
+for natures in sources:
+    for chemin, v in natures.items():
+        for m, k in v["marques"]:
+            c = par_univers.setdefault(cle(m), {})
+            c[univers_de(chemin)] = c.get(univers_de(chemin), 0) + k
+
+
+def egaree(m, chemin):
+    c = par_univers[cle(m)]
+    tot = sum(c.values())
+    haut = max(c.values())
+    return c.get(univers_de(chemin), 0) < 0.1 * tot and haut >= 0.6 * tot
+
+
+egarees = []
+nombres, comptes = {}, {}
+for natures in sources:
+    for chemin, v in natures.items():
+        nom = chemin.split("/")[-1]
+        nombres[nom] = nombres.get(nom, 0) + v["n"]
+        c = comptes.setdefault(nom, {})
+        # Fruits et légumes frais : Open Food Facts n'y trouve presque que des conserves, épices et soupes
+        # (« Ail » → Ducros, « Haricots verts » → Bonduelle) ; pas de marques prises (01/11/2026).
+        if chemin.startswith("Fruits et légumes/") or nom in sans_marques:
+            continue
+        for m, k in v["marques"]:
+            if egaree(m, chemin):
+                egarees.append((nom, m))
+                continue
+            m = accents.get(m, m)
+            c[m] = c.get(m, 0) + k
+res = {}
+for nom, n in nombres.items():
+    marques = [m for m, k in sorted(comptes[nom].items(), key=lambda x: -x[1]) if k >= 3 and cle(m) not in exclues][:10]
+    res[nom] = {"n": n, **({"m": marques} if marques else {})}
+json.dump({"_description": ext["_description"] + " ; plus Open Beauty, Products et Pet Food Facts ; marques d'enseigne retirées (outils/off/natures.py)",
+           "natures": dict(sorted(res.items()))}, open("assets/natures_off.json", "w", encoding="utf-8"), ensure_ascii=False, indent=0)
+print(len(egarees), "marques égarées retirées, par exemple", egarees[:20])
+print(len(res), "natures,", sum(1 for x in res.values() if "m" in x), "avec des marques,",
+      sum(len(x.get("m", [])) for x in res.values()), "marques en tout")

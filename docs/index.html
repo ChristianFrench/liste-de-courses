@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emplettes</title>
+<meta name="description" content="Emplettes : la liste de courses du foyer, préparée à plusieurs, faite dans l'ordre des rayons.">
+<link rel="icon" href="images/complet.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<!-- Page produite par outils/site/generer.py : modifier le script, pas ce fichier. -->
+<header class="menu">
+  <div class="large">
+    <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="navigation"><a href="index.html" aria-current="page">Accueil</a><a href="decouvrir.html">Découvrir</a><a href="telecharger.html">Télécharger</a><a href="aide.html">Aide</a><a href="essayer.html" class="essayer">Essayer</a></nav>
+  </div>
+</header>
+<div class="une">
+  <div class="large">
+    <div>
+      <h1>Emplettes</h1>
+      <p class="slogan">La liste de courses du foyer, préparée à plusieurs.</p>
+      <p>Chacun ajoute ce qui manque, depuis son téléphone ou son ordinateur. Au magasin, la liste suit l'ordre des rayons, et l'on coche au fil des allées. Sans compte, sans publicité, même sans réseau.</p>
+      <div class="boutons">
+        <a class="bouton plein" href="essayer.html">Essayer maintenant</a>
+        <a class="bouton" href="telecharger.html">Télécharger</a>
+      </div>
+    </div>
+    <div class="scene">
+      <img class="anim" id="animation" src="animation.webp" width="310" height="335" alt="La liste s'écrit, le caddie se remplit, les articles se cochent">
+      <button class="rejouer" id="rejouer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        Rejouer
+      </button>
+    </div>
+  </div>
+</div>
+<main>
+  <section>
+    <div class="large">
+      <div class="bandeau"><img src="images/liste_crayon.png" alt=""><h2>L'essentiel</h2></div>
+      <div class="cartes">
+        <div class="carte"><img src="icones/memo.png" alt=""><h3>Préparer à plusieurs</h3><p>Une liste commune, que chaque membre du foyer complète. On repart d'une liste type ou des courses précédentes.</p></div>
+        <div class="carte"><img src="icones/shopping-cart.png" alt=""><h3>Dans l'ordre des rayons</h3><p>L'application apprend votre parcours dans chaque magasin : la liste se range dans l'ordre où vous passez.</p></div>
+        <div class="carte"><img src="icones/busts-in-silhouette.png" alt=""><h3>Tout le foyer</h3><p>Un code de foyer suffit, sans compte ni mot de passe. Les données sont chiffrées avec ce code.</p></div>
+        <div class="carte"><img src="icones/cloud.png" alt=""><h3>Même sans réseau</h3><p>Tout est enregistré sur l'appareil : au fond du magasin, l'application fonctionne normalement.</p></div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="large">
+      <div class="bandeau"><img src="images/liste_chariot.png" alt=""><h2>Comment ça marche</h2></div>
+      <div class="etapes">
+        <div class="etape"><span class="no">1</span><div><b>Je paramètre</b><span>Une fois : le foyer, ses membres, ses magasins.</span></div></div>
+        <div class="etape"><span class="no">2</span><div><b>Je prépare ma liste</b><span>Seul ou à plusieurs, en cherchant les articles.</span></div></div>
+        <div class="etape"><span class="no">3</span><div><b>Je la valide</b><span>« Liste prête » : elle part dans les courses à faire.</span></div></div>
+        <div class="etape"><span class="no">4</span><div><b>Je fais mes courses</b><span>Dans l'ordre des rayons, en cochant au fil des allées.</span></div></div>
+      </div>
+      <div class="boutons" style="margin-top:20px"><a class="bouton plein" href="decouvrir.html">Découvrir les écrans</a></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="large">
+    <div>
+      <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+      <p style="margin:0;font-size:14.5px">La liste de courses du foyer, préparée à plusieurs.</p>
+    </div>
+    <div>
+      <h4>L'application</h4>
+      <ul>
+        <li><a href="decouvrir.html">Découvrir</a></li>
+        <li><a href="essayer.html">Essayer</a></li>
+        <li><a href="documents/mode-emploi.html">Mode d'emploi</a></li>
+        <li><a href="documents/depliant.html">Dépliant</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Télécharger</h4>
+      <ul>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk">Android (APK)</a></li>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Emplettes-Installation.exe">Windows</a></li>
+        <li><a href="telecharger.html">Installer pas à pas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Aide</h4>
+      <ul>
+        <li><a href="aide.html#questions">Questions fréquentes</a></li>
+        <li><a href="aide.html#video">Vidéo</a></li>
+        <li><a href="aide.html#donnees">Vos données</a></li>
+        <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bas"><span id="basVersion">Emplettes</span> · Police Atkinson Hyperlegible et icônes Noto 3D, licence SIL OFL</div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

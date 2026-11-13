@@ -1,0 +1,34 @@
+name: Voix de la vidéo (Piper, voix française Siwis)
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  voix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Voix
+        run: |
+          python3 -m pip install -q piper-tts
+          V=https://huggingface.co/rhasspy/piper-voices/resolve/main/fr/fr_FR/siwis/medium
+          curl -fsSL -o siwis.onnx "$V/fr_FR-siwis-medium.onnx"
+          curl -fsSL -o siwis.onnx.json "$V/fr_FR-siwis-medium.onnx.json"
+          curl -fsSL -o MODEL_CARD "$V/MODEL_CARD" || true
+          mkdir voix
+          python3 - <<'PY'
+          import json, subprocess
+          for cle, texte in json.load(open('outils/video/narration.json')):
+              subprocess.run(['piper', '--model', 'siwis.onnx', '--length_scale', '1.08', '--sentence_silence', '0.25',
+                              '--output_file', f'voix/{cle}.wav'], input=texte.encode(), check=True)
+              print(cle, 'ok')
+          PY
+          cp MODEL_CARD voix/ 2>/dev/null || true
+      - name: Déposer sur la branche « video-voix » (les artefacts ne sont pas lisibles depuis la session)
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan video-voix
+          git rm -rq --cached .
+          git add -f voix
+          git commit -qm "Voix de la vidéo pour ${GITHUB_SHA::7}"
+          git push -qf origin HEAD:refs/heads/video-voix

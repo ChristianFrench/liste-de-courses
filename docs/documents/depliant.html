@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dépliant · Emplettes</title>
+<link rel="icon" href="../images/complet.png">
+<!-- Dépliant d'Emplettes (refait le 04/11/2026 pour la version 0.7) : A4 paysage, trois volets, recto verso.
+     PDF : node outils/site/pdf.js (docs/documents/Emplettes - Depliant.pdf). -->
+<style>
+@font-face{font-family:Atkinson;src:url(../polices/AtkinsonHyperlegible-Regular.ttf)}
+@font-face{font-family:Atkinson;src:url(../polices/AtkinsonHyperlegible-Bold.ttf);font-weight:700}
+@page{size:A4 landscape;margin:0}
+:root{--accent:#8AA496;--accent-fonce:#557B66;--fond:#F5F9F6;--fond-barre:#E3EFE7;--niveau1:#CCD7D1;--encre:#375042;--texte:#222;--gris:#555}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Atkinson,sans-serif;color:var(--texte);background:#8a948e}
+.page{width:297mm;height:210mm;display:flex;overflow:hidden;background:#fff;margin:8mm auto;box-shadow:0 2mm 8mm rgba(0,0,0,.3);page-break-after:always}
+.page:last-of-type{page-break-after:auto}
+.volet{width:99mm;height:210mm;padding:10mm 9mm;position:relative;display:flex;flex-direction:column}
+.volet+.volet{border-left:.2mm dashed #cfdcd3}
+h1{font-size:34pt;line-height:1;color:#fff}
+h2{font-size:16pt;color:var(--encre);line-height:1.1;margin-bottom:3mm}
+h2 small{display:block;font-size:8.5pt;color:var(--accent-fonce);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1mm}
+h3{font-size:10.5pt;color:var(--encre);margin-bottom:.8mm}
+p,li{font-size:9pt;line-height:1.35}
+ul.points{list-style:none;display:flex;flex-direction:column;gap:2.3mm}
+ul.points li{padding-left:5mm;position:relative}
+ul.points li::before{content:"";position:absolute;left:0;top:1.3mm;width:2.4mm;height:2.4mm;border-radius:50%;background:var(--accent-fonce)}
+ul.points b{color:var(--encre)}
+.tel{background:#1f2421;border-radius:5.5mm;padding:1.5mm;box-shadow:0 1.5mm 4mm rgba(0,0,0,.25)}
+.tel img{display:block;width:100%;border-radius:4.2mm}
+.legende{font-size:7.5pt;color:var(--gris);text-align:center;margin-top:1.5mm;font-style:italic}
+.duo{display:flex;gap:4mm;align-items:flex-start}
+.encart{background:var(--fond-barre);border-radius:3mm;padding:3mm 3.5mm}
+.encart p{font-size:8.5pt}
+.bas{margin-top:auto}
+/* Couverture : la photo de l'accueil de l'application */
+.couverture{color:#fff;background:linear-gradient(170deg,rgba(20,32,25,.82),rgba(20,32,25,.55)),url(../images/photo.jpg) center/cover}
+.couverture .logo{width:30mm;filter:drop-shadow(0 1mm 2mm rgba(0,0,0,.4))}
+.couverture .accroche{font-size:12.5pt;line-height:1.35;margin-top:3mm;color:#e9f4ec}
+.couverture .tel{width:46mm;margin:5mm auto 0;transform:rotate(-4deg)}
+.plateformes{display:flex;gap:2mm;justify-content:center;margin-top:auto}
+.plateformes span{border:.3mm solid rgba(255,255,255,.75);border-radius:10mm;padding:1mm 3.2mm;font-size:8.5pt;font-weight:700}
+/* Étapes */
+.etapes{display:flex;flex-direction:column;gap:2.6mm}
+.etape{display:flex;gap:3mm;align-items:flex-start}
+.etape .num{flex:none;width:7.5mm;height:7.5mm;border-radius:50%;background:var(--accent-fonce);color:#fff;font-weight:700;font-size:10pt;display:flex;align-items:center;justify-content:center}
+.etape p{font-size:8.5pt}
+/* Bandeaux des volets intérieurs : comme les bandeaux de groupe de l'application */
+.bandeau{display:flex;align-items:center;gap:3mm;background:var(--niveau1);margin:-10mm -9mm 5mm;padding:6mm 9mm 4.5mm}
+.bandeau img{width:13mm;height:13mm;object-fit:contain}
+.bandeau h2{margin:0}
+.qr{width:28mm;height:28mm}
+.chiffres{display:flex;justify-content:space-between;text-align:center;margin:2mm 0 4mm}
+.chiffres b{display:block;font-size:15pt;color:var(--accent-fonce)}
+.chiffres span{font-size:7.5pt;color:var(--gris)}
+.barre-doc{position:sticky;top:0;z-index:2;background:var(--encre);color:#fff;display:flex;gap:12px;align-items:center;justify-content:center;padding:8px 12px;font:700 14px Atkinson,sans-serif}
+.barre-doc a{color:#fff;background:rgba(255,255,255,.15);border-radius:8px;padding:6px 12px;text-decoration:none}
+@media screen and (max-width:1150px){.page{zoom:.5}}
+@media screen and (max-width:600px){.page{zoom:.33}}
+@media print{body{background:#fff}.page{margin:0;box-shadow:none}.barre-doc{display:none}}
+</style>
+</head>
+<body>
+<div class="barre-doc"><a href="../aide.html">‹ Retour au site</a><a href="Emplettes - Depliant.pdf" download>Télécharger le PDF</a></div>
+
+<!-- ============ RECTO (extérieur) : rabat | dos | couverture ============ -->
+<section class="page">
+  <div class="volet">
+    <h2><small>En quatre étapes</small>Comment ça marche</h2>
+    <div class="etapes">
+      <div class="etape"><div class="num">1</div><div><h3>Je paramètre</h3><p>Une fois pour toutes : seul ou en foyer, les membres, les magasins, les couleurs de l'application.</p></div></div>
+      <div class="etape"><div class="num">2</div><div><h3>Je prépare ma liste</h3><p>Je tape trois lettres, l'article se range sous son secteur. Ou je pars d'une liste type, d'une course passée, du texte d'un mail.</p></div></div>
+      <div class="etape"><div class="num">3</div><div><h3>Je la valide</h3><p>« Liste prête » : un commentaire pour celui qui part, et le mail au foyer si besoin.</p></div></div>
+      <div class="etape"><div class="num">4</div><div><h3>Je fais mes courses</h3><p>La liste suit l'ordre de mes allées. Je coche, je mets en pause, je reprends, puis je garde le ticket.</p></div></div>
+    </div>
+    <div class="bas duo" style="align-items:flex-end">
+      <div class="tel" style="width:40mm;flex:none"><img src="../ecrans/03 Nouvelle-liste.webp" alt=""></div>
+      <p class="legende" style="text-align:left">Une nouvelle liste : par secteur, simple, depuis une liste type, une course passée ou un texte.</p>
+    </div>
+  </div>
+
+  <div class="volet">
+    <h2><small>Pour tout le foyer</small>Une liste, plusieurs mains</h2>
+    <ul class="points">
+      <li><b>Un foyer, un code</b> : sans compte ni mot de passe, chacun rejoint le foyer avec son code de partage.</li>
+      <li><b>Les listes se partagent</b> d'un appareil à l'autre, chiffrées avec le code du foyer, même après avoir été modifiées hors connexion.</li>
+      <li><b>Le parcours est personnel</b> : chaque membre a son ordre des allées, dans chaque magasin.</li>
+      <li><b>Lisible partout</b> : grands caractères, police conçue pour la lisibilité, gestes simples d'une main.</li>
+      <li><b>Prévenus en direct</b> : un message au foyer arrive en notification, même application fermée.</li>
+      <li><b>Un catalogue qui s'enrichit</b> : plus de 2 000 produits, vos ajouts, et des mises à jour pour tous les foyers.</li>
+      <li><b>Vos données restent chez vous</b>, avec des sauvegardes automatiques.</li>
+    </ul>
+    <div class="bas" style="text-align:center">
+      <img class="qr" src="qr-site.png" alt="">
+      <p style="font-weight:700;color:var(--encre);margin-top:2mm">Essayez-la, téléchargez-la</p>
+      <p style="font-size:7.5pt;color:var(--gris)">emplettes.eu<br>Android et Windows. Démonstration en ligne.</p>
+    </div>
+  </div>
+
+  <div class="volet couverture">
+    <img class="logo" src="../images/complet.png" alt="">
+    <h1 style="margin-top:4mm">Emplettes</h1>
+    <p class="accroche">La liste de courses du foyer,<br>préparée à plusieurs,<br>faite dans l'ordre des rayons.</p>
+    <div class="tel"><img src="../ecrans/01 Accueil.webp" alt=""></div>
+    <div class="plateformes"><span>Android</span><span>Windows</span><span>Démo en ligne</span></div>
+  </div>
+</section>
+
+<!-- ============ VERSO (intérieur) : préparer | en magasin | après ============ -->
+<section class="page">
+  <div class="volet">
+    <div class="bandeau"><img src="../images/liste_crayon.png" alt=""><h2><small>Préparer</small>Votre liste en quelques gestes</h2></div>
+    <div class="chiffres">
+      <div><b>2 212</b><span>produits</span></div>
+      <div><b>31</b><span>rayons</span></div>
+      <div><b>1</b><span>catalogue pour tous</span></div>
+    </div>
+    <ul class="points">
+      <li><b>Trois lettres suffisent</b> : l'article se range sous son secteur, dans l'ordre du magasin.</li>
+      <li><b>− et +</b> règlent la quantité ; la promotion, le packaging et la consigne s'affichent sur la ligne.</li>
+      <li><b>Les marques</b> de chaque secteur sont proposées.</li>
+      <li><b>Depuis un texte</b> : collez une liste reçue par mail, les articles sont reconnus.</li>
+    </ul>
+    <div class="bas duo">
+      <div class="tel" style="width:44mm;flex:none"><img src="../ecrans/05 Remplir.webp" alt=""></div>
+      <p class="legende" style="text-align:left;margin-top:24mm">La liste se remplit dans l'ordre de votre parcours.</p>
+    </div>
+  </div>
+
+  <div class="volet">
+    <div class="bandeau"><img src="../images/liste_chariot.png" alt=""><h2><small>En magasin</small>Dans l'ordre de vos allées</h2></div>
+    <ul class="points">
+      <li><b>Un parcours qui s'apprend tout seul</b> : l'ordre dans lequel vous cochez devient votre parcours.</li>
+      <li><b>Un geste par article</b> : une grande case : un appui le met dans le chariot, deux appuis le signalent manquant en rayon.</li>
+      <li><b>Pause</b> à tout moment : on reprend là où on s'était arrêté.</li>
+    </ul>
+    <div class="bas duo" style="justify-content:center">
+      <div style="width:52mm"><div class="tel"><img src="../ecrans/08 En-magasin.webp" alt=""></div><p class="legende">Les secteurs dans l'ordre du parcours</p></div>
+    </div>
+  </div>
+
+  <div class="volet">
+    <div class="bandeau"><img src="../icones/receipt.png" alt=""><h2><small>Après les courses</small>Rien ne se perd</h2></div>
+    <ul class="points">
+      <li><b>Le bilan à la caisse</b> : les articles manquants et non cochés, et un résumé envoyé au foyer.</li>
+      <li><b>L'historique</b> de vos courses, avec leur montant et le ticket de caisse.</li>
+      <li><b>Sauvegardes</b> automatiques, et une corbeille pour revenir en arrière.</li>
+      <li><b>À votre goût</b> : 17 palettes de couleurs, vos produits et vos marques.</li>
+    </ul>
+    <div class="bas duo" style="justify-content:space-between">
+      <div style="width:38mm"><div class="tel"><img src="../ecrans/08 Terminer.webp" alt=""></div><p class="legende">Le bilan avant de terminer</p></div>
+      <div style="width:38mm"><div class="tel"><img src="../ecrans/09 Historique.webp" alt=""></div><p class="legende">L'historique et ses tickets</p></div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

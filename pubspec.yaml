@@ -1,0 +1,63 @@
+name: liste_de_courses
+description: Liste de courses partagée (Android, iPhone, Windows)
+publish_to: 'none'
+version: 0.7.0+7
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  archive: ^3.6.1
+  excel: ^4.0.6
+  file_selector: ^1.1.0
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  path_provider: ^2.1.4
+  mqtt_client: ^10.13.0
+  pdfx: ^2.11.0
+  syncfusion_flutter_pdf: '>=33.2.13 <33.2.14'
+  url_launcher: ^6.3.1
+  sqlite3: ^2.4.6
+  sqlite3_flutter_libs: ^0.5.24
+  window_manager: ^0.5.2
+  crypto: ^3.0.7
+  http: ^1.2.2
+  image: ^4.3.0
+  cryptography: ^2.9.0
+  dartssh2: ^4.1.0
+  xterm: ^4.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icone_ronde.png
+    - assets/emplettes/
+    - assets/fonds/
+    - assets/donnees_maquette.json
+    - assets/catalogue_type.json
+    - assets/catalogue_demo.txt
+    - assets/correspondances_mails.json
+    - assets/marques_catalogue.json
+    - assets/marques_distributeur.json
+    - assets/natures_off.json
+    - assets/pictos/png/
+    - assets/icones/noto3d/
+    - assets/icones/symboles/
+    - assets/pictos/noto3d/
+    - assets/pictos/fluent3d/
+    - assets/pictos/maison/
+    - assets/recettes/
+  fonts:
+    - family: Atkinson
+      fonts:
+        - asset: assets/polices/AtkinsonHyperlegible-Regular.ttf
+        - asset: assets/polices/AtkinsonHyperlegible-Bold.ttf
+          weight: 700
+        - asset: assets/polices/AtkinsonHyperlegible-Italic.ttf
+          style: italic

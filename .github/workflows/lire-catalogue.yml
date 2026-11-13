@@ -1,0 +1,42 @@
+name: Lire le catalogue commun publié (diagnostic)
+on: workflow_dispatch
+jobs:
+  lire:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Catalogue retenu sur le serveur OVH
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null
+          echo "== sujets retenus sous ldc/ (noms et tailles seulement)"
+          mosquitto_sub -d -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t 'ldc/#' -W 15 -F '%t %l %r' 2>&1 | grep -v '^Client.*PUBLISH\|PINGREQ\|PINGRESP' | sed -E 's/(ldc\/[^/ ]+\/[^/ ]{4})[^/ ]*/\1…/' | sort | uniq -c | sort -rn | head -40 || true
+          for t in ldc/catalogue-commun 'ldc/catalogue-versions/+'; do
+            echo "== $t"
+            mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t "$t" -v -W 10 -F '%t %l' > /tmp/m.txt 2>&1 || true
+            cat /tmp/m.txt
+          done
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 10 > /tmp/c.txt || true
+          python3 - <<'PY'
+          import base64, gzip, json
+          t = open('/tmp/c.txt').read().strip()
+          print('taille', len(t), 'début', t[:12])
+          if t.startswith('sig:'): t = t[t.index(':', 4) + 1:]
+          if t.startswith('gz:'): t = gzip.decompress(base64.b64decode(t[3:])).decode()
+          j = json.loads(t)
+          print({k: j.get(k) for k in ('version', 'numero', 'date')}, 'rayons', len(j.get('rayons', [])))
+          # Liste des rayons et secteurs publiés (catalogue commun, public).
+          print('== LISTE')
+          for r in j.get('rayons', []):
+              print('R|' + r.get('nom', ''))
+              for s in r.get('secteurs', []):
+                  print('S|' + s.get('nom', ''))
+                  for pr in s.get('produits', []):
+                      print('P|' + (pr.get('nom', '') if isinstance(pr, dict) else str(pr)))
+          print('== FIN')
+          print('== IMAGES CHOISIES')
+          for k, v in sorted((j.get('images') or {}).items()):
+              print('I|' + k + ' = ' + str(v))
+          PY

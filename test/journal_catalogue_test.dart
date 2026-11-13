@@ -1,0 +1,182 @@
+import 'dart:typed_data';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:image/image.dart' as img;
+import 'package:liste_de_courses/donnees/images_perso.dart';
+import 'package:liste_de_courses/composants/pictogramme.dart';
+import 'package:liste_de_courses/donnees/catalogue_commun.dart';
+import 'package:liste_de_courses/donnees/journal_catalogue.dart';
+import 'package:liste_de_courses/donnees/univers.dart';
+import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
+
+Map<String, dynamic> cat(Map<String, Map<String, List<String>>> r, {List<Map<String, dynamic>> renommes = const []}) => {
+      'rayons': [
+        for (final e in r.entries)
+          {
+            'nom': e.key,
+            'secteurs': [
+              for (final s in e.value.entries) {'nom': s.key, 'taille': 1, 'produits': [for (final p in s.value) {'nom': p, 'taille': 1}]}
+            ]
+          }
+      ],
+      if (renommes.isNotEmpty) 'renommes': renommes,
+    };
+
+void main() {
+  test('photo de fond selon la saison (09/11/2026)', () {
+    expect(Etat.saisonDu(DateTime(2026, 3, 19)), 'hiver');
+    expect(Etat.saisonDu(DateTime(2026, 3, 20)), 'printemps');
+    expect(Etat.saisonDu(DateTime(2026, 6, 21)), 'ete');
+    expect(Etat.saisonDu(DateTime(2026, 9, 21)), 'ete');
+    expect(Etat.saisonDu(DateTime(2026, 9, 22)), 'automne');
+    expect(Etat.saisonDu(DateTime(2026, 12, 21)), 'hiver');
+    expect(Etat.saisonDu(DateTime(2027, 1, 5)), 'hiver');
+  });
+
+  test('noms des versions du catalogue : complément 3.1, majeure 4.0 (09/11/2026)', () {
+    expect(CatalogueCommun.libelleDe({'numero': 3}), '3');
+    expect(CatalogueCommun.libelleDe({'numero': 4, 'libelle': '3.1'}), '3.1');
+    expect(CatalogueCommun.libelleSuivant('3'), '3.1');
+    expect(CatalogueCommun.libelleSuivant('3.1'), '3.2');
+    expect(CatalogueCommun.libelleSuivant('3.9'), '3.10');
+    expect(CatalogueCommun.libelleSuivant('3.2', majeure: true), '4.0');
+    expect(CatalogueCommun.libelleSuivant('0'), '1.0', reason: 'première version');
+    final e = EtapeCatalogue('x', DateTime(2026), const [], '', numero: 4, libelle: '3.1');
+    expect(EtapeCatalogue.lire(e.versJson()).version, 'v3.1');
+    expect(EtapeCatalogue('y', DateTime(2026), const [], '', numero: 2).version, 'v2');
+  });
+
+  test('gestes lisibles : ajout, renommage, secteur déplacé', () {
+    final a = cat({'Frais': {'Fruits': ['Pommes']}, 'Épicerie': {}});
+    expect(gestesEntre(a, a), isEmpty);
+    expect(gestesEntre(a, cat({'Frais': {'Fruits': ['Pommes', 'Kakis']}, 'Épicerie': {}})), ['Produit ajouté : Kakis (Frais › Fruits)']);
+    expect(
+        gestesEntre(a, cat({'Frais': {'Fruits': ['Pomme']}, 'Épicerie': {}}, renommes: [{'type': 'produit', 'ancien': 'Pommes', 'nouveau': 'Pomme'}])),
+        ['Produit renommé : Pommes → Pomme']);
+    expect(gestesEntre(a, cat({'Frais': {}, 'Épicerie': {'Fruits': ['Pommes']}})), ['Secteur déplacé : Fruits, de Frais vers Épicerie']);
+  });
+
+  test('étapes : valider, généraliser, revenir abandonne la suite', () {
+    final j = JournalCatalogue([], []);
+    j.valider('Point de départ', 'i0', numero: 3);
+    j.noter(['Rayon ajouté : A']);
+    j.valider('Étape 1', 'i1');
+    j.noter(['Rayon ajouté : B']);
+    final relu = JournalCatalogue.lire(j.ecrire());
+    expect(relu.etapes.map((e) => e.nom), ['Point de départ', 'Étape 1']);
+    expect(relu.enCours.single.lignes, ['Rayon ajouté : B']);
+    relu.generalisee(4);
+    expect(relu.etapes.map((e) => e.numero), [3, 4]);
+    expect(relu.revenirA(0), 'i0');
+    expect(relu.etapes, hasLength(1));
+    expect(relu.enCours, isEmpty);
+  });
+
+  test('console : produit déplacé, icônes proposées et état', () {
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes'], 'Légumes': []}}));
+    final fruits = b.catalogue.rayons.single.secteurs.first, legumes = b.catalogue.rayons.single.secteurs.last;
+    expect(b.deplacerProduit(fruits, fruits.produits.single, legumes), isTrue);
+    expect(legumes.produits.single.nom, 'Pommes');
+    expect(propositionsIcone('Chats', ['Croquettes']), isNotEmpty);
+    expect(etatIconeSecteur('Animaux', 'Chats', const {}), EtatIcone.exacte);
+    expect(etatIconeSecteur('Animaux', 'Chats', {cleChoixSecteur('Animaux', 'Chats'): 'reserve--cafe'}), EtatIcone.exacte, reason: 'image maison avant le choix');
+    expect(etatIconeSecteur('Divers', 'Truc', {cleChoixSecteur('Divers', 'Truc'): 'reserve--cafe'}), EtatIcone.choisie);
+  });
+
+  test('console : secteur en rayon, rayon en secteur', () {
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes'], 'Légumes': ['Ail']}, 'Épicerie': {'Pâtes': ['Penne']}}));
+    final frais = b.rayon('Frais')!;
+    final r = b.secteurEnRayon(frais, b.secteur(frais, 'Fruits')!);
+    expect([for (final x in b.catalogue.rayons) x.nom], ['Frais', 'Fruits', 'Épicerie']);
+    expect(r.secteurs.single.nom, 'Fruits');
+    expect(r.secteurs.single.produits.single.nom, 'Pommes');
+    final s = b.rayonEnSecteur(b.rayon('Frais')!, b.rayon('Épicerie')!);
+    expect(b.rayon('Frais'), isNull);
+    expect(s.nom, 'Frais');
+    expect([for (final p in s.produits) p.nom], ['Ail']);
+    expect([for (final x in b.rayon('Épicerie')!.secteurs) x.nom], ['Pâtes', 'Frais']);
+  });
+
+  test('images ajoutées : mise à la taille, bibliothèque, historique', () {
+    // Un carré rouge sur un grand fond blanc : fond transparent, carré centré et agrandi dans 96 × 96.
+    final src = img.Image(width: 300, height: 200);
+    img.fill(src, color: img.ColorRgb8(255, 255, 255));
+    img.fillRect(src, x1: 100, y1: 50, x2: 160, y2: 110, color: img.ColorRgb8(220, 30, 30));
+    final png = preparerImagePerso(Uint8List.fromList(img.encodePng(src)))!;
+    final r = img.decodePng(png)!;
+    expect([r.width, r.height], [96, 96]);
+    expect(r.getPixel(2, 2).a, 0);
+    expect(r.getPixel(48, 48).r, greaterThan(200));
+    expect(preparerImagePerso(Uint8List.fromList([1, 2, 3])), isNull);
+
+    final b = Brouillon.lire(cat({'Frais': {'Fruits': ['Pommes']}}));
+    final avant = b.versJson();
+    final cle = b.ajouterImagePerso('Pot de miel', png);
+    expect(cle, 'perso--pot-de-miel');
+    b.choisirImage('frais', cle);
+    expect(gestesEntre(avant, b.versJson()), contains('Image ajoutée à la bibliothèque : Pot de miel'));
+    expect(b.versJsonSansImages().containsKey('imagesPerso'), isFalse);
+    expect(Brouillon.lire(b.versJson()).imagesPerso[cle]!.texte, 'Pot de miel');
+    final nouvelle = b.renommerImagePerso(cle, 'Miel');
+    expect(b.images['frais'], nouvelle);
+    b.retirerImagePerso(nouvelle);
+    expect(b.images.containsKey('frais'), isFalse);
+  });
+
+  test('secteurs au comptoir : icône composée (libre-service + sonnette)', () {
+    expect(cleSecteur('Fromagerie', 'Fromages au comptoir'), 'fromagerie--fromages-au-comptoir');
+    expect(cleSecteur('Boucherie', 'Viandes et volailles au comptoir'), 'boucherie--viandes-et-volailles-au-comptoir');
+    expect(cleSecteur('Volaille', 'Rôtisserie'), 'volaille--rotisserie');
+    expect(etatIconeSecteur('Traiteur', 'Traiteur au comptoir', const {}), EtatIcone.exacte);
+  });
+
+  test('icônes maison des rayons', () {
+    expect(cleRayon('Saisonnier'), 'saisonnier');
+    for (final u in universDesRayons.keys) {
+      expect(cleUnivers(u), isNotNull, reason: u);
+    }
+    expect(cleUnivers(autresRayons), isNull);
+    expect(etatIconeRayon('Saisonnier', const {}), EtatIcone.exacte);
+    expect(cleRayon('Entretien / Droguerie'), 'entretien-droguerie');
+    // Secteurs (130 images d'Aristide, 08/11/2026).
+    expect(cleSecteur('Fruits et légumes', 'Fruits'), 'fruits-et-legumes--fruits');
+    expect(cleSecteur('Poissonnerie', 'Poissonnerie au comptoir'), 'poissonnerie--poissonnerie-au-comptoir');
+    expect(cleSecteur('Entretien et  Droguerie', 'Lessives et soin du linge'), 'entretien-et-droguerie--lessives-et-soin-du-linge');
+    expect(cleSecteur('Entretien / Droguerie', 'Papier'), 'entretien-droguerie--papier');
+    expect(etatIconeSecteur('Saisonnier', 'NOËL', const {}), EtatIcone.exacte);
+    // Les images maison passent avant les choix faits à la main (09/11/2026).
+    expect(iconeSecteur('Saisonnier', 'Halloween', const {'saisonnier--halloween': 'bibliotheque--citrouille'}), 'saisonnier--halloween');
+    expect(iconeRayon('Saisonnier', const {'saisonnier': 'perso--saisons'}), 'saisonnier');
+  });
+
+  test('domaines dans le catalogue commun', () {
+    final b = Brouillon.lire(cat({'Boucherie': {'Viande': ['Steak']}, 'Glaces': {'Bâtonnets': []}, 'Neuf': {'Truc': []}}));
+    // Sans « univers » dans le catalogue : ceux d'origine.
+    expect(b.universDe('Boucherie'), 'Produits frais');
+    expect(b.universDe('Neuf'), autresRayons);
+    final avant = b.versJson();
+    b.changerUnivers('Neuf', 'Maison');
+    expect(b.universDe('Neuf'), 'Maison');
+    expect(gestesEntre(avant, b.versJson()), contains('Domaine ajouté : Maison'));
+    final a2 = b.versJson();
+    b.changerUnivers('Glaces', 'Produits frais');
+    expect(gestesEntre(a2, b.versJson()), contains('Rayon Glaces : domaine Surgelés → Produits frais'));
+    b.renommerUnivers('Maison', 'Bazar');
+    expect(b.universDe('Neuf'), 'Bazar');
+    b.renommerRayon(b.rayon('Neuf')!, 'Nouveau');
+    expect(b.universDe('Nouveau'), 'Bazar');
+    b.ordonnerUnivers(['Bazar']);
+    expect(b.univers.keys.first, 'Bazar');
+    b.changerUnivers('Nouveau', autresRayons);
+    expect(b.univers.containsKey('Bazar'), isFalse, reason: 'domaine vide retiré');
+    // Aller-retour JSON et application côté foyer.
+    final relu = Brouillon.lire(b.versJson());
+    expect(relu.universDe('Glaces'), 'Produits frais');
+    expect(relu.univers.keys.toList(), b.univers.keys.toList());
+    remplacerUnivers(lireUnivers(b.versJson()['univers']));
+    expect(universDuRayon('Glaces'), 'Produits frais');
+    remplacerUnivers(null);
+    expect(universDuRayon('Glaces'), 'Surgelés');
+  });
+}

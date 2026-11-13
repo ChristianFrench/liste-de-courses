@@ -1,0 +1,17 @@
+name: Open Food Facts
+
+# Interroge Open Food Facts pour enrichir le catalogue (outils/off/sonder.py) ; le résultat sort en notes.
+on:
+  workflow_dispatch:
+    inputs:
+      categories:
+        description: Catégories Open Food Facts (en anglais, séparées par des virgules)
+        required: true
+
+jobs:
+  sonder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Interroger Open Food Facts
+        run: python3 outils/off/sonder.py "${{ inputs.categories }}"

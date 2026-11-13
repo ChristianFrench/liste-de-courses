@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche produit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:2px;padding:0 4px;border-bottom:1px solid #CCCCCC;flex:none}
+.ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex:none}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.ph{background:#E4E4E4;border:1.5px dashed #888888;display:flex;align-items:center;justify-content:center;font-size:12px;color:#555555}
+.lbl{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#555555;margin:14px 0 6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:flex;align-items:center;min-height:40px;padding:0 14px;border:2px solid #222222;border-radius:20px;font-size:14px;background:#FFFFFF;font-family:inherit;color:#222222}
+.add{border-style:dashed}
+.row{display:flex;align-items:center;gap:8px;min-height:44px;border-bottom:1px solid #DDDDDD;font-size:14px}
+.btn{display:flex;align-items:center;justify-content:center;min-height:48px;padding:0 12px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:15px}
+.pri{background:#222222;color:#FFFFFF}
+.pri:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <a class="ib" href="Magasin-Produits.dc.html" aria-label="Retour aux produits"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <div style="flex:1;min-width:0"><div style="font-size:11px;color:#555555">Magasin › Produits</div><h1 style="margin:0;font-size:18px">Lait demi-écrémé</h1></div>
+    <a class="ib" href="#" aria-label="Modifier"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></a>
+  </header>
+  <main style="flex:1;overflow-y:auto;padding:12px">
+    <div class="ph" style="height:130px;border-radius:10px">Image du produit · ajouter une photo</div>
+    <div class="lbl">Où le trouver</div>
+    <div class="row"><span style="flex:1;font-weight:700">[Magasin 1]</span><span>Frais › Crèmerie</span></div>
+    <div class="row"><span style="flex:1;font-weight:700">[Magasin 2]</span><a href="Magasin-Secteurs.dc.html" style="font-style:italic;min-height:44px;display:flex;align-items:center">Non placé · indiquer le secteur</a></div>
+    <div class="lbl">Marques</div>
+    <div class="chips">
+      <button type="button" class="chip">[Marque A]</button>
+      <button type="button" class="chip">[Marque B]</button>
+      <button type="button" class="chip add">+ Marque</button>
+    </div>
+    <div class="lbl">Packagings</div>
+    <div class="chips">
+      <button type="button" class="chip">Bouteille 1 L</button>
+      <button type="button" class="chip">Pack de 6</button>
+      <button type="button" class="chip add">+ Packaging</button>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:8px;font-size:12px;color:#555555;border:1.5px dashed #888888;border-radius:8px;padding:8px 10px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      Déjà utilisé dans une liste : ni suppression ni archivage
+    </div>
+  </main>
+  <div style="padding:8px 12px;border-top:1px solid #CCCCCC">
+    <a class="btn pri" href="Construire.dc.html">Ajouter à la liste en préparation</a>
+  </div>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a class="act" href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

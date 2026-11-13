@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Listes · Préparer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid #CCCCCC;flex:none}
+.sub{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:8px 12px;border:2px solid #222222;border-radius:10px;overflow:hidden;flex:none}
+.sub a{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;text-decoration:none;font-size:14px;border-left:2px solid #222222}
+.sub a:first-child{border-left:0}
+.sub .on{background:#222222;color:#FFFFFF;font-weight:700}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 16px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:16px}
+.pri{background:#222222;color:#FFFFFF}
+.pri:hover{color:#FFFFFF}
+.sec{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#555555;margin:16px 0 8px}
+.card{display:flex;align-items:center;gap:12px;border:2px solid #222222;border-radius:10px;padding:12px;text-decoration:none;margin-bottom:8px;min-height:72px}
+.sub2{font-size:13px;color:#555555}
+.tag{border:1.5px dashed #222222;border-radius:4px;padding:2px 6px;font-size:11px;font-weight:700;white-space:nowrap}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <h1 style="margin:0;font-size:20px;flex:1">Listes</h1>
+    <span style="display:flex;align-items:center;gap:6px;font-size:12px"><span style="width:10px;height:10px;border-radius:50%;background:#222222"></span>Synchronisé</span>
+  </header>
+  <nav class="sub" aria-label="Listes">
+    <a class="on" href="Main.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Préparer</a>
+    <a href="Listes-Parcours.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h8a3 3 0 0 0 0-6H8a3 3 0 0 1 0-6h8"/></svg>Parcours</a>
+    <a href="Listes-Courses.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>Courses</a>
+  </nav>
+  <main style="flex:1;overflow-y:auto;padding:0 12px 12px">
+    <a class="btn pri" href="Preliste.dc.html" style="margin-top:8px">+ Nouvelle liste</a>
+
+    <div class="sec">En préparation</div>
+    <a class="card" href="Construire.dc.html">
+      <div style="flex:1"><div style="font-weight:700;font-size:16px">[Magasin 1]</div><div class="sub2">9 articles · modifiée par [Membre 2] · [heure]</div></div>
+      <span class="tag">Interrompue</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </a>
+    <a class="card" href="Construire.dc.html">
+      <div style="flex:1"><div style="font-weight:700;font-size:16px">[Magasin 2]</div><div class="sub2">4 articles · modifiée par [Membre 1] · [date]</div></div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </a>
+
+    <div class="sec">Prêtes pour les courses</div>
+    <a class="card" href="Listes-Courses.dc.html">
+      <div style="flex:1"><div style="font-weight:700;font-size:16px">[Magasin 1]</div><div class="sub2">12 articles · prête depuis [date]</div></div>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+    </a>
+    <div style="font-size:12px;color:#555555;margin-top:12px">Une préparation interrompue est conservée telle quelle : touchez-la pour reprendre.</div>
+  </main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a class="act" href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Découvrir · Emplettes</title>
+<meta name="description" content="Les écrans d'Emplettes, un par un.">
+<link rel="icon" href="images/complet.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<!-- Page produite par outils/site/generer.py : modifier le script, pas ce fichier. -->
+<header class="menu">
+  <div class="large">
+    <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="navigation"><a href="index.html">Accueil</a><a href="decouvrir.html" aria-current="page">Découvrir</a><a href="telecharger.html">Télécharger</a><a href="aide.html">Aide</a><a href="essayer.html" class="essayer">Essayer</a></nav>
+  </div>
+</header>
+<div class="titre-page"><div class="large"><img src="icones/mobile-phone.png" alt=""><div><h1>Découvrir</h1><p>Les écrans d'Emplettes, un par un, à votre rythme.</p></div></div></div>
+<main>
+  <section>
+    <div class="large">
+      <div class="visite">
+        <div class="telephone"><div class="ecran" id="diapos"></div></div>
+        <div class="explication">
+          <div class="choix-visite" role="tablist">
+            <button class="bouton" id="visiteCourte" role="tab">L'essentiel · 10 écrans</button>
+            <button class="bouton" id="visiteDetail" role="tab">En détail · 20 écrans</button>
+          </div>
+          <div class="compteur" id="compteur"></div>
+          <h2 id="titreEcran"></h2>
+          <p id="texteEcran"></p>
+          <ul id="pointsEcran"></ul>
+          <div class="navigation-visite">
+            <button class="bouton" id="precedent">‹ Précédent</button>
+            <button class="bouton plein" id="suivant">Suivant ›</button>
+            <label class="auto"><input type="checkbox" id="auto"> Défilement automatique</label>
+          </div>
+          <div class="points" id="points"></div>
+          <div class="boutons" style="margin-top:22px"><a class="bouton" href="essayer.html">Essayer la démonstration</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<script>window.VISITE = [{"f": "01 Accueil", "t": "L'accueil", "x": "Tout ce qui est en cours, d'un coup d'œil : les listes en préparation, celles à faire et les courses commencées.", "p": ["« Comment ça marche » rappelle les étapes.", "Touchez une liste pour ce que vous pouvez en faire."]}, {"f": "02 Preparer", "t": "Préparer", "x": "Les listes du foyer en préparation, et celles qui sont prêtes pour les courses.", "p": ["« Nouvelle liste » en bas de l'écran.", "Glisser une liste à gauche la supprime, à droite la remet en préparation."]}, {"f": "03 Nouvelle-liste", "t": "Une nouvelle liste", "x": "Le magasin, le nom proposé d'office, puis le point de départ.", "p": ["Liste par secteur ou liste simple.", "Depuis une liste type, une course passée ou un texte collé (mail, message)."]}, {"f": "05 Remplir", "t": "Remplir la liste", "x": "On cherche l'article en tapant trois lettres : il se range sous son secteur, dans l'ordre du magasin.", "p": ["− et + règlent la quantité.", "Promotion, packaging et consigne s'affichent sur la ligne.", "« Liste prête » la valide."]}, {"f": "07 Courses", "t": "Les courses", "x": "Les listes à faire, les courses en cours et les courses terminées, avec leur ticket.", "p": ["Touchez une liste puis « Faire les courses ».", "On choisit qui fait les courses et avec quel parcours."]}, {"f": "08 En-magasin", "t": "En magasin", "x": "La liste suit l'ordre des allées. Un appui sur la grande case coche l'article quand il est dans le chariot.", "p": ["Deux appuis sur la case : manquant en rayon.", "« Pause » sans rien perdre, « Terminer » pour le bilan.", "L'ordre des coches apprend le parcours."]}, {"f": "09 Historique", "t": "L'historique", "x": "Les courses passées, avec leur montant et leur ticket de caisse.", "p": ["Une course peut redevenir une liste type.", "Les plus anciennes passent aux archives."]}, {"f": "11 Magasins", "t": "Les magasins", "x": "Les magasins du foyer, et les parcours appris dans chacun.", "p": ["Tous partagent le même catalogue."]}, {"f": "12 Catalogue", "t": "Le catalogue", "x": "Plus de 2 000 produits rangés par rayons et secteurs, le même dans tous les magasins.", "p": ["On peut ajouter ses produits et ses marques.", "Un petit + signale ce que le foyer a ajouté.", "Il s'améliore pour tous les foyers : sa version s'affiche dans Gérer."]}, {"f": "10 Gerer", "t": "Gérer", "x": "Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, le catalogue, l'apparence, les sauvegardes.", "p": ["Le foyer se partage avec un simple code."]}];
+window.VISITE_DETAIL = [{"f": "01 Accueil", "t": "L'accueil", "x": "Tout ce qui est en cours, d'un coup d'œil : les listes en préparation, celles à faire et les courses commencées.", "p": ["« Comment ça marche » rappelle les étapes.", "Touchez une liste pour ce que vous pouvez en faire.", "Le nuage en haut à droite indique l'état du partage avec le foyer."]}, {"f": "02 Preparer", "t": "L'onglet Préparer", "x": "Les listes du foyer en préparation, puis celles qui sont prêtes pour les courses.", "p": ["« Nouvelle liste » en bas de l'écran.", "Glisser une liste à gauche la supprime (« Annuler » la rétablit), à droite la remet en préparation.", "Un appui long ouvre ses actions."]}, {"f": "03 Nouvelle-liste", "t": "Une nouvelle liste", "x": "Le magasin, la date et le nom proposé d'office, puis le type de liste.", "p": ["Par secteur : chaque article se range sous son secteur.", "Simple : les articles à la suite, sans rayons.", "Depuis une liste type, une course passée ou un texte collé."]}, {"f": "03 Liste-type", "t": "Les listes types", "x": "Vos listes habituelles, prêtes à reprendre : petit-déjeuner, ménage du mois…", "p": ["Une liste type se crée depuis une liste ou une course passée.", "On repart d'elle et on la complète."]}, {"f": "05 Remplir", "t": "Remplir la liste", "x": "La liste se présente comme en magasin : les secteurs dans l'ordre de votre parcours.", "p": ["− et + règlent la quantité.", "Promotion, mesure, lot et consigne s'affichent sur la ligne."]}, {"f": "05 Recherche", "t": "Trois lettres suffisent", "x": "En tapant « cam », le catalogue propose Camembert, Camembert Président, Camomille…", "p": ["Chaque proposition indique son rayon et son secteur.", "Un produit absent du catalogue se crée sur place."]}, {"f": "06 Article", "t": "Le détail d'un article", "x": "Un appui sur l'article ouvre son volet : consigne pour celui qui fait les courses, marque, promotion visée, packaging.", "p": ["« Pas trop mûres » s'affichera en magasin.", "« Nom, rayon, secteur » corrige la fiche du produit."]}, {"f": "06 Marque", "t": "Les marques", "x": "Les marques connues du secteur sont proposées ; « Autre marque… » en ajoute une.", "p": ["Choisir une marque crée le produit précis (Camembert Président).", "Le catalogue des marques se complète au fil des listes."]}, {"f": "06 Liste-prete", "t": "Liste prête", "x": "La liste est validée : un commentaire pour celui qui part, et le mail au foyer si besoin.", "p": ["La liste passe dans l'onglet Courses.", "Elle peut revenir en préparation à tout moment."]}, {"f": "07 Partir", "t": "Partir faire les courses", "x": "On indique qui fait les courses et dans quel magasin, avec quel parcours.", "p": ["« Enregistrer le parcours » l'apprend dès la première fois.", "Chacun a son parcours, dans chaque magasin."]}, {"f": "08 En-magasin", "t": "En magasin", "x": "La liste suit l'ordre des allées. Un appui sur la grande case coche l'article quand il est dans le chariot ; son secteur remonte en haut.", "p": ["Deux appuis sur la case : manquant en rayon ; un appui long : le détail.", "L'ordre des coches apprend le parcours : les rayons nouveaux s'insèrent à leur place.", "« Pause » sans rien perdre."]}, {"f": "08 Terminer", "t": "Le bilan", "x": "Avant de terminer : les articles manquants et non cochés, le montant, le ticket de caisse.", "p": ["Les articles non achetés peuvent partir dans une prochaine liste.", "Un résumé peut être envoyé au foyer."]}, {"f": "09 Course-passee", "t": "Les courses passées", "x": "Chaque course garde ses articles, son montant et son ticket de caisse.", "p": ["« Voir le ticket », « Consulter ».", "Une course passée peut redevenir une liste ou une liste type."]}, {"f": "17 Collaboration", "t": "Le foyer", "x": "Plusieurs membres, plusieurs appareils, les mêmes listes. On rejoint le foyer avec son code de partage, sans compte ni mot de passe.", "p": ["Les données sont chiffrées avec le code du foyer.", "Les modifications faites sans réseau se partagent au retour.", "Un message au foyer arrive en notification, même application fermée.", "Les invitations et les résumés partent par mail."]}, {"f": "10 Gerer", "t": "L'onglet Gérer", "x": "Ce qui se règle une fois pour toutes : le foyer et ses membres, les magasins, les catalogues, l'apparence, les données.", "p": ["Les réglages sont rangés par rubriques, comme les listes."]}, {"f": "11 Magasins", "t": "Les magasins", "x": "Les magasins du foyer, partagés par tous, avec les parcours appris dans chacun.", "p": ["Les grandes enseignes sont proposées d'office.", "Le parcours d'un magasin se recommence ou se corrige."]}, {"f": "12 Produits", "t": "Le catalogue des produits", "x": "Plus de 2 000 produits rangés en rayons et secteurs, le même catalogue dans tous les magasins.", "p": ["On ajoute ses produits, on les renomme, on les déplace.", "Un petit signe distingue ce que le foyer a ajouté ou modifié.", "Chaque nouvelle version du catalogue s'ajoute au foyer, sans rien retirer de ce qui lui sert."]}, {"f": "13 Marques", "t": "Le catalogue des marques", "x": "Les marques rangées par secteur : celles proposées dans le volet de l'article.", "p": ["On y ajoute ou retire des marques.", "Le nombre de marques s'affiche pour chaque secteur."]}, {"f": "15 Palettes", "t": "L'apparence", "x": "17 palettes de couleurs pour l'application, une autre pour les promotions et mesures, et un aperçu immédiat.", "p": ["Les icônes dans les titres des listes se retirent si on préfère.", "Grands caractères et police conçue pour la lisibilité."]}, {"f": "16 Donnees", "t": "Vos données", "x": "Tout reste sur l'appareil, avec des sauvegardes automatiques et une corbeille.", "p": ["« Sauvegarder maintenant » donne un fichier à garder ailleurs.", "Les anciennes courses passent aux archives."]}];</script>
+<footer>
+  <div class="large">
+    <div>
+      <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+      <p style="margin:0;font-size:14.5px">La liste de courses du foyer, préparée à plusieurs.</p>
+    </div>
+    <div>
+      <h4>L'application</h4>
+      <ul>
+        <li><a href="decouvrir.html">Découvrir</a></li>
+        <li><a href="essayer.html">Essayer</a></li>
+        <li><a href="documents/mode-emploi.html">Mode d'emploi</a></li>
+        <li><a href="documents/depliant.html">Dépliant</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Télécharger</h4>
+      <ul>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk">Android (APK)</a></li>
+        <li><a href="https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Emplettes-Installation.exe">Windows</a></li>
+        <li><a href="telecharger.html">Installer pas à pas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Aide</h4>
+      <ul>
+        <li><a href="aide.html#questions">Questions fréquentes</a></li>
+        <li><a href="aide.html#video">Vidéo</a></li>
+        <li><a href="aide.html#donnees">Vos données</a></li>
+        <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bas"><span id="basVersion">Emplettes</span> · Police Atkinson Hyperlegible et icônes Noto 3D, licence SIL OFL</div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

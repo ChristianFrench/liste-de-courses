@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Liste complète</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:48px;display:flex;align-items:center;gap:2px;padding:0 4px;border-bottom:2px solid #222222;flex:none}
+.ib{width:44px;height:44px;display:flex;align-items:center;justify-content:center;text-decoration:none;flex:none}
+.btn{display:flex;align-items:center;justify-content:center;min-height:52px;padding:0 12px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-size:16px}
+.pri{background:#222222;color:#FFFFFF}
+.pri:hover{color:#FFFFFF}
+.gh{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 8px;background:#F2F2F2;border-bottom:1px solid #DDDDDD;text-transform:uppercase;letter-spacing:.04em}
+.n{width:18px;height:18px;border-radius:50%;border:1.5px solid #222222;display:inline-flex;align-items:center;justify-content:center;font-size:10px;flex:none}
+.ln{display:flex;align-items:center;gap:8px;min-height:32px;padding:0 8px 0 32px;border-bottom:1px solid #EEEEEE;font-size:15px}
+.q{margin-left:auto;font-weight:700;flex:none}
+.pi{min-width:24px;height:16px;padding:0 3px;border:1.5px solid #222222;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex:none}
+.s{font-size:12px;color:#555555}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd">
+    <a class="ib" href="Listes-Courses.dc.html" aria-label="Retour"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></a>
+    <h1 style="margin:0;font-size:17px;flex:1">[Magasin 1] · 9 articles</h1>
+  </header>
+  <div style="padding:4px 8px;font-size:12px;color:#555555;border-bottom:1px solid #CCCCCC">Parcours habituel · [Membre 1] · 5 secteurs</div>
+  <main style="flex:1;overflow-y:auto">
+    <div class="gh"><span class="n">1</span>Fruits et légumes</div>
+    <div class="ln">Pommes <span class="s">sachet 1,5 kg</span><span class="q">1</span></div>
+    <div class="gh"><span class="n">2</span>Conserves et pâtes</div>
+    <div class="ln">Pâtes <span class="s">500 g</span><span class="pi">2=€</span><span class="q">3</span></div>
+    <div class="ln">Café moulu <span class="s">250 g</span><span class="q">1</span></div>
+    <div class="gh"><span class="n">3</span>Crèmerie</div>
+    <div class="ln">Lait demi-écrémé <span class="s">pack de 6</span><span class="pi">LOT</span><span class="q">3</span></div>
+    <div class="ln">Yaourts nature <span class="s">pack de 12</span><span class="q">1</span></div>
+    <div class="ln">Fromage râpé <span class="s">200 g</span><span class="q">1</span></div>
+    <div class="gh"><span class="n">4</span>Charcuterie</div>
+    <div class="ln">Jambon <span class="s">4 tranches</span><span class="q">1</span></div>
+    <div class="gh"><span class="n">5</span>Papier et entretien</div>
+    <div class="ln">Papier toilette <span class="s">paquet de 12</span><span class="q">1</span></div>
+    <div class="gh" style="border-top:2px dashed #222222"><span class="n" style="border-style:dashed">?</span>Non placé</div>
+    <div class="ln">Bougies chauffe-plat<span class="q">1</span></div>
+  </main>
+  <div style="padding:8px;border-top:2px solid #222222">
+    <a class="btn pri" href="Courses-Secteur.dc.html">Commencer · secteur 1</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+Intermarché ; Petit-déjeuner / Biscuits ; Chabrior
+Intermarché ; Jus de fruits ; Paquito
+Intermarché ; Produits laitiers ; Pâturages
+Intermarché ; Charcuterie ; Monique Ranou
+Intermarché ; Traiteur ; Monique Ranou
+Intermarché ; Bébé ; Pommette
+Intermarché ; Hygiène / Santé ; Apta
+Intermarché ; Hygiène / Entretien ; Labell
+Intermarché ; Animaux ; Canaillou
+Intermarché ; Conserves de légumes ; Saint Éloi
+Intermarché ; Café ; Planteur des Tropiques
+Intermarché ; Vins ; Expert Club
+Intermarché ; Produits du monde ; Itinéraire des Saveurs
+Intermarché ; Épicerie salée ; Bouton d'Or
+Intermarché ; Premier prix ; Top Budget
+
+Carrefour ; Bio ; Carrefour Bio
+Carrefour ; Animaux ; Companino
+Carrefour ; Produits régionaux ; Reflets de France
+Carrefour ; Produits premium ; Carrefour Extra
+Carrefour ; Produits premium ; Carrefour Sensation
+Carrefour ; Produits végétaux ; Végétal
+Carrefour ; Premier prix ; Carrefour Essential
+
+Leclerc ; Bio ; Bio Village
+Leclerc ; Bébé ; Mots d'Enfants
+Leclerc ; Animaux ; Tous Mes Amis
+Leclerc ; Entretien ; Clair
+Leclerc ; Hygiène / Beauté ; Manava
+Leclerc ; Produits végétaux ; Végé
+Leclerc ; Produits laitiers ; Délisse
+Leclerc ; Produits du monde ; Tables du Monde
+Leclerc ; Café ; Plantation
+Leclerc ; Premier prix ; Eco+
+Leclerc ; Produits régionaux ; Nos Régions ont du Talent
+
+Système U ; Bio ; U Bio
+Système U ; Produits festifs ; U Saveurs
+Système U ; Bébé ; U Tout Petits
+
+Auchan ; Bio ; Mieux Vivre Bio
+Auchan ; Premier prix ; Pouce
+
+Casino ; Bio ; Casino Bio
+Casino ; Produits premium ; Casino Délices
+
+Monoprix ; Bio ; Monoprix Bio
+Monoprix ; Produits premium ; Monoprix Gourmet

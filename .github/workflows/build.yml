@@ -1,0 +1,390 @@
+name: Compilation Android, Windows, web
+
+on:
+  push:
+  workflow_dispatch:
+
+env:
+  # Identifiant du serveur MQTT : secrets saisis par le maître d'ouvrage sur GitHub, jamais dans le dépôt.
+  MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR }}
+  MQTT_MOT_DE_PASSE: ${{ secrets.MQTT_MOT_DE_PASSE }}
+  # Code qui ouvre l'éditeur du catalogue commun sur l'appareil du maître d'ouvrage.
+  CODE_EDITEUR: ${{ secrets.CODE_EDITEUR }}
+  # Envoi direct des mails par EmailJS (compte du maître d'ouvrage) ; absents, l'application ouvre la messagerie.
+  EMAILJS_SERVICE: ${{ secrets.EMAILJS_SERVICE }}
+  EMAILJS_MODELE: ${{ secrets.EMAILJS_MODELE }}
+  EMAILJS_CLE: ${{ secrets.EMAILJS_CLE }}
+  # Serveur OVH d'Emplettes (06/11/2026) : partage, messages (ntfy), relais de mails, site web.
+  MQTT_HOTE_VPS: ${{ secrets.MQTT_HOTE_VPS }}
+  MQTT_UTILISATEUR_VPS: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+  MQTT_MOT_DE_PASSE_VPS: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+  RELAIS_CLE: ${{ secrets.RELAIS_CLE }}
+  VPS_HOTE: ${{ secrets.VPS_HOTE }}
+  # Notifications Android par Firebase : contenu du fichier google-services.json du projet Firebase.
+  GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+  CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,windows .
+
+jobs:
+  verification:
+    name: verification (analyse et tests de recette)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Analyser le code
+        run: |
+          sudo apt-get install -y -qq libsqlite3-dev > /dev/null   # SQLite pour les tests de la base locale
+          flutter pub get
+          flutter --version
+          set +e
+          flutter analyze --no-fatal-infos --no-fatal-warnings > analyse.log 2>&1
+          code=$?
+          python3 outils/annoter.py analyse.log "Analyse du code" analyse
+          exit $code
+      - name: Tests de recette de la maquette
+        if: always()
+        run: |
+          set +e
+          flutter test --reporter expanded > tests.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py tests.log "Tests de recette"; else tail -n 30 tests.log; fi
+          exit $code
+      - name: Deux appareils sur le vrai serveur MQTT (broker.hivemq.com)
+        if: always()
+        continue-on-error: true
+        run: |
+          flutter test test/synchro_serveur_reel.dart --reporter expanded > reel.log 2>&1
+          grep -o '::\(notice\|warning\) title=.*' reel.log || true
+          grep -q 'All tests passed' reel.log || { echo "::warning title=Synchronisation, serveur réel::échec"; tail -n 30 reel.log; exit 1; }
+      - name: Deux appareils sur le serveur OVH d'Emplettes (partage, messages, relais de mails)
+        if: always() && env.MQTT_HOTE_VPS != ''
+        continue-on-error: true
+        env:
+          MQTT_HOTE: ${{ secrets.MQTT_HOTE_VPS }}
+          MQTT_PORT: '8883'
+          MQTT_TLS: '1'
+          MQTT_UTILISATEUR: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          MQTT_MDP: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          curl -fsS "https://ntfy.$VPS_HOTE/v1/health" && echo " ntfy bon" || echo "::warning title=Serveur OVH::ntfy injoignable"
+          curl -fsS "https://$VPS_HOTE/api/mail/etat" && echo " relais bon" || echo "::warning title=Serveur OVH::relais de mails injoignable"
+          flutter test test/synchro_serveur_reel.dart --reporter expanded > vps.log 2>&1
+          grep -o '::\(notice\|warning\) title=.*' vps.log || true
+          grep -q 'All tests passed' vps.log || { echo "::warning title=Synchronisation, serveur OVH::échec"; tail -n 30 vps.log; exit 1; }
+      - name: Captures des écrans (branche « captures »)
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')
+        env:
+          CAPTURES: '1'
+        run: |
+          set +e
+          flutter test --update-goldens test/captures_test.dart > captures.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py captures.log "Captures des écrans"; fi
+          ls test/captures || exit 1
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git checkout -q --orphan captures-temp
+          git rm -rq --cached .
+          git add -f test/captures/*.png test/captures/*.txt 2>/dev/null || git add -f test/captures/*.png
+          git commit -qm "Captures des écrans pour ${GITHUB_SHA::7}"
+          git push -qf origin HEAD:refs/heads/captures
+          exit $code
+      - name: Conserver les captures pour la publication
+        if: always() && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')
+        uses: actions/upload-artifact@v4
+        with:
+          name: Captures
+          path: test/captures/
+          if-no-files-found: ignore
+
+  android:
+    # Mode rapide (« [rapide] » dans le message de commit) : Windows seulement ;
+    # mode web (« [web] ») : la version web seulement, la page « derniere-version » garde l'APK et l'exe précédents
+    if: "!contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[web]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        run: |
+          $CREER
+          python3 outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons
+      - name: Compiler l'APK
+        run: |
+          set +e
+          python3 outils/definitions.py
+          flutter build apk --release --dart-define-from-file=definitions.json > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
+          exit $code
+      - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
+      - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
+        run: |
+          python3 outils/definitions.py
+          flutter build apk --release --dart-define-from-file=definitions.json --target-platform android-x64
+          mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
+      # 13/11/2026 (Aristide) : la démonstration en APK, pour essayer sans toucher à la version opérationnelle.
+      # Autre identifiant d'application (elle s'installe à côté), nom « Emplettes démo », foyer d'exemple, sans
+      # aucun secret ni notification ; le dernier catalogue commun publié est embarqué.
+      - name: APK de démonstration (s'installe à côté de l'application)
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          set +e
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null || true
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 15 > assets/catalogue_demo.txt || true
+          echo "catalogue embarqué : $(wc -c < assets/catalogue_demo.txt) octets"
+          python3 outils/definitions.py
+          jq '{VERSION, COMMIT}' definitions.json > definitions-demo.json
+          for f in android/app/build.gradle.kts android/app/build.gradle; do
+            [ -f "$f" ] && sed -i 's/applicationId = "fr.listecourses.liste_de_courses"/applicationId = "fr.listecourses.liste_de_courses.demo"/; s/applicationId "fr.listecourses.liste_de_courses"/applicationId "fr.listecourses.liste_de_courses.demo"/' "$f"
+          done
+          grep -h applicationId android/app/build.gradle* || true
+          sed -i 's/android:label="Emplettes"/android:label="Emplettes démo"/' android/app/src/main/AndroidManifest.xml
+          rm -f android/app/src/main/res/values/firebase.xml
+          flutter build apk --release --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true > compilation-demo.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation APK démonstration"; else tail -n 5 compilation-demo.log; fi
+          [ $code -eq 0 ] && mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (demonstration).apk"
+          exit $code
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Liste de courses Android
+          path: build/Liste de courses*.apk
+
+  windows:
+    if: "!contains(github.event.head_commit.message, '[web]') && !contains(github.event.head_commit.message, '[apk]')"
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        shell: bash
+        run: |
+          $CREER
+          python outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons
+      - name: Compiler l'exécutable Windows
+        shell: bash
+        run: |
+          set +e
+          python outils/definitions.py
+          flutter build windows --release --dart-define-from-file=definitions.json > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python outils/annoter.py compilation.log "Compilation Windows"; else tail -n 20 compilation.log; fi
+          exit $code
+      - name: Joindre les bibliothèques Visual C++
+        shell: pwsh
+        run: |
+          $dest = "build/windows/x64/runner/Release"
+          foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") {
+            Copy-Item "C:\Windows\System32\$f" $dest
+          }
+      - name: Programme d'installation et de mise à jour (Inno Setup)
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          $version = ((Select-String -Path pubspec.yaml -Pattern '^version:\s*([^+\s]+)').Matches[0].Groups[1].Value)
+          $commit = "${{ github.sha }}".Substring(0, 7)
+          & $iscc /Q "/DVersion=$version" "/DCommit=$commit" "/DSource=$PWD\build\windows\x64\runner\Release" "/DIcone=$PWD\windows\runner\resources\app_icon.ico" "/DSortie=$PWD\build\installation" outils\installation\emplettes.iss
+          if ($LASTEXITCODE -ne 0) { Write-Output "::error title=Installation::échec d'Inno Setup"; exit 1 }
+          Get-ChildItem build\installation
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Emplettes Installation
+          path: build/installation/Emplettes-Installation.exe
+      - name: Compiler la console d'administration (Windows seulement, fenêtre large)
+        shell: bash
+        run: |
+          set +e
+          python outils/fenetre_editeur.py
+          flutter build windows --release --dart-define-from-file=definitions-editeur.json --dart-define=OUTIL_EDITEUR=true > compilation-editeur.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python outils/annoter.py compilation-editeur.log "Compilation outil de l'éditeur"; else tail -n 5 compilation-editeur.log; fi
+          exit $code
+      - name: Programme d'installation de l'outil de l'éditeur
+        shell: pwsh
+        run: |
+          $dest = "build/windows/x64/runner/Release"
+          foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") { Copy-Item "C:\Windows\System32\$f" $dest }
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          $version = ((Select-String -Path pubspec.yaml -Pattern '^version:\s*([^+\s]+)').Matches[0].Groups[1].Value)
+          $commit = "${{ github.sha }}".Substring(0, 7)
+          & $iscc /Q "/DVersion=$version" "/DCommit=$commit" "/DSource=$PWD\build\windows\x64\runner\Release" "/DSortie=$PWD\build\installation-editeur" outils\installation\editeur.iss
+          if ($LASTEXITCODE -ne 0) { Write-Output "::error title=Installation éditeur::échec d'Inno Setup"; exit 1 }
+          Get-ChildItem build\installation-editeur
+      # Pas sur la page publique « derniere-version » : il contient le code de l'éditeur. Téléchargement depuis la page de la compilation (compte GitHub).
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Emplettes editeur Installation
+          path: build/installation-editeur/Emplettes-Editeur-Installation.exe
+
+  web:
+    # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
+    # Mode APK (« [apk] ») : l'APK seulement, la page « derniere-version » garde l'exe et les captures précédents
+    if: "!contains(github.event.head_commit.message, '[rapide]') && !contains(github.event.head_commit.message, '[apk]')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer le projet
+        run: |
+          flutter create --org fr.listecourses --project-name liste_de_courses --platforms web .
+          python3 outils/preparer.py
+          flutter pub add dev:flutter_launcher_icons
+          dart run flutter_launcher_icons -f outils/web/icones.yaml
+          # sqlite3 compilé en WebAssembly, de la même version que le paquet Dart
+          V=$(python3 -c "import re; print(re.search(r'\n  sqlite3:\n(?:    .*\n)*?    version: \"([^\"]+)\"', open('pubspec.lock').read())[1])")
+          curl -fsSL -o web/sqlite3.wasm "https://github.com/simolus3/sqlite3.dart/releases/download/sqlite3-$V/sqlite3.wasm"
+          # Démarrage sans le service worker de Flutter (remplacé par hors_ligne.js)
+          cp outils/web/flutter_bootstrap.js web/
+      - name: Compiler la version web
+        run: |
+          set +e
+          python3 outils/definitions.py
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/web/ --dart-define-from-file=definitions.json > compilation.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
+          exit $code
+      - name: Ouverture sans réseau (service worker hors_ligne.js)
+        run: python3 outils/web/hors_ligne.py build/web
+      - name: Démonstration - embarquer le dernier catalogue commun publié (public, signé)
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null || true
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 15 > assets/catalogue_demo.txt || true
+          echo "catalogue embarqué : $(wc -c < assets/catalogue_demo.txt) octets"
+          [ -s assets/catalogue_demo.txt ] || echo "::warning::Démonstration : catalogue commun non lu, elle garde le catalogue de base"
+      - name: Compiler la version de démonstration (foyer d'exemples, sans partage)
+        run: |
+          set +e
+          # Sans aucun secret : la démonstration ne peut joindre ni le serveur du partage ni le service de mail.
+          jq '{VERSION, COMMIT}' definitions.json > definitions-demo.json
+          flutter build web --release --no-web-resources-cdn --base-href /liste-de-courses/demo/ --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true -o "$PWD/build/demo" > compilation-demo.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation démonstration"; else tail -n 5 compilation-demo.log; fi
+          exit $code
+      - name: Démonstration non installable (pas de deuxième icône sur l'écran d'accueil)
+        run: |
+          sed -i '/<link rel="manifest"/d; s#<title>[^<]*</title>#<title>Emplettes · démonstration</title>#' build/demo/index.html
+          rm -f build/demo/manifest.json
+          grep -c manifest build/demo/index.html || true
+      - name: Ouverture sans réseau de la démonstration
+        run: python3 outils/web/hors_ligne.py build/demo ldc-demo-
+      - name: Assembler le site (page de présentation + application + démonstration)
+        run: |
+          mkdir site
+          cp -r docs/. site/
+          cp -r build/web site/web
+          cp -r build/demo site/demo
+          touch site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - name: Publier aussi sur le serveur OVH (https://<domaine>/, /web/, /demo/)
+        if: github.ref == 'refs/heads/main' && env.VPS_HOTE != ''
+        env:
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+        run: |
+          # Même site, servi à la racine du domaine : seule l'adresse de base change.
+          cp -r site site-vps
+          sed -i 's#<base href="/liste-de-courses/web/">#<base href="/web/">#' site-vps/web/index.html
+          sed -i 's#<base href="/liste-de-courses/demo/">#<base href="/demo/">#' site-vps/demo/index.html
+          grep -c '<base href="/web/">' site-vps/web/index.html
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          # Le compte « deploiement » ne peut qu'écrire dans le dossier du site (rrsync).
+          rsync -rlz --delete-after --exclude telechargements/ \
+            -e "ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new" \
+            site-vps/ "deploiement@$VPS_HOTE:"
+          rm -f ~/.ssh/deploiement
+          curl -fsS "https://$VPS_HOTE/web/" | grep -c '<base href="/web/">'
+
+  site_web:
+    name: publication de la version web (GitHub Pages)
+    needs: web
+    if: github.ref == 'refs/heads/main'
+    concurrency: site_web
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}web/
+    steps:
+      - name: Publier le site par GitHub Actions (au lieu du dossier docs/)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X PUT repos/${{ github.repository }}/pages -f build_type=workflow || echo "::warning::Réglage Pages à faire à la main : Settings > Pages > Source = GitHub Actions"
+      - id: deploiement
+        uses: actions/deploy-pages@v4
+
+  publication:
+    name: publication (page « derniere-version »)
+    needs: [verification, android, windows]
+    concurrency: publication
+    if: always() && github.ref == 'refs/heads/main' && needs.verification.result == 'success' && (needs.windows.result == 'success' || (needs.windows.result == 'skipped' && contains(github.event.head_commit.message, '[apk]'))) && needs.android.result != 'failure'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: livrables }
+      - name: Préparer les fichiers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
+          mkdir -p publication
+          # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
+          gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Emplettes-demo.apk -p Captures.zip -D publication 2>/dev/null || true
+          # Mode APK : le programme d'installation Windows de la version précédente est repris tel quel
+          if [ ! -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then gh release download derniere-version -p Emplettes-Installation.exe -D publication 2>/dev/null || true; fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" publication/Emplettes-demo.apk; fi
+          if [ -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then cp -f "livrables/Emplettes Installation/Emplettes-Installation.exe" publication/; fi
+          if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
+          (cd documents && zip -qr ../publication/Documents.zip .)
+          {
+            echo "version=$VERSION"
+            echo "commit=${GITHUB_SHA::7}"
+            echo "date=$(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')"
+          } > publication/version.txt
+          cat publication/version.txt
+          ls -la publication
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(grep '^version=' publication/version.txt | cut -d= -f2)
+          gh release delete derniere-version --yes --cleanup-tag 2>/dev/null || true
+          git push -q origin :refs/tags/derniere-version 2>/dev/null || true
+          set +e
+          gh release create derniere-version publication/* \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Dernière version — $VERSION (${GITHUB_SHA::7})" \
+            --notes "Windows : Emplettes-Installation.exe installe ou met à jour en place. Version $VERSION, compilation du $(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')." 2> erreur.txt
+          code=$?
+          if [ $code -ne 0 ]; then echo "::error title=Publication::$(sed ':a;N;$!ba;s/\n/ | /g' erreur.txt)"; fi
+          exit $code
