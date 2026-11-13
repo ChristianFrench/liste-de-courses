@@ -1846,9 +1846,16 @@ class EcranConsultation extends StatelessWidget {
                 for (final g in l.lignes) ligne(g)
               else
                 // Liste en préparation ou prête : l'ordre du catalogue ; en courses ou terminée : celui du parcours.
-                for (final x in avecCoches
-                    ? etat.etapes(l, l.parcoursId)
-                    : etat.etapes(l, null, ordreBase: secteursOrdreCatalogue(etat)))
+                for (final x in switch (l.statut) {
+                  // 13/11/2026 (Aristide) : courses terminées dans l'ordre du parcours enregistré : celui où les
+                  // secteurs ont été visités, puis le parcours suivi (ou celui du magasin) pour les autres.
+                  StatutListe.terminee => etat.etapes(l, null, ordreBase: [
+                      ...etat.secteursDansLOrdre(l),
+                      ...?(etat.unParcours(l.parcoursId) ?? etat.parcoursPourCourses(l.magasinId, l.membreId ?? etat.moi.id))?.etapes,
+                    ]),
+                  StatutListe.enCours => etat.etapes(l, l.parcoursId),
+                  _ => etat.etapes(l, null, ordreBase: secteursOrdreCatalogue(etat)),
+                })
                   ...sectionSecteur(pictoEtape(x), 4, [
                     TitreGroupe(nom: x.nom, nonPlace: x.nonPlace, nombre: x.lignes.length, pictoDebordant: pictoEtape(x), pictoGauche: 4),
                     for (final g in x.lignes) ligne(g),

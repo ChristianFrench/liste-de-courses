@@ -2576,7 +2576,8 @@ class Etat extends ChangeNotifier {
     // Dans la base, une course de l'historique est la liste elle-même, au statut « terminee ».
     final c = Course(l.id, l.magasinId, DateTime.now(), l.membreId ?? moi.id, l.nbCoches, nom: l.nom);
     historique.insert(0, c);
-    retenirParcours(l);
+    // 13/11/2026 : la liste terminée garde le parcours appris (ou complété) pendant ces courses.
+    if (retenirParcours(l) case final p?) l.parcoursId = p.id;
     l.statut = StatutListe.terminee;
     l.interrompueLe = null;
     // Une rectificative restée sans réponse passe en « À faire » ; une rectificative en préparation le sera à sa fin.
