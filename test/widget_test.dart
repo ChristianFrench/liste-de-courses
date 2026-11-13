@@ -701,6 +701,7 @@ void main() {
       expect(etat.produits.where((p) => p.nom == 'Lait demi-écrémé Lactel'), isEmpty, reason: 'pas de produit de marque');
       final lactel = lait;
       expect(etat.marque(etat.ligne(l, lait.id)?.marqueId)?.nom, 'Lactel');
+      expect(find.textContaining('Lait demi-écrémé · Lactel', findRichText: true), findsWidgets, reason: 'la marque se voit sur la ligne');
       expect(etat.declinaisons(lait), contains('Lactel'), reason: 'Lactel est rattachée au produit');
       expect(etat.ligne(l, lactel.id)?.consigne, 'bien frais', reason: 'la ligne garde sa consigne');
       etat.marquesType = {};

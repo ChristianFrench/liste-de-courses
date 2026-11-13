@@ -1033,6 +1033,9 @@ class LigneArticle extends StatelessWidget {
             Expanded(
               child: Text.rich(
                 TextSpan(text: produit.nom, style: styleNom, children: [
+                  // 13/11/2026 (Aristide) : la marque choisie se voit sur la ligne (« Lait demi-écrémé · Lactel »).
+                  if (Etat.instance.marque(g.marqueId) case final m? when !produit.nom.toLowerCase().contains(m.nom.toLowerCase()))
+                    TextSpan(text: ' · ${m.nom}', style: styleNom.copyWith(fontWeight: FontWeight.bold)),
                   if (g.consigne != null) TextSpan(text: '  « ${g.consigne} »', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                 ]),
                 maxLines: 1,
