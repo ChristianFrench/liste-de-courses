@@ -131,6 +131,32 @@ jobs:
           python3 outils/definitions.py
           flutter build apk --release --dart-define-from-file=definitions.json --target-platform android-x64
           mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
+      # 13/11/2026 (Aristide) : la démonstration en APK, pour essayer sans toucher à la version opérationnelle.
+      # Autre identifiant d'application (elle s'installe à côté), nom « Emplettes démo », foyer d'exemple, sans
+      # aucun secret ni notification ; le dernier catalogue commun publié est embarqué.
+      - name: APK de démonstration (s'installe à côté de l'application)
+        env:
+          H: ${{ secrets.MQTT_HOTE_VPS }}
+          U: ${{ secrets.MQTT_UTILISATEUR_VPS }}
+          P: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
+        run: |
+          set +e
+          sudo apt-get -qq install -y mosquitto-clients > /dev/null || true
+          mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 15 > assets/catalogue_demo.txt || true
+          echo "catalogue embarqué : $(wc -c < assets/catalogue_demo.txt) octets"
+          python3 outils/definitions.py
+          jq '{VERSION, COMMIT}' definitions.json > definitions-demo.json
+          for f in android/app/build.gradle.kts android/app/build.gradle; do
+            [ -f "$f" ] && sed -i 's/applicationId = "fr.listecourses.liste_de_courses"/applicationId = "fr.listecourses.liste_de_courses.demo"/; s/applicationId "fr.listecourses.liste_de_courses"/applicationId "fr.listecourses.liste_de_courses.demo"/' "$f"
+          done
+          grep -h applicationId android/app/build.gradle* || true
+          sed -i 's/android:label="Emplettes"/android:label="Emplettes démo"/' android/app/src/main/AndroidManifest.xml
+          rm -f android/app/src/main/res/values/firebase.xml
+          flutter build apk --release --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true > compilation-demo.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation APK démonstration"; else tail -n 5 compilation-demo.log; fi
+          [ $code -eq 0 ] && mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (demonstration).apk"
+          exit $code
       - uses: actions/upload-artifact@v4
         with:
           name: Liste de courses Android
@@ -330,11 +356,12 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           mkdir -p publication
           # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
-          gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Captures.zip -D publication 2>/dev/null || true
+          gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Emplettes-demo.apk -p Captures.zip -D publication 2>/dev/null || true
           # Mode APK : le programme d'installation Windows de la version précédente est repris tel quel
           if [ ! -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then gh release download derniere-version -p Emplettes-Installation.exe -D publication 2>/dev/null || true; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" publication/Emplettes-demo.apk; fi
           if [ -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then cp -f "livrables/Emplettes Installation/Emplettes-Installation.exe" publication/; fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
           (cd documents && zip -qr ../publication/Documents.zip .)
