@@ -281,6 +281,11 @@ Future<void> formatsProduit(BuildContext context, Produit p) async {
 /// les foyers, prend sa place dans la liste ; l'ancien reste au catalogue.
 Future<void> modifierArticle(BuildContext context, Liste l, Produit p) async {
   final etat = Etat.instance;
+  // 13/11/2026 (Aristide) : pas de modification d'un produit des courses en cours.
+  if (etat.listes.any((x) => x.statut == StatutListe.enCours && etat.ligne(x, p.id) != null)) {
+    Nav.message(context, '« ${p.nom} » est dans les courses en cours : il se modifiera une fois les courses terminées');
+    return;
+  }
   final actuel = etat.secteurCatalogue(p.id);
   final rayons = [for (final r in etat.rayonsVisibles) if (etat.secteursVisibles(r.id).isNotEmpty) r];
   if (rayons.isEmpty) return;

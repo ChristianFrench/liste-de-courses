@@ -125,8 +125,22 @@ Widget listeGlissable(BuildContext context, Liste l, Widget ligne, {bool interro
   ActionLigne? droite;
   final actions = <ActionLigne>[];
   if (interrompue) {
-    actions.add(ActionLigne(Icons.play_arrow_outlined, 'Reprendre les courses', () => Nav.travail(EcranCoursesSecteur(listeId: l.id))));
-    droite = ActionLigne(Icons.undo, 'En préparation', () => coursesEnPreparation(context, l));
+    // 13/11/2026 (Aristide) : pendant les courses, aucune manipulation, voulue ou non, ne modifie la liste :
+    // ni glissement (suppression, remise en préparation), ni renommage, ni suppression. On reprend ou on consulte ;
+    // la remise en préparation reste possible dans le volet, après confirmation.
+    return Glissable(
+      key: ValueKey('glisser-${l.id}'),
+      titre: etat.nomListe(l),
+      detail: detail,
+      auToucher: true,
+      auDoubleToucher: ActionLigne(Icons.play_arrow_outlined, 'Reprendre les courses', () => Nav.travail(EcranCoursesSecteur(listeId: l.id))),
+      actions: [
+        ActionLigne(Icons.play_arrow_outlined, 'Reprendre les courses', () => Nav.travail(EcranCoursesSecteur(listeId: l.id))),
+        consulterListe(context, l.id),
+        ActionLigne(Icons.undo, 'Arrêter les courses et remettre en préparation', () => coursesEnPreparation(context, l)),
+      ],
+      child: ligne,
+    );
   } else if (l.statut == StatutListe.prete) {
     actions.add(ActionLigne(Icons.shopping_cart_outlined, 'Faire les courses', () => partirFaireLesCourses(context, l)));
     droite = ActionLigne(Icons.undo, 'En préparation', () => remettreEnPreparation(context, l));

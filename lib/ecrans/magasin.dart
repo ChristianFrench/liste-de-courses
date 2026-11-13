@@ -31,10 +31,16 @@ List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? liste
   final etat = Etat.instance;
   final utilise = etat.produitUtilise(p);
   final ajoute = etat.estAjoute(p);
+  // 13/11/2026 (Aristide) : un produit des courses en cours ne change ni de nom ni de place, et ne se supprime pas.
+  final enCourses = etat.listes.any((l) => l.statut == StatutListe.enCours && etat.ligne(l, p.id) != null);
+  final bloque = ActionLigne(Icons.lock_outline, 'En cours de courses : nom et place modifiables après', () {
+    Nav.message(context, '« ${p.nom} » est dans les courses en cours : son nom et sa place se modifieront après');
+  });
   return [
     if (etat.secteurCatalogue(p.id) == null)
       ActionLigne(Icons.place_outlined, 'Placer dans un rayon et un secteur', () => placerProduit(context, p)),
-    if (ajoute) ...[
+    if (enCourses) bloque,
+    if (ajoute && !enCourses) ...[
       ActionLigne(Icons.edit_outlined, 'Modifier', () => fenetreProduit(context, produit: p, secteur: etat.secteurCatalogue(p.id))),
       ActionLigne(Icons.delete_outline, 'Supprimer', () async {
         if (await demanderSuppression(context, p, 'le produit ${p.nom}') && depuisFiche && context.mounted) Navigator.of(context).pop();
@@ -42,7 +48,7 @@ List<ActionLigne> actionsProduit(BuildContext context, Produit p, {String? liste
     ],
     ActionLigne(Icons.sell_outlined, 'Ajouter une marque au produit', () => produitDeMarque(context, p)),
     // 02/11/2026 (Aristide) : déplacer le produit, mettre à jour ses mesures et packagings.
-    if (etat.secteurCatalogue(p.id) != null)
+    if (etat.secteurCatalogue(p.id) != null && !enCourses)
       ActionLigne(Icons.drive_file_move_outline, 'Déplacer le produit', () => deplacerProduit(context, p)),
     ActionLigne(Icons.straighten, 'Mettre à jour mesures et packaging', () => formatsProduit(context, p)),
     // 05/11/2026 (Aristide) : un produit du catalogue commun dont le foyer n'a pas l'usage se masque chez lui.
