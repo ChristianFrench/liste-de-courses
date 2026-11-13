@@ -586,7 +586,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                             ),
                             for (final g in x.lignes) _ligne(l, g),
                             if (_proposes == x.id)
-                              for (final p in _proposesDe(l, x)) _ligneProposee(l, p),
+                              for (final p in _autres(l, x)) _ligneProposee(l, p),
                           ]),
                         ],
                 ),
@@ -597,63 +597,43 @@ class _EcranConstructionState extends State<EcranConstruction> {
     );
   }
 
-  /// Secteur dont les articles non commandés sont déployés (un seul à la fois), et s'il l'est en entier.
+  /// Secteur dont les articles non commandés sont déployés (un seul à la fois).
   String? _proposes;
-  bool _toutSecteur = false;
 
-  /// Articles du secteur qui ne sont pas dans la liste, par ordre alphabétique.
+  /// Articles du secteur qui ne sont pas dans la liste. 13/11/2026 (Aristide) : les habituels d'abord (déjà mis
+  /// dans des listes, tous magasins ; les plus souvent pris en tête), puis les autres par ordre alphabétique.
   List<Produit> _autres(Liste l, Etape x) {
     final s = x.secteur;
     if (s == null) return const [];
     return [for (final p in etat.produitsDuSecteur(s)) if (etat.ligne(l, p.id) == null) p]
-      ..sort((a, b) => normaliser(a.nom).compareTo(normaliser(b.nom)));
+      ..sort((a, b) {
+        final u = b.nbUtilisations.compareTo(a.nbUtilisations);
+        return u != 0 ? u : normaliser(a.nom).compareTo(normaliser(b.nom));
+      });
   }
 
-  /// 13/11/2026 (Aristide) : les articles habituels (déjà mis dans des listes, tous magasins), pas encore
-  /// commandés ici ; les plus souvent pris d'abord.
-  List<Produit> _habituels(List<Produit> autres) => [for (final p in autres) if (p.nbUtilisations > 0) p]
-    ..sort((a, b) => b.nbUtilisations.compareTo(a.nbUtilisations));
-
-  /// Ce que le secteur déployé montre : ses habituels, ou tout le secteur (double appui, ou aucun habituel).
-  List<Produit> _proposesDe(Liste l, Etape x) {
-    final autres = _autres(l, x);
-    return _toutSecteur ? autres : _habituels(autres);
-  }
-
-  /// Bouton « + N » du bandeau (N : habituels non commandés ; « + » seul s'il n'en reste pas).
-  /// Toucher : les habituels (tout le secteur s'il n'y en a pas) ; double appui : tout le secteur ; « − » replie.
+  /// Bouton « Autres produits » du bandeau : un toucher déploie les articles non commandés, un autre les replie.
   Widget? _boutonAutres(Liste l, Etape x) {
     if (x.nonPlace) return null;
-    final autres = _autres(l, x);
-    final n = _habituels(autres).length;
     final ouvert = _proposes == x.id;
-    if (autres.isEmpty && !ouvert) return null;
-    void ouvrir(bool tout) => setState(() {
-          _proposes = x.id;
-          _toutSecteur = tout;
-        });
+    if (!ouvert && _autres(l, x).isEmpty) return null;
     return Semantics(
       button: true,
-      label: ouvert
-          ? 'Replier les articles proposés de ${x.nom}'
-          : n > 0
-              ? '$n articles habituels de ${x.nom} ; double appui : tout le secteur'
-              : 'Articles de ${x.nom}',
+      label: ouvert ? 'Replier les autres produits de ${x.nom}' : 'Autres produits de ${x.nom}',
       child: Material(
         color: ouvert ? Charte.cadre : Charte.blanc,
         shape: StadiumBorder(side: BorderSide(color: Charte.cadre, width: 1.5)),
         child: InkWell(
           key: ValueKey('autres-${x.id}'),
           customBorder: const StadiumBorder(),
-          onTap: () => ouvert ? setState(() => _proposes = null) : ouvrir(n == 0),
-          onDoubleTap: () => ouvrir(true),
+          onTap: () => setState(() => _proposes = ouvert ? null : x.id),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(minWidth: 56, minHeight: 32),
+            constraints: const BoxConstraints(minHeight: 32),
             child: Center(
+              widthFactor: 1,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text(ouvert ? '−' : (n > 0 ? '+ $n' : '+'),
-                    style: Charte.texte(15, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Text('Autres produits', style: Charte.texte(14, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
               ),
             ),
           ),
