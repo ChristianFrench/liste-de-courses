@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' as picto;
-import '../donnees/demonstration.dart';
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
@@ -1701,34 +1700,13 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       manquant: manquant,
       surligne: ajout,
       caseCourse: true,
-      // Version opérationnelle : toucher la ligne coche, deux appuis = manquant, P ou packaging = détail,
-      // appui long = menu.
-      onTap: demonstration ? null : () => _appui(etat, l, p, x),
-      onDetail: demonstration ? null : () => detailArticle(context, g),
-      onLongPress: demonstration
-          ? null
-          : () {
-              HapticFeedback.mediumImpact();
-              menuActions(context, titre: p.nom, actions: [
-                if (manquant)
-                  ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p, x))
-                else
-                  ActionLigne(Icons.remove_circle_outline, 'Manquant en rayon', () {
-                    etat.marquerManquant(l, p.id, true);
-                    Nav.message(context, '« ${p.nom} » : manquant en rayon');
-                  }),
-                ActionLigne(Icons.info_outline, 'Détail', () => detailArticle(context, g)),
-              ]);
-            },
-      // Essai, démonstration seulement (13/11/2026, Aristide) : aucun geste sur l'article lui-même ; la case
-      // coche (deux appuis : manquant) ; appui long sur la case : le détail, fermé seul après 4 secondes.
-      onCase: demonstration ? () => _appui(etat, l, p, x) : null,
-      onCaseLong: demonstration
-          ? () {
-              HapticFeedback.mediumImpact();
-              detailArticle(context, g, fermeSeul: true);
-            }
-          : null,
+      // 13/11/2026 (Aristide), généralisé à toutes les versions le 14/11 : aucun geste sur l'article lui-même ;
+      // la case coche (deux appuis : manquant) ; appui long sur la case : le détail, fermé seul après 4 secondes.
+      onCase: () => _appui(etat, l, p, x),
+      onCaseLong: () {
+        HapticFeedback.mediumImpact();
+        detailArticle(context, g, fermeSeul: true);
+      },
     );
   }
 
@@ -1755,8 +1733,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     } else {
       etat.cocher(l, p.id);
     }
-    if (demonstration) HapticFeedback.selectionClick();
-    if (!demonstration || x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
+    HapticFeedback.selectionClick();
+    if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
     // Après le délai du double appui : la case ne bouge pas sous le doigt entre deux appuis.
     Future.delayed(const Duration(milliseconds: 460), () {
       if (_dernierAppui != p.id || !(etat.ligne(l, p.id)?.coche ?? false)) return;

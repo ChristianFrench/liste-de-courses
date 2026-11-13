@@ -1124,9 +1124,10 @@ void main() {
       expect(find.byType(LigneArticle), findsNWidgets(9));
       await _ciblesTactiles(tester);
 
-      // Cocher un article (version opérationnelle : toucher la ligne) : il reste à sa place
+      // Cocher un article (toucher la case) : il reste à sa place
       final fromage = l4.lignes.firstWhere((g) => etat.produit(g.produitId)!.nom == 'Fromage râpé').produitId;
-      await _toucher(tester, find.text('Fromage râpé'));
+      await _toucher(tester, find.byKey(ValueKey('case-$fromage')));
+      await tester.pump(const Duration(seconds: 1));
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
       expect(find.text('Fromage râpé'), findsOneWidget);
 
@@ -1141,10 +1142,12 @@ void main() {
       await _ouvrirListe(tester, etat.nomListe(l4), 'Reprendre les courses');
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
 
-      // Deux appuis rapprochés : l'article manque en rayon
-      await tester.tap(find.text('Fromage râpé'));
+      // Deux appuis rapprochés sur la case : l'article manque en rayon
+      await tester.ensureVisible(find.byKey(ValueKey('case-$fromage')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
       await tester.pump(const Duration(milliseconds: 100));
-      await tester.tap(find.text('Fromage râpé'));
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
       await tester.pumpAndSettle();
       expect(etat.manquant(l4, fromage), isTrue);
       expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
