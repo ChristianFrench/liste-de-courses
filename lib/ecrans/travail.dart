@@ -706,7 +706,20 @@ class _EcranConstructionState extends State<EcranConstruction> {
       if (!mounted) return;
       final c = _lignes[produitId]?.currentContext;
       if (c != null && c.mounted) {
-        Scrollable.ensureVisible(c, alignment: 0.4, duration: const Duration(milliseconds: 200));
+        // 13/11/2026 (Aristide) : le secteur de l'article en haut de l'écran, l'article visible dessous.
+        final l = liste;
+        final s = l == null ? null : etat.secteurDe(l.magasinId, produitId);
+        final b = s == null ? null : _bandeaux[s.id]?.currentContext;
+        if (b == null || !b.mounted) {
+          Scrollable.ensureVisible(c, alignment: 0.4, duration: const Duration(milliseconds: 200));
+          return;
+        }
+        Scrollable.ensureVisible(b, duration: const Duration(milliseconds: 200)).then((_) {
+          if (mounted && c.mounted) {
+            Scrollable.ensureVisible(c,
+                alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd, duration: const Duration(milliseconds: 150));
+          }
+        });
         return;
       }
       if (essais <= 0 || !_defilement.hasClients) return;
