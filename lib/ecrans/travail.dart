@@ -573,6 +573,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                           for (final x in etat.etapes(l, null, ordreBase: secteursOrdreCatalogue(etat)))
                            ...sectionSecteur(pictoEtape(x), 4, [
                             TitreGroupe(
+                              key: _bandeaux.putIfAbsent(x.id, GlobalKey.new),
                               nom: x.nom,
                               nonPlace: x.nonPlace,
                               pictoDebordant: pictoEtape(x),
@@ -600,6 +601,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
   /// Secteur dont les articles non commandés sont déployés (un seul à la fois).
   String? _proposes;
 
+  /// Bandeaux des secteurs, pour amener en haut de l'écran celui dont on déploie les autres produits.
+  final _bandeaux = <String, GlobalKey>{};
+
   /// Articles du secteur qui ne sont pas dans la liste. 13/11/2026 (Aristide) : les habituels d'abord (déjà mis
   /// dans des listes, tous magasins ; les plus souvent pris en tête), puis les autres par ordre alphabétique.
   List<Produit> _autres(Liste l, Etape x) {
@@ -626,7 +630,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
         child: InkWell(
           key: ValueKey('autres-${x.id}'),
           customBorder: const StadiumBorder(),
-          onTap: () => setState(() => _proposes = ouvert ? null : x.id),
+          onTap: () {
+            setState(() => _proposes = ouvert ? null : x.id);
+            // 13/11/2026 (Aristide) : le secteur déployé vient en haut de l'écran.
+            if (!ouvert) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                final c = _bandeaux[x.id]?.currentContext;
+                if (c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
+              });
+            }
+          },
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 32),
             child: Center(
@@ -1963,15 +1976,23 @@ String texteCourtPromo(PromotionLigne p) {
 /// Promotion d'une ligne de préparation : le volet « Promo », puis la ligne mise à jour.
 Future<void> proposerPromo(BuildContext context, Liste l, LigneListe g) async {
   final etat = Etat.instance;
-  final r = await voletPromo(context, article: etat.produit(g.produitId)?.nom ?? 'l\'article', actuelle: g.promotion);
+  // 13/11/2026 (Aristide) : le nombre à acheter en haut du même volet.
+  final r = await voletPromo(context,
+      article: etat.produit(g.produitId)?.nom ?? 'l\'article',
+      actuelle: g.promotion,
+      quantite: g.quantite,
+      onQuantite: (q) => etat.quantite(l, g.produitId, q));
   if (r != null) etat.definirPromotion(l, g.produitId, r.promo);
 }
 
 /// Volet « Promo » (04/11/2026, Aristide) : la nature en une rangée de boutons (PX, LOT, 2=€, −%, FID, ?),
 /// puis une seule zone de saisie adaptée (prix, x + y, pourcentage ou montant, texte), OK ou Sans promo.
 /// Rend la promotion choisie (promo null : sans promotion), ou null si le volet est fermé sans choix.
-Future<({PromotionLigne? promo})?> voletPromo(BuildContext context, {required String article, PromotionLigne? actuelle}) {
+/// [quantite] et [onQuantite] (ajout par la recherche) : le nombre à acheter, en haut, appliqué aussitôt.
+Future<({PromotionLigne? promo})?> voletPromo(BuildContext context,
+    {required String article, PromotionLigne? actuelle, int? quantite, ValueChanged<int>? onQuantite}) {
   final etat = Etat.instance;
+  var nombre = quantite ?? 1;
   final types = [
     for (final id in FeuillePromotion.typesProposes)
       if (etat.typePromotion(id) case final t?) t,
@@ -2039,6 +2060,43 @@ Future<({PromotionLigne? promo})?> voletPromo(BuildContext context, {required St
         return corpsVolet(
           titre: 'Promo pour $article ?',
           contenu: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+            if (onQuantite != null) ...[
+              Row(children: [
+                Expanded(child: Text('Nombre à acheter', style: Charte.texte(16, gras: true))),
+                Semantics(
+                  button: true,
+                  label: 'Un de moins',
+                  child: IconButton(
+                    key: const ValueKey('promo-moins'),
+                    iconSize: 28,
+                    onPressed: nombre <= 1
+                        ? null
+                        : () => maj(() {
+                              nombre--;
+                              onQuantite(nombre);
+                            }),
+                    icon: Icon(Icons.remove_circle_outline, color: nombre <= 1 ? Charte.texteSecondaire : Charte.cadre),
+                  ),
+                ),
+                SizedBox(
+                    width: 40,
+                    child: Text('$nombre', key: const ValueKey('promo-nombre'), textAlign: TextAlign.center, style: Charte.texte(22, gras: true))),
+                Semantics(
+                  button: true,
+                  label: 'Un de plus',
+                  child: IconButton(
+                    key: const ValueKey('promo-plus'),
+                    iconSize: 28,
+                    onPressed: () => maj(() {
+                      nombre++;
+                      onQuantite(nombre);
+                    }),
+                    icon: Icon(Icons.add_circle_outline, color: Charte.cadre),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 12),
+            ],
             Wrap(spacing: 8, runSpacing: 8, children: [
               for (final t in types)
                 InkWell(

@@ -883,6 +883,9 @@ void main() {
       await tester.tap(bouton);
       await tester.pumpAndSettle();
       expect(proposes().length, autres.length, reason: 'tout le secteur non commandé');
+      final bandeau = find.ancestor(of: bouton, matching: find.byType(TitreGroupe)).first;
+      final liste = find.ancestor(of: bandeau, matching: find.byType(Scrollable)).first;
+      expect((tester.getTopLeft(bandeau).dy - tester.getTopLeft(liste).dy).abs(), lessThan(2), reason: 'le secteur déployé vient en haut');
       expect(proposes().first, habituel.id, reason: 'les habituels d\'abord');
       final c = find.byKey(ValueKey('propose-${habituel.id}'));
       await tester.ensureVisible(c);
@@ -1031,6 +1034,13 @@ void main() {
       // 04/11/2026 : après l'ajout par la recherche, le volet « Promo » : la nature, la valeur, OK
       final ligne = Etat.instance.listes.last.lignes.last;
       expect(find.text('Promo pour ${etat.produit(ligne.produitId)!.nom} ?'), findsOneWidget);
+      // 13/11/2026 : le nombre à acheter, en haut du même volet, appliqué aussitôt
+      expect(find.byKey(const ValueKey('promo-nombre')), findsOneWidget);
+      await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
+      await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
+      expect(ligne.quantite, 3);
+      await _toucher(tester, find.byKey(const ValueKey('promo-moins')));
+      expect(ligne.quantite, 2);
       await _toucher(tester, find.byKey(const ValueKey('nature-promo-prix')));
       await tester.enterText(find.byKey(const ValueKey('promo-saisie-Prix promo (€)')), '2,5');
       await _toucher(tester, find.text('OK'));
