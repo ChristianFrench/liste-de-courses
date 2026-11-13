@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' as picto;
+import '../donnees/demonstration.dart';
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
@@ -990,7 +991,9 @@ class LigneArticle extends StatelessWidget {
     final grise = coche || manquant;
     // La ligne grandit avec le texte (loupe des courses, réglage du téléphone).
     // En courses, la ligne fait 40 points pour une grande case (30 en préparation).
-    final hauteur = (caseCourse ? Charte.ligneListe : Charte.ligne) * MediaQuery.textScalerOf(context).scale(16) / 16;
+    // Essai des gestes de courses (démonstration seulement, 13/11/2026) : grande case, seule à réagir.
+    final essai = caseCourse && onCase != null;
+    final hauteur = (essai ? Charte.ligneListe : Charte.ligne) * MediaQuery.textScalerOf(context).scale(16) / 16;
     final taille = hauteur * 0.72;
     final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
       decoration: grise ? TextDecoration.lineThrough : null,
@@ -1018,11 +1021,27 @@ class LigneArticle extends StatelessWidget {
         onLongPress: onLongPress,
         child: Container(
           height: hauteur,
-          padding: EdgeInsets.only(left: caseCourse ? 0 : 6, right: 6),
+          padding: EdgeInsets.only(left: essai ? 0 : 6, right: 6),
           // Le trait sous la ligne ne prend pas de place : les signes gardent leurs 30 points.
           foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(children: [
-            if (caseCourse) ...[
+            if (caseCourse && !essai) ...[
+              if (manquant)
+                Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: Charte.blanc,
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
+                  ),
+                  child: Icone(Icons.close, size: 16, color: Charte.rouge),
+                )
+              else
+                CaseACocher(coche: coche, taille: 20),
+              const SizedBox(width: 2),
+            ],
+            if (essai) ...[
               Semantics(
                 button: true,
                 checked: coche,
@@ -1682,13 +1701,34 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       manquant: manquant,
       surligne: ajout,
       caseCourse: true,
-      // 13/11/2026 (Aristide) : aucun geste sur l'article lui-même ; seule la case réagit.
-      onCase: () => _appui(etat, l, p, x),
-      // 13/11/2026 (Aristide) : appui long sur la case : le détail, qui se ferme seul après 4 secondes.
-      onCaseLong: () {
-        HapticFeedback.mediumImpact();
-        detailArticle(context, g, fermeSeul: true);
-      },
+      // Version opérationnelle : toucher la ligne coche, deux appuis = manquant, P ou packaging = détail,
+      // appui long = menu.
+      onTap: demonstration ? null : () => _appui(etat, l, p, x),
+      onDetail: demonstration ? null : () => detailArticle(context, g),
+      onLongPress: demonstration
+          ? null
+          : () {
+              HapticFeedback.mediumImpact();
+              menuActions(context, titre: p.nom, actions: [
+                if (manquant)
+                  ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p, x))
+                else
+                  ActionLigne(Icons.remove_circle_outline, 'Manquant en rayon', () {
+                    etat.marquerManquant(l, p.id, true);
+                    Nav.message(context, '« ${p.nom} » : manquant en rayon');
+                  }),
+                ActionLigne(Icons.info_outline, 'Détail', () => detailArticle(context, g)),
+              ]);
+            },
+      // Essai, démonstration seulement (13/11/2026, Aristide) : aucun geste sur l'article lui-même ; la case
+      // coche (deux appuis : manquant) ; appui long sur la case : le détail, fermé seul après 4 secondes.
+      onCase: demonstration ? () => _appui(etat, l, p, x) : null,
+      onCaseLong: demonstration
+          ? () {
+              HapticFeedback.mediumImpact();
+              detailArticle(context, g, fermeSeul: true);
+            }
+          : null,
     );
   }
 
@@ -1715,8 +1755,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     } else {
       etat.cocher(l, p.id);
     }
-    HapticFeedback.selectionClick();
-    if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
+    if (demonstration) HapticFeedback.selectionClick();
+    if (!demonstration || x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
     // Après le délai du double appui : la case ne bouge pas sous le doigt entre deux appuis.
     Future.delayed(const Duration(milliseconds: 460), () {
       if (_dernierAppui != p.id || !(etat.ligne(l, p.id)?.coche ?? false)) return;
