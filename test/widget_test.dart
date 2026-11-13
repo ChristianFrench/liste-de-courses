@@ -5,6 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/gestures.dart' show kDoubleTapTimeout;
 import 'package:flutter/material.dart' show Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -851,6 +852,59 @@ void main() {
       expect(l.lignes.length, n);
       await tester.pump(const Duration(seconds: 4));
       await _ciblesTactiles(tester);
+    });
+
+    testWidgets('préparation : « + N » propose les habituels non commandés du secteur, double appui tout le secteur', (tester) async {
+      final etat = Etat.instance;
+      final l = etat.liste('l1')!;
+      await _accueil(tester);
+      await _ouvrirListe(tester, etat.nomListe(l), 'Continuer la préparation');
+      List<Produit> autresDe(Secteur s) => [for (final p in etat.produitsDuSecteur(s)) if (etat.ligne(l, p.id) == null) p];
+      final s = [for (final g in l.lignes) if (etat.secteurDe(l.magasinId, g.produitId) case final x?) x]
+          .firstWhere((x) => autresDe(x).length >= 2);
+      final autres = autresDe(s);
+      for (final p in autres) {
+        p.nbUtilisations = 0;
+      }
+      // Un seul habituel dans ce secteur.
+      final habituel = autres.last..nbUtilisations = 5;
+      etat.modifie();
+      await tester.pumpAndSettle();
+      Iterable<String> proposes() => [
+            for (final e in find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('propose-')).evaluate())
+              (e.widget.key! as ValueKey<String>).value.substring(8)
+          ];
+      final bouton = find.byKey(ValueKey('autres-${s.id}'));
+      Future<void> voir() async {
+        await Scrollable.ensureVisible(tester.element(bouton), alignment: 0.5);
+        await tester.pumpAndSettle();
+      }
+
+      await voir();
+      expect(find.descendant(of: bouton, matching: find.text('+ 1')), findsOneWidget);
+      await tester.tap(bouton);
+      await tester.pump(kDoubleTapTimeout + const Duration(milliseconds: 50));
+      await tester.pumpAndSettle();
+      expect(proposes(), [habituel.id], reason: 'toucher : les habituels seulement');
+      await voir();
+      await tester.tap(bouton);
+      await tester.pump(kDoubleTapTimeout + const Duration(milliseconds: 50));
+      await tester.pumpAndSettle();
+      expect(proposes(), isEmpty, reason: 'replié');
+      // Double appui : tout le secteur.
+      await voir();
+      await tester.tap(bouton);
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.tap(bouton);
+      await tester.pumpAndSettle();
+      expect(proposes().length, autres.length);
+      // Cocher : ajouté (quantité 1), il quitte les propositions.
+      final c = find.byKey(ValueKey('propose-${habituel.id}'));
+      await tester.ensureVisible(c);
+      await tester.tap(c);
+      await tester.pumpAndSettle();
+      expect(etat.ligne(l, habituel.id)?.quantite, 1);
+      expect(proposes(), isNot(contains(habituel.id)));
     });
 
     test('historique, archives et corbeille : remettre, archiver, vider', () {

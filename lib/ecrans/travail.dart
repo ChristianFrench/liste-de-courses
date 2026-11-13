@@ -577,12 +577,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
                               nonPlace: x.nonPlace,
                               pictoDebordant: pictoEtape(x),
                               pictoGauche: 4,
-                              nombre: x.lignes.length,
+                              // 13/11/2026 (Aristide) : plus le nombre d'articles commandés, mais un bouton « + N » :
+                              // les articles du secteur pas encore commandés, à cocher pour les ajouter.
+                              apres: _boutonAutres(l, x),
                               onTap: x.nonPlace
                                   ? () => placerNonPlaces(context, [for (final g in x.lignes) if (etat.produit(g.produitId) case final p?) p], liste: l)
                                   : null,
                             ),
                             for (final g in x.lignes) _ligne(l, g),
+                            if (_proposes == x.id)
+                              for (final p in _proposesDe(l, x)) _ligneProposee(l, p),
                           ]),
                         ],
                 ),
@@ -593,10 +597,102 @@ class _EcranConstructionState extends State<EcranConstruction> {
     );
   }
 
+  /// Secteur dont les articles non commandés sont déployés (un seul à la fois), et s'il l'est en entier.
+  String? _proposes;
+  bool _toutSecteur = false;
+
+  /// Articles du secteur qui ne sont pas dans la liste, par ordre alphabétique.
+  List<Produit> _autres(Liste l, Etape x) {
+    final s = x.secteur;
+    if (s == null) return const [];
+    return [for (final p in etat.produitsDuSecteur(s)) if (etat.ligne(l, p.id) == null) p]
+      ..sort((a, b) => normaliser(a.nom).compareTo(normaliser(b.nom)));
+  }
+
+  /// 13/11/2026 (Aristide) : les articles habituels (déjà mis dans des listes, tous magasins), pas encore
+  /// commandés ici ; les plus souvent pris d'abord.
+  List<Produit> _habituels(List<Produit> autres) => [for (final p in autres) if (p.nbUtilisations > 0) p]
+    ..sort((a, b) => b.nbUtilisations.compareTo(a.nbUtilisations));
+
+  /// Ce que le secteur déployé montre : ses habituels, ou tout le secteur (double appui, ou aucun habituel).
+  List<Produit> _proposesDe(Liste l, Etape x) {
+    final autres = _autres(l, x);
+    return _toutSecteur ? autres : _habituels(autres);
+  }
+
+  /// Bouton « + N » du bandeau (N : habituels non commandés ; « + » seul s'il n'en reste pas).
+  /// Toucher : les habituels (tout le secteur s'il n'y en a pas) ; double appui : tout le secteur ; « − » replie.
+  Widget? _boutonAutres(Liste l, Etape x) {
+    if (x.nonPlace) return null;
+    final autres = _autres(l, x);
+    final n = _habituels(autres).length;
+    final ouvert = _proposes == x.id;
+    if (autres.isEmpty && !ouvert) return null;
+    void ouvrir(bool tout) => setState(() {
+          _proposes = x.id;
+          _toutSecteur = tout;
+        });
+    return Semantics(
+      button: true,
+      label: ouvert
+          ? 'Replier les articles proposés de ${x.nom}'
+          : n > 0
+              ? '$n articles habituels de ${x.nom} ; double appui : tout le secteur'
+              : 'Articles de ${x.nom}',
+      child: Material(
+        color: ouvert ? Charte.cadre : Charte.blanc,
+        shape: StadiumBorder(side: BorderSide(color: Charte.cadre, width: 1.5)),
+        child: InkWell(
+          key: ValueKey('autres-${x.id}'),
+          customBorder: const StadiumBorder(),
+          onTap: () => ouvert ? setState(() => _proposes = null) : ouvrir(n == 0),
+          onDoubleTap: () => ouvrir(true),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 56, minHeight: 32),
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text(ouvert ? '−' : (n > 0 ? '+ $n' : '+'),
+                    style: Charte.texte(15, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Article du secteur pas encore commandé : case vide ; la cocher l'ajoute (quantité 1).
+  Widget _ligneProposee(Liste l, Produit p) {
+    final hauteur = Charte.ligne * MediaQuery.textScalerOf(context).scale(16) / 16;
+    return InkWell(
+      key: ValueKey('propose-${p.id}'),
+      onTap: () {
+        HapticFeedback.selectionClick();
+        etat.ajouterLigne(l, p.id);
+      },
+      child: SizedBox(
+        height: hauteur,
+        child: Row(children: [
+          const SizedBox(width: 8),
+          Icon(Icons.check_box_outline_blank, size: 22, color: Charte.texteSecondaire),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(p.nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+          ),
+        ]),
+      ),
+    );
+  }
+
   /// L'article trouvé s'ajoute (s'il n'y est pas) ; l'écran va sur lui et le signale quelques secondes.
   void _ajouter(Liste l, Produit p, {bool avecPromo = false}) {
     if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
-    setState(() => _surligne = p.id);
+    // Une nouvelle recherche referme les articles proposés d'un secteur.
+    setState(() {
+      _surligne = p.id;
+      _proposes = null;
+    });
     _amener(p.id, essais: 4);
     // 04/11/2026 (Aristide) : la promotion se propose aussitôt, dans son volet (« Sans promo » le ferme).
     final g = etat.ligne(l, p.id);
