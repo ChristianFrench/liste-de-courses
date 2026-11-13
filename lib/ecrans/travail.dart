@@ -952,8 +952,14 @@ class LigneArticle extends StatelessWidget {
     this.surligne = false,
     this.caseCourse = false,
     this.onPromo,
+    this.onCase,
+    this.onCaseLong,
   });
   final LigneListe ligne;
+
+  /// Courses (13/11/2026, Aristide) : seule la case réagit (toucher : cocher ; appui long : manquant, détail).
+  final VoidCallback? onCase;
+  final VoidCallback? onCaseLong;
 
   /// Toucher la promotion (préparation : le volet « Promo ») ; sinon [onDetail].
   final VoidCallback? onPromo;
@@ -983,7 +989,9 @@ class LigneArticle extends StatelessWidget {
     final couleurPromo = g.promotion == null ? null : etat.couleurPromo(g.promotion!.type);
     final grise = coche || manquant;
     // La ligne grandit avec le texte (loupe des courses, réglage du téléphone).
-    final hauteur = Charte.ligne * MediaQuery.textScalerOf(context).scale(16) / 16;
+    // En courses, la ligne fait 40 points pour une grande case (30 en préparation).
+    final hauteur = (caseCourse ? Charte.ligneListe : Charte.ligne) * MediaQuery.textScalerOf(context).scale(16) / 16;
+    final taille = hauteur * 0.72;
     final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
       decoration: grise ? TextDecoration.lineThrough : null,
     );
@@ -1010,25 +1018,40 @@ class LigneArticle extends StatelessWidget {
         onLongPress: onLongPress,
         child: Container(
           height: hauteur,
-          padding: const EdgeInsets.only(left: 6, right: 6),
+          padding: EdgeInsets.only(left: caseCourse ? 0 : 6, right: 6),
           // Le trait sous la ligne ne prend pas de place : les signes gardent leurs 30 points.
           foregroundDecoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
           child: Row(children: [
             if (caseCourse) ...[
-              if (manquant)
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: Charte.blanc,
-                    borderRadius: BorderRadius.circular(3),
-                    border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
+              Semantics(
+                button: true,
+                checked: coche,
+                label: manquant ? 'Manquant : toucher si trouvé' : (coche ? 'Décocher' : 'Cocher'),
+                child: InkWell(
+                  key: ValueKey('case-${produit.id}'),
+                  onTap: onCase,
+                  onLongPress: onCaseLong,
+                  child: SizedBox(
+                    width: taille + 22,
+                    height: hauteur,
+                    child: Center(
+                      child: manquant
+                          ? Container(
+                              width: taille,
+                              height: taille,
+                              decoration: BoxDecoration(
+                                color: Charte.blanc,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Charte.rouge, width: Charte.traitCadre),
+                              ),
+                              child: Icone(Icons.close, size: taille * 0.8, color: Charte.rouge),
+                            )
+                          : CaseACocher(coche: coche, taille: taille),
+                    ),
                   ),
-                  child: Icone(Icons.close, size: 16, color: Charte.rouge),
-                )
-              else
-                CaseACocher(coche: coche, taille: 20),
-              const SizedBox(width: 2),
+                ),
+              ),
+              const SizedBox(width: 4),
             ],
             Expanded(
               child: Text.rich(
@@ -1604,7 +1627,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                                   marque: x.lignes.any((g) => fondus.contains(g.produitId)) ? Icons.playlist_add : null,
                                 ),
                                 for (final g in x.lignes)
-                                  if (!aPart.contains(g.produitId) && vue(g)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
+                                  if (!aPart.contains(g.produitId) && vue(g)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId), x: x),
                               ]),
                           ],
                   ),
@@ -1638,7 +1661,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     });
   }
 
-  Widget _ligne(Etat etat, Liste l, LigneListe g, {bool ajout = false}) {
+  Widget _ligne(Etat etat, Liste l, LigneListe g, {bool ajout = false, Etape? x}) {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
     final manquant = etat.manquant(l, p.id);
@@ -1650,13 +1673,13 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       manquant: manquant,
       surligne: ajout,
       caseCourse: true,
-      onTap: () => _appui(etat, l, p),
-      onDetail: () => detailArticle(context, g),
-      onLongPress: () {
+      // 13/11/2026 (Aristide) : aucun geste sur l'article lui-même ; seule la case réagit.
+      onCase: () => _appui(etat, l, p, x),
+      onCaseLong: () {
         HapticFeedback.mediumImpact();
         menuActions(context, titre: p.nom, actions: [
           if (manquant)
-            ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p))
+            ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p, x))
           else
             ActionLigne(Icons.remove_circle_outline, 'Manquant en rayon', () {
               etat.marquerManquant(l, p.id, true);
@@ -1668,28 +1691,21 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     );
   }
 
-  String? _dernierAppui;
-  DateTime _dernierAppuiLe = DateTime(2000);
-
-  /// Un appui coche ou décoche ; deux appuis rapprochés sur le même article le marquent manquant en rayon.
-  /// Toucher un article manquant le coche (trouvé finalement).
-  void _appui(Etat etat, Liste l, Produit p) {
-    final maintenant = DateTime.now();
-    final deuxAppuis = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
-    _dernierAppui = deuxAppuis ? null : p.id;
-    _dernierAppuiLe = maintenant;
-    if (deuxAppuis) {
-      HapticFeedback.mediumImpact();
-      etat.marquerManquant(l, p.id, true);
-      Nav.message(context, '« ${p.nom} » : manquant en rayon');
-      return;
-    }
+  /// Toucher la case coche ou décoche ; un article manquant touché est trouvé finalement (coché).
+  /// 13/11/2026 (Aristide) : le secteur où l'on vient de cocher prend le haut de l'écran.
+  void _appui(Etat etat, Liste l, Produit p, Etape? x) {
     if (etat.manquant(l, p.id)) {
       etat.marquerManquant(l, p.id, false);
       if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
-      return;
+    } else {
+      etat.cocher(l, p.id);
     }
-    etat.cocher(l, p.id);
+    HapticFeedback.selectionClick();
+    if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final c = _titres[x.id]?.currentContext;
+      if (mounted && c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
+    });
   }
 
   /// Écran 9 — « Interrompre les courses ? » ; sans rien de coché, on peut simplement revenir aux listes prêtes.
