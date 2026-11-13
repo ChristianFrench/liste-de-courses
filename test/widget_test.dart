@@ -1143,11 +1143,19 @@ void main() {
       await _ouvrirListe(tester, etat.nomListe(l4), 'Reprendre les courses');
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
 
-      // Appui long sur la case : « Manquant en rayon »
+      // Appui long sur la case : le détail, qui se ferme seul après 4 secondes
       await tester.ensureVisible(find.byKey(ValueKey('case-$fromage')));
       await tester.longPress(find.byKey(ValueKey('case-$fromage')));
       await tester.pumpAndSettle();
-      await _toucher(tester, find.text('Manquant en rayon'));
+      expect(find.textContaining('Quantité'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Quantité'), findsNothing);
+      // Deux appuis rapprochés sur la case : l'article manque en rayon
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
+      await tester.pumpAndSettle();
       expect(etat.manquant(l4, fromage), isTrue);
       expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));

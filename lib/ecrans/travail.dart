@@ -1095,8 +1095,9 @@ class LigneArticle extends StatelessWidget {
   }
 }
 
-/// Détail d'un article pendant les courses (toucher son P ou son packaging) : en clair, dans un volet.
-Future<void> detailArticle(BuildContext context, LigneListe g) {
+/// Détail d'un article pendant les courses : en clair, dans un volet.
+/// [fermeSeul] (appui long sur la case, 13/11/2026, Aristide) : le volet se ferme tout seul après 4 secondes.
+Future<void> detailArticle(BuildContext context, LigneListe g, {bool fermeSeul = false}) async {
   final etat = Etat.instance;
   final p = etat.produit(g.produitId);
   final k = p == null ? null : etat.packagingDe(g, p);
@@ -1109,7 +1110,14 @@ Future<void> detailArticle(BuildContext context, LigneListe g) {
       'Promotion : ${promo.libelle.isNotEmpty ? promo.libelle : (etat.typePromotion(promo.type)?.nom ?? 'promo')}',
     if (g.consigne != null) 'Consigne : ${g.consigne}',
   ];
-  return volet<void>(
+  var ouvert = true;
+  final nav = Navigator.of(context);
+  if (fermeSeul) {
+    Future.delayed(const Duration(seconds: 4), () {
+      if (ouvert && nav.mounted) nav.pop();
+    });
+  }
+  await volet<void>(
     context,
     builder: (ctx) => corpsVolet(
       titre: p?.nom ?? 'Article',
@@ -1119,6 +1127,7 @@ Future<void> detailArticle(BuildContext context, LigneListe g) {
       ),
     ),
   );
+  ouvert = false;
 }
 
 // ---------------------------------------------------------------- Écran 4 : volet « Promotion visée »
@@ -1675,25 +1684,31 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       caseCourse: true,
       // 13/11/2026 (Aristide) : aucun geste sur l'article lui-même ; seule la case réagit.
       onCase: () => _appui(etat, l, p, x),
+      // 13/11/2026 (Aristide) : appui long sur la case : le détail, qui se ferme seul après 4 secondes.
       onCaseLong: () {
         HapticFeedback.mediumImpact();
-        menuActions(context, titre: p.nom, actions: [
-          if (manquant)
-            ActionLigne(Icons.check, 'Trouvé finalement', () => _appui(etat, l, p, x))
-          else
-            ActionLigne(Icons.remove_circle_outline, 'Manquant en rayon', () {
-              etat.marquerManquant(l, p.id, true);
-              Nav.message(context, '« ${p.nom} » : manquant en rayon');
-            }),
-          ActionLigne(Icons.info_outline, 'Détail', () => detailArticle(context, g)),
-        ]);
+        detailArticle(context, g, fermeSeul: true);
       },
     );
   }
 
-  /// Toucher la case coche ou décoche ; un article manquant touché est trouvé finalement (coché).
+  String? _dernierAppui;
+  DateTime _dernierAppuiLe = DateTime(2000);
+
+  /// Toucher la case coche ou décoche ; deux appuis rapprochés sur la même case marquent l'article manquant ;
+  /// un article manquant touché est trouvé finalement (coché).
   /// 13/11/2026 (Aristide) : le secteur où l'on vient de cocher prend le haut de l'écran.
   void _appui(Etat etat, Liste l, Produit p, Etape? x) {
+    final maintenant = DateTime.now();
+    final deuxAppuis = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
+    _dernierAppui = deuxAppuis ? null : p.id;
+    _dernierAppuiLe = maintenant;
+    if (deuxAppuis) {
+      HapticFeedback.mediumImpact();
+      etat.marquerManquant(l, p.id, true);
+      Nav.message(context, '« ${p.nom} » : manquant en rayon');
+      return;
+    }
     if (etat.manquant(l, p.id)) {
       etat.marquerManquant(l, p.id, false);
       if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
@@ -1702,7 +1717,9 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     }
     HapticFeedback.selectionClick();
     if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    // Après le délai du double appui : la case ne bouge pas sous le doigt entre deux appuis.
+    Future.delayed(const Duration(milliseconds: 460), () {
+      if (_dernierAppui != p.id || !(etat.ligne(l, p.id)?.coche ?? false)) return;
       final c = _titres[x.id]?.currentContext;
       if (mounted && c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
     });
