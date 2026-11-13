@@ -285,8 +285,8 @@ class _Etapes extends StatelessWidget {
       'Je fais mes courses',
       [
         'Au magasin, touchez « Faire les courses » : indiquez qui fait les courses et le parcours.',
-        'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez un article pour le cocher ; '
-            'touchez son P ou son packaging pour en voir le détail.',
+        'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez la grande case d\'un article pour le cocher, '
+            'deux fois pour le dire manquant ; un appui long sur la case en montre le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
         'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
         'À la fin, touchez « Terminer les courses ». La course va dans l\'onglet Courses, « Terminées » : joignez-y le PDF '

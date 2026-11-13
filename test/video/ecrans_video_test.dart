@@ -170,16 +170,20 @@ void main() {
         await _capture('v13 Terminer');
         await _toucher(tester, find.text('Continuer les courses'));
       });
-      // Un appui coche, deux appuis : manquant.
-      final articles = find.byType(LigneArticle);
-      if (articles.evaluate().isNotEmpty) {
-        await tester.tap(articles.at(2));
-        await tester.pump(const Duration(milliseconds: 320));
+      // Un appui sur la case coche (le secteur remonte en haut), deux appuis sur la case : manquant.
+      final cases = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('case-'));
+      if (cases.evaluate().length > 3) {
+        final c2 = tester.getCenter(cases.at(2));
+        debugPrint('VIDEO case coche ${c2.dx.round()} ${c2.dy.round()}');
+        await tester.tap(cases.at(2));
+        await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
         await _capture('v10 En-magasin-coche');
-        await tester.tap(articles.at(3));
+        final c3 = tester.getCenter(cases.at(3));
+        debugPrint('VIDEO case manquant ${c3.dx.round()} ${c3.dy.round()}');
+        await tester.tap(cases.at(3));
         await tester.pump(const Duration(milliseconds: 60));
-        await tester.tap(articles.at(3));
+        await tester.tap(cases.at(3));
         await tester.pump(const Duration(milliseconds: 320));
         await tester.pumpAndSettle();
         await _capture('v11 Manquant');

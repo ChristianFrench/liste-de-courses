@@ -408,12 +408,14 @@ class Aides {
       'sinon elle garde l\'ordre de saisie.\n$_gestes';
 
   static const enMagasin = 'La liste suit l\'ordre des allées, sous de minces bandeaux de secteur.\n'
-      'Touchez un article quand il est dans le chariot : il est barré et grisé, à sa place. Touchez-le de nouveau pour le décocher.\n'
-      'Touchez deux fois de suite un article absent du rayon (ou faites un appui long) : il est marqué « manquant », en rouge.\n'
-      'Touchez le P d\'une promotion ou le code du packaging pour en voir le détail.\n'
+      'Seule la grande case à gauche réagit : touchez-la quand l\'article est dans le chariot, il est barré et grisé, à sa place, '
+      'et son secteur remonte en haut de l\'écran. Touchez-la de nouveau pour le décocher.\n'
+      'Touchez deux fois de suite la case d\'un article absent du rayon : il est marqué « manquant », en rouge.\n'
+      'Un appui long sur la case montre le détail de l\'article (promotion, packaging, consigne), en bas, pendant 4 secondes.\n'
       '« Pause » interrompt les courses sans rien perdre. '
       '« Terminer » affiche les articles manquants et non cochés, puis range la course en attente de son ticket.\n'
-      'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n$_gestes';
+      'L\'ordre dans lequel vous cochez apprend le parcours du magasin pour les prochaines fois.\n'
+      'Pendant les courses, rien ne modifie la liste ni les produits : pas de glissement ni de menu sur les lignes, seule la case réagit.';
 
   static const foyer = 'Foyer : son nom, partagé ou seul sur cet appareil. Seul : pas de membres ni de synchronisation ; pour '
       'partager les listes avec d\'autres personnes, touchez la ligne du foyer puis « Passer en foyer ».\n'
