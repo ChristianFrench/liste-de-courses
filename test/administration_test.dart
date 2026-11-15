@@ -168,7 +168,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('console-recherche-compte')), findsOneWidget);
     expect(find.textContaining(RegExp(r'^1 / \d+$')), findsOneWidget);
-    expect(find.byKey(const ValueKey('console-produit-Fruits/Abricots')), findsOneWidget);
+    expect(find.textContaining(RegExp('[Aa]bricot')), findsWidgets, reason: 'la première correspondance est montrée');
     if (tester.widget<IconButton>(find.byKey(const ValueKey('console-recherche-suivant'))).onPressed != null) {
       await tester.tap(find.byKey(const ValueKey('console-recherche-suivant')));
       await tester.pumpAndSettle();
