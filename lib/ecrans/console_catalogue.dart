@@ -9,6 +9,7 @@ import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
 import '../donnees/catalogue_type.dart';
 import '../donnees/journal_catalogue.dart';
+import '../donnees/moderation.dart' show Moderation;
 import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/univers.dart';
@@ -172,6 +173,89 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   final _focus = FocusNode(debugLabel: 'catalogue');
   Object? _survole;
+
+  // ---------------------------------------------------------------- recherche au sens strict
+  // 15/11/2026 (Aristide) : la recherche ne filtre plus l'affichage ; elle montre la première correspondance
+  // (rayon, secteur ou produit, dans l'ordre du catalogue) et propose d'aller à la suivante ou à la précédente.
+
+  List<Object> _resultats = const [];
+  int _indice = 0;
+  Object? get _trouve => _resultats.isEmpty ? null : _resultats[_indice];
+  final _cleTrouve = GlobalKey();
+
+  static String _plat(String t) => Moderation.sansAccents(t.toLowerCase()).replaceAll('œ', 'oe');
+
+  void _chercher(String v) {
+    recherche = v;
+    final q = _plat(v.trim());
+    final r = <Object>[];
+    if (q.length >= 2) {
+      for (final x in _rayonsDansLOrdre()) {
+        if (_plat(x.nom).contains(q)) r.add(x);
+        for (final sc in x.secteurs) {
+          if (_plat(sc.nom).contains(q)) r.add(sc);
+          for (final p in _produitsTries(sc)) {
+            if (_plat(p.nom).contains(q)) r.add(p);
+          }
+        }
+      }
+    }
+    _resultats = r;
+    _indice = 0;
+    if (r.isEmpty) {
+      setState(() {});
+    } else {
+      _allerA(0);
+    }
+  }
+
+  void _allerA(int i) {
+    if (_resultats.isEmpty) return;
+    _indice = i % _resultats.length;
+    final o = _resultats[_indice];
+    setState(() {
+      produitsChoisis.clear();
+      choisi = null;
+      switch (o) {
+        case CatRayon r:
+          choisi = r;
+        case CatSecteur sc:
+          final r = _rayonDe(sc);
+          if (r != null) rayonsOuverts.add(r);
+          choisi = sc;
+        case CatProduit p:
+          for (final r in b.catalogue.rayons) {
+            for (final sc in r.secteurs) {
+              if (!sc.produits.any((x) => identical(x, p))) continue;
+              rayonsOuverts.add(r);
+              secteursOuverts.add(sc);
+              produitsChoisis.add(p);
+            }
+          }
+      }
+    });
+    // Défilement : position estimée (lignes de hauteur fixe), puis ajustement sur la ligne une fois construite.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_defilement.hasClients) return;
+      var y = 0.0;
+      for (final l in _lignes()) {
+        if (identical(l.objet, o)) break;
+        y += (l.domaine != null ? 46 : 0) + (l.p != null ? 32 : (l.s != null ? 38 : 42));
+      }
+      final pos = _defilement.position;
+      _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final c = _cleTrouve.currentContext;
+        if (c != null && c.mounted) Scrollable.ensureVisible(c, alignment: 0.3, duration: const Duration(milliseconds: 150));
+      });
+    });
+  }
+
+  Iterable<CatRayon> _rayonsDansLOrdre() => [
+        for (final u in [...b.univers.keys, autresRayons]) ...b.catalogue.rayons.where((x) => b.universDe(x.nom) == u),
+      ];
+
+  List<CatProduit> _produitsTries(CatSecteur s) => [...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase()));
 
   EtatEditeurCatalogue get e => widget.editeur;
   Brouillon get b => e.b!;
@@ -812,34 +896,21 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
   // ---------------------------------------------------------------- cadre du catalogue
 
   List<_Ligne> _lignes() {
-    final f = recherche.trim().toLowerCase();
-    final cherche = f.length >= 2;
     final l = <_Ligne>[];
     // Rayons regroupés par domaine, dans l'ordre des domaines (08/11/2026, Aristide).
     String? dernier;
-    for (final r in [
-      for (final u in [...b.univers.keys, autresRayons]) ...b.catalogue.rayons.where((x) => b.universDe(x.nom) == u),
-    ]) {
-      final rTrouve = cherche && r.nom.toLowerCase().contains(f);
-      final sous = <_Ligne>[];
-      for (final s in r.secteurs) {
-        final sTrouve = cherche && s.nom.toLowerCase().contains(f);
-        final produits = [for (final p in s.produits) if (cherche && p.nom.toLowerCase().contains(f)) p];
-        if (cherche && !rTrouve && !sTrouve && produits.isEmpty) continue;
-        sous.add(_Ligne(r, s));
-        if (cherche ? produits.isNotEmpty : secteursOuverts.contains(s)) {
-          final montres = cherche && !sTrouve ? produits : ([...s.produits]..sort((a, c) => a.nom.toLowerCase().compareTo(c.nom.toLowerCase())));
-          if (cherche && sTrouve && !secteursOuverts.contains(s) && produits.isEmpty) continue;
-          for (final p in montres) {
-            sous.add(_Ligne(r, s, p));
-          }
-        }
-      }
-      if (cherche && !rTrouve && sous.isEmpty) continue;
+    for (final r in _rayonsDansLOrdre()) {
       final u = b.universDe(r.nom);
       l.add(_Ligne(r, null, null, u == dernier ? null : u));
       dernier = u;
-      if (cherche || rayonsOuverts.contains(r)) l.addAll(sous);
+      if (!rayonsOuverts.contains(r)) continue;
+      for (final s in r.secteurs) {
+        l.add(_Ligne(r, s));
+        if (!secteursOuverts.contains(s)) continue;
+        for (final p in _produitsTries(s)) {
+          l.add(_Ligne(r, s, p));
+        }
+      }
     }
     return l;
   }
@@ -854,10 +925,13 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     final hauteur = niveau == 1 ? 42.0 : (niveau == 2 ? 38.0 : 32.0);
     final fond = survol
         ? Charte.accent
-        : selection
+        : trouve
+            ? Charte.clair(Charte.orange, 0.65)
+            : selection
             ? Charte.fondSelection
             : (niveau == 1 ? Charte.niveau(2) : niveau == 2 ? Charte.niveau(3) : Charte.blanc);
-    final ouvert = niveau == 1 ? (recherche.trim().length >= 2 || rayonsOuverts.contains(l.r)) : secteursOuverts.contains(l.s);
+    final ouvert = niveau == 1 ? rayonsOuverts.contains(l.r) : secteursOuverts.contains(l.s);
+    final trouve = identical(_trouve, o);
     Widget contenu;
     switch (niveau) {
       case 1:
@@ -899,6 +973,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         ]);
     }
     final rangee = Container(
+      key: trouve ? _cleTrouve : null,
       height: hauteur,
       padding: const EdgeInsets.only(left: 8, right: 8),
       decoration: BoxDecoration(color: fond, border: Border(bottom: BorderSide(color: niveau == 3 ? Charte.separateurLigne : Charte.blanc))),
@@ -1009,10 +1084,33 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
                 key: const ValueKey('console-recherche'),
                 style: Charte.texte(15),
                 decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
-                onChanged: (v) => setState(() => recherche = v),
+                onChanged: _chercher,
+                // Entrée : correspondance suivante, en gardant la main dans le champ.
+                onSubmitted: (_) => _allerA(_indice + 1),
               ),
             ),
           ),
+          if (recherche.trim().length >= 2) ...[
+            const SizedBox(width: 10),
+            Text(_resultats.isEmpty ? 'Aucun résultat' : '${_indice + 1} / ${_resultats.length}',
+                key: const ValueKey('console-recherche-compte'), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            Tooltip(
+              message: 'Précédent',
+              child: IconButton(
+                key: const ValueKey('console-recherche-precedent'),
+                onPressed: _resultats.length < 2 ? null : () => _allerA(_indice - 1 + _resultats.length),
+                icon: Icone(Icons.keyboard_arrow_up, size: 26, color: Charte.cadre),
+              ),
+            ),
+            Tooltip(
+              message: 'Suivant',
+              child: IconButton(
+                key: const ValueKey('console-recherche-suivant'),
+                onPressed: _resultats.length < 2 ? null : () => _allerA(_indice + 1),
+                icon: Icone(Icons.keyboard_arrow_down, size: 26, color: Charte.cadre),
+              ),
+            ),
+          ],
           const SizedBox(width: 6),
           Tooltip(
             message: toutOuvert ? 'Tout replier' : 'Tout déplier',

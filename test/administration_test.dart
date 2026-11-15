@@ -163,6 +163,20 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(ValueKey('console-produit-Légumes/$nom')), findsOneWidget, reason: 'déplacé à la souris');
 
+    // 15/11/2026 : recherche au sens strict, sans filtre : première correspondance surlignée, suivante / précédente.
+    await tester.enterText(find.byKey(const ValueKey('console-recherche')), 'ABRICOT');
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('console-recherche-compte')), findsOneWidget);
+    expect(find.textContaining(RegExp(r'^1 / \d+$')), findsOneWidget);
+    expect(find.byKey(const ValueKey('console-produit-Fruits/Abricots')), findsOneWidget);
+    if (tester.widget<IconButton>(find.byKey(const ValueKey('console-recherche-suivant'))).onPressed != null) {
+      await tester.tap(find.byKey(const ValueKey('console-recherche-suivant')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining(RegExp(r'^2 / \d+$')), findsOneWidget);
+    }
+    await tester.enterText(find.byKey(const ValueKey('console-recherche')), '');
+    await tester.pumpAndSettle();
+
     // Le menu ☰ : historique en fenêtre, iconographie en fenêtre, valider avec confirmation.
     await tester.tap(find.byKey(const ValueKey('console-menu')));
     await tester.pumpAndSettle();
