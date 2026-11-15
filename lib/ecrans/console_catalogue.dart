@@ -922,6 +922,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     final niveau = l.p != null ? 3 : (l.s != null ? 2 : 1);
     final selection = o is CatProduit ? produitsChoisis.contains(o) : identical(choisi, o);
     final survol = identical(_survole, o);
+    final trouve = identical(_trouve, o);
     final hauteur = niveau == 1 ? 42.0 : (niveau == 2 ? 38.0 : 32.0);
     final fond = survol
         ? Charte.accent
@@ -931,7 +932,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
             ? Charte.fondSelection
             : (niveau == 1 ? Charte.niveau(2) : niveau == 2 ? Charte.niveau(3) : Charte.blanc);
     final ouvert = niveau == 1 ? rayonsOuverts.contains(l.r) : secteursOuverts.contains(l.s);
-    final trouve = identical(_trouve, o);
     Widget contenu;
     switch (niveau) {
       case 1:
