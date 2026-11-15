@@ -362,3 +362,32 @@ List<ArticleLu> lireTexte(Etat etat, String texte, {List<Difficulte>? rapport}) 
   }
   return res;
 }
+
+/// Le produit du catalogue qui correspond le mieux à [nom] (recettes, 15/11/2026) : correspondance apprise,
+/// sinon la même recherche que pour une liste collée.
+Produit? reconnaitreProduit(Etat etat, String nom) {
+  final appris = _correspondances[normaliser(nom)];
+  if (appris != null) {
+    final n = normaliser(appris[0]);
+    for (final p in etat.produitsVisibles) {
+      if (normaliser(p.nom) == n) return p;
+    }
+  }
+  final p = _chercher(etat.produitsVisibles, nom);
+  if (p != null) return p;
+  // « Lait » → Lait demi-écrémé : un produit dont le nom contient tous les mots de l'ingrédient,
+  // le plus utilisé par le foyer, sinon le nom le plus court.
+  final mots = _mots(nom);
+  if (mots.isEmpty) return null;
+  Produit? meilleur;
+  for (final q in etat.produitsVisibles) {
+    final mq = _mots(q.nom.split(' · ').first);
+    if (!mots.every(mq.contains) || mq.first != mots.first) continue;
+    if (meilleur == null ||
+        q.nbUtilisations > meilleur.nbUtilisations ||
+        (q.nbUtilisations == meilleur.nbUtilisations && q.nom.length < meilleur.nom.length)) {
+      meilleur = q;
+    }
+  }
+  return meilleur;
+}

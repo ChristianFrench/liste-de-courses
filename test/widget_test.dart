@@ -854,6 +854,31 @@ void main() {
       await _ciblesTactiles(tester);
     });
 
+    testWidgets('préparation : bouton Recette, ingrédients d\'une recette collée à cocher, placard décoché', (tester) async {
+      final etat = Etat.instance;
+      final l = etat.liste('l1')!;
+      EcranConstruction.recettes = true;
+      addTearDown(() => EcranConstruction.recettes = false);
+      await _accueil(tester);
+      await _ouvrirListe(tester, etat.nomListe(l), 'Continuer la préparation');
+      final avant = l.lignes.length;
+      await _toucher(tester, find.byKey(const ValueKey('bouton-recette')));
+      await _toucher(tester, find.text('Texte de la recette').last);
+      await tester.enterText(find.byKey(const ValueKey('texte-recette')), 'Gâteau test\nIngrédients\n4 œufs\n1 pincée de sel\nPréparation\nMélanger.');
+      await _toucher(tester, find.text('Lire les ingrédients'));
+      expect(find.text('Gâteau test'), findsWidgets);
+      final oeufs = etat.produitsVisibles.firstWhere((p) => normaliser(p.nom) == 'oeufs' || normaliser(p.nom).startsWith('oeuf'));
+      final dejaOeufs = etat.ligne(l, oeufs.id) != null;
+      await _toucher(tester, find.text('Ajouter à la liste'));
+      if (!dejaOeufs) {
+        expect(etat.ligne(l, oeufs.id), isNotNull, reason: 'œufs cochés au départ');
+        expect(etat.ligne(l, oeufs.id)!.consigne, contains('pour : Gâteau test'));
+      }
+      expect(l.lignes.where((g) => normaliser(etat.produit(g.produitId)!.nom) == 'sel').isEmpty, isTrue,
+          reason: 'le sel (placard) est décoché');
+      expect(l.lignes.length, avant + (dejaOeufs ? 0 : 1));
+    });
+
     testWidgets('préparation : « Autres produits » du secteur, habituels d\'abord, cocher les ajoute', (tester) async {
       final etat = Etat.instance;
       final l = etat.liste('l1')!;

@@ -6,9 +6,11 @@ import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' as picto;
+import '../donnees/demonstration.dart';
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';
+import '../donnees/recette_ingredients.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'catalogue.dart' show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces, secteursOrdreCatalogue;
@@ -472,6 +474,9 @@ class EcranConstruction extends StatefulWidget {
   /// Après un ajout par la recherche, le volet « Promo » s'ouvre (04/11/2026) ; coupé par certains essais.
   static bool promoApresRecherche = true;
 
+  /// 15/11/2026 : le bouton « Recette » (ingrédients d'une recette à cocher) ; démonstration d'abord.
+  static bool recettes = demonstration;
+
   @override
   State<EcranConstruction> createState() => _EcranConstructionState();
 }
@@ -523,7 +528,21 @@ class _EcranConstructionState extends State<EcranConstruction> {
             sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · '
                 '${etat.coursesPrevues(l).isEmpty ? etat.creeeLe(l) : etat.coursesPrevues(l)}',
             aide: simple ? Aides.listeSimple : Aides.preparation,
-            droite: boutonLoupe(() => setState(() {})),
+            // 15/11/2026 (Aristide) : bouton « Recette » en bas à droite de l'en-tête (démonstration d'abord).
+            droite: EcranConstruction.recettes
+                ? Row(mainAxisSize: MainAxisSize.min, children: [
+                    KeyedSubtree(
+                      key: const ValueKey('bouton-recette'),
+                      child: _BoutonBascule(
+                        actif: false,
+                        image: 'assets/recettes/recettes-de-cuisine.png',
+                        libelle: 'Ajouter les ingrédients d\'une recette',
+                        onTap: () => _recette(l),
+                      ),
+                    ),
+                    boutonLoupe(() => setState(() {})),
+                  ])
+                : boutonLoupe(() => setState(() {})),
             actions: [
               ActionLigne(Icons.event_outlined, 'Changer le magasin ou la date', () => changerMagasinEtDate(context, l)),
               ActionLigne(Icons.mail_outline, 'Envoyer par mail', () async {
@@ -679,6 +698,157 @@ class _EcranConstructionState extends State<EcranConstruction> {
   }
 
   /// L'article trouvé s'ajoute (s'il n'y est pas) ; l'écran va sur lui et le signale quelques secondes.
+  /// 15/11/2026 (Aristide) : une recette (mes recettes, lien internet ou texte) propose ses ingrédients à cocher ;
+  /// les produits du placard sont décochés au départ ; les cochés complètent la liste, avec la consigne « pour : … ».
+  Future<void> _recette(Liste l) async {
+    final source = await choisirDansListe<int>(context, titre: 'Ingrédients d\'une recette', choix: {
+      0: 'Mes recettes',
+      1: 'Lien d\'une page internet',
+      2: 'Texte de la recette',
+    });
+    if (source == null || !mounted) return;
+    RecetteLue? r;
+    if (source == 0) {
+      r = await _choisirRecette();
+    } else if (source == 1) {
+      final lien = await demanderTexte(context,
+          titre: 'Lien de la recette', libelle: 'Adresse de la page', valider: 'Lire la recette',
+          cleChamp: const ValueKey('lien-recette'));
+      if (lien == null || lien.trim().isEmpty || !mounted) return;
+      try {
+        Nav.message(context, 'Lecture de la page…');
+        r = await recetteDepuisLien(lien);
+      } catch (_) {
+        if (mounted) {
+          Nav.message(context, 'Cette page ne peut pas être lue ici. Copiez le texte de la recette, '
+              'puis choisissez « Texte de la recette ».');
+        }
+        return;
+      }
+    } else {
+      final texte = TextEditingController();
+      final lire = await modale(
+        context,
+        titre: 'Texte de la recette',
+        icone: Icons.notes,
+        oui: 'Lire les ingrédients',
+        contenu: (context, maj) => TextField(
+          key: const ValueKey('texte-recette'),
+          controller: texte,
+          minLines: 12,
+          maxLines: 20,
+          style: Charte.texte(15),
+          decoration: const InputDecoration(
+              labelText: 'Recette (titre, ingrédients…)', hintText: 'Quiche lorraine\n200 g de lardons\n3 œufs\n20 cl de crème…'),
+        ),
+      );
+      if (!lire || texte.text.trim().isEmpty) return;
+      r = lireRecetteTexte(texte.text);
+    }
+    if (r == null || !mounted) return;
+    final lus = analyserIngredients(etat, r.ingredients);
+    final deja = [for (final a in lus) if (a.produit != null && etat.ligne(l, a.produit!.id) != null) a];
+    final aChoisir = [for (final a in lus) if (!deja.contains(a)) a];
+    if (aChoisir.isEmpty) {
+      Nav.message(context, deja.isEmpty ? 'Aucun ingrédient trouvé dans cette recette' : 'Tous les ingrédients sont déjà dans la liste');
+      return;
+    }
+    final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
+    final titre = r.titre;
+    final ok = await modale(
+      context,
+      titre: titre,
+      oui: 'Ajouter à la liste',
+      contenu: (context, maj) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
+              'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 8),
+          for (var i = 0; i < aChoisir.length; i++)
+            CaseModale(
+              key: ValueKey('ingredient-$i'),
+              texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
+              aide: aChoisir[i].texte,
+              coche: choisis.contains(i),
+              onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+              encadree: false,
+            ),
+          if (deja.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
+                  style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            ),
+        ],
+      ),
+    );
+    if (!ok || !mounted || choisis.isEmpty) return;
+    String? premier;
+    for (final i in choisis.toList()..sort()) {
+      final a = aChoisir[i];
+      final p = a.produit ?? etat.creerProduit(a.nom);
+      etat.ajouterLigne(l, p.id);
+      final c = etat.ligne(l, p.id)?.consigne;
+      final pour = 'pour : $titre';
+      if (c == null || !c.contains(pour)) etat.definirConsigne(l, p.id, c == null ? pour : '$c · $pour');
+      premier ??= p.id;
+    }
+    setState(() {
+      _surligne = premier;
+      _proposes = null;
+    });
+    if (premier != null) _amener(premier, essais: 4);
+    Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
+  }
+
+  /// Le catalogue de recettes : un champ pour filtrer, puis les titres par ordre alphabétique.
+  Future<RecetteLue?> _choisirRecette() async {
+    final toutes = await recettesFournies();
+    if (!mounted) return null;
+    RecetteLue? choix;
+    var filtre = '';
+    await modale(
+      context,
+      titre: 'Mes recettes',
+      oui: null,
+      contenu: (context, maj) {
+        final f = normaliser(filtre);
+        final vues = [for (final r in toutes) if (f.isEmpty || normaliser(r.titre).contains(f)) r];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              key: const ValueKey('filtre-recettes'),
+              style: Charte.texte(15),
+              decoration: const InputDecoration(labelText: 'Chercher une recette', prefixIcon: Icon(Icons.search)),
+              onChanged: (v) => maj(() => filtre = v),
+            ),
+            const SizedBox(height: 6),
+            for (final r in vues)
+              InkWell(
+                key: ValueKey('recette-${r.titre}'),
+                onTap: () {
+                  choix = r;
+                  Navigator.of(context).pop(true);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+                  child: Text.rich(TextSpan(children: [
+                    TextSpan(text: r.titre, style: Charte.texte(16)),
+                    if (r.types.isNotEmpty)
+                      TextSpan(text: '  ${r.types.first}', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                  ])),
+                ),
+              ),
+            if (vues.isEmpty) Text('Aucune recette', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          ],
+        );
+      },
+    );
+    return choix;
+  }
+
   void _ajouter(Liste l, Produit p, {bool avecPromo = false}) {
     if (etat.ligne(l, p.id) == null) etat.ajouterLigne(l, p.id);
     // Une nouvelle recherche referme les articles proposés d'un secteur.
