@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'dossier_application.dart';
+import 'modele.dart' show Etat;
 
 // Catalogue des recettes de la console (10/11/2026, Aristide) : les notes Google Keep libellées « Recettes … »
 // importées dans une base SÉPARÉE (recettes/recettes.json et ses photos, dans le dossier de la console), sans
@@ -209,7 +210,17 @@ class BaseRecettes {
       final j = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
       return BaseRecettes(d, [for (final r in (j['recettes'] as List? ?? const []).cast<Map>()) Recette.lire(r)])
         ..versionFournie = (j['fournies'] as num?)?.toInt() ?? 0;
-    } catch (_) {
+    } catch (e) {
+      // 16/11/2026 : une base de recettes illisible était remplacée par une base vide au premier
+      // enregistrement : elle est d'abord mise de côté, intacte.
+      final cote = '${f.path}.illisible-${DateTime.now().millisecondsSinceEpoch}';
+      var ou = 'mise de côté ($cote)';
+      try {
+        await f.rename(cote);
+      } catch (e2) {
+        ou = 'NON mise de côté ($e2)';
+      }
+      Etat.instance.noter('Base de recettes illisible, $ou : $e');
       return BaseRecettes(d);
     }
   }

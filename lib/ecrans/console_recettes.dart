@@ -6,6 +6,7 @@ import '../composants/icone.dart';
 import '../donnees/recettes.dart';
 import '../theme.dart';
 import 'administration_serveur.dart' show TitrePageAdmin;
+import '../donnees/modele.dart' show Etat;
 
 // Console › Catalogue des recettes (10/11/2026, Aristide) : base séparée, importée des notes Google Keep.
 // À gauche, la liste façon catalogue : un bandeau dépliable par type (Plats, Sauces, Desserts…), puis ses
@@ -38,10 +39,14 @@ class _PageRecettesState extends State<PageRecettes> {
         // Recettes reformulées et illustrations livrées avec la console : posées sans rien demander.
         try {
           await b.appliquerRecettesFournies();
-        } catch (_) {}
+        } catch (e) {
+          Etat.instance.noter('Recettes livrées non appliquées : $e');
+        }
         try {
           await b.appliquerIllustrationsFournies();
-        } catch (_) {}
+        } catch (e) {
+          Etat.instance.noter('Illustrations livrées non appliquées : $e');
+        }
         if (mounted) setState(() => base = b);
       }, onError: (Object e) {
         // Sans dossier de données (tests) : une base vide, en mémoire.

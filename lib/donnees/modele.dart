@@ -1319,12 +1319,15 @@ class Etat extends ChangeNotifier {
     try {
       final ip = _actif?.reglage('images_perso');
       remplacerImagesPerso(ip == null || ip.isEmpty ? {} : lireImagesPerso(jsonDecode(ip)));
-    } catch (_) {}
+    } catch (e) {
+      noter('Images du catalogue commun illisibles : $e');
+    }
     // Univers (domaines) reçus avec le catalogue commun (08/11/2026) ; sinon ceux d'origine.
     try {
       final u = _actif?.reglage('univers_catalogue');
       remplacerUnivers(u == null || u.isEmpty ? null : lireUnivers(jsonDecode(u)));
-    } catch (_) {
+    } catch (e) {
+      noter('Univers du catalogue commun illisibles, ceux d\'origine sont pris : $e');
       remplacerUnivers(null);
     }
     typesPromotion = [
@@ -3616,11 +3619,14 @@ class Etat extends ChangeNotifier {
             p = Produit(plusieurs && _trouve(produits, (x) => x.id == id) != null ? 'pc-${_cleNom(sn)}-${_cleNom(nom)}' : id, nom, [], [], 0);
             produits.add(p);
             parNom.putIfAbsent(bas(nom), () => p!);
+            // 16/11/2026 : un format ou une marque répétés (« 1 kg » et « 1kg ») ne comptent qu'une fois.
             for (final f in (pj['formats'] as List? ?? const []).cast<String>()) {
-              p.packagingIds.add(_packagingNomme(f).id);
+              final k = _packagingNomme(f).id;
+              if (!p.packagingIds.contains(k)) p.packagingIds.add(k);
             }
             for (final mq in (pj['marques'] as List? ?? const []).cast<String>()) {
-              p.marqueIds.add(marqueNommee(mq).id);
+              final m = marqueNommee(mq).id;
+              if (!p.marqueIds.contains(m)) p.marqueIds.add(m);
             }
             lignes.add('$sn : $nom');
           }
@@ -4150,8 +4156,9 @@ class Etat extends ChangeNotifier {
     if (formatsAppliques) return;
     try {
       catalogue ??= await CatalogueType.lireJson();
-    } catch (_) {
-      return; // catalogue illisible : on réessaiera au prochain lancement
+    } catch (e) {
+      noter('Formats du catalogue non appliqués (catalogue illisible), nouvel essai au prochain lancement : $e');
+      return;
     }
     final parNom = <String, List<String>>{};
     final tous = <String>{};

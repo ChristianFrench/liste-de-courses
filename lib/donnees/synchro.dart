@@ -965,7 +965,9 @@ class Synchro extends ChangeNotifier {
     final Map<String, dynamic> m;
     try {
       m = jsonDecode(contenu) as Map<String, dynamic>;
-    } catch (_) {
+    } catch (e) {
+      // 16/11/2026 : un message reçu illisible était ignoré sans trace.
+      _etat.noter('Message illisible reçu sur $sujet (${contenu.length} caractères) : $e');
       return;
     }
     final de = m['de'] as String?;

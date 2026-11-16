@@ -4,6 +4,7 @@ import 'dart:js_interop';
 import 'package:file_selector/file_selector.dart';
 
 import 'demonstration.dart';
+import 'modele.dart' show Etat;
 
 // Copies de sauvegarde dans le navigateur (localStorage) : elles disparaissent si l'on efface les données
 // du site ; seul le fichier téléchargé (« Sauvegarder maintenant ») protège alors.
@@ -43,18 +44,20 @@ Future<Map<String, String>> lireCopies() async {
   return res;
 }
 
+/// 16/11/2026 : une copie refusée par le navigateur (place pleine) était perdue sans trace ; l'erreur remonte
+/// désormais à la sauvegarde, qui la note au journal de l'appareil.
 Future<void> ecrireCopie(String nom, String contenu) async {
-  try {
-    _local?.setItem('$_prefixe$nom', contenu);
-    _definirNoms({..._noms(), nom}.toList());
-  } catch (_) {}
+  _local?.setItem('$_prefixe$nom', contenu);
+  _definirNoms({..._noms(), nom}.toList());
 }
 
 Future<void> effacerCopie(String nom) async {
   try {
     _local?.removeItem('$_prefixe$nom');
     _definirNoms(_noms()..remove(nom));
-  } catch (_) {}
+  } catch (e) {
+    Etat.instance.noter('Ancienne copie de sauvegarde non effacée, $nom : $e');
+  }
 }
 
 @JS('URL.createObjectURL')

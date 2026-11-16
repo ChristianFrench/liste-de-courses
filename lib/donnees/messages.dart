@@ -181,7 +181,9 @@ class MessagesFoyer extends ChangeNotifier {
         for (final m in (jsonDecode(base?.reglage('journal_ntfy') ?? '[]') as List).whereType<Map>()) {
           if (MessageFoyer.lire(m) case final x?) tous[x.id] = x;
         }
-      } catch (_) {}
+      } catch (e) {
+        Etat.instance.noter('Messages du foyer gardés illisibles : $e');
+      }
     }
     for (final x in lus) {
       tous[x.id] = x;

@@ -43,7 +43,9 @@ Future<int?> reparerEmplacementsPerdus() async {
   Map<String, dynamic>? catalogue;
   try {
     catalogue = await CatalogueCommun.instance.dernier();
-  } catch (_) {}
+  } catch (e) {
+    etat.noter('Réparation des emplacements sans le catalogue commun (illisible) : $e');
+  }
   final r = etat.reparerEmplacements(copies: copies, catalogue: catalogue);
   stockage.definirReglage(_reglageFait, '1');
   etat.noter('Réparation des emplacements : ${r.copies} produits replacés d\'après ${copies.length} sauvegarde(s), '

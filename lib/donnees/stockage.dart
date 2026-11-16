@@ -476,21 +476,23 @@ class Stockage {
       } finally {
         _db.execute('PRAGMA foreign_keys = ON');
       }
-      // Les liens qui ne mènent nulle part (emplacement d'un secteur disparu, ligne d'une liste disparue…)
-      // sont retirés ; ce qui reste est noté au journal de l'appareil, sans alerte à l'écran.
+      // 16/11/2026 : une référence FACULTATIVE qui ne mène nulle part (coché par un membre encore inconnu ici,
+      // marque ou packaging absents…) est vidée, la ligne est gardée. Avant, une ligne de liste cochée par un
+      // membre pas encore reçu était effacée en silence, sans rien envoyer aux autres appareils.
       final avant = referencesOrphelines();
-      for (final r in _db.select('SELECT DISTINCT "table" AS t FROM pragma_foreign_key_check')) {
-        final t = r['t'] as String;
-        if (!_liensRetirables.contains(t)) continue;
-        _db.execute('DELETE FROM "$t" WHERE rowid IN (SELECT rowid FROM pragma_foreign_key_check(?))', [t]);
-      }
-      // Ailleurs, une référence facultative (rayon où reprendre une préparation…) qui ne mène nulle part est vidée.
       for (final r in _db.select('SELECT "table" AS t, rowid AS id, fkid FROM pragma_foreign_key_check')) {
         final t = r['t'] as String;
         final colonne = _db.select('SELECT "from" AS c FROM pragma_foreign_key_list(?) WHERE id = ?', [t, r['fkid']]).firstOrNull?['c'];
         if (colonne == null || r['id'] == null) continue;
-        final facultative = _db.select('SELECT 1 FROM pragma_table_info(?) WHERE name = ? AND "notnull" = 0', [t, colonne]).isNotEmpty;
+        final facultative = _db.select('SELECT 1 FROM pragma_table_info(?) WHERE name = ? AND "notnull" = 0 AND pk = 0', [t, colonne]).isNotEmpty;
         if (facultative) _db.execute('UPDATE "$t" SET "$colonne" = NULL WHERE rowid = ?', [r['id']]);
+      }
+      // Les liens dont une référence obligatoire ne mène nulle part (emplacement d'un secteur disparu, ligne
+      // d'une liste disparue…) sont retirés ; ce qui reste est noté au journal de l'appareil, sans alerte à l'écran.
+      for (final r in _db.select('SELECT DISTINCT "table" AS t FROM pragma_foreign_key_check')) {
+        final t = r['t'] as String;
+        if (!_liensRetirables.contains(t)) continue;
+        _db.execute('DELETE FROM "$t" WHERE rowid IN (SELECT rowid FROM pragma_foreign_key_check(?))', [t]);
       }
       final reste = referencesOrphelines();
       _referencesAbimees = reste.isNotEmpty;
@@ -609,7 +611,10 @@ class Stockage {
       _Ensemble e, List<Map<String, Object?>> liens, CommonPreparedStatement Function(String) requete) {
     final parParent = <String, List<Object?>>{};
     for (final l in liens) {
-      (parParent[l[e.parent] as String] ??= []).add(l[e.enfant]);
+      final enfants = parParent[l[e.parent] as String] ??= [];
+      // 16/11/2026 : un même lien deux fois (une marque déjà connue, rendue par le catalogue commun) faisait
+      // échouer tout l'enregistrement (contrainte d'unicité) ; il n'est écrit qu'une fois.
+      if (!enfants.contains(l[e.enfant])) enfants.add(l[e.enfant]);
     }
     final presents = <String>{};
     parParent.forEach((parent, enfants) {

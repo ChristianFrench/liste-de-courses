@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'dossier_application.dart';
 import 'demonstration.dart';
+import 'modele.dart' show Etat;
 
 // Où sont rangées les copies de sauvegarde (Android et Windows ; le navigateur : sauvegarde_depot_web.dart).
 // Windows : Documents\Emplettes, hors du dossier de l'application.
@@ -46,7 +47,9 @@ Future<Map<String, String>> lireCopies() async {
     if (!nom.endsWith('.emplettes')) continue;
     try {
       res[nom] = await f.readAsString();
-    } catch (_) {}
+    } catch (e) {
+      Etat.instance.noter('Copie de sauvegarde illisible, $nom : $e');
+    }
   }
   return res;
 }
@@ -59,7 +62,10 @@ Future<void> ecrireCopie(String nom, String contenu) async {
   if (Platform.isAndroid && dossierSauvegardesEssai == null) {
     try {
       await _canal.invokeMethod<bool>('copieDocuments', {'nom': nom, 'chemin': f.path});
-    } catch (_) {}
+    } catch (e) {
+      // 16/11/2026 : la copie dans Documents (qui survit à une désinstallation) pouvait manquer sans trace.
+      Etat.instance.noter('Copie de sauvegarde non recopiée dans Documents, $nom : $e');
+    }
   }
 }
 
@@ -70,7 +76,9 @@ Future<void> effacerCopie(String nom) async {
   if (Platform.isAndroid && dossierSauvegardesEssai == null) {
     try {
       await _canal.invokeMethod<bool>('effacerDocument', {'nom': nom});
-    } catch (_) {}
+    } catch (e) {
+      Etat.instance.noter('Ancienne copie de sauvegarde non effacée de Documents, $nom : $e');
+    }
   }
 }
 
