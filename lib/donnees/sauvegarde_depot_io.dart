@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'dossier_application.dart';
 import 'demonstration.dart';
-import 'modele.dart' show Etat;
+import 'modele.dart' show Etat, EtatChargement;
 
 // Où sont rangées les copies de sauvegarde (Android et Windows ; le navigateur : sauvegarde_depot_web.dart).
 // Windows : Documents\Emplettes, hors du dossier de l'application.

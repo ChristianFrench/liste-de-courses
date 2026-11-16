@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'dossier_application.dart';
-import 'modele.dart' show Etat;
+import 'modele.dart' show Etat, EtatChargement;
 
 // Catalogue des recettes de la console (10/11/2026, Aristide) : les notes Google Keep libellées « Recettes … »
 // importées dans une base SÉPARÉE (recettes/recettes.json et ses photos, dans le dossier de la console), sans

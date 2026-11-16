@@ -12,7 +12,6 @@ import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
 import 'dart:async';
 
-import 'package:liste_de_courses/ecrans/travail.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
 import 'package:liste_de_courses/main.dart';

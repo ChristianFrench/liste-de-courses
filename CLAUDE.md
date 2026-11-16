@@ -17,6 +17,7 @@ Le maître d'ouvrage (M. Bezard) n'intervient pas dans le code.
 
 ## Règles
 
+- Avant de modifier le code, lire `ARCHITECTURE.md` (structure, chemin d'une modification, règles à ne jamais enfreindre) ; le tenir à jour.
 - Ne pas modifier le contenu de `ihm/vX.Y/` : c'est la référence transmise par le fil IHM. Un écart nécessaire se signale dans le compte rendu de livraison.
 - Le répertoire `ihm/` n'entre pas dans `Documents.zip`. Copier la spécification dans `documents/` si elle doit figurer dans « 1 Documents ».
 

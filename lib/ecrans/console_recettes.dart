@@ -6,7 +6,7 @@ import '../composants/icone.dart';
 import '../donnees/recettes.dart';
 import '../theme.dart';
 import 'administration_serveur.dart' show TitrePageAdmin;
-import '../donnees/modele.dart' show Etat;
+import '../donnees/modele.dart' show Etat, EtatChargement;
 
 // Console › Catalogue des recettes (10/11/2026, Aristide) : base séparée, importée des notes Google Keep.
 // À gauche, la liste façon catalogue : un bandeau dépliable par type (Plats, Sauces, Desserts…), puis ses

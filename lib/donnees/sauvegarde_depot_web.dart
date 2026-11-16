@@ -4,7 +4,7 @@ import 'dart:js_interop';
 import 'package:file_selector/file_selector.dart';
 
 import 'demonstration.dart';
-import 'modele.dart' show Etat;
+import 'modele.dart' show Etat, EtatChargement;
 
 // Copies de sauvegarde dans le navigateur (localStorage) : elles disparaissent si l'on efface les données
 // du site ; seul le fichier téléchargé (« Sauvegarder maintenant ») protège alors.
