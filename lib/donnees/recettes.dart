@@ -26,6 +26,7 @@ class Recette {
     this.texteOrigine,
     this.memo = false,
     this.illustration,
+    this.pour,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -56,6 +57,9 @@ class Recette {
 
   /// Illustration fournie avec la console déjà posée (« nom:taille ») : on ne la recopie pas à chaque ouverture.
   String? illustrationFournie;
+  /// Nombre de personnes (ou de pièces) prévu par les quantités : « 4 personnes », « 30 crêpes ».
+  String? pour;
+
   bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
 
   Map<String, dynamic> versJson() => {
@@ -74,6 +78,7 @@ class Recette {
         if (texteOrigine != null) 'texteOrigine': texteOrigine,
         if (memo) 'memo': true,
         if (illustration != null) 'illustration': illustration,
+        if (pour != null) 'pour': pour,
         if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
@@ -93,6 +98,7 @@ class Recette {
         texteOrigine: j['texteOrigine'] as String?,
         memo: j['memo'] == true,
         illustration: j['illustration'] as String?,
+        pour: j['pour'] as String?,
       )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 
