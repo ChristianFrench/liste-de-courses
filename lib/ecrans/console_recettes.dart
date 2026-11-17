@@ -226,6 +226,13 @@ class FicheRecette extends StatelessWidget {
                 Text(r.titre, style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
                 const SizedBox(height: 6),
                 Wrap(spacing: 8, runSpacing: 4, children: [
+                  if (r.source != null)
+                    Container(
+                      key: const ValueKey('recette-source'),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(color: Charte.cadre, borderRadius: BorderRadius.circular(12)),
+                      child: Text('Recette ${r.source}', style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
+                    ),
                   for (final t in r.types)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),

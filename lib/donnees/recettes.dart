@@ -27,6 +27,7 @@ class Recette {
     this.memo = false,
     this.illustration,
     this.pour,
+    this.source,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -60,6 +61,9 @@ class Recette {
   /// Nombre de personnes (ou de pièces) prévu par les quantités : « 4 personnes », « 30 crêpes ».
   String? pour;
 
+  /// Origine : null pour les recettes maison (Google Keep), « Emplettes » pour celles rédigées pour l'application.
+  String? source;
+
   bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
 
   Map<String, dynamic> versJson() => {
@@ -79,6 +83,7 @@ class Recette {
         if (memo) 'memo': true,
         if (illustration != null) 'illustration': illustration,
         if (pour != null) 'pour': pour,
+        if (source != null) 'source': source,
         if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
@@ -99,6 +104,7 @@ class Recette {
         memo: j['memo'] == true,
         illustration: j['illustration'] as String?,
         pour: j['pour'] as String?,
+        source: j['source'] as String?,
       )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 

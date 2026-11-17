@@ -157,7 +157,7 @@ void main() {
       'version': 1,
       'recettes': [
         {'id': 'keep-1', 'titre': 'Mousse au chocolat', 'types': ['Dessert'], 'ingredients': ['200 g Chocolat'],
-         'preparation': '1. Fondre.', 'photos': [], 'etapes': ['Faire fondre le chocolat.'], 'pour': '6 personnes'},
+         'preparation': '1. Fondre.', 'photos': [], 'etapes': ['Faire fondre le chocolat.'], 'pour': '6 personnes', 'source': 'Emplettes'},
         {'id': 'keep-3', 'titre': 'Nouvelle', 'types': ['Plats'], 'ingredients': [], 'preparation': '', 'photos': []},
       ],
     }));
@@ -170,6 +170,7 @@ void main() {
     expect(b.recettes.first.titre, 'Mousse au chocolat');
     expect(b.recettes.first.etapes.single, 'Faire fondre le chocolat.');
     expect(b.recettes.first.pour, '6 personnes');
+    expect(b.recettes.first.source, 'Emplettes');
     expect(b.recettes.first.photos, isEmpty);
     expect(b.recettes.first.illustration, 'illustration-x.jpg');
     expect(File('${dest.path}/vieille.jpg').existsSync(), isFalse);
