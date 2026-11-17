@@ -1,0 +1,41 @@
+# APK d'essai des tailles d'illustration des recettes (480, 720, 1080 pixels de large), publiée sur la page
+# « derniere-version » sous le nom Essai-illustrations.apk. Lancée à chaque modification de l'outil, ou à la main.
+name: Essai illustrations
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['outils/essai_illustrations/**', '.github/workflows/essai-illustrations.yml']
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Préparer les trois tailles
+        run: |
+          pip install -q pillow
+          python3 outils/essai_illustrations/preparer.py outils/recettes/illustrations outils/essai_illustrations/assets
+      - name: Compiler l'APK
+        working-directory: outils/essai_illustrations
+        run: |
+          flutter create --org fr.listecourses --project-name essai_illustrations --platforms android .
+          sed -i 's/android:label="essai_illustrations"/android:label="Essai illustrations"/' android/app/src/main/AndroidManifest.xml
+          flutter build apk --release
+          cp build/app/outputs/flutter-apk/app-release.apk ../../Essai-illustrations.apk
+      - name: Publier
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload derniere-version Essai-illustrations.apk --clobber
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Essai-illustrations
+          path: Essai-illustrations.apk
