@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/demonstration.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/recette_ingredients.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
 import 'dart:async';
 
@@ -102,6 +103,8 @@ void main() {
       for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
         if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
       }
+      await precacheImage(const AssetImage('assets/recettes/illustrations/quiche-lorraine.webp'), ctx, onError: (_, __) {});
+      await recettesFournies();
     });
     await tester.pumpAndSettle();
 
@@ -133,6 +136,35 @@ void main() {
         await _toucher(tester, find.textContaining('Camembert', findRichText: true).first);
         await _capture('v05 Article');
         await tester.tapAt(const Offset(195, 20));
+        await tester.pumpAndSettle();
+      });
+      // 17/11/2026 : une recette, ses ingrédients ajoutés (puis retirés, pour la suite de la vidéo).
+      await _essayer('Recette', () async {
+        final avant = [...semaine.lignes];
+        void position(String nom, Finder f) => debugPrint('POSITION $nom ${tester.getCenter(f)}');
+        position('bouton-recette', find.byKey(const ValueKey('bouton-recette')));
+        await _toucher(tester, find.byKey(const ValueKey('bouton-recette')));
+        await _capture('v06 Recette-choix');
+        position('mes-recettes', find.text('Mes recettes').last);
+        await _toucher(tester, find.text('Mes recettes').last);
+        await tester.enterText(find.byKey(const ValueKey('filtre-recettes')), 'quiche');
+        await tester.pumpAndSettle();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+        await _capture('v06 Mes-recettes');
+        position('quiche', find.byKey(const ValueKey('recette-Quiche lorraine')));
+        await _toucher(tester, find.byKey(const ValueKey('recette-Quiche lorraine')));
+        await _capture('v06 Recette');
+        position('ajouter', find.text('Ajouter à la liste'));
+        await _toucher(tester, find.text('Ajouter à la liste'));
+        await tester.pump(const Duration(seconds: 1));
+        await tester.pumpAndSettle();
+        await _capture('v06 Recette-ajoutee');
+        semaine.lignes
+          ..clear()
+          ..addAll(avant);
+        e.modifie();
+        await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
       });
       // Claire ajoute les yaourts depuis son téléphone.

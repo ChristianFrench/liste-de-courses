@@ -6,6 +6,7 @@
   ["03", "Pour ajouter un produit, trois lettres suffisent. Cam : camembert."],
   ["04", "Chaque article se range tout seul à sa place, dans l'ordre du magasin. Moins, plus : la quantité."],
   ["05", "Un appui sur l'article : une marque, une promotion, ou un mot pour celui qui fera les courses."],
+  ["05r", "Une recette en tête ? Le bouton Recette montre ses ingrédients : on coche, et ils s'ajoutent à la liste."],
   ["06", "Pendant ce temps, Claire complète la même liste depuis son téléphone."],
   ["07", "Et Thomas voit aussitôt les yaourts apparaître."],
   ["t2", "Deuxième partie : faire les courses."],

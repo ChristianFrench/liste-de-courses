@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/donnees/recette_ingredients.dart';
 import 'package:liste_de_courses/donnees/demonstration.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/synchro.dart';
@@ -94,6 +95,9 @@ void main() {
       for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
         if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
       }
+      // 17/11/2026 : la recette montrée sur le site, et le catalogue des recettes.
+      await precacheImage(const AssetImage('assets/recettes/illustrations/quiche-lorraine.webp'), ctx, onError: (_, __) {});
+      await recettesFournies();
     });
     await tester.pumpAndSettle();
 
@@ -125,6 +129,20 @@ void main() {
         await tester.enterText(find.byType(TextField).first, '');
         await tester.pumpAndSettle();
         FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+      });
+      await _essayer('Recette', () async {
+        await _toucher(tester, find.byKey(const ValueKey('bouton-recette')));
+        await _toucher(tester, find.text('Mes recettes').last);
+        await tester.enterText(find.byKey(const ValueKey('filtre-recettes')), 'quiche');
+        await tester.pumpAndSettle();
+        FocusManager.instance.primaryFocus?.unfocus();
+        await tester.pumpAndSettle();
+        await _capture('05 Mes-recettes');
+        await _toucher(tester, find.byKey(const ValueKey('recette-Quiche lorraine')));
+        await _capture('05 Recette');
+        await _toucher(tester, find.text('Annuler').last);
+        await tester.tapAt(const Offset(195, 20));
         await tester.pumpAndSettle();
       });
       await _essayer('Article', () async {

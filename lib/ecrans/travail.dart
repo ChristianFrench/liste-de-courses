@@ -6,7 +6,6 @@ import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart' as picto;
-import '../donnees/demonstration.dart';
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
 import '../donnees/modele.dart';

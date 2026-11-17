@@ -9,8 +9,9 @@ class EcranConstruction extends StatefulWidget {
   /// Après un ajout par la recherche, le volet « Promo » s'ouvre (04/11/2026) ; coupé par certains essais.
   static bool promoApresRecherche = true;
 
-  /// 15/11/2026 : le bouton « Recette » (ingrédients d'une recette à cocher) ; démonstration d'abord.
-  static bool recettes = demonstration;
+  /// 15/11/2026 : le bouton « Recette » (ingrédients d'une recette à cocher) ; démonstration d'abord, puis toutes
+  /// les versions le 17/11/2026 (Aristide). Coupé par certains essais.
+  static bool recettes = true;
 
   @override
   State<EcranConstruction> createState() => _EcranConstructionState();
@@ -33,6 +34,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
   @override
   void dispose() {
     _defilement.dispose();
+    _filtreRecettes.dispose();
     super.dispose();
   }
 
@@ -63,7 +65,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
             sousTitre: '${simple ? 'Liste simple · ' : ''}$n article${n > 1 ? 's' : ''} · '
                 '${etat.coursesPrevues(l).isEmpty ? etat.creeeLe(l) : etat.coursesPrevues(l)}',
             aide: simple ? Aides.listeSimple : Aides.preparation,
-            // 15/11/2026 (Aristide) : bouton « Recette » en bas à droite de l'en-tête (démonstration d'abord).
+            // 15/11/2026 (Aristide) : bouton « Recette » en bas à droite de l'en-tête (toutes les versions depuis le 17/11/2026).
             droite: EcranConstruction.recettes
                 ? Row(mainAxisSize: MainAxisSize.min, children: [
                     KeyedSubtree(
@@ -267,6 +269,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
       2: 'Texte de la recette',
     });
     if (source == null || !mounted) return;
+    _filtreRecettes.clear();
+    // 17/11/2026 (Aristide) : « Annuler » sur les ingrédients d'une recette de « Mes recettes » ramène à la liste
+    // des recettes.
+    while (mounted && !await _recetteChoisie(l, source)) {
+      if (source != 0) return;
+    }
+  }
+
+  /// Une recette, puis ses ingrédients à cocher. Rend faux si l'on a annulé la fenêtre des ingrédients.
+  Future<bool> _recetteChoisie(Liste l, int source) async {
     RecetteLue? r;
     if (source == 0) {
       r = await _choisirRecette();
@@ -274,7 +286,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       final lien = await demanderTexte(context,
           titre: 'Lien de la recette', libelle: 'Adresse de la page', valider: 'Lire la recette',
           cleChamp: const ValueKey('lien-recette'));
-      if (lien == null || lien.trim().isEmpty || !mounted) return;
+      if (lien == null || lien.trim().isEmpty || !mounted) return true;
       try {
         Nav.message(context, 'Lecture de la page…');
         r = await recetteDepuisLien(lien);
@@ -283,7 +295,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
           Nav.message(context, 'Cette page ne peut pas être lue ici. Copiez le texte de la recette, '
               'puis choisissez « Texte de la recette ».');
         }
-        return;
+        return true;
       }
     } else {
       final texte = TextEditingController();
@@ -302,16 +314,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
               labelText: 'Recette (titre, ingrédients…)', hintText: 'Quiche lorraine\n200 g de lardons\n3 œufs\n20 cl de crème…'),
         ),
       );
-      if (!lire || texte.text.trim().isEmpty) return;
+      if (!lire || texte.text.trim().isEmpty) return true;
       r = lireRecetteTexte(texte.text);
     }
-    if (r == null || !mounted) return;
+    if (r == null || !mounted) return true;
     final lus = analyserIngredients(etat, r.ingredients);
     final deja = [for (final a in lus) if (a.produit != null && etat.ligne(l, a.produit!.id) != null) a];
     final aChoisir = [for (final a in lus) if (!deja.contains(a)) a];
     if (aChoisir.isEmpty) {
       Nav.message(context, deja.isEmpty ? 'Aucun ingrédient trouvé dans cette recette' : 'Tous les ingrédients sont déjà dans la liste');
-      return;
+      return true;
     }
     final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
     final titre = r.titre;
@@ -345,7 +357,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
         ],
       ),
     );
-    if (!ok || !mounted || choisis.isEmpty) return;
+    if (!ok) return false;
+    if (!mounted || choisis.isEmpty) return true;
     String? premier;
     for (final i in choisis.toList()..sort()) {
       final a = aChoisir[i];
@@ -362,6 +375,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
     if (premier != null) _amener(premier, essais: 4);
     Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
+    return true;
   }
 
   Widget _illustration(String image) {
@@ -383,12 +397,15 @@ class _EcranConstructionState extends State<EcranConstruction> {
     );
   }
 
+  /// Le filtre de « Mes recettes », gardé quand on y revient depuis les ingrédients (Annuler).
+  final _filtreRecettes = TextEditingController();
+
   /// Le catalogue de recettes : un champ pour filtrer, puis les titres par ordre alphabétique.
   Future<RecetteLue?> _choisirRecette() async {
     final toutes = await recettesFournies();
     if (!mounted) return null;
     RecetteLue? choix;
-    var filtre = '';
+    var filtre = _filtreRecettes.text;
     await modale(
       context,
       titre: 'Mes recettes',
@@ -399,11 +416,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            TextField(
-              key: const ValueKey('filtre-recettes'),
-              style: Charte.texte(15),
-              decoration: const InputDecoration(labelText: 'Chercher une recette', prefixIcon: Icon(Icons.search)),
-              onChanged: (v) => maj(() => filtre = v),
+            // 17/11/2026 : place au-dessus du cadre pour le libellé, posé sur le bord (il était coupé).
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: TextField(
+                key: const ValueKey('filtre-recettes'),
+                controller: _filtreRecettes,
+                style: Charte.texte(15),
+                decoration: const InputDecoration(labelText: 'Chercher une recette', prefixIcon: Icon(Icons.search)),
+                onChanged: (v) => maj(() => filtre = v),
+              ),
             ),
             const SizedBox(height: 6),
             for (final r in vues)

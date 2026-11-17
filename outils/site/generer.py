@@ -153,7 +153,7 @@ VISITE = [  # (capture, titre, texte, points)
     ('03 Nouvelle-liste', 'Une nouvelle liste', 'Le magasin, le nom proposé d\'office, puis le point de départ.',
      ['Liste par secteur ou liste simple.', 'Depuis une liste type, une course passée ou un texte collé (mail, message).']),
     ('05 Remplir', 'Remplir la liste', 'On cherche l\'article en tapant trois lettres : il se range sous son secteur, dans l\'ordre du magasin.',
-     ['− et + règlent la quantité.', 'Promotion, packaging et consigne s\'affichent sur la ligne.', '« Liste prête » la valide.']),
+     ['− et + règlent la quantité.', 'Le bouton Recette ajoute les ingrédients d\'une recette.', '« Liste prête » la valide.']),
     ('07 Courses', 'Les courses', 'Les listes à faire, les courses en cours et les courses terminées, avec leur ticket.',
      ['Touchez une liste puis « Faire les courses ».', 'On choisit qui fait les courses et avec quel parcours.']),
     ('08 En-magasin', 'En magasin', 'La liste suit l\'ordre des allées. Un appui sur la grande case coche l\'article quand il est dans le chariot.',
@@ -181,6 +181,8 @@ VISITE_DETAIL = [  # visite détaillée, 20 étapes (04/11/2026, Aristide)
      ['− et + règlent la quantité.', 'Promotion, mesure, lot et consigne s\'affichent sur la ligne.']),
     ('05 Recherche', 'Trois lettres suffisent', 'En tapant « cam », le catalogue propose Camembert, Camembert Président, Camomille…',
      ['Chaque proposition indique son rayon et son secteur.', 'Un produit absent du catalogue se crée sur place.']),
+    ('05 Recette', 'Une recette', 'Le bouton Recette, en haut à droite : une de vos recettes, le lien d\'une page internet ou un texte collé. Ses ingrédients s\'affichent à cocher.',
+     ['Près de 300 recettes, illustrées.', 'Sel, poivre, huile… : les produits du placard sont décochés.', 'Chaque produit ajouté porte « pour : Quiche lorraine ».']),
     ('06 Article', 'Le détail d\'un article', 'Un appui sur l\'article ouvre son volet : consigne pour celui qui fait les courses, marque, promotion visée, packaging.',
      ['« Pas trop mûres » s\'affichera en magasin.', '« Nom, rayon, secteur » corrige la fiche du produit.']),
     ('06 Marque', 'Les marques', 'Les marques connues du secteur sont proposées ; « Autre marque… » en ajoute une.',
@@ -220,7 +222,7 @@ DECOUVRIR = titre_page('icones/mobile-phone.png', 'Découvrir', 'Les écrans d\'
         <div class="explication">
           <div class="choix-visite" role="tablist">
             <button class="bouton" id="visiteCourte" role="tab">L'essentiel · 10 écrans</button>
-            <button class="bouton" id="visiteDetail" role="tab">En détail · 20 écrans</button>
+            <button class="bouton" id="visiteDetail" role="tab">En détail · 21 écrans</button>
           </div>
           <div class="compteur" id="compteur"></div>
           <h2 id="titreEcran"></h2>

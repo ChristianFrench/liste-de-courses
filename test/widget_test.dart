@@ -898,6 +898,10 @@ void main() {
       expect((image.image as AssetImage).assetName, 'assets/recettes/illustrations/accras-de-morue.webp');
       final h = tester.getSize(find.byKey(const ValueKey('illustration-recette'))).height;
       expect(h, lessThanOrEqualTo(tester.view.physicalSize.height / tester.view.devicePixelRatio / 3 + 0.5));
+      // Annuler les ingrédients ramène à « Mes recettes », filtre gardé.
+      await _toucher(tester, find.text('Annuler').last);
+      expect(find.byKey(const ValueKey('filtre-recettes')), findsOneWidget);
+      expect(find.byKey(const ValueKey('recette-Accras de morue')), findsOneWidget);
     });
 
     testWidgets('préparation : « Autres produits » du secteur, habituels d\'abord, cocher les ajoute', (tester) async {
