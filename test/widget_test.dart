@@ -905,6 +905,7 @@ void main() {
           if (e.findRenderObject() case final RenderBox b) b.size.height.round()
       };
       expect(hauteurs.length, 1, reason: 'bandeaux de hauteurs $hauteurs');
+      expect(tester.getSize(bouton).height.round(), hauteurs.single, reason: 'le bouton a la hauteur du bandeau');
       Future<void> voir() async {
         await Scrollable.ensureVisible(tester.element(bouton), alignment: 0.5);
         await tester.pumpAndSettle();

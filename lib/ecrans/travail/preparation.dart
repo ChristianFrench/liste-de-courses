@@ -175,35 +175,54 @@ class _EcranConstructionState extends State<EcranConstruction> {
     if (x.nonPlace) return null;
     final ouvert = _proposes == x.id;
     if (!ouvert && _autres(l, x).isEmpty) return null;
-    return Semantics(
-      button: true,
-      label: ouvert ? 'Replier les autres produits de ${x.nom}' : 'Autres produits de ${x.nom}',
-      child: Material(
-        color: ouvert ? Charte.cadre : Charte.blanc,
-        shape: StadiumBorder(side: BorderSide(color: Charte.cadre, width: 1.5)),
-        child: InkWell(
-          key: ValueKey('autres-${x.id}'),
-          customBorder: const StadiumBorder(),
-          onTap: () {
-            setState(() => _proposes = ouvert ? null : x.id);
-            // 13/11/2026 (Aristide) : le secteur déployé vient en haut de l'écran.
-            if (!ouvert) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                final c = _bandeaux[x.id]?.currentContext;
-                if (c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
-              });
-            }
-          },
-          // 17/11/2026 (Aristide) : le bouton tient dans la hauteur du bandeau, qui reste celle des autres bandeaux.
-          child: SizedBox(
-            height: 16,
-            child: Center(
-              widthFactor: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: Text('Autres produits',
-                    textScaler: TextScaler.noScaling,
-                    style: Charte.texte(12, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre).copyWith(height: 1)),
+    // 17/11/2026 (Aristide) : le bouton occupe toute la hauteur du bandeau sans la changer : il prend dans la
+    // rangée la place du texte du titre et déborde sur les marges haute et basse (4 + 4) du bandeau.
+    final titre = TextPainter(
+      text: TextSpan(text: 'Ag', style: Charte.texte(14, gras: true)),
+      textScaler: MediaQuery.textScalerOf(context),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final place = titre.height;
+    titre.dispose();
+    final bande = place + 8;
+    final libelle = TextPainter(
+      text: TextSpan(text: 'Autres produits', style: Charte.texte(13, gras: true)),
+      textScaler: MediaQuery.textScalerOf(context),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    final largeur = libelle.width + 24 + 2;
+    libelle.dispose();
+    return SizedBox(
+      width: largeur,
+      height: place,
+      child: OverflowBox(
+        minHeight: bande,
+        maxHeight: bande,
+        child: Semantics(
+          button: true,
+          label: ouvert ? 'Replier les autres produits de ${x.nom}' : 'Autres produits de ${x.nom}',
+          child: Material(
+            color: ouvert ? Charte.cadre : Charte.blanc,
+            shape: StadiumBorder(side: BorderSide(color: Charte.cadre, width: 1.5)),
+            child: InkWell(
+              key: ValueKey('autres-${x.id}'),
+              customBorder: const StadiumBorder(),
+              onTap: () {
+                setState(() => _proposes = ouvert ? null : x.id);
+                // 13/11/2026 (Aristide) : le secteur déployé vient en haut de l'écran.
+                if (!ouvert) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    final c = _bandeaux[x.id]?.currentContext;
+                    if (c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
+                  });
+                }
+              },
+              child: Center(
+                widthFactor: 1,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text('Autres produits', style: Charte.texte(13, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
+                ),
               ),
             ),
           ),
