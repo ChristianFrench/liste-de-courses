@@ -322,6 +322,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
       contenu: (context, maj) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // 17/11/2026 (Aristide) : l'illustration de la recette en haut, 720 × 480, au plus un tiers de l'écran.
+          if (r!.image case final image?) _illustration(image),
           Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
               'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 8),
@@ -360,6 +362,25 @@ class _EcranConstructionState extends State<EcranConstruction> {
     });
     if (premier != null) _amener(premier, essais: 4);
     Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
+  }
+
+  Widget _illustration(String image) {
+    Widget rien(BuildContext _, Object __, StackTrace? ___) => const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height / 3),
+        child: AspectRatio(
+          aspectRatio: 3 / 2,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: image.startsWith('http')
+                ? Image.network(image, key: const ValueKey('illustration-recette'), fit: BoxFit.cover, errorBuilder: rien)
+                : Image.asset(image, key: const ValueKey('illustration-recette'), fit: BoxFit.cover, errorBuilder: rien),
+          ),
+        ),
+      ),
+    );
   }
 
   /// Le catalogue de recettes : un champ pour filtrer, puis les titres par ordre alphabétique.

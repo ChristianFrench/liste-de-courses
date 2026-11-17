@@ -53,6 +53,7 @@ flutter:
     - assets/pictos/fluent3d/
     - assets/pictos/maison/
     - assets/recettes/
+    - assets/recettes/illustrations/
   fonts:
     - family: Atkinson
       fonts:

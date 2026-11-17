@@ -12,10 +12,13 @@ import 'modele.dart';
 
 /// Une recette : son titre et ses lignes d'ingrédients telles qu'écrites (« 200 g de lardons fumés »).
 class RecetteLue {
-  const RecetteLue(this.titre, this.ingredients, {this.types = const []});
+  const RecetteLue(this.titre, this.ingredients, {this.types = const [], this.image});
   final String titre;
   final List<String> ingredients;
   final List<String> types;
+
+  /// Illustration : chemin d'un fichier de l'application (« assets/… ») ou adresse internet (page de recette).
+  final String? image;
 }
 
 /// Un ingrédient lu : la ligne d'origine, le nom nettoyé, le produit reconnu (ou null : produit à créer).
@@ -45,6 +48,7 @@ Future<List<RecetteLue>> recettesFournies() async {
               [i['quantite'], i['nom']].whereType<String>().join(' '),
           ],
           types: (r['types'] as List? ?? const []).cast<String>(),
+          image: r['image'] == null ? null : 'assets/recettes/illustrations/${r['image']}',
         ),
     ];
   } catch (_) {
@@ -158,13 +162,26 @@ RecetteLue? _chercherRecette(Object? j) {
     final estRecette = type == 'Recipe' || (type is List && type.contains('Recipe'));
     final ing = j['recipeIngredient'] ?? j['ingredients'];
     if (estRecette && ing is List) {
-      return RecetteLue(depuisHtml('<p>${j['name'] ?? 'RecetteLue'}</p>').trim(), [for (final i in ing) depuisHtml('<p>$i</p>').trim()]);
+      return RecetteLue(depuisHtml('<p>${j['name'] ?? 'RecetteLue'}</p>').trim(), [for (final i in ing) depuisHtml('<p>$i</p>').trim()],
+          image: _imageDe(j['image']));
     }
     for (final k in ['@graph', 'mainEntity', 'itemListElement']) {
       final r = _chercherRecette(j[k]);
       if (r != null) return r;
     }
   }
+  return null;
+}
+
+/// L'image d'une recette schema.org : une adresse, une liste d'adresses ou un objet ImageObject.
+String? _imageDe(Object? i) {
+  if (i is String) return i.startsWith('http') ? i : null;
+  if (i is List) {
+    for (final x in i) {
+      if (_imageDe(x) case final u?) return u;
+    }
+  }
+  if (i is Map) return _imageDe(i['url'] ?? i['contentUrl']);
   return null;
 }
 

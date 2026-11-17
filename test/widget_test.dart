@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show RenderBox, Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show RenderBox, Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis, Image, AssetImage;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/icone.dart';
@@ -15,6 +15,7 @@ import 'package:liste_de_courses/composants/signe_perso.dart';
 import 'package:liste_de_courses/donnees/catalogue_commun.dart' show Brouillon;
 import 'package:liste_de_courses/donnees/envoi.dart';
 import 'package:liste_de_courses/donnees/import_texte.dart';
+import 'package:liste_de_courses/donnees/recette_ingredients.dart' show recettesFournies;
 import 'package:liste_de_courses/donnees/modele.dart';
 import 'package:liste_de_courses/donnees/sauvegarde.dart';
 import 'package:liste_de_courses/donnees/univers.dart';
@@ -877,6 +878,26 @@ void main() {
       expect(l.lignes.where((g) => normaliser(etat.produit(g.produitId)!.nom) == 'sel').isEmpty, isTrue,
           reason: 'le sel (placard) est décoché');
       expect(l.lignes.length, avant + (dejaOeufs ? 0 : 1));
+    });
+
+    testWidgets('préparation : Mes recettes, l\'illustration de la recette en haut des ingrédients', (tester) async {
+      final etat = Etat.instance;
+      final l = etat.liste('l1')!;
+      EcranConstruction.recettes = true;
+      addTearDown(() => EcranConstruction.recettes = false);
+      await _accueil(tester);
+      await _ouvrirListe(tester, etat.nomListe(l), 'Continuer la préparation');
+      await _toucher(tester, find.byKey(const ValueKey('bouton-recette')));
+      await tester.runAsync(recettesFournies);
+      await _toucher(tester, find.text('Mes recettes').last);
+      await tester.enterText(find.byKey(const ValueKey('filtre-recettes')), 'accras');
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.byKey(const ValueKey('recette-Accras de morue')));
+      expect(find.byKey(const ValueKey('illustration-recette')), findsOneWidget);
+      final image = tester.widget<Image>(find.byKey(const ValueKey('illustration-recette')));
+      expect((image.image as AssetImage).assetName, 'assets/recettes/illustrations/accras-de-morue.webp');
+      final h = tester.getSize(find.byKey(const ValueKey('illustration-recette'))).height;
+      expect(h, lessThanOrEqualTo(tester.view.physicalSize.height / tester.view.devicePixelRatio / 3 + 0.5));
     });
 
     testWidgets('préparation : « Autres produits » du secteur, habituels d\'abord, cocher les ajoute', (tester) async {
