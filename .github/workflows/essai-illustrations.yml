@@ -1,4 +1,4 @@
-# APK d'essai des tailles d'illustration des recettes (480, 720, 1080 pixels de large), publiée sur la page
+# APK d'essai des tailles d'illustration des recettes (240, 360, 480, 720 pixels de large), publiée sur la page
 # « derniere-version » sous le nom Essai-illustrations.apk. Lancée à chaque modification de l'outil, ou à la main.
 name: Essai illustrations
 
@@ -19,7 +19,7 @@ jobs:
         with: { distribution: temurin, java-version: '17' }
       - uses: subosito/flutter-action@v2
         with: { channel: stable, cache: true }
-      - name: Préparer les trois tailles
+      - name: Préparer les quatre tailles
         run: |
           pip install -q pillow
           python3 outils/essai_illustrations/preparer.py outils/recettes/illustrations outils/essai_illustrations/assets

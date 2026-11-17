@@ -1,10 +1,9 @@
-# Prépare les illustrations des recettes en trois tailles (WebP, qualité 80) pour l'APK d'essai.
-# Source : outils/recettes/illustrations/*.jpg (768 × 512). La taille 1080 est agrandie : elle sert à mesurer
-# le poids et le temps, pas la netteté (une image ne peut pas être plus fine que sa source).
+# Prépare les illustrations des recettes en quatre tailles (WebP, qualité 80) pour l'APK d'essai.
+# Source : outils/recettes/illustrations/*.jpg (768 × 512). 17/11/2026 : 1080 retirée, 240 et 360 ajoutées (Aristide).
 import json, os, sys
 from PIL import Image
 src, dst = sys.argv[1], sys.argv[2]
-tailles = {'480': (480, 320), '720': (720, 480), '1080': (1080, 720)}
+tailles = {'240': (240, 160), '360': (360, 240), '480': (480, 320), '720': (720, 480)}
 noms, poids = [], {k: 0 for k in tailles}
 for f in sorted(os.listdir(src)):
     if not f.lower().endswith('.jpg'):

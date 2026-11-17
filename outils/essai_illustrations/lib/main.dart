@@ -1,5 +1,5 @@
 // Essai des tailles d'illustration des recettes (17/11/2026, demandé par Aristide) :
-// - « Comparer » : une recette, ses trois tailles l'une sous l'autre, en bandeau comme dans la fenêtre des ingrédients ;
+// - « Comparer » : une recette, ses quatre tailles l'une sous l'autre, en bandeau comme dans la fenêtre des ingrédients ;
 // - « Catalogue » : charge et décode les 296 illustrations dans une taille, chronomètre, puis les affiche.
 import 'dart:convert';
 import 'dart:ui' as ui;
@@ -10,8 +10,8 @@ import 'package:flutter/services.dart';
 void main() => runApp(const Essai());
 
 const vert = Color(0xFF3F7D5A);
-const tailles = ['480', '720', '1080'];
-String dimension(String t) => switch (t) { '480' => '480 × 320', '720' => '720 × 480', _ => '1080 × 720' };
+const tailles = ['240', '360', '480', '720'];
+String dimension(String t) => '$t × ${int.parse(t) * 2 ~/ 3}';
 String chemin(String t, String nom) => 'assets/i$t/$nom.webp';
 
 class Essai extends StatelessWidget {
@@ -126,7 +126,7 @@ class _ComparerState extends State<Comparer> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             'Votre écran : ${(ecran.width * ratio).round()} pixels réels de large. '
-            'Attention : la source fait 768 × 512, la version 1080 est agrandie ; elle ne peut pas être plus nette.',
+            'Source : 768 × 512.',
             style: const TextStyle(fontSize: 13, color: Colors.black54),
           ),
         ),
@@ -170,13 +170,13 @@ class Catalogue extends StatefulWidget {
 }
 
 class _CatalogueState extends State<Catalogue> {
-  String taille = '1080';
+  String taille = '720';
   bool enCours = false;
   int fait = 0;
   final mesures = <String, Mesure>{};
   String? affiche;
 
-  /// Lit et décode chaque image (sans la garder en mémoire : 296 images en 1080 feraient 900 Mo).
+  /// Lit et décode chaque image (sans la garder en mémoire : 296 images en 720 feraient 400 Mo).
   Future<void> _charger(String t) async {
     setState(() {
       enCours = true;
@@ -209,7 +209,7 @@ class _CatalogueState extends State<Catalogue> {
     });
   }
 
-  Future<void> _lesTrois() async {
+  Future<void> _lesQuatre() async {
     for (final t in tailles.reversed) {
       await _charger(t);
     }
@@ -233,7 +233,7 @@ class _CatalogueState extends State<Catalogue> {
                   style: FilledButton.styleFrom(backgroundColor: vert),
                   child: Text(dimension(t)),
                 ),
-              OutlinedButton(onPressed: enCours ? null : _lesTrois, child: const Text('Les trois')),
+              OutlinedButton(onPressed: enCours ? null : _lesQuatre, child: const Text('Les quatre')),
             ]),
             if (enCours) ...[
               const SizedBox(height: 14),
