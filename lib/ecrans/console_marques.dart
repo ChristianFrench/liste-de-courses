@@ -156,11 +156,14 @@ class _PageCatalogueMarquesState extends State<PageCatalogueMarques> {
       Expanded(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Expanded(child: _cadre(_listeMarques(visibles))),
-            const SizedBox(width: 16),
-            SizedBox(width: 420, child: _cadre(_examen(examen))),
-          ]),
+          // L'examen rétrécit avec la fenêtre (40 % de la largeur, de 300 à 420), la liste prend le reste.
+          child: LayoutBuilder(
+            builder: (context, c) => Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+              Expanded(child: _cadre(_listeMarques(visibles))),
+              const SizedBox(width: 16),
+              SizedBox(width: (c.maxWidth * 0.4).clamp(300.0, 420.0), child: _cadre(_examen(examen))),
+            ]),
+          ),
         ),
       ),
     ]);

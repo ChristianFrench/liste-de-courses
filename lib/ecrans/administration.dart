@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
 import '../composants/icone.dart';
@@ -66,15 +67,52 @@ class _ConsoleAdministrationState extends State<ConsoleAdministration> {
         rubrique = Rubrique.shell;
       });
 
+  /// 17/11/2026 (Aristide) : la fenêtre se rétrécit en réduisant les trois zones (menu, liste, fiche), puis se
+  /// bloque à une largeur minimum, plus petite quand le menu est replié. La fenêtre Windows reçoit ce minimum
+  /// (canal « emplettes/fenetre », voir outils/fenetre_editeur.py) et s'élargit si on déplie le menu.
+  double get _largeurMinimum => (_menuReplie ? largeurMenuReplie : largeurMenuDeplie) + 1 + largeurMinimumContenu;
+
+  static const _fenetre = MethodChannel('emplettes/fenetre');
+
+  Future<void> _imposerLargeurMinimum() async {
+    try {
+      await _fenetre.invokeMethod<void>('largeurMinimum', _largeurMinimum.round());
+    } catch (_) {
+      // Pas de fenêtre Windows (tests, autre système) : le défilement horizontal suffit.
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _imposerLargeurMinimum();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Material(
       color: Charte.fond,
-      child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      child: LayoutBuilder(builder: (context, c) {
+        final contenu = _contenu();
+        // Filet de sécurité si la fenêtre est tout de même plus étroite (autre système) : défilement horizontal.
+        if (c.maxWidth >= _largeurMinimum || !c.hasBoundedHeight) return contenu;
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: SizedBox(width: _largeurMinimum, height: c.maxHeight, child: contenu),
+        );
+      }),
+    );
+  }
+
+  Widget _contenu() {
+    return Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         _Menu(
             choisie: rubrique,
             replie: _menuReplie,
-            onReplier: () => setState(() => _menuReplie = !_menuReplie),
+            onReplier: () {
+              setState(() => _menuReplie = !_menuReplie);
+              _imposerLargeurMinimum();
+            },
             onChoix: (r) => setState(() {
                   _commande = null;
                   rubrique = r;
@@ -102,10 +140,14 @@ class _ConsoleAdministrationState extends State<ConsoleAdministration> {
             Rubrique.apparence => const _PageApparence(),
           },
         ),
-      ]),
-    );
+      ]);
   }
 }
+
+/// Largeurs de la console : menu déplié ou replié, et le minimum laissé aux pages (liste + fiche).
+const double largeurMenuDeplie = 270;
+const double largeurMenuReplie = 64;
+const double largeurMinimumContenu = 820;
 
 /// Le menu de gauche : l'image d'Emplettes, puis les fonctions groupées, puis « Verrouiller ».
 class _Menu extends StatelessWidget {
@@ -128,7 +170,7 @@ class _Menu extends StatelessWidget {
       ),
     );
     return Container(
-      width: replie ? 64 : 270,
+      width: replie ? largeurMenuReplie : largeurMenuDeplie,
       color: Charte.fondBandeau,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Padding(

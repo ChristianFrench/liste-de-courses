@@ -67,11 +67,14 @@ class _PageRecettesState extends State<PageRecettes> {
             ? Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)))
             : Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  SizedBox(width: 440, child: _cadre(_liste(b))),
-                  const SizedBox(width: 16),
-                  Expanded(child: _cadre(choisie == null ? _aucune(b) : FicheRecette(key: ValueKey(choisie!.id), recette: choisie!, base: b))),
-                ]),
+                // La liste rétrécit avec la fenêtre (40 % de la largeur, de 300 à 440), la fiche prend le reste.
+                child: LayoutBuilder(
+                  builder: (context, c) => Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    SizedBox(width: (c.maxWidth * 0.4).clamp(300.0, 440.0), child: _cadre(_liste(b))),
+                    const SizedBox(width: 16),
+                    Expanded(child: _cadre(choisie == null ? _aucune(b) : FicheRecette(key: ValueKey(choisie!.id), recette: choisie!, base: b))),
+                  ]),
+                ),
               ),
       ),
     ]);
