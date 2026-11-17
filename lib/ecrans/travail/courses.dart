@@ -416,11 +416,54 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       ),
     );
     if (!ok || !context.mounted) return;
-    // Le résumé se lit avant la fin des courses (la liste garde ses coches et ses manquants).
-    final envoi = resume ? messageEnvoi(await envoyerResume(etat, l), adressesFoyer(etat).length) : null;
-    if (!context.mounted) return;
-    Etat.instance.terminerCourses(l);
+    // 17/11/2026 (Aristide : « la terminaison est très longue ») : l'envoi du résumé (jusqu'à 20 s sans réseau)
+    // n'est plus attendu. Le texte est lu tout de suite, avant la fin des courses (la liste garde ses coches et
+    // ses manquants), puis le mail part pendant qu'on est déjà revenu aux courses ; son résultat s'affiche après.
+    final nb = adressesFoyer(etat).length;
+    final envoi = resume ? envoyerResume(etat, l) : null;
+    await _patienter(context, 'Fin des courses…', () => etat.terminerCourses(l));
     Nav.i.retourOnglet(Nav.courses);
-    Nav.message(context, '${envoi == null ? '' : '$envoi. '}Courses terminées : elles sont dans « Terminées », où joindre le ticket de caisse');
+    Nav.message(null, 'Courses terminées : elles sont dans « Terminées », où joindre le ticket de caisse');
+    if (envoi != null) {
+      unawaited(envoi.then((e) {
+        if (messageEnvoi(e, nb) case final m?) Nav.message(null, m);
+      }, onError: (Object e) {
+        etat.noter('Résumé des courses non envoyé : $e');
+        Nav.message(null, 'Le résumé n\'a pas pu partir');
+      }));
+    }
+  }
+
+  /// Fenêtre d'attente pendant un travail : elle s'affiche avant que le travail commence.
+  static Future<void> _patienter(BuildContext context, String texte, void Function() travail) async {
+    final nav = Navigator.of(context, rootNavigator: true);
+    unawaited(showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: Center(
+          child: Material(
+            color: Charte.blanc,
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const SizedBox(width: 26, height: 26, child: CircularProgressIndicator(strokeWidth: 3)),
+                const SizedBox(width: 18),
+                Text(texte, style: Charte.texte(16, gras: true)),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    ));
+    // Laisser la fenêtre se dessiner avant le travail, qui occupe l'appareil.
+    await Future<void>.delayed(const Duration(milliseconds: 80));
+    try {
+      travail();
+    } finally {
+      nav.pop();
+    }
   }
 }

@@ -91,10 +91,12 @@ class Sauvegarde {
     try {
       final copies = await liste();
       final texte = jsonEncode(Etat.instance.versJson());
-      final empreinte = crypto.sha256.convert(utf8.encode(texte)).toString();
+      // 17/11/2026 : empreinte et compression hors du fil de l'écran (Android, Windows), qui ne gèle plus
+      // deux secondes après la fin des courses.
+      final (empreinte, compresse) = await compute(_empreinteEtCompression, texte);
       final derniere = copies.where((x) => !x.ancre).firstOrNull ?? copies.firstOrNull;
       if (!forcer && derniere?.empreinte == empreinte) return false;
-      final contenu = await fabriquer(texte, raison, empreinte);
+      final contenu = await fabriquer(texte, raison, empreinte, compresse: compresse);
       final le = DateTime.now();
       final nom = 'Emplettes-${_horodatage(le)}-${le.millisecond.toString().padLeft(3, '0')}.emplettes';
       await depot.ecrireCopie(nom, contenu);
@@ -112,10 +114,10 @@ class Sauvegarde {
 
   /// Le fichier d'une copie : un en-tête lisible (date, jalon, foyer, nombres) et les données compressées,
   /// chiffrées avec le code du foyer s'il y en a un.
-  Future<String> fabriquer(String texte, String raison, String empreinte) async {
+  Future<String> fabriquer(String texte, String raison, String empreinte, {String? compresse}) async {
     final etat = Etat.instance;
     final code = Synchro.instance.code;
-    var donnees = 'gz:${base64Encode(GZipEncoder().encode(utf8.encode(texte))!)}';
+    var donnees = compresse ?? _compresser(texte);
     if (code != null) donnees = await (await ChiffreFoyer.pour(code)).chiffrer(donnees);
     return jsonEncode({
       'emplettes': 1,
@@ -214,3 +216,8 @@ class Sauvegarde {
     return '${d.year}${z(d.month)}${z(d.day)}-${z(d.hour)}${z(d.minute)}${z(d.second)}';
   }
 }
+
+String _compresser(String texte) => 'gz:${base64Encode(GZipEncoder().encode(utf8.encode(texte))!)}';
+
+(String, String) _empreinteEtCompression(String texte) =>
+    (crypto.sha256.convert(utf8.encode(texte)).toString(), _compresser(texte));

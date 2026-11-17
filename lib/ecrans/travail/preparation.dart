@@ -190,7 +190,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
       textScaler: MediaQuery.textScalerOf(context),
       textDirection: TextDirection.ltr,
     )..layout();
-    final largeur = libelle.width + 24 + 2;
+    // 17/11/2026 : marge d'arrondi ; le libellé ne passe jamais à la ligne (il était coupé sous Windows).
+    final largeur = libelle.width.ceilToDouble() + 24 + 6;
     libelle.dispose();
     return SizedBox(
       width: largeur,
@@ -221,7 +222,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 widthFactor: 1,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text('Autres produits', style: Charte.texte(13, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
+                  child: Text('Autres produits',
+                      maxLines: 1, softWrap: false, overflow: TextOverflow.visible,
+                      style: Charte.texte(13, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
                 ),
               ),
             ),
