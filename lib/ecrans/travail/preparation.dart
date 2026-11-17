@@ -194,13 +194,16 @@ class _EcranConstructionState extends State<EcranConstruction> {
               });
             }
           },
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 32),
+          // 17/11/2026 (Aristide) : le bouton tient dans la hauteur du bandeau, qui reste celle des autres bandeaux.
+          child: SizedBox(
+            height: 16,
             child: Center(
               widthFactor: 1,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('Autres produits', style: Charte.texte(14, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre)),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Text('Autres produits',
+                    textScaler: TextScaler.noScaling,
+                    style: Charte.texte(12, gras: true, couleur: ouvert ? Charte.blanc : Charte.cadre).copyWith(height: 1)),
               ),
             ),
           ),

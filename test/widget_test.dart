@@ -5,7 +5,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/material.dart' show Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
+import 'package:flutter/material.dart' show RenderBox, Axis, Icons, RichText, Offset, Scrollable, TextField, ValueKey, axisDirectionToAxis;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/composants/icone.dart';
@@ -899,6 +899,12 @@ void main() {
               (e.widget.key! as ValueKey<String>).value.substring(8)
           ];
       final bouton = find.byKey(ValueKey('autres-${s.id}'));
+      // 17/11/2026 (Aristide) : le bouton ne change pas la hauteur des bandeaux de secteur.
+      final hauteurs = {
+        for (final e in find.byType(TitreGroupe).evaluate())
+          if (e.findRenderObject() case final RenderBox b) b.size.height.round()
+      };
+      expect(hauteurs.length, 1, reason: 'bandeaux de hauteurs $hauteurs');
       Future<void> voir() async {
         await Scrollable.ensureVisible(tester.element(bouton), alignment: 0.5);
         await tester.pumpAndSettle();
