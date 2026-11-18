@@ -898,6 +898,12 @@ void main() {
       expect((image.image as AssetImage).assetName, 'assets/recettes/illustrations/accras-de-morue.webp');
       final h = tester.getSize(find.byKey(const ValueKey('illustration-recette'))).height;
       expect(h, lessThanOrEqualTo(tester.view.physicalSize.height / tester.view.devicePixelRatio / 3 + 0.5));
+      // La recette elle-même, repliée sous les ingrédients (18/11/2026).
+      final accras = (await tester.runAsync(recettesFournies))!.firstWhere((x) => x.titre == 'Accras de morue');
+      expect(accras.etapes, isNotEmpty);
+      expect(find.text(accras.etapes.first), findsNothing);
+      await _toucher(tester, find.byKey(const ValueKey('voir-recette')));
+      expect(find.text(accras.etapes.first), findsOneWidget);
       // Annuler les ingrédients ramène à « Mes recettes », filtre gardé.
       await _toucher(tester, find.text('Annuler').last);
       expect(find.byKey(const ValueKey('filtre-recettes')), findsOneWidget);

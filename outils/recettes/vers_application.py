@@ -1,5 +1,6 @@
 """Recettes fournies (console) → assets/recettes/recettes.json, version allégée lue par l'application :
-titre, types, ingrédients (« nom », « quantité », « précision ») et illustration.
+titre, types, ingrédients (« nom », « quantité », « précision »), illustration, et le texte : « pour », étapes,
+conseils, source.
 Les illustrations sont réduites en 720 × 480 WebP (choix d'Aristide du 17/11/2026) dans assets/recettes/illustrations/.
 Usage : python3 outils/recettes/vers_application.py"""
 import json, os
@@ -16,6 +17,10 @@ for r in sorted(src['recettes'], key=lambda r: r['titre'].lower()):
     if not ing:
         ing = [{'nom': x} for x in r.get('ingredients', [])]
     e = {'titre': r['titre'], 'types': r.get('types', []), 'ingredients': ing}
+    # 18/11/2026 (Aristide) : le texte de la recette aussi (sans « remarques » ni « texteOrigine », propres à la console).
+    for k in ('pour', 'etapes', 'conseils', 'source'):
+        if r.get(k):
+            e[k] = r[k]
     f = images.get(r.get('id'))
     if f and os.path.exists(f'{D}/{f}'):
         nom = os.path.splitext(f)[0] + '.webp'

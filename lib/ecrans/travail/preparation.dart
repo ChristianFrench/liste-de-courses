@@ -327,6 +327,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
     final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
     final titre = r.titre;
+    var voirRecette = false;
     final ok = await modale(
       context,
       titre: titre,
@@ -336,6 +337,12 @@ class _EcranConstructionState extends State<EcranConstruction> {
         children: [
           // 17/11/2026 (Aristide) : l'illustration de la recette en haut, 720 × 480, au plus un tiers de l'écran.
           if (r!.image case final image?) _illustration(image),
+          if (r.pour != null || r.source != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: Text([if (r.pour != null) 'Pour ${r.pour}', if (r.source != null) 'Recette ${r.source}'].join(' · '),
+                  style: Charte.texte(15, gras: true)),
+            ),
           Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
               'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 8),
@@ -354,6 +361,36 @@ class _EcranConstructionState extends State<EcranConstruction> {
               child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
                   style: Charte.texte(14, couleur: Charte.texteSecondaire)),
             ),
+          // 18/11/2026 (Aristide) : la recette elle-même, repliée sous les ingrédients.
+          if (r.etapes.isNotEmpty || r.conseils.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            InkWell(
+              key: const ValueKey('voir-recette'),
+              onTap: () => maj(() => voirRecette = !voirRecette),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(children: [
+                  Expanded(child: Text('La recette', style: Charte.texte(16, gras: true, couleur: Charte.cadre))),
+                  Icone(voirRecette ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
+                ]),
+              ),
+            ),
+            if (voirRecette) ...[
+              for (var k = 0; k < r.etapes.length; k++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 6),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    SizedBox(width: 26, child: Text('${k + 1}.', style: Charte.texte(15, gras: true, couleur: Charte.cadre))),
+                    Expanded(child: Text(r.etapes[k], style: Charte.texte(15))),
+                  ]),
+                ),
+              if (r.conseils.isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('Conseils', style: Charte.texte(15, gras: true)),
+                for (final c in r.conseils) Text('• $c', style: Charte.texte(15)),
+              ],
+            ],
+          ],
         ],
       ),
     );

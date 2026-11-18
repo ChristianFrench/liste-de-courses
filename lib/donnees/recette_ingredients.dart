@@ -12,10 +12,17 @@ import 'modele.dart';
 
 /// Une recette : son titre et ses lignes d'ingrédients telles qu'écrites (« 200 g de lardons fumés »).
 class RecetteLue {
-  const RecetteLue(this.titre, this.ingredients, {this.types = const [], this.image});
+  const RecetteLue(this.titre, this.ingredients,
+      {this.types = const [], this.image, this.pour, this.etapes = const [], this.conseils = const [], this.source});
   final String titre;
   final List<String> ingredients;
   final List<String> types;
+
+  /// Le texte de la recette (18/11/2026) : « 4 personnes », étapes, conseils, source (« Emplettes »).
+  final String? pour;
+  final List<String> etapes;
+  final List<String> conseils;
+  final String? source;
 
   /// Illustration : chemin d'un fichier de l'application (« assets/… ») ou adresse internet (page de recette).
   final String? image;
@@ -49,6 +56,10 @@ Future<List<RecetteLue>> recettesFournies() async {
           ],
           types: (r['types'] as List? ?? const []).cast<String>(),
           image: r['image'] == null ? null : 'assets/recettes/illustrations/${r['image']}',
+          pour: r['pour'] as String?,
+          etapes: (r['etapes'] as List? ?? const []).cast<String>(),
+          conseils: (r['conseils'] as List? ?? const []).cast<String>(),
+          source: r['source'] as String?,
         ),
     ];
   } catch (_) {
