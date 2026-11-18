@@ -904,6 +904,8 @@ void main() {
       expect(find.text(accras.etapes.first), findsNothing);
       await _toucher(tester, find.byKey(const ValueKey('voir-recette')));
       expect(find.text(accras.etapes.first), findsOneWidget);
+      // Le début du texte monte en haut de la fenêtre : « La recette » au-dessus de l'illustration de départ.
+      expect(find.byKey(const ValueKey('illustration-recette')).hitTestable(), findsNothing);
       // Annuler les ingrédients ramène à « Mes recettes », filtre gardé.
       await _toucher(tester, find.text('Annuler').last);
       expect(find.byKey(const ValueKey('filtre-recettes')), findsOneWidget);

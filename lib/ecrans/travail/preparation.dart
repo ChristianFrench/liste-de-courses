@@ -328,6 +328,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
     final titre = r.titre;
     var voirRecette = false;
+    final enTeteRecette = GlobalKey();
     final ok = await modale(
       context,
       titre: titre,
@@ -366,8 +367,20 @@ class _EcranConstructionState extends State<EcranConstruction> {
             const SizedBox(height: 10),
             InkWell(
               key: const ValueKey('voir-recette'),
-              onTap: () => maj(() => voirRecette = !voirRecette),
+              onTap: () {
+                maj(() => voirRecette = !voirRecette);
+                // 18/11/2026 (Aristide) : le début du texte déplié monte en haut de la fenêtre.
+                if (voirRecette) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    final c = enTeteRecette.currentContext;
+                    if (c != null && c.mounted) {
+                      Scrollable.ensureVisible(c, alignment: 0, duration: const Duration(milliseconds: 300));
+                    }
+                  });
+                }
+              },
               child: Padding(
+                key: enTeteRecette,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(children: [
                   Expanded(child: Text('La recette', style: Charte.texte(16, gras: true, couleur: Charte.cadre))),
