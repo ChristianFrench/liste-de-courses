@@ -35,6 +35,14 @@ class MainActivity : FlutterActivity() {
                 if (appel.method == "ticketRecu") {
                     resultat.success(enAttente)
                     enAttente = null
+                } else if (appel.method == "peutInstaller") {
+                    // 18/11/2026 : l'autorisation est demandée avant le téléchargement, pas après.
+                    if (Build.VERSION.SDK_INT >= 26 && !packageManager.canRequestPackageInstalls()) {
+                        startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                        resultat.success(false)
+                    } else {
+                        resultat.success(true)
+                    }
                 } else if (appel.method == "installerApk") {
                     resultat.success(installerApk(appel.arguments as String))
                 } else if (appel.method == "ouvrirPdf") {

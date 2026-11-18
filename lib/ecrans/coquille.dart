@@ -148,7 +148,15 @@ class BandeauMiseAJour extends StatefulWidget {
 }
 
 class _BandeauMiseAJourState extends State<BandeauMiseAJour> {
-  late final AppLifecycleListener _cycle = AppLifecycleListener(onResume: () => MiseAJour.instance.verifier());
+  late final AppLifecycleListener _cycle = AppLifecycleListener(onResume: () {
+    final m = MiseAJour.instance;
+    if (m.reprendre) {
+      m.reprendre = false;
+      m.mettreAJour();
+    } else {
+      m.verifier();
+    }
+  });
   Timer? _depart;
 
   @override

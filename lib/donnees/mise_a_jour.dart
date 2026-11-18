@@ -47,6 +47,9 @@ class MiseAJour extends ChangeNotifier {
   /// Message à montrer (échec, autorisation à donner).
   String? message;
 
+  /// Android : le réglage « installer des applications » vient d'être ouvert ; la mise à jour reprend au retour.
+  bool reprendre = false;
+
   /// Bandeau fermé par l'utilisateur pour ce commit.
   String? _ecarte;
 
@@ -111,16 +114,18 @@ class MiseAJour extends ChangeNotifier {
     progression = 0;
     notifyListeners();
     try {
-      final resultat = await plateforme.telechargerEtInstaller(Uri.parse('$_depot${appli.$2}'), appli.$2, _entetes, (p) {
+      // Fichier nommé par le commit : une APK déjà téléchargée pour cette version n'est pas retéléchargée.
+      final resultat = await plateforme.telechargerEtInstaller(Uri.parse('$_depot${appli.$2}'), '${disponible ?? 'derniere'}-${appli.$2}', _entetes, (p) {
         progression = p;
         notifyListeners();
       });
       message = switch (resultat) {
         'autorisation' => 'Autorisez Emplettes à installer des applications (réglage qui vient de s\'ouvrir), '
-            'puis touchez à nouveau « Mettre à jour ».',
+            'puis revenez dans Emplettes : la mise à jour continuera d\'elle-même.',
         'ok' => null,
         _ => 'La mise à jour n\'a pas pu se faire : $resultat',
       };
+      reprendre = resultat == 'autorisation';
       if (resultat != 'ok' && resultat != 'autorisation') Etat.instance.noter('Mise à jour : $resultat');
     } catch (e) {
       message = 'Téléchargement impossible. Vérifiez le réseau, puis réessayez.';
