@@ -15,19 +15,26 @@ echo "Protection des téléchargements (script du 18/11/2026, version 3)"
 CONF=/etc/nginx/sites-available/emplettes
 [ -f "$CONF" ] || { echo "Configuration Nginx introuvable : $CONF"; exit 1; }
 
-read -rp "Votre nom d'utilisateur [aristide] : " NOM
-NOM=${NOM:-aristide}
-while true; do
-  read -rsp "Votre mot de passe : " MDP; echo
-  read -rsp "Encore une fois : " MDP2; echo
-  [ -n "$MDP" ] && [ "$MDP" = "$MDP2" ] && break
-  echo "Vide ou différent, recommencez."
-done
-APPLI=$(openssl rand -hex 16)
-printf '%s:%s\n' "$NOM" "$(openssl passwd -apr1 "$MDP")" > /etc/nginx/emplettes-console.htpasswd
-{ printf '%s:%s\n' "$NOM" "$(openssl passwd -apr1 "$MDP")"; printf 'application:%s\n' "$(openssl passwd -apr1 "$APPLI")"; } > /etc/nginx/emplettes-essai.htpasswd
-chown root:www-data /etc/nginx/emplettes-*.htpasswd
-chmod 640 /etc/nginx/emplettes-*.htpasswd
+GARDER=n
+if [ -f /etc/nginx/emplettes-essai.htpasswd ]; then
+  read -rp "Mots de passe déjà en place : les garder ? [O/n] " R
+  [[ "${R:-o}" =~ ^[oO] ]] && GARDER=o
+fi
+if [ "$GARDER" = n ]; then
+  read -rp "Votre nom d'utilisateur [aristide] : " NOM
+  NOM=${NOM:-aristide}
+  while true; do
+    read -rsp "Votre mot de passe : " MDP; echo
+    read -rsp "Encore une fois : " MDP2; echo
+    [ -n "$MDP" ] && [ "$MDP" = "$MDP2" ] && break
+    echo "Vide ou différent, recommencez."
+  done
+  APPLI=$(openssl rand -hex 16)
+  printf '%s:%s\n' "$NOM" "$(openssl passwd -apr1 "$MDP")" > /etc/nginx/emplettes-console.htpasswd
+  { printf '%s:%s\n' "$NOM" "$(openssl passwd -apr1 "$MDP")"; printf 'application:%s\n' "$(openssl passwd -apr1 "$APPLI")"; } > /etc/nginx/emplettes-essai.htpasswd
+  chown root:www-data /etc/nginx/emplettes-*.htpasswd
+  chmod 640 /etc/nginx/emplettes-*.htpasswd
+fi
 
 cp "$CONF" "$CONF.avant-protection"
 python3 - "$CONF" <<'PY'
@@ -68,6 +75,7 @@ else
   echo "Erreur dans la configuration : rien n'a changé."; exit 1
 fi
 echo
+if [ "$GARDER" = o ]; then echo "C'est fait. Mots de passe et secret GitHub inchangés."; exit 0; fi
 echo "C'est fait. Saisissez maintenant ce secret dans GitHub (Settings > Secrets and variables > Actions) :"
 echo
 echo "  Nom    : TELECHARGEMENTS_ESSAI"
