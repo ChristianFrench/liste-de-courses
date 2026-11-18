@@ -21,6 +21,27 @@ if ('serviceWorker' in navigator) {
     setTimeout(inscrire, 60000);
   }
 }
+// Mise à jour (18/11/2026) : appelé par l'application quand une nouvelle version est publiée. Le service worker
+// va chercher la nouvelle version, la met en réserve, puis la page se recharge sur elle.
+window.emplettesRecharger = async () => {
+  try {
+    const r = navigator.serviceWorker && await navigator.serviceWorker.getRegistration();
+    if (r) {
+      await r.update();
+      const attente = r.installing || r.waiting;
+      if (attente) {
+        await new Promise((fini) => {
+          navigator.serviceWorker.addEventListener('controllerchange', fini, { once: true });
+          setTimeout(fini, 60000);
+        });
+      }
+    }
+  } catch (e) {
+    console.warn('mise à jour :', e);
+  }
+  location.reload();
+};
+
 // Demande au navigateur de ne pas effacer la base (IndexedDB) quand la place manque.
 if (navigator.storage && navigator.storage.persist) {
   navigator.storage.persist().catch(() => {});

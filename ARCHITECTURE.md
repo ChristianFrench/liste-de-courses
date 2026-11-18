@@ -40,6 +40,7 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `lib/donnees/catalogue_commun.dart`, `signature.dart`, `moderation.dart` | catalogue commun à tous les foyers : publication, signature, filtrage des apports |
 | `lib/donnees/reparation.dart` | réparations au démarrage (emplacements perdus, homonymes) |
 | `lib/donnees/sauvegarde*.dart` | copies de sauvegarde automatiques |
+| `lib/donnees/mise_a_jour*.dart` | mise à jour depuis l'application (fiche `version.json` du serveur, téléchargement, installation) |
 | `lib/donnees/messages.dart`, `notifications_telephone.dart`, `envoi.dart` | messages du foyer (ntfy, Firebase), mails, tickets PDF |
 | `lib/donnees/import_texte.dart`, `recette_ingredients.dart` | lecture d'une liste collée, d'une recette |
 | `lib/ecrans/travail.dart` + `travail/*.dart` | écrans de travail : nouvelle liste, préparation, ligne d'article, promotion, courses, consultation |
@@ -109,6 +110,10 @@ Contraintes du découpage en extensions (Dart) :
 - Un VPS OVH installé par `outils/vps/installer.sh` : Mosquitto (MQTT), ntfy (messages, relayés à Firebase pour
   Android), Nginx (site emplettes.eu, version web, WebSocket MQTT), relais de mails, sauvegardes de nuit.
 - Les identifiants sont des secrets GitHub, injectés à la compilation, jamais écrits dans le dépôt.
+- Les applications à télécharger sont sur le serveur (18/11/2026), plus sur GitHub : `https://<domaine>/telechargements/`
+  (versions clôturées, liens du site) et `telechargements/essai/` (chaque compilation). `version.json` y donne,
+  pour chaque application (`apk`, `demo`, `exe`), le commit de sa dernière compilation ; l'application le compare
+  au sien pour proposer la mise à jour. Le web lit son propre `web/version.json` (ou `demo/`).
 
 ## 8. Règles à ne jamais enfreindre
 
@@ -140,7 +145,9 @@ Essai long à la main : `GRAINES=200 flutter test test/convergence_test.dart`. P
 
 `.github/workflows/build.yml`, à chaque envoi sur `main` : vérification (analyse et essais), Android (APK +
 APK démo), Windows (installateur), web (application, démo, site). Marqueurs du message de commit : `[rapide]`
-(Windows seul), `[apk]`, `[web]` (voir `CLAUDE.md`). Tout est publié sur la page « derniere-version ».
+(Windows seul), `[apk]`, `[web]` (voir `CLAUDE.md`). Tout est publié sur la page « derniere-version » (réservée au développement) et déposé sur le serveur OVH dans
+`telechargements/essai/` ; « [version] » dans le message (« Clôturer la version ») le dépose aussi dans le dépôt
+officiel `telechargements/`.
 
 ## 11. Fragilités connues (16/11/2026)
 

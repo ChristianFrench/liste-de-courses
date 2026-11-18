@@ -261,7 +261,10 @@ jobs:
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation web"; else tail -n 20 compilation.log; fi
           exit $code
       - name: Ouverture sans réseau (service worker hors_ligne.js)
-        run: python3 outils/web/hors_ligne.py build/web
+        run: |
+          python3 outils/web/hors_ligne.py build/web
+          # Fiche de version lue par l'application pour proposer « Recharger » (18/11/2026), hors réserve.
+          echo "{\"commit\": \"${GITHUB_SHA::7}\"}" > build/web/version.json
       - name: Démonstration - embarquer le dernier catalogue commun publié (public, signé)
         env:
           H: ${{ secrets.MQTT_HOTE_VPS }}
@@ -287,7 +290,9 @@ jobs:
           rm -f build/demo/manifest.json
           grep -c manifest build/demo/index.html || true
       - name: Ouverture sans réseau de la démonstration
-        run: python3 outils/web/hors_ligne.py build/demo ldc-demo-
+        run: |
+          python3 outils/web/hors_ligne.py build/demo ldc-demo-
+          echo "{\"commit\": \"${GITHUB_SHA::7}\"}" > build/demo/version.json
       - name: Assembler le site (page de présentation + application + démonstration)
         run: |
           mkdir site
@@ -372,6 +377,58 @@ jobs:
           } > publication/version.txt
           cat publication/version.txt
           ls -la publication
+      # 18/11/2026 (Aristide) : les applications se téléchargent et se mettent à jour depuis le serveur OVH
+      # (https://<domaine>/telechargements/), GitHub reste réservé au développement.
+      # - chaque compilation dépose ce qu'elle a compilé dans telechargements/essai/ ;
+      # - « [version] » dans le message (Clôturer la version) dépose tout dans telechargements/ (dépôt officiel),
+      #   ainsi que la première fois, quand le dépôt officiel est encore vide.
+      # version.json : pour chaque application, le commit de sa dernière compilation (celles qui ne sont pas
+      # recompilées, en mode [apk] ou [rapide], gardent le leur).
+      - name: Déposer les applications sur le serveur OVH
+        if: env.VPS_HOTE != ''
+        env:
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+          MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          set -e
+          C=${GITHUB_SHA::7}
+          VERSION=$(grep '^version=' publication/version.txt | cut -d= -f2)
+          curl -fsS "https://$VPS_HOTE/telechargements/essai/version.json" -o precedent.json 2>/dev/null || echo '{}' > precedent.json
+          prec() { jq -r --arg k "$1" '.[$k] // ""' precedent.json; }
+          mkdir -p essai officiel
+          APK=$(prec apk); DEMO=$(prec demo); EXE=$(prec exe)
+          if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then
+            cp "livrables/Liste de courses Android/Liste de courses.apk" essai/Emplettes.apk
+            cp "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" essai/Emplettes-emulateur-PC.apk
+            APK=$C
+          fi
+          if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then
+            cp "livrables/Liste de courses Android/Liste de courses (demonstration).apk" essai/Emplettes-demo.apk; DEMO=$C
+          fi
+          if [ -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then
+            cp "livrables/Emplettes Installation/Emplettes-Installation.exe" essai/; EXE=$C
+          fi
+          jq -n --arg v "$VERSION" --arg d "$(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')" --arg a "$APK" --arg m "$DEMO" --arg e "$EXE" \
+            '{version: $v, date: $d, apk: $a, demo: $m, exe: $e}' > essai/version.json
+          cat essai/version.json
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          SSH="ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new"
+          # Arborescence complète envoyée à la racine du site : les dossiers se créent d'eux-mêmes (sans --delete).
+          mkdir -p depot/telechargements && cp -r essai depot/telechargements/
+          rsync -rlz -e "$SSH" depot/ "deploiement@$VPS_HOTE:"
+          if [[ "$MESSAGE" == *"[version]"* ]] || ! curl -fsS "https://$VPS_HOTE/telechargements/version.json" > /dev/null 2>&1; then
+            cp publication/Liste-de-courses.apk officiel/Emplettes.apk 2>/dev/null || true
+            cp publication/Liste-de-courses-emulateur-PC.apk officiel/Emplettes-emulateur-PC.apk 2>/dev/null || true
+            cp publication/Emplettes-demo.apk officiel/ 2>/dev/null || true
+            cp publication/Emplettes-Installation.exe officiel/ 2>/dev/null || true
+            jq --arg c "$C" '.apk = (if .apk == "" then $c else .apk end) | .demo = (if .demo == "" then $c else .demo end) | .exe = (if .exe == "" then $c else .exe end)' essai/version.json > officiel/version.json
+            echo "Dépôt officiel :"; cat officiel/version.json; ls -la officiel
+            rm -rf depot && mkdir -p depot && cp -r officiel depot/telechargements
+            rsync -rlz -e "$SSH" depot/ "deploiement@$VPS_HOTE:"
+          fi
+          rm -f ~/.ssh/deploiement
+          curl -fsS "https://$VPS_HOTE/telechargements/essai/version.json"
       - name: Publier
         env:
           GH_TOKEN: ${{ github.token }}

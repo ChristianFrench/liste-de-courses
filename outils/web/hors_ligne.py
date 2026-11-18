@@ -39,6 +39,8 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   const r = e.request;
   if (r.method !== 'GET' || new URL(r.url).origin !== self.location.origin) return;
+  // La fiche de version (mise à jour, 18/11/2026) vient toujours du réseau, jamais de la réserve.
+  if (new URL(r.url).pathname.endsWith('/version.json')) return;
   e.respondWith((async () => {
     const reserve = await caches.open(RESERVE);
     if (r.mode === 'navigate') {

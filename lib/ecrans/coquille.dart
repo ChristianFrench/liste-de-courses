@@ -2,10 +2,12 @@ import '../composants/icone.dart';
 import 'dart:async';
 
 // ignore_for_file: prefer_const_constructors
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
+import '../donnees/mise_a_jour.dart';
 import '../donnees/modele.dart';
 import '../donnees/synchro.dart';
 import '../navigation.dart';
@@ -107,7 +109,7 @@ class Coquille extends StatelessWidget {
         if (Etat.instance.erreurBase != null) return _ErreurBase(Etat.instance.erreurBase!);
         return s.mode.isEmpty || (s.suspendu != null && !s.actif) ? const EcranBienvenue() : coquille!;
       },
-      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: AlerteEnregistrement(child: ListenableBuilder(
+      child: GuetteurQuiSuisJe(child: GuetteurNouveautes(child: AlerteEnregistrement(child: BandeauMiseAJour(child: ListenableBuilder(
       listenable: nav,
       builder: (context, _) => PopScope(
         canPop: false,
@@ -129,9 +131,101 @@ class Coquille extends StatelessWidget {
           bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
         ),
       ),
-      )))),
+      ))))),
     );
   }
+}
+
+/// Mise à jour (18/11/2026) : la version publiée est cherchée peu après l'ouverture et à chaque retour dans
+/// l'application ; quand elle est plus récente, un bandeau vert propose « Mettre à jour » (ou « Recharger » sur
+/// le web), avec la progression du téléchargement.
+class BandeauMiseAJour extends StatefulWidget {
+  const BandeauMiseAJour({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<BandeauMiseAJour> createState() => _BandeauMiseAJourState();
+}
+
+class _BandeauMiseAJourState extends State<BandeauMiseAJour> {
+  late final AppLifecycleListener _cycle = AppLifecycleListener(onResume: () => MiseAJour.instance.verifier());
+  Timer? _depart;
+
+  @override
+  void initState() {
+    super.initState();
+    if (!MiseAJour.active) return;
+    _cycle;
+    _depart = Timer(const Duration(seconds: 8), () => MiseAJour.instance.verifier());
+  }
+
+  @override
+  void dispose() {
+    _depart?.cancel();
+    if (MiseAJour.active) _cycle.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: MiseAJour.instance,
+        builder: (context, enfant) {
+          final m = MiseAJour.instance;
+          final p = m.progression;
+          final montrer = m.aProposer || m.message != null;
+          return Column(children: [
+            if (montrer)
+              Material(
+                key: const ValueKey('bandeau-mise-a-jour'),
+                color: Charte.accent,
+                child: SafeArea(
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 6, 4, 6),
+                    child: Row(children: [
+                      const Icone(Icons.system_update, color: Colors.white),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                          Text(
+                            m.message ??
+                                (p != null
+                                    ? (kIsWeb ? 'Chargement de la nouvelle version…' : 'Téléchargement : ${(p * 100).round()} %')
+                                    : 'Nouvelle version disponible${m.version == null ? '' : ' : ${m.version}'} (${m.disponible})'),
+                            style: Charte.texte(14, gras: true, couleur: Colors.white),
+                          ),
+                          if (p != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, right: 8),
+                              child: LinearProgressIndicator(value: kIsWeb ? null : p, color: Colors.white, backgroundColor: Colors.white24),
+                            ),
+                        ]),
+                      ),
+                      if (p == null && m.aProposer)
+                        TextButton(
+                          key: const ValueKey('mettre-a-jour'),
+                          onPressed: m.mettreAJour,
+                          style: TextButton.styleFrom(foregroundColor: Colors.white, backgroundColor: Colors.white24),
+                          child: Text(kIsWeb ? 'Recharger' : 'Mettre à jour', style: Charte.texte(14, gras: true, couleur: Colors.white)),
+                        ),
+                      if (p == null)
+                        IconButton(
+                          tooltip: 'Plus tard',
+                          onPressed: () {
+                            m.message = null;
+                            m.ecarter();
+                          },
+                          icon: const Icone(Icons.close, color: Colors.white),
+                        ),
+                    ]),
+                  ),
+                ),
+              ),
+            Expanded(child: MediaQuery.removePadding(context: context, removeTop: montrer, child: enfant!)),
+          ]);
+        },
+        child: widget.child,
+      );
 }
 
 /// Bandeau rouge en haut de l'application quand des modifications ne sont pas enregistrées (web : disque du

@@ -15,7 +15,7 @@ import 'parametres.dart' show OptionFoyer, ajouterMembreParNom, repartirANeuf;
 // Pas d'administrateur (27/10/2026) : chaque membre peut ajouter, inviter, renommer ou retirer un membre
 // et régénérer le code. Chacun choisit son nom dans la liste des membres en rejoignant le foyer.
 
-const lienApk = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk';
+const lienApk = 'https://emplettes.eu/telechargements/Emplettes.apk'; // 18/11/2026 : serveur OVH
 const lienWeb = MessagesFoyer.domaine == ''
     ? 'https://christianfrench.github.io/liste-de-courses/web/'
     : 'https://${MessagesFoyer.domaine}/web/';

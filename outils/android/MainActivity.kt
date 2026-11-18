@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
+import android.provider.Settings
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -34,6 +35,8 @@ class MainActivity : FlutterActivity() {
                 if (appel.method == "ticketRecu") {
                     resultat.success(enAttente)
                     enAttente = null
+                } else if (appel.method == "installerApk") {
+                    resultat.success(installerApk(appel.arguments as String))
                 } else if (appel.method == "ouvrirPdf") {
                     resultat.success(ouvrirPdf(appel.arguments as String))
                 } else if (appel.method == "copieDocuments") {
@@ -86,6 +89,24 @@ class MainActivity : FlutterActivity() {
         val chemin = copier(intent) ?: return
         val c = canal
         if (c == null) enAttente = chemin else c.invokeMethod("ticket", chemin)
+    }
+
+    // Mise à jour (18/11/2026) : l'APK téléchargée dans les fichiers de l'application est confiée à l'installateur
+    // d'Android, qui demande confirmation. La première fois, Android demande d'autoriser Emplettes à installer
+    // des applications : on ouvre ce réglage, puis l'utilisateur relance la mise à jour.
+    private fun installerApk(chemin: String): String {
+        return try {
+            if (Build.VERSION.SDK_INT >= 26 && !packageManager.canRequestPackageInstalls()) {
+                startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+                return "autorisation"
+            }
+            val uri = FileProvider.getUriForFile(this, "$packageName.tickets", File(chemin))
+            startActivity(Intent(Intent.ACTION_VIEW).setDataAndType(uri, "application/vnd.android.package-archive")
+                .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK))
+            "ok"
+        } catch (e: Exception) {
+            "erreur : ${e.message}"
+        }
     }
 
     // Ticket rangé dans les fichiers de l'application : prêté au lecteur de PDF (FileProvider

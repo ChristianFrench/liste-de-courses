@@ -70,3 +70,5 @@ Name: "{autodesktop}\Emplettes"; Filename: "{app}\liste_de_courses.exe"; Tasks: 
 
 [Run]
 Filename: "{app}\liste_de_courses.exe"; Description: "Ouvrir Emplettes"; Flags: nowait postinstall skipifsilent
+; 18/11/2026 : mise à jour lancée par l'application (/SILENT) : elle se rouvre d'elle-même.
+Filename: "{app}\liste_de_courses.exe"; Flags: nowait; Check: WizardSilent

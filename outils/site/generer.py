@@ -5,8 +5,8 @@ Charte : docs/site.css (palette Sauge, Atkinson Hyperlegible, bandeaux de l'appl
 """
 import json, os
 
-APK = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Liste-de-courses.apk'
-EXE = 'https://github.com/ChristianFrench/liste-de-courses/releases/download/derniere-version/Emplettes-Installation.exe'
+APK = 'https://emplettes.eu/telechargements/Emplettes.apk'  # 18/11/2026 : depuis le serveur OVH, plus GitHub
+EXE = 'https://emplettes.eu/telechargements/Emplettes-Installation.exe'
 
 PAGES = [  # (fichier, titre du menu)
     ('index.html', 'Accueil'),

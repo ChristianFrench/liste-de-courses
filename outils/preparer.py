@@ -25,6 +25,9 @@ remplacer("android/app/src/main/AndroidManifest.xml",
 # Android : autorisation d'accès à internet (Open Food Facts, puis Firebase)
 remplacer("android/app/src/main/AndroidManifest.xml",
           r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.INTERNET"/>', regex=True)
+# 18/11/2026 : mise à jour depuis l'application (l'APK téléchargée est confiée à l'installateur d'Android).
+remplacer("android/app/src/main/AndroidManifest.xml",
+          r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>', regex=True)
 
 # Android : l'application reçoit les tickets de caisse PDF (« Partager » et « Ouvrir avec »).
 # Une seule fenêtre de l'application (singleTask) : un PDF partagé rejoint l'application déjà ouverte.
