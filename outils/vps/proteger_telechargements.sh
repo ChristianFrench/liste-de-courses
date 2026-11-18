@@ -10,7 +10,7 @@
 # à saisir comme secret GitHub TELECHARGEMENTS_ESSAI (le compte de l'application pour le dossier essai).
 # À relancer après une réinstallation du serveur (installer.sh réécrit la configuration de Nginx).
 set -euo pipefail
-echo "Protection des téléchargements (script du 18/11/2026, version 2)"
+echo "Protection des téléchargements (script du 18/11/2026, version 3)"
 [ "$(id -u)" = 0 ] || { echo "À lancer avec sudo."; exit 1; }
 CONF=/etc/nginx/sites-available/emplettes
 [ -f "$CONF" ] || { echo "Configuration Nginx introuvable : $CONF"; exit 1; }
@@ -48,12 +48,16 @@ if 'emplettes-essai.htpasswd' not in t:
                 break
         k += 1
     bloc = t[debut:k + 1]
-    essai = bloc.replace('location /telechargements/ {', 'location /telechargements/essai/ { auth_basic "Emplettes - essais"; auth_basic_user_file /etc/nginx/emplettes-essai.htpasswd;', 1)
-    console = bloc.replace('location /telechargements/ {', 'location /telechargements/console/ { auth_basic "Emplettes - console"; auth_basic_user_file /etc/nginx/emplettes-console.htpasswd;', 1)
+    essai = bloc.replace('location /telechargements/ {', 'location ^~ /telechargements/essai/ { auth_basic "Emplettes - essais"; auth_basic_user_file /etc/nginx/emplettes-essai.htpasswd;', 1)
+    console = bloc.replace('location /telechargements/ {', 'location ^~ /telechargements/console/ { auth_basic "Emplettes - console"; auth_basic_user_file /etc/nginx/emplettes-console.htpasswd;', 1)
     t = t[:k + 1] + '\n    ' + essai + '\n    ' + console + t[k + 1:]
     open(p, 'w').write(t)
     print('Nginx : dossiers essai/ et console/ protégés.')
 else:
+    # Version 3 : « ^~ » pour que la règle des fichiers .json/.js/.html ne passe pas avant la protection.
+    for d in ('essai', 'console'):
+        t = t.replace(f'location /telechargements/{d}/ {{', f'location ^~ /telechargements/{d}/ {{')
+    open(p, 'w').write(t)
     print('Nginx : protection déjà en place, mots de passe renouvelés.')
 PY
 if nginx -t 2>/dev/null; then
