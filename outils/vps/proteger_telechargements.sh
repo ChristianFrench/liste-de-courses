@@ -10,6 +10,7 @@
 # à saisir comme secret GitHub TELECHARGEMENTS_ESSAI (le compte de l'application pour le dossier essai).
 # À relancer après une réinstallation du serveur (installer.sh réécrit la configuration de Nginx).
 set -euo pipefail
+echo "Protection des téléchargements (script du 18/11/2026, version 2)"
 [ "$(id -u)" = 0 ] || { echo "À lancer avec sudo."; exit 1; }
 CONF=/etc/nginx/sites-available/emplettes
 [ -f "$CONF" ] || { echo "Configuration Nginx introuvable : $CONF"; exit 1; }
