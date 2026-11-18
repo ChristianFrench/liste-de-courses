@@ -114,6 +114,10 @@ Contraintes du découpage en extensions (Dart) :
   (versions clôturées, liens du site) et `telechargements/essai/` (chaque compilation). `version.json` y donne,
   pour chaque application (`apk`, `demo`, `exe`), le commit de sa dernière compilation ; l'application le compare
   au sien pour proposer la mise à jour. Le web lit son propre `web/version.json` (ou `demo/`).
+- `telechargements/essai/` et `telechargements/console/` sont protégés par mot de passe
+  (`outils/vps/proteger_telechargements.sh`, à relancer après une réinstallation du serveur) ; l'APK démo lit
+  `essai/` avec le compte « application » (secret `TELECHARGEMENTS_ESSAI`). La console n'y est déposée que si
+  son dossier est protégé.
 
 ## 8. Règles à ne jamais enfreindre
 

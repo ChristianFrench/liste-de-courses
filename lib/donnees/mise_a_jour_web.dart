@@ -14,4 +14,5 @@ Future<void> recharger() async {
   }
 }
 
-Future<String> telechargerEtInstaller(Uri url, String nom, void Function(double) progression) async => 'web';
+Future<String> telechargerEtInstaller(Uri url, String nom, Map<String, String> entetes, void Function(double) progression) async =>
+    'web';

@@ -451,3 +451,8 @@ EOF
 cat /etc/emplettes/deploiement_ed25519
 echo
 info "Ces valeurs restent dans /etc/emplettes (root seul). Ne les envoyez à personne, pas même à Claude."
+# 18/11/2026 : la configuration de Nginx vient d'être réécrite ; la protection des dossiers essai/ et console/
+# est à remettre (outils/vps/proteger_telechargements.sh).
+if [ -f /etc/nginx/emplettes-essai.htpasswd ]; then
+  info "Pensez à relancer outils/vps/proteger_telechargements.sh : la protection des essais et de la console est à remettre."
+fi

@@ -20,6 +20,8 @@ env:
   MQTT_MOT_DE_PASSE_VPS: ${{ secrets.MQTT_MOT_DE_PASSE_VPS }}
   RELAIS_CLE: ${{ secrets.RELAIS_CLE }}
   VPS_HOTE: ${{ secrets.VPS_HOTE }}
+  # Compte « application » du dossier protégé telechargements/essai/ (outils/vps/proteger_telechargements.sh).
+  TELECHARGEMENTS_ESSAI: ${{ secrets.TELECHARGEMENTS_ESSAI }}
   # Notifications Android par Firebase : contenu du fichier google-services.json du projet Firebase.
   GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
   CREER: flutter create --org fr.listecourses --project-name liste_de_courses --platforms android,windows .
@@ -145,7 +147,7 @@ jobs:
           mosquitto_sub -h "$H" -p 8883 --capath /etc/ssl/certs -u "$U" -P "$P" -t ldc/catalogue-commun -C 1 -W 15 > assets/catalogue_demo.txt || true
           echo "catalogue embarqué : $(wc -c < assets/catalogue_demo.txt) octets"
           python3 outils/definitions.py
-          jq '{VERSION, COMMIT}' definitions.json > definitions-demo.json
+          jq --arg t "$TELECHARGEMENTS_ESSAI" '{VERSION, COMMIT} + (if $t != "" then {TELECHARGEMENTS_ESSAI: $t} else {} end) | with_entries(select(.value != null))' definitions.json > definitions-demo.json
           for f in android/app/build.gradle.kts android/app/build.gradle; do
             [ -f "$f" ] && sed -i 's/applicationId = "fr.listecourses.liste_de_courses"/applicationId = "fr.listecourses.liste_de_courses.demo"/; s/applicationId "fr.listecourses.liste_de_courses"/applicationId "fr.listecourses.liste_de_courses.demo"/' "$f"
           done
@@ -393,7 +395,11 @@ jobs:
           set -e
           C=${GITHUB_SHA::7}
           VERSION=$(grep '^version=' publication/version.txt | cut -d= -f2)
-          curl -fsS "https://$VPS_HOTE/telechargements/essai/version.json" -o precedent.json 2>/dev/null || echo '{}' > precedent.json
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          SSH="ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new"
+          # La fiche précédente est relue par rsync (le dossier essai/ est protégé par mot de passe).
+          rsync -e "$SSH" "deploiement@$VPS_HOTE:telechargements/essai/version.json" precedent.json 2>/dev/null || echo '{}' > precedent.json
           prec() { jq -r --arg k "$1" '.[$k] // ""' precedent.json; }
           mkdir -p essai officiel
           APK=$(prec apk); DEMO=$(prec demo); EXE=$(prec exe)
@@ -411,11 +417,17 @@ jobs:
           jq -n --arg v "$VERSION" --arg d "$(TZ=Europe/Paris date '+%d/%m/%Y %H:%M')" --arg a "$APK" --arg m "$DEMO" --arg e "$EXE" \
             '{version: $v, date: $d, apk: $a, demo: $m, exe: $e}' > essai/version.json
           cat essai/version.json
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
-          SSH="ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new"
           # Arborescence complète envoyée à la racine du site : les dossiers se créent d'eux-mêmes (sans --delete).
           mkdir -p depot/telechargements && cp -r essai depot/telechargements/
+          # La console d'administration (elle contient le code d'éditeur) seulement si son dossier est protégé.
+          CONSOLE="livrables/Emplettes editeur Installation/Emplettes-Editeur-Installation.exe"
+          if [ -f "$CONSOLE" ]; then
+            if [ "$(curl -s -o /dev/null -w '%{http_code}' "https://$VPS_HOTE/telechargements/console/")" = "401" ]; then
+              mkdir -p depot/telechargements/console && cp "$CONSOLE" depot/telechargements/console/
+            else
+              echo "::warning title=Console::dossier console/ non protégé (outils/vps/proteger_telechargements.sh) : console non déposée"
+            fi
+          fi
           rsync -rlz -e "$SSH" depot/ "deploiement@$VPS_HOTE:"
           if [[ "$MESSAGE" == *"[version]"* ]] || ! curl -fsS "https://$VPS_HOTE/telechargements/version.json" > /dev/null 2>&1; then
             cp publication/Liste-de-courses.apk officiel/Emplettes.apk 2>/dev/null || true
@@ -428,7 +440,8 @@ jobs:
             rsync -rlz -e "$SSH" depot/ "deploiement@$VPS_HOTE:"
           fi
           rm -f ~/.ssh/deploiement
-          curl -fsS "https://$VPS_HOTE/telechargements/essai/version.json"
+          echo "essai/version.json : HTTP $(curl -s -o /dev/null -w '%{http_code}' "https://$VPS_HOTE/telechargements/essai/version.json") (200 libre, 401 protégé)"
+          curl -fsS "https://$VPS_HOTE/telechargements/version.json"
       - name: Publier
         env:
           GH_TOKEN: ${{ github.token }}

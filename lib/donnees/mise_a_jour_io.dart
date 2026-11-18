@@ -11,7 +11,7 @@ String get systeme => Platform.isAndroid ? 'android' : (Platform.isWindows ? 'wi
 Future<void> recharger() async {}
 
 /// Rend « ok », « autorisation » (Android : réglage à donner) ou la raison de l'échec.
-Future<String> telechargerEtInstaller(Uri url, String nom, void Function(double) progression) async {
+Future<String> telechargerEtInstaller(Uri url, String nom, Map<String, String> entetes, void Function(double) progression) async {
   final dossier = Platform.isAndroid
       ? Directory('${(await dossierApplication()).path}${Platform.pathSeparator}mise-a-jour')
       : Directory('${Directory.systemTemp.path}${Platform.pathSeparator}emplettes-mise-a-jour');
@@ -19,7 +19,7 @@ Future<String> telechargerEtInstaller(Uri url, String nom, void Function(double)
   final fichier = File('${dossier.path}${Platform.pathSeparator}$nom');
   final client = http.Client();
   try {
-    final reponse = await client.send(http.Request('GET', url));
+    final reponse = await client.send(http.Request('GET', url)..headers.addAll(entetes));
     if (reponse.statusCode != 200) return 'fichier introuvable sur le serveur (${reponse.statusCode})';
     final total = reponse.contentLength ?? 0;
     var recu = 0;

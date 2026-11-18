@@ -1,7 +1,7 @@
 // Mise à jour depuis l'application (18/11/2026, Aristide), démonstration d'abord.
 //
 // Les applications sont déposées par la compilation sur le serveur OVH (https://<domaine>/telechargements/,
-// dossier essai/ pour chaque compilation, racine pour les versions clôturées), avec une fiche version.json
+// dossier essai/ pour chaque compilation, protégé par mot de passe, racine pour les versions clôturées), avec une fiche version.json
 // qui donne, pour chaque application, le commit de sa dernière compilation. L'application compare ce commit
 // au sien :
 // - Android : elle télécharge l'APK et la confie à l'installateur d'Android (qui demande confirmation) ;
@@ -20,6 +20,10 @@ import 'modele.dart' show Etat, EtatChargement;
 const _commit = String.fromEnvironment('COMMIT');
 const _domaine = String.fromEnvironment('DOMAINE', defaultValue: 'emplettes.eu');
 
+/// Compte « application:mot de passe » du dossier protégé telechargements/essai/ (secret GitHub
+/// TELECHARGEMENTS_ESSAI, donné à l'APK démo seulement). Sans lui, la démo suit le dépôt officiel.
+const _compteEssai = String.fromEnvironment('TELECHARGEMENTS_ESSAI');
+
 class MiseAJour extends ChangeNotifier {
   MiseAJour._();
   static final instance = MiseAJour._();
@@ -28,7 +32,10 @@ class MiseAJour extends ChangeNotifier {
   static bool active = demonstration;
 
   /// Les versions d'essai (chaque compilation) plutôt que les versions clôturées : la démonstration les suit.
-  static bool get essai => demonstration;
+  static bool get essai => demonstration && _compteEssai.isNotEmpty;
+
+  static Map<String, String> get _entetes =>
+      essai ? {'Authorization': 'Basic ${base64Encode(utf8.encode(_compteEssai))}'} : const {};
 
   /// Le commit publié, quand il diffère de celui de l'application.
   String? disponible;
@@ -67,7 +74,7 @@ class MiseAJour extends ChangeNotifier {
       } else {
         final appli = _application;
         if (appli == null) return;
-        final r = await http.get(Uri.parse('${_depot}version.json')).timeout(const Duration(seconds: 15));
+        final r = await http.get(Uri.parse('${_depot}version.json'), headers: _entetes).timeout(const Duration(seconds: 15));
         if (r.statusCode != 200) return;
         final j = jsonDecode(r.body) as Map;
         publie = j[appli.$1] as String?;
@@ -104,7 +111,7 @@ class MiseAJour extends ChangeNotifier {
     progression = 0;
     notifyListeners();
     try {
-      final resultat = await plateforme.telechargerEtInstaller(Uri.parse('$_depot${appli.$2}'), appli.$2, (p) {
+      final resultat = await plateforme.telechargerEtInstaller(Uri.parse('$_depot${appli.$2}'), appli.$2, _entetes, (p) {
         progression = p;
         notifyListeners();
       });
