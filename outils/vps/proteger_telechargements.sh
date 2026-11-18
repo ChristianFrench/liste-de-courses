@@ -34,13 +34,23 @@ import sys, re
 p = sys.argv[1]
 t = open(p).read()
 if 'emplettes-essai.htpasswd' not in t:
-    lignes = t.split('\n')
-    i = next(k for k, l in enumerate(lignes) if 'location /telechargements/ {' in l)
-    l = lignes[i]
-    essai = l.replace('location /telechargements/ {', 'location /telechargements/essai/ { auth_basic "Emplettes - essais"; auth_basic_user_file /etc/nginx/emplettes-essai.htpasswd;')
-    console = l.replace('location /telechargements/ {', 'location /telechargements/console/ { auth_basic "Emplettes - console"; auth_basic_user_file /etc/nginx/emplettes-console.htpasswd;')
-    lignes[i + 1:i + 1] = [essai, console]
-    open(p, 'w').write('\n'.join(lignes))
+    # Le bloc « location /telechargements/ { … } » peut tenir sur plusieurs lignes (en-têtes de sécurité) :
+    # on le recopie en entier, jusqu'à son accolade fermante.
+    debut = t.index('location /telechargements/ {')
+    k, niveau = t.index('{', debut), 0
+    while True:
+        if t[k] == '{':
+            niveau += 1
+        elif t[k] == '}':
+            niveau -= 1
+            if niveau == 0:
+                break
+        k += 1
+    bloc = t[debut:k + 1]
+    essai = bloc.replace('location /telechargements/ {', 'location /telechargements/essai/ { auth_basic "Emplettes - essais"; auth_basic_user_file /etc/nginx/emplettes-essai.htpasswd;', 1)
+    console = bloc.replace('location /telechargements/ {', 'location /telechargements/console/ { auth_basic "Emplettes - console"; auth_basic_user_file /etc/nginx/emplettes-console.htpasswd;', 1)
+    t = t[:k + 1] + '\n    ' + essai + '\n    ' + console + t[k + 1:]
+    open(p, 'w').write(t)
     print('Nginx : dossiers essai/ et console/ protégés.')
 else:
     print('Nginx : protection déjà en place, mots de passe renouvelés.')
