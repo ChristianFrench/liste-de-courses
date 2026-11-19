@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for f in telechargements/version.json telechargements/Emplettes.apk telechargements/essai/version.json telechargements/essai/Emplettes.apk telechargements/essai/Memo-Emplettes.apk telechargements/console/Emplettes-Editeur-Installation.exe; do
-            echo "$(curl -s -o /dev/null -I -w '%{http_code}' "https://emplettes.eu/$f") $f"
+          for f in telechargements/version.json telechargements/Emplettes.apk telechargements/essai/version.json telechargements/essai/Emplettes.apk telechargements/essai/Memo-Emplettes.apk telechargements/essai/Emplettes-demo.apk telechargements/Emplettes-demo.apk telechargements/console/Emplettes-Editeur-Installation.exe; do
+            echo "$(curl -s -o /dev/null -I -w "%{http_code} %header{content-length}" "https://emplettes.eu/$f") $f"
           done
