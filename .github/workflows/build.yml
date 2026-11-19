@@ -128,11 +128,6 @@ jobs:
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
-      - name: APK pour émulateur sur PC (LDPlayer, BlueStacks…), plus léger
-        run: |
-          python3 outils/definitions.py
-          flutter build apk --release --dart-define-from-file=definitions.json --target-platform android-x64
-          mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (emulateur PC).apk"
       # 13/11/2026 (Aristide) : la démonstration en APK, pour essayer sans toucher à la version opérationnelle.
       # Autre identifiant d'application (elle s'installe à côté), nom « Emplettes démo », foyer d'exemple, sans
       # aucun secret ni notification ; le dernier catalogue commun publié est embarqué.
@@ -363,11 +358,10 @@ jobs:
           VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: *//; s/+.*//')
           mkdir -p publication
           # Mode rapide : l'APK et les captures de la version précédente sont repris tels quels
-          gh release download derniere-version -p Liste-de-courses.apk -p Liste-de-courses-emulateur-PC.apk -p Emplettes-demo.apk -p Captures.zip -D publication 2>/dev/null || true
+          gh release download derniere-version -p Liste-de-courses.apk -p Emplettes-demo.apk -p Captures.zip -D publication 2>/dev/null || true
           # Mode APK : le programme d'installation Windows de la version précédente est repris tel quel
           if [ ! -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then gh release download derniere-version -p Emplettes-Installation.exe -D publication 2>/dev/null || true; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses.apk" publication/Liste-de-courses.apk; fi
-          if [ -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" publication/Liste-de-courses-emulateur-PC.apk; fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then cp -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" publication/Emplettes-demo.apk; fi
           if [ -f "livrables/Emplettes Installation/Emplettes-Installation.exe" ]; then cp -f "livrables/Emplettes Installation/Emplettes-Installation.exe" publication/; fi
           if [ -d livrables/Captures ]; then rm -f publication/Captures.zip; (cd livrables/Captures && zip -qr ../../publication/Captures.zip .); fi
@@ -405,7 +399,6 @@ jobs:
           APK=$(prec apk); DEMO=$(prec demo); EXE=$(prec exe)
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then
             cp "livrables/Liste de courses Android/Liste de courses.apk" essai/Emplettes.apk
-            cp "livrables/Liste de courses Android/Liste de courses (emulateur PC).apk" essai/Emplettes-emulateur-PC.apk
             APK=$C
           fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then
@@ -431,7 +424,6 @@ jobs:
           rsync -rlz -e "$SSH" depot/ "deploiement@$VPS_HOTE:"
           if [[ "$MESSAGE" == *"[version]"* ]] || ! curl -fsS "https://$VPS_HOTE/telechargements/version.json" > /dev/null 2>&1; then
             cp publication/Liste-de-courses.apk officiel/Emplettes.apk 2>/dev/null || true
-            cp publication/Liste-de-courses-emulateur-PC.apk officiel/Emplettes-emulateur-PC.apk 2>/dev/null || true
             cp publication/Emplettes-demo.apk officiel/ 2>/dev/null || true
             cp publication/Emplettes-Installation.exe officiel/ 2>/dev/null || true
             jq --arg c "$C" '.apk = (if .apk == "" then $c else .apk end) | .demo = (if .demo == "" then $c else .demo end) | .exe = (if .exe == "" then $c else .exe end)' essai/version.json > officiel/version.json
