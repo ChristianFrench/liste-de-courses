@@ -27,7 +27,8 @@ class MemoWidget : AppWidgetProvider() {
             @Suppress("DEPRECATION")
             v.setRemoteAdapter(R.id.liste, service)
             v.setEmptyView(R.id.liste, R.id.vide)
-            val ouvrir = PendingIntent.getActivity(contexte, 1, Intent(Intent.ACTION_VIEW),
+            // Un seul modèle pour toute la liste : le relais ouvre le lien, ou plie / déplie la rubrique touchée.
+            val ouvrir = PendingIntent.getActivity(contexte, 1, Intent(contexte, Relais::class.java),
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
             v.setPendingIntentTemplate(R.id.liste, ouvrir)
             val appli = PendingIntent.getActivity(contexte, 2,
@@ -52,7 +53,28 @@ class MemoService : RemoteViewsService() {
     override fun onGetViewFactory(intent: Intent): RemoteViewsFactory = Fabrique(applicationContext)
 }
 
-private class Ligne(val rubrique: Boolean, val nom: String, val adresse: String)
+private class Ligne(val rubrique: Int, val nom: String, val adresse: String, val nombre: Int = 0, val ouverte: Boolean = false)
+
+// Comme les listes d'Emplettes : une bande par rubrique, une seule ouverte à la fois.
+class Relais : android.app.Activity() {
+    override fun onCreate(etat: android.os.Bundle?) {
+        super.onCreate(etat)
+        val i = intent
+        val adresse = i.getStringExtra("adresse")
+        if (adresse != null) {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(adresse)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+            } catch (e: Exception) {}
+        } else if (i.hasExtra("rubrique")) {
+            val r = i.getIntExtra("rubrique", -1)
+            val prefs = getSharedPreferences("memo", Context.MODE_PRIVATE)
+            val ouverte = prefs.getInt("ouverte", -1)
+            prefs.edit().putInt("ouverte", if (ouverte == r) -1 else r).commit()
+            MemoWidget.rafraichir(this)
+        }
+        finish()
+    }
+}
 
 private class Fabrique(val contexte: Context) : RemoteViewsService.RemoteViewsFactory {
     private var lignes = listOf<Ligne>()
@@ -61,18 +83,21 @@ private class Fabrique(val contexte: Context) : RemoteViewsService.RemoteViewsFa
     override fun onDestroy() {}
 
     override fun onDataSetChanged() {
-        val texte = contexte.getSharedPreferences("memo", Context.MODE_PRIVATE).getString("memo", null) ?: ""
+        val prefs = contexte.getSharedPreferences("memo", Context.MODE_PRIVATE)
+        val texte = prefs.getString("memo", null) ?: ""
+        val ouverte = prefs.getInt("ouverte", -1)
         val l = mutableListOf<Ligne>()
         try {
             val rubriques = JSONArray(texte)
             for (i in 0 until rubriques.length()) {
                 val r = rubriques.getJSONObject(i)
                 if (!r.optBoolean("widget", true)) continue
-                l.add(Ligne(true, r.optString("titre"), ""))
                 val liens = r.optJSONArray("liens") ?: JSONArray()
+                l.add(Ligne(i, r.optString("titre"), "", liens.length(), i == ouverte))
+                if (i != ouverte) continue
                 for (j in 0 until liens.length()) {
                     val e = liens.getJSONObject(j)
-                    l.add(Ligne(false, e.optString("nom"), e.optString("adresse")))
+                    l.add(Ligne(-1, e.optString("nom"), e.optString("adresse")))
                 }
             }
         } catch (e: Exception) {
@@ -89,16 +114,18 @@ private class Fabrique(val contexte: Context) : RemoteViewsService.RemoteViewsFa
 
     override fun getViewAt(position: Int): RemoteViews {
         val e = lignes[position]
-        if (e.rubrique) {
-            return RemoteViews(contexte.packageName, R.layout.memo_rubrique).apply { setTextViewText(R.id.texte, e.nom) }
+        if (e.rubrique >= 0) {
+            return RemoteViews(contexte.packageName, R.layout.memo_rubrique).apply {
+                setTextViewText(R.id.texte, e.nom)
+                setTextViewText(R.id.nombre, e.nombre.toString())
+                setTextViewText(R.id.chevron, if (e.ouverte) "▾" else "▸")
+                setOnClickFillInIntent(R.id.bande, Intent().putExtra("rubrique", e.rubrique))
+            }
         }
         return RemoteViews(contexte.packageName, R.layout.memo_lien).apply {
             setTextViewText(R.id.nom, e.nom)
             setTextViewText(R.id.adresse, e.adresse)
-            if (e.adresse.startsWith("http")) {
-                setOnClickFillInIntent(R.id.nom, Intent().setData(Uri.parse(e.adresse)))
-                setOnClickFillInIntent(R.id.adresse, Intent().setData(Uri.parse(e.adresse)))
-            }
+            if (e.adresse.startsWith("http")) setOnClickFillInIntent(R.id.ligne, Intent().putExtra("adresse", e.adresse))
         }
     }
 }

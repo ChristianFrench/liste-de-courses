@@ -102,6 +102,9 @@ class _AccueilState extends State<Accueil> {
   List<Rubrique>? rubriques;
   bool modifier = false;
 
+  /// Comme les listes d'Emplettes : une seule rubrique ouverte à la fois.
+  int? ouverte;
+
   @override
   void initState() {
     super.initState();
@@ -242,36 +245,68 @@ class _AccueilState extends State<Accueil> {
 
   Widget _carte(List<Rubrique> rs, int i) {
     final r = rs[i];
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16, right: 4),
-            child: Row(children: [
-              Expanded(child: Text(r.titre, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: vert))),
-              const Text('Widget', style: TextStyle(fontSize: 12, color: Colors.black54)),
-              Switch(value: r.widget, activeThumbColor: vert, onChanged: (v) => _changer(() => r.widget = v)),
-            ]),
+    final ouvert = ouverte == i;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Material(
+          color: vert,
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => setState(() => ouverte = ouvert ? null : i),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 4, 6, 4),
+              child: Row(children: [
+                Expanded(child: Text(r.titre, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white))),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(10)),
+                  child: Text('${r.liens.length}', style: const TextStyle(color: Colors.white, fontSize: 13)),
+                ),
+                Tooltip(
+                  message: 'Afficher dans le widget',
+                  child: Switch(
+                    value: r.widget,
+                    activeThumbColor: Colors.white,
+                    activeTrackColor: Colors.white38,
+                    onChanged: (v) => _changer(() => r.widget = v),
+                  ),
+                ),
+                Icon(ouvert ? Icons.expand_less : Icons.expand_more, color: Colors.white),
+              ]),
+            ),
           ),
+        ),
+        if (ouvert) ...[
           if (modifier)
             Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              IconButton(tooltip: 'Monter', icon: const Icon(Icons.arrow_upward), onPressed: () => _deplacer(rs, i, -1)),
-              IconButton(tooltip: 'Descendre', icon: const Icon(Icons.arrow_downward), onPressed: () => _deplacer(rs, i, 1)),
+              IconButton(tooltip: 'Monter', icon: const Icon(Icons.arrow_upward), onPressed: () {
+                _deplacer(rs, i, -1);
+                if (i > 0) setState(() => ouverte = i - 1);
+              }),
+              IconButton(tooltip: 'Descendre', icon: const Icon(Icons.arrow_downward), onPressed: () {
+                _deplacer(rs, i, 1);
+                if (i < rs.length - 1) setState(() => ouverte = i + 1);
+              }),
               IconButton(tooltip: 'Renommer', icon: const Icon(Icons.edit_outlined), onPressed: () => _rubrique(r)),
               IconButton(
                 tooltip: 'Supprimer la rubrique',
                 icon: const Icon(Icons.delete_outline),
                 onPressed: () async {
-                  if (await _confirmer('Supprimer la rubrique « ${r.titre} » et ses liens ?')) _changer(() => rs.removeAt(i));
+                  if (await _confirmer('Supprimer la rubrique « ${r.titre} » et ses liens ?')) {
+                    _changer(() {
+                      rs.removeAt(i);
+                      ouverte = null;
+                    });
+                  }
                 },
               ),
             ]),
           for (var j = 0; j < r.liens.length; j++)
             ListTile(
-              dense: true,
-              title: Text(r.liens[j].nom, style: const TextStyle(fontSize: 15)),
+              contentPadding: const EdgeInsets.only(left: 20, right: 4),
+              title: Text(r.liens[j].nom, style: const TextStyle(fontSize: 16)),
               subtitle: Text(r.liens[j].adresse, maxLines: 1, overflow: TextOverflow.ellipsis),
               onTap: () => modifier ? _lien(r, r.liens[j]) : _ouvrir(r.liens[j].adresse),
               trailing: modifier
@@ -280,15 +315,15 @@ class _AccueilState extends State<Accueil> {
                       IconButton(icon: const Icon(Icons.arrow_downward, size: 20), onPressed: () => _deplacer(r.liens, j, 1)),
                       IconButton(icon: const Icon(Icons.delete_outline, size: 20), onPressed: () => _changer(() => r.liens.removeAt(j))),
                     ])
-                  : const Icon(Icons.open_in_new, size: 18),
+                  : const Icon(Icons.open_in_new, size: 18, color: vert),
             ),
           if (modifier)
             Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(onPressed: () => _lien(r), icon: const Icon(Icons.add), label: const Text('Ajouter un lien')),
             ),
-        ]),
-      ),
+        ],
+      ]),
     );
   }
 }

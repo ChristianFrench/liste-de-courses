@@ -19,6 +19,8 @@ t = t.replace('</application>', '''    <receiver android:name=".MemoWidget" andr
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE" /></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/memo_widget_info" />
         </receiver>
+        <activity android:name=".Relais" android:exported="false" android:theme="@android:style/Theme.NoDisplay"
+            android:excludeFromRecents="true" android:noHistory="true" android:taskAffinity="" />
         <service android:name=".MemoService" android:permission="android.permission.BIND_REMOTEVIEWS" android:exported="false" />
     </application>''', 1)
 m.write_text(t)
