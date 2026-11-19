@@ -1,0 +1,22 @@
+# Recopie les applications des essais dans le dépôt officiel (telechargements/), sans recompiler (19/11/2026).
+name: officialiser
+on: workflow_dispatch
+jobs:
+  copie:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          VPS_HOTE: ${{ secrets.VPS_HOTE }}
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+        run: |
+          set -e
+          mkdir -p depot/telechargements
+          for f in Emplettes.apk Emplettes-demo.apk Emplettes-Installation.exe version.json; do
+            curl -fsS -o "depot/telechargements/$f" "https://$VPS_HOTE/telechargements/essai/$f"
+          done
+          ls -l depot/telechargements; cat depot/telechargements/version.json
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          rsync -rlz -e "ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new" depot/ "deploiement@$VPS_HOTE:"
+          rm -f ~/.ssh/deploiement
+          for f in Emplettes.apk Emplettes-demo.apk Emplettes-Installation.exe; do echo "$(curl -s -o /dev/null -I -w '%{http_code} %header{content-length}' "https://$VPS_HOTE/telechargements/$f") $f"; done
