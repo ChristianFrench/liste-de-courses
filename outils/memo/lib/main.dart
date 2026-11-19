@@ -1,11 +1,84 @@
 // Mémo Emplettes (19/11/2026, demandé par Aristide) : les composants d'Emplettes et leurs liens, à personnaliser.
 // Les rubriques cochées « Widget » s'affichent dans le widget d'écran d'accueil (android_ajouts/kotlin/MemoWidget.kt).
+// Deux versions (19/11/2026) : Android (widget d'écran d'accueil, sans les liens Windows) et Windows (petite fenêtre
+// épinglable au premier plan, sans les liens APK).
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:window_manager/window_manager.dart';
 
-void main() => runApp(const Memo());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows) {
+    await windowManager.ensureInitialized();
+    await windowManager.waitUntilReadyToShow(
+      const WindowOptions(size: Size(380, 720), minimumSize: Size(280, 300), title: 'Mémo Emplettes'),
+      () async {
+        await windowManager.setAlwaysOnTop(await Stockage.premierPlan());
+        await windowManager.show();
+      },
+    );
+  }
+  runApp(const Memo());
+}
+
+/// Android : préférences natives (lues aussi par le widget) ; Windows : un fichier dans %APPDATA%\Memo Emplettes.
+class Stockage {
+  static File _fichier(String nom) => File('${Platform.environment['APPDATA'] ?? '.'}\\Memo Emplettes\\$nom');
+
+  static Future<String?> lire() async {
+    if (!Platform.isWindows) return canal.invokeMethod<String>('lire');
+    final f = _fichier('memo.json');
+    return f.existsSync() ? f.readAsStringSync() : null;
+  }
+
+  static Future<void> ecrire(String texte) async {
+    if (!Platform.isWindows) {
+      await canal.invokeMethod('ecrire', texte);
+      return;
+    }
+    final f = _fichier('memo.json');
+    f.parent.createSync(recursive: true);
+    f.writeAsStringSync(texte);
+  }
+
+  static Future<bool> premierPlan() async => _fichier('premier-plan').existsSync();
+
+  static Future<void> garderPremierPlan(bool oui) async {
+    final f = _fichier('premier-plan');
+    if (oui) {
+      f.parent.createSync(recursive: true);
+      f.writeAsStringSync('1');
+    } else if (f.existsSync()) {
+      f.deleteSync();
+    }
+  }
+
+  static Future<bool> ouvrir(String adresse) async {
+    if (!Platform.isWindows) return await canal.invokeMethod<bool>('ouvrir', adresse) ?? false;
+    try {
+      await Process.start('explorer', [adresse]);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+}
+
+/// Les liens qui ne servent pas sur cet appareil : les installateurs Windows sur Android, les APK sur Windows.
+bool _inutile(Lien l) {
+  final a = l.adresse.toLowerCase();
+  return Platform.isAndroid ? a.endsWith('.exe') : (Platform.isWindows && a.endsWith('.apk'));
+}
+
+List<Rubrique> _pourCetAppareil(List<Rubrique> rs) {
+  for (final r in rs) {
+    r.liens.removeWhere(_inutile);
+  }
+  return rs..removeWhere((r) => r.liens.isEmpty && r.titre.isNotEmpty && _toutes().any((o) => o.titre == r.titre));
+}
 
 const vert = Color(0xFF3F7D5A);
 const canal = MethodChannel('memo');
@@ -31,7 +104,9 @@ const _e = 'https://emplettes.eu';
 const _t = '$_e/telechargements';
 const _g = 'https://github.com/ChristianFrench/liste-de-courses';
 
-List<Rubrique> origine() => [
+List<Rubrique> origine() => _pourCetAppareil(_toutes());
+
+List<Rubrique> _toutes() => [
       Rubrique('Site et applications web', [
         Lien('Site', _e),
         Lien('Démo web', '$_e/demo/'),
@@ -49,7 +124,8 @@ List<Rubrique> origine() => [
         Lien('APK 32 bits (à la demande)', '$_t/essai/Emplettes-32bits.apk'),
         Lien('Installateur Windows', '$_t/essai/Emplettes-Installation.exe'),
         Lien('Console catalogue (Windows)', '$_t/console/Emplettes-Editeur-Installation.exe'),
-        Lien('Mémo Emplettes (cette application)', '$_t/essai/Memo-Emplettes.apk'),
+        Lien('Mémo Emplettes', '$_t/essai/Memo-Emplettes.apk'),
+        Lien('Mémo Emplettes', '$_t/essai/Memo-Emplettes-Installation.exe'),
       ]),
       Rubrique('Documents et vidéo', [
         Lien('Mode d\'emploi', '$_e/documents/mode-emploi.html'),
@@ -105,17 +181,21 @@ class _AccueilState extends State<Accueil> {
   /// Comme les listes d'Emplettes : une seule rubrique ouverte à la fois.
   int? ouverte;
 
+  /// Windows : fenêtre gardée au-dessus des autres.
+  bool epingle = false;
+
   @override
   void initState() {
     super.initState();
     _lire();
+    if (Platform.isWindows) Stockage.premierPlan().then((v) => setState(() => epingle = v));
   }
 
   Future<void> _lire() async {
     List<Rubrique> r;
     try {
-      final t = await canal.invokeMethod<String>('lire');
-      r = t == null ? origine() : [for (final j in jsonDecode(t) as List) Rubrique.depuis(j as Map)];
+      final t = await Stockage.lire();
+      r = t == null ? origine() : _pourCetAppareil([for (final j in jsonDecode(t) as List) Rubrique.depuis(j as Map)]);
     } catch (_) {
       r = origine();
     }
@@ -125,7 +205,7 @@ class _AccueilState extends State<Accueil> {
 
   Future<void> _ecrire() async {
     try {
-      await canal.invokeMethod('ecrire', jsonEncode([for (final r in rubriques!) r.versJson()]));
+      await Stockage.ecrire(jsonEncode([for (final r in rubriques!) r.versJson()]));
     } catch (_) {}
   }
 
@@ -140,7 +220,7 @@ class _AccueilState extends State<Accueil> {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Copié')));
       return;
     }
-    final ok = await canal.invokeMethod<bool>('ouvrir', adresse) ?? false;
+    final ok = await Stockage.ouvrir(adresse);
     if (!ok && mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Impossible d\'ouvrir ce lien')));
   }
 
@@ -210,6 +290,16 @@ class _AccueilState extends State<Accueil> {
         foregroundColor: Colors.white,
         title: const Text('Mémo Emplettes'),
         actions: [
+          if (Platform.isWindows)
+            IconButton(
+              tooltip: epingle ? 'Ne plus garder au premier plan' : 'Garder au premier plan',
+              icon: Icon(epingle ? Icons.push_pin : Icons.push_pin_outlined),
+              onPressed: () async {
+                setState(() => epingle = !epingle);
+                await windowManager.setAlwaysOnTop(epingle);
+                await Stockage.garderPremierPlan(epingle);
+              },
+            ),
           IconButton(
             tooltip: modifier ? 'Terminer' : 'Modifier',
             icon: Icon(modifier ? Icons.check : Icons.edit_outlined),
@@ -234,7 +324,9 @@ class _AccueilState extends State<Accueil> {
                 child: Text(
                   modifier
                       ? 'Modifiez, ajoutez, déplacez ou supprimez rubriques et liens. « Widget » choisit ce qui s\'affiche sur l\'écran d\'accueil.'
-                      : 'Touchez un lien pour l\'ouvrir. Pour le widget : appui long sur l\'écran d\'accueil › Widgets › Mémo Emplettes.',
+                      : Platform.isWindows
+                          ? 'Cliquez sur un lien pour l\'ouvrir. La punaise garde la fenêtre au-dessus des autres.'
+                          : 'Touchez un lien pour l\'ouvrir. Pour le widget : appui long sur l\'écran d\'accueil › Widgets › Mémo Emplettes.',
                   style: const TextStyle(fontSize: 13, color: Colors.black54),
                 ),
               ),

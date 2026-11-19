@@ -1,11 +1,12 @@
 name: memo_emplettes
 description: Mémo des composants et liens d'Emplettes, avec un widget d'écran d'accueil Android (19/11/2026, Aristide).
 publish_to: none
-version: 1.0.2+3
+version: 1.1.0+4
 environment:
   sdk: ^3.8.0
 dependencies:
   flutter:
     sdk: flutter
+  window_manager: ^0.5.1
 flutter:
   uses-material-design: true

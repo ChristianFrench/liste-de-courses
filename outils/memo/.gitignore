@@ -1,3 +1,5 @@
 .dart_tool/
 .metadata
 android/
+windows/
+pubspec.lock
