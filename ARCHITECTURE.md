@@ -118,6 +118,9 @@ Contraintes du découpage en extensions (Dart) :
   (`outils/vps/proteger_telechargements.sh`, à relancer après une réinstallation du serveur) ; l'APK démo lit
   `essai/` avec le compte « application » (secret `TELECHARGEMENTS_ESSAI`). La console n'y est déposée que si
   son dossier est protégé.
+- Changer de VPS : `outils/vps/migrer.sh` (`exporter` sur l'ancien, `importer` sur le nouveau, après le changement
+  d'IP dans les DNS) reprend mots de passe, clé de publication, certificats, état MQTT retenu, ntfy, site et
+  téléchargements ; aucun secret GitHub ne change (`VPS_HOTE` est le nom de domaine).
 
 ## 8. Règles à ne jamais enfreindre
 
