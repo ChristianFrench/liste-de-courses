@@ -15,6 +15,8 @@ import 'donnees/reparation.dart';
 import 'donnees/synchro.dart';
 import 'donnees/ticket_recu.dart';
 import 'ecrans/coquille.dart';
+import 'ecrans/recettes.dart' show chercherRecette;
+import 'composants/entete.dart' show EnTeteFenetre;
 import 'ecrans/ouverture.dart';
 import 'ecrans/outil_editeur.dart';
 import 'navigation.dart';
@@ -24,6 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // 12/11/2026 (Aristide) : l'écran d'abord, avec une fenêtre de progression, puis la lecture de la base.
   if (!outilEditeur) {
+    EnTeteFenetre.chercherRecette = chercherRecette;
     ouvertureAffichee = true;
     runApp(const ListeDeCoursesApp(accueil: EcranOuverture()));
     WidgetsBinding.instance.addPostFrameCallback((_) => retirerEcranOuverture());

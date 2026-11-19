@@ -1,12 +1,10 @@
-import 'package:flutter/foundation.dart' show defaultTargetPlatform, kIsWeb, TargetPlatform;
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart';
 
-import '../donnees/demonstration.dart';
 import '../donnees/import_texte.dart' show normaliser;
 import '../donnees/modele.dart';
 import '../theme.dart';
 import 'icone.dart';
+import 'micro.dart';
 
 /// Nombre de lettres à taper avant que la liste des articles s'affiche.
 const lettresRecherche = 3;
@@ -157,45 +155,6 @@ class _ChampRechercheState extends State<ChampRecherche> {
   final _texte = TextEditingController();
   final _focus = FocusNode();
 
-  /// 19/11/2026 (Aristide) : recherche à la voix, un seul article ; le mot dicté s'écrit dans le champ comme au
-  /// clavier, et l'on choisit soi-même dans les résultats (articles présents dans plusieurs secteurs).
-  /// Démonstration d'abord ; Android et web (reconnaissance du système ou du navigateur).
-  static final bool voixPossible = demonstration && (kIsWeb || defaultTargetPlatform == TargetPlatform.android);
-  static final _voix = SpeechToText();
-  static bool? _voixPrete;
-  bool _ecoute = false;
-
-  Future<void> _dicter() async {
-    if (_ecoute) {
-      await _voix.stop();
-      if (mounted) setState(() => _ecoute = false);
-      return;
-    }
-    _voixPrete ??= await _voix.initialize(onError: (_) {
-      if (mounted) setState(() => _ecoute = false);
-    }, onStatus: (s) {
-      if ((s == 'done' || s == 'notListening') && mounted) setState(() => _ecoute = false);
-    });
-    if (!mounted) return;
-    if (_voixPrete != true) {
-      _voixPrete = null;
-      ScaffoldMessenger.maybeOf(context)?.showSnackBar(const SnackBar(content: Text('Reconnaissance vocale indisponible sur cet appareil')));
-      return;
-    }
-    _focus.requestFocus();
-    setState(() => _ecoute = true);
-    await _voix.listen(
-      localeId: 'fr_FR',
-      listenOptions: SpeechListenOptions(partialResults: true, listenMode: ListenMode.search, cancelOnError: true),
-      onResult: (r) {
-        if (!mounted) return;
-        final t = r.recognizedWords;
-        _texte.value = TextEditingValue(text: t, selection: TextSelection.collapsed(offset: t.length));
-        if (r.finalResult) setState(() => _ecoute = false);
-      },
-    );
-  }
-
   @override
   void dispose() {
     _texte.dispose();
@@ -300,25 +259,21 @@ class _ChampRechercheState extends State<ChampRecherche> {
             hintStyle: Charte.texte(widget.largeur == null && widget.droite == null ? 14 : 17, couleur: Charte.texteSecondaire),
             prefixIcon: Icone(Icons.search, color: Charte.cadre),
             prefixIconConstraints: const BoxConstraints(minWidth: 36, minHeight: 34),
-            suffixIcon: ListenableBuilder(
-              listenable: controleur,
-              builder: (context, _) => controleur.text.isEmpty || _ecoute
-                  ? (voixPossible
-                      ? IconButton(
-                          key: const ValueKey('micro-recherche'),
-                          tooltip: _ecoute ? 'Arrêter l\'écoute' : 'Dire un article',
-                          icon: Icone(_ecoute ? Icons.mic : Icons.mic_none, color: _ecoute ? Colors.red : Charte.cadre),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(minWidth: 44, minHeight: 40),
-                          onPressed: _dicter)
-                      : const SizedBox.shrink())
-                  : IconButton(
-                      tooltip: 'Effacer',
-                      icon: const Icone(Icons.close),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(minWidth: 44, minHeight: 40),
-                      onPressed: _fini),
-            ),
+            // Le micro reste en place pendant la dictée (le texte qui arrive ne doit pas le retirer) ; la croix s'y ajoute.
+            suffixIcon: Row(mainAxisSize: MainAxisSize.min, children: [
+              BoutonMicro(controleur: controleur, focus: focus),
+              ListenableBuilder(
+                listenable: controleur,
+                builder: (context, _) => controleur.text.isEmpty
+                    ? const SizedBox.shrink()
+                    : IconButton(
+                        tooltip: 'Effacer',
+                        icon: const Icone(Icons.close),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(minWidth: 44, minHeight: 40),
+                        onPressed: _fini),
+              ),
+            ]),
             filled: true,
             fillColor: Charte.blanc,
             border: OutlineInputBorder(

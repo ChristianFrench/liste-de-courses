@@ -40,6 +40,9 @@ class EnTeteFenetre extends StatelessWidget {
   /// Actions propres à la fenêtre : proposées en touchant le titre, avec l'aide.
   final List<ActionLigne> actions;
 
+  /// Recherche d'une recette (bouton de l'en-tête), fournie par l'application (ecrans/recettes.dart).
+  static void Function(BuildContext context)? chercherRecette;
+
   /// Élément de droite particulier (ex. : choix du magasin).
   final Widget? droite;
 
@@ -127,6 +130,9 @@ class EnTeteFenetre extends StatelessWidget {
                 ),
                 const SizedBox(width: 8),
                 // 02/11/2026 (Aristide) : sur toutes les fenêtres, le nuage puis l'aide, en haut à droite.
+                // 19/11/2026 (Aristide) : chercher une recette depuis toutes les fenêtres, à côté du nuage.
+                if (EnTeteFenetre.chercherRecette case final f?)
+                  boutonEnTete(Icons.restaurant_menu_outlined, 'Chercher une recette', () => f(context)),
                 const BoutonSynchro(),
                 boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, titre, aide ?? Aides.generale)),
               ],

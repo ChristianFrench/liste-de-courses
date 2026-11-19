@@ -652,7 +652,10 @@ class EcranMagasins extends StatelessWidget {
                 key: ValueKey('glisser-${m.id}'),
                 titre: m.nom,
                 versGauche: ActionLigne(Icons.delete_outline, 'Supprimer', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
+                // 19/11/2026 (Aristide) : renommer depuis la liste des magasins (appui long) ; les parcours, rattachés
+                // au magasin et non à son nom, sont gardés.
                 actions: [
+                  ActionLigne(Icons.edit_outlined, 'Renommer le magasin', () => renommerMagasin(context, m)),
                   ActionLigne(Icons.delete_outline, 'Supprimer le magasin', () => demanderSuppression(context, m, 'le magasin ${m.nom}'), danger: true),
                 ],
                 child: LigneMenu(
@@ -695,15 +698,7 @@ class EcranMagasin extends StatelessWidget {
             titre: m.nom,
             aide: Aides.parcours,
             actions: [
-              ActionLigne(Icons.edit_outlined, 'Renommer le magasin', () async {
-                final nom = await demanderTexte(context, titre: 'Nom du magasin', initial: m.nom);
-                if (nom == null || nom.isEmpty || !context.mounted) return;
-                if (etat.magasinNomme(nom) case final autre? when autre.id != m.id) {
-                  Nav.message(context, 'Un magasin s\'appelle déjà « $nom »');
-                  return;
-                }
-                etat.renommerMagasin(m, nom);
-              }),
+              ActionLigne(Icons.edit_outlined, 'Renommer le magasin', () => renommerMagasin(context, m)),
               ActionLigne(Icons.local_mall_outlined, 'Enseigne : ${etat.enseigneDe(m) ?? 'aucune'}', () async {
                 final e = await choisirDansListe<String>(context,
                     titre: 'Enseigne (marques distributeur)', choix: {'': 'Aucune', for (final x in etat.enseignesMdd) x: x});
@@ -1482,4 +1477,17 @@ class EcranProduitsMasques extends StatelessWidget {
       },
     );
   }
+}
+
+/// Renommer un magasin : seul son nom change, ses parcours, listes et historique lui restent rattachés.
+Future<void> renommerMagasin(BuildContext context, Magasin m) async {
+  final etat = Etat.instance;
+  final nom = await demanderTexte(context, titre: 'Nom du magasin', initial: m.nom, valider: 'Renommer');
+  if (nom == null || nom.trim().isEmpty || !context.mounted) return;
+  if (etat.magasinNomme(nom.trim()) case final autre? when autre.id != m.id) {
+    Nav.message(context, 'Un magasin s\'appelle déjà « ${nom.trim()} »');
+    return;
+  }
+  etat.renommerMagasin(m, nom.trim());
+  Nav.message(context, 'Magasin renommé ; ses parcours sont gardés');
 }

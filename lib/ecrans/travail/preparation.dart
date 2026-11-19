@@ -473,7 +473,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 key: const ValueKey('filtre-recettes'),
                 controller: _filtreRecettes,
                 style: Charte.texte(15),
-                decoration: const InputDecoration(labelText: 'Chercher une recette', prefixIcon: Icon(Icons.search)),
+                decoration: InputDecoration(
+                    labelText: 'Chercher une recette',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: BoutonMicro(controleur: _filtreRecettes, onTexte: (v) => maj(() => filtre = v))),
                 onChanged: (v) => maj(() => filtre = v),
               ),
             ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../composants/icone.dart';
+import '../composants/micro.dart';
 import '../donnees/import_texte.dart' show normaliser;
 import '../donnees/recette_ingredients.dart';
 import '../navigation.dart';
@@ -19,6 +20,19 @@ class EcranRecettes extends StatefulWidget {
 class _EcranRecettesState extends State<EcranRecettes> {
   List<RecetteLue>? _toutes;
   String _filtre = '';
+  final _champ = TextEditingController();
+
+  @override
+  void dispose() {
+    _champ.dispose();
+    super.dispose();
+  }
+
+  void _filtrer(String v, List<String> cles) {
+    // Une recherche ouvre tous les types trouvés ; l'effacer les replie.
+    Retractables.i.fixer(cles, v.trim().isNotEmpty);
+    setState(() => _filtre = v);
+  }
 
   @override
   void initState() {
@@ -29,7 +43,9 @@ class _EcranRecettesState extends State<EcranRecettes> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => ListenableBuilder(listenable: Retractables.i, builder: (context, _) => _page(context));
+
+  Widget _page(BuildContext context) {
     final toutes = _toutes;
     final f = normaliser(_filtre);
     final vues = [for (final r in toutes ?? const <RecetteLue>[]) if (f.isEmpty || normaliser(r.titre).contains(f)) r];
@@ -43,12 +59,18 @@ class _EcranRecettesState extends State<EcranRecettes> {
         final da = normaliser(a).startsWith('dessert'), db = normaliser(b).startsWith('dessert');
         return da == db ? a.compareTo(b) : (da ? 1 : -1);
       });
+    final cles = [for (final t in types) 'recettes/$t'];
+    final plis = Retractables.i;
+    final toutOuvert = cles.isNotEmpty && cles.every((c) => plis.ouvert(c, parDefaut: false));
     return PageBase(
       entete: EnTeteFenetre(
         retour: true,
         icone: Icons.restaurant_menu_outlined,
         sousTitre: 'Gérer › Courses',
         titre: 'Catalogue des recettes',
+        // 19/11/2026 (Aristide) : tout déplier / tout replier, comme les autres catalogues.
+        droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier',
+            () => plis.tous(cles, !toutOuvert)),
       ),
       corps: toutes == null
           ? const Center(child: CircularProgressIndicator())
@@ -57,9 +79,14 @@ class _EcranRecettesState extends State<EcranRecettes> {
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
                 child: TextField(
                   key: const ValueKey('chercher-recette'),
+                  controller: _champ,
                   style: Charte.texte(15),
-                  decoration: InputDecoration(labelText: 'Chercher une recette (${toutes.length})', prefixIcon: const Icon(Icons.search)),
-                  onChanged: (v) => setState(() => _filtre = v),
+                  decoration: InputDecoration(
+                    labelText: 'Chercher une recette (${toutes.length})',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: BoutonMicro(controleur: _champ, onTexte: (v) => _filtrer(v, [for (final t in parType.keys) 'recettes/$t'])),
+                  ),
+                  onChanged: (v) => _filtrer(v, [for (final t in parType.keys) 'recettes/$t']),
                 ),
               ),
               for (final t in types)
@@ -67,7 +94,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                   cle: 'recettes/$t',
                   titre: t,
                   nombre: parType[t]!.length,
-                  parDefaut: f.isNotEmpty,
+                  parDefaut: false,
                   enfants: [
                     for (final r in parType[t]!)
                       LigneMenu(
@@ -154,4 +181,63 @@ class FicheRecette extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// Bouton « recette » de l'en-tête (19/11/2026, Aristide) : chercher une recette (au clavier ou à la voix),
+/// la liste des recettes qui correspondent, puis sa fiche en touchant son titre.
+Future<void> chercherRecette(BuildContext context) async {
+  final toutes = await recettesFournies();
+  if (!context.mounted) return;
+  final champ = TextEditingController();
+  var filtre = '';
+  RecetteLue? choix;
+  await modale(
+    context,
+    titre: 'Chercher une recette',
+    icone: Icons.restaurant_menu_outlined,
+    oui: null,
+    contenu: (context, maj) {
+      final f = normaliser(filtre);
+      final vues = f.isEmpty ? const <RecetteLue>[] : [for (final r in toutes) if (normaliser(r.titre).contains(f)) r];
+      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 10),
+          child: TextField(
+            key: const ValueKey('chercher-recette-entete'),
+            controller: champ,
+            autofocus: true,
+            style: Charte.texte(15),
+            decoration: InputDecoration(
+              labelText: 'Nom de la recette',
+              prefixIcon: const Icon(Icons.search),
+              suffixIcon: BoutonMicro(controleur: champ, onTexte: (v) => maj(() => filtre = v)),
+            ),
+            onChanged: (v) => maj(() => filtre = v),
+          ),
+        ),
+        const SizedBox(height: 6),
+        if (f.isEmpty)
+          Text('${toutes.length} recettes : tapez ou dites quelques lettres du nom.', style: Charte.texte(14, couleur: Charte.texteSecondaire))
+        else if (vues.isEmpty)
+          Text('Aucune recette', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+        for (final r in vues)
+          InkWell(
+            key: ValueKey('trouvee-${r.titre}'),
+            onTap: () {
+              choix = r;
+              Navigator.of(context).pop(true);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
+              child: Text.rich(TextSpan(children: [
+                TextSpan(text: r.titre, style: Charte.texte(16)),
+                if (r.types.isNotEmpty) TextSpan(text: '  ${r.types.first}', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+              ])),
+            ),
+          ),
+      ]);
+    },
+  );
+  champ.dispose();
+  if (choix case final r? when context.mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
 }
