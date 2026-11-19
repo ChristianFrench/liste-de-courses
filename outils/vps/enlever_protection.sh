@@ -11,11 +11,12 @@ python3 - "$CONF" <<'PY'
 import sys
 p = sys.argv[1]
 t = open(p).read()
-cle = 'location ^~ /telechargements/essai/ {'
-if cle not in t:
+# Les deux formes écrites par les versions 2 et 3 du script de protection.
+cles = [c for c in ('location ^~ /telechargements/essai/ {', 'location /telechargements/essai/ {') if c in t]
+if not cles:
     print('Le dossier des essais n\'était pas protégé : rien à faire.')
     sys.exit(0)
-debut = t.index(cle)
+debut = t.index(cles[0])
 k, niveau = t.index('{', debut), 0
 while True:
     if t[k] == '{':
