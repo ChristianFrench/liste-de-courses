@@ -35,8 +35,6 @@ Variante **`[apk]`** dans le message de commit : seule l'APK Android est compil�
 
 Variante **`[web]`** dans le message de commit : seule la version web est compilée et publiée (tests de recette compris) ; l'APK, l'exe et les captures précédents restent sur la page « derniere-version ».
 
-Variante **`[32bits]`** dans le message de commit (19/11/2026) : l'APK n'est fabriquée que pour les téléphones 64 bits ; ce marqueur ajoute, à la demande seulement, une APK pour anciens téléphones 32 bits (`telechargements/essai/Emplettes-32bits.apk`).
-
 Quand le maître d'ouvrage écrit **« Clôturer la version »** : compilation complète (sans `[rapide]`), numéro de version augmenté, fiche d'évolution unique récapitulant tous les retours traités depuis la version précédente, cahier de tests mis à jour. Le message du commit contient **`[version]`** : les applications vont alors aussi dans le dépôt officiel du serveur OVH (`telechargements/`), celui des liens du site et des mises à jour proposées aux utilisateurs ; sans lui, elles ne vont que dans `telechargements/essai/`.
 
 Conseil au maître d'ouvrage : ouvrir un nouveau fil (avec le dépôt) quand le fil devient long ; tout l'état du projet est dans le dépôt.

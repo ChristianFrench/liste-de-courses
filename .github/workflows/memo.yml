@@ -23,7 +23,7 @@ jobs:
         run: |
           flutter create --org fr.listecourses --project-name memo_emplettes --platforms android .
           python3 android_ajouts/preparer.py
-          flutter build apk --release --target-platform android-arm64
+          flutter build apk --release --target-platform android-arm,android-arm64
           mkdir -p ../../sortie && cp build/app/outputs/flutter-apk/app-release.apk ../../sortie/Memo-Emplettes.apk
       - uses: actions/upload-artifact@v4
         with: { name: memo-apk, path: sortie/ }

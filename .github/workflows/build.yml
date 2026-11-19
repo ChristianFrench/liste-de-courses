@@ -123,20 +123,12 @@ jobs:
         run: |
           set +e
           python3 outils/definitions.py
-          # 19/11/2026 (Aristide) : téléphones 64 bits seulement (presque tous depuis 2017-2018), APK bien plus légère.
-          flutter build apk --release --target-platform android-arm64 --dart-define-from-file=definitions.json > compilation.log 2>&1
+          # 19/11/2026 : téléphones ARM 32 et 64 bits (un Android 32 bits sur processeur 64 bits refusait l'APK 64 bits seule), sans la partie PC (x86_64).
+          flutter build apk --release --target-platform android-arm,android-arm64 --dart-define-from-file=definitions.json > compilation.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation.log "Compilation Android"; else tail -n 20 compilation.log; fi
           exit $code
       - run: mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses.apk"
-      # Version pour les anciens téléphones 32 bits, gardée en réserve : fabriquée seulement à la demande,
-      # avec « [32bits] » dans le message de commit (déposée dans telechargements/essai/Emplettes-32bits.apk).
-      - name: APK pour anciens téléphones 32 bits (à la demande)
-        if: contains(github.event.head_commit.message, '[32bits]')
-        run: |
-          python3 outils/definitions.py
-          flutter build apk --release --target-platform android-arm --dart-define-from-file=definitions.json
-          mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (32 bits).apk"
       # 13/11/2026 (Aristide) : la démonstration en APK, pour essayer sans toucher à la version opérationnelle.
       # Autre identifiant d'application (elle s'installe à côté), nom « Emplettes démo », foyer d'exemple, sans
       # aucun secret ni notification ; le dernier catalogue commun publié est embarqué.
@@ -158,7 +150,7 @@ jobs:
           grep -h applicationId android/app/build.gradle* || true
           sed -i 's/android:label="Emplettes"/android:label="Emplettes démo"/' android/app/src/main/AndroidManifest.xml
           rm -f android/app/src/main/res/values/firebase.xml
-          flutter build apk --release --target-platform android-arm64 --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true > compilation-demo.log 2>&1
+          flutter build apk --release --target-platform android-arm,android-arm64 --dart-define-from-file=definitions-demo.json --dart-define=DEMONSTRATION=true > compilation-demo.log 2>&1
           code=$?
           if [ $code -ne 0 ]; then python3 outils/annoter.py compilation-demo.log "Compilation APK démonstration"; else tail -n 5 compilation-demo.log; fi
           [ $code -eq 0 ] && mv build/app/outputs/flutter-apk/app-release.apk "build/Liste de courses (demonstration).apk"
@@ -410,7 +402,6 @@ jobs:
           if [ -f "livrables/Liste de courses Android/Liste de courses.apk" ]; then
             cp "livrables/Liste de courses Android/Liste de courses.apk" essai/Emplettes.apk
             APK=$C
-            if [ -f "livrables/Liste de courses Android/Liste de courses (32 bits).apk" ]; then cp "livrables/Liste de courses Android/Liste de courses (32 bits).apk" essai/Emplettes-32bits.apk; fi
           fi
           if [ -f "livrables/Liste de courses Android/Liste de courses (demonstration).apk" ]; then
             cp "livrables/Liste de courses Android/Liste de courses (demonstration).apk" essai/Emplettes-demo.apk; DEMO=$C

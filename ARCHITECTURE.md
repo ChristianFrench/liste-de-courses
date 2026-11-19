@@ -153,7 +153,7 @@ Essai long à la main : `GRAINES=200 flutter test test/convergence_test.dart`. P
 ## 10. La compilation
 
 `.github/workflows/build.yml`, à chaque envoi sur `main` : vérification (analyse et essais), Android (APK +
-APK démo, téléphones 64 bits seulement ; `[32bits]` ajoute une APK pour anciens téléphones 32 bits), Windows (installateur), web (application, démo, site). Marqueurs du message de commit : `[rapide]`
+APK démo, téléphones ARM 32 et 64 bits, sans la partie PC x86_64), Windows (installateur), web (application, démo, site). Marqueurs du message de commit : `[rapide]`
 (Windows seul), `[apk]`, `[web]` (voir `CLAUDE.md`). Tout est publié sur la page « derniere-version » (réservée au développement) et déposé sur le serveur OVH dans
 `telechargements/essai/` ; « [version] » dans le message (« Clôturer la version ») le dépose aussi dans le dépôt
 officiel `telechargements/`.
