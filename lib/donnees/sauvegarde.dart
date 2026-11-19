@@ -112,19 +112,18 @@ class Sauvegarde {
     }
   }
 
-  /// Le fichier d'une copie : un en-tête lisible (date, jalon, foyer, nombres) et les données compressées,
-  /// chiffrées avec le code du foyer s'il y en a un.
+  /// Le fichier d'une copie : un en-tête lisible (date, jalon, foyer, nombres) et les données compressées.
+  /// 19/11/2026 (Aristide) : plus de chiffrement (« qui peut s'intéresser à nos listes de courses ? ») : une copie
+  /// se restaure sans le code du foyer. Les anciennes copies chiffrées s'ouvrent toujours avec le code.
   Future<String> fabriquer(String texte, String raison, String empreinte, {String? compresse}) async {
     final etat = Etat.instance;
-    final code = Synchro.instance.code;
-    var donnees = compresse ?? _compresser(texte);
-    if (code != null) donnees = await (await ChiffreFoyer.pour(code)).chiffrer(donnees);
+    final donnees = compresse ?? _compresser(texte);
     return jsonEncode({
       'emplettes': 1,
       'le': DateTime.now().toIso8601String().substring(0, 23),
       'jalon': raison,
       'foyer': etat.foyerNom,
-      'chiffre': code != null,
+      'chiffre': false,
       'empreinte': empreinte,
       'compte': {
         'listes': etat.listes.length,

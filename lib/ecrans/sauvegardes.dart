@@ -39,7 +39,6 @@ class _EcranSauvegardesState extends State<EcranSauvegardes> {
   @override
   Widget build(BuildContext context) {
     final copies = _copies;
-    final chiffre = Synchro.instance.code != null;
     return PageBase(
       entete: const EnTeteFenetre(retour: true, icone: Icons.save_outlined, sousTitre: 'Gérer › Paramètres › Données', titre: 'Sauvegardes'),
       corps: ListView(padding: const EdgeInsets.fromLTRB(0, 8, 0, 16), children: [
@@ -66,8 +65,7 @@ class _EcranSauvegardesState extends State<EcranSauvegardes> {
               'Une copie est faite à chaque étape importante (liste prête, courses terminées, catalogue, foyer), '
               'seulement si quelque chose a changé. Les trois dernières sont gardées, et une plus ancienne d\'au moins un mois. '
               'Elles sont rangées dans $_ou.\n'
-              '${chiffre ? 'Elles sont chiffrées avec le code du foyer : notez-le hors du téléphone (Gérer › Foyer), il faut le saisir '
-                  'pour restaurer sur un autre appareil.' : 'Sans foyer, les copies ne sont pas chiffrées : gardez le fichier dans un endroit privé.'}\n'
+              'Après une réinstallation, « Depuis un fichier » les retrouve dans ce dossier ; aucun code n\'est demandé.\n'
               'Pour vous protéger d\'un téléphone perdu, « Sauvegarder maintenant » donne un fichier à mettre sur Drive, '
               'dans un mail ou sur un ordinateur.',
               style: Charte.texte(14, couleur: Charte.texteSecondaire)),
