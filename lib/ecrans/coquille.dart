@@ -23,6 +23,7 @@ import 'messages.dart';
 import 'historique.dart';
 import 'listes.dart';
 import 'parametres.dart';
+import 'recettes.dart';
 
 /// Barre d'onglets (64) : 3 entrées icône 22 + libellé ; onglet actif = pastille 56 × 30 pleine.
 class BarreOnglets extends StatelessWidget {
@@ -353,6 +354,8 @@ class MenuGerer extends StatelessWidget {
                 '${etat.libelleCatalogueCommun} · ${etat.produits.length} produits', const EcranCatalogue()),
             ecran(Icons.sell_outlined, 'Catalogue des marques',
                 '${etat.libelleVersion(etat.versionCatalogueMarques)} · ${etat.nbMarquesConnues} marque${etat.nbMarquesConnues > 1 ? 's' : ''}', const EcranMarques()),
+            // 19/11/2026 (Aristide) : les recettes consultables hors de la préparation.
+            ecran(Icons.restaurant_menu_outlined, 'Catalogue des recettes', 'Toutes les recettes, par type', const EcranRecettes()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
             ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures', const EcranTypesPackaging(lots: false)),
             ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings', const EcranTypesPackaging()),

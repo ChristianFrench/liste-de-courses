@@ -29,6 +29,12 @@ remplacer("android/app/src/main/AndroidManifest.xml",
 remplacer("android/app/src/main/AndroidManifest.xml",
           r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>', regex=True)
 
+# 19/11/2026 : recherche à la voix (micro du champ de recherche) : le micro, et la reconnaissance du système.
+remplacer("android/app/src/main/AndroidManifest.xml",
+          r"(<manifest[^>]*>)", r'\1\n    <uses-permission android:name="android.permission.RECORD_AUDIO"/>', regex=True)
+remplacer("android/app/src/main/AndroidManifest.xml",
+          "<queries>", '<queries>\n        <intent><action android:name="android.speech.RecognitionService" /></intent>')
+
 # Android : l'application reçoit les tickets de caisse PDF (« Partager » et « Ouvrir avec »).
 # Une seule fenêtre de l'application (singleTask) : un PDF partagé rejoint l'application déjà ouverte.
 remplacer("android/app/src/main/AndroidManifest.xml",

@@ -28,6 +28,7 @@ dependencies:
   cryptography: ^2.9.0
   dartssh2: ^4.1.0
   xterm: ^4.0.0
+  speech_to_text: ^7.5.0
 
 dev_dependencies:
   flutter_test:
