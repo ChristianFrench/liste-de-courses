@@ -384,7 +384,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(children: [
                   Expanded(child: Text('La recette', style: Charte.texte(16, gras: true, couleur: Charte.cadre))),
-                  Icone(voirRecette ? Icons.expand_less : Icons.expand_more, color: Charte.cadre),
+                  Icone(voirRecette ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.cadre),
                 ]),
               ),
             ),

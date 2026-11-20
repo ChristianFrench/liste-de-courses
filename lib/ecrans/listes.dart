@@ -448,7 +448,7 @@ class _EcranParcoursState extends State<EcranParcours> {
               ),
             ])),
           ),
-          Icone(ouvert ? Icons.expand_less : Icons.expand_more, color: Charte.encre),
+          Icone(ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.encre),
         ],
       ),
     );

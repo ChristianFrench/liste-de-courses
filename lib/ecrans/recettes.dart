@@ -94,6 +94,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                   cle: 'recettes/$t',
                   titre: t,
                   nombre: parType[t]!.length,
+                  pliable: true,
                   parDefaut: false,
                   enfants: [
                     for (final r in parType[t]!)

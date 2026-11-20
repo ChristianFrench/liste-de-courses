@@ -168,6 +168,9 @@ class _EnTetePhoto extends StatelessWidget {
                         child: Text('Version $versionApplication',
                             style: _surPhoto(Charte.texte(12.5, couleur: const Color(0xEEFFFFFF)))),
                       ),
+                      // 20/11/2026 (Aristide) : la recherche d'une recette aussi sur l'accueil, à côté du nuage.
+                      if (EnTeteFenetre.chercherRecette case final f?)
+                        boutonEnTete(Icons.restaurant_menu_outlined, 'Chercher une recette', () => f(context)),
                       const BoutonSynchro(),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
@@ -228,7 +231,8 @@ class _EnTetePhoto extends StatelessWidget {
                               width: 30,
                               height: 30,
                               child: Icone(ferme ? Icons.unfold_more : Icons.unfold_less,
-                                  size: 22, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
+                                  // 20/11/2026 (Aristide) : tous les signes déplier / replier à la même taille (24).
+                                  size: 24, color: Charte.blanc, shadows: const [Shadow(color: Color(0x99000000), blurRadius: 4)])),
                         ),
                       ));
                 },
