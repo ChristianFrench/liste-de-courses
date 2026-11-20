@@ -26,7 +26,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // 12/11/2026 (Aristide) : l'écran d'abord, avec une fenêtre de progression, puis la lecture de la base.
   if (!outilEditeur) {
-    EnTeteFenetre.chercherRecette = chercherRecette;
+    // 20/11/2026 : l'icône recette de l'en-tête disparaît avec l'onglet « Cuisiner ».
+    if (!Nav.avecCuisiner) EnTeteFenetre.chercherRecette = chercherRecette;
     ouvertureAffichee = true;
     runApp(const ListeDeCoursesApp(accueil: EcranOuverture()));
     WidgetsBinding.instance.addPostFrameCallback((_) => retirerEcranOuverture());

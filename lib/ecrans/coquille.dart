@@ -35,6 +35,7 @@ class BarreOnglets extends StatelessWidget {
     (Icons.home_outlined, 'Accueil'),
     (Icons.checklist, 'Préparer'),
     (Icons.shopping_cart_outlined, 'Courses'),
+    if (Nav.avecCuisiner) (Icons.restaurant_menu_outlined, 'Cuisiner'),
     (Icons.tune, 'Gérer'),
   ];
 
@@ -70,9 +71,12 @@ class BarreOnglets extends StatelessWidget {
                       child: Stack(alignment: Alignment.center, children: [
                         Positioned(
                             top: 0,
-                            child: i == 3
+                            child: i == Nav.gerer
                                 ? Icone(entrees[i].$1, size: 56, color: Charte.cadre)
-                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
+                                : i == Nav.cuisiner
+                                    // En attendant l'image d'Aristide (produits et casserole), son image des recettes.
+                                    ? Image.asset('assets/recettes/recettes-de-cuisine.png', width: 52, height: 52, filterQuality: FilterQuality.medium)
+                                    : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
                         Positioned(
                           bottom: 1,
                           child: Text(entrees[i].$2,
@@ -317,6 +321,7 @@ class RacineOnglet extends StatelessWidget {
             corps: SousEcranPreparer(),
           ),
         Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
+        Nav.cuisiner => const EcranRecettes(onglet: true),
         _ => const MenuGerer(),
       },
     );
@@ -355,7 +360,9 @@ class MenuGerer extends StatelessWidget {
             ecran(Icons.sell_outlined, 'Catalogue des marques',
                 '${etat.libelleVersion(etat.versionCatalogueMarques)} · ${etat.nbMarquesConnues} marque${etat.nbMarquesConnues > 1 ? 's' : ''}', const EcranMarques()),
             // 19/11/2026 (Aristide) : les recettes consultables hors de la préparation.
-            ecran(Icons.restaurant_menu_outlined, 'Catalogue des recettes', 'Toutes les recettes, par type', const EcranRecettes()),
+            // 20/11/2026 : avec l'onglet « Cuisiner », plus de catalogue des recettes ici.
+            if (!Nav.avecCuisiner)
+              ecran(Icons.restaurant_menu_outlined, 'Catalogue des recettes', 'Toutes les recettes, par type', const EcranRecettes()),
             ecran(Icons.local_offer_outlined, 'Types de promotion', '${etat.typesPromotion.length} types', const EcranTypesPromotion()),
             ecran(Icons.scale_outlined, 'Types de mesure', '${etat.typesMesure.length} mesures', const EcranTypesPackaging(lots: false)),
             ecran(Icons.inventory_2_outlined, 'Types de packaging', '${etat.typesLot.length} packagings', const EcranTypesPackaging()),

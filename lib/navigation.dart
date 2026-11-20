@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'donnees/demonstration.dart';
 import 'ecrans/coquille.dart' show BarreOnglets;
 import 'theme.dart';
 
@@ -16,8 +17,11 @@ class Nav extends ChangeNotifier {
   static const int accueil = 0;
   static const int preparer = 1;
   static const int courses = 2;
-  static const int gerer = 3;
-  static const int nbOnglets = 4;
+  // 20/11/2026 (Aristide) : onglet « Cuisiner » (le livre de recettes) avant Gérer ; dans la démonstration d'abord.
+  static const bool avecCuisiner = demonstration;
+  static const int cuisiner = avecCuisiner ? 3 : -1;
+  static const int gerer = avecCuisiner ? 4 : 3;
+  static const int nbOnglets = avecCuisiner ? 5 : 4;
 
   // Rubriques de Gérer
   static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;

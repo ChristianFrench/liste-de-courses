@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../composants/composants.dart';
-import '../composants/micro.dart';
 import '../composants/pictogramme.dart' as picto;
 import '../donnees/envoi.dart';
 import '../donnees/import_texte.dart';
@@ -13,6 +12,7 @@ import '../donnees/modele.dart';
 import '../donnees/recette_ingredients.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'recettes.dart';
 import 'catalogue.dart'
     show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces, secteursOrdreCatalogue;
 

@@ -42,9 +42,9 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `lib/donnees/sauvegarde*.dart` | copies de sauvegarde automatiques |
 | `lib/donnees/mise_a_jour*.dart` | mise à jour depuis l'application (fiche `version.json` du serveur, téléchargement, installation) |
 | `lib/donnees/messages.dart`, `notifications_telephone.dart`, `envoi.dart` | messages du foyer (ntfy, Firebase), mails, tickets PDF |
-| `lib/donnees/import_texte.dart`, `recette_ingredients.dart` | lecture d'une liste collée, d'une recette |
+| `lib/donnees/import_texte.dart`, `recette_ingredients.dart` | lecture d'une liste collée, d'une recette ; `RecetteLue` (critères, temps, `ingredientsPour(n)`), `FiltreRecettes` (recherche titre + ingrédients, « ou » dans un critère, « et » entre critères), `ajusterQuantite` |
 | `lib/ecrans/travail.dart` + `travail/*.dart` | écrans de travail : nouvelle liste, préparation, ligne d'article, promotion, courses, consultation |
-| `lib/ecrans/recettes.dart` | Gérer › Courses › Catalogue des recettes (liste par type, fiche) ; `chercherRecette`, bouton de l'en-tête de toutes les fenêtres (`EnTeteFenetre.chercherRecette`, fixé dans `main.dart`) |
+| `lib/ecrans/recettes.dart` | le livre de recettes : onglet « Cuisiner » (`Nav.avecCuisiner`, démonstration d'abord : `Nav.cuisiner`/`Nav.gerer`/`nbOnglets` en dépendent), sinon Gérer › Courses › Catalogue des recettes et le bouton de l'en-tête (`EnTeteFenetre.chercherRecette`, fixé dans `main.dart`). Filtres (`FiltresRecettes`), fiche à onglets Ingrédients / Recette avec − / + personnes, « Ajouter aux courses » (`ajouterAuxCourses` → `cocherIngredientsRecette` de `travail/preparation.dart`, commun avec le bouton « Recette » de la préparation). Données : `outils/recettes/vers_application.py` → `assets/recettes/recettes.json` |
 | `lib/composants/recherche.dart`, `micro.dart` | champ de recherche d'article ; micro de dictée de toutes les zones de recherche (Android et web, `speech_to_text`) |
 | `lib/ecrans/console_*.dart`, `editeur_catalogue.dart`, `administration*.dart` | console Windows (catalogue, recettes, serveur) |
 | `outils/fenetre_editeur.py` | fenêtre de la console (taille, redimensionnable, largeur minimum reçue de Dart par le canal `emplettes/fenetre` : menu 270/64 + 1 + 820) |
