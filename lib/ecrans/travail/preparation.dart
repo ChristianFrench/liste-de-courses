@@ -327,8 +327,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
     final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
     final titre = r.titre;
-    var voirRecette = false;
-    final enTeteRecette = GlobalKey();
+    // 20/11/2026 (Aristide) : deux onglets, « Ingrédients » (les cases à cocher) et « Recette » (étapes, conseils).
+    var ongletRecette = false;
+    final avecTexte = r!.etapes.isNotEmpty || r.conseils.isNotEmpty;
     final ok = await modale(
       context,
       titre: titre,
@@ -337,72 +338,30 @@ class _EcranConstructionState extends State<EcranConstruction> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 17/11/2026 (Aristide) : l'illustration de la recette en haut, 720 × 480, au plus un tiers de l'écran.
-          if (r!.image case final image?) _illustration(image),
-          if (r.pour != null || r.source != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 6),
-              child: Text([if (r.pour != null) 'Pour ${r.pour}', if (r.source != null) 'Recette ${r.source}'].join(' · '),
-                  style: Charte.texte(15, gras: true)),
-            ),
-          Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
-              'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-          const SizedBox(height: 8),
-          for (var i = 0; i < aChoisir.length; i++)
-            CaseModale(
-              key: ValueKey('ingredient-$i'),
-              texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
-              aide: aChoisir[i].texte,
-              coche: choisis.contains(i),
-              onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
-              encadree: false,
-            ),
-          if (deja.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
-                  style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            ),
-          // 18/11/2026 (Aristide) : la recette elle-même, repliée sous les ingrédients.
-          if (r.etapes.isNotEmpty || r.conseils.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            InkWell(
-              key: const ValueKey('voir-recette'),
-              onTap: () {
-                maj(() => voirRecette = !voirRecette);
-                // 18/11/2026 (Aristide) : le début du texte déplié monte en haut de la fenêtre.
-                if (voirRecette) {
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    final c = enTeteRecette.currentContext;
-                    if (c != null && c.mounted) {
-                      Scrollable.ensureVisible(c, alignment: 0, duration: const Duration(milliseconds: 300));
-                    }
-                  });
-                }
-              },
-              child: Padding(
-                key: enTeteRecette,
-                padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Row(children: [
-                  Expanded(child: Text('La recette', style: Charte.texte(16, gras: true, couleur: Charte.cadre))),
-                  Icone(voirRecette ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.cadre),
-                ]),
+          IllustrationRecette(recette: r!, cle: const ValueKey('illustration-recette')),
+          EnTeteRecette(recette: r),
+          if (avecTexte) OngletsRecette(recette: ongletRecette, onChange: (v) => maj(() => ongletRecette = v)) else const SizedBox(height: 8),
+          if (ongletRecette)
+            TexteRecette(recette: r)
+          else ...[
+            Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
+                'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 8),
+            for (var i = 0; i < aChoisir.length; i++)
+              CaseModale(
+                key: ValueKey('ingredient-$i'),
+                texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
+                aide: aChoisir[i].texte,
+                coche: choisis.contains(i),
+                onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+                encadree: false,
               ),
-            ),
-            if (voirRecette) ...[
-              for (var k = 0; k < r.etapes.length; k++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    SizedBox(width: 26, child: Text('${k + 1}.', style: Charte.texte(15, gras: true, couleur: Charte.cadre))),
-                    Expanded(child: Text(r.etapes[k], style: Charte.texte(15))),
-                  ]),
-                ),
-              if (r.conseils.isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text('Conseils', style: Charte.texte(15, gras: true)),
-                for (final c in r.conseils) Text('• $c', style: Charte.texte(15)),
-              ],
-            ],
+            if (deja.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
+                    style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+              ),
           ],
         ],
       ),
@@ -428,59 +387,46 @@ class _EcranConstructionState extends State<EcranConstruction> {
     return true;
   }
 
-  Widget _illustration(String image) {
-    Widget rien(BuildContext _, Object __, StackTrace? ___) => const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height / 3),
-        child: AspectRatio(
-          aspectRatio: 3 / 2,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: image.startsWith('http')
-                ? Image.network(image, key: const ValueKey('illustration-recette'), fit: BoxFit.cover, errorBuilder: rien)
-                : Image.asset(image, key: const ValueKey('illustration-recette'), fit: BoxFit.cover, errorBuilder: rien),
-          ),
-        ),
-      ),
-    );
-  }
-
   /// Le filtre de « Mes recettes », gardé quand on y revient depuis les ingrédients (Annuler).
   final _filtreRecettes = TextEditingController();
+  final _criteresRecettes = FiltreRecettes();
 
-  /// Le catalogue de recettes : un champ pour filtrer, puis les titres par ordre alphabétique.
+  /// Le catalogue de recettes : la recherche (titre ou ingrédient), les filtres combinables (20/11/2026), puis
+  /// les titres par ordre alphabétique.
   Future<RecetteLue?> _choisirRecette() async {
     final toutes = await recettesFournies();
     if (!mounted) return null;
     RecetteLue? choix;
-    var filtre = _filtreRecettes.text;
+    final filtre = _criteresRecettes..texte = _filtreRecettes.text;
     await modale(
       context,
       titre: 'Mes recettes',
       oui: null,
       contenu: (context, maj) {
-        final f = normaliser(filtre);
-        final vues = [for (final r in toutes) if (f.isEmpty || normaliser(r.titre).contains(f)) r];
+        final vues = [for (final r in toutes) if (filtre.garde(r)) r];
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 17/11/2026 : place au-dessus du cadre pour le libellé, posé sur le bord (il était coupé).
             Padding(
               padding: const EdgeInsets.only(top: 10),
-              child: TextField(
-                key: const ValueKey('filtre-recettes'),
-                controller: _filtreRecettes,
-                style: Charte.texte(15),
-                decoration: InputDecoration(
-                    labelText: 'Chercher une recette',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: BoutonMicro(controleur: _filtreRecettes, onTexte: (v) => maj(() => filtre = v))),
-                onChanged: (v) => maj(() => filtre = v),
+              child: ChampRechercheRecette(
+                champ: _filtreRecettes,
+                cle: const ValueKey('filtre-recettes'),
+                onTexte: (v) => maj(() => filtre.texte = v),
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
+            FiltresRecettes(
+              filtre: filtre,
+              nombre: vues.length,
+              onChange: () => maj(() {}),
+              onEffacer: () => maj(() {
+                filtre.effacer();
+                _filtreRecettes.clear();
+                filtre.texte = '';
+              }),
+            ),
             for (final r in vues)
               InkWell(
                 key: ValueKey('recette-${r.titre}'),
@@ -492,8 +438,9 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
                   child: Text.rich(TextSpan(children: [
                     TextSpan(text: r.titre, style: Charte.texte(16)),
-                    if (r.types.isNotEmpty)
-                      TextSpan(text: '  ${r.types.first}', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                    TextSpan(
+                        text: '  ${[if (r.types.isNotEmpty) FiltreRecettes.libelle(r.types.first), if (r.tempsTotal case final t?) duree(t), if (r.difficulte != null) r.difficulte!].join(' · ')}',
+                        style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                   ])),
                 ),
               ),

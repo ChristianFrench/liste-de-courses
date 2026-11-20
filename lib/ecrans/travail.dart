@@ -13,6 +13,7 @@ import '../donnees/modele.dart';
 import '../donnees/recette_ingredients.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import 'recettes.dart';
 import 'catalogue.dart'
     show actionsNonPlace, autreMarque, modifierArticle, nouveauProduit, placerNonPlaces, secteursOrdreCatalogue;
 
