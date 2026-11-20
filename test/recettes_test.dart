@@ -188,13 +188,18 @@ void main() {
     expect(r.length, 497);
     final poulet = r.firstWhere((x) => x.titre == 'Poulet aux champignons et cidre');
     expect(poulet.tempsPreparation, 20);
-    expect(poulet.tempsCuisson, 30);
+    expect(poulet.tempsCuisson, 40);
     expect(poulet.pour, '4 personnes');
-    expect(poulet.repereTemps, 'Préparation 20 min · Cuisson 30 min · Facile');
+    expect(poulet.repereTemps, 'Préparation 20 min · Cuisson 40 min · Facile');
     expect(Recette.lire(poulet.versJson()).difficulte, 'Facile');
     for (final x in r.where((x) => !x.memo)) {
       expect(niveauxDifficulte, contains(x.difficulte), reason: x.titre);
     }
+    expect(poulet.regimes, contains('Sans gluten'));
+    expect(poulet.cuissons, isNotEmpty);
+    expect(poulet.cout, isNotNull);
+    expect(Recette.lire(poulet.versJson()).occasions, poulet.occasions);
+    expect(r.firstWhere((x) => x.titre == 'Houmous').regimes, contains('Végétalien'));
     expect(dureeRecette(70), '1 h 10');
     expect(dureeRecette(120), '2 h');
   });

@@ -1,12 +1,14 @@
 """Ajoute aux recettes fournies avec la console les 200 recettes n° 298 à 497 d'Aristide (20/11/2026) et pose la
-difficulté de toutes les recettes (outils/recettes/difficulte.py).
+difficulté et les critères de toutes les recettes (outils/recettes/difficulte.py, criteres.py).
 Source : outils/recettes/sources/nouvelles-298-497.txt (son fichier, tel quel) ; les étapes récrites recette par
 recette, quand elles existent, sont dans outils/recettes/sources/etapes-298-497.json ({numéro: [étapes]}) et
-remplacent celles du fichier.
+remplacent celles du fichier ; ce JSON est produit par outils/recettes/sources/etapes_lot4.py (lots 1 à 4),
+avec, par recette, les conseils, un temps de cuisson corrigé, les ingrédients retirés (« sans ») et les remarques.
 Usage : python3 outils/recettes/nouvelles_298_497.py   (augmente la version : la console réapplique à l'ouverture)"""
 import json, os, re, sys, unicodedata
 sys.path.insert(0, os.path.dirname(__file__))
 from difficulte import difficulte
+from criteres import criteres
 
 D = 'outils/recettes'
 FOURNIES = f'{D}/illustrations/recettes-fournies.json'
@@ -77,7 +79,11 @@ def main():
         ecrites = {int(k): v for k, v in json.load(open(f'{D}/sources/etapes-298-497.json', encoding='utf-8')).items()}
     ids = {r['id'] for r in recettes}
     for r in lire(f'{D}/sources/nouvelles-298-497.txt'):
-        etapes = ecrites.get(r['n'], r['etapes'])
+        e = ecrites.get(r['n'], {})
+        etapes = e.get('etapes', r['etapes'])
+        if 'cuisson' in e:
+            r['cuisson'] = e['cuisson']
+        r['ing'] = [d for d in r['ing'] if d['nom'] not in e.get('sans', [])]
         rid = f"emplettes-{slug(r['titre'])}"
         if rid in ids:
             rid += f"-{r['n']}"
@@ -88,10 +94,13 @@ def main():
             titreIngredients='Ingrédients', detail=detail, etapes=etapes,
             preparation='\n'.join(f'{i + 1}. {e}' for i, e in enumerate(etapes)),
             photos=[], pour=f"{r['pour']} personnes", source='Emplettes',
-            tempsPreparation=r['prep'], tempsCuisson=r['cuisson']))
+            tempsPreparation=r['prep'], tempsCuisson=r['cuisson'],
+            **({'conseils': e['conseils']} if e.get('conseils') else {}),
+            **({'remarques': e['remarques']} if e.get('remarques') else {})))
     for r in recettes:
         if not r.get('memo'):
             r['difficulte'] = difficulte(r['titre'])
+            r.update(criteres(r))
     src['recettes'] = recettes
     src['version'] = src.get('version', 1) + 1
     json.dump(src, open(FOURNIES, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

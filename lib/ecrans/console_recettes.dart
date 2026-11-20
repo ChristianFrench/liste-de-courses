@@ -251,6 +251,24 @@ class FicheRecette extends StatelessWidget {
                       '${r.modifieeLe == null ? '' : ' · modifiée le ${r.modifieeLe!.day.toString().padLeft(2, '0')}/${r.modifieeLe!.month.toString().padLeft(2, '0')}/${r.modifieeLe!.year}'}',
                       style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                 ]),
+                // Critères de choix (20/11/2026) : une pastille par valeur, groupées par critère.
+                if (r.regimes.isNotEmpty || r.saisons.isNotEmpty || r.cout != null || r.cuissons.isNotEmpty || r.occasions.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Wrap(key: const ValueKey('recette-criteres'), spacing: 6, runSpacing: 4, children: [
+                    for (final x in [
+                      ...r.regimes,
+                      if (r.saisons.isNotEmpty) r.repereSaisons,
+                      if (r.cout != null) r.cout!,
+                      ...r.cuissons,
+                      ...r.occasions,
+                    ])
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(color: Charte.clair(Charte.cadre, 0.85), borderRadius: BorderRadius.circular(10)),
+                        child: Text(x, style: Charte.texte(12.5, couleur: Charte.encreNiveau)),
+                      ),
+                  ]),
+                ],
               ]),
             ),
           ]),

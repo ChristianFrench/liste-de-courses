@@ -31,6 +31,11 @@ class Recette {
     this.tempsPreparation,
     this.tempsCuisson,
     this.difficulte,
+    this.regimes = const [],
+    this.saisons = const [],
+    this.cout,
+    this.cuissons = const [],
+    this.occasions = const [],
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -73,6 +78,17 @@ class Recette {
   int? tempsCuisson;
   String? difficulte;
 
+  /// Critères de choix (20/11/2026) : Végétarien, Végétalien, Sans gluten, Sans lactose ; Printemps… Hiver ;
+  /// €, €€, €€€ ; Sans cuisson, Four, Plaque, Cocotte-minute ; Quotidien, À l'avance, À recevoir, À emporter.
+  List<String> regimes;
+  List<String> saisons;
+  String? cout;
+  List<String> cuissons;
+  List<String> occasions;
+
+  /// « Toute l'année » quand les quatre saisons y sont.
+  String get repereSaisons => saisons.length == 4 ? "Toute l'année" : saisons.join(', ');
+
   /// « Préparation 15 min · Cuisson 1 h 10 · Facile » (vide si rien n'est connu).
   String get repereTemps => [
         if (tempsPreparation != null) 'Préparation ${dureeRecette(tempsPreparation!)}',
@@ -103,6 +119,11 @@ class Recette {
         if (tempsPreparation != null) 'tempsPreparation': tempsPreparation,
         if (tempsCuisson != null) 'tempsCuisson': tempsCuisson,
         if (difficulte != null) 'difficulte': difficulte,
+        if (regimes.isNotEmpty) 'regimes': regimes,
+        if (saisons.isNotEmpty) 'saisons': saisons,
+        if (cout != null) 'cout': cout,
+        if (cuissons.isNotEmpty) 'cuissons': cuissons,
+        if (occasions.isNotEmpty) 'occasions': occasions,
         if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
@@ -127,6 +148,11 @@ class Recette {
         tempsPreparation: (j['tempsPreparation'] as num?)?.toInt(),
         tempsCuisson: (j['tempsCuisson'] as num?)?.toInt(),
         difficulte: j['difficulte'] as String?,
+        regimes: [for (final x in (j['regimes'] as List? ?? const [])) x as String],
+        saisons: [for (final x in (j['saisons'] as List? ?? const [])) x as String],
+        cout: j['cout'] as String?,
+        cuissons: [for (final x in (j['cuissons'] as List? ?? const [])) x as String],
+        occasions: [for (final x in (j['occasions'] as List? ?? const [])) x as String],
       )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 
