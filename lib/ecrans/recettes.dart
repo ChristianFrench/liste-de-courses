@@ -6,6 +6,7 @@ import '../composants/micro.dart';
 import '../donnees/import_texte.dart' show normaliser;
 import '../donnees/modele.dart';
 import '../donnees/recette_ingredients.dart';
+import '../donnees/recettes_recues.dart';
 import '../navigation.dart';
 import '../theme.dart';
 import 'travail.dart' show cocherIngredientsRecette;
@@ -343,7 +344,9 @@ class IllustrationRecette extends StatelessWidget {
                         key: const ValueKey('illustration-type'), fit: BoxFit.contain, errorBuilder: rien),
                   ),
                 )
-              : image.startsWith('http')
+              : image.startsWith('recette:') && RecettesRecues.instance.image(image.substring(8)) != null
+                  ? Image.memory(RecettesRecues.instance.image(image.substring(8))!, key: cle, fit: BoxFit.cover, errorBuilder: rien)
+                  : image.startsWith('http')
                   ? Image.network(image, key: cle, fit: BoxFit.cover, errorBuilder: rien)
                   : Image.asset(image, key: cle, fit: BoxFit.cover, errorBuilder: rien),
         ),

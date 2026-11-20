@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
 import 'import_texte.dart';
+import 'demonstration.dart';
 import 'modele.dart';
+import 'recettes_recues.dart';
 
 // 15/11/2026 (Aristide) : une recette (catalogue de recettes, lien internet ou texte) propose ses ingrédients,
 // à cocher, pour compléter la liste en préparation. Pas de rayon à ce stade ; les produits du placard
@@ -13,7 +15,8 @@ import 'modele.dart';
 /// Une recette : son titre et ses lignes d'ingrédients telles qu'écrites (« 200 g de lardons fumés »).
 class RecetteLue {
   const RecetteLue(this.titre, this.ingredients,
-      {this.types = const [],
+      {this.id,
+      this.types = const [],
       this.image,
       this.pour,
       this.etapes = const [],
@@ -31,6 +34,13 @@ class RecetteLue {
   final String titre;
   final List<String> ingredients;
   final List<String> types;
+
+  /// Identifiant dans le catalogue des recettes (null pour une recette lue d'un lien ou d'un texte).
+  final String? id;
+
+  /// Le contenu, pour voir ce qu'une nouvelle version a changé.
+  String get signature => jsonEncode([titre, ingredients, types, pour, etapes, conseils, source, tempsPreparation, tempsCuisson,
+        difficulte, cout, regimes, saisons, cuissons, occasions]);
 
   /// Le texte de la recette (18/11/2026) : « 4 personnes », étapes, conseils, source (« Emplettes »).
   final String? pour;
@@ -100,7 +110,8 @@ class RecetteLue {
         ...occasions,
       ];
 
-  /// Illustration : chemin d'un fichier de l'application (« assets/… ») ou adresse internet (page de recette).
+  /// Illustration : chemin d'un fichier de l'application (« assets/… »), adresse internet (page de recette) ou
+  /// « recette:<empreinte> », image reçue du catalogue commun des recettes.
   final String? image;
 }
 
@@ -242,38 +253,85 @@ class FiltreRecettes {
 }
 
 List<RecetteLue>? _fournies;
+Map<String, dynamic>? _embarque;
 
-/// Les recettes fournies avec l'application (le catalogue de recettes d'Aristide).
+/// À relire au prochain appel de [recettesFournies] (nouvelle version reçue, image arrivée).
+void oublierRecettes() => _fournies = null;
+
+Future<Map<String, dynamic>> _lireEmbarque() async =>
+    _embarque ??= jsonDecode(await rootBundle.loadString('assets/recettes/recettes.json')) as Map<String, dynamic>;
+
+/// Empreintes des images embarquées (vers_application.py) : une version reçue ne les retélécharge pas.
+Future<Set<String>> empreintesEmbarquees() async {
+  try {
+    return {
+      for (final r in ((await _lireEmbarque())['recettes'] as List).cast<Map>())
+        if (r['empreinte'] case final String e) e,
+    };
+  } catch (_) {
+    return {};
+  }
+}
+
+/// Une recette lue en JSON : celle embarquée (ingrédients { nom, quantite }) ou celle de la console
+/// (ingrédients en texte, « detail » { nom, quantite, precision }).
+RecetteLue recetteDepuisJson(Map r, {String? image}) {
+  final List<Map> detail =
+      (r['detail'] as List?)?.whereType<Map>().toList() ?? (r['ingredients'] as List? ?? const []).whereType<Map>().toList();
+  final lignes = detail.isNotEmpty
+      ? [for (final i in detail) [i['quantite'], i['nom']].whereType<String>().where((x) => x.isNotEmpty).join(' ')]
+      : [for (final i in (r['ingredients'] as List? ?? const [])) '$i'];
+  List<String> liste(String c) => (r[c] as List? ?? const []).cast<String>();
+  return RecetteLue(
+    r['titre'] as String,
+    lignes,
+    id: r['id'] as String?,
+    types: liste('types'),
+    image: image,
+    pour: r['pour'] as String?,
+    etapes: liste('etapes'),
+    conseils: liste('conseils'),
+    source: r['source'] as String?,
+    tempsPreparation: (r['tempsPreparation'] as num?)?.toInt(),
+    tempsCuisson: (r['tempsCuisson'] as num?)?.toInt(),
+    difficulte: r['difficulte'] as String?,
+    cout: r['cout'] as String?,
+    regimes: liste('regimes'),
+    saisons: liste('saisons'),
+    cuissons: liste('cuissons'),
+    occasions: liste('occasions'),
+    quantites: detail.isNotEmpty ? [for (final i in detail) i['quantite'] as String?] : const [],
+  );
+}
+
+/// Les recettes : la dernière version reçue du catalogue commun des recettes (20/11/2026), sinon celles
+/// embarquées dans l'application (la démonstration garde toujours celles-ci).
 Future<List<RecetteLue>> recettesFournies() async {
   if (_fournies != null) return _fournies!;
   try {
-    final j = jsonDecode(await rootBundle.loadString('assets/recettes/recettes.json')) as Map<String, dynamic>;
-    _fournies = [
-      for (final r in (j['recettes'] as List).cast<Map<String, dynamic>>())
-        RecetteLue(
-          r['titre'] as String,
-          [
-            for (final i in (r['ingredients'] as List).cast<Map<String, dynamic>>())
-              [i['quantite'], i['nom']].whereType<String>().join(' '),
-          ],
-          types: (r['types'] as List? ?? const []).cast<String>(),
-          image: r['image'] == null ? null : 'assets/recettes/illustrations/${r['image']}',
-          pour: r['pour'] as String?,
-          etapes: (r['etapes'] as List? ?? const []).cast<String>(),
-          conseils: (r['conseils'] as List? ?? const []).cast<String>(),
-          source: r['source'] as String?,
-          tempsPreparation: (r['tempsPreparation'] as num?)?.toInt(),
-          tempsCuisson: (r['tempsCuisson'] as num?)?.toInt(),
-          difficulte: r['difficulte'] as String?,
-          cout: r['cout'] as String?,
-          regimes: (r['regimes'] as List? ?? const []).cast<String>(),
-          saisons: (r['saisons'] as List? ?? const []).cast<String>(),
-          cuissons: (r['cuissons'] as List? ?? const []).cast<String>(),
-          occasions: (r['occasions'] as List? ?? const []).cast<String>(),
-          quantites: [for (final i in (r['ingredients'] as List).cast<Map<String, dynamic>>()) i['quantite'] as String?],
-        ),
-    ];
-  } catch (_) {
+    final j = await _lireEmbarque();
+    final embarquees = (j['recettes'] as List).cast<Map<String, dynamic>>();
+    String? chemin(Map r) => r['image'] == null ? null : 'assets/recettes/illustrations/${r['image']}';
+    final recu = demonstration ? null : RecettesRecues.instance.index;
+    if (recu == null) {
+      _fournies = [for (final r in embarquees) recetteDepuisJson(r, image: chemin(r))];
+    } else {
+      final parEmpreinte = {for (final r in embarquees) if (r['empreinte'] != null) r['empreinte']: chemin(r)};
+      final parId = {for (final r in embarquees) if (r['id'] != null) r['id']: chemin(r)};
+      String? image(Map r) {
+        final e = r['image'] as String?;
+        if (e != null) {
+          if (parEmpreinte[e] case final c?) return c;
+          if (RecettesRecues.instance.image(e) != null) return 'recette:$e';
+        }
+        // Image pas encore reçue : celle embarquée de la même recette, sinon l'image du type.
+        return parId[r['id']];
+      }
+
+      _fournies = [for (final r in (recu['recettes'] as List).cast<Map>()) recetteDepuisJson(r, image: image(r))]
+        ..sort((a, b) => a.titre.toLowerCase().compareTo(b.titre.toLowerCase()));
+    }
+  } catch (e) {
     _fournies = const [];
   }
   return _fournies!;

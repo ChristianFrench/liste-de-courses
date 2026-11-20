@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../composants/composants.dart';
 import '../composants/pictogramme.dart';
 import '../donnees/catalogue_commun.dart';
+import '../donnees/recettes_recues.dart';
 import '../donnees/catalogue_type.dart';
 import '../donnees/images_perso.dart';
 import '../donnees/journal_catalogue.dart';
@@ -953,6 +954,35 @@ Future<void> montrerNouveautes(BuildContext context) async {
   c.nouveautesVues();
 }
 
+/// Fenêtre « Nouveautés des recettes » (20/11/2026), montrée une fois sur chaque appareil après une nouvelle
+/// version du catalogue des recettes : « Recettes v1.1 : 3 ajoutées, 2 modifiées », puis les titres.
+Future<void> montrerNouveautesRecettes(BuildContext context) async {
+  final r = RecettesRecues.instance;
+  final n = r.aMontrer;
+  if (n == null) return;
+  final (version, resume, lignes) = n;
+  await modale(
+    context,
+    titre: 'Nouveautés des recettes',
+    oui: 'Fermer',
+    non: null,
+    fermable: false,
+    contenu: (context, _) => ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          Text('Recettes v$version : $resume.', key: const ValueKey('nouveautes-recettes'), style: Charte.texte(15, gras: true)),
+          const SizedBox(height: 8),
+          for (final l in lignes)
+            Padding(padding: const EdgeInsets.symmetric(vertical: 2), child: Text(l, style: Charte.texte(15))),
+        ],
+      ),
+    ),
+  );
+  r.nouveautesVues();
+}
+
 /// Montre les nouveautés du catalogue dès qu'il y en a (au lancement, après la lecture du serveur).
 class GuetteurNouveautes extends StatefulWidget {
   const GuetteurNouveautes({super.key, required this.child});
@@ -969,19 +999,23 @@ class _GuetteurNouveautesState extends State<GuetteurNouveautes> {
   void initState() {
     super.initState();
     CatalogueCommun.instance.addListener(_verifier);
+    RecettesRecues.instance.addListener(_verifier);
     WidgetsBinding.instance.addPostFrameCallback((_) => _verifier());
   }
 
   @override
   void dispose() {
     CatalogueCommun.instance.removeListener(_verifier);
+    RecettesRecues.instance.removeListener(_verifier);
     super.dispose();
   }
 
   Future<void> _verifier() async {
-    if (_ouverte || !mounted || CatalogueCommun.instance.nouveautes.isEmpty) return;
+    if (_ouverte || !mounted) return;
     _ouverte = true;
-    await montrerNouveautes(context);
+    if (CatalogueCommun.instance.nouveautes.isNotEmpty) await montrerNouveautes(context);
+    // 20/11/2026 : les nouveautés du catalogue des recettes, une fois par appareil.
+    if (mounted && RecettesRecues.instance.aMontrer != null) await montrerNouveautesRecettes(context);
     _ouverte = false;
   }
 

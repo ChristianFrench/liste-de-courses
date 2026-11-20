@@ -93,6 +93,9 @@ class TransportChiffre implements Transport {
   Stream<String> get etats => dessous.etats;
 
   @override
+  void abonner(String sujet) => dessous.abonner(_versReel(sujet));
+
+  @override
   bool get connecte => dessous.connecte;
 
   @override

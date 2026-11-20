@@ -33,6 +33,9 @@ class _Transport implements Transport {
   }
 
   @override
+  void abonner(String sujet) {}
+
+  @override
   Future<void> fermer() async {}
 }
 

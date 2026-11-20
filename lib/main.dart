@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'composants/composants.dart' show voletsEnFenetre;
 import 'donnees/sauvegarde.dart';
 import 'donnees/catalogue_commun.dart';
+import 'donnees/recettes_recues.dart';
 import 'donnees/demonstration.dart';
 import 'donnees/messages.dart';
 import 'donnees/modele.dart';
@@ -88,6 +89,8 @@ Future<void> main() async {
   Synchro.instance.demarrer();
   // Catalogue commun : les nouveautés publiées par l'éditeur s'ajoutent au foyer
   CatalogueCommun.instance.verifier();
+  // Catalogue des recettes (20/11/2026) : nouvelle version publiée par l'éditeur, puis ses images.
+  RecettesRecues.instance.verifier();
 }
 
 /// L'outil de l'éditeur du catalogue commun : la même charte, un seul écran.

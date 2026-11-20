@@ -105,6 +105,9 @@ abstract class Transport {
     required String abonnement,
   });
   void publier(String sujet, String contenu, {bool retenu = false});
+
+  /// Un abonnement de plus, sur une liaison déjà ouverte (images des recettes, 20/11/2026).
+  void abonner(String sujet);
   Future<void> fermer();
 }
 
@@ -1197,6 +1200,11 @@ class TransportMqtt implements Transport {
   /// Accents écrits en \\uXXXX : le JSON reste identique une fois relu.
   String _ascii(String s) => s.replaceAllMapped(
       RegExp(r'[^\x00-\x7F]'), (m) => m[0]!.codeUnits.map((c) => '\\u${c.toRadixString(16).padLeft(4, '0')}').join());
+
+  @override
+  void abonner(String sujet) {
+    if (connecte) _client!.subscribe(sujet, MqttQos.atLeastOnce);
+  }
 
   @override
   void publier(String sujet, String contenu, {bool retenu = false}) {
