@@ -111,6 +111,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
               for (final t in types)
                 GroupeRetractable(
                   cle: 'recettes/$t',
+                  signe: _imageCritere(imageDuType([t]), 46),
                   titre: FiltreRecettes.libelle(t),
                   nombre: parType[t]!.length,
                   pliable: true,
@@ -172,6 +173,19 @@ class FiltresRecettes extends StatelessWidget {
   final VoidCallback onChange;
   final VoidCallback onEffacer;
 
+  /// Icône d'Aristide de chaque critère (assets/recettes/criteres/filtre-*.png).
+  static const icones = {
+    'Type': 'filtre-type-recette',
+    'Difficulté': 'filtre-difficulte',
+    'Temps': 'filtre-temps-preparation',
+    'Régime': 'filtre-regime',
+    'Saison': 'filtre-saison',
+    'Coût': 'filtre-cout',
+    'Cuisson': 'filtre-mode-cuisson',
+    'Occasion': 'filtre-occasion',
+  };
+
+  /// 20/11/2026 (Aristide) : les valeurs d'un critère en boutons à icône, à toucher pour (dé)sélectionner.
   Future<void> _choisir(BuildContext context, String critere) async {
     final valeurs = filtre.choix[critere]!;
     await modale(
@@ -179,20 +193,22 @@ class FiltresRecettes extends StatelessWidget {
       titre: critere,
       oui: 'Valider',
       non: null,
-      contenu: (context, maj) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        for (final v in FiltreRecettes.criteres[critere]!)
-          CaseModale(
-            key: ValueKey('valeur-$v'),
-            texte: FiltreRecettes.libelle(v),
-            image: iconeCritere(v) == null ? null : _imageCritere(iconeCritere(v)!, 28),
-            coche: valeurs.contains(v),
-            onChange: (c) {
-              maj(() => c ? valeurs.add(v) : valeurs.remove(v));
-              onChange();
-            },
-            encadree: false,
-          ),
-      ]),
+      contenu: (context, maj) => Padding(
+        padding: const EdgeInsets.only(top: 8),
+        child: Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.center, children: [
+          for (final v in FiltreRecettes.criteres[critere]!)
+            _Tuile(
+              cle: ValueKey('valeur-$v'),
+              image: iconeCritere(v) ?? icones[critere]!,
+              texte: FiltreRecettes.libelle(v),
+              choisi: valeurs.contains(v),
+              onTap: () {
+                maj(() => valeurs.contains(v) ? valeurs.remove(v) : valeurs.add(v));
+                onChange();
+              },
+            ),
+        ]),
+      ),
     );
     onChange();
   }
@@ -202,40 +218,104 @@ class FiltresRecettes extends StatelessWidget {
     final saison = FiltreRecettes.saisonDu(DateTime.now());
     final choixSaison = filtre.choix['Saison']!;
     final deSaison = choixSaison.length == 1 && choixSaison.contains(saison);
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Wrap(spacing: 6, children: [
-        for (final c in FiltreRecettes.criteres.keys)
-          Pastille(
-            switch (filtre.choix[c]!.length) {
-              0 => '$c ▾',
-              1 => FiltreRecettes.libelle(filtre.choix[c]!.first),
-              final n => '$c ($n)',
-            },
-            key: ValueKey('filtre-$c'),
-            couleur: filtre.choix[c]!.isEmpty ? null : Charte.cadre,
-            onTap: () => _choisir(context, c),
+    Widget bouton(String cle, String image, String aide, int n, bool actif, VoidCallback onTap) => Expanded(
+          child: Tooltip(
+            message: aide,
+            child: Semantics(
+              button: true,
+              label: aide,
+              selected: actif,
+              child: InkWell(
+                key: ValueKey(cle),
+                onTap: onTap,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  height: 48,
+                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                  decoration: BoxDecoration(
+                    color: actif ? Charte.clair(Charte.accent, 0.55) : null,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: actif ? Charte.cadre : Colors.transparent, width: 1.5),
+                  ),
+                  child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+                    _imageCritere(image, 34),
+                    if (n > 0)
+                      Positioned(
+                        right: 1,
+                        top: 1,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          decoration: BoxDecoration(color: Charte.cadre, borderRadius: BorderRadius.circular(8)),
+                          child: Text('$n', style: Charte.texte(11, gras: true, couleur: Charte.blanc)),
+                        ),
+                      ),
+                  ]),
+                ),
+              ),
+            ),
           ),
-        Pastille(
-          'De saison',
-          key: const ValueKey('filtre-de-saison'),
-          couleur: deSaison ? Charte.cadre : null,
-          onTap: () {
-            choixSaison.clear();
-            if (!deSaison) choixSaison.add(saison);
-            onChange();
-          },
-        ),
+        );
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Row(children: [
+        for (final c in FiltreRecettes.criteres.keys)
+          bouton('filtre-$c', icones[c]!, c, filtre.choix[c]!.length, filtre.choix[c]!.isNotEmpty, () => _choisir(context, c)),
+        bouton('filtre-de-saison', 'filtre-de-saison', 'De saison ($saison)', 0, deSaison, () {
+          choixSaison.clear();
+          if (!deSaison) choixSaison.add(saison);
+          onChange();
+        }),
       ]),
       Row(children: [
         Expanded(
-          child: Text('$nombre recette${nombre > 1 ? 's' : ''}',
-              key: const ValueKey('nombre-recettes'), style: Charte.texte(14, gras: true, couleur: Charte.texteSecondaire)),
+          child: Text(
+              [
+                '$nombre recette${nombre > 1 ? 's' : ''}',
+                for (final c in FiltreRecettes.criteres.keys)
+                  if (filtre.choix[c]!.isNotEmpty) filtre.choix[c]!.map(FiltreRecettes.libelle).join(' ou '),
+              ].join(' · '),
+              key: const ValueKey('nombre-recettes'),
+              style: Charte.texte(14, gras: true, couleur: Charte.texteSecondaire)),
         ),
         if (filtre.actif || filtre.texte.isNotEmpty)
           TextButton(key: const ValueKey('effacer-filtres'), onPressed: onEffacer, child: const Text('Effacer les filtres')),
       ]),
     ]);
   }
+}
+
+/// Une valeur de filtre : son icône, son libellé dessous ; choisie, sur fond vert pâle et cadre.
+class _Tuile extends StatelessWidget {
+  const _Tuile({required this.cle, required this.image, required this.texte, required this.choisi, required this.onTap});
+  final Key cle;
+  final String image;
+  final String texte;
+  final bool choisi;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        selected: choisi,
+        child: InkWell(
+          key: cle,
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            width: 96,
+            padding: const EdgeInsets.fromLTRB(4, 8, 4, 6),
+            decoration: BoxDecoration(
+              color: choisi ? Charte.clair(Charte.accent, 0.55) : Charte.fondBandeau,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: choisi ? Charte.cadre : Charte.separateurZone, width: choisi ? 2 : 1),
+            ),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              _imageCritere(image, 48),
+              const SizedBox(height: 4),
+              Text(texte, textAlign: TextAlign.center, style: Charte.texte(13, gras: choisi)),
+            ]),
+          ),
+        ),
+      );
 }
 
 /// Illustration d'une recette, 3:2, au plus un tiers de l'écran ; sans illustration, l'image du type.
@@ -294,7 +374,7 @@ class EnTeteRecette extends StatelessWidget {
       if (r.tempsCuisson case final t?) t == 0 ? ('sans-cuisson', 'Sans cuisson') : ('temps-cuisson', 'Cuisson ${duree(t)}'),
       if (r.difficulte case final d?) (iconeCritere(d), d),
     ];
-    final pastilles = r.pastilles;
+    final pastilles = [...r.types, ...r.pastilles];
     Widget bouton(IconData i, String cle, String aide, int vers) => IconButton(
           key: ValueKey(cle),
           tooltip: aide,
@@ -362,11 +442,20 @@ String? iconeCritere(String valeur) => switch (valeur) {
       'Automne' => 'automne',
       'Hiver' => 'hiver',
       'Toute l\'année' => 'toute-annee',
+      'Quotidien' => 'quotidien',
+      'À l\'avance' => 'a-l-avance',
+      'À recevoir' => 'a-recevoir',
+      'À emporter' => 'a-emporter',
+      'Moins de 30 min' || 'Moins d\'une heure' || 'Plus d\'une heure' => 'temps-preparation',
+      'Entrée' || 'Plats' || 'Plats accompagnement' || 'Sauces' || 'Dessert' => imageDuType([valeur]),
       _ => null,
     };
 
+/// Une icône de critère ou de type de recette, [nom] court (assets/recettes/criteres/) ou chemin complet.
+Widget imageCritere(String nom, double taille) => _imageCritere(nom, taille);
+
 Widget _imageCritere(String nom, double taille) =>
-    Image.asset('assets/recettes/criteres/$nom.png', width: taille, height: taille, filterQuality: FilterQuality.medium);
+    Image.asset(nom.startsWith('assets/') ? nom : 'assets/recettes/criteres/$nom.png', width: taille, height: taille, filterQuality: FilterQuality.medium);
 
 /// Une pastille de critère : l'icône d'Aristide (s'il y en a une) et le libellé.
 class PastilleCritere extends StatelessWidget {
@@ -385,7 +474,7 @@ class PastilleCritere extends StatelessWidget {
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         if (icone != null) ...[_imageCritere(icone, 20), const SizedBox(width: 4)],
-        Text(valeur, style: Charte.texte(13, gras: true)),
+        Text(FiltreRecettes.libelle(valeur), style: Charte.texte(13, gras: true)),
       ]),
     );
   }

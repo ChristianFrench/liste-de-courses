@@ -667,9 +667,13 @@ class GroupeRetractable extends StatelessWidget {
     this.actions = const [],
     this.pliable = false,
     this.emplettes,
+    this.signe,
   });
   final String cle;
   final bool ajoute;
+
+  /// Image du bandeau fournie toute faite (types de recettes, 20/11/2026), prioritaire sur les autres.
+  final Widget? signe;
 
   /// Image d'Emplettes du bandeau (assets/emplettes/<nom>.png), prioritaire sur [icone].
   final String? emplettes;
@@ -705,7 +709,8 @@ class GroupeRetractable extends StatelessWidget {
   Widget _construire(BuildContext context, bool ouvert) {
     // 03/11/2026 (Aristide) : les groupes de listes à préparer et à faire prennent les images d'Emplettes.
     // 09/11/2026 (Aristide) : « À faire » = chariot vide et liste non cochée ; « Terminées » = liste cochée.
-    final signe = emplettes != null
+    final signe = this.signe ??
+        (emplettes != null
         ? ImageEmplettes(emplettes!, taille: 46)
         : image != null
         ? Pictogramme(image!, taille: 46)
@@ -713,7 +718,7 @@ class GroupeRetractable extends StatelessWidget {
             ? ImageEmplettes(ImageEmplettes.pourIcone(icone), taille: 46)
             : icone == Icons.pause_circle_outline
                 ? ImageEmplettes.interrompue(46)
-                : (icone != null ? Icone(icone, size: 46) : null);
+                : (icone != null ? Icone(icone, size: 46) : null));
     // 01/11/2026 (Aristide) : l'icône qui déborde vers le bas reste au premier plan, par-dessus la ligne
     // suivante ; replié, le groupe laisse la place de ce débord.
     return Stack(clipBehavior: Clip.none, children: [
@@ -734,7 +739,7 @@ class GroupeRetractable extends StatelessWidget {
           grand: true,
           image: image,
           // L'image d'Emplettes est dessinée par-dessus : le bandeau lui réserve la même place qu'à une icône.
-          icone: icone ?? (emplettes != null ? Icons.circle_outlined : null),
+          icone: icone ?? (emplettes != null || this.signe != null ? Icons.circle_outlined : null),
           signeAuDessus: true,
           ouvert: pliable ? ouvert : null,
           onTap: pliable

@@ -377,13 +377,18 @@ class _EcranConstructionState extends State<EcranConstruction> {
                   Navigator.of(context).pop(true);
                 },
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
-                  child: Text.rich(TextSpan(children: [
+                  padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                  child: Row(children: [
+                    // 20/11/2026 (Aristide) : l'icône du type de recette devant le titre.
+                    imageCritere(imageDuType(r.types), 30),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text.rich(TextSpan(children: [
                     TextSpan(text: r.titre, style: Charte.texte(16)),
                     TextSpan(
                         text: '  ${[if (r.types.isNotEmpty) FiltreRecettes.libelle(r.types.first), if (r.tempsTotal case final t?) duree(t), if (r.difficulte != null) r.difficulte!].join(' · ')}',
                         style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                  ])),
+                  ]))),
+                  ]),
                 ),
               ),
             if (vues.isEmpty) Text('Aucune recette', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
