@@ -6,6 +6,8 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/recettes.dart';
+import 'package:liste_de_courses/donnees/recettes_communes.dart';
+import 'package:liste_de_courses/ecrans/console_recettes_edition.dart';
 
 void main() {
   test('découpage : titre, ingrédients à tirets, préparation', () {
@@ -202,5 +204,63 @@ void main() {
     expect(r.firstWhere((x) => x.titre == 'Houmous').regimes, contains('Végétalien'));
     expect(dureeRecette(70), '1 h 10');
     expect(dureeRecette(120), '2 h');
+  });
+
+  test('versions des recettes : journal, valider, revenir, changements depuis la publication', () async {
+    final d = Directory.systemTemp.createTempSync('recettes-versions');
+    Recette r(String id, String titre) =>
+        Recette(id: id, titre: titre, types: ['Plats'], ingredients: const [], preparation: '', photos: const []);
+    final b = BaseRecettes(d, [r('a', 'Gratin'), r('b', 'Soupe')]);
+    await b.demarrerJournal();
+    expect(b.journal.etapes.single.nom, 'Point de départ');
+    expect(RecettesCommunes.aPublier(b), isTrue);
+    expect(RecettesCommunes.libelleSuivant(b), '1.0');
+
+    final avant = b.recettes.first;
+    final apres = avant.copie()
+      ..titre = 'Gratin dauphinois'
+      ..tempsCuisson = 60;
+    await b.modifier(avant, apres);
+    expect(b.enCours, 1);
+    expect(b.journal.enCours.single.lignes.single, 'Recette modifiée : Gratin → Gratin dauphinois (titre, cuisson)');
+    expect(b.recettes.first.retouchee, isTrue);
+    await b.supprimer(b.recettes.last);
+    await b.valider('Essai');
+    expect(b.enCours, 0);
+    expect(b.journal.etapes.length, 2);
+
+    // Relue du disque : journal compris.
+    final relue = await BaseRecettes.ouvrir(dossier: d);
+    expect(relue.journal.etapes.map((e) => e.nom), ['Point de départ', 'Essai']);
+    expect(relue.recettes.map((x) => x.titre), ['Gratin dauphinois']);
+
+    await relue.revenirA(0);
+    expect(relue.recettes.map((x) => x.titre), ['Gratin', 'Soupe']);
+
+    // Après une publication, seuls les écarts comptent.
+    relue.publiee = {
+      'numero': 1,
+      'libelle': '1.0',
+      'empreintes': {for (final x in relue.recettes) x.id: RecettesCommunes.empreinteRecette(x)},
+      'titres': {for (final x in relue.recettes) x.id: x.titre},
+    };
+    expect(RecettesCommunes.aPublier(relue), isFalse);
+    expect(RecettesCommunes.libelleSuivant(relue), '1.1');
+    relue.recettes.removeLast();
+    relue.recettes.add(r(relue.nouvelIdentifiant('Tarte'), 'Tarte'));
+    final (a, m, s) = RecettesCommunes.changements(relue);
+    expect(a, ['Tarte']);
+    expect(m, isEmpty);
+    expect(s, ['Soupe']);
+    final (contenu, _) = await RecettesCommunes.contenu(relue);
+    expect((contenu['recettes'] as List).first, isNot(contains('retouchee')));
+  });
+
+  test('ingrédient en une ligne « Nom · quantité · précision »', () {
+    final i = lireLigneIngredient('Pommes de terre · 1 kg · type Charlotte')!;
+    expect((i.nom, i.quantite, i.precision), ('Pommes de terre', '1 kg', 'type Charlotte'));
+    expect(ligneIngredient(i), 'Pommes de terre · 1 kg · type Charlotte');
+    expect(ligneIngredient(IngredientRecette('Sel')), 'Sel');
+    expect(lireLigneIngredient('  '), isNull);
   });
 }

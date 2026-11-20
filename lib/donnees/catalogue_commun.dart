@@ -65,6 +65,11 @@ class CatalogueCommun extends ChangeNotifier {
 
   // ------------------------------------------------------------ Serveur
 
+  /// Une connexion courte au serveur, pour un autre contenu commun (catalogue des recettes, 20/11/2026).
+  Future<T?> avecServeur<T>(Future<T?> Function(Transport t, Stream<(String, String)> messages) action,
+          {required String abonnement}) =>
+      _avecServeur(action, abonnement: abonnement);
+
   /// Une connexion courte au serveur, le temps de [action].
   Future<T?> _avecServeur<T>(Future<T?> Function(Transport t, Stream<(String, String)> messages) action,
       {String abonnement = sujet}) async {

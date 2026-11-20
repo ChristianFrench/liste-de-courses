@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:archive/archive.dart';
+
 import 'dossier_application.dart';
+import 'journal_catalogue.dart';
 import 'modele.dart' show Etat, EtatChargement;
 
 // Catalogue des recettes de la console (10/11/2026, Aristide) : les notes Google Keep libellées « Recettes … »
@@ -36,6 +39,7 @@ class Recette {
     this.cout,
     this.cuissons = const [],
     this.occasions = const [],
+    this.retouchee = false,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -86,6 +90,12 @@ class Recette {
   List<String> cuissons;
   List<String> occasions;
 
+  /// Modifiée dans la console (20/11/2026) : une livraison de recettes ne l'écrase plus.
+  bool retouchee;
+
+  /// Copie indépendante.
+  Recette copie() => Recette.lire(versJson());
+
   /// « Toute l'année » quand les quatre saisons y sont.
   String get repereSaisons => saisons.length == 4 ? "Toute l'année" : saisons.join(', ');
 
@@ -124,6 +134,7 @@ class Recette {
         if (cout != null) 'cout': cout,
         if (cuissons.isNotEmpty) 'cuissons': cuissons,
         if (occasions.isNotEmpty) 'occasions': occasions,
+        if (retouchee) 'retouchee': true,
         if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
@@ -153,6 +164,7 @@ class Recette {
         cout: j['cout'] as String?,
         cuissons: [for (final x in (j['cuissons'] as List? ?? const [])) x as String],
         occasions: [for (final x in (j['occasions'] as List? ?? const [])) x as String],
+        retouchee: j['retouchee'] == true,
       )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 
@@ -272,6 +284,109 @@ class BaseRecettes {
   /// Version des recettes livrées avec la console déjà appliquée (0 : aucune).
   int versionFournie = 0;
 
+  /// 20/11/2026 (Aristide) : versions du catalogue des recettes, comme pour les produits et les marques.
+  /// Chaque geste est noté « en cours » ; « Valider » fige une étape (instantané de toutes les recettes) ;
+  /// « Généraliser » publie une version (voir recettes_communes.dart).
+  JournalCatalogue journal = JournalCatalogue([], []);
+
+  /// Dernière version publiée : numero, libelle, date, empreintes {id: empreinte du texte}, images publiées.
+  Map<String, dynamic> publiee = {};
+
+  int get enCours => journal.enCours.length;
+
+  /// Toutes les recettes, emballées (« gz: » + gzip en base 64), pour une étape du journal.
+  String instantane() => 'gz:${base64Encode(GZipEncoder().encode(utf8.encode(jsonEncode([for (final r in recettes) r.versJson()])))!)}';
+
+  static List<Recette> deballer(String texte) {
+    final s = texte.startsWith('gz:') ? utf8.decode(GZipDecoder().decodeBytes(base64Decode(texte.substring(3)))) : texte;
+    return [for (final m in (jsonDecode(s) as List).cast<Map>()) Recette.lire(m)];
+  }
+
+  /// Note un geste en cours (enregistré aussitôt) ; la première fois, l'état actuel devient le point de départ.
+  Future<void> noter(List<String> lignes) async {
+    if (lignes.isEmpty) return;
+    journal.noter(lignes);
+    await enregistrer();
+  }
+
+  /// Le point de départ du journal, la première fois.
+  Future<void> demarrerJournal() async {
+    if (journal.etapes.isNotEmpty) return;
+    journal.valider('Point de départ', instantane());
+    await enregistrer();
+  }
+
+  Future<EtapeCatalogue> valider(String nom) async {
+    final e = journal.valider(nom, instantane());
+    await enregistrer();
+    return e;
+  }
+
+  /// Revient à l'étape [i] : ses recettes remplacent les actuelles ; ce qui suit est abandonné.
+  Future<void> revenirA(int i) async {
+    final l = deballer(journal.revenirA(i));
+    recettes
+      ..clear()
+      ..addAll(l);
+    await enregistrer();
+  }
+
+  /// Ce qu'apporte une modification de [avant] en [apres] (une ligne par recette, champs touchés).
+  static List<String> gestesEntre(Recette? avant, Recette? apres) {
+    if (avant == null && apres == null) return const [];
+    if (avant == null) return ['Recette ajoutée : ${apres!.titre}'];
+    if (apres == null) return ['Recette supprimée : ${avant.titre}'];
+    final a = avant.versJson(), b = apres.versJson();
+    const noms = {
+      'titre': 'titre', 'types': 'types', 'detail': 'ingrédients', 'etapes': 'étapes', 'conseils': 'conseils',
+      'pour': 'portions', 'tempsPreparation': 'préparation', 'tempsCuisson': 'cuisson', 'difficulte': 'difficulté',
+      'regimes': 'régime', 'saisons': 'saison', 'cout': 'coût', 'cuissons': 'mode de cuisson', 'occasions': 'occasion',
+      'illustration': 'illustration', 'remarques': 'remarques',
+    };
+    final touches = [for (final e in noms.entries) if (jsonEncode(a[e.key]) != jsonEncode(b[e.key])) e.value];
+    if (touches.isEmpty) return const [];
+    final titre = avant.titre == apres.titre ? apres.titre : '${avant.titre} → ${apres.titre}';
+    return ['Recette modifiée : $titre (${touches.join(', ')})'];
+  }
+
+  /// Remplace (ou ajoute) une recette modifiée dans la console et note le geste.
+  Future<void> modifier(Recette? avant, Recette apres) async {
+    apres
+      ..retouchee = true
+      ..modifieeLe = DateTime.now();
+    final i = avant == null ? -1 : recettes.indexWhere((x) => x.id == avant.id);
+    if (i >= 0) {
+      recettes[i] = apres;
+    } else {
+      recettes.add(apres);
+    }
+    await noter(gestesEntre(avant, apres));
+  }
+
+  Future<void> supprimer(Recette r) async {
+    recettes.removeWhere((x) => x.id == r.id);
+    await noter(gestesEntre(r, null));
+  }
+
+  /// Identifiant d'une recette créée dans la console : « emplettes-<titre> », rendu unique.
+  String nouvelIdentifiant(String titre) {
+    final base = 'emplettes-${slugRecette(titre)}';
+    var id = base;
+    for (var n = 2; recettes.any((r) => r.id == id); n++) {
+      id = '$base-$n';
+    }
+    return id;
+  }
+
+  /// Pose [image] comme illustration de [r] sans effacer l'ancienne (une étape du journal peut y revenir).
+  Future<String> copierIllustration(Recette r, File image) async {
+    await dossier.create(recursive: true);
+    final ext = image.path.split('.').last.toLowerCase();
+    final nom = 'illustration-${slugRecette(r.titre)}-${DateTime.now().millisecondsSinceEpoch}.$ext';
+    await image.copy(photo(nom).path);
+    return nom;
+  }
+
   static Future<BaseRecettes> ouvrir({Directory? dossier}) async {
     final d = dossier ?? Directory('${(await dossierApplication()).path}${Platform.pathSeparator}recettes');
     final f = File('${d.path}${Platform.pathSeparator}recettes.json');
@@ -279,7 +394,9 @@ class BaseRecettes {
     try {
       final j = jsonDecode(await f.readAsString()) as Map<String, dynamic>;
       return BaseRecettes(d, [for (final r in (j['recettes'] as List? ?? const []).cast<Map>()) Recette.lire(r)])
-        ..versionFournie = (j['fournies'] as num?)?.toInt() ?? 0;
+        ..versionFournie = (j['fournies'] as num?)?.toInt() ?? 0
+        ..journal = JournalCatalogue.lire(_lireSiPresent(File('${d.path}${Platform.pathSeparator}journal.json')))
+        ..publiee = Map<String, dynamic>.from(j['publiee'] as Map? ?? const {});
     } catch (e) {
       // 16/11/2026 : une base de recettes illisible était remplacée par une base vide au premier
       // enregistrement : elle est d'abord mise de côté, intacte.
@@ -295,12 +412,25 @@ class BaseRecettes {
     }
   }
 
+  static String? _lireSiPresent(File f) {
+    try {
+      return f.existsSync() ? f.readAsStringSync() : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> enregistrer() async {
     await dossier.create(recursive: true);
+    // Le journal (instantanés compris) dans son propre fichier : recettes.json reste léger.
+    if (journal.etapes.isNotEmpty || journal.enCours.isNotEmpty) {
+      await File('${dossier.path}${Platform.pathSeparator}journal.json').writeAsString(journal.ecrire());
+    }
     final f = File('${dossier.path}${Platform.pathSeparator}recettes.json');
     await f.writeAsString(const JsonEncoder.withIndent(' ').convert({
       'version': 1,
       if (versionFournie > 0) 'fournies': versionFournie,
+      if (publiee.isNotEmpty) 'publiee': publiee,
       'recettes': [for (final r in recettes) r.versJson()],
     }));
   }
@@ -386,7 +516,7 @@ class BaseRecettes {
     var n = 0;
     for (final r in recettes) {
       final nom = carte[r.id];
-      if (nom is! String) continue;
+      if (nom is! String || r.retouchee) continue;
       final f = File('${d.path}${Platform.pathSeparator}$nom');
       if (!f.existsSync()) continue;
       final marque = '$nom:${f.lengthSync()}';
@@ -415,19 +545,26 @@ class BaseRecettes {
     }
     final version = (j['version'] as num?)?.toInt() ?? 1;
     if (version <= versionFournie) return 0;
-    var n = 0;
+    var n = 0, ajoutees = 0, maj = 0;
     for (final m in (j['recettes'] as List? ?? const []).cast<Map>()) {
       final r = Recette.lire(m);
       final i = recettes.indexWhere((x) => x.id == r.id);
       if (i >= 0) {
+        // 20/11/2026 : une recette modifiée dans la console garde la version d'Aristide.
+        if (recettes[i].retouchee) continue;
         r
           ..illustration = recettes[i].illustration
           ..illustrationFournie = recettes[i].illustrationFournie;
+        if (gestesEntre(recettes[i], r).isNotEmpty) maj++;
         recettes[i] = r;
       } else {
         recettes.add(r);
+        ajoutees++;
       }
       n++;
+    }
+    if (versionFournie > 0 && (ajoutees > 0 || maj > 0)) {
+      journal.noter(['Recettes livrées avec la console (n° $version) : $ajoutees ajoutée(s), $maj mise(s) à jour']);
     }
     // Plus de photos Keep : fichiers retirés de la base, sauf les illustrations en usage.
     final gardees = {for (final r in recettes) if (r.illustration != null) r.illustration!};
@@ -437,7 +574,7 @@ class BaseRecettes {
     if (dossier.existsSync()) {
       for (final x in dossier.listSync().whereType<File>()) {
         final nom = x.uri.pathSegments.last;
-        if (nom == 'recettes.json' || gardees.contains(nom)) continue;
+        if (nom == 'recettes.json' || nom == 'journal.json' || nom.startsWith('illustration-') || gardees.contains(nom)) continue;
         try {
           x.deleteSync();
         } catch (_) {}
