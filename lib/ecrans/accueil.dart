@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart';
 import '../donnees/modele.dart';
+import '../navigation.dart';
 import '../theme.dart';
 import 'listes.dart';
 
@@ -255,9 +256,16 @@ class _Etapes extends StatelessWidget {
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
+    // 20/11/2026 (Aristide) : avec l'onglet « Cuisiner » (démonstration d'abord).
+    if (Nav.avecCuisiner) 'Je\ncuisine',
   ];
 
-  static const _icones = [Icons.checklist, Icons.check_circle_outline, Icons.shopping_cart_outlined];
+  static const _icones = [
+    Icons.checklist,
+    Icons.check_circle_outline,
+    Icons.shopping_cart_outlined,
+    if (Nav.avecCuisiner) Icons.restaurant_menu_outlined,
+  ];
 
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
@@ -298,6 +306,23 @@ class _Etapes extends StatelessWidget {
             'ces courses passées servent ensuite à préparer les prochaines listes.',
       ],
     ),
+    if (Nav.avecCuisiner)
+      (
+        'Je cuisine',
+        [
+          'L\'onglet Cuisiner est votre livre de recettes : près de 500 recettes, rangées par type (entrées, plats, '
+              'accompagnements, sauces, desserts).',
+          'Cherchez une recette par son nom ou par un ingrédient : « courgette » trouve toutes les recettes qui en utilisent.',
+          'Les boutons à icône filtrent les recettes : type, difficulté, temps, régime, saison, coût, mode de cuisson, '
+              'occasion. « De saison » garde les recettes de la saison du jour ; « Effacer les filtres » remet tout à zéro.',
+          'Touchez une recette : sa photo, le temps de préparation et de cuisson, la difficulté, puis deux onglets, '
+              'Ingrédients et Recette, avec les étapes numérotées et les conseils.',
+          'Avec − et +, changez le nombre de personnes : les quantités suivent.',
+          '« Ajouter aux courses » propose les ingrédients à cocher et les met dans votre liste en préparation, '
+              'avec la mention « pour : » et le nom de la recette. Sans liste en préparation, une liste est créée.',
+          'Pendant la préparation d\'une liste, le bouton « Recette » donne aussi accès aux recettes.',
+        ],
+      ),
   ];
 
   static Future<void> _expliquer(BuildContext context, int i) => modale(
