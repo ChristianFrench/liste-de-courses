@@ -28,6 +28,9 @@ class Recette {
     this.illustration,
     this.pour,
     this.source,
+    this.tempsPreparation,
+    this.tempsCuisson,
+    this.difficulte,
   });
 
   /// Identifiant stable : la date de création de la note Keep (sinon son titre).
@@ -64,6 +67,19 @@ class Recette {
   /// Origine : null pour les recettes maison (Google Keep), « Emplettes » pour celles rédigées pour l'application.
   String? source;
 
+  /// 20/11/2026 (Aristide) : temps de préparation et de cuisson en minutes, difficulté sur quatre niveaux
+  /// ([niveauxDifficulte]). Null quand on ne les connaît pas.
+  int? tempsPreparation;
+  int? tempsCuisson;
+  String? difficulte;
+
+  /// « Préparation 15 min · Cuisson 1 h 10 · Facile » (vide si rien n'est connu).
+  String get repereTemps => [
+        if (tempsPreparation != null) 'Préparation ${dureeRecette(tempsPreparation!)}',
+        if (tempsCuisson != null) tempsCuisson == 0 ? 'Sans cuisson' : 'Cuisson ${dureeRecette(tempsCuisson!)}',
+        if (difficulte != null) difficulte!,
+      ].join(' · ');
+
   bool get normalisee => detail.isNotEmpty || etapes.isNotEmpty;
 
   Map<String, dynamic> versJson() => {
@@ -84,6 +100,9 @@ class Recette {
         if (illustration != null) 'illustration': illustration,
         if (pour != null) 'pour': pour,
         if (source != null) 'source': source,
+        if (tempsPreparation != null) 'tempsPreparation': tempsPreparation,
+        if (tempsCuisson != null) 'tempsCuisson': tempsCuisson,
+        if (difficulte != null) 'difficulte': difficulte,
         if (illustrationFournie != null) 'illustrationFournie': illustrationFournie,
       };
 
@@ -105,12 +124,25 @@ class Recette {
         illustration: j['illustration'] as String?,
         pour: j['pour'] as String?,
         source: j['source'] as String?,
+        tempsPreparation: (j['tempsPreparation'] as num?)?.toInt(),
+        tempsCuisson: (j['tempsCuisson'] as num?)?.toInt(),
+        difficulte: j['difficulte'] as String?,
       )..illustrationFournie = j['illustrationFournie'] as String?;
 }
 
 List<String> _textes(Object? l) => [for (final x in (l as List? ?? const [])) if ('$x'.trim().isNotEmpty) '$x'.trim()];
 
 /// Ingrédient d'une recette normalisée : « 3 gousses » · « Ail » · « écrasé ».
+/// Les quatre niveaux de difficulté, du plus simple au plus exigeant.
+const niveauxDifficulte = ['Facile', 'Moyen', 'Difficile', 'Avancé'];
+
+/// 15 → « 15 min », 70 → « 1 h 10 », 120 → « 2 h ».
+String dureeRecette(int minutes) {
+  if (minutes < 60) return '$minutes min';
+  final h = minutes ~/ 60, m = minutes % 60;
+  return m == 0 ? '$h h' : '$h h ${m.toString().padLeft(2, '0')}';
+}
+
 class IngredientRecette {
   IngredientRecette(this.nom, {this.quantite = '', this.precision = ''});
   final String nom, quantite, precision;

@@ -247,7 +247,7 @@ class FicheRecette extends StatelessWidget {
                       ]),
                     ),
                   Text(
-                      '${r.pour == null ? '' : 'Pour ${r.pour} · '}${r.ingredients.length} ingrédient${r.ingredients.length > 1 ? 's' : ''} · ${r.photos.length} photo${r.photos.length > 1 ? 's' : ''}'
+                      '${r.pour == null ? '' : 'Pour ${r.pour} · '}${r.repereTemps.isEmpty ? '' : '${r.repereTemps} · '}${r.ingredients.length} ingrédient${r.ingredients.length > 1 ? 's' : ''} · ${r.photos.length} photo${r.photos.length > 1 ? 's' : ''}'
                       '${r.modifieeLe == null ? '' : ' · modifiée le ${r.modifieeLe!.day.toString().padLeft(2, '0')}/${r.modifieeLe!.month.toString().padLeft(2, '0')}/${r.modifieeLe!.year}'}',
                       style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                 ]),

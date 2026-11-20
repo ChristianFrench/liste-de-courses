@@ -181,4 +181,21 @@ void main() {
     fourni.deleteSync(recursive: true);
     dest.deleteSync(recursive: true);
   });
+
+  test('recettes livrées : 497, temps de préparation et de cuisson, difficulté', () {
+    final j = jsonDecode(File('outils/recettes/illustrations/recettes-fournies.json').readAsStringSync()) as Map<String, dynamic>;
+    final r = [for (final x in j['recettes'] as List) Recette.lire(x as Map<String, dynamic>)];
+    expect(r.length, 497);
+    final poulet = r.firstWhere((x) => x.titre == 'Poulet aux champignons et cidre');
+    expect(poulet.tempsPreparation, 20);
+    expect(poulet.tempsCuisson, 30);
+    expect(poulet.pour, '4 personnes');
+    expect(poulet.repereTemps, 'Préparation 20 min · Cuisson 30 min · Facile');
+    expect(Recette.lire(poulet.versJson()).difficulte, 'Facile');
+    for (final x in r.where((x) => !x.memo)) {
+      expect(niveauxDifficulte, contains(x.difficulte), reason: x.titre);
+    }
+    expect(dureeRecette(70), '1 h 10');
+    expect(dureeRecette(120), '2 h');
+  });
 }
