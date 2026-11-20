@@ -12,7 +12,10 @@ import '../theme.dart';
 // Rangées par type (Entrée, Plat…), un champ pour chercher ; une recette s'ouvre sur sa fiche.
 
 class EcranRecettes extends StatefulWidget {
-  const EcranRecettes({super.key});
+  const EcranRecettes({super.key, this.depuisEnTete = false});
+
+  /// Ouvert par l'icône de l'en-tête : pas de « Gérer › Courses » au-dessus du titre.
+  final bool depuisEnTete;
   @override
   State<EcranRecettes> createState() => _EcranRecettesState();
 }
@@ -66,7 +69,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
       entete: EnTeteFenetre(
         retour: true,
         icone: Icons.restaurant_menu_outlined,
-        sousTitre: 'Gérer › Courses',
+        sousTitre: widget.depuisEnTete ? null : 'Gérer › Courses',
         titre: 'Catalogue des recettes',
         // 19/11/2026 (Aristide) : tout déplier / tout replier, comme les autres catalogues.
         droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier',
@@ -184,61 +187,6 @@ class FicheRecette extends StatelessWidget {
   }
 }
 
-/// Bouton « recette » de l'en-tête (19/11/2026, Aristide) : chercher une recette (au clavier ou à la voix),
-/// la liste des recettes qui correspondent, puis sa fiche en touchant son titre.
-Future<void> chercherRecette(BuildContext context) async {
-  final toutes = await recettesFournies();
-  if (!context.mounted) return;
-  final champ = TextEditingController();
-  var filtre = '';
-  RecetteLue? choix;
-  await modale(
-    context,
-    titre: 'Chercher une recette',
-    icone: Icons.restaurant_menu_outlined,
-    oui: null,
-    contenu: (context, maj) {
-      final f = normaliser(filtre);
-      final vues = f.isEmpty ? const <RecetteLue>[] : [for (final r in toutes) if (normaliser(r.titre).contains(f)) r];
-      return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: TextField(
-            key: const ValueKey('chercher-recette-entete'),
-            controller: champ,
-            autofocus: true,
-            style: Charte.texte(15),
-            decoration: InputDecoration(
-              labelText: 'Nom de la recette',
-              prefixIcon: const Icon(Icons.search),
-              suffixIcon: BoutonMicro(controleur: champ, onTexte: (v) => maj(() => filtre = v)),
-            ),
-            onChanged: (v) => maj(() => filtre = v),
-          ),
-        ),
-        const SizedBox(height: 6),
-        if (f.isEmpty)
-          Text('${toutes.length} recettes : tapez ou dites quelques lettres du nom.', style: Charte.texte(14, couleur: Charte.texteSecondaire))
-        else if (vues.isEmpty)
-          Text('Aucune recette', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-        for (final r in vues)
-          InkWell(
-            key: ValueKey('trouvee-${r.titre}'),
-            onTap: () {
-              choix = r;
-              Navigator.of(context).pop(true);
-            },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 9, horizontal: 4),
-              child: Text.rich(TextSpan(children: [
-                TextSpan(text: r.titre, style: Charte.texte(16)),
-                if (r.types.isNotEmpty) TextSpan(text: '  ${r.types.first}', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-              ])),
-            ),
-          ),
-      ]);
-    },
-  );
-  champ.dispose();
-  if (choix case final r? when context.mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
-}
+/// Bouton « recette » de l'en-tête (19/11/2026) : 20/11/2026 (Aristide) : pas de volet, le catalogue des recettes
+/// lui-même ; la flèche de retour ramène là où l'on était.
+Future<void> chercherRecette(BuildContext context) => Nav.aller<void>(context, const EcranRecettes(depuisEnTete: true));
