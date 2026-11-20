@@ -92,7 +92,7 @@ class RecetteLue {
   /// Les pastilles de critères : régimes, saison (« Toute l'année » si les quatre), coût, cuisson, occasions.
   List<String> get pastilles => [
         ...regimes,
-        if (saisons.length >= 4) 'Toute l\'année' else if (saisons.isNotEmpty) saisons.join(' · '),
+        if (saisons.length >= 4) 'Toute l\'année' else ...saisons,
         if (cout != null) cout!,
         // « Sans cuisson » est déjà dans l'en-tête quand le temps de cuisson vaut 0.
         for (final c in cuissons)

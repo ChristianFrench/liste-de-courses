@@ -55,6 +55,7 @@ flutter:
     - assets/pictos/maison/
     - assets/recettes/
     - assets/recettes/illustrations/
+    - assets/recettes/criteres/
   fonts:
     - family: Atkinson
       fonts:

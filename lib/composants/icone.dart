@@ -27,6 +27,13 @@ class Icone extends StatelessWidget {
         child: SizedBox(width: t, height: t, child: symbole.$2 ? Transform.flip(flipX: true, child: image) : image),
       );
     }
+    // 20/11/2026 (Aristide) : sa cocotte pour tout ce qui touche aux recettes.
+    if (icon == Icons.restaurant_menu_outlined) {
+      return Semantics(
+        label: semanticLabel,
+        child: Image.asset('assets/recettes/recettes-de-cuisine.png', width: t, height: t, filterQuality: FilterQuality.medium),
+      );
+    }
     final nom = icon == null ? null : iconesNoto[icon];
     if (nom == null) return Icon(icon, size: size, color: color, shadows: shadows, semanticLabel: semanticLabel);
     return Semantics(
@@ -67,6 +74,7 @@ class ImageEmplettes extends StatelessWidget {
   static String pourIcone(IconData? i) => switch (i) {
         Icons.checklist => 'liste_crayon',
         Icons.shopping_cart_outlined => 'liste_chariot',
+        Icons.restaurant_menu_outlined => 'cuisiner',
         _ => 'complet',
       };
 

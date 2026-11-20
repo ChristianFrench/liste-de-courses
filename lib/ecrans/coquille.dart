@@ -73,10 +73,7 @@ class BarreOnglets extends StatelessWidget {
                             top: 0,
                             child: i == Nav.gerer
                                 ? Icone(entrees[i].$1, size: 56, color: Charte.cadre)
-                                : i == Nav.cuisiner
-                                    // En attendant l'image d'Aristide (produits et casserole), son image des recettes.
-                                    ? Image.asset('assets/recettes/recettes-de-cuisine.png', width: 52, height: 52, filterQuality: FilterQuality.medium)
-                                    : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
+                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
                         Positioned(
                           bottom: 1,
                           child: Text(entrees[i].$2,

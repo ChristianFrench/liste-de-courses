@@ -184,6 +184,7 @@ class FiltresRecettes extends StatelessWidget {
           CaseModale(
             key: ValueKey('valeur-$v'),
             texte: FiltreRecettes.libelle(v),
+            image: iconeCritere(v) == null ? null : _imageCritere(iconeCritere(v)!, 28),
             coche: valeurs.contains(v),
             onChange: (c) {
               maj(() => c ? valeurs.add(v) : valeurs.remove(v));
@@ -285,9 +286,15 @@ class EnTeteRecette extends StatelessWidget {
   Widget build(BuildContext context) {
     final r = recette;
     final reglable = onPersonnes != null && r.personnes != null;
-    final ligne = r.ligne(avecPour: !reglable);
-    final pastilles = [if (r.source != null) 'Recette ${r.source}', ...r.pastilles];
     final n = personnes ?? r.personnes ?? 1;
+    // 20/11/2026 (Aristide) : ses icônes devant le nombre de personnes, les temps, la difficulté et les critères.
+    final infos = <(String?, String)>[
+      if (!reglable && r.pour != null) ('nombre-personnes', 'Pour ${r.pour}'),
+      if (r.tempsPreparation case final t?) ('temps-preparation', 'Préparation ${duree(t)}'),
+      if (r.tempsCuisson case final t?) t == 0 ? ('sans-cuisson', 'Sans cuisson') : ('temps-cuisson', 'Cuisson ${duree(t)}'),
+      if (r.difficulte case final d?) (iconeCritere(d), d),
+    ];
+    final pastilles = r.pastilles;
     Widget bouton(IconData i, String cle, String aide, int vers) => IconButton(
           key: ValueKey(cle),
           tooltip: aide,
@@ -296,29 +303,91 @@ class EnTeteRecette extends StatelessWidget {
           icon: Icone(i, size: 24, color: Charte.cadre),
         );
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if (r.source != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: Align(alignment: Alignment.centerLeft, child: Pastille('Recette ${r.source}', petite: true, couleur: Charte.cadre)),
+        ),
       if (reglable)
         Padding(
-          padding: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: 4),
           child: Row(children: [
+            _imageCritere('nombre-personnes', 24),
+            const SizedBox(width: 6),
             Text('Pour', style: Charte.texte(15, gras: true)),
             bouton(Icons.remove_circle_outline, 'moins-personnes', 'Moins de personnes', n - 1),
             Text(r.pourN(n), key: const ValueKey('nombre-personnes'), style: Charte.texte(15, gras: true)),
             bouton(Icons.add_circle_outline, 'plus-personnes', 'Plus de personnes', n + 1),
           ]),
         ),
-      if (ligne.isNotEmpty)
+      if (infos.isNotEmpty)
         Padding(
-          padding: EdgeInsets.only(top: reglable ? 0 : 10),
-          child: Text(ligne, key: const ValueKey('ligne-recette'), style: Charte.texte(15, gras: true)),
+          padding: EdgeInsets.only(top: reglable ? 0 : 8),
+          child: Wrap(key: const ValueKey('ligne-recette'), spacing: 14, runSpacing: 4, children: [
+            for (final (icone, texte) in infos)
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                if (icone != null) ...[_imageCritere(icone, 24), const SizedBox(width: 5)],
+                Text(texte, style: Charte.texte(15, gras: true)),
+              ]),
+          ]),
         ),
       if (pastilles.isNotEmpty)
         Padding(
-          padding: const EdgeInsets.only(top: 6),
-          child: Wrap(spacing: 5, runSpacing: 4, children: [
-            for (final p in pastilles) Pastille(p, petite: true, couleur: p.startsWith('Recette ') ? Charte.cadre : null),
-          ]),
+          padding: const EdgeInsets.only(top: 8),
+          child: Wrap(spacing: 6, runSpacing: 6, children: [for (final p in pastilles) PastilleCritere(p)]),
         ),
     ]);
+  }
+}
+
+/// Icône d'Aristide d'une valeur de critère (assets/recettes/criteres/), ou null.
+String? iconeCritere(String valeur) => switch (valeur) {
+      '€' => '1-euro',
+      '€€' => '2-euros',
+      '€€€' => '3-euros',
+      'Facile' => 'facile',
+      'Moyen' => 'moyen',
+      'Difficile' => 'difficile',
+      'Avancé' => 'avance',
+      'Sans cuisson' => 'sans-cuisson',
+      'Four' => 'four',
+      'Plaque' => 'plaque',
+      'Cocotte-minute' => 'cocotte-minute',
+      'Végétarien' => 'vegetarien',
+      'Végétalien' => 'vegetalien',
+      'Sans gluten' => 'sans-gluten',
+      'Sans lactose' => 'sans-lactose',
+      'Printemps' => 'printemps',
+      'Été' => 'ete',
+      'Automne' => 'automne',
+      'Hiver' => 'hiver',
+      'Toute l\'année' => 'toute-annee',
+      _ => null,
+    };
+
+Widget _imageCritere(String nom, double taille) =>
+    Image.asset('assets/recettes/criteres/$nom.png', width: taille, height: taille, filterQuality: FilterQuality.medium);
+
+/// Une pastille de critère : l'icône d'Aristide (s'il y en a une) et le libellé.
+class PastilleCritere extends StatelessWidget {
+  const PastilleCritere(this.valeur, {super.key});
+  final String valeur;
+
+  @override
+  Widget build(BuildContext context) {
+    final icone = iconeCritere(valeur);
+    return Container(
+      padding: EdgeInsets.fromLTRB(icone == null ? 8 : 4, 2, 8, 2),
+      decoration: BoxDecoration(
+        color: Charte.fondBandeau,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Charte.separateurZone),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        if (icone != null) ...[_imageCritere(icone, 20), const SizedBox(width: 4)],
+        Text(valeur, style: Charte.texte(13, gras: true)),
+      ]),
+    );
   }
 }
 

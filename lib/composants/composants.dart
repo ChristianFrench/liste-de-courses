@@ -1825,8 +1825,12 @@ Future<bool> modale(
 /// comme les zones de saisie et les listes déroulantes ; [encadree] faux pour les cases d'un choix parmi
 /// plusieurs éléments (articles lus dans un mail…) ou d'un [GroupeCases].
 class CaseModale extends StatelessWidget {
-  const CaseModale({super.key, required this.texte, this.aide, required this.coche, required this.onChange, this.encadree = true});
+  const CaseModale(
+      {super.key, required this.texte, this.aide, required this.coche, required this.onChange, this.encadree = true, this.image});
   final String texte;
+
+  /// Image devant le texte (icônes des critères de recette, 20/11/2026).
+  final Widget? image;
   final String? aide;
   final bool coche;
   final ValueChanged<bool> onChange;
@@ -1844,6 +1848,7 @@ class CaseModale extends StatelessWidget {
           children: [
             CaseACocher(coche: coche, taille: 24),
             const SizedBox(width: 12),
+            if (image case final i?) ...[i, const SizedBox(width: 8)],
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
