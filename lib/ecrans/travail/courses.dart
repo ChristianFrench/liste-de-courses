@@ -227,11 +227,13 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
                     padding: const EdgeInsets.only(bottom: 16),
                     children: aplat
                         ? [
+                            ..._recettes(context, l),
                             ...ajouts,
                             for (final g in l.lignes)
                               if (!aPart.contains(g.produitId) && vue(g)) _ligne(etat, l, g, ajout: fondus.contains(g.produitId)),
                           ]
                         : [
+                            ..._recettes(context, l),
                             ...ajouts,
                             for (final x in etapes)
                               if (x.lignes.any((g) => !aPart.contains(g.produitId) && vue(g)))
@@ -279,6 +281,19 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       final c = _titres[id]?.currentContext;
       if (c != null && c.mounted) Scrollable.ensureVisible(c);
     });
+  }
+
+  /// 21/11/2026 (Aristide) : en tête des courses, comme en préparation, les recettes dont les ingrédients sont
+  /// dans cette liste ; les toucher ouvre la recette (rien ne modifie la liste).
+  List<Widget> _recettes(BuildContext context, Liste l) {
+    if (!Nav.avecCuisiner) return const [];
+    final notes = [for (final n in Etat.instance.recettesDeListe(l)) if (n.etat == NoteRecette.traitee) n];
+    if (notes.isEmpty) return const [];
+    return [
+      BandeauRecettes(cle: 'courses/recettes', lignes: [
+        for (final n in notes) LigneRecetteChoisie(note: n, courses: true, onTap: () => voirRecetteNotee(context, n)),
+      ]),
+    ];
   }
 
   Widget _ligne(Etat etat, Liste l, LigneListe g, {bool ajout = false, Etape? x}) {

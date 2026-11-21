@@ -166,18 +166,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
     // Démonstration d'abord (avec les onglets Recettes et Cuisiner).
     final notes = Nav.avecCuisiner ? etat.recettesDeListe(l) : const <NoteRecette>[];
     if (notes.isEmpty) return const [];
-    return [
-      const TitreGroupe(key: ValueKey('recettes-choisies'), nom: 'Recettes choisies', icone: Icons.menu_book_outlined),
-      for (final n in notes) _ligneRecette(l, n),
-    ];
+    return [BandeauRecettes(cle: 'preparer/recettes', lignes: [for (final n in notes) _ligneRecette(l, n)])];
   }
 
   Widget _ligneRecette(Liste l, NoteRecette n) {
-    final (icone, couleur, etatTexte) = switch (n.etat) {
-      NoteRecette.traitee => (Icons.check_circle, Charte.vert, 'ajoutée à la liste'),
-      NoteRecette.ignoree => (Icons.cancel_outlined, Charte.texteSecondaire, 'ignorée'),
-      _ => (Icons.pending_outlined, Charte.orange, '${n.ingredients.length} ingrédient${n.ingredients.length > 1 ? 's' : ''} à ajouter'),
-    };
     final ignoree = n.etat == NoteRecette.ignoree;
     final actions = [
       if (n.etat == NoteRecette.aTraiter) ...[
@@ -185,38 +177,17 @@ class _EcranConstructionState extends State<EcranConstruction> {
         ActionLigne(Icons.cancel_outlined, 'Ignorer (j\'ai changé d\'avis)', () => etat.marquerRecette(n, NoteRecette.ignoree, l)),
       ],
       if (ignoree) ActionLigne(Icons.undo, 'Reprendre', () => etat.marquerRecette(n, NoteRecette.aTraiter, l)),
-      ActionLigne(Icons.menu_book_outlined, 'Voir la recette', () => _voirRecette(n)),
+      ActionLigne(Icons.menu_book_outlined, 'Voir la recette', () => voirRecetteNotee(context, n)),
     ];
-    return InkWell(
-      key: ValueKey('recette-choisie-${n.id}'),
+    return LigneRecetteChoisie(
+      note: n,
       onTap: () => n.etat == NoteRecette.aTraiter ? _traiterRecette(l, n) : menuActions(context, titre: n.titre, actions: actions),
       onLongPress: () => menuActions(context, titre: n.titre, actions: actions),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        child: Row(children: [
-          Icone(icone, size: 24, color: couleur),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text.rich(TextSpan(children: [
-              TextSpan(
-                  text: n.titre,
-                  style: Charte.texte(16, couleur: ignoree ? Charte.texteSecondaire : Charte.encre)
-                      .copyWith(decoration: ignoree ? TextDecoration.lineThrough : null)),
-              TextSpan(text: '  $etatTexte', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-            ])),
-          ),
-        ]),
-      ),
     );
   }
 
-  Future<RecetteLue?> _recetteDe(NoteRecette n) async {
-    final toutes = await recettesFournies();
-    return toutes.where((r) => n.recette != null ? r.id == n.recette : r.titre == n.titre).firstOrNull;
-  }
-
   Future<void> _traiterRecette(Liste l, NoteRecette n) async {
-    final r = await _recetteDe(n);
+    final r = await recetteNotee(n);
     if (!mounted) return;
     if (r == null) {
       Nav.message(context, 'Cette recette n\'est plus dans le catalogue des recettes');
@@ -224,18 +195,10 @@ class _EcranConstructionState extends State<EcranConstruction> {
     }
     final (_, premier) = await cocherIngredientsRecette(context, l, r, note: n);
     if (!mounted || premier == null) return;
-    setState(() {
-      _surligne = premier;
-      _proposes = null;
-    });
+    // 21/11/2026 (Aristide) : l'écran va sur le premier ingrédient ajouté, sans le laisser en couleur.
+    setState(() => _proposes = null);
     _amener(premier, essais: 4);
   }
-
-  Future<void> _voirRecette(NoteRecette n) async {
-    final r = await _recetteDe(n);
-    if (r != null && mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
-  }
-
   /// Secteur dont les articles non commandés sont déployés (un seul à la fois).
   String? _proposes;
 
@@ -403,10 +366,8 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final (ok, premier) = await cocherIngredientsRecette(context, l, r);
     if (!ok) return false;
     if (!mounted || premier == null) return true;
-    setState(() {
-      _surligne = premier;
-      _proposes = null;
-    });
+    // 21/11/2026 (Aristide) : l'écran va sur le premier ingrédient ajouté, sans le laisser en couleur.
+    setState(() => _proposes = null);
     _amener(premier, essais: 4);
     return true;
   }
@@ -796,15 +757,25 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
                       'du catalogue sont décochés.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 8),
-          for (var i = 0; i < aChoisir.length; i++)
-            CaseModale(
-              key: ValueKey('ingredient-$i'),
-              texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
-              aide: lignesPour(personnes)[aChoisir[i].texte] ?? aChoisir[i].texte,
-              coche: choisis.contains(i),
-              onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
-              encadree: false,
-            ),
+          // 21/11/2026 (Aristide) : les ingrédients que le catalogue ne connaît pas, tous à part, sous « Non trouvés ».
+          for (final trouve in [true, false]) ...[
+            if (!trouve && aChoisir.any((a) => a.produit == null))
+              Padding(
+                key: const ValueKey('ingredients-non-trouves'),
+                padding: const EdgeInsets.only(top: 12, bottom: 4),
+                child: Text('Non trouvés dans le catalogue', style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire)),
+              ),
+            for (var i = 0; i < aChoisir.length; i++)
+              if ((aChoisir[i].produit != null) == trouve)
+                CaseModale(
+                  key: ValueKey('ingredient-$i'),
+                  texte: aChoisir[i].produit?.nom ?? aChoisir[i].nom,
+                  aide: lignesPour(personnes)[aChoisir[i].texte] ?? aChoisir[i].texte,
+                  coche: choisis.contains(i),
+                  onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+                  encadree: false,
+                ),
+          ],
           if (deja.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(top: 10),
@@ -832,4 +803,84 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
     Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
   }
   return (true, premier);
+}
+
+/// Bandeau pliable « Recettes choisies » (21/11/2026, Aristide), en tête de la préparation et des courses.
+class BandeauRecettes extends StatelessWidget {
+  const BandeauRecettes({super.key, required this.cle, required this.lignes});
+  final String cle;
+  final List<Widget> lignes;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: Retractables.i,
+        builder: (context, _) {
+          final ouvert = Retractables.i.ouvert(cle);
+          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+            TitreGroupe(
+              key: const ValueKey('recettes-choisies'),
+              nom: 'Recettes choisies',
+              icone: Icons.menu_book_outlined,
+              nombre: lignes.length,
+              ouvert: ouvert,
+              onTap: () => Retractables.i.basculer(cle),
+            ),
+            if (ouvert) ...lignes,
+          ]);
+        },
+      );
+}
+
+/// Une recette de la note : son état (à traiter, ajoutée, ignorée) par une icône, son titre.
+class LigneRecetteChoisie extends StatelessWidget {
+  const LigneRecetteChoisie({super.key, required this.note, this.onTap, this.onLongPress, this.courses = false});
+  final NoteRecette note;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  /// Pendant les courses : seulement le titre et le nombre de personnes.
+  final bool courses;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = note;
+    final (icone, couleur, etatTexte) = switch (n.etat) {
+      NoteRecette.traitee => (Icons.check_circle, Charte.vert, courses ? (n.personnes == null ? '' : 'pour ${n.personnes} pers.') : 'ajoutée à la liste'),
+      NoteRecette.ignoree => (Icons.cancel_outlined, Charte.texteSecondaire, 'ignorée'),
+      _ => (Icons.pending_outlined, Charte.orange, '${n.ingredients.length} ingrédient${n.ingredients.length > 1 ? 's' : ''} à ajouter'),
+    };
+    final ignoree = n.etat == NoteRecette.ignoree;
+    return InkWell(
+      key: ValueKey('recette-choisie-${n.id}'),
+      onTap: onTap,
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(children: [
+          Icone(icone, size: 24, color: couleur),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: n.titre,
+                  style: Charte.texte(16, couleur: ignoree ? Charte.texteSecondaire : Charte.encre)
+                      .copyWith(decoration: ignoree ? TextDecoration.lineThrough : null)),
+              TextSpan(text: '  $etatTexte', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+            ])),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// La recette d'une note, dans le catalogue des recettes (null si elle n'y est plus).
+Future<RecetteLue?> recetteNotee(NoteRecette n) async {
+  final toutes = await recettesFournies();
+  return toutes.where((r) => n.recette != null ? r.id == n.recette : r.titre == n.titre).firstOrNull;
+}
+
+Future<void> voirRecetteNotee(BuildContext context, NoteRecette n) async {
+  final r = await recetteNotee(n);
+  if (r != null && context.mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
 }

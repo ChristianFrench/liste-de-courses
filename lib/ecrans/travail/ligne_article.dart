@@ -60,7 +60,8 @@ class LigneArticle extends StatelessWidget {
     // Essai des gestes de courses (démonstration seulement, 13/11/2026) : grande case, seule à réagir.
     final essai = caseCourse && onCase != null;
     final hauteur = (essai ? Charte.ligneListe : Charte.ligne) * MediaQuery.textScalerOf(context).scale(16) / 16;
-    final taille = hauteur * 0.72;
+    // 21/11/2026 (Aristide) : les cases un peu plus petites (0,72 → 0,64 de la ligne).
+    final taille = hauteur * 0.64;
     final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
       decoration: grise ? TextDecoration.lineThrough : null,
     );
@@ -150,6 +151,21 @@ class LigneArticle extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            // 21/11/2026 (Aristide) : pendant les courses, une icône signale la consigne ; la toucher l'affiche.
+            if (essai && g.consigne != null)
+              Semantics(
+                button: true,
+                label: 'Consigne',
+                child: InkWell(
+                  key: ValueKey('consigne-${produit.id}'),
+                  onTap: () => detailArticle(context, g),
+                  child: SizedBox(
+                    width: 34,
+                    height: hauteur,
+                    child: Center(child: Icone(Icons.sticky_note_2_outlined, size: 22, color: grise ? Charte.texteSecondaire : Charte.cadre)),
+                  ),
+                ),
+              ),
             // 04/11/2026 (Aristide) : la promotion avant la mesure, en texte seul dans la couleur des promotions
             // (« PX2,50€ », « LOT3+1 ») ; la toucher rouvre le volet « Promo » ([onPromo]).
             if (g.promotion case final pr?)

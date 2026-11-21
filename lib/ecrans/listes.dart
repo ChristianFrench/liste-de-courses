@@ -502,7 +502,7 @@ Future<void> partirFaireLesCourses(BuildContext context, Liste l) async {
   var membreId = etat.moi.id;
   String parcoursDefaut() => etat.parcoursPourCourses(l.magasinId, membreId)?.id ?? '';
   var parcoursId = parcoursDefaut();
-  var apprendre = etat.parcoursDuMagasin(l.magasinId).isEmpty;
+  var apprendre = true; // 21/11 Aristide : « Enregistrer le parcours » coché par défaut
   final avecConsigne = l.lignes.where((g) => g.consigne != null).toList();
   final ok = await modale(
     context,

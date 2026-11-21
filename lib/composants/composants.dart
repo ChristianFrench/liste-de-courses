@@ -1851,7 +1851,7 @@ class CaseModale extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: encadree ? 12 : 0, vertical: 8),
         child: Row(
           children: [
-            CaseACocher(coche: coche, taille: 24),
+            CaseACocher(coche: coche, taille: 21),
             const SizedBox(width: 12),
             if (image case final i?) ...[i, const SizedBox(width: 8)],
             Expanded(
