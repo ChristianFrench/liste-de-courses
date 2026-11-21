@@ -1045,20 +1045,18 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
             ),
           ],
           const SizedBox(width: 6),
-          Tooltip(
-            message: toutOuvert ? 'Tout replier' : 'Tout déplier',
-            child: IconButton(
-              key: const ValueKey('console-tout'),
-              onPressed: () => setState(() {
-                if (toutOuvert) {
-                  rayonsOuverts.clear();
-                  secteursOuverts.clear();
-                } else {
-                  rayonsOuverts.addAll(b.catalogue.rayons);
-                }
-              }),
-              icon: Icone(toutOuvert ? Icons.unfold_less : Icons.unfold_more, size: 26, color: Charte.cadre),
-            ),
+          _Bouton(
+            key: const ValueKey('console-tout'),
+            texte: toutOuvert ? 'Tout replier' : 'Tout déplier',
+            icone: toutOuvert ? Icons.unfold_less : Icons.unfold_more,
+            onTap: () => setState(() {
+              if (toutOuvert) {
+                rayonsOuverts.clear();
+                secteursOuverts.clear();
+              } else {
+                rayonsOuverts.addAll(b.catalogue.rayons);
+              }
+            }),
           ),
           const Spacer(),
           // 07/11/2026 (Aristide) : ajouter à partir d'un texte toujours à portée, pas seulement au clic droit.

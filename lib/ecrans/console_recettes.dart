@@ -299,7 +299,7 @@ class _PageRecettesState extends State<PageRecettes> {
       var y = 0.0;
       for (final l in _lignes(b)) {
         if (l.$3 != null && l.$1 == type && l.$3!.id == id) break;
-        y += RangeeConsole.hauteurDe(l.$3 != null ? 3 : (l.$2 != null ? 2 : 1));
+        y += l.$3 != null ? 44 : RangeeConsole.hauteurDe(l.$2 != null ? 2 : 1);
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -397,6 +397,8 @@ class _PageRecettesState extends State<PageRecettes> {
         libelle: r.titre,
         choisie: identical(r, choisie),
         trouvee: _resultats.isNotEmpty && _resultats[_indice] == cle,
+        hauteur: 44,
+        signe: _vignette(b, r, 40),
         colonnes: [
           ([if (r.pour != null) r.pour!, if (r.repereTemps.isNotEmpty) r.repereTemps].join(' · '), 4),
           ([if (r.origine != null) r.origine!, if (r.cout != null) r.cout!, ...r.regimes].join(' · '), 3),
@@ -428,6 +430,18 @@ class _PageRecettesState extends State<PageRecettes> {
       libelle: type,
       compte: '${_pluriel(arbre[type]!.length, 'sous-type')} · ${_pluriel(n, 'recette')}',
       onTap: () => setState(() => ouvert ? ouverts.remove(type) : ouverts.add(type)),
+      // Tout déplier / replier le type : ses sous-types et leurs recettes.
+      toutOuvert: ouvert && arbre[type]!.keys.every((st) => sousOuverts.contains('$type|$st')),
+      onTout: () => setState(() {
+        final cles = [for (final st in arbre[type]!.keys) '$type|$st'];
+        if (ouvert && cles.every(sousOuverts.contains)) {
+          sousOuverts.removeAll(cles);
+          ouverts.remove(type);
+        } else {
+          ouverts.add(type);
+          sousOuverts.addAll(cles);
+        }
+      }),
     );
   }
 
@@ -574,18 +588,21 @@ class FicheRecette extends StatelessWidget {
             ),
             if (modifier != null || illustrer != null || supprimer != null) ...[
               const SizedBox(width: 12),
-              Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+              // Largeur fixe : dans la ligne de l'en-tête, une colonne étirée sans largeur écrasait le titre (21/11/2026).
+              SizedBox(
+                width: 170,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
                 if (modifier != null)
-                  BoutonConsole(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, onTap: modifier),
+                  Bouton(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, taille: 15, onTap: modifier),
                 if (illustrer != null) ...[
                   const SizedBox(height: 6),
-                  BoutonConsole(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, onTap: illustrer),
+                  Bouton(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, taille: 15, onTap: illustrer),
                 ],
                 if (supprimer != null) ...[
                   const SizedBox(height: 6),
-                  BoutonConsole(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, onTap: supprimer),
+                  Bouton(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, taille: 15, onTap: supprimer),
                 ],
-              ]),
+              ])),
             ],
           ]),
         ),

@@ -486,6 +486,12 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
         signe: signeDomaine(l.domaine, 32),
         nom: l.domaine,
         compte: _pluriel(marquesDuDomaine.length, 'marque'),
+        // Tout déplier / replier le domaine : ses marques et leurs produits.
+        toutOuvert: marquesDuDomaine.keys.every((m) => ouvertes.contains('${l.domaine}|$m')),
+        onTout: () => setState(() {
+          final cles = [for (final m in marquesDuDomaine.keys) '${l.domaine}|$m'];
+          cles.every(ouvertes.contains) ? ouvertes.removeAll(cles) : ouvertes.addAll(cles);
+        }),
       ),
       r,
     ]);
