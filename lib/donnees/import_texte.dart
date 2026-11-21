@@ -391,3 +391,32 @@ Produit? reconnaitreProduit(Etat etat, String nom) {
   }
   return meilleur;
 }
+
+/// Les produits possibles pour un ingrédient de recette (21/11/2026, Aristide) : un seul quand il est reconnu
+/// sans doute ; plusieurs (un par secteur, le plus utilisé) quand le nom se trouve dans plusieurs secteurs, à
+/// choisir ; aucun quand le catalogue ne le connaît pas (à placer).
+List<Produit> candidatsProduit(Etat etat, String nom) {
+  final p = reconnaitreProduit(etat, nom);
+  if (p == null) return const [];
+  if (_correspondances[normaliser(nom)] != null) return [p];
+  final mots = _mots(nom);
+  final base = _mots(p.nom.split(' · ').first).join(' ');
+  // Mêmes noms ailleurs (« Petits pois » frais, surgelés, en conserve), ou, pour un ingrédient vague reconnu par
+  // ses mots (« Lait »), les produits qui commencent par lui et contiennent tous ses mots.
+  final exact = _mots(nom).join(' ') == base;
+  final parSecteur = <String?, Produit>{};
+  for (final q in etat.produitsVisibles) {
+    final mq = _mots(q.nom.split(' · ').first);
+    final ok = mq.join(' ') == base || (!exact && mots.isNotEmpty && mq.isNotEmpty && mq.first == mots.first && mots.every(mq.contains));
+    if (!ok) continue;
+    final s = etat.secteurCatalogue(q.id)?.id;
+    final x = parSecteur[s];
+    if (x == null || q.nbUtilisations > x.nbUtilisations || (q.nbUtilisations == x.nbUtilisations && q.nom.length < x.nom.length)) {
+      parSecteur[s] = q;
+    }
+  }
+  final s0 = etat.secteurCatalogue(p.id)?.id;
+  parSecteur[s0] = p;
+  if (parSecteur.length <= 1) return [p];
+  return [p, for (final e in parSecteur.entries) if (e.key != s0) e.value].take(4).toList();
+}

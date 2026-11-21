@@ -4,6 +4,8 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/donnees/demonstration.dart';
+import 'package:liste_de_courses/donnees/import_texte.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
 
 void main() {
@@ -34,5 +36,25 @@ void main() {
     final relue = NoteRecette.depuis(quiche.versJson());
     expect((relue.titre, relue.etat, relue.liste), ('Quiche', 't', l.id));
     expect(relue.ingredients, ['200 g Lardons']);
+  });
+
+  test('ingrédients à régler : un par secteur quand le nom est dans plusieurs, gardés dans la note', () async {
+    final etat = Etat.instance;
+    await etat.charger(dossier: Directory.systemTemp.createTempSync('regler'));
+    etat.remplirDemonstration();
+    final parmesan = candidatsProduit(etat, 'Parmesan');
+    expect(parmesan.length, 2);
+    expect({for (final p in parmesan) etat.secteurCatalogue(p.id)?.id}.length, 2);
+    expect(candidatsProduit(etat, 'Lardons fumés').length, 1);
+    expect(candidatsProduit(etat, 'Zzz introuvable'), isEmpty);
+    final l = etat.creerListe(etat.magasins.first.id, []);
+    etat.recetteTraitee(l, titre: 'Risotto', ingredients: ['50 g Parmesan'], aRegler: [
+      {'t': '50 g Parmesan', 'n': 'Parmesan', 'c': [for (final p in parmesan) p.id]},
+    ]);
+    final n = etat.recettesTraitees(l).single;
+    final relu = NoteRecette.depuis(n.versJson());
+    expect(relu.aRegler.single['n'], 'Parmesan');
+    etat.reglerIngredient(n, n.aRegler.single);
+    expect(n.aRegler, isEmpty);
   });
 }

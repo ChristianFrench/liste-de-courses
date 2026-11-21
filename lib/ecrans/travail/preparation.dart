@@ -166,7 +166,90 @@ class _EcranConstructionState extends State<EcranConstruction> {
     // Démonstration d'abord (avec les onglets Recettes et Cuisiner).
     final notes = Nav.avecCuisiner ? etat.recettesDeListe(l) : const <NoteRecette>[];
     if (notes.isEmpty) return const [];
-    return [BandeauRecettes(cle: 'preparer/recettes', lignes: [for (final n in notes) _ligneRecette(l, n)])];
+    return [
+      BandeauRecettes(cle: 'preparer/recettes', nombre: notes.length, lignes: [
+        for (final n in notes) ...[
+          _ligneRecette(l, n),
+          if (n.etat == NoteRecette.traitee)
+            for (final x in n.aRegler) _ligneARegler(l, n, x),
+        ],
+      ]),
+    ];
+  }
+
+  /// Un ingrédient coché d'une recette, pas encore dans la liste : à choisir (plusieurs secteurs) ou à placer.
+  Widget _ligneARegler(Liste l, NoteRecette n, Map<String, dynamic> x) {
+    final choisir = (x['c'] as List?)?.isNotEmpty ?? false;
+    return InkWell(
+      key: ValueKey('a-regler-${n.id}-${x['n']}'),
+      onTap: () => _regler(l, n, x),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(42, 4, 8, 4),
+        child: Row(children: [
+          Icone(choisir ? Icons.call_split : Icons.help_outline, size: 22, color: Charte.orange),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(text: '${x['n']}', style: Charte.texte(16)),
+              TextSpan(text: choisir ? '  à choisir' : '  à placer', style: Charte.texte(13, couleur: Charte.orange)),
+            ])),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  /// Le même choix que la recherche quand elle trouve plusieurs articles (21/11/2026, Aristide) : les articles
+  /// possibles avec leur rayon et secteur, puis « Créer », et « Ne pas l'acheter ».
+  Future<void> _regler(Liste l, NoteRecette n, Map<String, dynamic> x) async {
+    final nom = '${x['n']}';
+    final vus = <String>{};
+    final possibles = [
+      for (final id in (x['c'] as List? ?? const [])) if (etat.produit('$id') case final p?) p,
+      ...chercherProduits(etat.produitsVisibles, nom, max: 12),
+    ].where((p) => vus.add(p.id)).toList();
+    String ou(Produit p) {
+      final s = etat.secteurCatalogue(p.id);
+      return s == null ? 'Non placé' : '${etat.rayon(s.rayonId)?.nom ?? ''} › ${s.nom}';
+    }
+
+    final choix = await volet<Object>(
+      context,
+      builder: (ctx) => corpsVolet(
+        titre: nom,
+        contenu: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('${x['t']}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            const SizedBox(height: 6),
+            for (final (i, p) in possibles.indexed)
+              LigneMenu(key: ValueKey('regler-$i'), titre: p.nom, sousTitre: ou(p), onTap: () => Navigator.of(ctx).pop(p)),
+            LigneMenu(
+                key: const ValueKey('regler-creer'),
+                titre: 'Créer « $nom »',
+                icone: Icons.add_circle_outline,
+                onTap: () => Navigator.of(ctx).pop('creer')),
+            LigneMenu(
+                key: const ValueKey('regler-abandon'),
+                titre: 'Ne pas l\'acheter',
+                icone: Icons.cancel_outlined,
+                onTap: () => Navigator.of(ctx).pop('abandon')),
+          ],
+        ),
+      ),
+    );
+    if (!mounted || choix == null) return;
+    Produit? p;
+    if (choix is Produit) {
+      p = choix;
+    } else if (choix == 'creer') {
+      p = await nouveauProduit(context, nom: nom);
+      if (p == null || !mounted) return;
+    }
+    etat.reglerIngredient(n, x);
+    if (p == null) return;
+    ajouterPourRecette(l, p, n.titre);
+    _amener(p.id, essais: 4);
   }
 
   Widget _ligneRecette(Liste l, NoteRecette n) {
@@ -701,17 +784,31 @@ class _EcranConstructionState extends State<EcranConstruction> {
 /// fenêtre pour le bouton « Recette » (coches standard : placard et inconnus décochés) et pour une recette de la
 /// note préparée (21/11/2026, Aristide : les ingrédients notés pré-cochés). La recette est alors marquée traitée
 /// pour cette liste. Rend (faux, null) si l'on annule, sinon (vrai, premier produit ajouté).
+/// 0 : reconnu sans doute ; 1 : présent dans plusieurs secteurs (à choisir) ; 2 : inconnu du catalogue (à placer).
+int groupeIngredient(IngredientLu a) => a.produit == null ? 2 : (a.aChoisir && Nav.avecCuisiner ? 1 : 0);
+
+/// Ajoute [p] à la liste avec la consigne « pour : <recette> ».
+void ajouterPourRecette(Liste l, Produit p, String titre) {
+  final etat = Etat.instance;
+  etat.ajouterLigne(l, p.id);
+  final c = etat.ligne(l, p.id)?.consigne;
+  final pour = 'pour : $titre';
+  if (c == null || !c.contains(pour)) etat.definirConsigne(l, p.id, c == null ? pour : '$c · $pour');
+}
+
 Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, RecetteLue r,
     {int? personnes, NoteRecette? note}) async {
   final etat = Etat.instance;
   final lus = analyserIngredients(etat, r.ingredients);
-  final deja = [for (final a in lus) if (a.produit != null && etat.ligne(l, a.produit!.id) != null) a];
+  final deja = [for (final a in lus) if (a.candidats.any((p) => etat.ligne(l, p.id) != null)) a];
   final aChoisir = [for (final a in lus) if (!deja.contains(a)) a];
-  void traitee(List<String> lignes) {
+  void traitee(List<String> lignes, [List<Map<String, dynamic>> aRegler = const []]) {
     if (note != null) {
       etat.marquerRecette(note, NoteRecette.traitee, l);
+      etat.definirARegler(note, aRegler);
     } else if (Nav.avecCuisiner) {
-      etat.recetteTraitee(l, recette: r.id, titre: r.titre, personnes: personnes ?? r.personnes, ingredients: lignes);
+      etat.recetteTraitee(l,
+          recette: r.id, titre: r.titre, personnes: personnes ?? r.personnes, ingredients: lignes, aRegler: [...aRegler]);
     }
   }
 
@@ -723,7 +820,7 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
   final notes = note == null ? null : {for (final x in note.ingredients) x.trim()};
   final choisis = {
     for (var i = 0; i < aChoisir.length; i++)
-      if (notes != null ? notes.contains(aChoisir[i].texte) : !aChoisir[i].placard && aChoisir[i].produit != null) i
+      if (notes != null ? notes.contains(aChoisir[i].texte) : !aChoisir[i].placard && (aChoisir[i].produit != null || Nav.avecCuisiner)) i
   };
   final titre = r.titre;
   // 20/11/2026 (Aristide) : deux onglets, « Ingrédients » (les cases à cocher) et « Recette » (étapes, conseils).
@@ -757,19 +854,25 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
                       'du catalogue sont décochés.',
               style: Charte.texte(15, couleur: Charte.texteSecondaire)),
           const SizedBox(height: 8),
-          // 21/11/2026 (Aristide) : les ingrédients que le catalogue ne connaît pas, tous à part, sous « Non trouvés ».
-          for (final trouve in [true, false]) ...[
-            if (!trouve && aChoisir.any((a) => a.produit == null))
+          // 21/11/2026 (Aristide) : les ingrédients reconnus sans doute d'abord ; ceux présents dans plusieurs
+          // secteurs (à choisir) et ceux que le catalogue ne connaît pas (à placer) à part. Cochés, ils iront sous
+          // la recette, en tête de la liste, pour être choisis ou placés.
+          for (final (groupe, titreGroupe) in [
+            (0, ''),
+            (1, 'Dans plusieurs secteurs : à choisir dans la liste'),
+            (2, 'Non trouvés dans le catalogue : à placer dans la liste'),
+          ]) ...[
+            if (groupe > 0 && aChoisir.any((a) => groupeIngredient(a) == groupe))
               Padding(
-                key: const ValueKey('ingredients-non-trouves'),
+                key: ValueKey('ingredients-groupe-$groupe'),
                 padding: const EdgeInsets.only(top: 12, bottom: 4),
-                child: Text('Non trouvés dans le catalogue', style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire)),
+                child: Text(titreGroupe, style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire)),
               ),
             for (var i = 0; i < aChoisir.length; i++)
-              if ((aChoisir[i].produit != null) == trouve)
+              if (groupeIngredient(aChoisir[i]) == groupe)
                 CaseModale(
                   key: ValueKey('ingredient-$i'),
-                  texte: aChoisir[i].produit?.nom ?? aChoisir[i].nom,
+                  texte: groupe == 0 ? aChoisir[i].produit!.nom : aChoisir[i].nom,
                   aide: lignesPour(personnes)[aChoisir[i].texte] ?? aChoisir[i].texte,
                   coche: choisis.contains(i),
                   onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
@@ -789,16 +892,19 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
   if (!ok) return (false, null);
   if (!context.mounted) return (true, null);
   String? premier;
+  final aRegler = <Map<String, dynamic>>[];
   for (final i in choisis.toList()..sort()) {
     final a = aChoisir[i];
+    if (Nav.avecCuisiner && groupeIngredient(a) > 0) {
+      aRegler.add({'t': a.texte, 'n': a.nom, if (a.candidats.isNotEmpty) 'c': [for (final p in a.candidats) p.id]});
+      continue;
+    }
     final p = a.produit ?? etat.creerProduit(a.nom);
-    etat.ajouterLigne(l, p.id);
-    final c = etat.ligne(l, p.id)?.consigne;
-    final pour = 'pour : $titre';
-    if (c == null || !c.contains(pour)) etat.definirConsigne(l, p.id, c == null ? pour : '$c · $pour');
+    ajouterPourRecette(l, p, titre);
     premier ??= p.id;
   }
-  traitee([for (final i in choisis.toList()..sort()) aChoisir[i].texte]);
+  traitee([for (final i in choisis.toList()..sort()) aChoisir[i].texte], aRegler);
+  if (aRegler.isNotEmpty && context.mounted) Retractables.i.fixer(['preparer/recettes'], true);
   if (choisis.isNotEmpty) {
     Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
   }
@@ -807,8 +913,9 @@ Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, 
 
 /// Bandeau pliable « Recettes choisies » (21/11/2026, Aristide), en tête de la préparation et des courses.
 class BandeauRecettes extends StatelessWidget {
-  const BandeauRecettes({super.key, required this.cle, required this.lignes});
+  const BandeauRecettes({super.key, required this.cle, required this.lignes, this.nombre});
   final String cle;
+  final int? nombre;
   final List<Widget> lignes;
 
   @override
@@ -821,7 +928,7 @@ class BandeauRecettes extends StatelessWidget {
               key: const ValueKey('recettes-choisies'),
               nom: 'Recettes choisies',
               icone: Icons.menu_book_outlined,
-              nombre: lignes.length,
+              nombre: nombre ?? lignes.length,
               ouvert: ouvert,
               onTap: () => Retractables.i.basculer(cle),
             ),

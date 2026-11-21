@@ -117,10 +117,14 @@ class RecetteLue {
 
 /// Un ingrédient lu : la ligne d'origine, le nom nettoyé, le produit reconnu (ou null : produit à créer).
 class IngredientLu {
-  const IngredientLu(this.texte, this.nom, this.produit, {this.placard = false});
+  const IngredientLu(this.texte, this.nom, this.produit, {this.placard = false, this.candidats = const []});
   final String texte;
   final String nom;
   final Produit? produit;
+
+  /// Produits possibles (21/11/2026) : plusieurs quand le nom est dans plusieurs secteurs (à choisir).
+  final List<Produit> candidats;
+  bool get aChoisir => candidats.length > 1;
 
   /// Produit du placard (sel, poivre, huile…), qu'on a en général : décoché au départ.
   final bool placard;
@@ -381,9 +385,10 @@ List<IngredientLu> analyserIngredients(Etat etat, List<String> lignes) {
     final nom = nomIngredient(ligne);
     final n = normaliser(nom);
     if (n.isEmpty || n == 'eau' || n.startsWith('eau ') && !n.contains('gazeuse') && !n.contains('fleur')) continue;
-    final p = reconnaitreProduit(etat, nom);
+    final c = candidatsProduit(etat, nom);
+    final p = c.firstOrNull;
     if (!vus.add(p?.id ?? 'n:$n')) continue;
-    res.add(IngredientLu(ligne.trim(), nom, p, placard: estDuPlacard(nom)));
+    res.add(IngredientLu(ligne.trim(), nom, p, placard: estDuPlacard(nom), candidats: c));
   }
   return res;
 }

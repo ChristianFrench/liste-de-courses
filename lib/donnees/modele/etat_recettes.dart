@@ -14,8 +14,10 @@ class NoteRecette {
     this.ingredients = const [],
     this.etat = aTraiter,
     this.liste,
+    List<Map<String, dynamic>>? aRegler,
     DateTime? le,
-  }) : le = le ?? DateTime.now();
+  })  : aRegler = aRegler ?? [],
+        le = le ?? DateTime.now();
 
   static const aTraiter = 'a', traitee = 't', ignoree = 'i';
 
@@ -34,6 +36,10 @@ class NoteRecette {
   String? liste;
   final DateTime le;
 
+  /// Ingrédients cochés mais pas ajoutés (21/11/2026, Aristide) : inconnus du catalogue (à placer) ou présents
+  /// dans plusieurs secteurs (à choisir). Chacun : {t: ligne de la recette, n: nom, c: [produits possibles]}.
+  final List<Map<String, dynamic>> aRegler;
+
   factory NoteRecette.depuis(Map j) => NoteRecette(
         id: j['id'] as String,
         recette: j['recette'] as String?,
@@ -42,6 +48,7 @@ class NoteRecette {
         ingredients: [for (final x in (j['ingredients'] as List? ?? const [])) '$x'],
         etat: j['etat'] as String? ?? aTraiter,
         liste: j['liste'] as String?,
+        aRegler: [for (final x in (j['aRegler'] as List? ?? const [])) if (x is Map) Map<String, dynamic>.from(x)],
         le: DateTime.tryParse(j['le'] as String? ?? ''),
       );
 
@@ -53,6 +60,7 @@ class NoteRecette {
         if (ingredients.isNotEmpty) 'ingredients': ingredients,
         'etat': etat,
         if (liste != null) 'liste': liste,
+        if (aRegler.isNotEmpty) 'aRegler': aRegler,
         'le': le.toIso8601String().substring(0, 16),
       };
 }
@@ -94,11 +102,26 @@ extension EtatRecettes on Etat {
   }
 
   /// Recette choisie directement depuis la préparation (bouton « Recette ») : notée comme traitée pour [l].
-  void recetteTraitee(Liste l, {String? recette, required String titre, int? personnes, required List<String> ingredients}) {
+  void recetteTraitee(Liste l,
+      {String? recette, required String titre, int? personnes, required List<String> ingredients, List<Map<String, dynamic>>? aRegler}) {
     noteRecettes.removeWhere((n) => n.etat == NoteRecette.aTraiter && (n.recette ?? n.titre) == (recette ?? titre));
     noteRecettes.add(NoteRecette(
         id: nouvelId('n'), recette: recette, titre: titre, personnes: personnes, ingredients: ingredients,
-        etat: NoteRecette.traitee, liste: l.id));
+        etat: NoteRecette.traitee, liste: l.id, aRegler: aRegler));
+    modifie();
+  }
+
+  /// Fixe les ingrédients à régler d'une recette traitée.
+  void definirARegler(NoteRecette n, List<Map<String, dynamic>> aRegler) {
+    n.aRegler
+      ..clear()
+      ..addAll(aRegler);
+    modifie();
+  }
+
+  /// Un ingrédient à régler est réglé (produit choisi ou placé, ou abandonné).
+  void reglerIngredient(NoteRecette n, Map<String, dynamic> x) {
+    n.aRegler.remove(x);
     modifie();
   }
 }
