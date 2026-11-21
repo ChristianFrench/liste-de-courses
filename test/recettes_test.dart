@@ -184,10 +184,10 @@ void main() {
     dest.deleteSync(recursive: true);
   });
 
-  test('recettes livrées : 497, temps de préparation et de cuisson, difficulté', () {
+  test('recettes livrées : 597, temps de préparation et de cuisson, difficulté', () {
     final j = jsonDecode(File('outils/recettes/illustrations/recettes-fournies.json').readAsStringSync()) as Map<String, dynamic>;
     final r = [for (final x in j['recettes'] as List) Recette.lire(x as Map<String, dynamic>)];
-    expect(r.length, 497);
+    expect(r.length, 597);
     final poulet = r.firstWhere((x) => x.titre == 'Poulet aux champignons et cidre');
     expect(poulet.tempsPreparation, 20);
     expect(poulet.tempsCuisson, 40);

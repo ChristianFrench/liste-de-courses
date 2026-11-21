@@ -26,11 +26,15 @@ Galettes de lentilles corail aux herbes | Aubergines farcies au boulgour | Courg
 Poivrons farcis au riz et champignons | Cabillaud en croûte d’herbes | Haddock poché aux poireaux |
 Saint-Jacques au beurre de citron | Saint-Jacques aux poireaux fondants | Rôti de porc aux pruneaux et sauge |
 Porc braisé au chou rouge | Crème au praliné noisette | Crème au café et à la cardamome | Crème au chocolat blanc et citron |
-Gâteau à la châtaigne et au chocolat | Poires rôties au chocolat noir | Pommes poêlées au caramel et cannelle"""
+Gâteau à la châtaigne et au chocolat | Poires rôties au chocolat noir | Pommes poêlées au caramel et cannelle |
+Butter chicken | Mafé de bœuf | Bò bún | Moussaka libanaise aux pois chiches | Paella végétarienne | Okonomiyaki au chou |
+Lasagnes aux légumes et à la ricotta | Samoussas aux légumes | Rouleaux de printemps aux crevettes |
+Cheesecake au citron sans cuisson | Moelleux au chocolat cœur coulant | Tarte à la rhubarbe meringuée |
+Mousse au chocolat et caramel au beurre salé | Tiramisu aux fraises | Pavlova aux fruits exotiques | Flan pâtissier"""
 
 DIFFICILE = """Pommes dauphines | Sauce béarnaise | Sauce hollandaise | Beurre blanc | Pralines | Cassoulet |
 Pâtes fraîches maison | Tarte au citron meringuée | Œufs à la neige | Île flottante | Galette des rois à la frangipane |
-Bugnes"""
+Bugnes | Pastilla de poulet | Gâteau basque à la crème"""
 
 AVANCE = """Bouillabaisse | Charlotte aux poires | Foie gras mi-cuit"""
 
