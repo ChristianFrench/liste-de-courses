@@ -11,6 +11,7 @@ import '../donnees/catalogue_type.dart';
 import '../donnees/images_perso.dart';
 import '../donnees/journal_catalogue.dart';
 import 'console_catalogue.dart';
+import 'console_marques.dart' show CatalogueMarquesLarge;
 import '../donnees/modele.dart';
 import '../donnees/signature.dart';
 import '../donnees/univers.dart';
@@ -25,10 +26,13 @@ String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
 class EcranEditeurCatalogue extends StatefulWidget {
   const EcranEditeurCatalogue(
-      {super.key, this.auChangement, this.actionsAPart = false, this.large = false, this.versIconographie});
+      {super.key, this.auChangement, this.actionsAPart = false, this.large = false, this.marques = false, this.versIconographie});
 
   /// Console Windows : disposition grand écran ([CatalogueLarge]) au lieu de l'écran du téléphone (07/11/2026).
   final bool large;
+
+  /// Grand écran : le catalogue des marques (21/11/2026) plutôt que celui des produits ; même état, même journal.
+  final bool marques;
 
   /// Ouvre l'iconographie (proposé quand des rayons ou secteurs n'ont pas d'icône à la généralisation).
   final VoidCallback? versIconographie;
@@ -293,6 +297,17 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   /// Enregistre le brouillon après un geste et le note au journal.
   void modifie() => _modifie();
 
+  /// Enregistre le brouillon après un geste décrit par [lignes] (catalogue des marques).
+  void modifieAvec(List<String> lignes) {
+    final c = CatalogueCommun.instance;
+    c.enregistrerBrouillon(b!);
+    if (lignes.isNotEmpty) journal.noter(lignes);
+    _avant = b!.versJson();
+    c.enregistrerJournal(journal);
+    setState(() {});
+    widget.auChangement?.call();
+  }
+
   Widget _rayon(BuildContext context, Brouillon b, CatRayon r) {
     final plis = Retractables.i;
     final ouvert = plis.ouvert(_cleR(r), parDefaut: false);
@@ -355,7 +370,7 @@ class EtatEditeurCatalogue extends State<EcranEditeurCatalogue> {
   @override
   Widget build(BuildContext context) {
     final b = this.b;
-    if (widget.large) return CatalogueLarge(editeur: this);
+    if (widget.large) return widget.marques ? CatalogueMarquesLarge(editeur: this) : CatalogueLarge(editeur: this);
     return PageBase(
       entete: EnTeteFenetre(
         icone: Icons.public,

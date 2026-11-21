@@ -4,6 +4,8 @@ import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 
 import '../composants/composants.dart' show Bouton, confirmer, demanderTexte;
+import '../donnees/moderation.dart' show Moderation;
+import 'console_commun.dart';
 import '../composants/icone.dart';
 import '../donnees/journal_catalogue.dart';
 import '../donnees/recettes.dart';
@@ -11,7 +13,6 @@ import '../donnees/recettes_communes.dart';
 import '../navigation.dart' show Nav;
 import 'console_recettes_edition.dart';
 import '../theme.dart';
-import 'administration_serveur.dart' show TitrePageAdmin;
 import '../donnees/modele.dart' show Etat, EtatChargement;
 
 // Console › Catalogue des recettes (10/11/2026, Aristide) : base séparée, importée des notes Google Keep.
@@ -70,77 +71,72 @@ class _PageRecettesState extends State<PageRecettes> {
   @override
   Widget build(BuildContext context) {
     final b = base;
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      // 12/11/2026 (Aristide) : plus de bouton d'import Keep ; les recettes reformulées et leurs illustrations
-      // sont livrées avec la console et posées à l'ouverture.
-      const TitrePageAdmin('Contenu', 'Catalogue des recettes'),
-      if (b != null) _barreVersion(b),
-      Expanded(
-        child: b == null
-            ? Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)))
-            : Padding(
-                padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-                // La liste rétrécit avec la fenêtre (40 % de la largeur, de 300 à 440), la fiche prend le reste.
-                child: LayoutBuilder(
-                  builder: (context, c) => Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    SizedBox(width: (c.maxWidth * 0.4).clamp(300.0, 440.0), child: _cadre(_liste(b))),
-                    const SizedBox(width: 16),
-                    Expanded(
-                        child: _cadre(choisie == null
-                            ? _aucune(b)
-                            : FicheRecette(
-                                key: ValueKey('${choisie!.id}-${choisie!.modifieeLe?.millisecondsSinceEpoch}'),
-                                recette: choisie!,
-                                base: b,
-                                modifier: () => _modifier(b, choisie!),
-                                illustrer: () => _illustrer(b, choisie!),
-                                supprimer: () => _supprimer(b, choisie!),
-                              ))),
-                  ]),
-                ),
-              ),
-      ),
-    ]);
+    if (b == null) return Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)));
+    // 21/11/2026 (Aristide) : même présentation que le catalogue des produits ; la hiérarchie type › sous-type ›
+    // recettes sur toute la largeur, le détail d'une recette en fenêtre.
+    return Scaffold(
+      backgroundColor: Charte.fond,
+      body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        _titre(b),
+        Container(height: 1, color: Charte.separateurZone),
+        Expanded(child: _cadreListe(b)),
+      ]),
+    );
   }
 
   // ------------------------------------------------------------ Versions (20/11/2026)
 
   String _pluriel(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
-  /// Bandeau des versions : où en est le catalogue, et les gestes Nouvelle recette / Valider / Historique /
-  /// Généraliser, comme pour le catalogue des produits.
-  Widget _barreVersion(BaseRecettes b) {
+  /// En-tête : où en est le catalogue des recettes, Généraliser et le menu ☰, comme pour les produits.
+  Widget _titre(BaseRecettes b) {
     final (a, m, r) = RecettesCommunes.changements(b);
-    final publie = RecettesCommunes.libellePublie(b);
     final aPublier = RecettesCommunes.aPublier(b);
-    final etat = b.publiee.isEmpty
-        ? 'Jamais généralisé'
-        : 'Version v$publie généralisée le ${_date('${b.publiee['date']}')}';
-    final ecarts = [
-      if (a.isNotEmpty) _pluriel(a.length, 'ajoutée'),
-      if (m.isNotEmpty) _pluriel(m.length, 'modifiée'),
-      if (r.isNotEmpty) _pluriel(r.length, 'retirée'),
-    ];
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-      child: Wrap(spacing: 10, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        Text('$etat · ${b.enCours == 0 ? 'rien en cours' : '${_pluriel(b.enCours, 'modification')} en cours'}'
-            '${ecarts.isEmpty ? '' : ' · depuis la dernière version : ${ecarts.join(', ')}'}',
-            key: const ValueKey('recettes-etat'), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-        Bouton(key: const ValueKey('recettes-nouvelle'), texte: 'Nouvelle recette', icone: Icons.add, hauteur: 36, taille: 14, onTap: () => _modifier(b, null)),
-        Bouton(key: const ValueKey('recettes-valider'), texte: 'Valider (${b.enCours})', icone: Icons.check, hauteur: 36, taille: 14,
-            onTap: b.enCours == 0 ? null : () => _valider(b)),
-        Bouton(key: const ValueKey('recettes-historique'), texte: 'Historique', icone: Icons.history, hauteur: 36, taille: 14, onTap: () => _historique(b)),
-        Bouton(
-          key: const ValueKey('recettes-generaliser'),
-          texte: _publication != null ? 'Envoi… $_publication' : 'Généraliser (v${RecettesCommunes.libelleSuivant(b)})',
-          icone: Icons.public,
-          plein: true,
-          hauteur: 36,
-          taille: 14,
-          onTap: _publication != null || !aPublier ? null : () => _generaliser(b),
-        ),
-      ]),
+    final types = b.parType();
+    final illustrees = b.recettes.where((x) => x.illustration != null).length;
+    final ecarts = a.length + m.length + r.length;
+    return EnTeteConsole(
+      signe: Image.asset('assets/recettes/recettes-de-cuisine.png', width: 34, height: 34),
+      titre: 'Catalogue des recettes',
+      chiffres: [
+        b.publiee.isEmpty ? 'Aucune version publiée' : 'Version publiée v${RecettesCommunes.libellePublie(b)} du ${_date('${b.publiee['date']}').split(' ').first}',
+        _pluriel(types.length, 'type'),
+        _pluriel(b.recettes.length, 'recette'),
+        _pluriel(illustrees, 'illustrée'),
+        if (a.isNotEmpty || m.isNotEmpty || r.isNotEmpty)
+          'depuis la dernière version : ${[
+            if (a.isNotEmpty) _pluriel(a.length, 'ajoutée'),
+            if (m.isNotEmpty) _pluriel(m.length, 'modifiée'),
+            if (r.isNotEmpty) _pluriel(r.length, 'retirée'),
+          ].join(', ')}',
+      ],
+      pastilles: [
+        PastilleConsole('en-cours', 'en cours', '${b.enCours}', fort: b.enCours > 0),
+        PastilleConsole('etapes', 'étapes', '${b.journal.etapes.length}'),
+        PastilleConsole('a-generaliser', 'à généraliser', b.publiee.isEmpty ? '${RecettesCommunes.publiables(b).length}' : (ecarts == 0 ? 'rien' : '$ecarts')),
+      ],
+      bouton: BoutonConsole(
+        key: const ValueKey('recettes-generaliser'),
+        texte: _publication != null ? 'Envoi… $_publication' : 'Généraliser…',
+        icone: Icons.public,
+        plein: true,
+        onTap: _publication != null || !aPublier || b.enCours > 0 ? null : () => _generaliser(b),
+      ),
+      menu: [
+        const EntreeMenuConsole('historique', Icons.history, 'Historique…'),
+        const EntreeMenuConsole('nouvelle', Icons.add, 'Nouvelle recette…'),
+        EntreeMenuConsole('valider', Icons.check, 'Valider les modifications (${b.enCours})…', actif: b.enCours > 0),
+        EntreeMenuConsole('generaliser', Icons.public, 'Généraliser…', actif: aPublier && b.enCours == 0 && _publication == null),
+      ],
+      onMenu: (v) => switch (v) {
+        'historique' => _historique(b),
+        'nouvelle' => _modifier(b, null),
+        'valider' => _valider(b),
+        _ => _generaliser(b),
+      },
+      alertes: [
+        if (b.enCours > 0) ('${_pluriel(b.enCours, 'modification')} en cours : validez-les (menu ☰) avant de généraliser.', false),
+      ],
     );
   }
 
@@ -152,30 +148,33 @@ class _PageRecettesState extends State<PageRecettes> {
   /// Avancement de la publication (« 12/496 images »), ou null.
   String? _publication;
 
-  Future<void> _modifier(BaseRecettes b, Recette? r) async {
+  Future<Recette?> _modifier(BaseRecettes b, Recette? r) async {
     final x = await editerRecette(context, recette: r, base: b);
-    if (x == null || !mounted) return;
+    if (x == null || !mounted) return null;
     await b.modifier(r, x);
     if (mounted) setState(() => choisie = x);
+    return x;
   }
 
-  Future<void> _illustrer(BaseRecettes b, Recette r) async {
+  Future<Recette?> _illustrer(BaseRecettes b, Recette r) async {
     final f = await openFile(acceptedTypeGroups: const [XTypeGroup(label: 'Images', extensions: ['jpg', 'jpeg', 'png', 'webp'])]);
-    if (f == null || !mounted) return;
+    if (f == null || !mounted) return null;
     final x = r.copie()..illustration = await b.copierIllustration(r, File(f.path));
     await b.modifier(r, x);
     if (mounted) setState(() => choisie = x);
+    return x;
   }
 
-  Future<void> _supprimer(BaseRecettes b, Recette r) async {
+  Future<bool> _supprimer(BaseRecettes b, Recette r) async {
     final ok = await confirmer(context,
         titre: 'Supprimer « ${r.titre} » ?',
         contenu: Text('Elle disparaîtra des applications à la prochaine version généralisée.', style: Charte.texte(15)),
         plein: 'Annuler',
         contour: 'Supprimer');
-    if (ok != true || !mounted) return;
+    if (ok != true || !mounted) return false;
     await b.supprimer(r);
     if (mounted) setState(() => choisie = null);
+    return true;
   }
 
   Future<void> _valider(BaseRecettes b) async {
@@ -230,120 +229,249 @@ class _PageRecettesState extends State<PageRecettes> {
     if (mounted) setState(() => choisie = null);
   }
 
-  Widget _cadre(Widget enfant) => Container(
-        decoration: BoxDecoration(
-          color: Charte.blanc,
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Charte.separateurZone),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: enfant,
-      );
+  // ------------------------------------------------------------ la liste (21/11/2026)
 
-  Widget _aucune(BaseRecettes b) => Center(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          Image.asset('assets/recettes/recettes-de-cuisine.png', width: 128, height: 128),
-          const SizedBox(height: 12),
-          Text(b.recettes.isEmpty ? 'Aucune recette.' : 'Choisissez une recette à gauche.',
-              style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-        ]),
-      );
+  /// Sous-types dépliés (« type|sous-type ») ; [ouverts] garde les types dépliés.
+  final sousOuverts = <String>{};
 
-  Widget _liste(BaseRecettes b) {
-    final q = recherche.trim().toLowerCase();
-    final groupes = b.parType();
-    final lignes = <Widget>[];
-    for (final MapEntry(key: type, value: l) in groupes.entries) {
-      final visibles = [for (final r in l) if (q.isEmpty || r.titre.toLowerCase().contains(q) || r.ingredients.any((i) => i.toLowerCase().contains(q))) r];
-      if (visibles.isEmpty) continue;
-      final ouvert = q.isNotEmpty || ouverts.contains(type);
-      lignes.add(InkWell(
-        key: ValueKey('type-recette-$type'),
-        onTap: () => setState(() => ouvert && q.isEmpty ? ouverts.remove(type) : ouverts.add(type)),
-        child: Container(
-          color: Charte.fondBandeau,
-          padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
-          child: Row(children: [
-            Icone(ouvert ? Icons.expand_more : Icons.chevron_right, color: Charte.cadre),
-            const SizedBox(width: 4),
-            Image.asset(iconeTypeRecette(type), width: 36, height: 36),
-            const SizedBox(width: 10),
-            Expanded(child: Text(type, style: Charte.texte(16, gras: true, couleur: Charte.encreNiveau))),
-            Text('${visibles.length}', style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-          ]),
-        ),
-      ));
-      if (!ouvert) continue;
-      // 21/11/2026 : les recettes d'un type rangées par sous-type, sous un petit intertitre.
-      visibles.sort((a, c) {
-        final x = rangSousType(type, a.sousTypes[type]).compareTo(rangSousType(type, c.sousTypes[type]));
-        return x != 0 ? x : a.titre.toLowerCase().compareTo(c.titre.toLowerCase());
-      });
-      String? sousTypeCourant = '';
-      for (final r in visibles) {
-        final st = r.sousTypes[type];
-        if (st != sousTypeCourant && visibles.any((x) => x.sousTypes[type] != null)) {
-          sousTypeCourant = st;
-          final nb = visibles.where((x) => x.sousTypes[type] == st).length;
-          lignes.add(Container(
-            key: ValueKey('sous-type-$type-${st ?? 'aucun'}'),
-            padding: const EdgeInsets.fromLTRB(20, 8, 12, 4),
-            child: Row(children: [
-              Expanded(child: Text(st ?? 'Sans sous-type', style: Charte.texte(13.5, gras: true, couleur: Charte.cadre))),
-              Text('$nb', style: Charte.texte(12.5, couleur: Charte.texteSecondaire)),
-            ]),
-          ));
-        }
-        final actif = identical(r, choisie);
-        lignes.add(InkWell(
-          key: ValueKey('recette-${r.id}-$type'),
-          onTap: () => setState(() => choisie = r),
-          child: Container(
-            color: actif ? Charte.fondSelection : null,
-            padding: const EdgeInsets.fromLTRB(16, 6, 12, 6),
-            child: Row(children: [
-              _vignette(b, r, 44),
-              const SizedBox(width: 12),
+  // Recherche au sens strict, comme pour les produits : « type|id » des recettes trouvées.
+  List<String> _resultats = const [];
+  int _indice = 0;
+  final _defilement = ScrollController();
+
+  @override
+  void dispose() {
+    _defilement.dispose();
+    super.dispose();
+  }
+
+  static String _plat(String t) => Moderation.sansAccents(t.toLowerCase()).replaceAll('œ', 'oe');
+
+  /// Type › sous-type › recettes (par titre) ; « Sans sous-type » pour une recette qui n'en a pas.
+  Map<String, Map<String, List<Recette>>> _arbre(BaseRecettes b) {
+    final m = <String, Map<String, List<Recette>>>{};
+    for (final MapEntry(key: type, value: l) in b.parType().entries) {
+      final s = <String, List<Recette>>{};
+      final tries = [...l]..sort((a, c) {
+          final x = rangSousType(type, a.sousTypes[type]).compareTo(rangSousType(type, c.sousTypes[type]));
+          return x != 0 ? x : _plat(a.titre).compareTo(_plat(c.titre));
+        });
+      for (final r in tries) {
+        s.putIfAbsent(r.sousTypes[type] ?? 'Sans sous-type', () => []).add(r);
+      }
+      m[type] = s;
+    }
+    return m;
+  }
+
+  void _chercher(BaseRecettes b, String v) {
+    recherche = v;
+    final q = _plat(v.trim());
+    _resultats = q.length < 2
+        ? const []
+        : [
+            for (final MapEntry(key: t, value: s) in _arbre(b).entries)
+              for (final l in s.values)
+                for (final r in l)
+                  if (_plat(r.titre).contains(q) || r.ingredients.any((i) => _plat(i).contains(q))) '$t|${r.id}',
+          ];
+    _indice = 0;
+    if (_resultats.isEmpty) {
+      setState(() {});
+    } else {
+      _allerA(b, 0);
+    }
+  }
+
+  void _allerA(BaseRecettes b, int i) {
+    if (_resultats.isEmpty) return;
+    _indice = i % _resultats.length;
+    final cle = _resultats[_indice];
+    final type = cle.substring(0, cle.indexOf('|')), id = cle.substring(cle.indexOf('|') + 1);
+    final r = b.recettes.firstWhere((x) => x.id == id);
+    setState(() {
+      choisie = r;
+      ouverts.add(type);
+      sousOuverts.add('$type|${r.sousTypes[type] ?? 'Sans sous-type'}');
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_defilement.hasClients) return;
+      var y = 0.0;
+      for (final l in _lignes(b)) {
+        if (l.$3 != null && l.$1 == type && l.$3!.id == id) break;
+        y += RangeeConsole.hauteurDe(l.$3 != null ? 3 : (l.$2 != null ? 2 : 1));
+      }
+      final pos = _defilement.position;
+      _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
+    });
+  }
+
+  /// Les lignes du cadre : (type, sous-type, recette).
+  List<(String, String?, Recette?)> _lignes(BaseRecettes b) => [
+        for (final MapEntry(key: t, value: s) in _arbre(b).entries) ...[
+          (t, null, null),
+          if (ouverts.contains(t))
+            for (final MapEntry(key: st, value: l) in s.entries) ...[
+              (t, st, null),
+              if (sousOuverts.contains('$t|$st')) for (final r in l) (t, st, r),
+            ],
+        ],
+      ];
+
+  /// Le détail d'une recette, en fenêtre : la fiche (onglets), ses gestes, Fermer.
+  Future<void> _detail(BaseRecettes b, Recette r) async {
+    setState(() => choisie = r);
+    var courante = r;
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, maj) => Dialog(
+          backgroundColor: Charte.blanc,
+          child: SizedBox(
+            width: 1040,
+            height: 780,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(r.titre, maxLines: 2, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: actif)),
-                  Text(r.ingredients.isEmpty ? 'Texte seul' : '${r.ingredients.length} ingrédients',
-                      style: Charte.texte(12.5, couleur: Charte.texteSecondaire)),
-                ]),
+                child: FicheRecette(
+                  key: ValueKey('${courante.id}-${courante.modifieeLe?.millisecondsSinceEpoch}'),
+                  recette: courante,
+                  base: b,
+                  modifier: () async {
+                    final x = await _modifier(b, courante);
+                    if (x != null) maj(() => courante = x);
+                  },
+                  illustrer: () async {
+                    final x = await _illustrer(b, courante);
+                    if (x != null) maj(() => courante = x);
+                  },
+                  supprimer: () async {
+                    if (await _supprimer(b, courante) && ctx.mounted) Navigator.of(ctx).pop();
+                  },
+                ),
+              ),
+              Container(height: 1, color: Charte.separateurZone),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: BoutonConsole(key: const ValueKey('recette-fermer'), texte: 'Fermer', onTap: () => Navigator.of(ctx).pop()),
+                ),
               ),
             ]),
           ),
-        ));
-      }
+        ),
+      ),
+    );
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _menuRecette(BaseRecettes b, Offset ou, Recette r) async {
+    setState(() => choisie = r);
+    final v = await menuConsole(context, ou, const [
+      EntreeMenuConsole('voir', Icons.menu_book_outlined, 'Voir la recette…'),
+      EntreeMenuConsole('modifier', Icons.edit_outlined, 'Modifier…'),
+      EntreeMenuConsole('illustrer', Icons.add_photo_alternate_outlined, 'Changer l\'illustration…'),
+      null,
+      EntreeMenuConsole('supprimer', Icons.delete_outline, 'Supprimer'),
+    ]);
+    if (!mounted) return;
+    switch (v) {
+      case 'voir':
+        await _detail(b, r);
+      case 'modifier':
+        await _modifier(b, r);
+      case 'illustrer':
+        await _illustrer(b, r);
+      case 'supprimer':
+        await _supprimer(b, r);
     }
+  }
+
+  Widget _rangee(BaseRecettes b, Map<String, Map<String, List<Recette>>> arbre, (String, String?, Recette?) l) {
+    final (type, st, r) = l;
+    if (r != null) {
+      final cle = '$type|${r.id}';
+      return RangeeConsole(
+        key: ValueKey('recette-${r.id}-$type'),
+        niveau: 3,
+        libelle: r.titre,
+        choisie: identical(r, choisie),
+        trouvee: _resultats.isNotEmpty && _resultats[_indice] == cle,
+        colonnes: [
+          ([if (r.pour != null) r.pour!, if (r.repereTemps.isNotEmpty) r.repereTemps].join(' · '), 4),
+          ([if (r.origine != null) r.origine!, if (r.cout != null) r.cout!, ...r.regimes].join(' · '), 3),
+        ],
+        onTap: () => _detail(b, r),
+        onDoubleTap: () => _modifier(b, r),
+        onClicDroit: (o) => _menuRecette(b, o, r),
+      );
+    }
+    if (st != null) {
+      final k = '$type|$st';
+      final ouvert = sousOuverts.contains(k);
+      return RangeeConsole(
+        key: ValueKey('sous-type-$type-$st'),
+        niveau: 2,
+        ouvert: ouvert,
+        libelle: st,
+        compte: _pluriel(arbre[type]![st]!.length, 'recette'),
+        onTap: () => setState(() => ouvert ? sousOuverts.remove(k) : sousOuverts.add(k)),
+      );
+    }
+    final ouvert = ouverts.contains(type);
+    final n = arbre[type]!.values.fold(0, (n, l) => n + l.length);
+    return RangeeConsole(
+      key: ValueKey('type-recette-$type'),
+      niveau: 1,
+      ouvert: ouvert,
+      signe: Image.asset(iconeTypeRecette(type), width: 30, height: 30),
+      libelle: type,
+      compte: '${_pluriel(arbre[type]!.length, 'sous-type')} · ${_pluriel(n, 'recette')}',
+      onTap: () => setState(() => ouvert ? ouverts.remove(type) : ouverts.add(type)),
+    );
+  }
+
+  Widget _cadreListe(BaseRecettes b) {
+    final arbre = _arbre(b);
+    final lignes = _lignes(b);
+    final toutes = {for (final MapEntry(key: t, value: s) in arbre.entries) for (final st in s.keys) '$t|$st'};
+    final toutOuvert = ouverts.length == arbre.length && sousOuverts.containsAll(toutes);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(14, 12, 14, 8),
-        child: Row(children: [
-          Expanded(
-            child: TextField(
-              key: const ValueKey('recettes-recherche'),
-              style: Charte.texte(15),
-              decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Une recette ou un ingrédient'),
-              onChanged: (v) => setState(() => recherche = v),
-            ),
-          ),
-          Tooltip(
-            message: ouverts.length == groupes.length ? 'Tout replier' : 'Tout déplier',
-            child: IconButton(
-              onPressed: () => setState(() => ouverts.length == groupes.length ? ouverts.clear() : ouverts.addAll(groupes.keys)),
-              icon: Icone(ouverts.length == groupes.length ? Icons.unfold_less : Icons.unfold_more, color: Charte.cadre),
-            ),
-          ),
-        ]),
+      BarreConsole(
+        aideRecherche: 'Une recette ou un ingrédient',
+        recherche: recherche,
+        onChercher: (v) => _chercher(b, v),
+        onSuivant: () => _allerA(b, _indice + 1),
+        onPrecedent: () => _allerA(b, _indice - 1 + _resultats.length),
+        trouves: _resultats.length,
+        indice: _indice,
+        toutOuvert: toutOuvert,
+        onTout: () => setState(() {
+          if (toutOuvert) {
+            ouverts.clear();
+            sousOuverts.clear();
+          } else {
+            ouverts.addAll(arbre.keys);
+            sousOuverts.addAll(toutes);
+          }
+        }),
+        boutons: [
+          BoutonConsole(key: const ValueKey('recettes-nouvelle'), texte: 'Nouvelle recette', icone: Icons.add, onTap: () => _modifier(b, null)),
+        ],
+        aide: 'Clic : voir la recette · Clic droit : voir, modifier, changer l\'illustration, supprimer · Double-clic : modifier',
       ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-        child: Text('${b.recettes.length} recette${b.recettes.length > 1 ? 's' : ''} · ${groupes.length} type${groupes.length > 1 ? 's' : ''}',
-            style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+      Expanded(
+        child: CadreConsole(
+          child: lignes.isEmpty
+              ? Center(child: Text('Aucune recette.', style: Charte.texte(15, couleur: Charte.texteSecondaire)))
+              : ListView.builder(
+                  key: const ValueKey('recettes-cadre'),
+                  controller: _defilement,
+                  itemCount: lignes.length,
+                  itemBuilder: (_, i) => _rangee(b, arbre, lignes[i]),
+                ),
+        ),
       ),
-      Container(height: 1, color: Charte.separateurZone),
-      Expanded(child: ListView(children: lignes)),
     ]);
   }
 }
@@ -448,14 +576,14 @@ class FicheRecette extends StatelessWidget {
               const SizedBox(width: 12),
               Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
                 if (modifier != null)
-                  Bouton(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, hauteur: 34, taille: 14, onTap: modifier),
+                  BoutonConsole(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, onTap: modifier),
                 if (illustrer != null) ...[
                   const SizedBox(height: 6),
-                  Bouton(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, hauteur: 34, taille: 14, onTap: illustrer),
+                  BoutonConsole(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, onTap: illustrer),
                 ],
                 if (supprimer != null) ...[
                   const SizedBox(height: 6),
-                  Bouton(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, hauteur: 34, taille: 14, onTap: supprimer),
+                  BoutonConsole(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, onTap: supprimer),
                 ],
               ]),
             ],

@@ -13,6 +13,7 @@ import '../donnees/moderation.dart' show Moderation;
 import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/univers.dart';
+import 'console_commun.dart';
 import 'console_images.dart';
 import 'editeur_catalogue.dart';
 
@@ -658,22 +659,12 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   Future<void> _menuGeneral(String v) async {
     switch (v) {
-      case 'historique':
-        await montrerHistorique(context, e);
       case 'iconographie':
         await montrerIconographie(context, e);
       case 'images':
         await montrerImagesAjoutees(context, e);
-      case 'valider':
-        await e.valider();
-      case 'generaliser':
-        await e.generaliser();
-      case 'repartir':
-        await e.repartir();
-      case 'cle':
-        await e.cleSignature();
-      case 'renvoyer':
-        await e.renvoyer();
+      default:
+        await gesteCatalogueCommun(context, e, v);
     }
     if (mounted) setState(() {});
   }
@@ -686,91 +677,35 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     final date = p?['date'] as String?;
     final secteurs = b.catalogue.rayons.fold(0, (n, r) => n + r.secteurs.length);
     final manquantes = sansIcone(b);
-    Widget pastille(String cle, String libelle, String valeur, {bool fort = false}) => Container(
-          key: ValueKey('pastille-$cle'),
-          margin: const EdgeInsets.only(left: 8),
-          padding: const EdgeInsets.fromLTRB(12, 6, 12, 6),
-          decoration: BoxDecoration(
-            color: fort ? Charte.clair(Charte.accent, 0.6) : Charte.blanc,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Charte.separateurZone),
-          ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-            Text(valeur, style: Charte.texte(17, gras: true, couleur: Charte.encreNiveau)),
-            Text(libelle, style: Charte.texte(12, couleur: Charte.texteSecondaire)),
-          ]),
-        );
-    PopupMenuItem<String> item(String v, IconData i, String t, {bool actif = true}) => PopupMenuItem(
-          value: v,
-          enabled: actif,
-          height: 42,
-          child: Row(children: [Icone(i, size: 22, color: Charte.cadre), const SizedBox(width: 12), Text(t, style: Charte.texte(15))]),
-        );
-    return Container(
-      color: Charte.fondBandeau,
-      padding: const EdgeInsets.fromLTRB(20, 14, 12, 14),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
-          Icone(Icons.public, size: 34, color: Charte.cadre),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('Catalogue commun', style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
-              Text(
-                [
-                  numero == 0 ? 'Aucune version publiée' : 'Version publiée v$libelle${date == null ? '' : ' du ${date.substring(8, 10)}/${date.substring(5, 7)}/${date.substring(0, 4)}'}',
-                  _pluriel(b.catalogue.rayons.length, 'rayon'),
-                  _pluriel(secteurs, 'secteur'),
-                  _pluriel(b.nbProduits, 'produit'),
-                  if (manquantes > 0) '$manquantes sans icône',
-                ].join(' · '),
-                style: Charte.texte(14, couleur: Charte.texteSecondaire),
-              ),
-            ]),
-          ),
-          pastille('en-cours', 'en cours', '${e.enCours}', fort: e.enCours > 0),
-          pastille('etapes', 'étapes', '${e.journal.etapes.length}'),
-          pastille('a-generaliser', 'à généraliser', b.modifications == 0 ? 'rien' : '${b.modifications}'),
-          const SizedBox(width: 12),
-          _Bouton(
-            key: const ValueKey('generaliser'),
-            texte: e.enPublication ? 'Envoi…' : 'Généraliser…',
-            icone: Icons.public,
-            plein: true,
-            onTap: e.enPublication || b.modifications == 0 || e.enCours > 0 ? null : () => _menuGeneral('generaliser'),
-          ),
-          const SizedBox(width: 4),
-          PopupMenuButton<String>(
-            key: const ValueKey('console-menu'),
-            tooltip: 'Menu',
-            icon: Icone(Icons.menu, size: 28, color: Charte.cadre),
-            onSelected: _menuGeneral,
-            itemBuilder: (_) => [
-              item('historique', Icons.history, 'Historique…'),
-              item('iconographie', Icons.image_outlined, 'Iconographie…${manquantes > 0 ? ' ($manquantes sans icône)' : ''}'),
-              item('images', Icons.add_photo_alternate_outlined, 'Images ajoutées…${b.imagesPerso.isEmpty ? '' : ' (${b.imagesPerso.length})'}'),
-              item('valider', Icons.check, 'Valider les modifications (${e.enCours})…', actif: e.enCours > 0),
-              item('generaliser', Icons.public, 'Généraliser…', actif: b.modifications > 0 && e.enCours == 0),
-              const PopupMenuDivider(),
-              item('repartir', Icons.restore, 'Repartir d\'un catalogue…'),
-              item('cle', Icons.key_outlined, 'Clé de signature…'),
-              if (e.absenteDuServeur) item('renvoyer', Icons.cloud_upload_outlined, 'Renvoyer v$libelle au serveur'),
-            ],
-          ),
-        ]),
-        if (e.enCours > 0)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 46),
-            child: Text('${_pluriel(e.enCours, 'modification')} en cours : validez-les (menu ☰) avant de généraliser.',
-                style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
-          ),
-        if (e.absenteDuServeur)
-          Padding(
-            padding: const EdgeInsets.only(top: 6, left: 46),
-            child: Text('La version v$libelle n\'est pas sur le serveur : renvoyez-la (menu ☰).',
-                style: Charte.texte(13.5, gras: true, couleur: Charte.rouge)),
-          ),
+    // 21/11/2026 : en-tête commun aux trois catalogues ([EnTeteConsole]).
+    return EnTeteConsole(
+      signe: Icone(Icons.public, size: 34, color: Charte.cadre),
+      titre: 'Catalogue des produits',
+      chiffres: [
+        numero == 0 ? 'Aucune version publiée' : 'Version publiée v$libelle${date == null ? '' : ' du ${date.substring(8, 10)}/${date.substring(5, 7)}/${date.substring(0, 4)}'}',
+        _pluriel(b.catalogue.rayons.length, 'rayon'),
+        _pluriel(secteurs, 'secteur'),
+        _pluriel(b.nbProduits, 'produit'),
+        if (manquantes > 0) '$manquantes sans icône',
+      ],
+      pastilles: [
+        PastilleConsole('en-cours', 'en cours', '${e.enCours}', fort: e.enCours > 0),
+        PastilleConsole('etapes', 'étapes', '${e.journal.etapes.length}'),
+        PastilleConsole('a-generaliser', 'à généraliser', b.modifications == 0 ? 'rien' : '${b.modifications}'),
+      ],
+      bouton: _Bouton(
+        key: const ValueKey('generaliser'),
+        texte: e.enPublication ? 'Envoi…' : 'Généraliser…',
+        icone: Icons.public,
+        plein: true,
+        onTap: e.enPublication || b.modifications == 0 || e.enCours > 0 ? null : () => _menuGeneral('generaliser'),
+      ),
+      menu: menuCatalogueCommun(e, extras: [
+        EntreeMenuConsole('iconographie', Icons.image_outlined, 'Iconographie…${manquantes > 0 ? ' ($manquantes sans icône)' : ''}'),
+        EntreeMenuConsole('images', Icons.add_photo_alternate_outlined, 'Images ajoutées…${b.imagesPerso.isEmpty ? '' : ' (${b.imagesPerso.length})'}'),
       ]),
+      onMenu: _menuGeneral,
+      alertes: alertesCatalogueCommun(e),
     );
   }
 
@@ -822,9 +757,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     _message('${r.nom} rangé dans « $vers »');
   }
 
-  Widget _signeDomaine(String u, double taille) => cleUnivers(u) != null
-      ? Pictogramme(cleUnivers(u), taille: taille)
-      : Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: taille * 0.85, color: Charte.encreNiveau);
+  Widget _signeDomaine(String u, double taille) => signeDomaine(u, taille);
 
   Future<void> _menuDomaine(Offset ou, String u) async {
     PopupMenuItem<String> item(String v, IconData i, String t, {bool actif = true}) => PopupMenuItem(
@@ -1501,3 +1434,52 @@ class _Bouton extends StatelessWidget {
   @override
   Widget build(BuildContext context) => IntrinsicWidth(child: Bouton(texte: texte, icone: icone, onTap: onTap, plein: plein, taille: 15));
 }
+
+// ---------------------------------------------------------------- menu ☰ commun (21/11/2026)
+
+/// Le menu ☰ du catalogue commun (produits et marques) : historique, [extras], valider, généraliser, puis
+/// repartir, clé de signature, renvoyer.
+List<EntreeMenuConsole?> menuCatalogueCommun(EtatEditeurCatalogue e, {List<EntreeMenuConsole> extras = const []}) {
+  final b = e.b!;
+  return [
+    const EntreeMenuConsole('historique', Icons.history, 'Historique…'),
+    ...extras,
+    EntreeMenuConsole('valider', Icons.check, 'Valider les modifications (${e.enCours})…', actif: e.enCours > 0),
+    EntreeMenuConsole('generaliser', Icons.public, 'Généraliser…', actif: b.modifications > 0 && e.enCours == 0),
+    null,
+    const EntreeMenuConsole('repartir', Icons.restore, 'Repartir d\'un catalogue…'),
+    const EntreeMenuConsole('cle', Icons.key_outlined, 'Clé de signature…'),
+    if (e.absenteDuServeur) EntreeMenuConsole('renvoyer', Icons.cloud_upload_outlined, 'Renvoyer v${e.libellePublie} au serveur'),
+  ];
+}
+
+List<(String, bool)> alertesCatalogueCommun(EtatEditeurCatalogue e) => [
+      if (e.enCours > 0) ('${_pluriel(e.enCours, 'modification')} en cours : validez-les (menu ☰) avant de généraliser.', false),
+      if (e.absenteDuServeur) ('La version v${e.libellePublie} n\'est pas sur le serveur : renvoyez-la (menu ☰).', true),
+    ];
+
+/// Les gestes du menu ☰ communs aux produits et aux marques.
+Future<bool> gesteCatalogueCommun(BuildContext context, EtatEditeurCatalogue e, String v) async {
+  switch (v) {
+    case 'historique':
+      await montrerHistorique(context, e);
+    case 'valider':
+      await e.valider();
+    case 'generaliser':
+      await e.generaliser();
+    case 'repartir':
+      await e.repartir();
+    case 'cle':
+      await e.cleSignature();
+    case 'renvoyer':
+      await e.renvoyer();
+    default:
+      return false;
+  }
+  return true;
+}
+
+/// L'image d'un domaine (univers), ou son icône.
+Widget signeDomaine(String u, double taille) => cleUnivers(u) != null
+    ? Pictogramme(cleUnivers(u), taille: taille)
+    : Icone(apparenceUnivers[u]?.$1 ?? Icons.storefront_outlined, size: taille * 0.85, color: Charte.encreNiveau);

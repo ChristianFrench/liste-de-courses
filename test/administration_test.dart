@@ -85,7 +85,7 @@ void main() {
     expect(find.text('Catalogue des produits'), findsWidgets);
     voletsEnFenetre = true;
     expect(find.text('Fruits et légumes'), findsOneWidget, reason: 'le cadre du catalogue');
-    expect(find.text('Catalogue commun'), findsOneWidget, reason: 'le titre commun');
+    expect(find.text('Catalogue des produits'), findsWidgets, reason: 'le titre commun (et le menu)');
     // 07/11/2026 (2e version) : un seul cadre ; rayon puis secteur dépliés, les produits dessous.
     await tester.tap(find.byKey(const ValueKey('console-rayon-Fruits et légumes')));
     await tester.pump(const Duration(milliseconds: 400));
