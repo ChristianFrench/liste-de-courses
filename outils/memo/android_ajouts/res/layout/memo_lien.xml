@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/ligne"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="20dp" android:paddingRight="14dp" android:paddingTop="6dp" android:paddingBottom="6dp">
+    <TextView android:id="@+id/nom"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:textColor="#22332A" android:textSize="15sp" />
+    <TextView android:id="@+id/adresse"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:singleLine="true" android:ellipsize="middle"
+        android:textColor="#5E7468" android:textSize="12sp" />
+</LinearLayout>

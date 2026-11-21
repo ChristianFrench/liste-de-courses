@@ -1,0 +1,17 @@
+name: essai_illustrations
+description: Essai des tailles d'illustration des recettes sur téléphone (240, 360, 480, 720 pixels de large).
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: ^3.8.0
+dependencies:
+  flutter:
+    sdk: flutter
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/i480/
+    - assets/i720/
+    - assets/i240/
+    - assets/i360/

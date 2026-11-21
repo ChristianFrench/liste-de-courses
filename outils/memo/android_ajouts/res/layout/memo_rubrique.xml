@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/bande"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:orientation="horizontal" android:gravity="center_vertical"
+    android:layout_marginLeft="8dp" android:layout_marginRight="8dp" android:layout_marginTop="6dp"
+    android:background="@drawable/memo_bande"
+    android:paddingLeft="12dp" android:paddingRight="10dp" android:paddingTop="9dp" android:paddingBottom="9dp">
+    <TextView android:id="@+id/texte"
+        android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content"
+        android:singleLine="true" android:ellipsize="end"
+        android:textColor="#FFFFFF" android:textSize="15sp" android:textStyle="bold" />
+    <TextView android:id="@+id/nombre"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:paddingLeft="8dp" android:paddingRight="8dp"
+        android:textColor="#E3F1E8" android:textSize="13sp" />
+    <TextView android:id="@+id/chevron"
+        android:layout_width="wrap_content" android:layout_height="wrap_content"
+        android:textColor="#FFFFFF" android:textSize="15sp" />
+</LinearLayout>

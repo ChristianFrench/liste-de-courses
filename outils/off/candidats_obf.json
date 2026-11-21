@@ -1,0 +1,2144 @@
+{
+"huile": {
+"n": 218,
+"noms": [
+"huile de massage",
+"huile de douche",
+"huile de ricin"
+],
+"categorie": null,
+"categories": [
+[
+"en:body",
+44
+],
+[
+"en:body-oils",
+39
+],
+[
+"en:hair",
+27
+],
+[
+"en:cosmetic-products",
+15
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"L'Oréal",
+"L'Oreal Consumer products",
+"Weleda",
+"Yves Rocher",
+"Léa Nature",
+"Garnier"
+],
+"part_marque": 0.0
+},
+"creme": {
+"n": 364,
+"noms": [
+"crème de douche",
+"crème de soin",
+"crème douche extra"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+69
+],
+[
+"en:showers-and-baths",
+51
+],
+[
+"fr:cremes-douche",
+43
+],
+[
+"en:open-beauty-facts",
+31
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Cadum",
+"Nivea",
+"Le Petit Olivier",
+"Mixa",
+"L'arbre vert",
+"Cien"
+],
+"part_marque": 0.0
+},
+"gel": {
+"n": 375,
+"noms": [
+"gel lavant mains",
+"gel lavant corps",
+"gel lavant douceur"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+93
+],
+[
+"en:soaps",
+33
+],
+[
+"fr:savons-liquides",
+27
+],
+[
+"en:shower-gels",
+20
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Carrefour",
+"Cosmia",
+"Auchan",
+"Mustela",
+"Yves Rocher",
+"Cadum"
+],
+"part_marque": 0.0
+},
+"expert": {
+"n": 55,
+"noms": [
+"expert blancheur",
+"expert sensitive",
+"mixa expert peau"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+9
+],
+[
+"en:face",
+6
+],
+[
+"en:hygiene",
+6
+],
+[
+"en:toothpastes",
+6
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Henkel",
+"Franck Provost",
+"Dentamyl",
+"Unilever",
+"Vademecum",
+"Mixa"
+],
+"part_marque": 0.02
+},
+"soin": {
+"n": 229,
+"noms": [
+"soin des lèvres",
+"soin de jour",
+"soin complet"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+30
+],
+[
+"en:open-beauty-facts",
+21
+],
+[
+"en:hygiene",
+21
+],
+[
+"en:non-food-products",
+17
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Sanogyl",
+"Cosmia",
+"Le Petit Marseillais",
+"Saforelle",
+"Caudalie",
+"Unilever"
+],
+"part_marque": 0.0
+},
+"shampoing": {
+"n": 259,
+"noms": [
+"shampoing",
+"cosmia - shampoing",
+"shampoing extra doux"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+59
+],
+[
+"en:shampoos",
+59
+],
+[
+"en:open-beauty-facts",
+32
+],
+[
+"en:non-food-products",
+23
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Cosmia",
+"Unilever",
+"Timotei",
+"Garnier",
+"Klorane",
+"Auchan"
+],
+"part_marque": 0.0
+},
+"eau": {
+"n": 134,
+"noms": [
+"eau de cologne",
+"eau nettoyante",
+"eau florale de"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+13
+],
+[
+"en:perfumes",
+9
+],
+[
+"en:non-food-products",
+9
+],
+[
+"en:open-beauty-facts",
+9
+]
+],
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"marques": [
+"Cosmia",
+"Avène",
+"Caudalie",
+"Mustela",
+"Fragonard",
+"Christian Lenart"
+],
+"part_marque": 0.0
+},
+"brume": {
+"n": 39,
+"noms": [
+"brume parfumée",
+"brume d oreiller",
+"brume eau pure"
+],
+"categorie": null,
+"categories": [
+[
+"en:cosmetic-products",
+7
+],
+[
+"en:non-food-products",
+3
+],
+[
+"en:open-beauty-facts",
+3
+],
+[
+"en:perfumes",
+3
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Mixa Solaire",
+"Yves Rocher",
+"Messegue",
+"Novexpert",
+"Elisabeth Arden",
+"Sol de Janeiro"
+],
+"part_marque": 0.0
+},
+"men": {
+"n": 42,
+"noms": [
+"dove men care",
+"men power action",
+"rexona men anti-transpirant"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+10
+],
+[
+"en:hair",
+9
+],
+[
+"en:shampoos",
+9
+],
+[
+"en:deodorants",
+7
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Unilever",
+"Dove",
+"Rexona",
+"Schwarzkopf",
+"Henkel",
+"Nivea"
+],
+"part_marque": 0.02
+},
+"masque": {
+"n": 138,
+"noms": [
+"masque",
+"masque nutritif technique",
+"masque hydratant"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+20
+],
+[
+"en:face",
+20
+],
+[
+"en:face-masks",
+19
+],
+[
+"en:hair-care",
+18
+]
+],
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"marques": [
+"Sephora",
+"L'Oreal Consumer products",
+"L'Oréal",
+"Yves Rocher",
+"Cosmia",
+"Garnier"
+],
+"part_marque": 0.0
+},
+"sensitive": {
+"n": 51,
+"noms": [
+"sensitive",
+"sensitive végétal",
+"sensitive deodorant"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+9
+],
+[
+"en:toothpastes",
+4
+],
+[
+"en:shaving",
+3
+],
+[
+"en:accessories",
+3
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Elmex",
+"Yves Rocher",
+"Carrefour",
+"Nivea",
+"Nivea Men",
+"Hema"
+],
+"part_marque": 0.0
+},
+"pure": {
+"n": 43,
+"noms": [
+"pure calmille",
+"pure algue",
+"pure natural soin"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+12
+],
+[
+"en:facial-creams",
+6
+],
+[
+"en:hygiene",
+5
+],
+[
+"en:deodorants",
+4
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Yves Rocher",
+"Nivea",
+"L'Oréal",
+"L'Oreal Consumer products",
+"Garnier",
+"Timotei"
+],
+"part_marque": 0.0
+},
+"gommage": {
+"n": 37,
+"noms": [
+"gommage douceur",
+"gommage",
+"gommage visage douceur"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+6
+],
+[
+"en:face-scrubs",
+6
+],
+[
+"en:visage",
+3
+],
+[
+"en:non-food-products",
+3
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Yves Rocher",
+"Cattier",
+"payot",
+"Cosmia",
+"La Rosée",
+"Nora"
+],
+"part_marque": 0.0
+},
+"anti": {
+"n": 118,
+"noms": [
+"axe anti-transpirant homme",
+"monsavon anti-transpirant femme",
+"anti-transpirant"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+35
+],
+[
+"en:deodorants",
+29
+],
+[
+"en:anti-perspirants",
+19
+],
+[
+"en:roll-on-deodorants",
+15
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Narta",
+"Axe",
+"Nivea",
+"L'Oréal",
+"Monsavon",
+"Cosmia"
+],
+"part_marque": 0.0
+},
+"lotion": {
+"n": 60,
+"noms": [
+"lotion tonique",
+"lotion anti moustiques",
+"lotion tonique fraîcheur"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+11
+],
+[
+"en:face-lotions",
+6
+],
+[
+"en:cleansers",
+6
+],
+[
+"en:body",
+5
+]
+],
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"marques": [
+"Henkel",
+"Diadermine",
+"Cosmia",
+"Cien",
+"Marque Repère",
+"Weleda"
+],
+"part_marque": 0.0
+},
+"spray": {
+"n": 119,
+"noms": [
+"spray solaire enfant",
+"spray coiffant micro-aéré",
+"spray antiseptique"
+],
+"categorie": null,
+"categories": [
+[
+"en:in-sun-protections",
+21
+],
+[
+"en:suncare",
+21
+],
+[
+"en:sunscreen",
+17
+],
+[
+"en:hair",
+9
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Lovea",
+"Nivea",
+"Cien",
+"Vivelle Dop",
+"Avène",
+"Corinne de Farme"
+],
+"part_marque": 0.0
+},
+"apre": {
+"n": 37,
+"noms": [
+"timotei après shampoing",
+"après shampoing",
+"après shampoing extra"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+8
+],
+[
+"en:hair-conditioners",
+8
+],
+[
+"en:non-food-products",
+6
+],
+[
+"en:open-beauty-facts",
+6
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Unilever",
+"Timotei",
+"Cosmia",
+"Le Petit Marseillais",
+"Garnier",
+"Art naturals"
+],
+"part_marque": 0.0
+},
+"apre shampoing": {
+"n": 35,
+"noms": [
+"après shampoing",
+"après shampoing extra doux",
+"timotei après shampoing à"
+],
+"categorie": null,
+"categories": [
+[
+"en:hair",
+8
+],
+[
+"en:hair-conditioners",
+8
+],
+[
+"en:non-food-products",
+6
+],
+[
+"en:open-beauty-facts",
+6
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Unilever",
+"Timotei",
+"Cosmia",
+"Le Petit Marseillais",
+"Garnier",
+"Art naturals"
+],
+"part_marque": 0.0
+},
+"beurre": {
+"n": 35,
+"noms": [
+"beurre de karité",
+"beurre de soin",
+"beurre karité"
+],
+"categorie": null,
+"categories": [
+[
+"en:body",
+5
+],
+[
+"en:body-creams",
+5
+],
+[
+"fr:baumes-et-beurres-pour-le-corps",
+5
+],
+[
+"en:cosmetic-products",
+4
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"The Body Shop",
+"Cattier",
+"L'Oreal Luxe",
+"L'Oréal",
+"Palmer's",
+"Oléanat"
+],
+"part_marque": 0.0
+},
+"pro": {
+"n": 33,
+"noms": [
+"pro-expert",
+"pro expert",
+"pro repair"
+],
+"categorie": "en:hygiene",
+"categories": [
+[
+"en:hygiene",
+10
+],
+[
+"en:toothpastes",
+9
+],
+[
+"en:non-food-products",
+4
+],
+[
+"en:open-beauty-facts",
+4
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Oral-B",
+"Sensodyne",
+"Henkel",
+"Elemis",
+"Ora-B",
+"GSK"
+],
+"part_marque": 0.0
+},
+"bebe": {
+"n": 45,
+"noms": [
+"weleda bébé calendula",
+"klorane bébé crème",
+"bébé"
+],
+"categorie": null,
+"categories": [
+[
+"en:non-food-products",
+2
+],
+[
+"en:open-beauty-facts",
+2
+],
+[
+"en:hair",
+2
+],
+[
+"en:shampoos",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Klorane",
+"Weleda",
+"Leader Price",
+"Mixa",
+"Cadum",
+"Cattier"
+],
+"part_marque": 0.02
+},
+"hydra": {
+"n": 42,
+"noms": [
+"hydra aloe vera",
+"hydra végétal",
+"hydra"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+8
+],
+[
+"en:body",
+4
+],
+[
+"en:facial-creams",
+4
+],
+[
+"en:hygiene",
+4
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"L'Oréal",
+"Léa Nature",
+"L'Oréal Men Expert",
+"Mustela",
+"Yves Rocher",
+"So' Bio étic"
+],
+"part_marque": 0.0
+},
+"serum": {
+"n": 58,
+"noms": [
+"sérum correcteur éclat",
+"cosmia - serum",
+"serum végétal rides"
+],
+"categorie": null,
+"categories": [
+[
+"en:face",
+9
+],
+[
+"en:anti-aging-face-care-products",
+6
+],
+[
+"en:facial-creams",
+6
+],
+[
+"en:non-food-products",
+3
+]
+],
+"secteur": "Parfumerie et soins/Cosmétiques et parfums",
+"marques": [
+"L'Oréal Paris",
+"Yves Rocher",
+"Cosmia",
+"Dr. Hauschka",
+"Léa Nature",
+"Cosmia Bio"
+],
+"part_marque": 0.0
+},
+"total": {
+"n": 31,
+"noms": [
+"total care",
+"elseve total repair",
+"total repair 5"
+],
+"categorie": "en:hygiene",
+"categories": [
+[
+"en:hygiene",
+12
+],
+[
+"en:toothpastes",
+6
+],
+[
+"en:hair",
+6
+],
+[
+"en:mouthwashes",
+5
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Colgate",
+"Listerine",
+"L'Oréal",
+"Elseve",
+"L'Oreal Consumer products",
+"L'Oréal Paris"
+],
+"part_marque": 0.0
+},
+"protection": {
+"n": 37,
+"noms": [
+"protection caries",
+"protection complète",
+"protection gencives"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+11
+],
+[
+"en:toothpastes",
+5
+],
+[
+"en:open-beauty-facts",
+3
+],
+[
+"en:in-sun-protections",
+2
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Unilever",
+"Signal",
+"Henkel",
+"Vademecum",
+"Marque Repère",
+"Dentamyl"
+],
+"part_marque": 0.0
+},
+"lait": {
+"n": 366,
+"noms": [
+"lait de douche",
+"lait corps hydratant",
+"lait de toilette"
+],
+"categorie": null,
+"categories": [
+[
+"en:body",
+79
+],
+[
+"en:body-milks",
+77
+],
+[
+"en:open-beauty-facts",
+27
+],
+[
+"en:face",
+23
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Le Petit Marseillais",
+"Yves Rocher",
+"Nivea",
+"Cosmia",
+"Mixa",
+"L'Oréal"
+],
+"part_marque": 0.0
+},
+"petit": {
+"n": 44,
+"noms": [
+"le petit marseillais",
+"le petit olivier",
+"klorane petit junior"
+],
+"categorie": null,
+"categories": [
+[
+"en:open-beauty-facts",
+8
+],
+[
+"en:non-food-products",
+7
+],
+[
+"en:body",
+3
+],
+[
+"en:hair",
+3
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Le Petit Marseillais",
+"Klorane",
+"Le Petit Olivier",
+"Le Petit Marsellais",
+"L'Occitane en Provence",
+"Les petits plaisirs"
+],
+"part_marque": 0.0
+},
+"bain": {
+"n": 56,
+"noms": [
+"bain douche énergisant",
+"bain moussant",
+"bain moussant parfum"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+16
+],
+[
+"en:showers-and-baths",
+16
+],
+[
+"en:bubble-baths",
+10
+],
+[
+"en:shower-gels",
+3
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Yves Rocher",
+"Cosmia",
+"Cien",
+"Eco+",
+"Labell",
+"Kérastase"
+],
+"part_marque": 0.0
+},
+"liquide": {
+"n": 53,
+"noms": [
+"liquide vaisselle",
+"liquide vaisselle peaux",
+"liquide de rinçage"
+],
+"categorie": null,
+"categories": [
+[
+"fr:liquide-vaisselle",
+14
+],
+[
+"en:dish-detergent-soap",
+5
+],
+[
+"en:home-garden",
+5
+],
+[
+"en:household-cleaning-products",
+5
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Auchan",
+"Carrefour",
+"Better life",
+"U",
+"L'arbre vert",
+"Mir"
+],
+"part_marque": 0.0
+},
+"liquide vaisselle": {
+"n": 45,
+"noms": [
+"liquide vaisselle",
+"liquide vaisselle peaux sensibles",
+"liquide vaisselle secrets de"
+],
+"categorie": null,
+"categories": [
+[
+"fr:liquide-vaisselle",
+13
+],
+[
+"en:dish-detergent-soap",
+5
+],
+[
+"en:home-garden",
+5
+],
+[
+"en:household-cleaning-products",
+5
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Auchan",
+"Better life",
+"Carrefour",
+"L'arbre vert",
+"Mir",
+"maison verte"
+],
+"part_marque": 0.0
+},
+"lingette": {
+"n": 95,
+"noms": [
+"lingettes fraîcheur",
+"lingettes",
+"lingettes nettoyantes"
+],
+"categorie": null,
+"categories": [
+[
+"en:open-beauty-facts",
+27
+],
+[
+"en:non-food-products",
+25
+],
+[
+"en:accessories",
+17
+],
+[
+"en:moist-wipes",
+17
+]
+],
+"secteur": "Bébé/Hygiène bébé",
+"marques": [
+"Cosmia Baby",
+"Auchan Baby",
+"Carrefour",
+"Auchan",
+"Biolane",
+"Mustela"
+],
+"part_marque": 0.0
+},
+"douche": {
+"n": 141,
+"noms": [
+"douche crème douceurs",
+"douche crème extra",
+"douche huile précieuse"
+],
+"categorie": "fr:cremes-douche",
+"categories": [
+[
+"en:hygiene",
+94
+],
+[
+"en:showers-and-baths",
+94
+],
+[
+"en:shower-gels",
+52
+],
+[
+"fr:cremes-douche",
+43
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Dop",
+"Le Petit Marseillais",
+"Ushuaïa",
+"Léa Nature",
+"So' Bio étic",
+"Cottage"
+],
+"part_marque": 0.0
+},
+"douche creme": {
+"n": 57,
+"noms": [
+"douche crème douceurs d'enfance",
+"douche crème extra doux",
+"douche crème douceurs de"
+],
+"categorie": "fr:cremes-douche",
+"categories": [
+[
+"en:hygiene",
+47
+],
+[
+"en:showers-and-baths",
+47
+],
+[
+"fr:cremes-douche",
+37
+],
+[
+"en:shower-gels",
+11
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Dop",
+"Le Petit Marseillais",
+"Léa Nature",
+"Ushuaïa",
+"Labell",
+"So' Bio étic"
+],
+"part_marque": 0.0
+},
+"gel lavant": {
+"n": 110,
+"noms": [
+"gel lavant corps et",
+"gel lavant mains",
+"gel lavant pour les"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+31
+],
+[
+"en:soaps",
+15
+],
+[
+"fr:savons-liquides",
+13
+],
+[
+"en:shower-gels",
+13
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Cosmia",
+"Auchan",
+"Carrefour",
+"Le Chat",
+"Henkel",
+"Mustela"
+],
+"part_marque": 0.0
+},
+"anti transpirant": {
+"n": 65,
+"noms": [
+"monsavon anti-transpirant femme spray",
+"anti-transpirant",
+"anti transpirant"
+],
+"categorie": "en:deodorants",
+"categories": [
+[
+"en:deodorants",
+28
+],
+[
+"en:hygiene",
+28
+],
+[
+"en:anti-perspirants",
+18
+],
+[
+"en:roll-on-deodorants",
+14
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Narta",
+"Axe",
+"Monsavon",
+"Cosmia",
+"Nivea",
+"L'Oréal"
+],
+"part_marque": 0.0
+},
+"lessive": {
+"n": 46,
+"noms": [
+"persil lessive liquide",
+"skip lessive liquide",
+"lessive liquide"
+],
+"categorie": null,
+"categories": [
+[
+"fr:lessive",
+9
+],
+[
+"en:household-chemicals",
+2
+],
+[
+"en:liquid-detergent",
+2
+],
+[
+"en:non-open-products-facts",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Henkel",
+"Persil",
+"Skip",
+"X-TRA",
+"maison verte",
+"Biovie Lea Nature"
+],
+"part_marque": 0.0
+},
+"bio": {
+"n": 62,
+"noms": [
+"monsavon bio déodorant",
+"bio capilargil specific",
+"bio naïa"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+11
+],
+[
+"en:hair",
+9
+],
+[
+"en:open-beauty-facts",
+8
+],
+[
+"en:shampoos",
+7
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"BIO",
+"Monsavon",
+"Unilever",
+"Dermaclay",
+"Henkel",
+"Vademecum"
+],
+"part_marque": 0.29
+},
+"creme douche": {
+"n": 85,
+"noms": [
+"crème douche extra douce",
+"crème douche",
+"crème douche surgras"
+],
+"categorie": "fr:cremes-douche",
+"categories": [
+[
+"en:showers-and-baths",
+47
+],
+[
+"en:hygiene",
+46
+],
+[
+"fr:cremes-douche",
+39
+],
+[
+"en:shower-gels",
+9
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Cadum",
+"L'arbre vert",
+"Le Petit Olivier",
+"Le Petit Marseillais",
+"Nivea",
+"Cien"
+],
+"part_marque": 0.0
+},
+"lait demaquillant": {
+"n": 37,
+"noms": [
+"lait démaquillant",
+"lait démaquillant douceur",
+"lait demaquillant"
+],
+"categorie": "en:cleansing-milks",
+"categories": [
+[
+"en:cleansers",
+18
+],
+[
+"en:face",
+18
+],
+[
+"en:cleansing-milks",
+17
+],
+[
+"en:open-beauty-facts",
+5
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Mixa",
+"Cosmia",
+"Nuxe",
+"Monoprix",
+"Carrefour",
+"Inell"
+],
+"part_marque": 0.0
+},
+"integral": {
+"n": 44,
+"noms": [
+"signal integral 8",
+"integral 8 actions",
+"signal intégral 8"
+],
+"categorie": "en:toothpaste",
+"categories": [
+[
+"en:non-food-products",
+27
+],
+[
+"en:open-beauty-facts",
+27
+],
+[
+"en:toothpaste",
+17
+],
+[
+"en:hygiene",
+14
+]
+],
+"secteur": "Parfumerie et soins/Santé dentaire",
+"marques": [
+"Signal",
+"Unilever",
+"Integral 8",
+"Paic"
+],
+"part_marque": 0.0
+},
+"natural": {
+"n": 31,
+"noms": [
+"naturals",
+"natural lip balm",
+"natural tea tree"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+4
+],
+[
+"en:hair",
+4
+],
+[
+"en:shampoos",
+3
+],
+[
+"en:accessories",
+2
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Ben & Anna",
+"Revlon",
+"Palmolive",
+"L'Oréal",
+"The Humble Co.",
+"Desert Essence"
+],
+"part_marque": 0.0
+},
+"ultra": {
+"n": 85,
+"noms": [
+"ultra doux shampooing",
+"ultra doux après-shampooing",
+"ultra doux"
+],
+"categorie": "en:shampoos",
+"categories": [
+[
+"en:hair",
+47
+],
+[
+"en:shampoos",
+35
+],
+[
+"fr:shampooings-aux-extraits-naturels",
+13
+],
+[
+"en:hair-conditioners",
+11
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Garnier",
+"L'Oréal",
+"L'Oreal Consumer products",
+"Ultra Doux",
+"Always",
+"Les Cosmétiques Design Paris"
+],
+"part_marque": 0.0
+},
+"gel nettoyant": {
+"n": 36,
+"noms": [
+"gel nettoyant purifiant",
+"gel nettoyant visage",
+"gel nettoyant mains"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+8
+],
+[
+"en:face",
+7
+],
+[
+"en:soaps",
+5
+],
+[
+"fr:savons-liquides",
+4
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Cien",
+"Cosmia",
+"L'Oréal",
+"Yves Rocher",
+"Mussofi",
+"Lidl"
+],
+"part_marque": 0.0
+},
+"lait douche": {
+"n": 35,
+"noms": [
+"lait de douche aux",
+"lait de douche hydratant",
+"lait de douche"
+],
+"categorie": null,
+"categories": [
+[
+"en:body",
+7
+],
+[
+"en:body-milks",
+7
+],
+[
+"en:hygiene",
+7
+],
+[
+"en:showers-and-baths",
+7
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Cosmia",
+"By U",
+"U",
+"Marque Repère",
+"Manava",
+"Cadum"
+],
+"part_marque": 0.0
+},
+"soin levre": {
+"n": 36,
+"noms": [
+"soin des lèvres",
+"cosmia - soin des",
+"soin lèvres sensibles"
+],
+"categorie": "en:lip-cosmetics",
+"categories": [
+[
+"en:face",
+15
+],
+[
+"en:lip-balms",
+15
+],
+[
+"en:lip-cosmetics",
+15
+],
+[
+"en:non-food-products",
+5
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Cosmia",
+"Doctissimo",
+"Doctissimo parapharmacie",
+"FDG Group",
+"Laino",
+"Le Petit Marseillais"
+],
+"part_marque": 0.0
+},
+"ultra dou": {
+"n": 59,
+"noms": [
+"ultra doux shampooing à",
+"ultra doux",
+"ultra doux après-shampooing crème"
+],
+"categorie": "en:shampoos",
+"categories": [
+[
+"en:hair",
+44
+],
+[
+"en:shampoos",
+33
+],
+[
+"fr:shampooings-aux-extraits-naturels",
+13
+],
+[
+"en:hair-conditioners",
+11
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Garnier",
+"L'Oreal Consumer products",
+"L'Oréal",
+"Ultra Doux",
+"Garnier Ultra Doux"
+],
+"part_marque": 0.0
+},
+"baume": {
+"n": 118,
+"noms": [
+"baume après rasage",
+"baume corps nourrissant",
+"baume nourrissant senteur"
+],
+"categorie": null,
+"categories": [
+[
+"en:body",
+13
+],
+[
+"en:face",
+9
+],
+[
+"en:body-creams",
+9
+],
+[
+"en:aftershaves",
+8
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Yves Rocher",
+"Mennen",
+"Nivea",
+"Le Petit Marseillais",
+"Emma Noël",
+"L'Oréal"
+],
+"part_marque": 0.0
+},
+"fructi": {
+"n": 30,
+"noms": [
+"fructis shampooing fortifiant",
+"fructis nutri repair",
+"fructis après-shampooing fortifiant"
+],
+"categorie": "en:shampoos",
+"categories": [
+[
+"en:hair",
+22
+],
+[
+"en:shampoos",
+17
+],
+[
+"en:anti-dandruff-shampoos",
+4
+],
+[
+"en:shampoo-for-dry-hair",
+4
+]
+],
+"secteur": "Parfumerie et soins/Cheveux",
+"marques": [
+"Garnier",
+"L'Oreal Consumer products",
+"L'Oréal",
+"Fructis",
+"Garnier Fructis"
+],
+"part_marque": 0.0
+},
+"mousse": {
+"n": 32,
+"noms": [
+"mousse de douche",
+"mousse lavante mains",
+"mousse de rasage"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+2
+],
+[
+"en:hair",
+2
+],
+[
+"fr:coiffants",
+2
+],
+[
+"en:shaving",
+2
+]
+],
+"secteur": "Hygiène/Rasage",
+"marques": [
+"Mennen",
+"Cosmia",
+"Rituals",
+"Dove",
+"Unilever",
+"Ehrmann"
+],
+"part_marque": 0.0
+},
+"stick": {
+"n": 52,
+"noms": [
+"stick lèvres hydratant",
+"stick à lèvres",
+"stick lèvres réparateur"
+],
+"categorie": "en:lip-cosmetics",
+"categories": [
+[
+"en:lip-cosmetics",
+18
+],
+[
+"en:face",
+17
+],
+[
+"en:lip-balms",
+17
+],
+[
+"en:hygiene",
+8
+]
+],
+"secteur": "Parapharmacie/Solaires et soins spécifiques",
+"marques": [
+"Mennen",
+"Carrefour",
+"Dermophil",
+"Avène",
+"Les Cosmétiques Design Paris",
+"La Rosée"
+],
+"part_marque": 0.0
+},
+"papier": {
+"n": 31,
+"noms": [
+"papier toilette",
+"papier toilette humide",
+"papier toilette compact"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+4
+],
+[
+"fr:papier-toilette",
+4
+],
+[
+"en:accessories",
+2
+],
+[
+"en:intimate-hygiene",
+2
+]
+],
+"secteur": "Hygiène/Hygiène féminine",
+"marques": [
+"Floralys",
+"Lotus",
+"Sublimo",
+"Aldi",
+"U",
+"Mimosa"
+],
+"part_marque": 0.0
+},
+"papier toilette": {
+"n": 31,
+"noms": [
+"papier toilette",
+"papier toilette douceur resistant",
+"papier toilette humide premium"
+],
+"categorie": null,
+"categories": [
+[
+"en:hygiene",
+4
+],
+[
+"fr:papier-toilette",
+4
+],
+[
+"en:accessories",
+2
+],
+[
+"en:intimate-hygiene",
+2
+]
+],
+"secteur": "Hygiène/Hygiène féminine",
+"marques": [
+"Floralys",
+"Lotus",
+"Sublimo",
+"Aldi",
+"U",
+"Mimosa"
+],
+"part_marque": 0.0
+},
+"creme lavante": {
+"n": 42,
+"noms": [
+"crème lavante",
+"crème lavante peaux sensibles",
+"crème lavante adoucissante au"
+],
+"categorie": "en:soaps",
+"categories": [
+[
+"en:hygiene",
+16
+],
+[
+"en:soaps",
+14
+],
+[
+"fr:savons-liquides",
+11
+],
+[
+"en:showers-and-baths",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Manava",
+"Cien",
+"Marque Repère",
+"Les Cosmétiques Design Paris",
+"Nectar of Nature",
+"Bebe Biafine"
+],
+"part_marque": 0.0
+},
+"mouchoir": {
+"n": 46,
+"noms": [
+"mouchoirs",
+"mouchoirs blancs",
+"mouchoir"
+],
+"categorie": "fr:mouchoirs",
+"categories": [
+[
+"fr:mouchoirs",
+21
+],
+[
+"en:non-open-products-facts",
+19
+],
+[
+"en:open-beauty-facts",
+3
+],
+[
+"en:non-food-products",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Auchan",
+"Lotus",
+"Labell",
+"U",
+"Monoprix",
+"Top budget"
+],
+"part_marque": 0.0
+},
+"deo": {
+"n": 66,
+"noms": [
+"deo",
+"dove deo bio",
+"dove deo invdr"
+],
+"categorie": "en:deodorants",
+"categories": [
+[
+"en:hygiene",
+27
+],
+[
+"en:deodorants",
+26
+],
+[
+"en:roll-on-deodorants",
+6
+],
+[
+"en:anti-perspirants",
+3
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Unilever",
+"Dove",
+"Nivea",
+"Lavera",
+"Brut",
+"Léa Nature"
+],
+"part_marque": 0.0
+},
+"love": {
+"n": 33,
+"noms": [
+"love beauty and",
+"love my skin",
+"love charm"
+],
+"categorie": null,
+"categories": [
+[
+"en:open-beauty-facts",
+4
+],
+[
+"en:non-food-products",
+3
+],
+[
+"en:toothpaste",
+3
+],
+[
+"en:hygiene",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Love Beauty and Planet",
+"Watsons",
+"Nocibé",
+"L'Oreal Luxe",
+"Kiehl's",
+"L'Oréal"
+],
+"part_marque": 0.0
+},
+"lessive liquide": {
+"n": 34,
+"noms": [
+"persil lessive liquide bouquet",
+"lessive liquide",
+"skip lessive liquide active"
+],
+"categorie": null,
+"categories": [
+[
+"fr:lessive",
+3
+],
+[
+"en:household-chemicals",
+2
+],
+[
+"en:liquid-detergent",
+2
+],
+[
+"en:non-open-products-facts",
+2
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Henkel",
+"Persil",
+"Skip",
+"Omo",
+"Tandil",
+"Apta"
+],
+"part_marque": 0.0
+},
+"lait corp": {
+"n": 112,
+"noms": [
+"lait corps",
+"lait corps hydratant",
+"lait corps sous la"
+],
+"categorie": "en:body-milks",
+"categories": [
+[
+"en:body",
+36
+],
+[
+"en:body-milks",
+36
+],
+[
+"en:open-beauty-facts",
+11
+],
+[
+"en:non-food-products",
+9
+]
+],
+"secteur": "Parfumerie et soins/Toilette et soins du corps",
+"marques": [
+"Mixa",
+"Yves Rocher",
+"Nivea",
+"Le Petit Olivier",
+"Cattier",
+"Dove"
+],
+"part_marque": 0.0
+}
+}

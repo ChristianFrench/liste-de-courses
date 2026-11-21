@@ -1,0 +1,73 @@
+# Mémo Emplettes (19/11/2026, Aristide) : composants et liens d'Emplettes.
+# - Android : widget d'écran d'accueil personnalisable (sans les liens Windows) → telechargements/essai/Memo-Emplettes.apk
+# - Windows : petite fenêtre épinglable au premier plan (sans les liens APK) → telechargements/essai/Memo-Emplettes-Installation.exe
+name: Mémo Emplettes
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['outils/memo/**', '.github/workflows/memo.yml']
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Compiler l'APK
+        working-directory: outils/memo
+        run: |
+          flutter create --org fr.listecourses --project-name memo_emplettes --platforms android .
+          python3 android_ajouts/preparer.py
+          flutter build apk --release --target-platform android-arm,android-arm64
+          mkdir -p ../../sortie && cp build/app/outputs/flutter-apk/app-release.apk ../../sortie/Memo-Emplettes.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: memo-apk, path: sortie/ }
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with: { channel: stable, cache: true }
+      - name: Compiler pour Windows
+        working-directory: outils/memo
+        shell: bash
+        run: |
+          flutter create --org fr.listecourses --project-name memo_emplettes --platforms windows .
+          sed -i 's/L"memo_emplettes"/L"Mémo Emplettes"/' windows/runner/main.cpp || true
+          flutter build windows --release
+      - name: Installateur (Inno Setup)
+        working-directory: outils/memo
+        shell: pwsh
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
+          $version = (Select-String -Path pubspec.yaml -Pattern '^version: *([0-9.]+)').Matches[0].Groups[1].Value
+          & $iscc /Q "/DVersion=$version" "/DSource=$PWD\build\windows\x64\runner\Release" "/DIcone=$PWD\windows\runner\resources\app_icon.ico" "/DSortie=$PWD\..\..\sortie" memo.iss
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - uses: actions/upload-artifact@v4
+        with: { name: memo-windows, path: sortie/ }
+
+  depot:
+    needs: [apk, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: telechargement, merge-multiple: true }
+      - name: Déposer sur le serveur (telechargements/essai/)
+        env:
+          VPS_HOTE: ${{ secrets.VPS_HOTE }}
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+        run: |
+          ls -l telechargement
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          mkdir -p depot/telechargements/essai && cp telechargement/* depot/telechargements/essai/
+          rsync -rlz -e "ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new" depot/ "deploiement@$VPS_HOTE:"
+          rm -f ~/.ssh/deploiement
+          for f in Memo-Emplettes.apk Memo-Emplettes-Installation.exe; do echo "$(curl -s -o /dev/null -I -w '%{http_code}' "https://$VPS_HOTE/telechargements/essai/$f") $f"; done

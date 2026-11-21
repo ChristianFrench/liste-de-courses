@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<g transform="rotate(40 24 24)"><rect x="3" y="18" width="42" height="12" rx="6" fill="#FFCC80"/>
+<rect x="17" y="19.5" width="14" height="9" rx="2" fill="#FFE0B2"/>
+<circle cx="8" cy="22" r=".9" fill="#F4A940"/><circle cx="8" cy="26" r=".9" fill="#F4A940"/><circle cx="12" cy="22" r=".9" fill="#F4A940"/><circle cx="12" cy="26" r=".9" fill="#F4A940"/>
+<circle cx="36" cy="22" r=".9" fill="#F4A940"/><circle cx="36" cy="26" r=".9" fill="#F4A940"/><circle cx="40" cy="22" r=".9" fill="#F4A940"/><circle cx="40" cy="26" r=".9" fill="#F4A940"/></g><g transform="rotate(-40 24 24)"><rect x="3" y="18" width="42" height="12" rx="6" fill="#FFCC80"/>
+<rect x="17" y="19.5" width="14" height="9" rx="2" fill="#FFE0B2"/>
+<circle cx="8" cy="22" r=".9" fill="#F4A940"/><circle cx="8" cy="26" r=".9" fill="#F4A940"/><circle cx="12" cy="22" r=".9" fill="#F4A940"/><circle cx="12" cy="26" r=".9" fill="#F4A940"/>
+<circle cx="36" cy="22" r=".9" fill="#F4A940"/><circle cx="36" cy="26" r=".9" fill="#F4A940"/><circle cx="40" cy="22" r=".9" fill="#F4A940"/><circle cx="40" cy="26" r=".9" fill="#F4A940"/></g>
+<path d="M24 20.5v7M20.5 24h7" stroke="#E53935" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+<path d="M5 32C9 21 33 18 43 25 37 36 13 40 5 32z" fill="#388E3C"/>
+<path d="M8 31.5c5-7 23-9 32-5.5-6 6-24 10-32 5.5z" fill="#C5E1A5"/>
+<circle cx="14.5" cy="30" r="3.9" fill="#43A047"/><circle cx="21" cy="28.3" r="3.9" fill="#43A047"/><circle cx="27.5" cy="27.3" r="3.9" fill="#43A047"/><circle cx="34" cy="27" r="3.6" fill="#43A047"/>
+<path d="M13.5 28.6l.8-.6M20 26.9l.8-.6M26.5 25.9l.8-.6M33 25.7l.8-.6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" fill="none" opacity=".8"/>
+<path d="M43 25c1-2 1.5-4 .5-6" stroke="#2E7D32" stroke-width="2" stroke-linecap="round" fill="none"/>
+<circle cx="14" cy="13" r="9" fill="#E1F5FE"/><path d="M14 13L14.0 6.0M14.0 9.1l-1.7 -1.7M14.0 9.1l1.7 -1.7M14 13L20.1 9.5M17.3 11.1l0.6 -2.4M17.3 11.1l2.4 0.6M14 13L20.1 16.5M17.3 14.9l2.4 -0.6M17.3 14.9l0.6 2.4M14 13L14.0 20.0M14.0 16.9l1.7 1.7M14.0 16.9l-1.7 1.7M14 13L7.9 16.5M10.7 14.9l-0.6 2.4M10.7 14.9l-2.4 -0.6M14 13L7.9 9.5M10.7 11.1l-2.4 0.6M10.7 11.1l-0.6 -2.4" stroke="#29B6F6" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+</svg>

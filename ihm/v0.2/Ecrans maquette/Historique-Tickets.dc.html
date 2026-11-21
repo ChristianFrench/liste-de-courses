@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Historique · Tickets de caisse</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&amp;display=swap">
+<style>
+body{margin:0}
+*{box-sizing:border-box}
+a{color:#222222}a:hover{color:#000000}
+.hd{height:52px;display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid #CCCCCC;flex:none}
+.sub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:8px 12px;border:2px solid #222222;border-radius:10px;overflow:hidden;flex:none}
+.sub a{display:flex;align-items:center;justify-content:center;gap:6px;min-height:44px;text-decoration:none;font-size:14px;border-left:2px solid #222222}
+.sub a:first-child{border-left:0}
+.sub .on{background:#222222;color:#FFFFFF;font-weight:700}
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid #222222;height:64px;background:#FFFFFF;flex:none}
+.tabbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;text-decoration:none;min-height:44px}
+.ico{width:56px;height:30px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.tabbar .act{font-weight:700}
+.tabbar .act .ico{background:#222222;color:#FFFFFF}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 12px;border:2px solid #222222;border-radius:8px;font-weight:700;text-decoration:none;background:#FFFFFF;color:#222222;font-family:inherit;font-size:15px}
+.tk{display:flex;align-items:center;gap:12px;min-height:72px;border-bottom:1px solid #DDDDDD}
+.ph{background:#E4E4E4;border:1.5px dashed #888888;display:flex;align-items:center;justify-content:center;font-size:10px;color:#555555;flex:none}
+.s{font-size:12px;color:#555555}
+</style>
+</helmet>
+<div style="width:390px;height:844px;display:flex;flex-direction:column;background:#FFFFFF;color:#222222;font-family:'Atkinson Hyperlegible',system-ui,sans-serif;overflow:hidden">
+  <header class="hd"><h1 style="margin:0;font-size:20px;flex:1">Historique</h1></header>
+  <nav class="sub" aria-label="Historique">
+    <a href="Historique-Courses.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 4h2l2 11h11l2-8H6"/><circle cx="9" cy="19" r="1.5"/><circle cx="17" cy="19" r="1.5"/></svg>Courses effectuées</a>
+    <a class="on" href="Historique-Tickets.dc.html"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg>Tickets de caisse</a>
+  </nav>
+  <main style="flex:1;overflow-y:auto;padding:0 12px 12px">
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
+      <button type="button" class="btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-3h3L15 7"/></svg>Photographier</button>
+      <button type="button" class="btn" style="border-style:dashed;font-weight:400;font-size:13px">Compte magasin (à étudier)</button>
+    </div>
+    <div class="tk">
+      <div class="ph" style="width:44px;height:56px">TICKET</div>
+      <div style="flex:1"><b>[jj/mm] · [Magasin 1] · [montant] €</b><div class="s">Lié à la course du [jj/mm] · 12 articles</div></div>
+    </div>
+    <div class="tk">
+      <div class="ph" style="width:44px;height:56px">TICKET</div>
+      <div style="flex:1"><b>[jj/mm] · [Magasin 1] · [montant] €</b><div class="s">Lié à la course du [jj/mm] · 15 articles</div></div>
+    </div>
+    <div class="tk">
+      <div class="ph" style="width:44px;height:56px">TICKET</div>
+      <div style="flex:1"><b>[jj/mm] · [Magasin 1] · [montant] €</b><div class="s" style="font-weight:700;color:#222222">Non rattaché à une course</div></div>
+      <a href="Historique-Courses.dc.html" style="min-height:44px;display:flex;align-items:center;font-size:14px">Rattacher</a>
+    </div>
+    <div class="tk">
+      <div class="ph" style="width:44px;height:56px">TICKET</div>
+      <div style="flex:1"><b>[jj/mm] · [Magasin 1] · [montant] €</b><div class="s">Lié à la course du [jj/mm] · 13 articles</div></div>
+    </div>
+  </main>
+  <nav class="tabbar" aria-label="Navigation principale">
+    <a href="Main.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Listes</a>
+    <a class="act" href="Historique-Courses.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Historique</a>
+    <a href="Magasin-Rayons.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l2-5h14l2 5M4 9v11h16V9M3 9h18M9 20v-6h6v6"/></svg></span>Magasin</a>
+    <a href="Parametres.dc.html"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9L7 7M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg></span>Paramètres</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>
