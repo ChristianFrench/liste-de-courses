@@ -12,6 +12,7 @@ from difficulte import difficulte
 from criteres import criteres
 from nouvelles_298_497 import FOURNIES, slug
 from recettes_498_597_lot4 import L
+from classement import appliquer
 
 PREMIER = 498
 
@@ -44,6 +45,7 @@ def main():
         x['difficulte'] = difficulte(x['titre'])
         x.update(criteres(x))
         recettes.append(x)
+    appliquer(recettes)  # types, sous-types et origine (classement.py)
     src['recettes'] = recettes
     src['version'] = src.get('version', 1) + 1
     json.dump(src, open(FOURNIES, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

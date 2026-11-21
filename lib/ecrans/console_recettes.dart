@@ -274,7 +274,26 @@ class _PageRecettesState extends State<PageRecettes> {
         ),
       ));
       if (!ouvert) continue;
+      // 21/11/2026 : les recettes d'un type rangées par sous-type, sous un petit intertitre.
+      visibles.sort((a, c) {
+        final x = rangSousType(type, a.sousTypes[type]).compareTo(rangSousType(type, c.sousTypes[type]));
+        return x != 0 ? x : a.titre.toLowerCase().compareTo(c.titre.toLowerCase());
+      });
+      String? sousTypeCourant = '';
       for (final r in visibles) {
+        final st = r.sousTypes[type];
+        if (st != sousTypeCourant && visibles.any((x) => x.sousTypes[type] != null)) {
+          sousTypeCourant = st;
+          final nb = visibles.where((x) => x.sousTypes[type] == st).length;
+          lignes.add(Container(
+            key: ValueKey('sous-type-$type-${st ?? 'aucun'}'),
+            padding: const EdgeInsets.fromLTRB(20, 8, 12, 4),
+            child: Row(children: [
+              Expanded(child: Text(st ?? 'Sans sous-type', style: Charte.texte(13.5, gras: true, couleur: Charte.cadre))),
+              Text('$nb', style: Charte.texte(12.5, couleur: Charte.texteSecondaire)),
+            ]),
+          ));
+        }
         final actif = identical(r, choisie);
         lignes.add(InkWell(
           key: ValueKey('recette-${r.id}-$type'),
@@ -332,8 +351,8 @@ class _PageRecettesState extends State<PageRecettes> {
 /// Icône d'un type de recette (images d'Aristide, 11/11/2026) ; « recettes-de-cuisine » pour les autres.
 String iconeTypeRecette(String type) {
   final t = type.toLowerCase();
-  if (t.startsWith('dessert')) return 'assets/recettes/desserts.png';
-  if (t.startsWith('entr')) return 'assets/recettes/entrees.png';
+  if (t.startsWith('dessert') || t.startsWith('petit')) return 'assets/recettes/desserts.png';
+  if (t.startsWith('entr') || t.startsWith('ap')) return 'assets/recettes/entrees.png';
   if (t.contains('accompagnement')) return 'assets/recettes/plats-accompagnement.png';
   if (t.startsWith('plat')) return 'assets/recettes/plats-complets.png';
   if (t.startsWith('sauce')) return 'assets/recettes/sauces.png';
@@ -396,7 +415,7 @@ class FicheRecette extends StatelessWidget {
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         Image.asset(iconeTypeRecette(t), width: 18, height: 18),
                         const SizedBox(width: 5),
-                        Text(t, style: Charte.texte(13, couleur: Charte.cadre)),
+                        Text(r.sousTypes[t] == null ? t : '$t · ${r.sousTypes[t]}', style: Charte.texte(13, couleur: Charte.cadre)),
                       ]),
                     ),
                   Text(
@@ -405,11 +424,12 @@ class FicheRecette extends StatelessWidget {
                       style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                 ]),
                 // Critères de choix (20/11/2026) : une pastille par valeur, groupées par critère.
-                if (r.regimes.isNotEmpty || r.saisons.isNotEmpty || r.cout != null || r.cuissons.isNotEmpty || r.occasions.isNotEmpty) ...[
+                if (r.origine != null || r.regimes.isNotEmpty || r.saisons.isNotEmpty || r.cout != null || r.cuissons.isNotEmpty || r.occasions.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(key: const ValueKey('recette-criteres'), spacing: 6, runSpacing: 4, children: [
                     for (final x in [
                       ...r.regimes,
+                      if (r.origine != null) r.origine!,
                       if (r.saisons.isNotEmpty) r.repereSaisons,
                       if (r.cout != null) r.cout!,
                       ...r.cuissons,

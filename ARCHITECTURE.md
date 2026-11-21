@@ -50,7 +50,7 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `lib/composants/recherche.dart`, `micro.dart` | champ de recherche d'article ; micro de dictée de toutes les zones de recherche (Android et web, `speech_to_text`) |
 | `lib/ecrans/console_*.dart`, `editeur_catalogue.dart`, `administration*.dart` | console Windows (catalogue, recettes, serveur) |
 | `outils/fenetre_editeur.py` | fenêtre de la console (taille, redimensionnable, largeur minimum reçue de Dart par le canal `emplettes/fenetre` : menu 270/64 + 1 + 820) |
-| `outils/recettes/nouvelles_298_497.py`, `difficulte.py`, `vers_application.py` | recettes livrées avec la console (`outils/recettes/illustrations/recettes-fournies.json`, version à augmenter pour réappliquer) et leur copie allégée pour l'application |
+| `outils/recettes/nouvelles_298_497.py`, `nouvelles_498_597.py`, `difficulte.py`, `criteres.py`, `classement.py` (9 types, sous-types, origine), `vers_application.py` | recettes livrées avec la console (`outils/recettes/illustrations/recettes-fournies.json`, version à augmenter pour réappliquer) et leur copie allégée pour l'application |
 | `lib/donnees/recettes_communes.dart`, `lib/ecrans/console_recettes_edition.dart` | catalogue des recettes versionné (20/11/2026) : modification dans la console, journal (`journal.json` de la base), « Généraliser » publie l'index signé `ldc/recettes-communes` et les images `ldc/recettes-images/<empreinte>` |
 | `lib/composants/` | éléments d'interface communs (volets, boutons, champs, en-tête, recherche) |
 | `outils/` | scripts (icônes, catalogue, site, vidéo, serveur `outils/vps/installer.sh`) |

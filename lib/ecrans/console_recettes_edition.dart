@@ -8,7 +8,6 @@ import '../theme.dart';
 // des recettes comme pour les produits). Une fenêtre avec tous les champs ; les ingrédients s'écrivent un par
 // ligne sous la forme uniforme « Nom · quantité · précision », les étapes et les conseils un par ligne.
 
-const typesRecette = ['Entrée', 'Plats', 'Plats accompagnement', 'Sauces', 'Dessert'];
 const valeursRegimes = ['Végétarien', 'Végétalien', 'Sans gluten', 'Sans lactose'];
 const valeursSaisons = ['Printemps', 'Été', 'Automne', 'Hiver'];
 const valeursCout = ['€', '€€', '€€€'];
@@ -60,6 +59,8 @@ class _FenetreRecetteState extends State<_FenetreRecette> {
   late final regimes = {...?r?.regimes};
   late final saisons = {...(r == null ? valeursSaisons : r!.saisons)};
   late String? cout = r?.cout ?? '€€';
+  late final sousTypes = <String, String?>{...?r?.sousTypes};
+  late String? origine = r?.origine ?? 'France';
   late final cuissons = {...?r?.cuissons};
   late final occasions = {...?r?.occasions};
   String? erreur;
@@ -81,7 +82,9 @@ class _FenetreRecetteState extends State<_FenetreRecette> {
             source: 'Emplettes');
     x
       ..titre = t
-      ..types = [for (final y in typesRecette) if (types.contains(y)) y]
+      ..types = [for (final y in typesRecettes.keys) if (types.contains(y)) y]
+      ..sousTypes = {for (final y in typesRecettes.keys) if (types.contains(y) && sousTypes[y] != null) y: sousTypes[y]!}
+      ..origine = origine
       ..pour = pour.text.trim().isEmpty ? null : pour.text.trim()
       ..tempsPreparation = int.tryParse(prep.text.trim())
       ..tempsCuisson = int.tryParse(cuisson.text.trim())
@@ -150,7 +153,40 @@ class _FenetreRecetteState extends State<_FenetreRecette> {
             child: ListView(padding: const EdgeInsets.fromLTRB(20, 14, 20, 14), children: [
               _champ(titre, 'Titre', cle: const ValueKey('edition-titre')),
               const SizedBox(height: 12),
-              _choix('Types', typesRecette, types.contains, (v) => _bascule(types, v)),
+              _choix('Types', typesRecettes.keys.toList(), types.contains, (v) => _bascule(types, v)),
+              // 21/11/2026 : un sous-type par type choisi, et l'origine.
+              Wrap(spacing: 18, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
+                for (final t in typesRecettes.keys)
+                  if (types.contains(t))
+                    Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(t, style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
+                      const SizedBox(width: 8),
+                      DropdownButton<String?>(
+                        key: ValueKey('edition-sous-type-$t'),
+                        value: typesRecettes[t]!.contains(sousTypes[t]) ? sousTypes[t] : null,
+                        hint: Text('Sous-type', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+                        items: [
+                          DropdownMenuItem<String?>(value: null, child: Text('Aucun', style: Charte.texte(15))),
+                          for (final s in typesRecettes[t]!) DropdownMenuItem<String?>(value: s, child: Text(s, style: Charte.texte(15))),
+                        ],
+                        onChanged: (v) => setState(() => sousTypes[t] = v),
+                      ),
+                    ]),
+                Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('Origine', style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
+                  const SizedBox(width: 8),
+                  DropdownButton<String?>(
+                    key: const ValueKey('edition-origine'),
+                    value: origine,
+                    items: [
+                      DropdownMenuItem<String?>(value: null, child: Text('Non précisée', style: Charte.texte(15))),
+                      for (final o in originesRecettes) DropdownMenuItem<String?>(value: o, child: Text(o, style: Charte.texte(15))),
+                    ],
+                    onChanged: (v) => setState(() => origine = v),
+                  ),
+                ]),
+              ]),
+              const SizedBox(height: 12),
               Wrap(spacing: 12, runSpacing: 12, crossAxisAlignment: WrapCrossAlignment.center, children: [
                 _champ(pour, 'Pour', aide: '4 personnes', largeur: 180, cle: const ValueKey('edition-pour')),
                 _champ(prep, 'Préparation (min)', largeur: 160, nombre: true, cle: const ValueKey('edition-preparation')),

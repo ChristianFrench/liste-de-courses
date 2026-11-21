@@ -206,6 +206,28 @@ void main() {
     expect(dureeRecette(120), '2 h');
   });
 
+  test('classement livré : 9 types, un sous-type par type, origine (21/11/2026)', () {
+    final j = jsonDecode(File('outils/recettes/illustrations/recettes-fournies.json').readAsStringSync()) as Map<String, dynamic>;
+    final r = [for (final x in j['recettes'] as List) Recette.lire(x as Map<String, dynamic>)];
+    for (final x in r) {
+      expect(x.types, isNotEmpty, reason: x.titre);
+      for (final t in x.types) {
+        expect(typesRecettes[t], contains(x.sousTypes[t]), reason: '${x.titre} : $t');
+      }
+      expect(originesRecettes, contains(x.origine), reason: x.titre);
+    }
+    final tikka = r.firstWhere((x) => x.titre == 'Poulet tikka masala');
+    expect(tikka.sousTypes, {'Plats': 'Volaille'});
+    expect(tikka.origine, 'Inde');
+    expect(tikka.classement, ['Plats · Volaille']);
+    expect(Recette.lire(tikka.versJson()).sousTypes, tikka.sousTypes);
+    expect(r.firstWhere((x) => x.memo).types, ['Bases culinaires']);
+    expect(r.firstWhere((x) => x.titre == 'Sauce caramel au beurre salé').types, ['Sauces', 'Dessert']);
+    final b = BaseRecettes(Directory.systemTemp, r);
+    expect(b.parType().keys.first, 'Apéritif');
+    expect(b.parType().keys.last, 'Bases culinaires');
+  });
+
   test('versions des recettes : journal, valider, revenir, changements depuis la publication', () async {
     final d = Directory.systemTemp.createTempSync('recettes-versions');
     Recette r(String id, String titre) =>
