@@ -173,6 +173,11 @@ class _EnTetePhoto extends StatelessWidget {
                       if (EnTeteFenetre.chercherRecette case final f?)
                         boutonEnTete(Icons.restaurant_menu_outlined, 'Chercher une recette', () => f(context)),
                       const BoutonSynchro(),
+                      // 21/11/2026 (Aristide) : Gérer quitte la barre des onglets : roue dentée en haut de l'accueil.
+                      if (Nav.avecCuisiner)
+                        KeyedSubtree(
+                            key: const ValueKey('ouvrir-gerer'),
+                            child: boutonEnTete(Icons.settings_outlined, 'Gérer', () => Nav.i.allerOnglet(Nav.gerer))),
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
                     ],
@@ -253,6 +258,8 @@ class _Etapes extends StatelessWidget {
   const _Etapes();
 
   static const _etapes = [
+    // 21/11/2026 (Aristide) : les recettes au début du cycle (choix) et à la fin (cuisine).
+    if (Nav.avecCuisiner) 'Je choisis\nmes recettes',
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
@@ -261,6 +268,7 @@ class _Etapes extends StatelessWidget {
   ];
 
   static const _icones = [
+    if (Nav.avecCuisiner) Icons.menu_book_outlined,
     Icons.checklist,
     Icons.check_circle_outline,
     Icons.shopping_cart_outlined,
@@ -269,6 +277,18 @@ class _Etapes extends StatelessWidget {
 
   // Explication de chaque étape, affichée quand on la touche.
   static const _explications = [
+    if (Nav.avecCuisiner)
+      (
+        'Je choisis mes recettes',
+        [
+          'Avant de préparer la liste, et seulement si vous le souhaitez : dans l\'onglet Recettes, cherchez une recette '
+              'par son nom ou un ingrédient, ou filtrez-les avec les boutons à icône.',
+          'Sur la recette, cochez les ingrédients à acheter (ceux du placard sont décochés), puis touchez « Noter les '
+              'ingrédients » : la recette va dans la note préparée, commune à tout le foyer.',
+          'Aucune liste n\'est nécessaire. Quand une liste est en préparation, les recettes notées apparaissent en tête, '
+              'sous « Recettes choisies » : touchez-en une pour ajouter ses ingrédients, ou ignorez-la si vous avez changé d\'avis.',
+        ],
+      ),
     (
       'Je prépare ma liste',
       [
@@ -310,17 +330,11 @@ class _Etapes extends StatelessWidget {
       (
         'Je cuisine',
         [
-          'L\'onglet Cuisiner est votre livre de recettes : près de 500 recettes, rangées par type (entrées, plats, '
-              'accompagnements, sauces, desserts).',
-          'Cherchez une recette par son nom ou par un ingrédient : « courgette » trouve toutes les recettes qui en utilisent.',
-          'Les boutons à icône filtrent les recettes : type, difficulté, temps, régime, saison, coût, mode de cuisson, '
-              'occasion. « De saison » garde les recettes de la saison du jour ; « Effacer les filtres » remet tout à zéro.',
-          'Touchez une recette : sa photo, le temps de préparation et de cuisson, la difficulté, puis deux onglets, '
-              'Ingrédients et Recette, avec les étapes numérotées et les conseils.',
+          'Les courses faites, l\'onglet Cuisiner est votre livre de recettes : près de 500 recettes, rangées par type.',
+          'Cherchez une recette par son nom ou par un ingrédient, ou filtrez-les avec les boutons à icône.',
+          'Touchez une recette : sa photo, le volet « Caractéristiques » (personnes, temps, difficulté), puis deux '
+              'onglets, Ingrédients et Recette, avec les étapes numérotées et les conseils.',
           'Avec − et +, changez le nombre de personnes : les quantités suivent.',
-          '« Ajouter aux courses » propose les ingrédients à cocher et les met dans votre liste en préparation, '
-              'avec la mention « pour : » et le nom de la recette. Sans liste en préparation, une liste est créée.',
-          'Pendant la préparation d\'une liste, le bouton « Recette » donne aussi accès aux recettes.',
         ],
       ),
   ];
@@ -363,7 +377,7 @@ class _Etapes extends StatelessWidget {
                 // 01/11/2026 (Aristide) : une icône à la place du numéro.
                 // 03/11/2026 : les images d'Emplettes pour préparer et faire les courses.
                 // 09/11/2026 (Aristide) : la liste validée attend les courses : chariot vide et liste non cochée.
-                ImageEmplettes(i == 1 ? 'liste_a_faire' : ImageEmplettes.pourIcone(_icones[i]), taille: 52),
+                ImageEmplettes(_icones[i] == Icons.check_circle_outline ? 'liste_a_faire' : ImageEmplettes.pourIcone(_icones[i]), taille: 52),
                 const SizedBox(height: 6),
                 Text(_etapes[i], textAlign: TextAlign.center, style: _surPhoto(Charte.texte(13, gras: true, couleur: Charte.blanc))),
               ],

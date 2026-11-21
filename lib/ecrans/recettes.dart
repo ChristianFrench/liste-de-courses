@@ -9,14 +9,16 @@ import '../donnees/recette_ingredients.dart';
 import '../donnees/recettes_recues.dart';
 import '../navigation.dart';
 import '../theme.dart';
-import 'travail.dart' show cocherIngredientsRecette;
 
 // Gérer › Courses › Catalogue des recettes (19/11/2026, Aristide) : consulter les recettes hors de la préparation.
 // Rangées par type (Entrée, Plat…), un champ pour chercher (titre ou ingrédient), des filtres combinables (20/11/2026) ;
 // une recette s'ouvre sur sa fiche.
 
 class EcranRecettes extends StatefulWidget {
-  const EcranRecettes({super.key, this.depuisEnTete = false, this.onglet = false});
+  const EcranRecettes({super.key, this.depuisEnTete = false, this.onglet = false, this.choix = false});
+
+  /// Onglet « Recettes » (21/11/2026) : le choix des recettes, dont on note les ingrédients ; sinon « Cuisiner ».
+  final bool choix;
 
   /// Ouvert par l'icône de l'en-tête : pas de « Gérer › Courses » au-dessus du titre.
   final bool depuisEnTete;
@@ -78,9 +80,9 @@ class _EcranRecettesState extends State<EcranRecettes> {
     return PageBase(
       entete: EnTeteFenetre(
         retour: !widget.onglet,
-        icone: Icons.restaurant_menu_outlined,
+        icone: widget.choix ? Icons.menu_book_outlined : Icons.restaurant_menu_outlined,
         sousTitre: widget.depuisEnTete || widget.onglet ? null : 'Gérer › Courses',
-        titre: widget.onglet ? 'Cuisiner' : 'Catalogue des recettes',
+        titre: widget.onglet ? (widget.choix ? 'Recettes' : 'Cuisiner') : 'Catalogue des recettes',
         // 19/11/2026 (Aristide) : tout déplier / tout replier, comme les autres catalogues.
         droite: boutonEnTete(toutOuvert ? Icons.unfold_less : Icons.unfold_more, toutOuvert ? 'Tout replier' : 'Tout déplier',
             () => plis.tous(cles, !toutOuvert)),
@@ -122,8 +124,14 @@ class _EcranRecettesState extends State<EcranRecettes> {
                       LigneMenu(
                         key: ValueKey('fiche-${r.titre}'),
                         titre: r.titre,
-                        sousTitre: resumeRecette(r),
-                        onTap: () => Nav.aller<void>(context, FicheRecette(recette: r)),
+                        sousTitre: [
+                          resumeRecette(r),
+                          if (widget.choix && Etat.instance.noteATraiter(r.id, r.titre) != null) 'notée',
+                        ].where((x) => x.isNotEmpty).join(' · '),
+                        onTap: () async {
+                          await Nav.aller<void>(context, FicheRecette(recette: r, choix: widget.choix));
+                          if (mounted) setState(() {});
+                        },
                       ),
                   ],
                 ),
@@ -545,10 +553,61 @@ class TexteRecette extends StatelessWidget {
   }
 }
 
-/// La fiche d'une recette : illustration, en-tête et critères, puis les onglets « Ingrédients » et « Recette ».
-class FicheRecette extends StatefulWidget {
-  const FicheRecette({super.key, required this.recette});
+/// Volet « Caractéristiques » (21/11/2026, Aristide) : replié, il résume temps et difficulté ; déplié, il montre
+/// le nombre de personnes (− / +), les temps, la difficulté et les pastilles de critères.
+class VoletCaracteristiques extends StatefulWidget {
+  const VoletCaracteristiques({super.key, required this.recette, this.personnes, this.onPersonnes});
   final RecetteLue recette;
+  final int? personnes;
+  final ValueChanged<int>? onPersonnes;
+
+  @override
+  State<VoletCaracteristiques> createState() => _VoletCaracteristiquesState();
+}
+
+class _VoletCaracteristiquesState extends State<VoletCaracteristiques> {
+  var _ouvert = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final r = widget.recette;
+    final n = widget.personnes ?? r.personnes;
+    final resume = [
+      if (n != null && r.personnes != null) r.pourN(n) else if (r.pour != null) r.pour!,
+      if (r.tempsTotal case final t?) duree(t),
+      if (r.difficulte case final d?) d,
+    ].join(' · ');
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      InkWell(
+        key: const ValueKey('volet-caracteristiques'),
+        onTap: () => setState(() => _ouvert = !_ouvert),
+        child: Padding(
+          padding: const EdgeInsets.only(top: 10, bottom: 4),
+          child: Row(children: [
+            Text('Caractéristiques', style: Charte.texte(16, gras: true, couleur: Charte.cadre)),
+            const SizedBox(width: 8),
+            if (!_ouvert)
+              Expanded(
+                child: Text(resume, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+              )
+            else
+              const Spacer(),
+            Icone(_ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.cadre),
+          ]),
+        ),
+      ),
+      if (_ouvert) EnTeteRecette(recette: r, personnes: widget.personnes, onPersonnes: widget.onPersonnes),
+    ]);
+  }
+}
+
+/// La fiche d'une recette : illustration, volet des caractéristiques, onglets « Ingrédients » et « Recette ».
+/// Au moment du choix ([choix], onglet Recettes, 21/11/2026) les ingrédients se cochent et « Noter les
+/// ingrédients » les range dans la note préparée du foyer ; pour cuisiner, la fiche se consulte seulement.
+class FicheRecette extends StatefulWidget {
+  const FicheRecette({super.key, required this.recette, this.choix = false});
+  final RecetteLue recette;
+  final bool choix;
 
   @override
   State<FicheRecette> createState() => _FicheRecetteState();
@@ -556,75 +615,93 @@ class FicheRecette extends StatefulWidget {
 
 class _FicheRecetteState extends State<FicheRecette> {
   var _recette = false;
-  late int? _personnes = widget.recette.personnes;
+  late int? _personnes;
+  late final Set<String> _coches;
+
+  @override
+  void initState() {
+    super.initState();
+    final r = widget.recette;
+    final note = Etat.instance.noteATraiter(r.id, r.titre);
+    _personnes = note?.personnes ?? r.personnes;
+    _coches = note != null
+        ? {for (final x in note.ingredients) x.trim()}
+        : {for (final x in r.ingredients) if (!estDuPlacard(nomIngredient(x))) x.trim()};
+  }
+
+  void _noter() {
+    final r = widget.recette;
+    final lignes = [for (final x in r.ingredients) if (_coches.contains(x.trim())) x.trim()];
+    Etat.instance.noterRecette(recette: r.id, titre: r.titre, personnes: _personnes, ingredients: lignes);
+    setState(() {});
+    Nav.message(context, '« ${r.titre} » notée (${lignes.length} ingrédient${lignes.length > 1 ? 's' : ''}) : '
+        'proposée à la préparation de votre liste');
+  }
 
   @override
   Widget build(BuildContext context) {
     final r = widget.recette;
-    return PageBase(
-      entete: EnTeteFenetre(retour: true, icone: Icons.restaurant_menu_outlined, sousTitre: 'Recettes', titre: r.titre),
-      corps: AvecDecision(
-        // 20/11/2026 (Aristide) : un seul pont vers les courses.
-        boutons: [
-          Bouton(
-            key: const ValueKey('ajouter-aux-courses'),
-            texte: 'Ajouter aux courses',
-            icone: Icons.add_shopping_cart,
-            plein: true,
-            onTap: () => ajouterAuxCourses(context, r, personnes: _personnes),
+    final etat = Etat.instance;
+    final notee = etat.noteATraiter(r.id, r.titre);
+    final lignes = r.ingredientsPour(_personnes);
+    final contenu = ListView(padding: const EdgeInsets.fromLTRB(16, 10, 16, 24), children: [
+      IllustrationRecette(recette: r, cle: const ValueKey('illustration-fiche')),
+      VoletCaracteristiques(recette: r, personnes: _personnes, onPersonnes: (n) => setState(() => _personnes = n)),
+      OngletsRecette(recette: _recette, onChange: (v) => setState(() => _recette = v)),
+      if (_recette)
+        TexteRecette(recette: r)
+      else if (widget.choix) ...[
+        Text('Cochez les ingrédients à acheter, puis notez-les : ils seront proposés quand vous préparerez votre liste.',
+            style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+        for (var i = 0; i < r.ingredients.length; i++)
+          CaseModale(
+            key: ValueKey('ingredient-$i'),
+            texte: lignes[i],
+            coche: _coches.contains(r.ingredients[i].trim()),
+            onChange: (v) => setState(() => v ? _coches.add(r.ingredients[i].trim()) : _coches.remove(r.ingredients[i].trim())),
+            encadree: false,
           ),
-        ],
-        contenu: ListView(padding: const EdgeInsets.fromLTRB(16, 10, 16, 24), children: [
-          IllustrationRecette(recette: r, cle: const ValueKey('illustration-fiche')),
-          EnTeteRecette(recette: r, personnes: _personnes, onPersonnes: (n) => setState(() => _personnes = n)),
-          OngletsRecette(recette: _recette, onChange: (v) => setState(() => _recette = v)),
-          if (_recette)
-            TexteRecette(recette: r)
-          else
-            for (final i in r.ingredientsPour(_personnes))
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Padding(padding: const EdgeInsets.only(top: 3, right: 8), child: Icone(Icons.circle, size: 7, color: Charte.cadre)),
-                  Expanded(child: Text(i, style: Charte.texte(15))),
-                ]),
-              ),
-        ]),
-      ),
+      ] else
+        for (final i in lignes)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Padding(padding: const EdgeInsets.only(top: 3, right: 8), child: Icone(Icons.circle, size: 7, color: Charte.cadre)),
+              Expanded(child: Text(i, style: Charte.texte(15))),
+            ]),
+          ),
+    ]);
+    return PageBase(
+      entete: EnTeteFenetre(
+          retour: true,
+          icone: widget.choix ? Icons.menu_book_outlined : Icons.restaurant_menu_outlined,
+          sousTitre: widget.choix ? 'Recettes' : 'Cuisiner',
+          titre: r.titre),
+      corps: widget.choix
+          ? AvecDecision(
+              boutons: [
+                if (notee != null)
+                  Bouton(
+                    key: const ValueKey('retirer-de-la-note'),
+                    texte: 'Retirer',
+                    onTap: () {
+                      etat.retirerDeLaNote(notee);
+                      setState(() {});
+                    },
+                  ),
+                Bouton(
+                  key: const ValueKey('noter-ingredients'),
+                  texte: notee == null ? 'Noter les ingrédients' : 'Mettre à jour la note',
+                  icone: Icons.edit_note,
+                  plein: true,
+                  onTap: _noter,
+                ),
+              ],
+              contenu: contenu,
+            )
+          : contenu,
     );
   }
-}
-
-/// « Ajouter aux courses » (20/11/2026, Aristide) : une seule liste en préparation, les ingrédients y vont ;
-/// plusieurs, on choisit ; aucune, une liste est créée (magasin à choisir s'il y en a plusieurs).
-Future<void> ajouterAuxCourses(BuildContext context, RecetteLue r, {int? personnes}) async {
-  final etat = Etat.instance;
-  final enPreparation = [...etat.listesStatut(StatutListe.enConstruction), ...etat.listesStatut(StatutListe.prete)];
-  Liste? liste;
-  Liste Function()? creer;
-  if (enPreparation.length == 1) {
-    liste = enPreparation.single;
-  } else if (enPreparation.length > 1) {
-    final id = await choisirDansListe<String>(context,
-        titre: 'Ajouter à quelle liste ?', choix: {for (final l in enPreparation) l.id: etat.nomListe(l)});
-    if (id == null || !context.mounted) return;
-    liste = etat.liste(id);
-  } else {
-    if (etat.magasins.isEmpty) {
-      Nav.message(context, 'Créez d\'abord un magasin (Gérer › Magasins)');
-      return;
-    }
-    var magasin = etat.magasins.first.id;
-    if (etat.magasins.length > 1) {
-      final m = await choisirDansListe<String>(context,
-          titre: 'Nouvelle liste : quel magasin ?', choix: {for (final m in etat.magasins) m.id: m.nom});
-      if (m == null || !context.mounted) return;
-      magasin = m;
-    }
-    creer = () => etat.creerListe(magasin, []);
-  }
-  if (!context.mounted) return;
-  await cocherIngredientsRecette(context, liste, r, direListe: true, creer: creer, personnes: personnes);
 }
 
 /// Bouton « recette » de l'en-tête (19/11/2026) : 20/11/2026 (Aristide) : pas de volet, le catalogue des recettes

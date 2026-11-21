@@ -25,6 +25,13 @@ import 'theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // 21/11/2026 (Aristide) : la barre d'état d'Android visible par-dessus l'image du haut : icônes blanches sur
+  // un léger voile sombre.
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Color(0x40000000),
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
+  ));
   // 12/11/2026 (Aristide) : l'écran d'abord, avec une fenêtre de progression, puis la lecture de la base.
   if (!outilEditeur) {
     // 20/11/2026 : l'icône recette de l'en-tête disparaît avec l'onglet « Cuisiner ».

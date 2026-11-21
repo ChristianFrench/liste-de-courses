@@ -111,19 +111,24 @@ class _EcranConstructionState extends State<EcranConstruction> {
             Container(height: 1, color: Charte.separateurZone),
           ],
           corps: l.lignes.isEmpty
-              ? Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
-                      style: Charte.texte(16, couleur: Charte.texteSecondaire)),
-                )
+              ? ListView(children: [
+                  ..._recettesChoisies(l),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text('Tapez le début du nom d\'un article dans le champ ci-dessus et touchez-le : il s\'ajoute à la liste.',
+                        style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                  ),
+                ])
               : avecLoupe(
                   context,
                   ListView(
                   controller: _defilement,
                   padding: const EdgeInsets.only(bottom: 16),
                   children: simple
-                      ? [for (final g in l.lignes) _ligne(l, g)]
+                      ? [..._recettesChoisies(l), for (final g in l.lignes) _ligne(l, g)]
                       : [
+                          // 21/11/2026 (Aristide) : en tête de liste, les recettes choisies (note préparée).
+                          ..._recettesChoisies(l),
                           // 12/11/2026 (Aristide) : en préparation, les secteurs dans l'ordre du catalogue (univers,
                           // rayons, secteurs), pas dans celui du parcours, qui ne sert qu'aux courses.
                           for (final x in etat.etapes(l, null, ordreBase: secteursOrdreCatalogue(etat)))
@@ -152,6 +157,83 @@ class _EcranConstructionState extends State<EcranConstruction> {
         );
       },
     );
+  }
+
+  /// « Recettes choisies » (21/11/2026, Aristide) : en tête de la liste, sous la forme des secteurs, une ligne
+  /// par recette de la note préparée du foyer : à traiter (toucher : ses ingrédients notés, pré-cochés), traitée
+  /// (ajoutée à cette liste), ignorée (on a changé d'avis). Un appui long propose les autres gestes.
+  List<Widget> _recettesChoisies(Liste l) {
+    // Démonstration d'abord (avec les onglets Recettes et Cuisiner).
+    final notes = Nav.avecCuisiner ? etat.recettesDeListe(l) : const <NoteRecette>[];
+    if (notes.isEmpty) return const [];
+    return [
+      const TitreGroupe(key: ValueKey('recettes-choisies'), nom: 'Recettes choisies', icone: Icons.menu_book_outlined),
+      for (final n in notes) _ligneRecette(l, n),
+    ];
+  }
+
+  Widget _ligneRecette(Liste l, NoteRecette n) {
+    final (icone, couleur, etatTexte) = switch (n.etat) {
+      NoteRecette.traitee => (Icons.check_circle, Charte.vert, 'ajoutée à la liste'),
+      NoteRecette.ignoree => (Icons.cancel_outlined, Charte.texteSecondaire, 'ignorée'),
+      _ => (Icons.pending_outlined, Charte.orange, '${n.ingredients.length} ingrédient${n.ingredients.length > 1 ? 's' : ''} à ajouter'),
+    };
+    final ignoree = n.etat == NoteRecette.ignoree;
+    final actions = [
+      if (n.etat == NoteRecette.aTraiter) ...[
+        ActionLigne(Icons.add_shopping_cart, 'Ajouter ses ingrédients', () => _traiterRecette(l, n)),
+        ActionLigne(Icons.cancel_outlined, 'Ignorer (j\'ai changé d\'avis)', () => etat.marquerRecette(n, NoteRecette.ignoree, l)),
+      ],
+      if (ignoree) ActionLigne(Icons.undo, 'Reprendre', () => etat.marquerRecette(n, NoteRecette.aTraiter, l)),
+      ActionLigne(Icons.menu_book_outlined, 'Voir la recette', () => _voirRecette(n)),
+    ];
+    return InkWell(
+      key: ValueKey('recette-choisie-${n.id}'),
+      onTap: () => n.etat == NoteRecette.aTraiter ? _traiterRecette(l, n) : menuActions(context, titre: n.titre, actions: actions),
+      onLongPress: () => menuActions(context, titre: n.titre, actions: actions),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        child: Row(children: [
+          Icone(icone, size: 24, color: couleur),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text.rich(TextSpan(children: [
+              TextSpan(
+                  text: n.titre,
+                  style: Charte.texte(16, couleur: ignoree ? Charte.texteSecondaire : Charte.encre)
+                      .copyWith(decoration: ignoree ? TextDecoration.lineThrough : null)),
+              TextSpan(text: '  $etatTexte', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+            ])),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  Future<RecetteLue?> _recetteDe(NoteRecette n) async {
+    final toutes = await recettesFournies();
+    return toutes.where((r) => n.recette != null ? r.id == n.recette : r.titre == n.titre).firstOrNull;
+  }
+
+  Future<void> _traiterRecette(Liste l, NoteRecette n) async {
+    final r = await _recetteDe(n);
+    if (!mounted) return;
+    if (r == null) {
+      Nav.message(context, 'Cette recette n\'est plus dans le catalogue des recettes');
+      return;
+    }
+    final (_, premier) = await cocherIngredientsRecette(context, l, r, note: n);
+    if (!mounted || premier == null) return;
+    setState(() {
+      _surligne = premier;
+      _proposes = null;
+    });
+    _amener(premier, essais: 4);
+  }
+
+  Future<void> _voirRecette(NoteRecette n) async {
+    final r = await _recetteDe(n);
+    if (r != null && mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
   }
 
   /// Secteur dont les articles non commandés sont déployés (un seul à la fois).
@@ -654,80 +736,100 @@ class _EcranConstructionState extends State<EcranConstruction> {
   }
 }
 
-/// Les ingrédients d'une recette à cocher, ajoutés à la liste [l] avec la consigne « pour : <recette> »
-/// (préparation, et « Ajouter aux courses » de l'onglet Cuisiner, 20/11/2026). Rend (faux, null) si l'on annule,
-/// sinon (vrai, premier produit ajouté). Sans liste, [creer] la crée au moment d'ajouter (rien n'est créé si l'on annule).
-Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste? liste, RecetteLue r,
-    {bool direListe = false, Liste Function()? creer, int? personnes}) async {
+/// Les ingrédients d'une recette à cocher, ajoutés à la liste [l] avec la consigne « pour : <recette> ». Même
+/// fenêtre pour le bouton « Recette » (coches standard : placard et inconnus décochés) et pour une recette de la
+/// note préparée (21/11/2026, Aristide : les ingrédients notés pré-cochés). La recette est alors marquée traitée
+/// pour cette liste. Rend (faux, null) si l'on annule, sinon (vrai, premier produit ajouté).
+Future<(bool, String?)> cocherIngredientsRecette(BuildContext context, Liste l, RecetteLue r,
+    {int? personnes, NoteRecette? note}) async {
   final etat = Etat.instance;
-    final lus = analyserIngredients(etat, r.ingredients);
-    final deja = [for (final a in lus) if (a.produit != null && liste != null && etat.ligne(liste, a.produit!.id) != null) a];
-    final aChoisir = [for (final a in lus) if (!deja.contains(a)) a];
-    if (aChoisir.isEmpty) {
-      Nav.message(context, deja.isEmpty ? 'Aucun ingrédient trouvé dans cette recette' : 'Tous les ingrédients sont déjà dans la liste');
-      return (true, null);
+  final lus = analyserIngredients(etat, r.ingredients);
+  final deja = [for (final a in lus) if (a.produit != null && etat.ligne(l, a.produit!.id) != null) a];
+  final aChoisir = [for (final a in lus) if (!deja.contains(a)) a];
+  void traitee(List<String> lignes) {
+    if (note != null) {
+      etat.marquerRecette(note, NoteRecette.traitee, l);
+    } else if (Nav.avecCuisiner) {
+      etat.recetteTraitee(l, recette: r.id, titre: r.titre, personnes: personnes ?? r.personnes, ingredients: lignes);
     }
-    final choisis = {for (var i = 0; i < aChoisir.length; i++) if (!aChoisir[i].placard && aChoisir[i].produit != null) i};
-    final titre = r.titre;
-    // 20/11/2026 (Aristide) : deux onglets, « Ingrédients » (les cases à cocher) et « Recette » (étapes, conseils).
-    var ongletRecette = false;
-    final avecTexte = r.etapes.isNotEmpty || r.conseils.isNotEmpty;
-    // 20/11/2026 (Aristide) : − / + sur le nombre de personnes, les quantités suivent.
-    personnes ??= r.personnes;
-    Map<String, String> lignesPour(int? n) {
-      final p = r.ingredientsPour(n);
-      return {for (var i = 0; i < p.length; i++) r.ingredients[i].trim(): p[i]};
-    }
-    final ok = await modale(
-      context,
-      titre: titre,
-      oui: 'Ajouter à la liste',
-      contenu: (context, maj) => Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // 17/11/2026 (Aristide) : l'illustration de la recette en haut, 720 × 480, au plus un tiers de l'écran.
-          IllustrationRecette(recette: r, cle: const ValueKey('illustration-recette')),
-          EnTeteRecette(recette: r, personnes: personnes, onPersonnes: (n) => maj(() => personnes = n)),
-          if (avecTexte) OngletsRecette(recette: ongletRecette, onChange: (v) => maj(() => ongletRecette = v)) else const SizedBox(height: 8),
-          if (ongletRecette)
-            TexteRecette(recette: r)
-          else ...[
-            Text('Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
-                'du catalogue sont décochés.', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-            const SizedBox(height: 8),
-            for (var i = 0; i < aChoisir.length; i++)
-              CaseModale(
-                key: ValueKey('ingredient-$i'),
-                texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
-                aide: lignesPour(personnes)[aChoisir[i].texte] ?? aChoisir[i].texte,
-                coche: choisis.contains(i),
-                onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
-                encadree: false,
-              ),
-            if (deja.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
-                    style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-              ),
-          ],
+  }
+
+  if (aChoisir.isEmpty) {
+    Nav.message(context, deja.isEmpty ? 'Aucun ingrédient trouvé dans cette recette' : 'Tous les ingrédients sont déjà dans la liste');
+    if (deja.isNotEmpty) traitee(const []);
+    return (true, null);
+  }
+  final notes = note == null ? null : {for (final x in note.ingredients) x.trim()};
+  final choisis = {
+    for (var i = 0; i < aChoisir.length; i++)
+      if (notes != null ? notes.contains(aChoisir[i].texte) : !aChoisir[i].placard && aChoisir[i].produit != null) i
+  };
+  final titre = r.titre;
+  // 20/11/2026 (Aristide) : deux onglets, « Ingrédients » (les cases à cocher) et « Recette » (étapes, conseils).
+  var ongletRecette = false;
+  final avecTexte = r.etapes.isNotEmpty || r.conseils.isNotEmpty;
+  // 20/11/2026 (Aristide) : − / + sur le nombre de personnes, les quantités suivent.
+  personnes ??= note?.personnes ?? r.personnes;
+  Map<String, String> lignesPour(int? n) {
+    final p = r.ingredientsPour(n);
+    return {for (var i = 0; i < p.length; i++) r.ingredients[i].trim(): p[i]};
+  }
+
+  final ok = await modale(
+    context,
+    titre: titre,
+    oui: 'Ajouter à la liste',
+    contenu: (context, maj) => Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // 17/11/2026 (Aristide) : l'illustration de la recette en haut, 720 × 480, au plus un tiers de l'écran.
+        IllustrationRecette(recette: r, cle: const ValueKey('illustration-recette')),
+        VoletCaracteristiques(recette: r, personnes: personnes, onPersonnes: (n) => maj(() => personnes = n)),
+        if (avecTexte) OngletsRecette(recette: ongletRecette, onChange: (v) => maj(() => ongletRecette = v)) else const SizedBox(height: 8),
+        if (ongletRecette)
+          TexteRecette(recette: r)
+        else ...[
+          Text(
+              note != null
+                  ? 'Les ingrédients notés sont cochés.'
+                  : 'Cochez ce qu\'il faut acheter. Les produits du placard (sel, poivre, huile…) et ceux inconnus '
+                      'du catalogue sont décochés.',
+              style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+          const SizedBox(height: 8),
+          for (var i = 0; i < aChoisir.length; i++)
+            CaseModale(
+              key: ValueKey('ingredient-$i'),
+              texte: aChoisir[i].produit?.nom ?? '${aChoisir[i].nom} (nouveau)',
+              aide: lignesPour(personnes)[aChoisir[i].texte] ?? aChoisir[i].texte,
+              coche: choisis.contains(i),
+              onChange: (v) => maj(() => v ? choisis.add(i) : choisis.remove(i)),
+              encadree: false,
+            ),
+          if (deja.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text('Déjà dans la liste : ${deja.map((a) => a.produit!.nom).join(', ')}.',
+                  style: Charte.texte(14, couleur: Charte.texteSecondaire)),
+            ),
         ],
-      ),
-    );
-    if (!ok) return (false, null);
-    if (!context.mounted || choisis.isEmpty) return (true, null);
-    final l = liste ?? creer!();
-    String? premier;
-    for (final i in choisis.toList()..sort()) {
-      final a = aChoisir[i];
-      final p = a.produit ?? etat.creerProduit(a.nom);
-      etat.ajouterLigne(l, p.id);
-      final c = etat.ligne(l, p.id)?.consigne;
-      final pour = 'pour : $titre';
-      if (c == null || !c.contains(pour)) etat.definirConsigne(l, p.id, c == null ? pour : '$c · $pour');
-      premier ??= p.id;
-    }
-    Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »${direListe ? ' dans « ${etat.nomListe(l)} »' : ''}');
+      ],
+    ),
+  );
+  if (!ok) return (false, null);
+  if (!context.mounted) return (true, null);
+  String? premier;
+  for (final i in choisis.toList()..sort()) {
+    final a = aChoisir[i];
+    final p = a.produit ?? etat.creerProduit(a.nom);
+    etat.ajouterLigne(l, p.id);
+    final c = etat.ligne(l, p.id)?.consigne;
+    final pour = 'pour : $titre';
+    if (c == null || !c.contains(pour)) etat.definirConsigne(l, p.id, c == null ? pour : '$c · $pour');
+    premier ??= p.id;
+  }
+  traitee([for (final i in choisis.toList()..sort()) aChoisir[i].texte]);
+  if (choisis.isNotEmpty) {
+    Nav.message(context, '${choisis.length} produit${choisis.length > 1 ? 's' : ''} ajouté${choisis.length > 1 ? 's' : ''} pour « $titre »');
+  }
   return (true, premier);
 }
-

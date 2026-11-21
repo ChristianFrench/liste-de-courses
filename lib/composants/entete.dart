@@ -26,8 +26,12 @@ class EnTeteFenetre extends StatelessWidget {
     this.droite,
     this.aide,
     this.onAppuiLong,
+    this.onRetour,
   });
   final String titre;
+
+  /// Flèche de retour sur un écran racine (Gérer, ouvert depuis l'accueil, 21/11/2026).
+  final VoidCallback? onRetour;
 
   /// Choisit l'image de signature des onglets (sans flèche de retour) : liste et crayon (Préparer),
   /// liste et chariot (Courses), engrenage (Gérer), sinon l'image complète d'Emplettes.
@@ -87,6 +91,7 @@ class EnTeteFenetre extends StatelessWidget {
             Row(
               children: [
                 if (retour) bouton(Icons.chevron_left, 'Retour', () => Navigator.of(context).maybePop()),
+                if (!retour && onRetour != null) bouton(Icons.chevron_left, 'Retour', onRetour!),
                 // 03/11/2026 (Aristide) : l'icône de l'application en signature sur les onglets
                 if (!retour)
                   Padding(
@@ -174,8 +179,10 @@ Widget boutonEnTete(IconData i, String libelle, VoidCallback onTap) => Tooltip(
 
 /// Passe à l'onglet voisin ([sens] = 1 : suivant, -1 : précédent), comme un appui sur la barre du bas.
 void glisserOnglet(BuildContext context, int sens) {
-  final o = Nav.i.onglet + sens;
-  if (o < 0 || o >= Nav.nbOnglets) return;
+  // 21/11/2026 : dans l'ordre de la barre (Gérer n'y est plus dans la démonstration).
+  final k = Nav.ordre.indexOf(Nav.i.onglet) + sens;
+  if (Nav.ordre.indexOf(Nav.i.onglet) < 0 || k < 0 || k >= Nav.ordre.length) return;
+  final o = Nav.ordre[k];
   final enTravail = Nav.i.racine.currentState?.canPop() ?? false;
   if (enTravail) {
     // Pendant les courses, quitter passe par la pause.

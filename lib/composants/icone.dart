@@ -28,7 +28,7 @@ class Icone extends StatelessWidget {
       );
     }
     // 20/11/2026 (Aristide) : sa cocotte pour tout ce qui touche aux recettes.
-    if (icon == Icons.restaurant_menu_outlined) {
+    if (icon == Icons.restaurant_menu_outlined || icon == Icons.menu_book_outlined) {
       return Semantics(
         label: semanticLabel,
         child: Image.asset('assets/recettes/recettes-de-cuisine.png', width: t, height: t, filterQuality: FilterQuality.medium),
@@ -75,6 +75,7 @@ class ImageEmplettes extends StatelessWidget {
         Icons.checklist => 'liste_crayon',
         Icons.shopping_cart_outlined => 'liste_chariot',
         Icons.restaurant_menu_outlined => 'cuisiner',
+        Icons.menu_book_outlined => 'recettes',
         _ => 'complet',
       };
 

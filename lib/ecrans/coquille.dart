@@ -31,13 +31,17 @@ class BarreOnglets extends StatelessWidget {
   final int actif;
   final ValueChanged<int> onChoix;
 
-  static const entrees = <(IconData, String)>[
-    (Icons.home_outlined, 'Accueil'),
-    (Icons.checklist, 'Préparer'),
-    (Icons.shopping_cart_outlined, 'Courses'),
-    if (Nav.avecCuisiner) (Icons.restaurant_menu_outlined, 'Cuisiner'),
-    (Icons.tune, 'Gérer'),
-  ];
+  static const _entrees = <int, (IconData, String)>{
+    Nav.accueil: (Icons.home_outlined, 'Accueil'),
+    Nav.preparer: (Icons.checklist, 'Préparer'),
+    Nav.courses: (Icons.shopping_cart_outlined, 'Courses'),
+    if (Nav.avecCuisiner) Nav.cuisiner: (Icons.restaurant_menu_outlined, 'Cuisiner'),
+    if (Nav.avecCuisiner) Nav.recettes: (Icons.menu_book_outlined, 'Recettes'),
+    Nav.gerer: (Icons.tune, 'Gérer'),
+  };
+
+  /// Icône et libellé des onglets de la barre, dans l'ordre affiché.
+  static List<(IconData, String)> get entrees => [for (final o in Nav.ordre) _entrees[o]!];
 
   @override
   Widget build(BuildContext context) {
@@ -51,32 +55,32 @@ class BarreOnglets extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (var i = 0; i < entrees.length; i++)
+          for (var k = 0; k < Nav.ordre.length; k++)
             Expanded(
               child: Semantics(
                 button: true,
-                selected: i == actif,
-                label: entrees[i].$2,
+                selected: Nav.ordre[k] == actif,
+                label: entrees[k].$2,
                 child: InkWell(
-                  onTap: () => onChoix(i),
+                  onTap: () => onChoix(Nav.ordre[k]),
                   // 01/11/2026 (Aristide) : grande icône, le libellé posé dessus, en bas.
                   child: Center(
                     child: Container(
                       width: 72,
                       height: Charte.barreOnglets - 6,
                       decoration: BoxDecoration(
-                        color: i == actif ? Charte.clair(Charte.accent, 0.55) : null,
+                        color: Nav.ordre[k] == actif ? Charte.clair(Charte.accent, 0.55) : null,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Stack(alignment: Alignment.center, children: [
                         Positioned(
                             top: 0,
-                            child: i == Nav.gerer
-                                ? Icone(entrees[i].$1, size: 56, color: Charte.cadre)
-                                : ImageEmplettes(i == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[i].$1), taille: 60)),
+                            child: Nav.ordre[k] == Nav.gerer
+                                ? Icone(entrees[k].$1, size: 56, color: Charte.cadre)
+                                : ImageEmplettes(k == 0 ? 'complet' : ImageEmplettes.pourIcone(entrees[k].$1), taille: 60)),
                         Positioned(
                           bottom: 1,
-                          child: Text(entrees[i].$2,
+                          child: Text(entrees[k].$2,
                               style: Charte.texte(Charte.tNavigation + 1, gras: true, couleur: Charte.encre).copyWith(shadows: const [
                                 Shadow(color: Color(0xFFFFFFFF), blurRadius: 3),
                                 Shadow(color: Color(0xFFFFFFFF), blurRadius: 2),
@@ -319,6 +323,7 @@ class RacineOnglet extends StatelessWidget {
           ),
         Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
         Nav.cuisiner => const EcranRecettes(onglet: true),
+        Nav.recettes => const EcranRecettes(onglet: true, choix: true),
         _ => const MenuGerer(),
       },
     );
@@ -339,7 +344,12 @@ class MenuGerer extends StatelessWidget {
     Widget ecran(IconData icone, String titre, String sousTitre, Widget e) =>
         LigneMenu(icone: icone, titre: titre, sousTitre: sousTitre, onTap: () => Nav.aller<void>(context, e));
     return PageBase(
-      entete: const EnTeteFenetre(icone: Icons.tune, titre: 'Gérer', aide: Aides.gerer),
+      // 21/11/2026 (Aristide) : Gérer s'ouvre par la roue dentée de l'accueil ; la flèche y ramène.
+      entete: EnTeteFenetre(
+          icone: Icons.tune,
+          titre: 'Gérer',
+          aide: Aides.gerer,
+          onRetour: Nav.avecCuisiner ? () => Nav.i.allerOnglet(Nav.accueil) : null),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [

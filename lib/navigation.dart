@@ -17,11 +17,17 @@ class Nav extends ChangeNotifier {
   static const int accueil = 0;
   static const int preparer = 1;
   static const int courses = 2;
-  // 20/11/2026 (Aristide) : onglet « Cuisiner » (le livre de recettes) avant Gérer ; dans la démonstration d'abord.
+  // 20/11/2026 (Aristide) : onglet « Cuisiner » (le livre de recettes) ; démonstration d'abord.
+  // 21/11/2026 (Aristide) : deux onglets de recettes, « Recettes » au début du cycle (choisir, noter les
+  // ingrédients) et « Cuisiner » à la fin ; Gérer quitte la barre (roue dentée de l'accueil).
   static const bool avecCuisiner = demonstration;
   static const int cuisiner = avecCuisiner ? 3 : -1;
-  static const int gerer = avecCuisiner ? 4 : 3;
-  static const int nbOnglets = avecCuisiner ? 5 : 4;
+  static const int recettes = avecCuisiner ? 4 : -2;
+  static const int gerer = avecCuisiner ? 5 : 3;
+  static const int nbOnglets = avecCuisiner ? 6 : 4;
+
+  /// Les onglets de la barre du bas, dans l'ordre affiché.
+  static const ordre = avecCuisiner ? [accueil, recettes, preparer, courses, cuisiner] : [accueil, preparer, courses, gerer];
 
   // Rubriques de Gérer
   static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;

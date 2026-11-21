@@ -901,6 +901,9 @@ void main() {
       // 20/11/2026 : en-tête (pour, temps, difficulté), puis onglets « Ingrédients » / « Recette ».
       final accras = (await tester.runAsync(recettesFournies))!.firstWhere((x) => x.titre == 'Accras de morue');
       expect(accras.etapes, isNotEmpty);
+      // 21/11/2026 : les caractéristiques dans un volet replié.
+      expect(find.byKey(const ValueKey('ligne-recette')), findsNothing);
+      await _toucher(tester, find.byKey(const ValueKey('volet-caracteristiques')));
       expect(find.byKey(const ValueKey('ligne-recette')), findsOneWidget);
       expect(find.text(accras.etapes.first), findsNothing);
       expect(find.byKey(const ValueKey('ingredient-0')), findsOneWidget);

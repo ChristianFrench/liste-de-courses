@@ -318,6 +318,7 @@ extension EtatChargement on Etat {
             if (sansTicket.isNotEmpty) 'sansTicket': sansTicket.toList(),
             if (terminees2) 'terminees2': true,
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
+            if (noteRecettes.isNotEmpty) 'noteRecettes': [for (final n in noteRecettes) n.versJson()],
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
             if (datesPrevues.isNotEmpty) 'datesPrevues': datesPrevues,

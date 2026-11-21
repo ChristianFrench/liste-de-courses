@@ -29,6 +29,7 @@ part 'modele/etat_corbeille.dart';
 part 'modele/etat_foyer.dart';
 part 'modele/etat_catalogue_commun.dart';
 part 'modele/etat_marques.dart';
+part 'modele/etat_recettes.dart';
 
 // Modèle de données (« Données maquette.json »), gardé dans la base locale SQLite de l'appareil
 // au schéma v2 (stockage.dart). Chaque action est enregistrée immédiatement.
@@ -101,6 +102,10 @@ class Etat extends ChangeNotifier {
 
   /// Commentaire saisi à la validation d'une liste (identifiant de liste → texte), repris en courses et dans le mail.
   Map<String, String> commentaires = {};
+
+  /// « Note préparée » du foyer (21/11/2026, Aristide) : les recettes choisies et leurs ingrédients notés,
+  /// en attendant la préparation d'une liste. Voir [NoteRecette].
+  List<NoteRecette> noteRecettes = [];
 
   /// Articles manquants en rayon, signalés pendant les courses (identifiant de liste → produits).
   Map<String, Set<String>> manquants = {};
@@ -512,6 +517,7 @@ class Etat extends ChangeNotifier {
     sansTicket = _ids(options?['sansTicket']).toSet();
     terminees2 = options?['terminees2'] == true;
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
+    noteRecettes = [for (final n in (options?['noteRecettes'] as List? ?? const []).whereType<Map>()) NoteRecette.depuis(n)];
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
     datesPrevues = {for (final e in (options?['datesPrevues'] as Map? ?? {}).entries) e.key as String: e.value as String};
