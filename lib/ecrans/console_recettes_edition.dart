@@ -5,7 +5,7 @@ import '../donnees/recettes.dart';
 import '../theme.dart';
 
 // Console › Catalogue des recettes › Modifier / Nouvelle recette (20/11/2026, Aristide : versions du catalogue
-// des recettes comme pour les produits). Une fenêtre avec tous les champs ; les ingrédients s'écrivent un par
+// des recettes comme pour les produits). Une fenêtre à trois onglets (Caractéristiques, Ingrédients, Recette, 22/11/2026) ; les ingrédients s'écrivent un par
 // ligne sous la forme uniforme « Nom · quantité · précision », les étapes et les conseils un par ligne.
 
 const valeursRegimes = ['Végétarien', 'Végétalien', 'Sans gluten', 'Sans lactose'];
@@ -116,118 +116,125 @@ class _FenetreRecetteState extends State<_FenetreRecette> {
     return largeur == null ? champ : SizedBox(width: largeur, child: champ);
   }
 
-  Widget _choix(String titre, List<String> valeurs, bool Function(String) actif, void Function(String) basculer) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
+  /// Une ligne « libellé : valeur », la même pour tous les critères (22/11/2026).
+  Widget _rangee(String libelle, Widget valeur) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
         child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          SizedBox(width: 130, child: Text(titre, style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau))),
-          Expanded(
-            child: Wrap(spacing: 6, runSpacing: 6, children: [
-              for (final v in valeurs)
-                FilterChip(
-                  key: ValueKey('critere-$titre-$v'),
-                  label: Text(v, style: Charte.texte(13.5)),
-                  selected: actif(v),
-                  onSelected: (_) => setState(() => basculer(v)),
-                ),
-            ]),
-          ),
+          SizedBox(width: 170, child: Text(libelle, style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau))),
+          Expanded(child: Align(alignment: Alignment.centerLeft, child: valeur)),
         ]),
+      );
+
+  Widget _choix(String titre, List<String> valeurs, bool Function(String) actif, void Function(String) basculer) => _rangee(
+        titre,
+        Wrap(spacing: 6, runSpacing: 6, children: [
+          for (final v in valeurs)
+            FilterChip(
+              key: ValueKey('critere-$titre-$v'),
+              label: Text(v, style: Charte.texte(13.5)),
+              selected: actif(v),
+              onSelected: (_) => setState(() => basculer(v)),
+            ),
+        ]),
+      );
+
+  Widget _liste<T>(Key cle, T valeur, List<(T, String)> valeurs, void Function(T?) choisir) => SizedBox(
+        width: 320,
+        child: DropdownButton<T>(
+          key: cle,
+          isExpanded: true,
+          value: valeur,
+          items: [for (final (v, l) in valeurs) DropdownMenuItem<T>(value: v, child: Text(l, style: Charte.texte(15)))],
+          onChanged: (v) => setState(() => choisir(v)),
+        ),
       );
 
   void _bascule(Set<String> s, String v) => s.contains(v) ? s.remove(v) : s.add(v);
 
+  /// Onglet Caractéristiques : titre, types et sous-types, origine, temps, difficulté et critères,
+  /// tous sur le même modèle de ligne.
+  Widget _caracteristiques() => ListView(padding: const EdgeInsets.fromLTRB(20, 16, 20, 14), children: [
+        _champ(titre, 'Titre', cle: const ValueKey('edition-titre')),
+        const SizedBox(height: 14),
+        _choix('Types', typesRecettes.keys.toList(), types.contains, (v) => _bascule(types, v)),
+        for (final t in typesRecettes.keys)
+          if (types.contains(t))
+            _rangee(
+              'Sous-type $t',
+              _liste<String?>(ValueKey('edition-sous-type-$t'), typesRecettes[t]!.contains(sousTypes[t]) ? sousTypes[t] : null,
+                  [(null, 'Aucun'), for (final s in typesRecettes[t]!) (s, s)], (v) => sousTypes[t] = v),
+            ),
+        _rangee('Origine',
+            _liste<String?>(const ValueKey('edition-origine'), origine, [(null, 'Non précisée'), for (final o in originesRecettes) (o, o)], (v) => origine = v)),
+        _rangee(
+          'Temps (minutes)',
+          Row(children: [
+            _champ(prep, 'Préparation', largeur: 150, nombre: true, cle: const ValueKey('edition-preparation')),
+            const SizedBox(width: 12),
+            _champ(cuisson, 'Cuisson', largeur: 150, nombre: true, cle: const ValueKey('edition-cuisson')),
+          ]),
+        ),
+        _rangee('Difficulté',
+            _liste<String?>(const ValueKey('edition-difficulte'), difficulte, [for (final d in niveauxDifficulte) (d, d)], (v) => difficulte = v)),
+        _choix('Régime', valeursRegimes, regimes.contains, (v) => _bascule(regimes, v)),
+        _choix('Saison', valeursSaisons, saisons.contains, (v) => _bascule(saisons, v)),
+        _choix('Coût', valeursCout, (v) => cout == v, (v) => cout = cout == v ? null : v),
+        _choix('Mode de cuisson', valeursCuissons, cuissons.contains, (v) => _bascule(cuissons, v)),
+        _choix('Occasion', valeursOccasions, occasions.contains, (v) => _bascule(occasions, v)),
+      ]);
+
+  /// Onglet Ingrédients : le nombre de personnes, puis un ingrédient par ligne.
+  Widget _ingredients() => ListView(padding: const EdgeInsets.fromLTRB(20, 16, 20, 14), children: [
+        _champ(pour, 'Pour', aide: '4 personnes', largeur: 240, cle: const ValueKey('edition-pour')),
+        const SizedBox(height: 14),
+        _champ(ingredients, 'Ingrédients, un par ligne : Nom · quantité · précision', aide: 'Pommes de terre · 1 kg · type Charlotte',
+            lignes: 18, cle: const ValueKey('edition-ingredients')),
+      ]);
+
+  /// Onglet Recette : les étapes, puis les conseils.
+  Widget _recette() => ListView(padding: const EdgeInsets.fromLTRB(20, 16, 20, 14), children: [
+        _champ(etapes, "Étapes, une par ligne (verbes à l'infinitif)", lignes: 16, cle: const ValueKey('edition-etapes')),
+        const SizedBox(height: 14),
+        _champ(conseils, 'Conseils, un par ligne', lignes: 4, cle: const ValueKey('edition-conseils')),
+      ]);
+
   @override
   Widget build(BuildContext context) {
+    // 22/11/2026 (Aristide) : la fenêtre de modification a les mêmes trois onglets que la fiche.
     return Dialog(
       backgroundColor: Charte.blanc,
       child: SizedBox(
-        width: 960,
-        height: 760,
-        child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-            child: Text(r == null ? 'Nouvelle recette' : 'Modifier « ${r!.titre} »', style: Charte.texte(19, gras: true)),
-          ),
-          Container(height: 1, color: Charte.separateurZone),
-          Expanded(
-            child: ListView(padding: const EdgeInsets.fromLTRB(20, 14, 20, 14), children: [
-              _champ(titre, 'Titre', cle: const ValueKey('edition-titre')),
-              const SizedBox(height: 12),
-              _choix('Types', typesRecettes.keys.toList(), types.contains, (v) => _bascule(types, v)),
-              // 21/11/2026 : un sous-type par type choisi, et l'origine.
-              Wrap(spacing: 18, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                for (final t in typesRecettes.keys)
-                  if (types.contains(t))
-                    Row(mainAxisSize: MainAxisSize.min, children: [
-                      Text(t, style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
-                      const SizedBox(width: 8),
-                      DropdownButton<String?>(
-                        key: ValueKey('edition-sous-type-$t'),
-                        value: typesRecettes[t]!.contains(sousTypes[t]) ? sousTypes[t] : null,
-                        hint: Text('Sous-type', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                        items: [
-                          DropdownMenuItem<String?>(value: null, child: Text('Aucun', style: Charte.texte(15))),
-                          for (final s in typesRecettes[t]!) DropdownMenuItem<String?>(value: s, child: Text(s, style: Charte.texte(15))),
-                        ],
-                        onChanged: (v) => setState(() => sousTypes[t] = v),
-                      ),
-                    ]),
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Origine', style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
-                  const SizedBox(width: 8),
-                  DropdownButton<String?>(
-                    key: const ValueKey('edition-origine'),
-                    value: origine,
-                    items: [
-                      DropdownMenuItem<String?>(value: null, child: Text('Non précisée', style: Charte.texte(15))),
-                      for (final o in originesRecettes) DropdownMenuItem<String?>(value: o, child: Text(o, style: Charte.texte(15))),
-                    ],
-                    onChanged: (v) => setState(() => origine = v),
-                  ),
-                ]),
+        width: 1040,
+        height: 780,
+        child: DefaultTabController(
+          length: 3,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              color: Charte.fondBandeau,
+              padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+              child: Text(r == null ? 'Nouvelle recette' : 'Modifier « ${r!.titre} »', style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
+            ),
+            TabBar(
+              labelStyle: Charte.texte(15, gras: true),
+              unselectedLabelStyle: Charte.texte(15),
+              labelColor: Charte.encreNiveau,
+              indicatorColor: Charte.cadre,
+              tabs: const [Tab(text: 'Caractéristiques'), Tab(text: 'Ingrédients'), Tab(text: 'Recette')],
+            ),
+            Container(height: 1, color: Charte.separateurZone),
+            Expanded(child: TabBarView(children: [_caracteristiques(), _ingredients(), _recette()])),
+            Container(height: 1, color: Charte.separateurZone),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Row(children: [
+                if (erreur != null) Expanded(child: Text(erreur!, style: Charte.texte(14, gras: true, couleur: Charte.rouge))) else const Spacer(),
+                Bouton(key: const ValueKey('edition-annuler'), texte: 'Annuler', onTap: () => Navigator.of(context).pop()),
+                const SizedBox(width: 10),
+                Bouton(key: const ValueKey('edition-enregistrer'), texte: 'Enregistrer', plein: true, icone: Icons.check, onTap: _enregistrer),
               ]),
-              const SizedBox(height: 12),
-              Wrap(spacing: 12, runSpacing: 12, crossAxisAlignment: WrapCrossAlignment.center, children: [
-                _champ(pour, 'Pour', aide: '4 personnes', largeur: 180, cle: const ValueKey('edition-pour')),
-                _champ(prep, 'Préparation (min)', largeur: 160, nombre: true, cle: const ValueKey('edition-preparation')),
-                _champ(cuisson, 'Cuisson (min)', largeur: 160, nombre: true, cle: const ValueKey('edition-cuisson')),
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('Difficulté', style: Charte.texte(14, gras: true, couleur: Charte.encreNiveau)),
-                  const SizedBox(width: 10),
-                  DropdownButton<String>(
-                    key: const ValueKey('edition-difficulte'),
-                    value: difficulte,
-                    items: [for (final d in niveauxDifficulte) DropdownMenuItem(value: d, child: Text(d, style: Charte.texte(15)))],
-                    onChanged: (v) => setState(() => difficulte = v),
-                  ),
-                ]),
-              ]),
-              const SizedBox(height: 14),
-              _choix('Régime', valeursRegimes, regimes.contains, (v) => _bascule(regimes, v)),
-              _choix('Saison', valeursSaisons, saisons.contains, (v) => _bascule(saisons, v)),
-              _choix('Coût', valeursCout, (v) => cout == v, (v) => cout = cout == v ? null : v),
-              _choix('Cuisson', valeursCuissons, cuissons.contains, (v) => _bascule(cuissons, v)),
-              _choix('Occasion', valeursOccasions, occasions.contains, (v) => _bascule(occasions, v)),
-              const SizedBox(height: 6),
-              _champ(ingredients, 'Ingrédients, un par ligne', aide: 'Pommes de terre · 1 kg · type Charlotte', lignes: 8,
-                  cle: const ValueKey('edition-ingredients')),
-              const SizedBox(height: 12),
-              _champ(etapes, 'Étapes, une par ligne (verbes à l\'infinitif)', lignes: 8, cle: const ValueKey('edition-etapes')),
-              const SizedBox(height: 12),
-              _champ(conseils, 'Conseils, un par ligne', lignes: 2, cle: const ValueKey('edition-conseils')),
-            ]),
-          ),
-          Container(height: 1, color: Charte.separateurZone),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Row(children: [
-              if (erreur != null) Expanded(child: Text(erreur!, style: Charte.texte(14, gras: true, couleur: Charte.rouge))) else const Spacer(),
-              Bouton(key: const ValueKey('edition-annuler'), texte: 'Annuler', onTap: () => Navigator.of(context).pop()),
-              const SizedBox(width: 10),
-              Bouton(key: const ValueKey('edition-enregistrer'), texte: 'Enregistrer', plein: true, icone: Icons.check, onTap: _enregistrer),
-            ]),
-          ),
-        ]),
+            ),
+          ]),
+        ),
       ),
     );
   }
