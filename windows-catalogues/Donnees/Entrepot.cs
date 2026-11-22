@@ -17,6 +17,8 @@ sealed class Entrepot
     public List<Recette> Recettes = new();
     public string? Erreur;
     JsonObject? _racineRecettes;
+    public HierarchieMarques Marques = new();
+    public string? FichierMarques => Dossier is null ? null : Path.Combine(Dossier, "marques", "hierarchie.json");
 
     public string? FichierRecettes => Dossier is null ? null : Path.Combine(Dossier, "recettes", "recettes.json");
 
@@ -58,6 +60,7 @@ sealed class Entrepot
             }
             e.ChargerCatalogue();
             e.ChargerRecettes();
+            e.ChargerMarques();
         }
         catch (Exception x)
         {
@@ -167,6 +170,31 @@ sealed class Entrepot
         foreach (var r in _racineRecettes?["recettes"]?.AsArray() ?? new JsonArray())
             if (r is JsonObject o) Recettes.Add(Recette.Lire(o));
         RecettesPubliees = (int?)_racineRecettes?["publiee"]?["numero"];
+    }
+
+    /// <summary>Hiérarchie des marques ; la première fois, celle livrée avec le logiciel est copiée dans les données.</summary>
+    void ChargerMarques()
+    {
+        var f = FichierMarques!;
+        if (!File.Exists(f))
+        {
+            var livree = Path.Combine(AppContext.BaseDirectory, "marques-hierarchie.json");
+            if (!File.Exists(livree)) return;
+            Directory.CreateDirectory(Path.GetDirectoryName(f)!);
+            File.Copy(livree, f);
+        }
+        if (JsonNode.Parse(File.ReadAllText(f)) is JsonObject o) Marques = HierarchieMarques.Lire(o);
+    }
+
+    /// <summary>Enregistre la hiérarchie des marques (copie hierarchie.json.bak avant).</summary>
+    public void EnregistrerMarques()
+    {
+        var f = FichierMarques ?? throw new InvalidOperationException("Pas de dossier de données.");
+        Directory.CreateDirectory(Path.GetDirectoryName(f)!);
+        if (File.Exists(f)) File.Copy(f, f + ".bak", overwrite: true);
+        var temp = f + ".tmp";
+        File.WriteAllText(temp, Marques.Racine.ToJsonString(new JsonSerializerOptions(Options) { WriteIndented = true }));
+        File.Move(temp, f, overwrite: true);
     }
 
     static readonly JsonSerializerOptions Options = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };

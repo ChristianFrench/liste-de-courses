@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Globalization;
 using System.Text;
 using EmplettesCatalogues.Donnees;
@@ -315,10 +316,12 @@ sealed class FormPrincipale : Form
                     $"{publie} · {c.Domaines.Count} domaines · {c.Rayons.Count} rayons · {c.Rayons.Sum(r => r.Secteurs.Count)} secteurs · {c.TousLesProduits.Count()} produits", travail);
                 break;
             case Vue.Marques:
-                var marques = c.TousLesProduits.SelectMany(p => p.Marques).Distinct(StringComparer.CurrentCultureIgnoreCase).Count();
-                var declinaisons = c.TousLesProduits.Sum(p => p.Marques.Count);
+                var h = _entrepot.Marques;
+                var uniques = h.Familles.SelectMany(f => f.Liste).Select(m => ((string?)m["nom"] ?? "").ToLowerInvariant()).Distinct().Count();
+                var aClasser = MarquesAClasser().Count;
                 _banniere.Afficher(Icones.Glyphe(Icones.Marques, Icones.Vert, 44), TitreVue(_vue),
-                    $"{publie} · {marques} marques · {declinaisons} déclinaisons de produits", travail);
+                    $"{h.Groupes.Count} groupes · {h.Familles.Count()} familles · {uniques} marques · {c.TousLesProduits.Sum(p => p.Marques.Count)} déclinaisons de produits",
+                    new[] { ("À classer", aClasser == 0 ? "aucune" : $"{aClasser} marque{(aClasser > 1 ? "s" : "")}", aClasser > 0) });
                 break;
             default:
                 var r = _entrepot.Recettes;
@@ -392,31 +395,55 @@ sealed class FormPrincipale : Form
         }
     }
 
-    sealed record Marque(string Nom, string Domaine, List<Produit> Produits);
+    sealed record GroupeM(string Nom);
+
+    /// <summary>Produits du catalogue déclinés dans la marque <paramref name="nom"/>.</summary>
+    List<Produit> ProduitsDe(string nom) =>
+        _entrepot.Catalogue.TousLesProduits.Where(p => p.Marques.Contains(nom, StringComparer.CurrentCultureIgnoreCase)).ToList();
+
+    /// <summary>Marques des produits du catalogue absentes de la hiérarchie des marques.</summary>
+    List<string> MarquesAClasser() =>
+        _entrepot.Catalogue.TousLesProduits.SelectMany(p => p.Marques).Distinct(StringComparer.CurrentCultureIgnoreCase)
+            .Where(m => !_entrepot.Marques.Contient(m)).OrderBy(m => m, StringComparer.CurrentCultureIgnoreCase).ToList();
 
     void ArbreMarques()
     {
-        var c = _entrepot.Catalogue;
         var im = Vignette("marque", () => Icones.Glyphe(Icones.Marques, Icones.Orange, 24), Icones.Marques);
-        foreach (var d in c.Domaines)
+        var ig = Vignette("groupe-marques", () => Icones.Glyphe(Icones.Produits, Icones.Vert, 24), Icones.Produits);
+        var idossier = Vignette("sous-type", () => Icones.Glyphe('\uE8B7', Icones.Orange, 24), '\uE8B7');
+        TreeNode NoeudMarque(MarqueH m)
         {
-            var marques = c.Rayons.Where(r => r.Domaine == d).SelectMany(r => r.Secteurs).SelectMany(s => s.Produits)
-                .SelectMany(p => p.Marques.Select(m => (m, p)))
-                .GroupBy(x => x.m, StringComparer.CurrentCultureIgnoreCase)
-                .OrderBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase).ToList();
-            if (marques.Count == 0) continue;
-            var nd = Noeud(d, new Domaine(d), Vignette("d:" + d, () => IconesCatalogue.Domaine(d), Icones.Produits));
-            nd.ToolTipText = $"{marques.Count} marques";
-            foreach (var g in marques)
+            var produits = ProduitsDe(m.Nom);
+            var nm = Noeud(m.Nom, m, im);
+            nm.ToolTipText = $"{produits.Count} produit{(produits.Count > 1 ? "s" : "")}{(m.Source.Length > 0 ? " · " + m.Source : "")}";
+            foreach (var p in produits)
+                nm.Nodes.Add(Noeud($"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}", p,
+                    Vignette($"s:{p.Secteur.Rayon.Nom}/{p.Secteur.Nom}", () => IconesCatalogue.Secteur(p.Secteur.Rayon.Nom, p.Secteur.Nom), Icones.Produits)));
+            return nm;
+        }
+        foreach (var g in _entrepot.Marques.Groupes)
+        {
+            var ng = Noeud(g.Nom, new GroupeM(g.Nom), ig);
+            ng.ToolTipText = $"{g.Familles.Count} familles";
+            foreach (var f in g.Familles)
             {
-                var m = new Marque(g.Key, d, g.Select(x => x.p).ToList());
-                var nm = Noeud(g.Key, m, im);
-                foreach (var p in m.Produits)
-                    nm.Nodes.Add(Noeud($"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}", p,
-                        Vignette($"s:{p.Secteur.Rayon.Nom}/{p.Secteur.Nom}", () => IconesCatalogue.Secteur(p.Secteur.Rayon.Nom, p.Secteur.Nom), Icones.Produits)));
-                nd.Nodes.Add(nm);
+                var nf = Noeud(f.Nom, f, idossier);
+                nf.ToolTipText = $"{f.Marques.Count} marques";
+                foreach (var m in f.Liste.OrderBy(x => (string?)x["nom"], StringComparer.CurrentCultureIgnoreCase))
+                    nf.Nodes.Add(NoeudMarque(new MarqueH(m, f)));
+                ng.Nodes.Add(nf);
             }
-            _arbre.Nodes.Add(nd);
+            _arbre.Nodes.Add(ng);
+        }
+        var reste = MarquesAClasser();
+        if (reste.Count > 0)
+        {
+            var fa = new FamilleMarques { Nom = "Marques à classer", Groupe = "", AClasser = true };
+            foreach (var m in reste) fa.Marques.Add(new JsonObject { ["nom"] = m });
+            var na = Noeud($"Marques à classer ({reste.Count})", fa, Vignette("a-classer", () => Icones.Glyphe(Icones.Controler, Icones.Rouge, 24), Icones.Controler));
+            na.ToolTipText = "Marques des produits du catalogue absentes de la hiérarchie : les glisser dans leur famille";
+            foreach (var m in fa.Liste) na.Nodes.Add(NoeudMarque(new MarqueH(m, fa)));
+            _arbre.Nodes.Add(na);
         }
     }
 
@@ -528,11 +555,32 @@ sealed class FormPrincipale : Form
                 Ligne("Secteurs", rayons.Sum(r => r.Secteurs.Count).ToString());
                 Ligne("Produits", rayons.Sum(r => r.Secteurs.Sum(s => s.Produits.Count)).ToString());
                 break;
-            case Marque m:
+            case MarqueH m:
                 icone = Icones.Glyphe(Icones.Marques, Icones.Orange, 64);
-                sous = $"Marque · {m.Domaine}";
-                Ligne("Produits", m.Produits.Count.ToString());
-                foreach (var p in m.Produits) Ligne("", $"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}");
+                sous = m.Famille.AClasser ? "Marque à classer" : $"Marque · {m.Famille.Groupe} › {m.Famille.Nom}";
+                var autres = _entrepot.Marques.Familles.Where(f => f != m.Famille && f.Liste.Any(x => string.Equals((string?)x["nom"], m.Nom, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                if (autres.Count > 0) Ligne("Aussi dans", string.Join(" ; ", autres.Select(f => $"{f.Groupe} › {f.Nom}")));
+                Ligne("Origine", m.Source switch
+                {
+                    "catalogue_initial" => "Catalogue initial", "ajout_catalogue" => "Ajout au catalogue", "ajout_mdd" => "Marque de distributeur",
+                    "catalogue_produits" => "Reprise des produits", "" => "—", var s => s,
+                });
+                var pm = ProduitsDe(m.Nom);
+                Ligne("Produits", pm.Count.ToString());
+                foreach (var p in pm) Ligne("", $"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}");
+                break;
+            case FamilleMarques f:
+                icone = Icones.Glyphe('\uE8B7', Icones.Orange, 64);
+                sous = f.AClasser ? "Marques des produits absentes de la hiérarchie" : $"Famille de produits · {f.Groupe}";
+                Ligne("Marques", f.Marques.Count.ToString());
+                Ligne("Marques avec produits", f.Liste.Count(x => ProduitsDe((string?)x["nom"] ?? "").Count > 0).ToString());
+                break;
+            case GroupeM g:
+                icone = Icones.Glyphe(Icones.Produits, Icones.Vert, 64);
+                sous = "Groupe de marques";
+                var gr = _entrepot.Marques.Groupes.First(x => x.Nom == g.Nom);
+                Ligne("Familles", gr.Familles.Count.ToString());
+                foreach (var f in gr.Familles) Ligne(f.Nom, $"{f.Marques.Count} marques");
                 break;
             case TypeRecette t:
                 icone = IconesCatalogue.TypeRecette(t.Type);
@@ -552,7 +600,7 @@ sealed class FormPrincipale : Form
                 break;
         }
         _iconeDroite.Image = icone ?? Icones.Glyphe(GlypheVue(_vue), Icones.Vert, 64);
-        _titreDroite.Text = n.Tag is Marque mm ? mm.Nom : n.Text;
+        _titreDroite.Text = n.Tag is MarqueH mm ? mm.Nom : n.Tag is FamilleMarques fm ? fm.Nom : n.Text;
         _sousTitreDroite.Text = sous;
         _proprietes.EndUpdate();
         _proprietes.Columns[1].Width = -2;
@@ -563,7 +611,7 @@ sealed class FormPrincipale : Form
     TreeNode? _presse;
     bool _presseCopie;
 
-    static bool Deplacable(TreeNode n) => n.Tag is Produit or Secteur or Rayon or Recette && n.Parent?.Tag is not Marque;
+    static bool Deplacable(TreeNode n) => n.Tag is MarqueH || (n.Tag is Produit or Secteur or Rayon or Recette && n.Parent?.Tag is not MarqueH);
 
     void ConstruireMenuArbre()
     {
@@ -577,7 +625,7 @@ sealed class FormPrincipale : Form
             var n = _arbre.SelectedNode;
             if (n is null) { e.Cancel = true; return; }
             couper.Enabled = n.Tag is not null && Deplacable(n);
-            copier.Enabled = n.Tag is Produit or Recette && Deplacable(n);
+            copier.Enabled = n.Tag is Produit or Recette or MarqueH && Deplacable(n);
             coller.Enabled = _presse is not null && Cible(_presse, n, _presseCopie) is not null;
             ouvrir.Visible = n.Tag is Recette;
         };
@@ -595,7 +643,7 @@ sealed class FormPrincipale : Form
     void Couper(bool copie)
     {
         var n = _arbre.SelectedNode;
-        if (n is null || !Deplacable(n) || (copie && n.Tag is not (Produit or Recette))) { Message(copie ? "Seuls un produit ou une recette se copient" : "Cet élément ne se déplace pas"); return; }
+        if (n is null || !Deplacable(n) || (copie && n.Tag is not (Produit or Recette or MarqueH))) { Message(copie ? "Seuls un produit, une marque ou une recette se copient" : "Cet élément ne se déplace pas"); return; }
         _presse = n;
         _presseCopie = copie;
         Message($"« {n.Text} » {(copie ? "copié" : "coupé")} : choisir où le coller (Ctrl+V)");
@@ -638,6 +686,8 @@ sealed class FormPrincipale : Form
             case Rayon when copie: return null;
             case Rayon when ici.Tag is Domaine d: return (d, null);
             case Rayon when ici.Tag is Rayon r2: return (new Domaine(r2.Domaine), r2);
+            case MarqueH when ici.Tag is FamilleMarques f && !f.AClasser: return (f, null);
+            case MarqueH when ici.Tag is MarqueH m2 && !m2.Famille.AClasser: return (m2.Famille, m2);
             case Recette when ici.Tag is SousType st: return (st, null);
             case Recette when ici.Tag is TypeRecette t: return (new SousType(t.Type, null), null);
             case Recette when ici.Tag is Recette && ici.Parent?.Tag is SousType st2: return (st2, null);
@@ -663,6 +713,15 @@ sealed class FormPrincipale : Form
                 _entrepot.EnregistrerRecettes();
                 Message(copie ? $"« {r.Titre} » ajoutée à {st.Type}" : $"« {r.Titre} » rangée dans {st.Type} › {st.Nom ?? "Sans sous-type"}");
                 RafraichirArbre(garderSelection: true);
+                return true;
+            }
+            if (source.Tag is MarqueH mh)
+            {
+                var ligne = _entrepot.Marques.Deplacer(mh, (FamilleMarques)parent, avant as MarqueH, copie);
+                _entrepot.EnregistrerMarques();
+                Message(ligne);
+                RafraichirArbre(garderSelection: true);
+                MajBanniere();
                 return true;
             }
             var c = _entrepot.Catalogue;

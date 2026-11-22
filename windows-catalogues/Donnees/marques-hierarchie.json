@@ -1,0 +1,2341 @@
+{
+  "meta": {
+    "description": "Hiérarchie des marques par type de produits vendus (Rayon > Famille de produits > Marques)",
+    "date_mise_a_jour": "2026-11-22",
+    "total_rayons": 15,
+    "total_familles": 39,
+    "total_marques_uniques": 412
+  },
+  "rayons": {
+    "Crèmerie, œufs et produits laitiers": {
+      "nombre_marques": 51,
+      "familles": {
+        "Laits, beurres, crèmes et œufs": {
+          "nombre_marques": 11,
+          "marques": [
+            {
+              "nom": "Bridélice",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Candia",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Délisse",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Elle & Vire",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Isigny",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lactel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Matines",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Milbona",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Pâturages",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Paysan Breton",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "St Hubert",
+              "produits": 2,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Fromages": {
+          "nombre_marques": 25,
+          "marques": [
+            {
+              "nom": "Babybel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Baskeriou",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Bel",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Boursin",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Bresse Bleu",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Caprice des Dieux",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Chaussée aux Moines",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Chêne d'Argent",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Cœur de Lion",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Entremont",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Etorki",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Germain",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Gillot",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Kiri",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "La Vache qui rit",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Le Rustique",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Leerdammer",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Les Croisés",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Montegeneroso",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Petit Basque",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Président",
+              "produits": 5,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "RichesMonts",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Roquefort Société",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "St Môret",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Tartare",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Yaourts, desserts frais et alternatives végétales": {
+          "nombre_marques": 15,
+          "marques": [
+            {
+              "nom": "Actimel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Activia",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Alpro",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Andros",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Charles & Alice",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Danette",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Danone",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Envie de Bien Manger",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Fjord",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Gervais",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "La Laitière",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Mamie Nova",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Perle de Lait",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Sojasun",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Yoplait",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Boucherie, charcuterie, volaille et traiteur frais": {
+      "nombre_marques": 27,
+      "familles": {
+        "Viandes et volailles": {
+          "nombre_marques": 5,
+          "marques": [
+            {
+              "nom": "Bigard",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Charal",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Le Gaulois",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Maître Coq",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Père Dodu",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Charcuterie et salaisons": {
+          "nombre_marques": 14,
+          "marques": [
+            {
+              "nom": "Aoste",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Cochonou",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Dulano",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Ferial",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Fleury Michon",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Herta",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Justin Bridou",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Labeyrie",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Madrange",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Maison Montfort",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Monique Ranou",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Montagne Noire",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Montorsi",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Parmacotto",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Traiteur frais, plats préparés et snacking": {
+          "nombre_marques": 8,
+          "marques": [
+            {
+              "nom": "Chef Select",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Daunat",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Lanaudière",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Marie",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pierre Martinet",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Sodebo",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Stoeffler",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "William Saurin",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Fruits, légumes et produits de la mer": {
+      "nombre_marques": 19,
+      "familles": {
+        "Fruits secs, graines et olives": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Alesto",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Daco Bello",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Menguy's",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Pipas",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Pom'Soleil",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Tramier",
+              "produits": 2,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)": {
+          "nombre_marques": 7,
+          "marques": [
+            {
+              "nom": "Connétable",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Iglo",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Ocean Sea",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Odyssée",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Petit Navire",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Rio Mare",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Saupiquet",
+              "produits": 3,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Légumes préparés, conserves et surgelés": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Bonduelle",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Cassegrain",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "D'aucy",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Freshona",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Géant Vert",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Saint Eloi",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        }
+      }
+    },
+    "Boulangerie, pâtisserie et petit-déjeuner": {
+      "nombre_marques": 34,
+      "familles": {
+        "Pains de mie, brioches et viennoiseries": {
+          "nombre_marques": 5,
+          "marques": [
+            {
+              "nom": "Brioche Pasquier",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Chabrior",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Harry's",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Jacquet",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "La Boulangère",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Biscuits, gâteaux et pâtisseries": {
+          "nombre_marques": 14,
+          "marques": [
+            {
+              "nom": "Belin",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Bn",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Bonne Maman",
+              "produits": 1,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Brossard",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Delacre",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Gerblé",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Les Féliciens",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lotus Biscoff",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "LU",
+              "produits": 5,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Motta",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Oreo",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "P'tit Déli",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Saint Michel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Sondey",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        },
+        "Céréales, confitures, pâtes à tartiner et miel": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Crownfield",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Jardin Bio étic",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Kellogg's",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Natura",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Nutella",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Skippy",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Cafés, thés, infusions et cacao": {
+          "nombre_marques": 9,
+          "marques": [
+            {
+              "nom": "Carte Noire",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Éléphant",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Illy",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lipton",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Malongo",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Nesquik",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Ricoré",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Starbucks",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Van Houten",
+              "produits": 2,
+              "source": "catalogue_initial"
+            }
+          ]
+        }
+      }
+    },
+    "Épicerie salée et aides culinaires": {
+      "nombre_marques": 30,
+      "familles": {
+        "Pâtes, riz, semoules et féculents": {
+          "nombre_marques": 7,
+          "marques": [
+            {
+              "nom": "Barilla",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Ben's Original",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Combino",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Lustucru",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Panzani",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Taureau Ailé",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Tipiak",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Sauces, condiments, épices et huiles": {
+          "nombre_marques": 12,
+          "marques": [
+            {
+              "nom": "Amora",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Ducros",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Heinz",
+              "produits": 5,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Icône",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lesieur",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Maggi",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Maille",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Mutti",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Puget",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Spigol",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Tabasco",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Zapetti",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Plats cuisinés en conserve et cuisine du monde": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Buitoni",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "La Belle Chaurienne",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Old El Paso",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "PanPani",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Raynal et Roquelaure",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Reine d'Huicq",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Biscuits apéritifs et chips": {
+          "nombre_marques": 5,
+          "marques": [
+            {
+              "nom": "Bouton d'Or",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Doritos",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Jafaden",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Lay's",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Vico",
+              "produits": 3,
+              "source": "catalogue_initial"
+            }
+          ]
+        }
+      }
+    },
+    "Confiserie, chocolats et glaces": {
+      "nombre_marques": 27,
+      "familles": {
+        "Chocolats et confiseries": {
+          "nombre_marques": 17,
+          "marques": [
+            {
+              "nom": "Carambar",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Chupa Chups",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Côte d'Or",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Ferrero",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Fin Carré",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Frisk",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Haribo",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Ivoria",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Kinder",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Lindt",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "M&M's",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Milka",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Mister Choc",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Nestlé",
+              "produits": 5,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Nestlé Dessert",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Poulain",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Suchard",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Glaces et sorbets": {
+          "nombre_marques": 10,
+          "marques": [
+            {
+              "nom": "Adélie",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Ben & Jerry's",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Bon Gelati",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carte d'Or",
+              "produits": 8,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Cornetto",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Extrême",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Gelatelli",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Häagen-Dazs",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Magnum",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Miko",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Surgelés salés (plats, frites et boulangerie surgelée)": {
+      "nombre_marques": 4,
+      "familles": {
+        "Frites, pommes de terre et plats surgelés": {
+          "nombre_marques": 4,
+          "marques": [
+            {
+              "nom": "Épi d'Or",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Findus",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "McCain",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Picard",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Boissons": {
+      "nombre_marques": 34,
+      "familles": {
+        "Eaux plates et gazeuses": {
+          "nombre_marques": 9,
+          "marques": [
+            {
+              "nom": "Badoit",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Cristaline",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Evian",
+              "produits": 1,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Montclar",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Perrier",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "San Pellegrino",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "St-Yorre",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Vittel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Volvic",
+              "produits": 2,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Jus de fruits, sirops et boissons sans alcool": {
+          "nombre_marques": 17,
+          "marques": [
+            {
+              "nom": "Champomy",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Coca-Cola",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Fanta",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Freeway",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "French Bloom",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Innocent",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Joker",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Lipton Ice Tea",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Moulin de Valdonne",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Oasis",
+              "produits": 1,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Orangina",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Paquito",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Pulco",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Schweppes",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Solevita",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Sprite",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Tropicana",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Bières, vins et spiritueux": {
+          "nombre_marques": 8,
+          "marques": [
+            {
+              "nom": "1664",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Get",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Heineken",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Kronenbourg",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Leffe",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Martel",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Ricard",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Saint-Vincent",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        }
+      }
+    },
+    "Animalerie": {
+      "nombre_marques": 3,
+      "familles": {
+        "Alimentation et soins pour animaux": {
+          "nombre_marques": 3,
+          "marques": [
+            {
+              "nom": "Carrefour Companino",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Felix",
+              "produits": 4,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Ultima",
+              "produits": 3,
+              "source": "catalogue_initial"
+            }
+          ]
+        }
+      }
+    },
+    "Hygiène, beauté et parapharmacie": {
+      "nombre_marques": 35,
+      "familles": {
+        "Soins du visage, du corps et parfumerie": {
+          "nombre_marques": 18,
+          "marques": [
+            {
+              "nom": "Cien",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Cosmia",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Dove",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Garnier",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Inell",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "L'Oréal",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "La Beauté Monoprix",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Labell",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Le Petit Marseillais",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Les Cosmétiques Design Paris",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Mixa",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Monsavon",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Nectar of Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Nivea",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "RoC",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Sanex",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "SVR",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Tahiti",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Soins capillaires et rasage": {
+          "nombre_marques": 4,
+          "marques": [
+            {
+              "nom": "Garnier Ultra Doux",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Gillette",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Head & Shoulders",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Wilkinson",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Hygiène bucco-dentaire": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Colgate",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Elgydium",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Freedent",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Oral-B",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Sensodyne",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Signal",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Hygiène féminine, bébé et incontinences": {
+          "nombre_marques": 7,
+          "marques": [
+            {
+              "nom": "Always",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Mots d'Enfants",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Nana",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pampers",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pommette",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Toujours",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Vania",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Entretien de la maison et papier": {
+      "nombre_marques": 32,
+      "familles": {
+        "Lessives et soin du linge": {
+          "nombre_marques": 9,
+          "marques": [
+            {
+              "nom": "Ariel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Dash",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Formil",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "K2r",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Le Chat",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Mir",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Skip",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Soupline",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Vanish",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Nettoyants ménagers, vaisselle et insecticides": {
+          "nombre_marques": 17,
+          "marques": [
+            {
+              "nom": "Ajax",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Apta",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Arbre Vert",
+              "produits": 3,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Briochin",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Calgon",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Cif",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Destop",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Febreze",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Finish",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Harpic",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "La Croix",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Paic",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Raid",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "St Marc",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Sun",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "W5",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "WC Net",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        },
+        "Essuie-tout, papier toilette, mouchoirs et emballages": {
+          "nombre_marques": 6,
+          "marques": [
+            {
+              "nom": "Alfapac",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Floralys",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Kleenex",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lotus",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Mimosa",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Sopalin",
+              "produits": 1,
+              "source": "catalogue_initial"
+            }
+          ]
+        }
+      }
+    },
+    "Équipement de la maison, cuisine et bricolage": {
+      "nombre_marques": 33,
+      "familles": {
+        "Arts de la table, cuisson et conservation": {
+          "nombre_marques": 14,
+          "marques": [
+            {
+              "nom": "Arcopal",
+              "produits": 2,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Bialetti",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Bodum",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Brita",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Duralex",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Ernesto",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Guardini",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Lagostina",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Le Parfait",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Luminarc",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Moulinex",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pyrex",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Seb",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Tefal",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        },
+        "Accessoires ménagers, petit électroménager et piles": {
+          "nombre_marques": 19,
+          "marques": [
+            {
+              "nom": "Actuel",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Home",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Domedia",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Duracell",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Elsay",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Energizer",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Foxter",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Home Essentiels",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Leifheit",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Livarno Home",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Mapa",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Monoprix Maison",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Parkside",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Qilive",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Redstone",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Scotch-Brite",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Silvercrest",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Spontex",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Vileda",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Textile et habillement": {
+      "nombre_marques": 20,
+      "familles": {
+        "Vêtements, sous-vêtements et accessoires": {
+          "nombre_marques": 20,
+          "marques": [
+            {
+              "nom": "Athena",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Bout'chou",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Crivit",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Dim",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Eminence",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Esmara",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Inextenso",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Labonal",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Le Bourget",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Livergy",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Lupilu",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Olympia",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Petit Bateau",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pierre Cardin",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Playtex",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Tex",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Tex Basic",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Tex Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Tissaia",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Well",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Culture, papeterie, jouets et licences": {
+      "nombre_marques": 31,
+      "familles": {
+        "Papeterie et fournitures scolaires": {
+          "nombre_marques": 14,
+          "marques": [
+            {
+              "nom": "Bic",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Canson",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Clairefontaine",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Crelando",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Cultura",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Maped",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Oxford",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Paper Mate",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pilot",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Post-it",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Reynolds",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Stabilo",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "UHU",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "United Office",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        },
+        "Jouets, jeux de société et licences": {
+          "nombre_marques": 17,
+          "marques": [
+            {
+              "nom": "Asmodee",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Barbie",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Disney",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Dujardin",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Funko",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Hasbro",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Hot Wheels",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Lansay",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Lego",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Mattel",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Nathan",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Pat' Patrouille",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Playmobil",
+              "produits": 1,
+              "source": "catalogue_initial"
+            },
+            {
+              "nom": "Playtive",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Ravensburger",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "Smoby",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            },
+            {
+              "nom": "VTech",
+              "produits": 0,
+              "source": "ajout_catalogue"
+            }
+          ]
+        }
+      }
+    },
+    "Marques de distributeurs généralistes (multi-rayons)": {
+      "nombre_marques": 32,
+      "familles": {
+        "Gammes cœur de marché et premium": {
+          "nombre_marques": 18,
+          "marques": [
+            {
+              "nom": "Auchan",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Auchan Gourmet",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "By U",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Classic'",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Essential",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Extra",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Sensation",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Soft",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "L'Origine du Goût",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Manava",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Marque Repère",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Monoprix",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Monoprix Gourmet",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Repère",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "U",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "U Saveurs",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "U Tout Doux",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        },
+        "Gammes bio et terroir": {
+          "nombre_marques": 9,
+          "marques": [
+            {
+              "nom": "Auchan Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Bio Village",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Carrefour Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Itinéraire des Saveurs",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Monoprix Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Nos Régions ont du Talent",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Reflets de France",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Saveurs de Nos Régions",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "U Bio",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        },
+        "Gammes économiques / premiers prix": {
+          "nombre_marques": 5,
+          "marques": [
+            {
+              "nom": "Bien Vu!",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Eco+",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Pouce",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Simpl",
+              "produits": 0,
+              "source": "ajout_mdd"
+            },
+            {
+              "nom": "Top Budget",
+              "produits": 0,
+              "source": "ajout_mdd"
+            }
+          ]
+        }
+      }
+    }
+  }
+}
