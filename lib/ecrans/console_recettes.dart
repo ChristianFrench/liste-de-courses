@@ -299,7 +299,7 @@ class _PageRecettesState extends State<PageRecettes> {
       var y = 0.0;
       for (final l in _lignes(b)) {
         if (l.$3 != null && l.$1 == type && l.$3!.id == id) break;
-        y += l.$3 != null ? 44 : RangeeConsole.hauteurDe(l.$2 != null ? 2 : 1);
+        y += RangeeConsole.hauteurDe(titre: l.$3 == null);
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -393,12 +393,11 @@ class _PageRecettesState extends State<PageRecettes> {
       final cle = '$type|${r.id}';
       return RangeeConsole(
         key: ValueKey('recette-${r.id}-$type'),
-        niveau: 3,
+        profondeur: 1,
+        titre: false,
         libelle: r.titre,
         choisie: identical(r, choisie),
         trouvee: _resultats.isNotEmpty && _resultats[_indice] == cle,
-        hauteur: 44,
-        signe: _vignette(b, r, 40),
         colonnes: [
           ([if (r.pour != null) r.pour!, if (r.repereTemps.isNotEmpty) r.repereTemps].join(' · '), 4),
           ([if (r.origine != null) r.origine!, if (r.cout != null) r.cout!, ...r.regimes].join(' · '), 3),
@@ -413,7 +412,7 @@ class _PageRecettesState extends State<PageRecettes> {
       final ouvert = sousOuverts.contains(k);
       return RangeeConsole(
         key: ValueKey('sous-type-$type-$st'),
-        niveau: 2,
+        profondeur: 1,
         ouvert: ouvert,
         libelle: st,
         compte: _pluriel(arbre[type]![st]!.length, 'recette'),
@@ -424,24 +423,12 @@ class _PageRecettesState extends State<PageRecettes> {
     final n = arbre[type]!.values.fold(0, (n, l) => n + l.length);
     return RangeeConsole(
       key: ValueKey('type-recette-$type'),
-      niveau: 1,
+      profondeur: 0,
       ouvert: ouvert,
       signe: Image.asset(iconeTypeRecette(type), width: 30, height: 30),
       libelle: type,
       compte: '${_pluriel(arbre[type]!.length, 'sous-type')} · ${_pluriel(n, 'recette')}',
       onTap: () => setState(() => ouvert ? ouverts.remove(type) : ouverts.add(type)),
-      // Tout déplier / replier le type : ses sous-types et leurs recettes.
-      toutOuvert: ouvert && arbre[type]!.keys.every((st) => sousOuverts.contains('$type|$st')),
-      onTout: () => setState(() {
-        final cles = [for (final st in arbre[type]!.keys) '$type|$st'];
-        if (ouvert && cles.every(sousOuverts.contains)) {
-          sousOuverts.removeAll(cles);
-          ouverts.remove(type);
-        } else {
-          ouverts.add(type);
-          sousOuverts.addAll(cles);
-        }
-      }),
     );
   }
 
@@ -449,7 +436,6 @@ class _PageRecettesState extends State<PageRecettes> {
     final arbre = _arbre(b);
     final lignes = _lignes(b);
     final toutes = {for (final MapEntry(key: t, value: s) in arbre.entries) for (final st in s.keys) '$t|$st'};
-    final toutOuvert = ouverts.length == arbre.length && sousOuverts.containsAll(toutes);
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       BarreConsole(
         aideRecherche: 'Une recette ou un ingrédient',
@@ -459,15 +445,13 @@ class _PageRecettesState extends State<PageRecettes> {
         onPrecedent: () => _allerA(b, _indice - 1 + _resultats.length),
         trouves: _resultats.length,
         indice: _indice,
-        toutOuvert: toutOuvert,
-        onTout: () => setState(() {
-          if (toutOuvert) {
-            ouverts.clear();
-            sousOuverts.clear();
-          } else {
-            ouverts.addAll(arbre.keys);
-            sousOuverts.addAll(toutes);
-          }
+        onDeplier: () => setState(() {
+          ouverts.addAll(arbre.keys);
+          sousOuverts.addAll(toutes);
+        }),
+        onReplier: () => setState(() {
+          ouverts.clear();
+          sousOuverts.clear();
         }),
         boutons: [
           BoutonConsole(key: const ValueKey('recettes-nouvelle'), texte: 'Nouvelle recette', icone: Icons.add, onTap: () => _modifier(b, null)),
@@ -501,22 +485,7 @@ String iconeTypeRecette(String type) {
   return 'assets/recettes/recettes-de-cuisine.png';
 }
 
-Widget _vignette(BaseRecettes b, Recette r, double taille) {
-  final nom = r.illustration ?? (r.photos.isEmpty ? null : r.photos.first);
-  final f = nom == null ? null : b.photo(nom);
-  return ClipRRect(
-    borderRadius: BorderRadius.circular(6),
-    child: SizedBox(
-      width: taille,
-      height: taille,
-      child: f == null || !f.existsSync()
-          ? Image.asset(iconeTypeRecette(r.types.isEmpty ? '' : r.types.first), fit: BoxFit.contain)
-          : Image.file(f, fit: BoxFit.cover, cacheWidth: (taille * 2).round()),
-    ),
-  );
-}
-
-/// Fiche d'une recette : bandeau (photo, titre, types, nombre d'ingrédients), puis les onglets.
+/// Fiche d'une recette : en-tête (titre, gestes), puis les onglets Caractéristiques, Ingrédients, Recette.
 class FicheRecette extends StatelessWidget {
   const FicheRecette({super.key, required this.recette, required this.base, this.modifier, this.illustrer, this.supprimer});
   final Recette recette;
@@ -528,81 +497,28 @@ class FicheRecette extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final r = recette;
+    // 22/11/2026 (Aristide : « réorganiser la fenêtre touffue du détail ») : un en-tête court (titre, gestes),
+    // puis trois onglets : Caractéristiques (illustration et critères, tous présentés de la même façon),
+    // Ingrédients (nombre de personnes, un ingrédient par ligne) et Recette.
     return DefaultTabController(
       length: 3,
-      initialIndex: r.ingredients.isEmpty ? 2 : 1,
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Container(
           color: Charte.fondBandeau,
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 14),
+          padding: const EdgeInsets.fromLTRB(20, 14, 16, 14),
           child: Row(children: [
-            _vignette(base, r, 72),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(r.titre, style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
-                const SizedBox(height: 6),
-                Wrap(spacing: 8, runSpacing: 4, children: [
-                  if (r.source != null)
-                    Container(
-                      key: const ValueKey('recette-source'),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                      decoration: BoxDecoration(color: Charte.cadre, borderRadius: BorderRadius.circular(12)),
-                      child: Text('Recette ${r.source}', style: Charte.texte(13, gras: true, couleur: Charte.blanc)),
-                    ),
-                  for (final t in r.types)
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                      decoration: BoxDecoration(color: Charte.blanc, borderRadius: BorderRadius.circular(12), border: Border.all(color: Charte.cadre)),
-                      child: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Image.asset(iconeTypeRecette(t), width: 18, height: 18),
-                        const SizedBox(width: 5),
-                        Text(r.sousTypes[t] == null ? t : '$t · ${r.sousTypes[t]}', style: Charte.texte(13, couleur: Charte.cadre)),
-                      ]),
-                    ),
-                  Text(
-                      '${r.pour == null ? '' : 'Pour ${r.pour} · '}${r.repereTemps.isEmpty ? '' : '${r.repereTemps} · '}${r.ingredients.length} ingrédient${r.ingredients.length > 1 ? 's' : ''} · ${r.photos.length} photo${r.photos.length > 1 ? 's' : ''}'
-                      '${r.modifieeLe == null ? '' : ' · modifiée le ${r.modifieeLe!.day.toString().padLeft(2, '0')}/${r.modifieeLe!.month.toString().padLeft(2, '0')}/${r.modifieeLe!.year}'}',
-                      style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-                ]),
-                // Critères de choix (20/11/2026) : une pastille par valeur, groupées par critère.
-                if (r.origine != null || r.regimes.isNotEmpty || r.saisons.isNotEmpty || r.cout != null || r.cuissons.isNotEmpty || r.occasions.isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Wrap(key: const ValueKey('recette-criteres'), spacing: 6, runSpacing: 4, children: [
-                    for (final x in [
-                      ...r.regimes,
-                      if (r.origine != null) r.origine!,
-                      if (r.saisons.isNotEmpty) r.repereSaisons,
-                      if (r.cout != null) r.cout!,
-                      ...r.cuissons,
-                      ...r.occasions,
-                    ])
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: Charte.clair(Charte.cadre, 0.85), borderRadius: BorderRadius.circular(10)),
-                        child: Text(x, style: Charte.texte(12.5, couleur: Charte.encreNiveau)),
-                      ),
-                  ]),
-                ],
-              ]),
-            ),
-            if (modifier != null || illustrer != null || supprimer != null) ...[
-              const SizedBox(width: 12),
-              // Largeur fixe : dans la ligne de l'en-tête, une colonne étirée sans largeur écrasait le titre (21/11/2026).
-              SizedBox(
-                width: 170,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-                if (modifier != null)
-                  Bouton(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, taille: 15, onTap: modifier),
-                if (illustrer != null) ...[
-                  const SizedBox(height: 6),
-                  Bouton(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, taille: 15, onTap: illustrer),
-                ],
-                if (supprimer != null) ...[
-                  const SizedBox(height: 6),
-                  Bouton(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, taille: 15, onTap: supprimer),
-                ],
-              ])),
+            Expanded(child: Text(r.titre, style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau))),
+            if (modifier != null) ...[
+              const SizedBox(width: 10),
+              BoutonConsole(key: const ValueKey('recette-modifier'), texte: 'Modifier', icone: Icons.edit_outlined, onTap: modifier),
+            ],
+            if (illustrer != null) ...[
+              const SizedBox(width: 8),
+              BoutonConsole(key: const ValueKey('recette-illustrer'), texte: 'Illustration', icone: Icons.image_outlined, onTap: illustrer),
+            ],
+            if (supprimer != null) ...[
+              const SizedBox(width: 8),
+              BoutonConsole(key: const ValueKey('recette-supprimer'), texte: 'Supprimer', icone: Icons.delete_outline, onTap: supprimer),
             ],
           ]),
         ),
@@ -611,12 +527,12 @@ class FicheRecette extends StatelessWidget {
           unselectedLabelStyle: Charte.texte(15),
           labelColor: Charte.encreNiveau,
           indicatorColor: Charte.cadre,
-          tabs: const [Tab(text: 'Photos'), Tab(text: 'Ingrédients'), Tab(text: 'Recette')],
+          tabs: const [Tab(text: 'Caractéristiques'), Tab(text: 'Ingrédients'), Tab(text: 'Recette')],
         ),
         Container(height: 1, color: Charte.separateurZone),
         Expanded(
           child: TabBarView(children: [
-            _photos(),
+            _caracteristiques(),
             _ingredients(),
             _recette(),
           ]),
@@ -625,23 +541,51 @@ class FicheRecette extends StatelessWidget {
     );
   }
 
-  Widget _photos() {
-    final fichiers = [
-      for (final p in [if (recette.illustration != null) recette.illustration!, ...recette.photos]) base.photo(p)
-    ].where((f) => f.existsSync()).toList();
-    if (fichiers.isEmpty) return Center(child: Text('Pas de photo', style: Charte.texte(15, couleur: Charte.texteSecondaire)));
-    return ListView(padding: const EdgeInsets.all(16), children: [
-      for (final f in fichiers)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 520),
-              child: ClipRRect(borderRadius: BorderRadius.circular(8), child: Image.file(f, fit: BoxFit.contain)),
-            ),
-          ),
+  /// Onglet Caractéristiques : l'illustration à gauche, à droite une ligne « libellé : valeur » par critère.
+  Widget _caracteristiques() {
+    final r = recette;
+    String ou(String? x) => x == null || x.isEmpty ? '—' : x;
+    String liste(List<String> l) => l.isEmpty ? '—' : l.join(', ');
+    final lignes = <(String, String)>[
+      ('Type', r.types.isEmpty ? '—' : [for (final t in r.types) r.sousTypes[t] == null ? t : '$t › ${r.sousTypes[t]}'].join(' ; ')),
+      ('Origine', ou(r.origine)),
+      ('Préparation', r.tempsPreparation == null ? '—' : dureeRecette(r.tempsPreparation!)),
+      ('Cuisson', r.tempsCuisson == null ? '—' : (r.tempsCuisson == 0 ? 'Sans cuisson' : dureeRecette(r.tempsCuisson!))),
+      ('Difficulté', ou(r.difficulte)),
+      ('Régime', liste(r.regimes)),
+      ('Saison', r.saisons.isEmpty ? '—' : r.repereSaisons),
+      ('Coût', ou(r.cout)),
+      ('Mode de cuisson', liste(r.cuissons)),
+      ('Occasion', liste(r.occasions)),
+      ('Source', r.source == null ? 'Recette maison' : 'Recette ${r.source}'),
+      if (r.modifieeLe != null)
+        ('Modifiée le', '${r.modifieeLe!.day.toString().padLeft(2, '0')}/${r.modifieeLe!.month.toString().padLeft(2, '0')}/${r.modifieeLe!.year}'),
+    ];
+    final nom = r.illustration ?? (r.photos.isEmpty ? null : r.photos.first);
+    final f = nom == null ? null : base.photo(nom);
+    final image = f != null && f.existsSync()
+        ? Image.file(f, fit: BoxFit.cover)
+        : Container(color: Charte.fondBandeau, padding: const EdgeInsets.all(40), child: Image.asset(iconeTypeRecette(r.types.isEmpty ? '' : r.types.first)));
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ClipRRect(borderRadius: BorderRadius.circular(10), child: SizedBox(key: const ValueKey('recette-illustration'), width: 420, height: 280, child: image)),
+        const SizedBox(width: 24),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            for (final (libelle, valeur) in lignes)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  SizedBox(width: 150, child: Text(libelle, style: Charte.texte(15, couleur: Charte.texteSecondaire))),
+                  Expanded(child: SelectableText(valeur, style: Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
+                ]),
+              ),
+          ]),
         ),
-    ]);
+      ]),
+    );
   }
 
   Widget _titre(String t) => Padding(
@@ -720,21 +664,26 @@ class FicheRecette extends StatelessWidget {
 
   Widget _ingredients() {
     final r = recette;
+    final pour = r.pour == null
+        ? const <Widget>[]
+        : [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text('Pour ${r.pour}', key: const ValueKey('recette-pour'), style: Charte.texte(17, gras: true, couleur: Charte.encreNiveau)),
+            ),
+          ];
     if (r.detail.isNotEmpty) {
-      // Recette normalisée : quantité · nom · précision, en colonnes.
-      return ListView(padding: const EdgeInsets.fromLTRB(22, 12, 22, 22), children: [
+      // Un ingrédient par ligne : nom, quantité, précision.
+      return ListView(padding: const EdgeInsets.fromLTRB(22, 16, 22, 22), children: [
+        ...pour,
         for (final i in r.detail)
           Container(
             padding: const EdgeInsets.symmetric(vertical: 7),
             decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              SizedBox(width: 150, child: SelectableText(i.quantite.isEmpty ? '—' : i.quantite, style: Charte.texte(16, couleur: Charte.texteSecondaire))),
-              Expanded(
-                child: SelectableText.rich(TextSpan(children: [
-                  TextSpan(text: i.nom, style: Charte.texte(16, gras: true)),
-                  if (i.precision.isNotEmpty) TextSpan(text: '  ${i.precision}', style: Charte.texte(15, couleur: Charte.texteSecondaire)),
-                ])),
-              ),
+              Expanded(flex: 4, child: SelectableText(i.nom, style: Charte.texte(16, gras: true))),
+              Expanded(flex: 3, child: SelectableText(i.quantite.isEmpty ? '—' : i.quantite, style: Charte.texte(16))),
+              Expanded(flex: 4, child: SelectableText(i.precision, style: Charte.texte(15, couleur: Charte.texteSecondaire))),
             ]),
           ),
       ]);
@@ -743,6 +692,7 @@ class FicheRecette extends StatelessWidget {
       return Center(child: Text(r.memo ? 'Mémo sans ingrédients : voir l\'onglet Recette.' : 'Pas de liste d\'ingrédients : tout est dans l\'onglet Recette.', style: Charte.texte(15, couleur: Charte.texteSecondaire)));
     }
     return ListView(padding: const EdgeInsets.fromLTRB(22, 16, 22, 22), children: [
+      ...pour,
       if (r.titreIngredients != null)
         Padding(
           padding: const EdgeInsets.only(bottom: 10),

@@ -220,7 +220,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
       var y = 0.0;
       for (final l in _lignes(_parDomaine())) {
         if (l.produit == null && l.cle == cle && !l.seulEntete) break;
-        y += (l.entete ? BandeauDomaineConsole.hauteur : 0) + (l.seulEntete ? 0 : RangeeConsole.hauteurDe(l.produit == null ? 1 : 3));
+        y += (l.entete ? RangeeConsole.hauteurTitre : 0) + (l.seulEntete ? 0 : RangeeConsole.hauteurDe(titre: l.produit == null));
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -457,7 +457,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
 
   // ------------------------------------------------------------ affichage
 
-  Widget _titre(int nbMarques, int nbDeclinaisons, int nbDomaines, int aExaminer) {
+  Widget _titre(int nbMarques, int nbDeclinaisons, int nbDomaines) {
     final p = e.publie;
     final numero = e.numeroPublie, libelle = e.libellePublie;
     final date = p?['date'] as String?;
@@ -486,7 +486,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
       ),
       menu: menuCatalogueCommun(e, extras: [
         EntreeMenuConsole('foyers', Icons.groups_outlined, 'Marques des foyers…${nouvelles > 0 ? ' ($nouvelles)' : ''}'),
-        EntreeMenuConsole('examen', Icons.rule, 'À examiner… ($aExaminer)'),
+        EntreeMenuConsole('examen', Icons.rule, _examenCache == null ? 'À examiner…' : 'À examiner… (${_examenCache!.length})'),
       ]),
       onMenu: _menuGeneral,
       alertes: alertesCatalogueCommun(e),
@@ -499,7 +499,8 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
     if (l.produit case final p?) {
       r = RangeeConsole(
         key: ValueKey('marque-produit-${l.cle}/${p.$3.nom}'),
-        niveau: 3,
+        profondeur: 1,
+        titre: false,
         libelle: p.$3.nom,
         colonnes: [('${p.$1.nom} › ${p.$2.nom}', 4), (p.$3.marques.where((x) => x != l.marque).take(4).join(', '), 3)],
         onClicDroit: (o) => _menuMarque(o, l.marque),
@@ -509,7 +510,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
       final n = marquesDuDomaine[l.marque]!.length;
       r = RangeeConsole(
         key: ValueKey('marque-console-${l.cle}'),
-        niveau: 1,
+        profondeur: 1,
         ouvert: ouvert,
         libelle: l.marque,
         compte: _pluriel(n, 'produit'),
@@ -528,25 +529,14 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
     }
     if (!l.entete) return r;
     final ouvertDomaine = !domainesFermes.contains(l.domaine);
-    final toutDomaine = ouvertDomaine && marquesDuDomaine.keys.every((m) => ouvertes.contains('${l.domaine}|$m'));
-    final bandeau = BandeauDomaineConsole(
+    final bandeau = RangeeConsole(
       key: ValueKey('marques-domaine-${l.domaine}'),
-      signe: signeDomaine(l.domaine, 32),
-      nom: l.domaine,
-      compte: _pluriel(marquesDuDomaine.length, 'marque'),
+      profondeur: 0,
       ouvert: ouvertDomaine,
+      signe: signeDomaine(l.domaine, 30),
+      libelle: l.domaine,
+      compte: _pluriel(marquesDuDomaine.length, 'marque'),
       onTap: () => setState(() => ouvertDomaine ? domainesFermes.add(l.domaine) : domainesFermes.remove(l.domaine)),
-      // Tout déplier / replier le domaine : ses marques et leurs produits.
-      toutOuvert: toutDomaine,
-      onTout: () => setState(() {
-        final cles = [for (final m in marquesDuDomaine.keys) '${l.domaine}|$m'];
-        if (toutDomaine) {
-          ouvertes.removeAll(cles);
-        } else {
-          domainesFermes.remove(l.domaine);
-          ouvertes.addAll(cles);
-        }
-      }),
     );
     if (l.seulEntete) return bandeau;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
@@ -561,14 +551,12 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
     final d = _parDomaine();
     final nbMarques = {for (final m in d.values) ...m.keys}.length;
     final nbDeclinaisons = d.values.fold(0, (n, m) => n + m.values.fold(0, (k, l) => k + l.length));
-    final examen = _examen();
     final lignes = _lignes(d);
     final toutes = {for (final MapEntry(key: u, value: m) in d.entries) for (final x in m.keys) '$u|$x'};
-    final toutOuvert = toutes.isNotEmpty && domainesFermes.isEmpty && ouvertes.containsAll(toutes);
     return Scaffold(
       backgroundColor: Charte.fond,
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _titre(nbMarques, nbDeclinaisons, d.length, examen.length),
+        _titre(nbMarques, nbDeclinaisons, d.length),
         Container(height: 1, color: Charte.separateurZone),
         BarreConsole(
           aideRecherche: 'Une marque ou un produit',
@@ -578,14 +566,13 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
           onPrecedent: () => _allerA(_indice - 1 + _resultats.length),
           trouves: _resultats.length,
           indice: _indice,
-          toutOuvert: toutOuvert,
-          onTout: () => setState(() {
-            if (toutOuvert) {
-              ouvertes.clear();
-            } else {
-              domainesFermes.clear();
-              ouvertes.addAll(toutes);
-            }
+          onDeplier: () => setState(() {
+            domainesFermes.clear();
+            ouvertes.addAll(toutes);
+          }),
+          onReplier: () => setState(() {
+            ouvertes.clear();
+            domainesFermes.addAll(d.keys);
           }),
           boutons: [
             BoutonConsole(
@@ -596,7 +583,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
             ),
             BoutonConsole(
               key: const ValueKey('marques-examen'),
-              texte: 'À examiner (${examen.length})…',
+              texte: _examenCache == null ? 'À examiner…' : 'À examiner (${_examenCache!.length})…',
               icone: Icons.rule,
               onTap: _fenetreExamen,
             ),

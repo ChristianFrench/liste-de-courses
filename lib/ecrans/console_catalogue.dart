@@ -250,7 +250,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
       var y = 0.0;
       for (final l in _lignes()) {
         if (identical(l.objet, o) && !l.seulEntete) break;
-        y += (l.domaine != null ? 46 : 0) + (l.seulEntete ? 0 : (l.p != null ? 32 : (l.s != null ? 38 : 42)));
+        y += (l.domaine != null ? RangeeConsole.hauteurTitre : 0) + (l.seulEntete ? 0 : RangeeConsole.hauteurDe(titre: l.p == null));
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -813,33 +813,17 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         _message('${d.data.rayon!.nom} rangé dans « $u »');
       },
       builder: (_, __, ___) {
-        final rayons = b.catalogue.rayons.where((x) => b.universDe(x.nom) == u).toList();
         final ouvert = !domainesFermes.contains(u);
-        final tout = ouvert && rayons.every((r) => rayonsOuverts.contains(r) && r.secteurs.every(secteursOuverts.contains));
-        return BandeauDomaineConsole(
+        return RangeeConsole(
           key: ValueKey('console-domaine-$u'),
-          signe: _signeDomaine(u, 32),
-          nom: u,
-          compte: _pluriel(n, 'rayon'),
-          survole: _survole == u,
-          onClicDroit: (o) => _menuDomaine(o, u),
+          profondeur: 0,
           ouvert: ouvert,
+          signe: _signeDomaine(u, 30),
+          libelle: u,
+          compte: _pluriel(n, 'rayon'),
+          survolee: _survole == u,
           onTap: () => setState(() => ouvert ? domainesFermes.add(u) : domainesFermes.remove(u)),
-          toutOuvert: tout,
-          onTout: () => setState(() {
-            if (tout) {
-              rayonsOuverts.removeAll(rayons);
-              for (final r in rayons) {
-                secteursOuverts.removeAll(r.secteurs);
-              }
-            } else {
-              domainesFermes.remove(u);
-              rayonsOuverts.addAll(rayons);
-              for (final r in rayons) {
-                secteursOuverts.addAll(r.secteurs);
-              }
-            }
-          }),
+          onClicDroit: (o) => _menuDomaine(o, u),
         );
       },
     );
@@ -874,7 +858,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     return l;
   }
 
-  Widget _libelle(Object o, String nom, TextStyle style) => Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: style);
 
   Widget _rangee(_Ligne l) {
     final o = l.objet;
@@ -882,75 +865,39 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     final selection = o is CatProduit ? produitsChoisis.contains(o) : identical(choisi, o);
     final survol = identical(_survole, o);
     final trouve = identical(_trouve, o);
-    final hauteur = niveau == 1 ? 42.0 : (niveau == 2 ? 38.0 : 32.0);
-    final fond = survol
-        ? Charte.accent
-        : trouve
-            ? Charte.clair(Charte.orange, 0.65)
-            : selection
-            ? Charte.fondSelection
-            : (niveau == 1 ? Charte.niveau(2) : niveau == 2 ? Charte.niveau(3) : Charte.blanc);
     final ouvert = niveau == 1 ? rayonsOuverts.contains(l.r) : secteursOuverts.contains(l.s);
-    Widget contenu;
-    switch (niveau) {
-      case 1:
-        final r = l.r;
-        contenu = Row(children: [
-          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
-          _icone(iconeRayon(r.nom, b.images), 30, () => _choisirImage(cleChoixRayon(r.nom), r.nom), r.nom),
-          const SizedBox(width: 8),
-          Expanded(child: _libelle(r, r.nom, Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
-          Text(_pluriel(r.secteurs.length, 'secteur'), style: Charte.texte(13, couleur: Charte.encreNiveau)),
-          const SizedBox(width: 8),
-          // Tout déplier / replier le rayon : ses secteurs et leurs produits.
-          Builder(builder: (_) {
-            final tout = ouvert && r.secteurs.every(secteursOuverts.contains);
-            return boutonToutConsole(tout, () => setState(() {
-                  if (tout) {
-                    secteursOuverts.removeAll(r.secteurs);
-                    rayonsOuverts.remove(r);
-                  } else {
-                    rayonsOuverts.add(r);
-                    secteursOuverts.addAll(r.secteurs);
-                  }
-                }), r.nom);
-          }),
-        ]);
-      case 2:
-        final s = l.s!;
-        contenu = Row(children: [
-          const SizedBox(width: 30),
-          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 20, color: Charte.encreNiveau),
-          _icone(iconeSecteur(l.r.nom, s.nom, b.images), 26,
-              () => _choisirImage(cleChoixSecteur(l.r.nom, s.nom), s.nom), s.nom),
-          const SizedBox(width: 8),
-          Expanded(child: _libelle(s, s.nom, Charte.texte(14.5, gras: true))),
-          Text(_pluriel(s.produits.length, 'produit'), style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-          const SizedBox(width: 8),
-        ]);
-      default:
-        final p = l.p!;
-        contenu = Row(children: [
-          const SizedBox(width: 92),
-          Expanded(flex: 4, child: _libelle(p, p.nom, Charte.texte(14.5, gras: selection))),
-          Expanded(
-            flex: 3,
-            child: Text(p.formats.join(', '), maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(p.marques.take(4).join(', '),
-                maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
-          ),
-        ]);
-    }
-    final rangee = Container(
-      key: trouve ? _cleTrouve : null,
-      height: hauteur,
-      padding: const EdgeInsets.only(left: 8, right: 8),
-      decoration: BoxDecoration(color: fond, border: Border(bottom: BorderSide(color: niveau == 3 ? Charte.separateurLigne : Charte.blanc))),
-      child: contenu,
-    );
+    // 22/11/2026 : la ligne commune aux trois catalogues ([RangeeConsole.corps]) ; domaine 0, rayon 1, secteur 2.
+    final rangee = switch (niveau) {
+      1 => RangeeConsole.corps(
+          cle: trouve ? _cleTrouve : null,
+          profondeur: 1,
+          ouvert: ouvert,
+          signe: _icone(iconeRayon(l.r.nom, b.images), 30, () => _choisirImage(cleChoixRayon(l.r.nom), l.r.nom), l.r.nom),
+          libelle: l.r.nom,
+          compte: _pluriel(l.r.secteurs.length, 'secteur'),
+          choisie: selection,
+          trouvee: trouve,
+          survolee: survol),
+      2 => RangeeConsole.corps(
+          cle: trouve ? _cleTrouve : null,
+          profondeur: 2,
+          ouvert: ouvert,
+          signe: _icone(iconeSecteur(l.r.nom, l.s!.nom, b.images), 30, () => _choisirImage(cleChoixSecteur(l.r.nom, l.s!.nom), l.s!.nom), l.s!.nom),
+          libelle: l.s!.nom,
+          compte: _pluriel(l.s!.produits.length, 'produit'),
+          choisie: selection,
+          trouvee: trouve,
+          survolee: survol),
+      _ => RangeeConsole.corps(
+          cle: trouve ? _cleTrouve : null,
+          profondeur: 2,
+          titre: false,
+          libelle: l.p!.nom,
+          colonnes: [(l.p!.formats.join(', '), 3), (l.p!.marques.take(4).join(', '), 3)],
+          choisie: selection,
+          trouvee: trouve,
+          survolee: survol),
+    };
     final glisse = switch (niveau) {
       1 => _Glisse.rayon(l.r),
       2 => _Glisse.secteur(l.r, l.s),
@@ -1044,63 +991,29 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
 
   Widget _cadre() {
     final lignes = _lignes();
-    final toutOuvert = rayonsOuverts.length == b.catalogue.rayons.length;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(
-        padding: const EdgeInsets.fromLTRB(20, 12, 12, 10),
-        child: Row(children: [
-          Flexible(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 380),
-              child: TextField(
-                key: const ValueKey('console-recherche'),
-                style: Charte.texte(15),
-                decoration: const InputDecoration(labelText: 'Rechercher', hintText: 'Un rayon, un secteur, un produit'),
-                onChanged: _chercher,
-                // Entrée : correspondance suivante, en gardant la main dans le champ.
-                onSubmitted: (_) => _allerA(_indice + 1),
-              ),
-            ),
-          ),
-          if (recherche.trim().length >= 2) ...[
-            const SizedBox(width: 10),
-            Text(_resultats.isEmpty ? 'Aucun résultat' : '${_indice + 1} / ${_resultats.length}',
-                key: const ValueKey('console-recherche-compte'), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
-            Tooltip(
-              message: 'Précédent',
-              child: IconButton(
-                key: const ValueKey('console-recherche-precedent'),
-                onPressed: _resultats.length < 2 ? null : () => _allerA(_indice - 1 + _resultats.length),
-                icon: Icone(Icons.keyboard_arrow_up, size: 26, color: Charte.cadre),
-              ),
-            ),
-            Tooltip(
-              message: 'Suivant',
-              child: IconButton(
-                key: const ValueKey('console-recherche-suivant'),
-                onPressed: _resultats.length < 2 ? null : () => _allerA(_indice + 1),
-                icon: Icone(Icons.keyboard_arrow_down, size: 26, color: Charte.cadre),
-              ),
-            ),
-          ],
-          const SizedBox(width: 6),
-          _Bouton(
-            key: const ValueKey('console-tout'),
-            texte: toutOuvert ? 'Tout replier' : 'Tout déplier',
-            icone: toutOuvert ? Icons.unfold_less : Icons.unfold_more,
-            onTap: () => setState(() {
-              if (toutOuvert) {
-                rayonsOuverts.clear();
-                secteursOuverts.clear();
-              } else {
-                domainesFermes.clear();
-                rayonsOuverts.addAll(b.catalogue.rayons);
-              }
-            }),
-          ),
-          const Spacer(),
+      BarreConsole(
+        aideRecherche: 'Un rayon, un secteur, un produit',
+        recherche: recherche,
+        onChercher: _chercher,
+        onSuivant: () => _allerA(_indice + 1),
+        onPrecedent: () => _allerA(_indice - 1 + _resultats.length),
+        trouves: _resultats.length,
+        indice: _indice,
+        onDeplier: () => setState(() {
+          domainesFermes.clear();
+          rayonsOuverts.addAll(b.catalogue.rayons);
+          for (final r in b.catalogue.rayons) {
+            secteursOuverts.addAll(r.secteurs);
+          }
+        }),
+        onReplier: () => setState(() {
+          rayonsOuverts.clear();
+          secteursOuverts.clear();
+          domainesFermes.addAll([...b.univers.keys, autresRayons]);
+        }),
+        boutons: [
           // 07/11/2026 (Aristide) : ajouter à partir d'un texte toujours à portée, pas seulement au clic droit.
-          const SizedBox(width: 12),
           _Bouton(
             key: const ValueKey('console-texte'),
             texte: 'Ajouter à partir d\'un texte',
@@ -1115,7 +1028,6 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               if (ok) _modifie();
             },
           ),
-          const SizedBox(width: 8),
           _Bouton(
             key: const ValueKey('console-nouveau-rayon'),
             texte: 'Nouveau rayon',
@@ -1125,16 +1037,9 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
               if (mounted) setState(() {});
             },
           ),
-        ]),
-      ),
-      // Aide sur sa propre ligne : à côté des boutons, elle était écrasée quand la fenêtre est étroite.
-      Padding(
-        padding: const EdgeInsets.fromLTRB(20, 0, 16, 8),
-        child: Text(
-          'Clic droit : actions de l\'élément · Double-clic ou F2 : renommer · Suppr : retirer · Entrée : ajouter dedans · '
-          'Glisser-déposer : déplacer un produit, un secteur ou un rayon · Ctrl+clic : plusieurs produits',
-          style: Charte.texte(12.5, couleur: Charte.texteSecondaire),
-        ),
+        ],
+        aide: 'Clic : déplier · Clic droit : actions de l\'élément · Double-clic ou F2 : renommer · Suppr : retirer · Entrée : ajouter dedans · '
+            'Glisser-déposer : déplacer un produit, un secteur ou un rayon · Ctrl+clic : plusieurs produits',
       ),
       Expanded(
         child: Container(

@@ -12,7 +12,7 @@ import '../theme.dart';
 // - [BarreConsole] : recherche au sens strict (n / total, précédent, suivant), tout déplier, boutons à droite,
 //   puis la ligne d'aide ;
 // - [CadreConsole] : le cadre de la liste, sur toute la largeur ;
-// - [BandeauDomaineConsole] et [RangeeConsole] : les lignes de l'arbre (domaine, niveaux 1 à 3).
+// - [RangeeConsole] : toutes les lignes de l'arbre, titres (même présentation à tous les niveaux) et feuilles.
 
 String plurielConsole(int n, String mot) => '$n $mot${n > 1 ? 's' : ''}';
 
@@ -133,7 +133,8 @@ class EnTeteConsole extends StatelessWidget {
   }
 }
 
-/// Barre au-dessus du cadre : recherche au sens strict, tout déplier / replier, boutons ; puis l'aide.
+/// Barre au-dessus du cadre : recherche au sens strict, tout déplier / tout replier (deux icônes, pour toute la
+/// hiérarchie), boutons ; puis l'aide.
 class BarreConsole extends StatelessWidget {
   const BarreConsole({
     super.key,
@@ -144,16 +145,15 @@ class BarreConsole extends StatelessWidget {
     required this.recherche,
     required this.trouves,
     required this.indice,
-    required this.toutOuvert,
-    required this.onTout,
+    required this.onDeplier,
+    required this.onReplier,
     this.boutons = const [],
     required this.aide,
   });
   final String aideRecherche, recherche, aide;
   final void Function(String) onChercher;
-  final VoidCallback onSuivant, onPrecedent, onTout;
+  final VoidCallback onSuivant, onPrecedent, onDeplier, onReplier;
   final int trouves, indice;
-  final bool toutOuvert;
   final List<Widget> boutons;
 
   @override
@@ -194,12 +194,24 @@ class BarreConsole extends StatelessWidget {
                 ),
               ),
             ],
-            const SizedBox(width: 6),
-            BoutonConsole(
-              key: const ValueKey('console-tout'),
-              texte: toutOuvert ? 'Tout replier' : 'Tout déplier',
-              icone: toutOuvert ? Icons.unfold_less : Icons.unfold_more,
-              onTap: onTout,
+            const SizedBox(width: 10),
+            // 22/11/2026 (Aristide) : toute la hiérarchie, en icônes : flèche vers le bas = tout déplier,
+            // flèche vers le haut = tout replier.
+            Tooltip(
+              message: 'Tout déplier',
+              child: IconButton(
+                key: const ValueKey('console-tout-deplier'),
+                onPressed: onDeplier,
+                icon: Icone(Icons.keyboard_double_arrow_down, size: 28, color: Charte.cadre),
+              ),
+            ),
+            Tooltip(
+              message: 'Tout replier',
+              child: IconButton(
+                key: const ValueKey('console-tout-replier'),
+                onPressed: onReplier,
+                icon: Icone(Icons.keyboard_double_arrow_up, size: 28, color: Charte.cadre),
+              ),
             ),
             const Spacer(),
             for (final b in boutons) ...[const SizedBox(width: 8), b],
@@ -228,61 +240,17 @@ class CadreConsole extends StatelessWidget {
       );
 }
 
-/// En-tête d'un domaine, au-dessus de son premier élément (bandeau foncé, texte blanc).
-class BandeauDomaineConsole extends StatelessWidget {
-  const BandeauDomaineConsole(
-      {super.key,
-      required this.signe,
-      required this.nom,
-      required this.compte,
-      this.survole = false,
-      this.onClicDroit,
-      this.toutOuvert,
-      this.onTout,
-      this.ouvert = true,
-      this.onTap});
-  final bool? toutOuvert;
-  final VoidCallback? onTout;
-
-  /// Domaine replié ou déplié (22/11/2026, Aristide : « repliés / dépliés à tous les niveaux »).
-  final bool ouvert;
-  final VoidCallback? onTap;
-  final Widget signe;
-  final String nom, compte;
-  final bool survole;
-  final void Function(Offset)? onClicDroit;
-  static const hauteur = 46.0;
-
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onTap,
-        onSecondaryTapDown: onClicDroit == null ? null : (d) => onClicDroit!(d.globalPosition),
-        child: Container(
-          height: hauteur,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: survole ? Charte.accent : Charte.cadre,
-            border: Border(bottom: BorderSide(color: Charte.blanc), top: BorderSide(color: Charte.blanc, width: 4)),
-          ),
-          child: Row(children: [
-            if (onTap != null) Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.blanc),
-            SizedBox(width: 36, child: Center(child: signe)),
-            const SizedBox(width: 10),
-            Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
-            Text(compte, style: Charte.texte(13, couleur: Charte.blanc)),
-            if (onTout != null) ...[const SizedBox(width: 8), boutonToutConsole(toutOuvert == true, onTout!, nom, couleur: Charte.blanc)],
-          ]),
-        ),
-      );
-}
-
-/// Une ligne de l'arbre : niveau 1 (rayon, type), 2 (secteur, sous-type) ou 3 (produit, marque, recette).
-/// Les niveaux 1 et 2 se déplient ; le niveau 3 porte des colonnes.
+/// Une ligne de l'arbre, la MÊME dans les trois catalogues (22/11/2026, Aristide : « les titres, sous-titres ont
+/// TOUS la même présentation, police, couleur de fond » ; « sur chaque niveau un dépliement / repliement avec la
+/// MÊME présentation »).
+/// - Titre (domaine, rayon, secteur ; domaine, marque ; type, sous-type) : chevron à gauche (› replié, ⌄ déplié),
+///   place de l'icône, libellé en gras, compte à droite ; même fond à tous les niveaux, retrait selon la profondeur.
+/// - Ligne (produit, produit d'une marque, recette) : fond blanc, alignée sous le libellé de son titre, colonnes.
 class RangeeConsole extends StatelessWidget {
   const RangeeConsole({
     super.key,
-    required this.niveau,
+    required this.profondeur,
+    this.titre = true,
     this.ouvert = false,
     this.signe,
     required this.libelle,
@@ -291,92 +259,92 @@ class RangeeConsole extends StatelessWidget {
     this.choisie = false,
     this.trouvee = false,
     this.survolee = false,
-    this.decalage = 0,
     this.onTap,
     this.onDoubleTap,
     this.onClicDroit,
-    this.hauteur,
-    this.toutOuvert,
-    this.onTout,
   });
-  final int niveau;
-
-  /// Hauteur imposée (recettes avec vignette) ; sinon celle du niveau.
-  final double? hauteur;
-
-  /// Titre qui contient des titres : bouton « tout déplier / tout replier » de ce qu'il contient.
-  final bool? toutOuvert;
-  final VoidCallback? onTout;
-  final bool ouvert, choisie, trouvee, survolee;
-
-  /// Icône ou image (30 px au niveau 1, 26 au niveau 2).
+  final int profondeur;
+  final bool titre, ouvert, choisie, trouvee, survolee;
   final Widget? signe;
   final String libelle;
   final String? compte;
-
-  /// Niveau 3 : colonnes après le libellé, (texte, poids).
   final List<(String, int)> colonnes;
-
-  /// Retrait supplémentaire à gauche (niveau 3 sous un niveau 1 seulement).
-  final double decalage;
   final VoidCallback? onTap, onDoubleTap;
   final void Function(Offset)? onClicDroit;
 
-  static double hauteurDe(int niveau) => niveau == 1 ? 42.0 : (niveau == 2 ? 38.0 : 32.0);
+  static const hauteurTitre = 40.0, hauteurLigne = 32.0, retrait = 24.0, placeSigne = 34.0;
+  static double hauteurDe({required bool titre}) => titre ? hauteurTitre : hauteurLigne;
 
-  @override
-  Widget build(BuildContext context) {
+  /// Le dessin seul (sans les gestes) : le catalogue des produits l'enveloppe de son glisser-déposer.
+  static Widget corps({
+    required int profondeur,
+    bool titre = true,
+    bool ouvert = false,
+    Widget? signe,
+    required String libelle,
+    String? compte,
+    List<(String, int)> colonnes = const [],
+    bool choisie = false,
+    bool trouvee = false,
+    bool survolee = false,
+    Key? cle,
+  }) {
     final fond = survolee
         ? Charte.accent
         : trouvee
             ? Charte.clair(Charte.orange, 0.65)
             : choisie
                 ? Charte.fondSelection
-                : (niveau == 1 ? Charte.niveau(2) : niveau == 2 ? Charte.niveau(3) : Charte.blanc);
-    final Widget contenu = switch (niveau) {
-      1 => Row(children: [
-          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
-          if (signe != null) SizedBox(width: 34, height: 34, child: Center(child: signe)),
-          const SizedBox(width: 8),
-          Expanded(child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
-          if (compte != null) Text(compte!, style: Charte.texte(13, couleur: Charte.encreNiveau)),
-          const SizedBox(width: 8),
-          if (onTout != null) boutonToutConsole(toutOuvert == true, onTout!, libelle),
-        ]),
-      2 => Row(children: [
-          const SizedBox(width: 30),
-          Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 20, color: Charte.encreNiveau),
-          if (signe != null) SizedBox(width: 30, height: 30, child: Center(child: signe)),
-          const SizedBox(width: 8),
-          Expanded(child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: true))),
-          if (compte != null) Text(compte!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
-          const SizedBox(width: 8),
-          if (onTout != null) boutonToutConsole(toutOuvert == true, onTout!, libelle),
-        ]),
-      _ => Row(children: [
-          SizedBox(width: 92 - decalage - (signe == null ? 0 : (hauteur ?? 32) + 4)),
-          if (signe != null) ...[SizedBox(width: (hauteur ?? 32) - 4, height: (hauteur ?? 32) - 4, child: signe), const SizedBox(width: 8)],
-          Expanded(flex: 4, child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: choisie))),
-          for (final (t, poids) in colonnes)
-            Expanded(
-              flex: poids,
-              child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
-            ),
-        ]),
-    };
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      onDoubleTap: onDoubleTap,
-      onSecondaryTapDown: onClicDroit == null ? null : (d) => onClicDroit!(d.globalPosition),
-      child: Container(
-        height: hauteur ?? hauteurDe(niveau),
-        padding: const EdgeInsets.only(left: 8, right: 8),
-        decoration: BoxDecoration(color: fond, border: Border(bottom: BorderSide(color: niveau == 3 ? Charte.separateurLigne : Charte.blanc))),
-        child: contenu,
-      ),
+                : (titre ? Charte.niveau(2) : Charte.blanc);
+    final gauche = 6 + retrait * profondeur;
+    final contenu = titre
+        ? Row(children: [
+            SizedBox(width: gauche),
+            Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.encreNiveau),
+            const SizedBox(width: 4),
+            SizedBox(width: placeSigne, height: placeSigne, child: Center(child: signe)),
+            const SizedBox(width: 8),
+            Expanded(child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
+            if (compte != null) Text(compte, style: Charte.texte(13, couleur: Charte.encreNiveau)),
+            const SizedBox(width: 8),
+          ])
+        : Row(children: [
+            SizedBox(width: gauche + 26),
+            Expanded(flex: 4, child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: choisie))),
+            for (final (t, poids) in colonnes)
+              Expanded(
+                flex: poids,
+                child: Text(t, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(13.5, couleur: Charte.texteSecondaire)),
+              ),
+          ]);
+    return Container(
+      key: cle,
+      height: hauteurDe(titre: titre),
+      padding: const EdgeInsets.only(right: 8),
+      decoration: BoxDecoration(color: fond, border: Border(bottom: BorderSide(color: titre ? Charte.blanc : Charte.separateurLigne))),
+      child: contenu,
     );
   }
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        onDoubleTap: onDoubleTap,
+        onSecondaryTapDown: onClicDroit == null ? null : (d) => onClicDroit!(d.globalPosition),
+        child: corps(
+          profondeur: profondeur,
+          titre: titre,
+          ouvert: ouvert,
+          signe: signe,
+          libelle: libelle,
+          compte: compte,
+          colonnes: colonnes,
+          choisie: choisie,
+          trouvee: trouvee,
+          survolee: survolee,
+        ),
+      );
 }
 
 /// Menu d'un clic droit : (valeur, icône, texte, actif).
@@ -396,18 +364,4 @@ Future<String?> menuConsole(BuildContext context, Offset ou, List<EntreeMenuCons
               child: Row(children: [Icone(e.icone, size: 20, color: Charte.cadre), const SizedBox(width: 10), Text(e.texte, style: Charte.texte(15))]),
             ),
       ],
-    );
-
-/// « Tout déplier / tout replier » d'un titre de la hiérarchie. Partout les mêmes icônes : chevron (› / ⌄) pour
-/// le titre lui-même, double flèche (unfold) pour tout ce qu'il contient.
-Widget boutonToutConsole(bool ouvert, VoidCallback onTap, String nom, {Color? couleur}) => Tooltip(
-      message: '${ouvert ? 'Tout replier' : 'Tout déplier'} : $nom',
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(6),
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Icone(ouvert ? Icons.unfold_less : Icons.unfold_more, size: 22, color: couleur ?? Charte.encreNiveau),
-        ),
-      ),
     );
