@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:liste_de_courses/donnees/modele.dart';
+import 'package:liste_de_courses/donnees/recette_ingredients.dart' show recettesFournies;
 import 'package:liste_de_courses/donnees/pictos.dart';
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/main.dart';
@@ -56,8 +57,24 @@ Future<void> _toucher(WidgetTester tester, Finder f) async {
 
 Finder _onglet(String l) => find.descendant(of: find.byType(BarreOnglets), matching: find.text(l));
 
+/// 22/11/2026 : Gérer n'est plus dans la barre (roue dentée de l'accueil) ; on y va directement, à sa racine.
+Future<void> _allerA(WidgetTester tester, String onglet) async {
+  if (onglet != 'Gérer') {
+    await _toucher(tester, _onglet(onglet));
+    await _toucher(tester, _onglet(onglet));
+    return;
+  }
+  Nav.i.allerOnglet(Nav.gerer);
+  await tester.pumpAndSettle();
+  Nav.i.retourOnglet(Nav.gerer);
+  await tester.pumpAndSettle();
+}
+
 void main() {
-  setUpAll(_polices);
+  setUpAll(() async {
+    await _polices();
+    await recettesFournies(); // lu en vrai asynchrone (l'onglet Recettes le demande dès le lancement)
+  });
 
   testWidgets('écrans', (tester) async {
     final e = Etat.instance;
@@ -106,7 +123,7 @@ void main() {
     await _toucher(tester, find.text('OK'));
     await _toucher(tester, find.byTooltip('Retour'));
 
-    await _toucher(tester, _onglet('Gérer'));
+    await _allerA(tester, 'Gérer');
     await _capture('19 Gerer');
     await _toucher(tester, find.text('Magasins'));
     await _capture('22 Magasins');
@@ -140,8 +157,7 @@ void main() {
     await _toucher(tester, find.text('Historique').last);
     await _capture('11 Historique-Courses');
 
-    await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, _onglet('Gérer'));
+    await _allerA(tester, 'Gérer');
     await _toucher(tester, find.text('Catalogue des produits'));
     await _capture('13 Catalogue');
     await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
@@ -169,8 +185,7 @@ void main() {
     await _toucher(tester, find.textContaining('Produits ajoutés'));
     await _capture('20 Produits-ajoutes');
 
-    await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, _onglet('Gérer'));
+    await _allerA(tester, 'Gérer');
     await _capture('17 Gerer');
     await _toucher(tester, find.text('Types de promotion'));
     await _capture('18 Types-de-promotion');
@@ -191,8 +206,7 @@ void main() {
       ('Gérer', 'Apparence', '27 Apparence'),
       ('Gérer', 'Collaboration', '27 Collaboration'),
     ]) {
-      await _toucher(tester, _onglet(onglet));
-      await _toucher(tester, _onglet(onglet));
+      await _allerA(tester, onglet);
       try {
         await _toucher(tester, find.text(rubrique));
       } on StateError {
@@ -212,8 +226,7 @@ void main() {
         expect(find.text('Images de fond'), findsOneWidget, reason: 'toujours dans Apparence');
       }
     }
-    await _toucher(tester, _onglet('Gérer'));
-    await _toucher(tester, _onglet('Gérer'));
+    await _allerA(tester, 'Gérer');
     await _toucher(tester, find.text('Foyer'));
     await _toucher(tester, find.byKey(const ValueKey('titre-actions')).hitTestable().first);
     await _capture('25 Foyer-Actions');
