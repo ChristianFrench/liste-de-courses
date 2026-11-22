@@ -10,6 +10,7 @@ sealed class Produit
     public List<string> Marques = new();
     public List<string> Formats = new();
     public Secteur Secteur = null!;
+    public JsonObject Json = new();
 }
 
 sealed class Secteur
@@ -17,6 +18,7 @@ sealed class Secteur
     public string Nom = "";
     public List<Produit> Produits = new();
     public Rayon Rayon = null!;
+    public JsonObject Json = new();
 }
 
 sealed class Rayon
@@ -24,24 +26,33 @@ sealed class Rayon
     public string Nom = "";
     public string Domaine = Catalogue.AutresRayons;
     public List<Secteur> Secteurs = new();
+    public JsonObject Json = new();
 }
 
+/// <summary>
+/// Le catalogue des produits (brouillon de l'éditeur). Les objets JSON d'origine sont gardés (<see cref="Racine"/>) et
+/// modifiés sur place par les déplacements : les champs que ce logiciel ne connaît pas sont conservés.
+/// </summary>
 sealed class Catalogue
 {
     public const string AutresRayons = "Autres rayons";
     public List<Rayon> Rayons = new();
     public List<string> Domaines = new();
+    public JsonObject Racine = new();
     /// <summary>D'où vient le catalogue affiché (brouillon en cours, dernier publié, aucun).</summary>
     public string Origine = "aucun catalogue";
+    public int? NumeroPublie;
+    public string? DatePubliee;
 
     public IEnumerable<Produit> TousLesProduits => Rayons.SelectMany(r => r.Secteurs).SelectMany(s => s.Produits);
 
     public static Catalogue Lire(JsonNode? j, string origine)
     {
         var c = new Catalogue { Origine = origine };
-        if (j is null) return c;
+        if (j is not JsonObject racine) return c;
+        c.Racine = racine;
         var domaineDuRayon = new Dictionary<string, string>();
-        foreach (var u in j["univers"]?.AsArray() ?? new JsonArray())
+        foreach (var u in racine["univers"]?.AsArray() ?? new JsonArray())
         {
             var nom = (string?)u?["nom"];
             if (nom is null) continue;
@@ -49,22 +60,19 @@ sealed class Catalogue
             foreach (var r in u!["rayons"]?.AsArray() ?? new JsonArray())
                 if ((string?)r is { } rn) domaineDuRayon[rn] = nom;
         }
-        foreach (var rj in j["rayons"]?.AsArray() ?? new JsonArray())
+        foreach (var rj in racine["rayons"]?.AsArray() ?? new JsonArray())
         {
-            var r = new Rayon { Nom = (string?)rj?["nom"] ?? "" };
+            if (rj is not JsonObject ro) continue;
+            var r = new Rayon { Nom = (string?)ro["nom"] ?? "", Json = ro };
             r.Domaine = domaineDuRayon.GetValueOrDefault(r.Nom, AutresRayons);
-            foreach (var sj in rj?["secteurs"]?.AsArray() ?? new JsonArray())
+            foreach (var sj in ro["secteurs"]?.AsArray() ?? new JsonArray())
             {
-                var s = new Secteur { Nom = (string?)sj?["nom"] ?? "", Rayon = r };
-                foreach (var pj in sj?["produits"]?.AsArray() ?? new JsonArray())
+                if (sj is not JsonObject so) continue;
+                var s = new Secteur { Nom = (string?)so["nom"] ?? "", Rayon = r, Json = so };
+                foreach (var pj in so["produits"]?.AsArray() ?? new JsonArray())
                 {
-                    s.Produits.Add(new Produit
-                    {
-                        Nom = (string?)pj?["nom"] ?? "",
-                        Marques = Textes(pj?["marques"]),
-                        Formats = Textes(pj?["formats"]),
-                        Secteur = s,
-                    });
+                    if (pj is not JsonObject po) continue;
+                    s.Produits.Add(new Produit { Nom = (string?)po["nom"] ?? "", Marques = Textes(po["marques"]), Formats = Textes(po["formats"]), Secteur = s, Json = po });
                 }
                 r.Secteurs.Add(s);
             }
@@ -76,6 +84,89 @@ sealed class Catalogue
 
     internal static List<string> Textes(JsonNode? n) =>
         n is JsonArray a ? a.Select(x => (string?)x).Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x!).ToList() : new();
+
+    static JsonArray Tableau(JsonObject o, string cle)
+    {
+        if (o[cle] is JsonArray a) return a;
+        a = new JsonArray();
+        o[cle] = a;
+        return a;
+    }
+
+    // ------------------------------------------------------------ déplacements (rendent la ligne du journal)
+
+    /// <summary>Déplace (ou copie) le produit dans le secteur <paramref name="cible"/>, avant <paramref name="avant"/> s'il est donné.</summary>
+    public string? DeplacerProduit(Produit p, Secteur cible, Produit? avant, bool copie)
+    {
+        if (ReferenceEquals(p, avant)) return null;
+        if (cible.Produits.Any(x => !ReferenceEquals(x, p) && string.Equals(x.Nom, p.Nom, StringComparison.CurrentCultureIgnoreCase)))
+            throw new InvalidOperationException($"Le secteur « {cible.Nom} » contient déjà « {p.Nom} ».");
+        var de = p.Secteur;
+        var json = copie ? (JsonObject)p.Json.DeepClone() : p.Json;
+        if (!copie)
+        {
+            Tableau(de.Json, "produits").Remove(p.Json);
+            de.Produits.Remove(p);
+        }
+        var x = copie ? new Produit { Nom = p.Nom, Marques = new(p.Marques), Formats = new(p.Formats), Json = json } : p;
+        x.Secteur = cible;
+        var i = avant is null ? cible.Produits.Count : cible.Produits.IndexOf(avant);
+        if (i < 0) i = cible.Produits.Count;
+        cible.Produits.Insert(i, x);
+        Tableau(cible.Json, "produits").Insert(i, json);
+        return copie
+            ? $"Produit « {p.Nom} » copié dans {cible.Rayon.Nom} › {cible.Nom}"
+            : (ReferenceEquals(de, cible) ? $"Produit « {p.Nom} » déplacé dans {cible.Nom}" : $"Produit « {p.Nom} » : {de.Rayon.Nom} › {de.Nom} → {cible.Rayon.Nom} › {cible.Nom}");
+    }
+
+    public string? DeplacerSecteur(Secteur s, Rayon cible, Secteur? avant)
+    {
+        if (ReferenceEquals(s, avant)) return null;
+        if (cible.Secteurs.Any(x => !ReferenceEquals(x, s) && string.Equals(x.Nom, s.Nom, StringComparison.CurrentCultureIgnoreCase)))
+            throw new InvalidOperationException($"Le rayon « {cible.Nom} » contient déjà un secteur « {s.Nom} ».");
+        var de = s.Rayon;
+        Tableau(de.Json, "secteurs").Remove(s.Json);
+        de.Secteurs.Remove(s);
+        s.Rayon = cible;
+        var i = avant is null ? cible.Secteurs.Count : cible.Secteurs.IndexOf(avant);
+        if (i < 0) i = cible.Secteurs.Count;
+        cible.Secteurs.Insert(i, s);
+        Tableau(cible.Json, "secteurs").Insert(i, s.Json);
+        return ReferenceEquals(de, cible) ? $"Secteur « {s.Nom} » déplacé dans {cible.Nom}" : $"Secteur « {s.Nom} » : {de.Nom} → {cible.Nom}";
+    }
+
+    public string? DeplacerRayon(Rayon r, string domaine, Rayon? avant)
+    {
+        if (ReferenceEquals(r, avant)) return null;
+        var de = r.Domaine;
+        // Ordre des rayons : celui du tableau « rayons ».
+        var rayons = Tableau(Racine, "rayons");
+        rayons.Remove(r.Json);
+        Rayons.Remove(r);
+        var i = avant is null ? Rayons.FindLastIndex(x => x.Domaine == domaine) + 1 : Rayons.IndexOf(avant);
+        if (i <= 0 && avant is null) i = Rayons.Count;
+        Rayons.Insert(i, r);
+        rayons.Insert(i, r.Json);
+        // Domaine : listes « univers ».
+        r.Domaine = domaine;
+        var univers = Tableau(Racine, "univers");
+        foreach (var u in univers.OfType<JsonObject>())
+        {
+            var liste = Tableau(u, "rayons");
+            foreach (var x in liste.Where(x => (string?)x == r.Nom).ToList()) liste.Remove(x);
+        }
+        if (domaine != AutresRayons)
+        {
+            var u = univers.OfType<JsonObject>().FirstOrDefault(x => (string?)x["nom"] == domaine);
+            if (u is null) { u = new JsonObject { ["nom"] = domaine, ["rayons"] = new JsonArray() }; univers.Add(u); }
+            var liste = Tableau(u, "rayons");
+            var ordre = Rayons.Where(x => x.Domaine == domaine).Select(x => x.Nom).ToList();
+            liste.Clear();
+            foreach (var n in ordre) liste.Add(n);
+        }
+        if (!Domaines.Contains(domaine)) Domaines.Add(domaine);
+        return de == domaine ? $"Rayon « {r.Nom} » déplacé dans {domaine}" : $"Rayon « {r.Nom} » : {de} → {domaine}";
+    }
 }
 
 sealed class Ingredient

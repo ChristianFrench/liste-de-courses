@@ -66,27 +66,97 @@ sealed class Entrepot
         return e;
     }
 
+    public string? FichierBase => Dossier is null ? null : Path.Combine(Dossier, "liste_de_courses.db");
+
+    /// <summary>Gestes en cours (non validés) et étapes validées non publiées, d'après le journal de la console.</summary>
+    public int GestesEnCours, EtapesNonPubliees;
+    public int? RecettesPubliees;
+    bool _baseSauvee;
+
+    SqliteConnection Connexion(bool ecriture)
+    {
+        var c = new SqliteConnection(new SqliteConnectionStringBuilder
+        {
+            DataSource = FichierBase!, Mode = ecriture ? SqliteOpenMode.ReadWrite : SqliteOpenMode.ReadOnly, Pooling = false, DefaultTimeout = 10,
+        }.ToString());
+        c.Open();
+        return c;
+    }
+
+    static string? Reglage(SqliteConnection c, string cle)
+    {
+        using var cmd = c.CreateCommand();
+        cmd.CommandText = "SELECT valeur FROM parametre WHERE cle = $c";
+        cmd.Parameters.AddWithValue("$c", cle);
+        return cmd.ExecuteScalar() as string;
+    }
+
+    static void Definir(SqliteConnection c, SqliteTransaction t, string cle, string valeur)
+    {
+        using var cmd = c.CreateCommand();
+        cmd.Transaction = t;
+        cmd.CommandText = "INSERT OR REPLACE INTO parametre (cle, valeur) VALUES ($c, $v)";
+        cmd.Parameters.AddWithValue("$c", cle);
+        cmd.Parameters.AddWithValue("$v", valeur);
+        cmd.ExecuteNonQuery();
+    }
+
     void ChargerCatalogue()
     {
-        var db = Path.Combine(Dossier!, "liste_de_courses.db");
-        if (!File.Exists(db)) return;
-        using var c = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = db, Mode = SqliteOpenMode.ReadOnly, Pooling = false }.ToString());
-        c.Open();
-        string? Reglage(string cle)
+        if (!File.Exists(FichierBase)) return;
+        using var c = Connexion(false);
+        var publie = Reglage(c, "catalogue_commun");
+        JsonNode? jp = publie is null ? null : JsonNode.Parse(publie);
+        var brouillon = Reglage(c, "catalogue_brouillon");
+        Catalogue = brouillon is not null ? Catalogue.Lire(JsonNode.Parse(brouillon), "brouillon en cours")
+            : jp is not null ? Catalogue.Lire(jp.DeepClone(), "dernier catalogue publié") : new Catalogue();
+        Catalogue.NumeroPublie = (int?)jp?["numero"];
+        Catalogue.DatePubliee = (string?)jp?["date"];
+        LireJournal(Reglage(c, "catalogue_journal"));
+    }
+
+    void LireJournal(string? texte)
+    {
+        GestesEnCours = EtapesNonPubliees = 0;
+        if (string.IsNullOrEmpty(texte)) return;
+        try
         {
-            using var cmd = c.CreateCommand();
-            cmd.CommandText = "SELECT valeur FROM parametre WHERE cle = $c";
-            cmd.Parameters.AddWithValue("$c", cle);
-            return cmd.ExecuteScalar() as string;
+            var j = JsonNode.Parse(texte);
+            GestesEnCours = j?["enCours"]?.AsArray().Count ?? 0;
+            EtapesNonPubliees = j?["etapes"]?.AsArray().Count(e => e?["v"] is null && e?["l"] is null) ?? 0;
         }
-        var brouillon = Reglage("catalogue_brouillon");
-        if (brouillon is not null)
+        catch (JsonException) { }
+    }
+
+    /// <summary>
+    /// Enregistre le brouillon du catalogue dans la base de la console et note le geste dans son journal (en cours),
+    /// en une seule transaction. Une copie de sécurité de la base (.bak) est faite au premier enregistrement.
+    /// </summary>
+    public void EnregistrerCatalogue(string geste)
+    {
+        if (!File.Exists(FichierBase)) throw new InvalidOperationException("Base de la console introuvable.");
+        if (!_baseSauvee)
         {
-            Catalogue = Catalogue.Lire(JsonNode.Parse(brouillon), "brouillon en cours");
-            return;
+            File.Copy(FichierBase!, FichierBase + ".bak", overwrite: true);
+            _baseSauvee = true;
         }
-        var publie = Reglage("catalogue_commun");
-        if (publie is not null) Catalogue = Catalogue.Lire(JsonNode.Parse(publie), "dernier catalogue publié");
+        var racine = Catalogue.Racine;
+        racine["modifications"] = ((int?)racine["modifications"] ?? 0) + 1;
+        using var c = Connexion(true);
+        using var t = c.BeginTransaction();
+        var journal = JsonNode.Parse(Reglage(c, "catalogue_journal") ?? "{}") as JsonObject ?? new JsonObject();
+        if (journal["etapes"] is not JsonArray) journal["etapes"] = new JsonArray();
+        if (journal["enCours"] is not JsonArray) journal["enCours"] = new JsonArray();
+        journal["enCours"]!.AsArray().Add(new JsonObject
+        {
+            ["d"] = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss.fff"),
+            ["l"] = new JsonArray(JsonValue.Create(geste)),
+        });
+        Definir(c, t, "catalogue_brouillon", racine.ToJsonString(Options));
+        Definir(c, t, "catalogue_journal", journal.ToJsonString(Options));
+        t.Commit();
+        Catalogue.Origine = "brouillon en cours";
+        LireJournal(journal.ToJsonString());
     }
 
     void ChargerRecettes()
@@ -96,6 +166,7 @@ sealed class Entrepot
         _racineRecettes = JsonNode.Parse(File.ReadAllText(f))?.AsObject();
         foreach (var r in _racineRecettes?["recettes"]?.AsArray() ?? new JsonArray())
             if (r is JsonObject o) Recettes.Add(Recette.Lire(o));
+        RecettesPubliees = (int?)_racineRecettes?["publiee"]?["numero"];
     }
 
     static readonly JsonSerializerOptions Options = new() { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };

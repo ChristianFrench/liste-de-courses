@@ -16,13 +16,23 @@ sealed class FormPrincipale : Form
     Vue _vue = Vue.Produits;
 
     readonly MenuStrip _menus = new();
-    readonly ToolStrip _outils = new() { ImageScalingSize = new Size(20, 20), GripStyle = ToolStripGripStyle.Hidden, Padding = new Padding(4, 2, 4, 2) };
+    readonly ToolStrip _outils = new() { ImageScalingSize = new Size(32, 32), GripStyle = ToolStripGripStyle.Hidden, Padding = new Padding(6, 4, 6, 4) };
+    readonly Banniere _banniere = new();
+    readonly ImageList _images = new() { ImageSize = new Size(24, 24), ColorDepth = ColorDepth.Depth32Bit };
+    readonly ContextMenuStrip _menuArbre = new();
+    readonly PictureBox _iconeDroite = new() { SizeMode = PictureBoxSizeMode.Zoom, Size = new Size(64, 64), Location = new Point(12, 10) };
     readonly StatusStrip _etat = new();
     readonly SplitContainer _partage = new() { Dock = DockStyle.Fill, FixedPanel = FixedPanel.None };
-    readonly TreeView _arbre = new() { Dock = DockStyle.Fill, HideSelection = false, BorderStyle = BorderStyle.None, ShowLines = true, FullRowSelect = false, ItemHeight = 20 };
+    readonly TreeView _arbre = new()
+    {
+        Dock = DockStyle.Fill, HideSelection = false, BorderStyle = BorderStyle.None, ShowLines = false, FullRowSelect = true,
+        ItemHeight = 30, Indent = 22, AllowDrop = true, ShowNodeToolTips = true,
+    };
     readonly Panel _droite = new() { Dock = DockStyle.Fill, BackColor = SystemColors.Window };
     readonly ListView _proprietes = new() { Dock = DockStyle.Fill, View = View.Details, FullRowSelect = true, HeaderStyle = ColumnHeaderStyle.Nonclickable, BorderStyle = BorderStyle.None };
-    readonly Label _titreDroite = new() { Dock = DockStyle.Top, Height = 34, Font = new Font("Segoe UI", 12f, FontStyle.Bold), TextAlign = ContentAlignment.MiddleLeft, Padding = new Padding(8, 0, 0, 0) };
+    readonly Label _titreDroite = new() { AutoSize = true, Location = new Point(88, 16), Font = new Font("Segoe UI", 15f) };
+    readonly Label _sousTitreDroite = new() { AutoSize = true, Location = new Point(90, 50), ForeColor = Color.FromArgb(90, 90, 90) };
+    readonly Panel _enteteDroite = new() { Dock = DockStyle.Top, Height = 86 };
     readonly Panel _panneauProprietes = new() { Dock = DockStyle.Fill };
     PanneauRecette _panneauRecette;
 
@@ -48,21 +58,28 @@ sealed class FormPrincipale : Form
         MinimumSize = new Size(900, 560);
         KeyPreview = true;
 
-        _proprietes.Columns.Add("Propriété", 160);
+        _proprietes.Columns.Add("Caractéristique", 170);
         _proprietes.Columns.Add("Valeur", 600);
+        _enteteDroite.Controls.AddRange([_iconeDroite, _titreDroite, _sousTitreDroite]);
         _panneauProprietes.Controls.Add(_proprietes);
-        _panneauProprietes.Controls.Add(_titreDroite);
+        _panneauProprietes.Controls.Add(_enteteDroite);
+        _panneauProprietes.Padding = new Padding(8, 0, 8, 8);
         _panneauRecette = NouveauPanneauRecette();
-        _droite.Controls.Add(_panneauProprietes);
 
+        _arbre.ImageList = _images;
+        _arbre.HandleCreated += (_, _) => Natif.ThemeExplorateur(_arbre.Handle);
         _partage.Panel1.Controls.Add(_arbre);
         _partage.Panel2.Controls.Add(_droite);
 
         ConstruireMenus();
         ConstruireOutils();
         ConstruireEtat();
+        ConstruireMenuArbre();
 
-        Controls.Add(_partage);
+        var zone = new Panel { Dock = DockStyle.Fill };
+        zone.Controls.Add(_partage);
+        zone.Controls.Add(_banniere);
+        Controls.Add(zone);
         Controls.Add(_outils);
         Controls.Add(_menus);
         Controls.Add(_etat);
@@ -71,7 +88,11 @@ sealed class FormPrincipale : Form
         _arbre.BeforeSelect += (_, e) => { if (!QuitterFicheModifiee()) e.Cancel = true; };
         _arbre.AfterSelect += (_, e) => AfficherSelection(e.Node);
         _arbre.NodeMouseDoubleClick += (_, e) => OuvrirEnFenetre(e.Node);
-        _arbre.KeyDown += (_, e) => { if (e.KeyCode == Keys.Enter) { OuvrirEnFenetre(_arbre.SelectedNode); e.Handled = true; } };
+        _arbre.KeyDown += ToucheArbre;
+        _arbre.ItemDrag += (_, e) => { if (e.Item is TreeNode n && Deplacable(n)) DoDragDrop(n, DragDropEffects.Move | DragDropEffects.Copy); };
+        _arbre.DragOver += SurvolGlisser;
+        _arbre.DragDrop += Deposer;
+        _arbre.NodeMouseClick += (_, e) => { if (e.Button == MouseButtons.Right) _arbre.SelectedNode = e.Node; };
         Load += (_, _) =>
         {
             _partage.SplitterDistance = (int)(_partage.Width * 0.42);
@@ -118,9 +139,9 @@ sealed class FormPrincipale : Form
             Item("&Annuler", Icones.Annuler, Icones.Gris, Keys.Control | Keys.Z),
             Item("&Rétablir", Icones.Retablir, Icones.Gris, Keys.Control | Keys.Y),
             new ToolStripSeparator(),
-            Item("Co&uper", Icones.Couper, Icones.Gris, Keys.Control | Keys.X),
-            Item("&Copier", Icones.Copier, Icones.Gris, Keys.Control | Keys.C),
-            Item("C&oller", Icones.Coller, Icones.Gris, Keys.Control | Keys.V),
+            Item("Co&uper", Icones.Couper, Icones.Gris, Keys.None, (_, _) => Couper(false), "Ctrl+X"),
+            Item("&Copier", Icones.Copier, Icones.Gris, Keys.None, (_, _) => Couper(true), "Ctrl+C"),
+            Item("C&oller", Icones.Coller, Icones.Gris, Keys.None, (_, _) => Coller(), "Ctrl+V"),
             new ToolStripSeparator(),
             Item("Re&nommer", Icones.Renommer, Icones.Gris, Keys.F2),
             Item("&Supprimer", Icones.Supprimer, Icones.Rouge, Keys.Delete),
@@ -188,49 +209,54 @@ sealed class FormPrincipale : Form
 
     void ConstruireOutils()
     {
-        ToolStripButton Bouton(char glyphe, Color couleur, string bulle, EventHandler? clic = null)
+        // 22/11/2026 (Aristide : « agrandir la barre d'outils ») : icônes de 32 pixels, libellé dessous.
+        ToolStripButton Bouton(char glyphe, Color couleur, string texte, string bulle, EventHandler? clic = null)
         {
-            var b = new ToolStripButton(null, Icones.Glyphe(glyphe, couleur), clic) { ToolTipText = bulle, DisplayStyle = ToolStripItemDisplayStyle.Image };
+            var b = new ToolStripButton(texte, Icones.Glyphe(glyphe, couleur, 32), clic)
+            {
+                ToolTipText = bulle, DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
+                TextImageRelation = TextImageRelation.ImageAboveText, AutoSize = true, Padding = new Padding(4, 0, 4, 0),
+            };
             if (clic is null) { b.Enabled = false; b.ToolTipText = bulle + " : à venir"; }
             return b;
         }
         _outils.Items.AddRange(new ToolStripItem[] {
-            Bouton(Icones.Enregistrer, Icones.Bleu, "Enregistrer (Ctrl+S)", (_, _) => EnregistrerFiche()),
-            Bouton(Icones.Recharger, Icones.Bleu, "Recharger les données (F5)", (_, _) => Recharger()),
+            Bouton(Icones.Enregistrer, Icones.Bleu, "Enregistrer", "Enregistrer (Ctrl+S)", (_, _) => EnregistrerFiche()),
+            Bouton(Icones.Recharger, Icones.Bleu, "Recharger", "Recharger les données (F5)", (_, _) => Recharger()),
             new ToolStripSeparator(),
-            Bouton(Icones.Annuler, Icones.Gris, "Annuler (Ctrl+Z)"),
-            Bouton(Icones.Retablir, Icones.Gris, "Rétablir (Ctrl+Y)"),
+            Bouton(Icones.Annuler, Icones.Gris, "Annuler", "Annuler (Ctrl+Z)"),
+            Bouton(Icones.Retablir, Icones.Gris, "Rétablir", "Rétablir (Ctrl+Y)"),
+            new ToolStripSeparator(),
+            Bouton(Icones.Couper, Icones.Gris, "Couper", "Couper (Ctrl+X)", (_, _) => Couper(false)),
+            Bouton(Icones.Copier, Icones.Gris, "Copier", "Copier (Ctrl+C)", (_, _) => Couper(true)),
+            Bouton(Icones.Coller, Icones.Gris, "Coller", "Coller (Ctrl+V)", (_, _) => Coller()),
             new ToolStripSeparator(),
         });
         foreach (var v in Enum.GetValues<Vue>())
         {
-            var b = new ToolStripButton(NomVue(v), Icones.Glyphe(GlypheVue(v), Icones.Vert), (_, _) => ChoisirVue(v))
-            {
-                ToolTipText = $"{TitreVue(v)} (Ctrl+{(int)v + 1})",
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-            };
+            var b = Bouton(GlypheVue(v), Icones.Vert, NomVue(v), $"{TitreVue(v)} (Ctrl+{(int)v + 1})", (_, _) => ChoisirVue(v));
             _boutonsVue[v] = b;
             _outils.Items.Add(b);
         }
-        var cherche = new ToolStripButton(null, Icones.Glyphe(Icones.Rechercher, Icones.Bleu), (_, _) => Chercher(1)) { ToolTipText = "Suivant (F3)" };
+        var cherche = new ToolStripButton(null, Icones.Glyphe(Icones.Rechercher, Icones.Bleu, 24), (_, _) => Chercher(1)) { ToolTipText = "Suivant (F3)" };
         _recherche.KeyDown += (_, e) => { if (e.KeyCode == Keys.Enter) { Chercher(e.Shift ? -1 : 1); e.SuppressKeyPress = true; } };
+        _recherche.Font = new Font("Segoe UI", 10f);
         _outils.Items.AddRange(new ToolStripItem[] {
             new ToolStripSeparator(),
-            Bouton(Icones.Deplier, Icones.Gris, "Tout déplier (Ctrl+Plus)", (_, _) => Plier(true)),
-            Bouton(Icones.Replier, Icones.Gris, "Tout replier (Ctrl+Moins)", (_, _) => Plier(false)),
+            Bouton(Icones.Deplier, Icones.Gris, "Déplier", "Tout déplier (Ctrl+Plus)", (_, _) => Plier(true)),
+            Bouton(Icones.Replier, Icones.Gris, "Replier", "Tout replier (Ctrl+Moins)", (_, _) => Plier(false)),
             new ToolStripSeparator(),
-            Bouton(Icones.Ajouter, Icones.Vert, "Nouveau (Ctrl+N)"),
-            Bouton(Icones.Renommer, Icones.Gris, "Renommer (F2)"),
-            Bouton(Icones.Supprimer, Icones.Rouge, "Supprimer (Suppr)"),
+            Bouton(Icones.Ajouter, Icones.Vert, "Nouveau", "Nouveau (Ctrl+N)"),
+            Bouton(Icones.Renommer, Icones.Gris, "Renommer", "Renommer (F2)"),
+            Bouton(Icones.Supprimer, Icones.Rouge, "Supprimer", "Supprimer (Suppr)"),
             new ToolStripSeparator(),
-            Bouton(Icones.Controler, Icones.Vert, "Contrôler le catalogue (F7)"),
-            Bouton(Icones.Proposer, Icones.Bleu, "Proposer cette version"),
+            Bouton(Icones.Controler, Icones.Vert, "Contrôler", "Contrôler le catalogue (F7)"),
+            Bouton(Icones.Proposer, Icones.Bleu, "Proposer", "Proposer cette version"),
             new ToolStripSeparator(),
-            new ToolStripLabel("Rechercher"),
             _recherche,
             cherche,
         });
-        var aide = Bouton(Icones.Aide, Icones.Bleu, "Aide (F1)", (_, _) => FormTexte.Aide(this));
+        var aide = Bouton(Icones.Aide, Icones.Bleu, "Aide", "Aide (F1)", (_, _) => FormTexte.Aide(this));
         aide.Alignment = ToolStripItemAlignment.Right;
         _outils.Items.Add(aide);
     }
@@ -264,21 +290,66 @@ sealed class FormPrincipale : Form
         foreach (var (k, b) in _boutonsVue) b.Checked = k == v;
         foreach (var (k, m) in _menusVue) m.Checked = k == v;
         _droite.Controls.Clear();
-        _droite.Controls.Add(v == Vue.Recettes ? _panneauRecette : _panneauProprietes);
         _panneauRecette.Afficher(null);
-        _proprietes.Items.Clear();
-        _titreDroite.Text = "";
         RafraichirArbre();
         MajEtat();
+        MajBanniere();
         Message($"{TitreVue(v)} affiché");
     }
 
-    static TreeNode Titre(string texte, object? tag = null) =>
-        new(texte) { Tag = tag, NodeFont = new Font("Segoe UI", 9f, FontStyle.Bold) };
+    void MajBanniere()
+    {
+        var c = _entrepot.Catalogue;
+        var publie = c.NumeroPublie is int n
+            ? $"Version publiée n° {n}{(c.DatePubliee is { Length: >= 10 } d ? $" du {d[8..10]}/{d[5..7]}/{d[..4]}" : "")}"
+            : "Aucune version publiée";
+        var travail = new List<(string, string, bool)>
+        {
+            ("En cours", _entrepot.GestesEnCours == 0 ? "rien" : $"{_entrepot.GestesEnCours} geste{(_entrepot.GestesEnCours > 1 ? "s" : "")}", _entrepot.GestesEnCours > 0),
+            ("Étapes validées", _entrepot.EtapesNonPubliees == 0 ? "aucune à proposer" : $"{_entrepot.EtapesNonPubliees} à proposer", _entrepot.EtapesNonPubliees > 0),
+        };
+        switch (_vue)
+        {
+            case Vue.Produits:
+                _banniere.Afficher(Icones.Glyphe(Icones.Produits, Icones.Vert, 44), TitreVue(_vue),
+                    $"{publie} · {c.Domaines.Count} domaines · {c.Rayons.Count} rayons · {c.Rayons.Sum(r => r.Secteurs.Count)} secteurs · {c.TousLesProduits.Count()} produits", travail);
+                break;
+            case Vue.Marques:
+                var marques = c.TousLesProduits.SelectMany(p => p.Marques).Distinct(StringComparer.CurrentCultureIgnoreCase).Count();
+                var declinaisons = c.TousLesProduits.Sum(p => p.Marques.Count);
+                _banniere.Afficher(Icones.Glyphe(Icones.Marques, Icones.Vert, 44), TitreVue(_vue),
+                    $"{publie} · {marques} marques · {declinaisons} déclinaisons de produits", travail);
+                break;
+            default:
+                var r = _entrepot.Recettes;
+                _banniere.Afficher(Icones.Glyphe(Icones.Recettes, Icones.Vert, 44), TitreVue(_vue),
+                    $"{(_entrepot.RecettesPubliees is int rp ? $"Version publiée n° {rp}" : "Aucune version publiée")} · {r.Count} recettes · {r.Count(x => x.Illustration is not null)} illustrées",
+                    new[] { ("Retouchées", $"{r.Count(x => (bool?)x.Brut["retouchee"] == true)}", false) });
+                break;
+        }
+    }
+
+    // ------------------------------------------------------------ arbre (façon Explorateur)
+
+    /// <summary>Index de l'image <paramref name="cle"/> dans la liste de l'arbre (créée au premier besoin).</summary>
+    string Vignette(string cle, Func<Image?> fabrique, char glyphe)
+    {
+        if (!_images.Images.ContainsKey(cle))
+            _images.Images.Add(cle, IconesCatalogue.Carre(fabrique(), 24, Icones.Glyphe(glyphe, Icones.Gris, 24)));
+        return cle;
+    }
+
+    TreeNode Noeud(string texte, object? tag, string image) =>
+        new(texte) { Tag = tag, ImageKey = image, SelectedImageKey = image };
+
+    sealed record Domaine(string Nom);
+    sealed record TypeRecette(string Type);
+    sealed record SousType(string Type, string? Nom);
 
     void RafraichirArbre(bool garderSelection = false)
     {
         var avant = garderSelection ? _arbre.SelectedNode?.Tag : null;
+        var ouverts = Tous(_arbre.Nodes).Where(n => n.IsExpanded).Select(n => n.FullPath).ToHashSet();
         _arbre.BeginUpdate();
         _arbre.Nodes.Clear();
         switch (_vue)
@@ -287,12 +358,15 @@ sealed class FormPrincipale : Form
             case Vue.Marques: ArbreMarques(); break;
             default: ArbreRecettes(); break;
         }
+        if (garderSelection)
+            foreach (var n in Tous(_arbre.Nodes).Where(n => ouverts.Contains(n.FullPath)).ToList()) n.Expand();
         _arbre.EndUpdate();
-        if (avant is not null && Trouver(_arbre.Nodes, n => ReferenceEquals(n.Tag, avant)) is { } n)
+        if (avant is not null && Trouver(_arbre.Nodes, n => Equals(n.Tag, avant)) is { } trouve)
         {
-            n.EnsureVisible();
-            _arbre.SelectedNode = n;
+            trouve.EnsureVisible();
+            _arbre.SelectedNode = trouve;
         }
+        else if (!garderSelection) AfficherSelection(null);
     }
 
     void ArbreProduits()
@@ -300,14 +374,16 @@ sealed class FormPrincipale : Form
         var c = _entrepot.Catalogue;
         foreach (var d in c.Domaines)
         {
-            var nd = Titre(d);
+            var nd = Noeud(d, new Domaine(d), Vignette("d:" + d, () => IconesCatalogue.Domaine(d), Icones.Produits));
             foreach (var r in c.Rayons.Where(r => r.Domaine == d))
             {
-                var nr = Titre(r.Nom, r);
+                var nr = Noeud(r.Nom, r, Vignette("r:" + r.Nom, () => IconesCatalogue.Rayon(r.Nom), Icones.Produits));
                 foreach (var s in r.Secteurs)
                 {
-                    var ns = Titre($"{s.Nom}  ({s.Produits.Count})", s);
-                    foreach (var p in s.Produits) ns.Nodes.Add(new TreeNode(p.Nom) { Tag = p });
+                    var ns = Noeud(s.Nom, s, Vignette($"s:{r.Nom}/{s.Nom}", () => IconesCatalogue.Secteur(r.Nom, s.Nom), Icones.Produits));
+                    ns.ToolTipText = $"{s.Produits.Count} produits";
+                    var ip = Vignette("produit", () => null, Icones.Produits);
+                    foreach (var p in s.Produits) ns.Nodes.Add(Noeud(p.Nom, p, ip));
                     nr.Nodes.Add(ns);
                 }
                 nd.Nodes.Add(nr);
@@ -321,6 +397,7 @@ sealed class FormPrincipale : Form
     void ArbreMarques()
     {
         var c = _entrepot.Catalogue;
+        var im = Vignette("marque", () => Icones.Glyphe(Icones.Marques, Icones.Orange, 24), Icones.Marques);
         foreach (var d in c.Domaines)
         {
             var marques = c.Rayons.Where(r => r.Domaine == d).SelectMany(r => r.Secteurs).SelectMany(s => s.Produits)
@@ -328,12 +405,15 @@ sealed class FormPrincipale : Form
                 .GroupBy(x => x.m, StringComparer.CurrentCultureIgnoreCase)
                 .OrderBy(g => g.Key, StringComparer.CurrentCultureIgnoreCase).ToList();
             if (marques.Count == 0) continue;
-            var nd = Titre($"{d}  ({marques.Count})");
+            var nd = Noeud(d, new Domaine(d), Vignette("d:" + d, () => IconesCatalogue.Domaine(d), Icones.Produits));
+            nd.ToolTipText = $"{marques.Count} marques";
             foreach (var g in marques)
             {
                 var m = new Marque(g.Key, d, g.Select(x => x.p).ToList());
-                var nm = Titre($"{g.Key}  ({m.Produits.Count})", m);
-                foreach (var p in m.Produits) nm.Nodes.Add(new TreeNode($"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}") { Tag = p });
+                var nm = Noeud(g.Key, m, im);
+                foreach (var p in m.Produits)
+                    nm.Nodes.Add(Noeud($"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}", p,
+                        Vignette($"s:{p.Secteur.Rayon.Nom}/{p.Secteur.Nom}", () => IconesCatalogue.Secteur(p.Secteur.Rayon.Nom, p.Secteur.Nom), Icones.Produits)));
                 nd.Nodes.Add(nm);
             }
             _arbre.Nodes.Add(nd);
@@ -342,18 +422,21 @@ sealed class FormPrincipale : Form
 
     void ArbreRecettes()
     {
+        var idossier = Vignette("sous-type", () => Icones.Glyphe('', Icones.Orange, 24), '');
+        var irecette = Vignette("recette", () => Icones.Glyphe(Icones.Recettes, Icones.Vert, 24), Icones.Recettes);
         foreach (var (type, sousTypes) in Criteres.Types)
         {
             var dans = _entrepot.Recettes.Where(r => r.Types.Contains(type)).ToList();
-            if (dans.Count == 0) continue;
-            var nt = Titre($"{type}  ({dans.Count})");
-            foreach (var st in sousTypes.Append("Sans sous-type"))
+            var nt = Noeud(type, new TypeRecette(type), Vignette("t:" + type, () => IconesCatalogue.TypeRecette(type), Icones.Recettes));
+            nt.ToolTipText = $"{dans.Count} recettes";
+            foreach (var st in sousTypes.Cast<string?>().Append(null))
             {
-                var liste = dans.Where(r => (r.SousTypes.GetValueOrDefault(type) ?? "Sans sous-type") == st)
+                var liste = dans.Where(r => r.SousTypes.GetValueOrDefault(type) == st)
                     .OrderBy(r => r.Titre, StringComparer.CurrentCultureIgnoreCase).ToList();
-                if (liste.Count == 0) continue;
-                var ns = Titre($"{st}  ({liste.Count})");
-                foreach (var r in liste) ns.Nodes.Add(new TreeNode(r.Titre) { Tag = r });
+                if (liste.Count == 0 && st is null) continue;
+                var ns = Noeud(st ?? "Sans sous-type", new SousType(type, st), idossier);
+                ns.ToolTipText = $"{liste.Count} recettes";
+                foreach (var r in liste) ns.Nodes.Add(Noeud(r.Titre, r, irecette));
                 nt.Nodes.Add(ns);
             }
             _arbre.Nodes.Add(nt);
@@ -361,8 +444,8 @@ sealed class FormPrincipale : Form
         var sansType = _entrepot.Recettes.Where(r => r.Types.Count == 0).ToList();
         if (sansType.Count > 0)
         {
-            var n = Titre($"Sans type  ({sansType.Count})");
-            foreach (var r in sansType) n.Nodes.Add(new TreeNode(r.Titre) { Tag = r });
+            var n = Noeud("Sans type", null, idossier);
+            foreach (var r in sansType) n.Nodes.Add(Noeud(r.Titre, r, irecette));
             _arbre.Nodes.Add(n);
         }
     }
@@ -380,49 +463,230 @@ sealed class FormPrincipale : Form
 
     void AfficherSelection(TreeNode? n)
     {
+        _droite.SuspendLayout();
+        _droite.Controls.Clear();
+        if (n is null) { _droite.ResumeLayout(); return; }
         if (_vue == Vue.Recettes)
         {
-            _panneauRecette.Afficher(n?.Tag as Recette);
+            if (n.Tag is Recette r)
+            {
+                _droite.Controls.Add(_panneauRecette);
+                _panneauRecette.Afficher(r);
+            }
+            else
+            {
+                AfficherProprietes(n);
+                _droite.Controls.Add(_panneauProprietes);
+            }
+            _droite.ResumeLayout();
             return;
         }
+        AfficherProprietes(n);
+        _droite.Controls.Add(_panneauProprietes);
+        _droite.ResumeLayout();
+    }
+
+    void AfficherProprietes(TreeNode n)
+    {
         _proprietes.BeginUpdate();
         _proprietes.Items.Clear();
         void Ligne(string p, string v) => _proprietes.Items.Add(new ListViewItem(new[] { p, v }));
-        switch (n?.Tag)
+        Image? icone = null;
+        string sous = "";
+        switch (n.Tag)
         {
             case Produit p:
-                _titreDroite.Text = p.Nom;
+                icone = IconesCatalogue.Secteur(p.Secteur.Rayon.Nom, p.Secteur.Nom);
+                sous = "Produit";
                 Ligne("Domaine", p.Secteur.Rayon.Domaine);
                 Ligne("Rayon", p.Secteur.Rayon.Nom);
                 Ligne("Secteur", p.Secteur.Nom);
                 Ligne("Marques", p.Marques.Count == 0 ? "—" : string.Join(", ", p.Marques));
-                Ligne("Formats", p.Formats.Count == 0 ? "—" : string.Join(", ", p.Formats));
+                Ligne("Formats de vente", p.Formats.Count == 0 ? "—" : string.Join(", ", p.Formats));
                 break;
             case Secteur s:
-                _titreDroite.Text = s.Nom;
+                icone = IconesCatalogue.Secteur(s.Rayon.Nom, s.Nom);
+                sous = "Secteur";
                 Ligne("Domaine", s.Rayon.Domaine);
                 Ligne("Rayon", s.Rayon.Nom);
                 Ligne("Produits", s.Produits.Count.ToString());
+                Ligne("Produits avec marques", s.Produits.Count(x => x.Marques.Count > 0).ToString());
+                Ligne("Formats proposés", Catalogue.Textes(s.Json["formats"]) is { Count: > 0 } f ? string.Join(", ", f) : "—");
                 break;
             case Rayon r:
-                _titreDroite.Text = r.Nom;
+                icone = IconesCatalogue.Rayon(r.Nom);
+                sous = "Rayon";
                 Ligne("Domaine", r.Domaine);
                 Ligne("Secteurs", r.Secteurs.Count.ToString());
                 Ligne("Produits", r.Secteurs.Sum(s => s.Produits.Count).ToString());
                 break;
+            case Domaine d:
+                icone = IconesCatalogue.Domaine(d.Nom);
+                sous = "Domaine";
+                var rayons = _entrepot.Catalogue.Rayons.Where(r => r.Domaine == d.Nom).ToList();
+                Ligne("Rayons", rayons.Count.ToString());
+                Ligne("Secteurs", rayons.Sum(r => r.Secteurs.Count).ToString());
+                Ligne("Produits", rayons.Sum(r => r.Secteurs.Sum(s => s.Produits.Count)).ToString());
+                break;
             case Marque m:
-                _titreDroite.Text = m.Nom;
-                Ligne("Domaine", m.Domaine);
+                icone = Icones.Glyphe(Icones.Marques, Icones.Orange, 64);
+                sous = $"Marque · {m.Domaine}";
                 Ligne("Produits", m.Produits.Count.ToString());
                 foreach (var p in m.Produits) Ligne("", $"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}");
                 break;
+            case TypeRecette t:
+                icone = IconesCatalogue.TypeRecette(t.Type);
+                sous = "Type de recettes";
+                var dans = _entrepot.Recettes.Where(r => r.Types.Contains(t.Type)).ToList();
+                Ligne("Recettes", dans.Count.ToString());
+                foreach (var st in Criteres.Types.First(x => x.Type == t.Type).SousTypes)
+                    Ligne(st, dans.Count(r => r.SousTypes.GetValueOrDefault(t.Type) == st).ToString());
+                break;
+            case SousType st:
+                icone = IconesCatalogue.TypeRecette(st.Type);
+                sous = $"Sous-type de {st.Type}";
+                Ligne("Recettes", _entrepot.Recettes.Count(r => r.Types.Contains(st.Type) && r.SousTypes.GetValueOrDefault(st.Type) == st.Nom).ToString());
+                break;
             default:
-                _titreDroite.Text = n?.Text ?? "";
-                if (n is not null) Ligne("Éléments", n.Nodes.Count.ToString());
+                Ligne("Éléments", n.Nodes.Count.ToString());
                 break;
         }
+        _iconeDroite.Image = icone ?? Icones.Glyphe(GlypheVue(_vue), Icones.Vert, 64);
+        _titreDroite.Text = n.Tag is Marque mm ? mm.Nom : n.Text;
+        _sousTitreDroite.Text = sous;
         _proprietes.EndUpdate();
         _proprietes.Columns[1].Width = -2;
+    }
+
+    // ------------------------------------------------------------ couper, copier, coller, glisser-déposer
+
+    TreeNode? _presse;
+    bool _presseCopie;
+
+    static bool Deplacable(TreeNode n) => n.Tag is Produit or Secteur or Rayon or Recette && n.Parent?.Tag is not Marque;
+
+    void ConstruireMenuArbre()
+    {
+        var couper = new ToolStripMenuItem("Co&uper", Icones.Glyphe(Icones.Couper, Icones.Gris, 16), (_, _) => Couper(false)) { ShortcutKeyDisplayString = "Ctrl+X" };
+        var copier = new ToolStripMenuItem("&Copier", Icones.Glyphe(Icones.Copier, Icones.Gris, 16), (_, _) => Couper(true)) { ShortcutKeyDisplayString = "Ctrl+C" };
+        var coller = new ToolStripMenuItem("C&oller", Icones.Glyphe(Icones.Coller, Icones.Gris, 16), (_, _) => Coller()) { ShortcutKeyDisplayString = "Ctrl+V" };
+        var ouvrir = new ToolStripMenuItem("&Ouvrir dans une fenêtre", null, (_, _) => OuvrirEnFenetre(_arbre.SelectedNode)) { ShortcutKeyDisplayString = "Entrée" };
+        _menuArbre.Items.AddRange(new ToolStripItem[] { couper, copier, coller, new ToolStripSeparator(), ouvrir });
+        _menuArbre.Opening += (_, e) =>
+        {
+            var n = _arbre.SelectedNode;
+            if (n is null) { e.Cancel = true; return; }
+            couper.Enabled = n.Tag is not null && Deplacable(n);
+            copier.Enabled = n.Tag is Produit or Recette && Deplacable(n);
+            coller.Enabled = _presse is not null && Cible(_presse, n, _presseCopie) is not null;
+            ouvrir.Visible = n.Tag is Recette;
+        };
+        _arbre.ContextMenuStrip = _menuArbre;
+    }
+
+    void ToucheArbre(object? sender, KeyEventArgs e)
+    {
+        if (e.KeyCode == Keys.Enter) { OuvrirEnFenetre(_arbre.SelectedNode); e.Handled = true; }
+        else if (e.Control && e.KeyCode == Keys.X) { Couper(false); e.Handled = true; }
+        else if (e.Control && e.KeyCode == Keys.C) { Couper(true); e.Handled = true; }
+        else if (e.Control && e.KeyCode == Keys.V) { Coller(); e.Handled = true; }
+    }
+
+    void Couper(bool copie)
+    {
+        var n = _arbre.SelectedNode;
+        if (n is null || !Deplacable(n) || (copie && n.Tag is not (Produit or Recette))) { Message(copie ? "Seuls un produit ou une recette se copient" : "Cet élément ne se déplace pas"); return; }
+        _presse = n;
+        _presseCopie = copie;
+        Message($"« {n.Text} » {(copie ? "copié" : "coupé")} : choisir où le coller (Ctrl+V)");
+    }
+
+    void Coller()
+    {
+        if (_presse is null || _arbre.SelectedNode is null) { Message("Rien à coller"); return; }
+        if (Executer(_presse, _arbre.SelectedNode, _presseCopie) && !_presseCopie) _presse = null;
+    }
+
+    void SurvolGlisser(object? sender, DragEventArgs e)
+    {
+        var source = e.Data?.GetData(typeof(TreeNode)) as TreeNode;
+        var ici = _arbre.GetNodeAt(_arbre.PointToClient(new Point(e.X, e.Y)));
+        var copie = (e.KeyState & 8) != 0; // Ctrl : copier
+        if (source is null || ici is null || Cible(source, ici, copie) is null) { e.Effect = DragDropEffects.None; return; }
+        e.Effect = copie ? DragDropEffects.Copy : DragDropEffects.Move;
+        if (!ici.IsExpanded && ici.Nodes.Count > 0 && ici.Tag is not (Produit or Recette)) ici.Expand();
+    }
+
+    void Deposer(object? sender, DragEventArgs e)
+    {
+        var source = e.Data?.GetData(typeof(TreeNode)) as TreeNode;
+        var ici = _arbre.GetNodeAt(_arbre.PointToClient(new Point(e.X, e.Y)));
+        if (source is not null && ici is not null) Executer(source, ici, (e.KeyState & 8) != 0);
+    }
+
+    /// <summary>Où va <paramref name="source"/> déposé sur <paramref name="ici"/> : (parent, avant), ou null si refusé.</summary>
+    static (object Parent, object? Avant)? Cible(TreeNode source, TreeNode ici, bool copie)
+    {
+        if (ReferenceEquals(source, ici)) return null;
+        switch (source.Tag)
+        {
+            case Produit when ici.Tag is Secteur s: return (s, null);
+            case Produit when ici.Tag is Produit p && ici.Parent?.Tag is Secteur: return (p.Secteur, p);
+            case Secteur when copie: return null;
+            case Secteur when ici.Tag is Rayon r: return (r, null);
+            case Secteur when ici.Tag is Secteur s2: return (s2.Rayon, s2);
+            case Rayon when copie: return null;
+            case Rayon when ici.Tag is Domaine d: return (d, null);
+            case Rayon when ici.Tag is Rayon r2: return (new Domaine(r2.Domaine), r2);
+            case Recette when ici.Tag is SousType st: return (st, null);
+            case Recette when ici.Tag is TypeRecette t: return (new SousType(t.Type, null), null);
+            case Recette when ici.Tag is Recette && ici.Parent?.Tag is SousType st2: return (st2, null);
+        }
+        return null;
+    }
+
+    bool Executer(TreeNode source, TreeNode ici, bool copie)
+    {
+        if (Cible(source, ici, copie) is not var (parent, avant)) { Message("Déplacement impossible ici"); return false; }
+        if (_vue == Vue.Recettes && _panneauRecette.Modifiee && !QuitterFicheModifiee()) return false;
+        try
+        {
+            if (source.Tag is Recette r)
+            {
+                var st = (SousType)parent;
+                var de = (source.Parent?.Tag as SousType)?.Type;
+                if (copie || de is null) { if (!r.Types.Contains(st.Type)) r.Types.Add(st.Type); }
+                else if (de != st.Type) { r.Types[r.Types.IndexOf(de)] = st.Type; r.SousTypes.Remove(de); }
+                r.Types = r.Types.Distinct().OrderBy(Criteres.RangType).ToList();
+                if (st.Nom is null) r.SousTypes.Remove(st.Type); else r.SousTypes[st.Type] = st.Nom;
+                r.Ecrire();
+                _entrepot.EnregistrerRecettes();
+                Message(copie ? $"« {r.Titre} » ajoutée à {st.Type}" : $"« {r.Titre} » rangée dans {st.Type} › {st.Nom ?? "Sans sous-type"}");
+                RafraichirArbre(garderSelection: true);
+                return true;
+            }
+            var c = _entrepot.Catalogue;
+            var geste = source.Tag switch
+            {
+                Produit p => c.DeplacerProduit(p, (Secteur)parent, avant as Produit, copie),
+                Secteur s => c.DeplacerSecteur(s, (Rayon)parent, avant as Secteur),
+                Rayon ra => c.DeplacerRayon(ra, ((Domaine)parent).Nom, avant as Rayon),
+                _ => null,
+            };
+            if (geste is null) return false;
+            _entrepot.EnregistrerCatalogue(geste);
+            Message(geste);
+            RafraichirArbre(garderSelection: true);
+            MajBanniere();
+            MajEtat();
+            return true;
+        }
+        catch (Exception x)
+        {
+            MessageBox.Show(this, x.Message, Infos.Nom, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            Recharger();
+            return false;
+        }
     }
 
     /// <summary>Double-clic ou Entrée sur une recette : la même fiche, dans une fenêtre.</summary>
@@ -518,4 +782,13 @@ sealed class FormPrincipale : Form
         _arbre.SelectedNode = cible;
         Message($"{tous.IndexOf(cible) + 1} / {tous.Count} résultats pour « {_recherche.Text.Trim()} »");
     }
+}
+
+/// <summary>Apparence de l'Explorateur de fichiers pour l'arbre (survol, sélection, chevrons).</summary>
+static class Natif
+{
+    [System.Runtime.InteropServices.DllImport("uxtheme.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode)]
+    static extern int SetWindowTheme(IntPtr h, string app, string? id);
+
+    public static void ThemeExplorateur(IntPtr h) => SetWindowTheme(h, "Explorer", null);
 }

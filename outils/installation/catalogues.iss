@@ -58,8 +58,14 @@ Name: "bureau"; Description: "Mettre une icône sur le Bureau"; Flags: checkedon
 [Files]
 Source: "{#Source}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "catalogues.ico"; DestDir: "{app}"; Flags: ignoreversion
+; 22/11/2026 : les icônes des catalogues (domaines, rayons, secteurs, types de recettes), celles de l'application
+Source: "..\..\assets\pictos\maison\*.png"; DestDir: "{app}\icones\maison"; Flags: ignoreversion
+Source: "..\..\assets\pictos\noto3d\*.png"; DestDir: "{app}\icones\noto3d"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\..\assets\pictos\png\*.png"; DestDir: "{app}\icones\png"; Flags: ignoreversion skipifsourcedoesntexist
+Source: "..\..\assets\recettes\*.png"; DestDir: "{app}\icones\recettes"; Flags: ignoreversion
 
 [InstallDelete]
+Type: filesandordirs; Name: "{app}\icones"
 ; Les fichiers de la version précédente sont remplacés en entier (pas de restes d'une ancienne compilation)
 Type: filesandordirs; Name: "{app}\data"
 ; 22/11/2026 : la première version (Flutter) laissait son programme et ses bibliothèques ; tout ce qui n'est pas du
