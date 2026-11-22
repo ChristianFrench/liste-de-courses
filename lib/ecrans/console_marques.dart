@@ -33,8 +33,11 @@ class PageCatalogueMarques extends StatelessWidget {
 
 /// Une ligne du cadre : l'en-tête d'un domaine (sur sa première marque), une marque, ou un produit d'une marque.
 class _Ligne {
-  _Ligne(this.domaine, this.marque, {this.produit, this.entete = false});
+  _Ligne(this.domaine, this.marque, {this.produit, this.entete = false, this.seulEntete = false});
   final String domaine, marque;
+
+  /// Domaine replié : son en-tête seul (22/11/2026).
+  final bool seulEntete;
   final (CatRayon, CatSecteur, CatProduit)? produit;
   final bool entete;
   String get cle => '$domaine|$marque';
@@ -56,6 +59,33 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
   /// Marques dépliées (« domaine|marque ») ; marque choisie.
   final ouvertes = <String>{};
   String? choisie;
+
+  /// Domaines repliés (22/11/2026, Aristide : « repliés / dépliés à tous les niveaux »).
+  final domainesFermes = <String>{};
+
+  // 22/11/2026 (Aristide : « le catalogue des marques a un temps d'affichage très long ») : les marques par
+  // domaine, l'examen et les déclinaisons des foyers sont calculés une fois, puis seulement après un geste.
+  Map<String, Map<String, List<(CatRayon, CatSecteur, CatProduit)>>>? _domaines;
+  List<AExaminer>? _examenCache;
+  List<(CatRayon, CatSecteur, CatProduit, String, int)>? _nouvellesCache;
+  Brouillon? _brouillonCache;
+  int _gestesCache = -1;
+
+  void _invalider() {
+    _domaines = null;
+    _examenCache = null;
+    _nouvellesCache = null;
+  }
+
+  /// Recalcule si le brouillon a changé ailleurs (historique, repartir) : autre objet ou autre journal.
+  void _verifierCache() {
+    final g = e.journal.enCours.length * 1000 + e.journal.etapes.length;
+    if (!identical(_brouillonCache, e.b) || g != _gestesCache) {
+      _invalider();
+      _brouillonCache = e.b;
+      _gestesCache = g;
+    }
+  }
 
   // Recherche au sens strict, comme pour les produits : elle montre une correspondance à la fois.
   String recherche = '';
@@ -93,11 +123,13 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
     setState(() {
       _lecture = false;
       if (l != null) foyers = l;
+      _nouvellesCache = null;
     });
     if (l == null) Nav.message(context, 'Pas de liaison avec le serveur : les marques des foyers ne sont pas lues.');
   }
 
   void _modifie(List<String> lignes) {
+    _invalider();
     e.modifieAvec(lignes);
     if (mounted) setState(() {});
   }
@@ -106,6 +138,11 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
 
   /// Domaines, dans l'ordre du catalogue, avec leurs marques (par ordre alphabétique) et leurs produits.
   Map<String, Map<String, List<(CatRayon, CatSecteur, CatProduit)>>> _parDomaine() {
+    _verifierCache();
+    return _domaines ??= _calculerDomaines();
+  }
+
+  Map<String, Map<String, List<(CatRayon, CatSecteur, CatProduit)>>> _calculerDomaines() {
     final marques = b.marquesDesProduits();
     final m = <String, Map<String, List<(CatRayon, CatSecteur, CatProduit)>>>{
       for (final u in [...b.univers.keys, autresRayons]) u: {},
@@ -129,6 +166,10 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
   List<_Ligne> _lignes(Map<String, Map<String, List<(CatRayon, CatSecteur, CatProduit)>>> d) {
     final l = <_Ligne>[];
     for (final MapEntry(key: u, value: marques) in d.entries) {
+      if (domainesFermes.contains(u)) {
+        l.add(_Ligne(u, marques.keys.first, entete: true, seulEntete: true));
+        continue;
+      }
       var premiere = true;
       for (final MapEntry(key: m, value: produits) in marques.entries) {
         l.add(_Ligne(u, m, entete: premiere));
@@ -170,6 +211,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
     final q = _plat(recherche.trim());
     setState(() {
       choisie = cle;
+      domainesFermes.remove(cle.split('|').first);
       // Trouvée par un de ses produits : la marque se déplie pour le montrer.
       if (!_plat(cle.split('|').last).contains(q)) ouvertes.add(cle);
     });
@@ -177,8 +219,8 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
       if (!mounted || !_defilement.hasClients) return;
       var y = 0.0;
       for (final l in _lignes(_parDomaine())) {
-        if (l.produit == null && l.cle == cle) break;
-        y += (l.entete ? BandeauDomaineConsole.hauteur : 0) + RangeeConsole.hauteurDe(l.produit == null ? 1 : 3);
+        if (l.produit == null && l.cle == cle && !l.seulEntete) break;
+        y += (l.entete ? BandeauDomaineConsole.hauteur : 0) + (l.seulEntete ? 0 : RangeeConsole.hauteurDe(l.produit == null ? 1 : 3));
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -243,16 +285,20 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
         await _fenetreExamen();
       default:
         await gesteCatalogueCommun(context, e, v);
+        _invalider();
     }
     if (mounted) setState(() {});
   }
 
   List<AExaminer> _examen() {
-    final connues = <String>{for (final l in Etat.instance.marquesType.values) ...l};
-    return b.aExaminer(connues: connues, acceptes: acceptes);
+    _verifierCache();
+    return _examenCache ??= b.aExaminer(connues: {for (final l in Etat.instance.marquesType.values) ...l}, acceptes: acceptes);
   }
 
-  List<(CatRayon, CatSecteur, CatProduit, String, int)> get _nouvelles => b.declinaisonsNouvelles(foyers ?? const {});
+  List<(CatRayon, CatSecteur, CatProduit, String, int)> get _nouvelles {
+    _verifierCache();
+    return _nouvellesCache ??= b.declinaisonsNouvelles(foyers ?? const {});
+  }
 
   // ------------------------------------------------------------ fenêtres
 
@@ -388,6 +434,7 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
                                   texte: 'Accepter',
                                   onTap: () {
                                     acceptes.add(x.cle);
+                                    _examenCache = null;
                                     Etat.instance.stockageFoyer?.definirReglage('marques_acceptees', acceptes.join('\n'));
                                     setState(() {});
                                     maj(() {});
@@ -480,19 +527,30 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
       );
     }
     if (!l.entete) return r;
+    final ouvertDomaine = !domainesFermes.contains(l.domaine);
+    final toutDomaine = ouvertDomaine && marquesDuDomaine.keys.every((m) => ouvertes.contains('${l.domaine}|$m'));
+    final bandeau = BandeauDomaineConsole(
+      key: ValueKey('marques-domaine-${l.domaine}'),
+      signe: signeDomaine(l.domaine, 32),
+      nom: l.domaine,
+      compte: _pluriel(marquesDuDomaine.length, 'marque'),
+      ouvert: ouvertDomaine,
+      onTap: () => setState(() => ouvertDomaine ? domainesFermes.add(l.domaine) : domainesFermes.remove(l.domaine)),
+      // Tout déplier / replier le domaine : ses marques et leurs produits.
+      toutOuvert: toutDomaine,
+      onTout: () => setState(() {
+        final cles = [for (final m in marquesDuDomaine.keys) '${l.domaine}|$m'];
+        if (toutDomaine) {
+          ouvertes.removeAll(cles);
+        } else {
+          domainesFermes.remove(l.domaine);
+          ouvertes.addAll(cles);
+        }
+      }),
+    );
+    if (l.seulEntete) return bandeau;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
-      BandeauDomaineConsole(
-        key: ValueKey('marques-domaine-${l.domaine}'),
-        signe: signeDomaine(l.domaine, 32),
-        nom: l.domaine,
-        compte: _pluriel(marquesDuDomaine.length, 'marque'),
-        // Tout déplier / replier le domaine : ses marques et leurs produits.
-        toutOuvert: marquesDuDomaine.keys.every((m) => ouvertes.contains('${l.domaine}|$m')),
-        onTout: () => setState(() {
-          final cles = [for (final m in marquesDuDomaine.keys) '${l.domaine}|$m'];
-          cles.every(ouvertes.contains) ? ouvertes.removeAll(cles) : ouvertes.addAll(cles);
-        }),
-      ),
+      bandeau,
       r,
     ]);
   }
@@ -501,16 +559,16 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
   Widget build(BuildContext context) {
     if (e.b == null) return Center(child: Text('Chargement…', style: Charte.texte(16, couleur: Charte.texteSecondaire)));
     final d = _parDomaine();
-    final marques = b.marquesDesProduits();
-    final nbDeclinaisons = marques.values.fold(0, (n, l) => n + l.length);
+    final nbMarques = {for (final m in d.values) ...m.keys}.length;
+    final nbDeclinaisons = d.values.fold(0, (n, m) => n + m.values.fold(0, (k, l) => k + l.length));
     final examen = _examen();
     final lignes = _lignes(d);
     final toutes = {for (final MapEntry(key: u, value: m) in d.entries) for (final x in m.keys) '$u|$x'};
-    final toutOuvert = toutes.isNotEmpty && ouvertes.containsAll(toutes);
+    final toutOuvert = toutes.isNotEmpty && domainesFermes.isEmpty && ouvertes.containsAll(toutes);
     return Scaffold(
       backgroundColor: Charte.fond,
       body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        _titre(marques.length, nbDeclinaisons, d.length, examen.length),
+        _titre(nbMarques, nbDeclinaisons, d.length, examen.length),
         Container(height: 1, color: Charte.separateurZone),
         BarreConsole(
           aideRecherche: 'Une marque ou un produit',
@@ -521,7 +579,14 @@ class _CatalogueMarquesLargeState extends State<CatalogueMarquesLarge> {
           trouves: _resultats.length,
           indice: _indice,
           toutOuvert: toutOuvert,
-          onTout: () => setState(() => toutOuvert ? ouvertes.clear() : ouvertes.addAll(toutes)),
+          onTout: () => setState(() {
+            if (toutOuvert) {
+              ouvertes.clear();
+            } else {
+              domainesFermes.clear();
+              ouvertes.addAll(toutes);
+            }
+          }),
           boutons: [
             BoutonConsole(
               key: const ValueKey('marques-foyers'),

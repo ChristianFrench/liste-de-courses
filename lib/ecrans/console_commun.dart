@@ -231,9 +231,22 @@ class CadreConsole extends StatelessWidget {
 /// En-tête d'un domaine, au-dessus de son premier élément (bandeau foncé, texte blanc).
 class BandeauDomaineConsole extends StatelessWidget {
   const BandeauDomaineConsole(
-      {super.key, required this.signe, required this.nom, required this.compte, this.survole = false, this.onClicDroit, this.toutOuvert, this.onTout});
+      {super.key,
+      required this.signe,
+      required this.nom,
+      required this.compte,
+      this.survole = false,
+      this.onClicDroit,
+      this.toutOuvert,
+      this.onTout,
+      this.ouvert = true,
+      this.onTap});
   final bool? toutOuvert;
   final VoidCallback? onTout;
+
+  /// Domaine replié ou déplié (22/11/2026, Aristide : « repliés / dépliés à tous les niveaux »).
+  final bool ouvert;
+  final VoidCallback? onTap;
   final Widget signe;
   final String nom, compte;
   final bool survole;
@@ -243,6 +256,7 @@ class BandeauDomaineConsole extends StatelessWidget {
   @override
   Widget build(BuildContext context) => GestureDetector(
         behavior: HitTestBehavior.opaque,
+        onTap: onTap,
         onSecondaryTapDown: onClicDroit == null ? null : (d) => onClicDroit!(d.globalPosition),
         child: Container(
           height: hauteur,
@@ -252,23 +266,12 @@ class BandeauDomaineConsole extends StatelessWidget {
             border: Border(bottom: BorderSide(color: Charte.blanc), top: BorderSide(color: Charte.blanc, width: 4)),
           ),
           child: Row(children: [
+            if (onTap != null) Icone(ouvert ? Icons.expand_more : Icons.chevron_right, size: 22, color: Charte.blanc),
             SizedBox(width: 36, child: Center(child: signe)),
             const SizedBox(width: 10),
             Expanded(child: Text(nom, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
             Text(compte, style: Charte.texte(13, couleur: Charte.blanc)),
-            if (onTout != null) ...[
-              const SizedBox(width: 8),
-              Tooltip(
-                message: '${toutOuvert == true ? 'Tout replier' : 'Tout déplier'} : $nom',
-                child: InkWell(
-                  onTap: onTout,
-                  child: Padding(
-                    padding: const EdgeInsets.all(4),
-                    child: Icone(toutOuvert == true ? Icons.unfold_less : Icons.unfold_more, size: 22, color: Charte.blanc),
-                  ),
-                ),
-              ),
-            ],
+            if (onTout != null) ...[const SizedBox(width: 8), boutonToutConsole(toutOuvert == true, onTout!, nom, couleur: Charte.blanc)],
           ]),
         ),
       );
@@ -338,7 +341,7 @@ class RangeeConsole extends StatelessWidget {
           Expanded(child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
           if (compte != null) Text(compte!, style: Charte.texte(13, couleur: Charte.encreNiveau)),
           const SizedBox(width: 8),
-          if (onTout != null) _boutonTout(toutOuvert == true, onTout!, libelle),
+          if (onTout != null) boutonToutConsole(toutOuvert == true, onTout!, libelle),
         ]),
       2 => Row(children: [
           const SizedBox(width: 30),
@@ -348,7 +351,7 @@ class RangeeConsole extends StatelessWidget {
           Expanded(child: Text(libelle, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14.5, gras: true))),
           if (compte != null) Text(compte!, style: Charte.texte(13, couleur: Charte.texteSecondaire)),
           const SizedBox(width: 8),
-          if (onTout != null) _boutonTout(toutOuvert == true, onTout!, libelle),
+          if (onTout != null) boutonToutConsole(toutOuvert == true, onTout!, libelle),
         ]),
       _ => Row(children: [
           SizedBox(width: 92 - decalage - (signe == null ? 0 : (hauteur ?? 32) + 4)),
@@ -395,15 +398,16 @@ Future<String?> menuConsole(BuildContext context, Offset ou, List<EntreeMenuCons
       ],
     );
 
-/// « Tout déplier / tout replier » d'un titre de la hiérarchie.
-Widget _boutonTout(bool ouvert, VoidCallback onTap, String nom) => Tooltip(
+/// « Tout déplier / tout replier » d'un titre de la hiérarchie. Partout les mêmes icônes : chevron (› / ⌄) pour
+/// le titre lui-même, double flèche (unfold) pour tout ce qu'il contient.
+Widget boutonToutConsole(bool ouvert, VoidCallback onTap, String nom, {Color? couleur}) => Tooltip(
       message: '${ouvert ? 'Tout replier' : 'Tout déplier'} : $nom',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(6),
         child: Padding(
           padding: const EdgeInsets.all(4),
-          child: Icone(ouvert ? Icons.unfold_less : Icons.unfold_more, size: 22, color: Charte.cadre),
+          child: Icone(ouvert ? Icons.unfold_less : Icons.unfold_more, size: 22, color: couleur ?? Charte.encreNiveau),
         ),
       ),
     );

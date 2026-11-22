@@ -145,8 +145,11 @@ class _Glisse {
 
 /// Une ligne du cadre : un rayon, un secteur ou un produit.
 class _Ligne {
-  _Ligne(this.r, [this.s, this.p, this.domaine]);
+  _Ligne(this.r, [this.s, this.p, this.domaine, this.seulEntete = false]);
   final CatRayon r;
+
+  /// Domaine replié : son en-tête seul (22/11/2026).
+  final bool seulEntete;
 
   /// Premier rayon d'un domaine : son en-tête est dessiné au-dessus (08/11/2026).
   final String? domaine;
@@ -166,6 +169,9 @@ class CatalogueLarge extends StatefulWidget {
 class _CatalogueLargeState extends State<CatalogueLarge> {
   String recherche = '';
   final rayonsOuverts = <CatRayon>{};
+
+  /// Domaines repliés (22/11/2026, Aristide : « repliés / dépliés à tous les niveaux »).
+  final domainesFermes = <String>{};
   final secteursOuverts = <CatSecteur>{};
 
   /// Rayon ou secteur choisi (clic) ; produits choisis (clic, Ctrl+clic).
@@ -215,6 +221,9 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     _indice = i % _resultats.length;
     final o = _resultats[_indice];
     setState(() {
+      // Le domaine de la correspondance se déplie.
+      final ray = switch (o) { CatRayon r => r, CatSecteur sc => _rayonDe(sc), CatProduit p => _ou(p)?.$1, _ => null };
+      if (ray != null) domainesFermes.remove(b.universDe(ray.nom));
       produitsChoisis.clear();
       choisi = null;
       switch (o) {
@@ -240,8 +249,8 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
       if (!mounted || !_defilement.hasClients) return;
       var y = 0.0;
       for (final l in _lignes()) {
-        if (identical(l.objet, o)) break;
-        y += (l.domaine != null ? 46 : 0) + (l.p != null ? 32 : (l.s != null ? 38 : 42));
+        if (identical(l.objet, o) && !l.seulEntete) break;
+        y += (l.domaine != null ? 46 : 0) + (l.seulEntete ? 0 : (l.p != null ? 32 : (l.s != null ? 38 : 42)));
       }
       final pos = _defilement.position;
       _defilement.jumpTo((y - pos.viewportDimension / 3).clamp(0.0, pos.maxScrollExtent));
@@ -803,26 +812,38 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
         _modifie();
         _message('${d.data.rayon!.nom} rangé dans « $u »');
       },
-      builder: (_, __, ___) => GestureDetector(
-        key: ValueKey('console-domaine-$u'),
-        behavior: HitTestBehavior.opaque,
-        onSecondaryTapDown: (d) => _menuDomaine(d.globalPosition, u),
-        child: Container(
-          height: 46,
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          decoration: BoxDecoration(
-            color: _survole == u ? Charte.accent : Charte.cadre,
-            border: Border(bottom: BorderSide(color: Charte.blanc), top: BorderSide(color: Charte.blanc, width: 4)),
-          ),
-          child: Row(children: [
-            SizedBox(width: 36, child: Center(child: _signeDomaine(u, 32))),
-            const SizedBox(width: 10),
-            Expanded(child: Text(u, maxLines: 1, overflow: TextOverflow.ellipsis, style: Charte.texte(14, gras: true, couleur: Charte.blanc))),
-            Text(_pluriel(n, 'rayon'), style: Charte.texte(13, couleur: Charte.blanc)),
-          ]),
-        ),
-      ),
+      builder: (_, __, ___) {
+        final rayons = b.catalogue.rayons.where((x) => b.universDe(x.nom) == u).toList();
+        final ouvert = !domainesFermes.contains(u);
+        final tout = ouvert && rayons.every((r) => rayonsOuverts.contains(r) && r.secteurs.every(secteursOuverts.contains));
+        return BandeauDomaineConsole(
+          key: ValueKey('console-domaine-$u'),
+          signe: _signeDomaine(u, 32),
+          nom: u,
+          compte: _pluriel(n, 'rayon'),
+          survole: _survole == u,
+          onClicDroit: (o) => _menuDomaine(o, u),
+          ouvert: ouvert,
+          onTap: () => setState(() => ouvert ? domainesFermes.add(u) : domainesFermes.remove(u)),
+          toutOuvert: tout,
+          onTout: () => setState(() {
+            if (tout) {
+              rayonsOuverts.removeAll(rayons);
+              for (final r in rayons) {
+                secteursOuverts.removeAll(r.secteurs);
+              }
+            } else {
+              domainesFermes.remove(u);
+              rayonsOuverts.addAll(rayons);
+              for (final r in rayons) {
+                secteursOuverts.addAll(r.secteurs);
+              }
+            }
+          }),
+        );
+      },
     );
+    if (l.seulEntete) return entete;
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [entete, _rangee(l)]);
   }
 
@@ -834,8 +855,13 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
     String? dernier;
     for (final r in _rayonsDansLOrdre()) {
       final u = b.universDe(r.nom);
-      l.add(_Ligne(r, null, null, u == dernier ? null : u));
+      final premier = u != dernier;
       dernier = u;
+      if (domainesFermes.contains(u)) {
+        if (premier) l.add(_Ligne(r, null, null, u, true));
+        continue;
+      }
+      l.add(_Ligne(r, null, null, premier ? u : null));
       if (!rayonsOuverts.contains(r)) continue;
       for (final s in r.secteurs) {
         l.add(_Ligne(r, s));
@@ -876,6 +902,19 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
           Expanded(child: _libelle(r, r.nom, Charte.texte(15, gras: true, couleur: Charte.encreNiveau))),
           Text(_pluriel(r.secteurs.length, 'secteur'), style: Charte.texte(13, couleur: Charte.encreNiveau)),
           const SizedBox(width: 8),
+          // Tout déplier / replier le rayon : ses secteurs et leurs produits.
+          Builder(builder: (_) {
+            final tout = ouvert && r.secteurs.every(secteursOuverts.contains);
+            return boutonToutConsole(tout, () => setState(() {
+                  if (tout) {
+                    secteursOuverts.removeAll(r.secteurs);
+                    rayonsOuverts.remove(r);
+                  } else {
+                    rayonsOuverts.add(r);
+                    secteursOuverts.addAll(r.secteurs);
+                  }
+                }), r.nom);
+          }),
         ]);
       case 2:
         final s = l.s!;
@@ -1054,6 +1093,7 @@ class _CatalogueLargeState extends State<CatalogueLarge> {
                 rayonsOuverts.clear();
                 secteursOuverts.clear();
               } else {
+                domainesFermes.clear();
                 rayonsOuverts.addAll(b.catalogue.rayons);
               }
             }),
