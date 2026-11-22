@@ -44,10 +44,17 @@ class _EcranRecettesState extends State<EcranRecettes> {
   /// Une recherche ou un filtre ouvre tous les types trouvés ; tout effacer les replie.
   void _changer(void Function() f) {
     f();
-    final types = {for (final r in _toutes ?? const <RecetteLue>[]) if (_filtre.garde(r)) ..._typesDe(r)};
-    Retractables.i.fixer([for (final t in types) 'recettes/$t'], _filtre.texte.trim().isNotEmpty || _filtre.actif);
+    final cles = {
+      for (final r in _toutes ?? const <RecetteLue>[])
+        if (_filtre.garde(r))
+          for (final t in _typesDe(r)) ...['recettes/$t', _cleSousType(t, r.sousTypes[t])],
+    };
+    Retractables.i.fixer(cles, _filtre.texte.trim().isNotEmpty || _filtre.actif);
     setState(() {});
   }
+
+  /// Clé de pliage d'un sous-type (deuxième niveau, 22/11/2026).
+  static String _cleSousType(String t, String? st) => 'recettes/$t/${st ?? 'Autres'}';
 
   /// 22/11/2026 : une recette de plusieurs types se range sous chacun.
   static List<String> _typesDe(RecetteLue r) => r.types.isEmpty ? const ['Autres recettes'] : r.types;
@@ -87,7 +94,14 @@ class _EcranRecettesState extends State<EcranRecettes> {
         return d != 0 ? d : normaliser(a.titre).compareTo(normaliser(b.titre));
       });
     }
-    final cles = [for (final t in types) 'recettes/$t'];
+    // 22/11/2026 (Aristide) : tout déplier / replier vaut aussi pour le deuxième niveau (sous-types).
+    final cles = [
+      for (final t in types) ...[
+        'recettes/$t',
+        if (parType[t]!.any((x) => x.sousTypes[t] != null))
+          ...{for (final r in parType[t]!) _cleSousType(t, r.sousTypes[t])},
+      ],
+    ];
     final plis = Retractables.i;
     final toutOuvert = cles.isNotEmpty && cles.every((c) => plis.ouvert(c, parDefaut: false));
     return PageBase(
@@ -136,7 +150,15 @@ class _EcranRecettesState extends State<EcranRecettes> {
                     for (final (i, r) in parType[t]!.indexed) ...[
                       if (parType[t]!.any((x) => x.sousTypes[t] != null) &&
                           (i == 0 || parType[t]![i - 1].sousTypes[t] != r.sousTypes[t]))
-                        BandeSousType(key: ValueKey('sous-type-$t-${r.sousTypes[t]}'), type: t, sousType: r.sousTypes[t]),
+                        BandeSousType(
+                          key: ValueKey('sous-type-$t-${r.sousTypes[t]}'),
+                          type: t,
+                          sousType: r.sousTypes[t],
+                          nombre: parType[t]!.where((x) => x.sousTypes[t] == r.sousTypes[t]).length,
+                          ouvert: plis.ouvert(_cleSousType(t, r.sousTypes[t]), parDefaut: false),
+                          onTap: () => plis.basculer(_cleSousType(t, r.sousTypes[t]), parDefaut: false),
+                        ),
+                      if (!parType[t]!.any((x) => x.sousTypes[t] != null) || plis.ouvert(_cleSousType(t, r.sousTypes[t]), parDefaut: false))
                       LigneMenu(
                         key: ValueKey('fiche-${r.titre}'),
                         titre: r.titre,
@@ -733,18 +755,33 @@ Future<void> chercherRecette(BuildContext context) => Nav.aller<void>(context, c
 
 /// Bande d'un sous-type dans la liste des recettes : son icône (iconographie d'Aristide, 22/11/2026), son nom.
 class BandeSousType extends StatelessWidget {
-  const BandeSousType({super.key, required this.type, this.sousType});
+  const BandeSousType({super.key, required this.type, this.sousType, this.nombre, this.ouvert = false, this.onTap});
   final String type;
   final String? sousType;
+  final int? nombre;
+
+  /// Deuxième niveau pliable (22/11/2026, Aristide) : toucher la bande déplie ou replie ses recettes.
+  final bool ouvert;
+  final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Container(
+  Widget build(BuildContext context) => Material(
         color: Charte.fondBandeau,
-        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
-        child: Row(children: [
-          _imageCritere(imageDuType([type], sousType: sousType), 32),
-          const SizedBox(width: 10),
-          Expanded(child: Text(sousType ?? 'Autres', style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire))),
-        ]),
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.fromLTRB(12, 4, 8, 4),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Charte.separateurLigne))),
+            child: Row(children: [
+              _imageCritere(imageDuType([type], sousType: sousType), 32),
+              const SizedBox(width: 10),
+              Expanded(child: Text(sousType ?? 'Autres', style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire))),
+              if (nombre != null) Text('$nombre', style: Charte.texte(14, gras: true, couleur: Charte.texteSecondaire)),
+              const SizedBox(width: 6),
+              Icone(ouvert ? Icons.expand_less : Icons.expand_more, size: 24, color: Charte.cadre),
+            ]),
+          ),
+        ),
       );
 }

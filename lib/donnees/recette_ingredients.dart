@@ -335,7 +335,11 @@ Future<List<RecetteLue>> recettesFournies() async {
     final j = await _lireEmbarque();
     final embarquees = (j['recettes'] as List).cast<Map<String, dynamic>>();
     String? chemin(Map r) => r['image'] == null ? null : 'assets/recettes/illustrations/${r['image']}';
-    final recu = demonstration ? null : RecettesRecues.instance.index;
+    var recu = demonstration ? null : RecettesRecues.instance.index;
+    // 22/11/2026 : une version reçue d'avant le classement v7 (sans sous-types) ne remplace pas les recettes
+    // embarquées, plus récentes ; la prochaine généralisation la remplacera.
+    bool classee(List l) => l.any((r) => r is Map && (r['sousTypes'] as Map?)?.isNotEmpty == true);
+    if (recu != null && classee(embarquees) && !classee(recu['recettes'] as List? ?? const [])) recu = null;
     if (recu == null) {
       _fournies = [for (final r in embarquees) recetteDepuisJson(r, image: chemin(r))];
     } else {

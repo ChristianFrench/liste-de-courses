@@ -30,6 +30,7 @@ void main() {
           'id': accras.id,
           'titre': 'Accras de morue',
           'types': ['Entrée'],
+          'sousTypes': {'Entrée': 'Entrée chaude'},
           'ingredients': ['250 g Morue'],
           'detail': [
             {'nom': 'Morue', 'quantite': '250 g'}
@@ -47,6 +48,15 @@ void main() {
         },
       ],
     };
+    // 22/11/2026 : une version d'avant le classement (sans sous-types) ne remplace pas les recettes embarquées.
+    final ancienne = {
+      'numero': 1,
+      'recettes': [
+        {'titre': 'Ancienne', 'types': ['Entrée'], 'ingredients': ['Sel']},
+      ],
+    };
+    await RecettesRecues.instance.appliquer(ancienne);
+    expect((await recettesFournies()).length, embarquees.length);
     await RecettesRecues.instance.appliquer(version);
     final recues = await recettesFournies();
     expect(recues.map((r) => r.titre), ['Accras de morue', 'Zeste de nouveauté']);
