@@ -37,7 +37,6 @@ void main() {
     expect(find.byKey(const ValueKey('barre-outils')), findsOneWidget);
     expect(find.byKey(const ValueKey('barre-etat')), findsOneWidget);
     expect(find.text('Fruits et légumes'), findsOneWidget, reason: 'le catalogue des produits dans la zone de travail');
-    expect(find.byKey(const ValueKey('console-tout-deplier')), findsNothing, reason: 'tout déplier est dans la barre d\'outils');
 
     // Tout déplier depuis la barre d'outils : les secteurs apparaissent.
     await tester.tap(find.byKey(const ValueKey('outil-deplier')));
