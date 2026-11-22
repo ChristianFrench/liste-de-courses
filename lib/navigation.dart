@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'donnees/demonstration.dart';
 import 'ecrans/coquille.dart' show BarreOnglets;
 import 'theme.dart';
 
@@ -20,7 +19,8 @@ class Nav extends ChangeNotifier {
   // 20/11/2026 (Aristide) : onglet « Cuisiner » (le livre de recettes) ; démonstration d'abord.
   // 21/11/2026 (Aristide) : deux onglets de recettes, « Recettes » au début du cycle (choisir, noter les
   // ingrédients) et « Cuisiner » à la fin ; Gérer quitte la barre (roue dentée de l'accueil).
-  static const bool avecCuisiner = demonstration;
+  // 22/11/2026 (Aristide) : généralisé à toutes les versions.
+  static const bool avecCuisiner = true;
   static const int cuisiner = avecCuisiner ? 3 : -1;
   static const int recettes = avecCuisiner ? 4 : -2;
   static const int gerer = avecCuisiner ? 5 : 3;

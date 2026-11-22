@@ -6,6 +6,9 @@ import 'package:archive/archive.dart';
 import 'dossier_application.dart';
 import 'journal_catalogue.dart';
 import 'modele.dart' show Etat, EtatChargement;
+import 'classement_recettes.dart';
+
+export 'classement_recettes.dart';
 
 // Catalogue des recettes de la console (10/11/2026, Aristide) : les notes Google Keep libellées « Recettes … »
 // importées dans une base SÉPARÉE (recettes/recettes.json et ses photos, dans le dossier de la console), sans
@@ -223,38 +226,12 @@ String slugRecette(String titre) => _norm(titre.replaceAll('œ', 'oe').replaceAl
     .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
     .replaceAll(RegExp(r'^-+|-+$'), '');
 
-/// Les 9 types et leurs sous-types (21/11/2026, Aristide : « ajouter un niveau dans le classement »), dans
-/// l'ordre d'affichage. Source du classement livré : outils/recettes/classement.py.
-const typesRecettes = <String, List<String>>{
-  'Apéritif': ['Amuse-bouche', 'Tartinade et dip', 'Bouchées et feuilletés'],
-  'Entrée': ['Soupe et velouté', 'Salade composée', 'Entrée froide', 'Entrée chaude'],
-  'Plats': ['Viande', 'Volaille', 'Poisson et fruits de mer', 'Végétarien'],
-  'Plats complets': ['Gratin et lasagnes', 'Mijoté complet', 'Tarte salée et pizza', 'Riz et pâtes garnis', 'Bowl et salade-repas'],
-  'Plats accompagnement': ['Légumes', 'Féculents', 'Légumineuses'],
-  'Sauces': ['Sauce chaude', 'Sauce froide et vinaigrette', 'Condiment', 'Sauce sucrée'],
-  'Dessert': ['Gâteau', 'Tarte', 'Crème et mousse', 'Fruits', 'Glace', 'Sauce sucrée'],
-  'Petit-déjeuner et goûter': ['Crêpes et gaufres', 'Biscuits et petits gâteaux', 'Brioches et viennoiseries', 'Pains',
-      'Confitures et pâtes à tartiner'],
-  'Bases culinaires': ['Pâtes', 'Fonds et bouillons', 'Crèmes de base', 'Mémos techniques'],
-};
-
-/// Origines d'une recette (21/11/2026), une par recette.
-const originesRecettes = [
-  'France', 'Italie', 'Espagne et Portugal', "Autres pays d'Europe", 'Maghreb et Moyen-Orient', 'Afrique', 'Inde', 'Asie',
-  'Amériques',
-];
-
 /// Ordre des types : celui de [typesRecettes], puis les autres par ordre alphabétique, puis « Autres ».
 int _rangType(String t) {
   final i = typesRecettes.keys.toList().indexOf(t);
   return i >= 0 ? i : (t == 'Autres' ? 1000 : 999);
 }
 
-/// Rang d'un sous-type dans son type (les sous-types inconnus ou absents à la fin).
-int rangSousType(String type, String? sousType) {
-  final i = (typesRecettes[type] ?? const <String>[]).indexOf(sousType ?? '');
-  return i >= 0 ? i : 999;
-}
 
 /// Découpe le texte d'une note : (titre des ingrédients, ingrédients, préparation).
 /// 1. La première ligne qui commence par « ingrédi… » (sans accents ni majuscules) est le titre des ingrédients.

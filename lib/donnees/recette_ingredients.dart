@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 
+import 'classement_recettes.dart';
 import 'import_texte.dart';
 import 'demonstration.dart';
 import 'modele.dart';
@@ -30,6 +31,8 @@ class RecetteLue {
       this.saisons = const [],
       this.cuissons = const [],
       this.occasions = const [],
+      this.sousTypes = const {},
+      this.origine,
       this.quantites = const []});
   final String titre;
   final List<String> ingredients;
@@ -40,7 +43,14 @@ class RecetteLue {
 
   /// Le contenu, pour voir ce qu'une nouvelle version a changé.
   String get signature => jsonEncode([titre, ingredients, types, pour, etapes, conseils, source, tempsPreparation, tempsCuisson,
-        difficulte, cout, regimes, saisons, cuissons, occasions]);
+        difficulte, cout, regimes, saisons, cuissons, occasions, sousTypes, origine]);
+
+  /// Classement (catalogue v7, 22/11/2026) : un sous-type par type, et l'origine (« Italie »).
+  final Map<String, String> sousTypes;
+  final String? origine;
+
+  /// « Plats · Volaille » pour chaque type.
+  List<String> get classement => [for (final t in types) sousTypes[t] == null ? t : '$t · ${sousTypes[t]}'];
 
   /// Le texte de la recette (18/11/2026) : « 4 personnes », étapes, conseils, source (« Emplettes »).
   final String? pour;
@@ -108,6 +118,7 @@ class RecetteLue {
         for (final c in cuissons)
           if (!(tempsCuisson == 0 && c == 'Sans cuisson')) c,
         ...occasions,
+        if (origine != null) origine!,
       ];
 
   /// Illustration : chemin d'un fichier de l'application (« assets/… »), adresse internet (page de recette) ou
@@ -177,15 +188,18 @@ String ajusterQuantite(String quantite, double facteur) {
   return '$debut$fin$reste';
 }
 
-/// Image par défaut d'un type de recette (icônes d'Aristide), pour les recettes encore sans illustration.
-String imageDuType(List<String> types) {
-  final t = types.isEmpty ? '' : normaliser(types.first);
-  if (t.startsWith('dessert')) return 'assets/recettes/desserts.png';
-  if (t.startsWith('entree')) return 'assets/recettes/entrees.png';
-  if (t.contains('accompagnement')) return 'assets/recettes/plats-accompagnement.png';
-  if (t.startsWith('plat')) return 'assets/recettes/plats-complets.png';
-  if (t.startsWith('sauce')) return 'assets/recettes/sauces.png';
-  return 'assets/recettes/recettes-de-cuisine.png';
+/// Nom de fichier simplifié (« Petit-déjeuner et goûter » → « petit-dejeuner-et-gouter »).
+String slugRecette(String t) => normaliser(t).replaceAll(RegExp(r"[^a-z0-9]+"), '-').replaceAll(RegExp(r'^-|-$'), '');
+
+/// Icône d'un type de recette (22/11/2026, iconographie d'Aristide, assets/recettes/types/), ou d'un de ses
+/// sous-types avec [sousType] ; l'icône générale pour un type inconnu.
+String imageDuType(List<String> types, {String? sousType}) {
+  final t = types.isEmpty ? '' : types.first;
+  if (!typesRecettes.containsKey(t)) return 'assets/recettes/recettes-de-cuisine.png';
+  if (sousType != null && (typesRecettes[t] ?? const []).contains(sousType)) {
+    return 'assets/recettes/types/${slugRecette(t)}--${slugRecette(sousType)}.png';
+  }
+  return 'assets/recettes/types/${slugRecette(t)}.png';
 }
 
 /// Les filtres du choix d'une recette (20/11/2026, Aristide) : plusieurs valeurs d'un critère en « ou »,
@@ -196,7 +210,8 @@ class FiltreRecettes {
 
   /// Les critères et leurs valeurs, dans l'ordre d'affichage.
   static const criteres = <String, List<String>>{
-    'Type': ['Entrée', 'Plats', 'Plats accompagnement', 'Sauces', 'Dessert'],
+    // 22/11/2026 : les 9 types du catalogue v7, et l'origine.
+    'Type': [...typesRecettesOrdre],
     'Difficulté': ['Facile', 'Moyen', 'Difficile', 'Avancé'],
     'Temps': ['Moins de 30 min', 'Moins d\'une heure', 'Plus d\'une heure'],
     'Régime': ['Végétarien', 'Végétalien', 'Sans gluten', 'Sans lactose'],
@@ -204,6 +219,7 @@ class FiltreRecettes {
     'Coût': ['€', '€€', '€€€'],
     'Cuisson': ['Sans cuisson', 'Four', 'Plaque', 'Cocotte-minute'],
     'Occasion': ['Quotidien', 'À l\'avance', 'À recevoir', 'À emporter'],
+    'Origine': originesRecettes,
   };
 
   /// Libellé d'une valeur (« Plats accompagnement » → « Accompagnement »).
@@ -241,6 +257,7 @@ class FiltreRecettes {
     if (!un('Coût', [if (r.cout case final c?) c])) return false;
     if (!un('Cuisson', r.cuissons)) return false;
     if (!un('Occasion', r.occasions)) return false;
+    if (!un('Origine', [if (r.origine case final o?) o])) return false;
     final t = choix['Temps']!;
     if (t.isNotEmpty) {
       // Les recettes sans temps (recettes maison) ne sont écartées que par ce filtre.
@@ -304,6 +321,8 @@ RecetteLue recetteDepuisJson(Map r, {String? image}) {
     saisons: liste('saisons'),
     cuissons: liste('cuissons'),
     occasions: liste('occasions'),
+    sousTypes: {for (final e in (r['sousTypes'] as Map? ?? const {}).entries) '${e.key}': '${e.value}'},
+    origine: r['origine'] as String?,
     quantites: detail.isNotEmpty ? [for (final i in detail) i['quantite'] as String?] : const [],
   );
 }

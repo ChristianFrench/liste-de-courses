@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../composants/composants.dart';
 import '../composants/icone.dart';
 import '../composants/micro.dart';
+import '../donnees/classement_recettes.dart';
 import '../donnees/import_texte.dart' show normaliser;
 import '../donnees/modele.dart';
 import '../donnees/recette_ingredients.dart';
@@ -43,12 +44,13 @@ class _EcranRecettesState extends State<EcranRecettes> {
   /// Une recherche ou un filtre ouvre tous les types trouvés ; tout effacer les replie.
   void _changer(void Function() f) {
     f();
-    final types = {for (final r in _toutes ?? const <RecetteLue>[]) if (_filtre.garde(r)) _typeDe(r)};
+    final types = {for (final r in _toutes ?? const <RecetteLue>[]) if (_filtre.garde(r)) ..._typesDe(r)};
     Retractables.i.fixer([for (final t in types) 'recettes/$t'], _filtre.texte.trim().isNotEmpty || _filtre.actif);
     setState(() {});
   }
 
-  static String _typeDe(RecetteLue r) => r.types.isEmpty ? 'Autres recettes' : r.types.first;
+  /// 22/11/2026 : une recette de plusieurs types se range sous chacun.
+  static List<String> _typesDe(RecetteLue r) => r.types.isEmpty ? const ['Autres recettes'] : r.types;
 
   @override
   void initState() {
@@ -66,14 +68,25 @@ class _EcranRecettesState extends State<EcranRecettes> {
     final vues = [for (final r in toutes ?? const <RecetteLue>[]) if (_filtre.garde(r)) r];
     final parType = <String, List<RecetteLue>>{};
     for (final r in vues) {
-      parType.putIfAbsent(_typeDe(r), () => []).add(r);
+      for (final t in _typesDe(r)) {
+        parType.putIfAbsent(t, () => []).add(r);
+      }
     }
-    // Ordre alphabétique des types, les desserts en dernier (comme la console).
+    // 22/11/2026 (catalogue v7) : les 9 types dans l'ordre du classement, puis les sous-types (ceux sans
+    // sous-type à la fin).
     final types = parType.keys.toList()
       ..sort((a, b) {
-        final da = normaliser(a).startsWith('dessert'), db = normaliser(b).startsWith('dessert');
-        return da == db ? a.compareTo(b) : (da ? 1 : -1);
+        final c = rangTypeRecette(a).compareTo(rangTypeRecette(b));
+        return c != 0 ? c : a.compareTo(b);
       });
+    for (final t in types) {
+      parType[t]!.sort((a, b) {
+        final c = rangSousType(t, a.sousTypes[t]).compareTo(rangSousType(t, b.sousTypes[t]));
+        if (c != 0) return c;
+        final d = (a.sousTypes[t] ?? '').compareTo(b.sousTypes[t] ?? '');
+        return d != 0 ? d : normaliser(a.titre).compareTo(normaliser(b.titre));
+      });
+    }
     final cles = [for (final t in types) 'recettes/$t'];
     final plis = Retractables.i;
     final toutOuvert = cles.isNotEmpty && cles.every((c) => plis.ouvert(c, parDefaut: false));
@@ -88,7 +101,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
             () => plis.tous(cles, !toutOuvert)),
       ),
       corps: toutes == null
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: Text('Chargement des recettes…', style: Charte.texte(16, couleur: Charte.texteSecondaire))) // sans animation sans fin (onglets construits d'avance)
           : ListView(padding: const EdgeInsets.only(bottom: 16), children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
@@ -120,7 +133,10 @@ class _EcranRecettesState extends State<EcranRecettes> {
                   pliable: true,
                   parDefaut: false,
                   enfants: [
-                    for (final r in parType[t]!)
+                    for (final (i, r) in parType[t]!.indexed) ...[
+                      if (parType[t]!.any((x) => x.sousTypes[t] != null) &&
+                          (i == 0 || parType[t]![i - 1].sousTypes[t] != r.sousTypes[t]))
+                        BandeSousType(key: ValueKey('sous-type-$t-${r.sousTypes[t]}'), type: t, sousType: r.sousTypes[t]),
                       LigneMenu(
                         key: ValueKey('fiche-${r.titre}'),
                         titre: r.titre,
@@ -133,6 +149,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                           if (mounted) setState(() {});
                         },
                       ),
+                    ],
                   ],
                 ),
               if (vues.isEmpty)
@@ -192,6 +209,8 @@ class FiltresRecettes extends StatelessWidget {
     'Coût': 'filtre-cout',
     'Cuisson': 'filtre-mode-cuisson',
     'Occasion': 'filtre-occasion',
+    // 22/11/2026 : pas encore d'icône d'Aristide pour l'origine : le globe.
+    'Origine': 'globe',
   };
 
   /// 20/11/2026 (Aristide) : les valeurs d'un critère en boutons à icône, à toucher pour (dé)sélectionner.
@@ -247,7 +266,7 @@ class FiltresRecettes extends StatelessWidget {
                     border: Border.all(color: actif ? Charte.cadre : Colors.transparent, width: 1.5),
                   ),
                   child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
-                    _imageCritere(image, 34),
+                    _imageCritere(image, 28), // 22/11/2026 : 11 boutons (Origine en plus)
                     if (n > 0)
                       Positioned(
                         right: 1,
@@ -385,7 +404,8 @@ class EnTeteRecette extends StatelessWidget {
       if (r.tempsCuisson case final t?) t == 0 ? ('sans-cuisson', 'Sans cuisson') : ('temps-cuisson', 'Cuisson ${duree(t)}'),
       if (r.difficulte case final d?) (iconeCritere(d), d),
     ];
-    final pastilles = [...r.types, ...r.pastilles];
+    // 22/11/2026 : le classement (« Plats · Volaille ») et l'origine parmi les critères.
+    final pastilles = [...r.classement, ...r.pastilles];
     Widget bouton(IconData i, String cle, String aide, int vers) => IconButton(
           key: ValueKey(cle),
           tooltip: aide,
@@ -458,15 +478,18 @@ String? iconeCritere(String valeur) => switch (valeur) {
       'À recevoir' => 'a-recevoir',
       'À emporter' => 'a-emporter',
       'Moins de 30 min' || 'Moins d\'une heure' || 'Plus d\'une heure' => 'temps-preparation',
-      'Entrée' || 'Plats' || 'Plats accompagnement' || 'Sauces' || 'Dessert' => imageDuType([valeur]),
+      _ when typesRecettes.containsKey(valeur) => imageDuType([valeur]),
+      _ when valeur.contains(' · ') && typesRecettes.containsKey(valeur.split(' · ').first) => imageDuType([valeur.split(' · ').first], sousType: valeur.split(' · ').last),
+      _ when originesRecettes.contains(valeur) => 'globe',
       _ => null,
     };
 
 /// Une icône de critère ou de type de recette, [nom] court (assets/recettes/criteres/) ou chemin complet.
 Widget imageCritere(String nom, double taille) => _imageCritere(nom, taille);
 
-Widget _imageCritere(String nom, double taille) =>
-    Image.asset(nom.startsWith('assets/') ? nom : 'assets/recettes/criteres/$nom.png', width: taille, height: taille, filterQuality: FilterQuality.medium);
+Widget _imageCritere(String nom, double taille) => nom == 'globe'
+    ? SizedBox(width: taille, height: taille, child: Center(child: Icone(Icons.public, size: taille * 0.85, color: Charte.cadre)))
+    : Image.asset(nom.startsWith('assets/') ? nom : 'assets/recettes/criteres/$nom.png', width: taille, height: taille, filterQuality: FilterQuality.medium);
 
 /// Une pastille de critère : l'icône d'Aristide (s'il y en a une) et le libellé.
 class PastilleCritere extends StatelessWidget {
@@ -707,3 +730,21 @@ class _FicheRecetteState extends State<FicheRecette> {
 /// Bouton « recette » de l'en-tête (19/11/2026) : 20/11/2026 (Aristide) : pas de volet, le catalogue des recettes
 /// lui-même ; la flèche de retour ramène là où l'on était.
 Future<void> chercherRecette(BuildContext context) => Nav.aller<void>(context, const EcranRecettes(depuisEnTete: true));
+
+/// Bande d'un sous-type dans la liste des recettes : son icône (iconographie d'Aristide, 22/11/2026), son nom.
+class BandeSousType extends StatelessWidget {
+  const BandeSousType({super.key, required this.type, this.sousType});
+  final String type;
+  final String? sousType;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        color: Charte.fondBandeau,
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 4),
+        child: Row(children: [
+          _imageCritere(imageDuType([type], sousType: sousType), 32),
+          const SizedBox(width: 10),
+          Expanded(child: Text(sousType ?? 'Autres', style: Charte.texte(15, gras: true, couleur: Charte.texteSecondaire))),
+        ]),
+      );
+}

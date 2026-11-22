@@ -21,7 +21,9 @@ for r in sorted(src['recettes'], key=lambda r: r['titre'].lower()):
         ing = [{'nom': x} for x in r.get('ingredients', [])]
     e = {'id': r.get('id'), 'titre': r['titre'], 'types': r.get('types', []), 'ingredients': ing}
     # 18/11/2026 (Aristide) : le texte de la recette aussi (sans « remarques » ni « texteOrigine », propres à la console).
-    for k in ('pour', 'etapes', 'conseils', 'source', 'difficulte', 'regimes', 'saisons', 'cout', 'cuissons', 'occasions'):
+    # 22/11/2026 : sous-types (type → sous-type) et origine (catalogue v7).
+    for k in ('pour', 'etapes', 'conseils', 'source', 'difficulte', 'regimes', 'saisons', 'cout', 'cuissons', 'occasions',
+              'sousTypes', 'origine'):
         if r.get(k):
             e[k] = r[k]
     # 20/11/2026 : les temps, 0 compris (0 = sans cuisson) ; absents pour les recettes maison.

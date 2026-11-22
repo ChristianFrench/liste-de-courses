@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:liste_de_courses/donnees/classement_recettes.dart';
 import 'package:liste_de_courses/donnees/recette_ingredients.dart';
 
 void main() {
@@ -87,5 +88,20 @@ void main() {
     expect(f.garde(r), isTrue);
     expect(f.garde(maison), isFalse, reason: 'sans temps : écartée par un filtre de temps seulement');
     expect(FiltreRecettes.saisonDu(DateTime(2026, 11, 20)), 'Automne');
+  });
+
+  test('catalogue v7 embarqué : 9 types, sous-types, origine, filtre Origine', () async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    final rs = await recettesFournies();
+    expect(rs.length, greaterThanOrEqualTo(590));
+    expect({for (final r in rs) ...r.types}.where(typesRecettes.containsKey).length, 9);
+    final r = rs.firstWhere((x) => x.sousTypes.isNotEmpty && x.origine != null);
+    expect(r.classement.first, contains(' · '));
+    expect(r.pastilles, contains(r.origine));
+    expect(imageDuType([r.types.first], sousType: r.sousTypes[r.types.first]), contains('--'));
+    final f = FiltreRecettes()..choix['Origine']!.add('Italie');
+    final italiennes = rs.where(f.garde).toList();
+    expect(italiennes, isNotEmpty);
+    expect(italiennes.every((x) => x.origine == 'Italie'), isTrue);
   });
 }

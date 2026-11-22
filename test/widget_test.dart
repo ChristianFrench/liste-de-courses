@@ -123,7 +123,9 @@ Finder _onglet(String libelle) => find.descendant(of: find.byType(BarreOnglets),
 
 /// Onglet Gérer, puis la rubrique donnée.
 Future<void> _rubrique(WidgetTester tester, String titre) async {
-  await _toucher(tester, _onglet('Gérer'));
+  // 22/11/2026 : Gérer n'est plus dans la barre (roue dentée de l'accueil).
+  Nav.i.allerOnglet(Nav.gerer);
+  await tester.pumpAndSettle();
   Nav.i.retourOnglet(Nav.gerer); // depuis une rubrique ouverte : retour au menu de Gérer
   await tester.pumpAndSettle();
   // Le menu a pu rester défilé vers le bas : on remonte en haut.
@@ -152,7 +154,12 @@ Future<void> _ciblesTactiles(WidgetTester tester) =>
     expectLater(tester, meetsGuideline(const MinimumTapTargetGuideline(size: Size(30, 30), link: 'lignes de 30 points')));
 
 void main() {
-  setUpAll(_chargerPolice);
+  setUpAll(() async {
+    await _chargerPolice();
+    // 22/11/2026 : l'onglet Recettes charge le catalogue des recettes dès le lancement ; lu ici d'abord (vrai
+    // asynchrone), sinon la lecture en attente dans le temps simulé des tests bloque les suivantes.
+    await recettesFournies();
+  });
   setUp(_donnees);
 
   group('Règles', () {
@@ -554,7 +561,11 @@ void main() {
       expect(find.byType(EnTeteFenetre), findsNothing, reason: 'pas de bandeau de titre sur l\'accueil');
       await tester.fling(find.byKey(const ValueKey('bonjour')), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
-      expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'glisser à gauche : onglet Préparer');
+      expect(find.descendant(of: find.byType(EnTeteFenetre), matching: find.text('Recettes')), findsOneWidget,
+          reason: 'glisser à gauche : onglet Recettes');
+      await tester.fling(find.byType(EnTeteFenetre).first, const Offset(-200, 0), 1000);
+      await tester.pumpAndSettle();
+      expect(find.text('Nouvelle liste'), findsOneWidget, reason: 'puis onglet Préparer');
       await tester.fling(find.byType(EnTeteFenetre), const Offset(-200, 0), 1000);
       await tester.pumpAndSettle();
       expect(find.text('Courses').first, findsOneWidget);
