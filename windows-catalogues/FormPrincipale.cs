@@ -461,7 +461,8 @@ sealed class FormPrincipale : Form
                 var liste = dans.Where(r => r.SousTypes.GetValueOrDefault(type) == st)
                     .OrderBy(r => r.Titre, StringComparer.CurrentCultureIgnoreCase).ToList();
                 if (liste.Count == 0 && st is null) continue;
-                var ns = Noeud(st ?? "Sans sous-type", new SousType(type, st), idossier);
+                var ns = Noeud(st ?? "Sans sous-type", new SousType(type, st),
+                    st is null ? idossier : Vignette($"st:{type}/{st}", () => IconesCatalogue.SousTypeRecette(type, st), '\uE8B7'));
                 ns.ToolTipText = $"{liste.Count} recettes";
                 foreach (var r in liste) ns.Nodes.Add(Noeud(r.Titre, r, irecette));
                 nt.Nodes.Add(ns);
@@ -591,7 +592,7 @@ sealed class FormPrincipale : Form
                     Ligne(st, dans.Count(r => r.SousTypes.GetValueOrDefault(t.Type) == st).ToString());
                 break;
             case SousType st:
-                icone = IconesCatalogue.TypeRecette(st.Type);
+                icone = IconesCatalogue.SousTypeRecette(st.Type, st.Nom);
                 sous = $"Sous-type de {st.Type}";
                 Ligne("Recettes", _entrepot.Recettes.Count(r => r.Types.Contains(st.Type) && r.SousTypes.GetValueOrDefault(st.Type) == st.Nom).ToString());
                 break;

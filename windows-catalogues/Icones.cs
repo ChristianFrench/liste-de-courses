@@ -108,7 +108,14 @@ static class IconesCatalogue
     public static Image? Secteur(string rayon, string secteur) => Fichier($"{CleRayon(rayon)}--{Simple(secteur)}") ?? Rayon(rayon);
 
     /// <summary>Image d'un type de recette (les mêmes que la console).</summary>
-    public static Image? TypeRecette(string type)
+    /// <summary>Icône d'un type de recettes (22/11/2026 : iconographie d'Aristide, assets/recettes/types), sinon l'ancienne.</summary>
+    public static Image? TypeRecette(string type) => Fichier("../recettes/types/" + Simple(type)) ?? AncienType(type);
+
+    /// <summary>Icône d'un sous-type (« type--sous-type »), sinon celle du type.</summary>
+    public static Image? SousTypeRecette(string type, string? sousType) =>
+        (sousType is null ? null : Fichier($"../recettes/types/{Simple(type)}--{Simple(sousType)}")) ?? TypeRecette(type);
+
+    static Image? AncienType(string type)
     {
         var t = type.ToLowerInvariant();
         var nom = t.StartsWith("dessert") || t.StartsWith("petit") ? "desserts"

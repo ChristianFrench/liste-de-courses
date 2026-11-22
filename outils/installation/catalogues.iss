@@ -63,6 +63,7 @@ Source: "..\..\assets\pictos\maison\*.png"; DestDir: "{app}\icones\maison"; Flag
 Source: "..\..\assets\pictos\noto3d\*.png"; DestDir: "{app}\icones\noto3d"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\..\assets\pictos\png\*.png"; DestDir: "{app}\icones\png"; Flags: ignoreversion skipifsourcedoesntexist
 Source: "..\..\assets\recettes\*.png"; DestDir: "{app}\icones\recettes"; Flags: ignoreversion
+Source: "..\..\assets\recettes\types\*.png"; DestDir: "{app}\icones\recettes\types"; Flags: ignoreversion
 
 [InstallDelete]
 Type: filesandordirs; Name: "{app}\icones"
