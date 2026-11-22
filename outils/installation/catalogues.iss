@@ -1,6 +1,6 @@
 ; Programme d'installation et de mise à jour d'« Emplettes · catalogues » (22/11/2026, Aristide) : gestion des
-; catalogues (produits, marques, recettes), séparée de la console technique. Même application compilée avec
-; OUTIL_EDITEUR=true et OUTIL_CATALOGUES=true ; installée à part (autre AppId, autre dossier).
+; catalogues (produits, marques, recettes), séparée de la console technique. Logiciel Windows natif (C# WinForms,
+; windows-catalogues/, publié autonome win-x64 : rien à installer d'autre) ; installé à part (autre AppId, autre dossier).
 ; catalogues.ico est provisoire (copie de editeur.ico) : la remplacer par l'icône d'Aristide suffit.
 
 #ifndef Version
@@ -58,16 +58,14 @@ Name: "bureau"; Description: "Mettre une icône sur le Bureau"; Flags: checkedon
 [Files]
 Source: "{#Source}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "catalogues.ico"; DestDir: "{app}"; Flags: ignoreversion
-; Illustrations des recettes d'Aristide (12/11/2026), posées par la console à l'ouverture du catalogue des recettes
-Source: "..\recettes\illustrations\*"; DestDir: "{app}\recettes-illustrations"; Flags: ignoreversion
 
 [InstallDelete]
 ; Les fichiers de la version précédente sont remplacés en entier (pas de restes d'une ancienne compilation)
 Type: filesandordirs; Name: "{app}\data"
 
 [Icons]
-Name: "{autoprograms}\Emplettes catalogues"; Filename: "{app}\liste_de_courses.exe"; IconFilename: "{app}\catalogues.ico"
-Name: "{autodesktop}\Emplettes catalogues"; Filename: "{app}\liste_de_courses.exe"; IconFilename: "{app}\catalogues.ico"; Tasks: bureau
+Name: "{autoprograms}\Emplettes catalogues"; Filename: "{app}\EmplettesCatalogues.exe"; IconFilename: "{app}\catalogues.ico"
+Name: "{autodesktop}\Emplettes catalogues"; Filename: "{app}\EmplettesCatalogues.exe"; IconFilename: "{app}\catalogues.ico"; Tasks: bureau
 
 [Run]
-Filename: "{app}\liste_de_courses.exe"; Description: "Ouvrir Emplettes · catalogues"; Flags: nowait postinstall skipifsilent
+Filename: "{app}\EmplettesCatalogues.exe"; Description: "Ouvrir Emplettes · catalogues"; Flags: nowait postinstall skipifsilent

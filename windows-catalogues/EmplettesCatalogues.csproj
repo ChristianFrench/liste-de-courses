@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- « Emplettes · catalogues » (22/11/2026, Aristide) : logiciel Windows natif (C# WinForms, .NET 8) de gestion des
+       catalogues (produits, marques, recettes), séparé de la console technique. Compilé par GitHub Actions (job windows). -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>EmplettesCatalogues</AssemblyName>
+    <RootNamespace>EmplettesCatalogues</RootNamespace>
+    <ApplicationIcon>..\outils\installation\catalogues.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationDefaultFont>Segoe UI, 9pt</ApplicationDefaultFont>
+    <Product>Emplettes · catalogues</Product>
+    <Company>Emplettes</Company>
+    <Version>0.7.0</Version>
+    <InformationalVersion>0.7.0 (local)</InformationalVersion>
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.11" />
+  </ItemGroup>
+</Project>
