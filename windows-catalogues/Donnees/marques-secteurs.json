@@ -1,0 +1,2326 @@
+{
+ "meta": {
+  "description": "Marques par secteur du catalogue des produits (Domaine › Rayon › Secteur › Marques)",
+  "date_mise_a_jour": "2026-11-22",
+  "origine": "hierarchie-aristide-v2.json rangée par hierarchie_secteurs.py"
+ },
+ "secteurs": {
+  "Fruits et légumes/Légumes": [
+   {
+    "nom": "Pom'Soleil",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   }
+  ],
+  "Fruits et légumes/Fruits secs et graines": [
+   {
+    "nom": "Alesto",
+    "source": "ajout_mdd",
+    "famille": "Fruits secs, graines et olives"
+   },
+   {
+    "nom": "Daco Bello",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   },
+   {
+    "nom": "Natura",
+    "source": "catalogue_initial",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   },
+   {
+    "nom": "Tramier",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   }
+  ],
+  "Boucherie/Boucherie libre-service": [
+   {
+    "nom": "Bigard",
+    "source": "ajout_catalogue",
+    "famille": "Viandes et volailles"
+   },
+   {
+    "nom": "Charal",
+    "source": "ajout_catalogue",
+    "famille": "Viandes et volailles"
+   },
+   {
+    "nom": "Ferial",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   }
+  ],
+  "Boucherie/Produits du terroir": [
+   {
+    "nom": "La Belle Chaurienne",
+    "source": "catalogue_initial",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   },
+   {
+    "nom": "Lanaudière",
+    "source": "catalogue_initial",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Maison Montfort",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   }
+  ],
+  "Volaille/Volaille libre-service": [
+   {
+    "nom": "Le Gaulois",
+    "source": "catalogue_initial",
+    "famille": "Viandes et volailles"
+   },
+   {
+    "nom": "Maître Coq",
+    "source": "catalogue_initial",
+    "famille": "Viandes et volailles"
+   },
+   {
+    "nom": "Père Dodu",
+    "source": "ajout_catalogue",
+    "famille": "Viandes et volailles"
+   }
+  ],
+  "Poissonnerie/Poissonnerie libre-service": [
+   {
+    "nom": "Fleury Michon",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Labeyrie",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Odyssée",
+    "source": "ajout_mdd",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   }
+  ],
+  "Crèmerie/Lait": [
+   {
+    "nom": "Candia",
+    "source": "ajout_catalogue",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Lactel",
+    "source": "ajout_catalogue",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Pâturages",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   }
+  ],
+  "Crèmerie/Beurre, œufs, crème": [
+   {
+    "nom": "Bridélice",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Délisse",
+    "source": "ajout_mdd",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Elle & Vire",
+    "source": "ajout_catalogue",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Isigny",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Matines",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Milbona",
+    "source": "ajout_mdd",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Paysan Breton",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "Président",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "St Hubert",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   }
+  ],
+  "Crèmerie/Yaourts et desserts": [
+   {
+    "nom": "Actimel",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Activia",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Alpro",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Charles & Alice",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Danette",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Danone",
+    "source": "catalogue_initial",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Envie de Bien Manger",
+    "source": "ajout_mdd",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Fjord",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Gervais",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "La Laitière",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Mamie Nova",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Nestlé",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Perle de Lait",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Sojasun",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Yoplait",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   }
+  ],
+  "Fromagerie/Fromages libre-service": [
+   {
+    "nom": "Babybel",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Baskeriou",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Bel",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Boursin",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Bresse Bleu",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Caprice des Dieux",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Chaussée aux Moines",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Chêne d'Argent",
+    "source": "ajout_mdd",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Cœur de Lion",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Entremont",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Etorki",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Germain",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Gillot",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Kiri",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "La Vache qui rit",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Le Rustique",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Leerdammer",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Les Croisés",
+    "source": "ajout_mdd",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Petit Basque",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Président",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Pâturages",
+    "source": "catalogue_initial",
+    "famille": "Laits, beurres, crèmes et œufs"
+   },
+   {
+    "nom": "RichesMonts",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Roquefort Société",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "St Môret",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Tartare",
+    "source": "ajout_catalogue",
+    "famille": "Fromages"
+   }
+  ],
+  "Fromagerie/Fromages au comptoir": [
+   {
+    "nom": "Baskeriou",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Germain",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Président",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   }
+  ],
+  "Charcuterie/Charcuterie libre-service": [
+   {
+    "nom": "Aoste",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Cochonou",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Dulano",
+    "source": "ajout_mdd",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Fleury Michon",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Herta",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Justin Bridou",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Madrange",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Monique Ranou",
+    "source": "ajout_mdd",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Montagne Noire",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Montegeneroso",
+    "source": "catalogue_initial",
+    "famille": "Fromages"
+   },
+   {
+    "nom": "Montorsi",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Parmacotto",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   }
+  ],
+  "Charcuterie/Charcuterie au comptoir": [
+   {
+    "nom": "Montorsi",
+    "source": "catalogue_initial",
+    "famille": "Charcuterie et salaisons"
+   }
+  ],
+  "Traiteur/Traiteur frais": [
+   {
+    "nom": "Chef Select",
+    "source": "ajout_mdd",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Daunat",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Labeyrie",
+    "source": "ajout_catalogue",
+    "famille": "Charcuterie et salaisons"
+   },
+   {
+    "nom": "Pierre Martinet",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Sodebo",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Stoeffler",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "William Saurin",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   }
+  ],
+  "Boulangerie/Pain": [
+   {
+    "nom": "Harry's",
+    "source": "catalogue_initial",
+    "famille": "Pains de mie, brioches et viennoiseries"
+   },
+   {
+    "nom": "Jacquet",
+    "source": "ajout_catalogue",
+    "famille": "Pains de mie, brioches et viennoiseries"
+   },
+   {
+    "nom": "La Boulangère",
+    "source": "ajout_catalogue",
+    "famille": "Pains de mie, brioches et viennoiseries"
+   }
+  ],
+  "Viennoiserie et pâtisserie/Viennoiserie": [
+   {
+    "nom": "Brioche Pasquier",
+    "source": "ajout_catalogue",
+    "famille": "Pains de mie, brioches et viennoiseries"
+   }
+  ],
+  "Épicerie salée/Pâtes, riz et féculents": [
+   {
+    "nom": "Barilla",
+    "source": "catalogue_initial",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Ben's Original",
+    "source": "ajout_catalogue",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Combino",
+    "source": "ajout_mdd",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Lustucru",
+    "source": "ajout_catalogue",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Panzani",
+    "source": "ajout_catalogue",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Taureau Ailé",
+    "source": "ajout_catalogue",
+    "famille": "Pâtes, riz, semoules et féculents"
+   },
+   {
+    "nom": "Tipiak",
+    "source": "ajout_catalogue",
+    "famille": "Pâtes, riz, semoules et féculents"
+   }
+  ],
+  "Épicerie salée/Conserves": [
+   {
+    "nom": "Bonduelle",
+    "source": "ajout_catalogue",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "Cassegrain",
+    "source": "catalogue_initial",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "Connétable",
+    "source": "catalogue_initial",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   },
+   {
+    "nom": "D'aucy",
+    "source": "catalogue_initial",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "Freshona",
+    "source": "ajout_mdd",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "Géant Vert",
+    "source": "catalogue_initial",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "La Belle Chaurienne",
+    "source": "catalogue_initial",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   },
+   {
+    "nom": "Lanaudière",
+    "source": "catalogue_initial",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Mutti",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Petit Navire",
+    "source": "ajout_catalogue",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   },
+   {
+    "nom": "Raynal et Roquelaure",
+    "source": "ajout_catalogue",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   },
+   {
+    "nom": "Rio Mare",
+    "source": "ajout_catalogue",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   },
+   {
+    "nom": "Saint Eloi",
+    "source": "ajout_mdd",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "Saupiquet",
+    "source": "catalogue_initial",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   }
+  ],
+  "Épicerie salée/Sauces et condiments": [
+   {
+    "nom": "Amora",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Heinz",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Lesieur",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Maille",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Puget",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Tabasco",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   }
+  ],
+  "Épicerie salée/Sel, épices et aides culinaires": [
+   {
+    "nom": "Ducros",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Maggi",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Spigol",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   }
+  ],
+  "Épicerie salée/Soupes et plats préparés": [
+   {
+    "nom": "Buitoni",
+    "source": "ajout_catalogue",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   },
+   {
+    "nom": "PanPani",
+    "source": "ajout_catalogue",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   }
+  ],
+  "Bio, vrac et terroir/Diététique et bio": [
+   {
+    "nom": "Jardin Bio étic",
+    "source": "ajout_catalogue",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   }
+  ],
+  "Apéritif/Chips et biscuits apéritif": [
+   {
+    "nom": "Belin",
+    "source": "catalogue_initial",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Doritos",
+    "source": "catalogue_initial",
+    "famille": "Biscuits apéritifs et chips"
+   },
+   {
+    "nom": "Jafaden",
+    "source": "ajout_mdd",
+    "famille": "Biscuits apéritifs et chips"
+   },
+   {
+    "nom": "Lay's",
+    "source": "catalogue_initial",
+    "famille": "Biscuits apéritifs et chips"
+   },
+   {
+    "nom": "Vico",
+    "source": "catalogue_initial",
+    "famille": "Biscuits apéritifs et chips"
+   }
+  ],
+  "Apéritif/Fruits secs salés et olives": [
+   {
+    "nom": "Bouton d'Or",
+    "source": "ajout_mdd",
+    "famille": "Biscuits apéritifs et chips"
+   },
+   {
+    "nom": "Menguy's",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   },
+   {
+    "nom": "Pipas",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   },
+   {
+    "nom": "Tramier",
+    "source": "catalogue_initial",
+    "famille": "Fruits secs, graines et olives"
+   }
+  ],
+  "Cuisine du monde/Mexique et Amérique": [
+   {
+    "nom": "Old El Paso",
+    "source": "catalogue_initial",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   }
+  ],
+  "Cuisine du monde/Italie": [
+   {
+    "nom": "Zapetti",
+    "source": "ajout_catalogue",
+    "famille": "Sauces, condiments, épices et huiles"
+   }
+  ],
+  "Petit-déjeuner/Café": [
+   {
+    "nom": "Carte Noire",
+    "source": "ajout_catalogue",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Illy",
+    "source": "catalogue_initial",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Malongo",
+    "source": "ajout_catalogue",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Ricoré",
+    "source": "ajout_catalogue",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Starbucks",
+    "source": "catalogue_initial",
+    "famille": "Cafés, thés, infusions et cacao"
+   }
+  ],
+  "Petit-déjeuner/Thé et chocolat en poudre": [
+   {
+    "nom": "Lipton",
+    "source": "ajout_catalogue",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Nesquik",
+    "source": "catalogue_initial",
+    "famille": "Cafés, thés, infusions et cacao"
+   },
+   {
+    "nom": "Nestlé",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Poulain",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Éléphant",
+    "source": "catalogue_initial",
+    "famille": "Cafés, thés, infusions et cacao"
+   }
+  ],
+  "Petit-déjeuner/Céréales": [
+   {
+    "nom": "Crownfield",
+    "source": "ajout_mdd",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   },
+   {
+    "nom": "Kellogg's",
+    "source": "catalogue_initial",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   },
+   {
+    "nom": "Nestlé",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   }
+  ],
+  "Petit-déjeuner/Biscottes et tartines": [
+   {
+    "nom": "Chabrior",
+    "source": "ajout_mdd",
+    "famille": "Pains de mie, brioches et viennoiseries"
+   }
+  ],
+  "Petit-déjeuner/Confitures et pâtes à tartiner": [
+   {
+    "nom": "Andros",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Bonne Maman",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Côte d'Or",
+    "source": "ajout_catalogue",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Ferrero",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Nutella",
+    "source": "ajout_catalogue",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   },
+   {
+    "nom": "Skippy",
+    "source": "ajout_catalogue",
+    "famille": "Céréales, confitures, pâtes à tartiner et miel"
+   }
+  ],
+  "Biscuits et sucré/Biscuits et gâteaux": [
+   {
+    "nom": "Bn",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Brossard",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Delacre",
+    "source": "catalogue_initial",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Gerblé",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Lotus Biscoff",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "LU",
+    "source": "catalogue_initial",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Oreo",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "P'tit Déli",
+    "source": "ajout_mdd",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Saint Michel",
+    "source": "ajout_catalogue",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Sondey",
+    "source": "ajout_mdd",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   }
+  ],
+  "Biscuits et sucré/Chocolat et confiserie": [
+   {
+    "nom": "Carambar",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Chupa Chups",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Côte d'Or",
+    "source": "ajout_catalogue",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Fin Carré",
+    "source": "ajout_mdd",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Frisk",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Haribo",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Ivoria",
+    "source": "ajout_mdd",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Kinder",
+    "source": "ajout_catalogue",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Lindt",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "M&M's",
+    "source": "ajout_catalogue",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Milka",
+    "source": "ajout_catalogue",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Mister Choc",
+    "source": "ajout_mdd",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Motta",
+    "source": "catalogue_initial",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Nestlé",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Nestlé Dessert",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Pat' Patrouille",
+    "source": "catalogue_initial",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Poulain",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   },
+   {
+    "nom": "Suchard",
+    "source": "catalogue_initial",
+    "famille": "Chocolats et confiseries"
+   }
+  ],
+  "Biscuits et sucré/Sucre, farine et pâtisserie": [
+   {
+    "nom": "Van Houten",
+    "source": "catalogue_initial",
+    "famille": "Cafés, thés, infusions et cacao"
+   }
+  ],
+  "Surgelés/Légumes surgelés": [
+   {
+    "nom": "Bonduelle",
+    "source": "ajout_catalogue",
+    "famille": "Légumes préparés, conserves et surgelés"
+   },
+   {
+    "nom": "McCain",
+    "source": "catalogue_initial",
+    "famille": "Frites, pommes de terre et plats surgelés"
+   }
+  ],
+  "Surgelés/Viandes et poissons surgelés": [
+   {
+    "nom": "Findus",
+    "source": "catalogue_initial",
+    "famille": "Frites, pommes de terre et plats surgelés"
+   },
+   {
+    "nom": "Ocean Sea",
+    "source": "ajout_mdd",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   }
+  ],
+  "Surgelés/Plats et pizzas surgelés": [
+   {
+    "nom": "Iglo",
+    "source": "ajout_catalogue",
+    "famille": "Poissons, crustacés et produits de la mer (frais, conserves, surgelés)"
+   },
+   {
+    "nom": "Marie",
+    "source": "ajout_catalogue",
+    "famille": "Traiteur frais, plats préparés et snacking"
+   },
+   {
+    "nom": "Picard",
+    "source": "ajout_catalogue",
+    "famille": "Frites, pommes de terre et plats surgelés"
+   },
+   {
+    "nom": "Épi d'Or",
+    "source": "catalogue_initial",
+    "famille": "Frites, pommes de terre et plats surgelés"
+   }
+  ],
+  "Glaces/Glaces": [
+   {
+    "nom": "Adélie",
+    "source": "ajout_mdd",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Ben & Jerry's",
+    "source": "ajout_catalogue",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Bon Gelati",
+    "source": "ajout_mdd",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Carte d'Or",
+    "source": "catalogue_initial",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Cornetto",
+    "source": "ajout_catalogue",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Extrême",
+    "source": "ajout_catalogue",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Gelatelli",
+    "source": "ajout_mdd",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Häagen-Dazs",
+    "source": "catalogue_initial",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Magnum",
+    "source": "catalogue_initial",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Miko",
+    "source": "ajout_catalogue",
+    "famille": "Glaces et sorbets"
+   },
+   {
+    "nom": "Oasis",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   }
+  ],
+  "Eaux et boissons sans alcool/Eaux": [
+   {
+    "nom": "Badoit",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Cristaline",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Montclar",
+    "source": "catalogue_initial",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Perrier",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "San Pellegrino",
+    "source": "catalogue_initial",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "St-Yorre",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Vittel",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Volvic",
+    "source": "catalogue_initial",
+    "famille": "Eaux plates et gazeuses"
+   }
+  ],
+  "Eaux et boissons sans alcool/Jus de fruits": [
+   {
+    "nom": "Andros",
+    "source": "ajout_catalogue",
+    "famille": "Yaourts, desserts frais et alternatives végétales"
+   },
+   {
+    "nom": "Innocent",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Joker",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Paquito",
+    "source": "ajout_mdd",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Solevita",
+    "source": "ajout_mdd",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Tropicana",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   }
+  ],
+  "Eaux et boissons sans alcool/Sodas et sirops": [
+   {
+    "nom": "Coca-Cola",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Fanta",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Freeway",
+    "source": "ajout_mdd",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Lipton Ice Tea",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Moulin de Valdonne",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Orangina",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Pulco",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Schweppes",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Sprite",
+    "source": "ajout_catalogue",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   }
+  ],
+  "Cave/Bières et cidres": [
+   {
+    "nom": "1664",
+    "source": "ajout_catalogue",
+    "famille": "Bières, vins et spiritueux"
+   },
+   {
+    "nom": "Heineken",
+    "source": "catalogue_initial",
+    "famille": "Bières, vins et spiritueux"
+   },
+   {
+    "nom": "Kronenbourg",
+    "source": "ajout_catalogue",
+    "famille": "Bières, vins et spiritueux"
+   },
+   {
+    "nom": "Leffe",
+    "source": "ajout_catalogue",
+    "famille": "Bières, vins et spiritueux"
+   }
+  ],
+  "Cave/Vins": [
+   {
+    "nom": "Icône",
+    "source": "catalogue_initial",
+    "famille": "Sauces, condiments, épices et huiles"
+   },
+   {
+    "nom": "Saint-Vincent",
+    "source": "catalogue_initial",
+    "famille": "Bières, vins et spiritueux"
+   }
+  ],
+  "Cave/Champagnes et mousseux": [
+   {
+    "nom": "Champomy",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "French Bloom",
+    "source": "catalogue_initial",
+    "famille": "Jus de fruits, sirops et boissons sans alcool"
+   },
+   {
+    "nom": "Martel",
+    "source": "catalogue_initial",
+    "famille": "Bières, vins et spiritueux"
+   },
+   {
+    "nom": "Reine d'Huicq",
+    "source": "catalogue_initial",
+    "famille": "Plats cuisinés en conserve et cuisine du monde"
+   }
+  ],
+  "Cave/Alcools et apéritifs": [
+   {
+    "nom": "Get",
+    "source": "catalogue_initial",
+    "famille": "Bières, vins et spiritueux"
+   },
+   {
+    "nom": "Ricard",
+    "source": "ajout_catalogue",
+    "famille": "Bières, vins et spiritueux"
+   }
+  ],
+  "Bébé/Hygiène bébé": [
+   {
+    "nom": "Mixa",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Mots d'Enfants",
+    "source": "ajout_mdd",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   },
+   {
+    "nom": "Pampers",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   },
+   {
+    "nom": "Pommette",
+    "source": "ajout_mdd",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   }
+  ],
+  "Parfumerie et soins/Toilette et soins du corps": [
+   {
+    "nom": "Cien",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Cosmia",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Dove",
+    "source": "ajout_catalogue",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Evian",
+    "source": "ajout_catalogue",
+    "famille": "Eaux plates et gazeuses"
+   },
+   {
+    "nom": "Inell",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "La Beauté Monoprix",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Labell",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Le Petit Marseillais",
+    "source": "ajout_catalogue",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Les Cosmétiques Design Paris",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Mixa",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Monsavon",
+    "source": "ajout_catalogue",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Nectar of Bio",
+    "source": "ajout_mdd",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Nivea",
+    "source": "ajout_catalogue",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Sanex",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Tahiti",
+    "source": "ajout_catalogue",
+    "famille": "Soins du visage, du corps et parfumerie"
+   }
+  ],
+  "Parfumerie et soins/Cheveux": [
+   {
+    "nom": "Garnier",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   },
+   {
+    "nom": "Garnier Ultra Doux",
+    "source": "ajout_catalogue",
+    "famille": "Soins capillaires et rasage"
+   },
+   {
+    "nom": "Head & Shoulders",
+    "source": "ajout_catalogue",
+    "famille": "Soins capillaires et rasage"
+   },
+   {
+    "nom": "L'Oréal",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   }
+  ],
+  "Parfumerie et soins/Santé dentaire": [
+   {
+    "nom": "Colgate",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène bucco-dentaire"
+   },
+   {
+    "nom": "Elgydium",
+    "source": "catalogue_initial",
+    "famille": "Hygiène bucco-dentaire"
+   },
+   {
+    "nom": "Freedent",
+    "source": "catalogue_initial",
+    "famille": "Hygiène bucco-dentaire"
+   },
+   {
+    "nom": "Oral-B",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène bucco-dentaire"
+   },
+   {
+    "nom": "Sensodyne",
+    "source": "catalogue_initial",
+    "famille": "Hygiène bucco-dentaire"
+   },
+   {
+    "nom": "Signal",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène bucco-dentaire"
+   }
+  ],
+  "Parfumerie et soins/Cosmétiques et parfums": [
+   {
+    "nom": "RoC",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   }
+  ],
+  "Hygiène/Hygiène féminine": [
+   {
+    "nom": "Always",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   },
+   {
+    "nom": "Nana",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   },
+   {
+    "nom": "Toujours",
+    "source": "ajout_mdd",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   },
+   {
+    "nom": "Vania",
+    "source": "ajout_catalogue",
+    "famille": "Hygiène féminine, bébé et incontinences"
+   }
+  ],
+  "Hygiène/Rasage": [
+   {
+    "nom": "Gillette",
+    "source": "ajout_catalogue",
+    "famille": "Soins capillaires et rasage"
+   },
+   {
+    "nom": "Wilkinson",
+    "source": "ajout_catalogue",
+    "famille": "Soins capillaires et rasage"
+   }
+  ],
+  "Parapharmacie/Solaires et soins spécifiques": [
+   {
+    "nom": "SVR",
+    "source": "catalogue_initial",
+    "famille": "Soins du visage, du corps et parfumerie"
+   }
+  ],
+  "Entretien / Droguerie/Lessives et soin du linge": [
+   {
+    "nom": "Arbre Vert",
+    "source": "catalogue_initial",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Ariel",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Calgon",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Dash",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Formil",
+    "source": "ajout_mdd",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "K2r",
+    "source": "catalogue_initial",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Le Chat",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Skip",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Soupline",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Vanish",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   }
+  ],
+  "Entretien / Droguerie/Produits Vaisselle": [
+   {
+    "nom": "Arbre Vert",
+    "source": "catalogue_initial",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Finish",
+    "source": "catalogue_initial",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Mir",
+    "source": "ajout_catalogue",
+    "famille": "Lessives et soin du linge"
+   },
+   {
+    "nom": "Paic",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Sun",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   }
+  ],
+  "Entretien / Droguerie/Nettoyants ménagers": [
+   {
+    "nom": "Ajax",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Apta",
+    "source": "ajout_mdd",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Briochin",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Cif",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Destop",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Febreze",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Harpic",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "La Croix",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "Raid",
+    "source": "catalogue_initial",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "St Marc",
+    "source": "ajout_catalogue",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "W5",
+    "source": "ajout_mdd",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   },
+   {
+    "nom": "WC Net",
+    "source": "catalogue_initial",
+    "famille": "Nettoyants ménagers, vaisselle et insecticides"
+   }
+  ],
+  "Entretien / Droguerie/Accessoires de ménage": [
+   {
+    "nom": "Actuel",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Domedia",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Elsay",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Foxter",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Leifheit",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Mapa",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Scotch-Brite",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Spontex",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Vileda",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Entretien / Droguerie/Papier": [
+   {
+    "nom": "Floralys",
+    "source": "ajout_mdd",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   },
+   {
+    "nom": "Kleenex",
+    "source": "catalogue_initial",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   },
+   {
+    "nom": "Lotus",
+    "source": "catalogue_initial",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   },
+   {
+    "nom": "Mimosa",
+    "source": "catalogue_initial",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   },
+   {
+    "nom": "Sopalin",
+    "source": "catalogue_initial",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   }
+  ],
+  "Entretien / Droguerie/Emballages et Aluminium etc": [
+   {
+    "nom": "Alfapac",
+    "source": "catalogue_initial",
+    "famille": "Essuie-tout, papier toilette, mouchoirs et emballages"
+   },
+   {
+    "nom": "Pyrex",
+    "source": "catalogue_initial",
+    "famille": "Arts de la table, cuisson et conservation"
+   }
+  ],
+  "Cuisine et arts de la table/Arts de la table et cuisine": [
+   {
+    "nom": "Bialetti",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Bodum",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Brita",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Ernesto",
+    "source": "ajout_mdd",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Guardini",
+    "source": "catalogue_initial",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Home Essentiels",
+    "source": "catalogue_initial",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Lagostina",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Le Parfait",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Redstone",
+    "source": "catalogue_initial",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Tefal",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   }
+  ],
+  "Cuisine et arts de la table/Vaisselle": [
+   {
+    "nom": "Arcopal",
+    "source": "catalogue_initial",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Duralex",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Luminarc",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   }
+  ],
+  "Bricolage, auto et jardin/Outillage": [
+   {
+    "nom": "Parkside",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Bricolage, auto et jardin/Électricité et éclairage": [
+   {
+    "nom": "Duracell",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Energizer",
+    "source": "ajout_catalogue",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Loisirs/Papeterie et librairie": [
+   {
+    "nom": "Bic",
+    "source": "catalogue_initial",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Canson",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Clairefontaine",
+    "source": "catalogue_initial",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Crelando",
+    "source": "ajout_mdd",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Cultura",
+    "source": "ajout_mdd",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Disney",
+    "source": "catalogue_initial",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Maped",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Oxford",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Paper Mate",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Pilot",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Post-it",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Reynolds",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "Stabilo",
+    "source": "catalogue_initial",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "UHU",
+    "source": "ajout_catalogue",
+    "famille": "Papeterie et fournitures scolaires"
+   },
+   {
+    "nom": "United Office",
+    "source": "ajout_mdd",
+    "famille": "Papeterie et fournitures scolaires"
+   }
+  ],
+  "Loisirs/Jouets": [
+   {
+    "nom": "Asmodee",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Barbie",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Dujardin",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Funko",
+    "source": "catalogue_initial",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Hasbro",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Hot Wheels",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Lansay",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Lego",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Mattel",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Nathan",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Playmobil",
+    "source": "catalogue_initial",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Playtive",
+    "source": "ajout_mdd",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Ravensburger",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "Smoby",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   },
+   {
+    "nom": "VTech",
+    "source": "ajout_catalogue",
+    "famille": "Jouets, jeux de société et licences"
+   }
+  ],
+  "Électroménager et décoration/Petit électroménager": [
+   {
+    "nom": "Moulinex",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Qilive",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Seb",
+    "source": "ajout_catalogue",
+    "famille": "Arts de la table, cuisson et conservation"
+   },
+   {
+    "nom": "Silvercrest",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Électroménager et décoration/Décoration": [
+   {
+    "nom": "Livarno Home",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   },
+   {
+    "nom": "Monoprix Maison",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Électroménager et décoration/Rangement": [
+   {
+    "nom": "Carrefour Home",
+    "source": "ajout_mdd",
+    "famille": "Accessoires ménagers, petit électroménager et piles"
+   }
+  ],
+  "Textile/Vêtements femme": [
+   {
+    "nom": "Crivit",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Esmara",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Inextenso",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Tex",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Tex Basic",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Tex Bio",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Well",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Textile/Vêtements homme": [
+   {
+    "nom": "Athena",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Crivit",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Eminence",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Livergy",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Textile/Vêtements enfant et bébé": [
+   {
+    "nom": "Bout'chou",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Lupilu",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Petit Bateau",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Textile/Lingerie": [
+   {
+    "nom": "Dim",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Le Bourget",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Pierre Cardin",
+    "source": "catalogue_initial",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Playtex",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Textile/Accessoires de mode": [
+   {
+    "nom": "Labonal",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   },
+   {
+    "nom": "Olympia",
+    "source": "ajout_catalogue",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Textile/Linge de maison": [
+   {
+    "nom": "Tissaia",
+    "source": "ajout_mdd",
+    "famille": "Vêtements, sous-vêtements et accessoires"
+   }
+  ],
+  "Animaux/Chats": [
+   {
+    "nom": "Carrefour Companino",
+    "source": "catalogue_initial",
+    "famille": "Alimentation et soins pour animaux"
+   },
+   {
+    "nom": "Felix",
+    "source": "catalogue_initial",
+    "famille": "Alimentation et soins pour animaux"
+   },
+   {
+    "nom": "Les Féliciens",
+    "source": "catalogue_initial",
+    "famille": "Biscuits, gâteaux et pâtisseries"
+   },
+   {
+    "nom": "Ultima",
+    "source": "catalogue_initial",
+    "famille": "Alimentation et soins pour animaux"
+   }
+  ]
+ },
+ "distributeurs": [
+  {
+   "nom": "Auchan",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Auchan Gourmet",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "By U",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour Classic'",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour Essential",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour Extra",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour Sensation",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Carrefour Soft",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "L'Origine du Goût",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Manava",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Marque Repère",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Monoprix",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Monoprix Gourmet",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Repère",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "U",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "U Saveurs",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "U Tout Doux",
+   "source": "ajout_mdd",
+   "gamme": "Gammes cœur de marché et premium"
+  },
+  {
+   "nom": "Auchan Bio",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Bio Village",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Carrefour Bio",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Itinéraire des Saveurs",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Monoprix Bio",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Nos Régions ont du Talent",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Reflets de France",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Saveurs de Nos Régions",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "U Bio",
+   "source": "ajout_mdd",
+   "gamme": "Gammes bio et terroir"
+  },
+  {
+   "nom": "Bien Vu!",
+   "source": "ajout_mdd",
+   "gamme": "Gammes économiques / premiers prix"
+  },
+  {
+   "nom": "Eco+",
+   "source": "ajout_mdd",
+   "gamme": "Gammes économiques / premiers prix"
+  },
+  {
+   "nom": "Pouce",
+   "source": "ajout_mdd",
+   "gamme": "Gammes économiques / premiers prix"
+  },
+  {
+   "nom": "Simpl",
+   "source": "ajout_mdd",
+   "gamme": "Gammes économiques / premiers prix"
+  },
+  {
+   "nom": "Top Budget",
+   "source": "ajout_mdd",
+   "gamme": "Gammes économiques / premiers prix"
+  }
+ ]
+}

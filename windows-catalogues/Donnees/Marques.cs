@@ -3,94 +3,75 @@ using System.Text.Json.Nodes;
 namespace EmplettesCatalogues.Donnees;
 
 /// <summary>
-/// Hiérarchie des marques (22/11/2026, fournie par Aristide) : groupe (« rayon » du fichier) › famille de produits ›
-/// marques. Fichier marques/hierarchie.json du dossier des données ; la première fois, copie de celui livré avec le
-/// logiciel. Les produits d'une marque se lisent dans le catalogue des produits (marques de chaque produit).
+/// Marques par secteur du catalogue des produits (22/11/2026, Aristide : « on ne verra les marques que par rapport au
+/// produit d'un secteur ») : clé « Rayon/Secteur » → marques {nom, source, famille}. Fichier marques/secteurs.json du
+/// dossier des données ; la première fois, copie de celui livré (outils/marques/hierarchie_secteurs.py, rangé depuis
+/// la hiérarchie d'Aristide). Les marques des produits d'un secteur s'y ajoutent d'elles-mêmes à l'affichage.
 /// </summary>
-sealed class FamilleMarques
-{
-    public string Nom = "", Groupe = "";
-    public JsonArray Marques = new();
-    /// <summary>« Marques à classer » : marques des produits absentes de la hiérarchie (rien n'y est enregistré).</summary>
-    public bool AClasser;
-    public IEnumerable<JsonObject> Liste => Marques.OfType<JsonObject>();
-}
-
-sealed record GroupeMarques(string Nom, List<FamilleMarques> Familles);
-
-sealed record MarqueH(JsonObject Json, FamilleMarques Famille)
+sealed record MarqueS(JsonObject Json, string Cle, bool DesProduits)
 {
     public string Nom => (string?)Json["nom"] ?? "";
-    public string Source => (string?)Json["source"] ?? "";
-    public bool Equals(MarqueH? o) => o is not null && ReferenceEquals(Json, o.Json);
-    public override int GetHashCode() => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(Json);
+    public string Source => (string?)Json["source"] ?? (DesProduits ? "produits" : "");
+    public string Famille => (string?)Json["famille"] ?? (string?)Json["gamme"] ?? "";
+    public bool Distributeur => Cle == MarquesParSecteur.Distributeurs;
+    public bool Equals(MarqueS? o) => o is not null && (DesProduits ? o.DesProduits && o.Cle == Cle && o.Nom == Nom : ReferenceEquals(Json, o.Json));
+    public override int GetHashCode() => DesProduits ? HashCode.Combine(Cle, Nom) : System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(Json);
 }
 
-sealed class HierarchieMarques
+sealed class MarquesParSecteur
 {
-    public JsonObject Racine = new();
-    public List<GroupeMarques> Groupes = new();
+    public const string Distributeurs = "*distributeurs";
+    public JsonObject Racine = new() { ["secteurs"] = new JsonObject(), ["distributeurs"] = new JsonArray() };
 
-    public static HierarchieMarques Lire(JsonObject racine)
+    public static string Cle(Secteur s) => $"{s.Rayon.Nom}/{s.Nom}";
+
+    JsonArray Tableau(string cle, bool creer)
     {
-        var h = new HierarchieMarques { Racine = racine };
-        foreach (var (g, gv) in racine["rayons"]?.AsObject() ?? new JsonObject())
-        {
-            var groupe = new GroupeMarques(g, new());
-            foreach (var (f, fv) in gv?["familles"]?.AsObject() ?? new JsonObject())
-            {
-                var liste = fv?["marques"] as JsonArray;
-                if (liste is null && fv is JsonObject fo) fo["marques"] = liste = new JsonArray();
-                groupe.Familles.Add(new FamilleMarques { Nom = f, Groupe = g, Marques = liste ?? new JsonArray() });
-            }
-            h.Groupes.Add(groupe);
-        }
-        return h;
+        if (cle == Distributeurs) return Racine["distributeurs"] as JsonArray ?? (JsonArray)(Racine["distributeurs"] = new JsonArray());
+        var sec = Racine["secteurs"] as JsonObject ?? (JsonObject)(Racine["secteurs"] = new JsonObject());
+        if (sec[cle] is JsonArray a) return a;
+        var n = new JsonArray();
+        if (creer) sec[cle] = n;
+        return n;
     }
 
-    public IEnumerable<FamilleMarques> Familles => Groupes.SelectMany(g => g.Familles);
+    public IEnumerable<string> Cles => (Racine["secteurs"] as JsonObject ?? new JsonObject()).Select(e => e.Key);
 
-    public bool Contient(string marque) =>
-        Familles.Any(f => f.Liste.Any(m => string.Equals((string?)m["nom"], marque, StringComparison.CurrentCultureIgnoreCase)));
-
-    /// <summary>Range <paramref name="m"/> dans <paramref name="vers"/> (avant <paramref name="avant"/>) ; copie : la
-    /// marque reste aussi dans sa famille. Renvoie la ligne du geste.</summary>
-    public string Deplacer(MarqueH m, FamilleMarques vers, MarqueH? avant, bool copie)
+    /// <summary>Marques du secteur : celles du fichier, puis celles de ses produits qui n'y sont pas.</summary>
+    public List<MarqueS> DuSecteur(Secteur s)
     {
-        if (vers.AClasser) throw new InvalidOperationException("« Marques à classer » ne reçoit pas de marque.");
-        var deja = vers.Liste.FirstOrDefault(x => string.Equals((string?)x["nom"], m.Nom, StringComparison.CurrentCultureIgnoreCase));
+        var cle = Cle(s);
+        var l = Tableau(cle, false).OfType<JsonObject>().Select(j => new MarqueS(j, cle, false)).ToList();
+        foreach (var m in s.Produits.SelectMany(p => p.Marques).Distinct(StringComparer.CurrentCultureIgnoreCase))
+            if (!l.Any(x => string.Equals(x.Nom, m, StringComparison.CurrentCultureIgnoreCase)))
+                l.Add(new MarqueS(new JsonObject { ["nom"] = m }, cle, true));
+        return l.OrderBy(x => x.Nom, StringComparer.CurrentCultureIgnoreCase).ToList();
+    }
+
+    public List<MarqueS> DuCle(string cle) => Tableau(cle, false).OfType<JsonObject>().Select(j => new MarqueS(j, cle, false))
+        .OrderBy(x => x.Nom, StringComparer.CurrentCultureIgnoreCase).ToList();
+
+    /// <summary>Range la marque dans le secteur <paramref name="vers"/> ; copie (ou marque venue des produits) : elle
+    /// reste aussi où elle était. Renvoie la ligne du geste.</summary>
+    public string Deplacer(MarqueS m, string vers, MarqueS? avant, bool copie)
+    {
+        if (vers == m.Cle && !m.DesProduits && avant is null) throw new InvalidOperationException("La marque est déjà dans ce secteur.");
+        var cible = Tableau(vers, true);
+        var deja = cible.OfType<JsonObject>().FirstOrDefault(x => string.Equals((string?)x["nom"], m.Nom, StringComparison.CurrentCultureIgnoreCase));
         if (deja is not null && !ReferenceEquals(deja, m.Json))
-            throw new InvalidOperationException($"La famille « {vers.Nom} » a déjà la marque « {m.Nom} ».");
+            throw new InvalidOperationException($"Le secteur « {vers} » a déjà la marque « {m.Nom} ».");
         JsonObject j;
-        if (copie || m.Famille.AClasser)
-            j = m.Famille.AClasser ? new JsonObject { ["nom"] = m.Nom, ["produits"] = 0, ["source"] = "catalogue_produits" } : (JsonObject)m.Json.DeepClone();
+        if (m.DesProduits) j = new JsonObject { ["nom"] = m.Nom, ["source"] = "produits" };
+        else if (copie) j = (JsonObject)m.Json.DeepClone();
         else
         {
-            m.Famille.Marques.Remove(m.Json);
+            Tableau(m.Cle, false).Remove(m.Json);
+            if (m.Cle != Distributeurs && Tableau(m.Cle, false).Count == 0) (Racine["secteurs"] as JsonObject)?.Remove(m.Cle);
             j = m.Json;
         }
-        var i = avant is null ? -1 : vers.Marques.IndexOf(avant.Json);
-        if (i < 0) vers.Marques.Add(j); else vers.Marques.Insert(i, j);
-        Recompter();
-        return $"Marque « {m.Nom} » {(copie ? "copiée" : "rangée")} dans {vers.Groupe} › {vers.Nom}";
-    }
-
-    /// <summary>Met à jour les nombres du fichier (marques par famille, par groupe, totaux).</summary>
-    public void Recompter()
-    {
-        foreach (var g in Groupes)
-        {
-            foreach (var f in g.Familles)
-                if (Racine["rayons"]?[g.Nom]?["familles"]?[f.Nom] is JsonObject fo) fo["nombre_marques"] = f.Marques.Count;
-            if (Racine["rayons"]?[g.Nom] is JsonObject go)
-                go["nombre_marques"] = g.Familles.SelectMany(f => f.Liste).Select(m => ((string?)m["nom"] ?? "").ToLowerInvariant()).Distinct().Count();
-        }
-        if (Racine["meta"] is JsonObject meta)
-        {
-            meta["total_rayons"] = Groupes.Count;
-            meta["total_familles"] = Familles.Count();
-            meta["total_marques_uniques"] = Familles.SelectMany(f => f.Liste).Select(m => ((string?)m["nom"] ?? "").ToLowerInvariant()).Distinct().Count();
-            meta["date_mise_a_jour"] = DateTime.Now.ToString("yyyy-MM-dd");
-        }
+        var i = avant is null || avant.DesProduits ? -1 : cible.IndexOf(avant.Json);
+        if (i < 0) cible.Add(j); else cible.Insert(i, j);
+        if (Racine["meta"] is JsonObject meta) meta["date_mise_a_jour"] = DateTime.Now.ToString("yyyy-MM-dd");
+        return $"Marque « {m.Nom} » {(copie || m.DesProduits ? "ajoutée à" : "rangée dans")} {vers.Replace("/", " › ")}";
     }
 }

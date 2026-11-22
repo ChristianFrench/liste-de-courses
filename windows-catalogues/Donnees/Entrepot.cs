@@ -17,8 +17,8 @@ sealed class Entrepot
     public List<Recette> Recettes = new();
     public string? Erreur;
     JsonObject? _racineRecettes;
-    public HierarchieMarques Marques = new();
-    public string? FichierMarques => Dossier is null ? null : Path.Combine(Dossier, "marques", "hierarchie.json");
+    public MarquesParSecteur Marques = new();
+    public string? FichierMarques => Dossier is null ? null : Path.Combine(Dossier, "marques", "secteurs.json");
 
     public string? FichierRecettes => Dossier is null ? null : Path.Combine(Dossier, "recettes", "recettes.json");
 
@@ -172,21 +172,21 @@ sealed class Entrepot
         RecettesPubliees = (int?)_racineRecettes?["publiee"]?["numero"];
     }
 
-    /// <summary>Hiérarchie des marques ; la première fois, celle livrée avec le logiciel est copiée dans les données.</summary>
+    /// <summary>Marques par secteur ; la première fois, celles livrées avec le logiciel est copiée dans les données.</summary>
     void ChargerMarques()
     {
         var f = FichierMarques!;
         if (!File.Exists(f))
         {
-            var livree = Path.Combine(AppContext.BaseDirectory, "marques-hierarchie.json");
+            var livree = Path.Combine(AppContext.BaseDirectory, "marques-secteurs.json");
             if (!File.Exists(livree)) return;
             Directory.CreateDirectory(Path.GetDirectoryName(f)!);
             File.Copy(livree, f);
         }
-        if (JsonNode.Parse(File.ReadAllText(f)) is JsonObject o) Marques = HierarchieMarques.Lire(o);
+        if (JsonNode.Parse(File.ReadAllText(f)) is JsonObject o) Marques = new MarquesParSecteur { Racine = o };
     }
 
-    /// <summary>Enregistre la hiérarchie des marques (copie hierarchie.json.bak avant).</summary>
+    /// <summary>Enregistre les marques par secteur (copie secteurs.json.bak avant).</summary>
     public void EnregistrerMarques()
     {
         var f = FichierMarques ?? throw new InvalidOperationException("Pas de dossier de données.");
