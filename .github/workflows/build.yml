@@ -230,6 +230,35 @@ jobs:
         with:
           name: Emplettes editeur Installation
           path: build/installation-editeur/Emplettes-Editeur-Installation.exe
+      # 22/11/2026 (Aristide) : « Emplettes · catalogues », gestion des catalogues séparée de la console technique.
+      # Même fenêtre large que la console (fenetre_editeur.py déjà passé), son propre titre et sa propre icône.
+      - name: Compiler Emplettes · catalogues (Windows seulement)
+        shell: bash
+        run: |
+          set +e
+          sed -i 's/window.Create(L"Emplettes administration"/window.Create(L"Emplettes catalogues"/' windows/runner/main.cpp
+          grep -q 'L"Emplettes catalogues"' windows/runner/main.cpp || { echo "::error title=Catalogues::titre de fenêtre introuvable"; exit 1; }
+          cp outils/installation/catalogues.ico windows/runner/resources/app_icon.ico
+          flutter build windows --release --dart-define-from-file=definitions-editeur.json --dart-define=OUTIL_EDITEUR=true --dart-define=OUTIL_CATALOGUES=true > compilation-catalogues.log 2>&1
+          code=$?
+          if [ $code -ne 0 ]; then python outils/annoter.py compilation-catalogues.log "Compilation Emplettes catalogues"; else tail -n 5 compilation-catalogues.log; fi
+          exit $code
+      - name: Programme d'installation d'Emplettes · catalogues
+        shell: pwsh
+        run: |
+          $dest = "build/windows/x64/runner/Release"
+          foreach ($f in "msvcp140.dll","vcruntime140.dll","vcruntime140_1.dll") { Copy-Item "C:\Windows\System32\$f" $dest }
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          $version = ((Select-String -Path pubspec.yaml -Pattern '^version:\s*([^+\s]+)').Matches[0].Groups[1].Value)
+          $commit = "${{ github.sha }}".Substring(0, 7)
+          & $iscc /Q "/DVersion=$version" "/DCommit=$commit" "/DSource=$PWD\build\windows\x64\runner\Release" "/DSortie=$PWD\build\installation-catalogues" outils\installation\catalogues.iss
+          if ($LASTEXITCODE -ne 0) { Write-Output "::error title=Installation catalogues::échec d'Inno Setup"; exit 1 }
+          Get-ChildItem build\installation-catalogues
+      # Comme la console : il contient le code de l'éditeur, donc pas sur la page publique.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Emplettes catalogues Installation
+          path: build/installation-catalogues/Emplettes-Catalogues-Installation.exe
 
   web:
     # Version web (navigateur), publiée sur GitHub Pages avec la page de présentation (docs/)
@@ -419,6 +448,8 @@ jobs:
           if [ -f "$CONSOLE" ]; then
             if [ "$(curl -s -o /dev/null -w '%{http_code}' "https://$VPS_HOTE/telechargements/console/")" = "401" ]; then
               mkdir -p depot/telechargements/console && cp "$CONSOLE" depot/telechargements/console/
+              CATALOGUES="livrables/Emplettes catalogues Installation/Emplettes-Catalogues-Installation.exe"
+              if [ -f "$CATALOGUES" ]; then cp "$CATALOGUES" depot/telechargements/console/; fi
             else
               echo "::warning title=Console::dossier console/ non protégé (outils/vps/proteger_telechargements.sh) : console non déposée"
             fi

@@ -4,7 +4,9 @@ import '../composants/composants.dart';
 import '../donnees/catalogue_commun.dart';
 import '../theme.dart';
 import '../composants/icone.dart';
+import '../donnees/demonstration.dart' show outilCatalogues;
 import 'administration.dart';
+import 'catalogues/fenetre_catalogues.dart';
 
 // Console d'administration d'Emplettes (application Windows seule, 06/11/2026, Aristide) : à chaque lancement,
 // le code d'éditeur (secret GitHub CODE_EDITEUR) ouvre la console (administration.dart).
@@ -20,12 +22,26 @@ class _EcranOutilEditeurState extends State<EcranOutilEditeur> {
   final _code = TextEditingController();
   String? _erreur;
 
+  /// « Emplettes · catalogues » : l'écran d'accueil (nom, version) pendant 1,5 s au lancement.
+  bool _accueil = outilCatalogues;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_accueil) {
+      Future<void>.delayed(const Duration(milliseconds: 1500), () {
+        if (mounted) setState(() => _accueil = false);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: CatalogueCommun.instance,
       builder: (context, _) {
-        if (CatalogueCommun.instance.editeur) return const ConsoleAdministration();
+        if (_accueil) return const AccueilCatalogues();
+        if (CatalogueCommun.instance.editeur) return outilCatalogues ? const FenetreCatalogues() : const ConsoleAdministration();
         return Material(
           color: Charte.niveau(4),
           child: Center(
@@ -43,7 +59,7 @@ class _EcranOutilEditeurState extends State<EcranOutilEditeur> {
                   const SizedBox(width: 14),
                   Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('Emplettes', style: Charte.texte(24, gras: true, couleur: Charte.encreNiveau)),
-                    Text('Administration', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
+                    Text(outilCatalogues ? 'Gestion des catalogues' : 'Administration', style: Charte.texte(16, couleur: Charte.texteSecondaire)),
                   ]),
                 ]),
                 const SizedBox(height: 22),

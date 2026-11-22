@@ -105,7 +105,7 @@ class OutilEditeurApp extends StatelessWidget {
   const OutilEditeurApp({super.key});
 
   @override
-  Widget build(BuildContext context) => const ListeDeCoursesApp(accueil: EcranOutilEditeur(), titre: 'Emplettes · administration');
+  Widget build(BuildContext context) => ListeDeCoursesApp(accueil: const EcranOutilEditeur(), titre: outilCatalogues ? 'Emplettes · catalogues' : 'Emplettes · administration');
 }
 
 class ListeDeCoursesApp extends StatelessWidget {

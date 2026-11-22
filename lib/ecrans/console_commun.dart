@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart' show Bouton;
 import '../composants/icone.dart';
+import '../donnees/demonstration.dart' show outilCatalogues;
 import '../donnees/version.dart';
 import '../theme.dart';
 
@@ -141,6 +142,13 @@ class EnTeteConsole extends StatelessWidget {
 
 /// Barre au-dessus du cadre : recherche au sens strict, tout déplier / tout replier (deux icônes, pour toute la
 /// hiérarchie), boutons ; puis l'aide.
+/// Commandes de la fenêtre « Emplettes · catalogues » (22/11/2026) : ses menus et sa barre d'outils agissent sur le
+/// catalogue affiché, dont la [BarreConsole] inscrit ici les gestes à chaque affichage.
+class CommandesConsole {
+  static VoidCallback? deplier, replier;
+  static final recherche = FocusNode(debugLabel: 'recherche');
+}
+
 class BarreConsole extends StatelessWidget {
   const BarreConsole({
     super.key,
@@ -163,7 +171,10 @@ class BarreConsole extends StatelessWidget {
   final List<Widget> boutons;
 
   @override
-  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
+  Widget build(BuildContext context) {
+    CommandesConsole.deplier = onDeplier;
+    CommandesConsole.replier = onReplier;
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, mainAxisSize: MainAxisSize.min, children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 12, 12, 10),
           child: Row(children: [
@@ -172,6 +183,7 @@ class BarreConsole extends StatelessWidget {
                 constraints: const BoxConstraints(maxWidth: 380),
                 child: TextField(
                   key: const ValueKey('console-recherche'),
+                  focusNode: CommandesConsole.recherche,
                   style: Charte.texte(15),
                   decoration: InputDecoration(labelText: 'Rechercher', hintText: aideRecherche),
                   onChanged: onChercher,
@@ -200,6 +212,8 @@ class BarreConsole extends StatelessWidget {
                 ),
               ),
             ],
+            // Dans « Emplettes · catalogues », tout déplier / replier est dans le menu Affichage et la barre d'outils.
+            if (!outilCatalogues) ...[
             const SizedBox(width: 10),
             // 22/11/2026 (Aristide) : toute la hiérarchie, en icônes : flèche vers le bas = tout déplier,
             // flèche vers le haut = tout replier.
@@ -219,6 +233,7 @@ class BarreConsole extends StatelessWidget {
                 icon: Icone(Icons.keyboard_double_arrow_up, size: 28, color: Charte.cadre),
               ),
             ),
+            ],
             const Spacer(),
             for (final b in boutons) ...[const SizedBox(width: 8), b],
           ]),
@@ -228,6 +243,7 @@ class BarreConsole extends StatelessWidget {
           child: Text(aide, style: Charte.texte(12.5, couleur: Charte.texteSecondaire)),
         ),
       ]);
+  }
 }
 
 /// Le cadre de la liste, sur toute la largeur.

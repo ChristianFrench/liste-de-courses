@@ -9,6 +9,10 @@ const demonstration = bool.fromEnvironment('DEMONSTRATION');
 /// application Windows seule (installateur Emplettes-Editeur-Installation.exe), données dans le sous-dossier « editeur ».
 const outilEditeur = bool.fromEnvironment('OUTIL_EDITEUR');
 
+/// « Emplettes · catalogues » (22/11/2026, Aristide) : logiciel Windows de gestion des catalogues, séparé de la
+/// console technique. Compilé avec OUTIL_EDITEUR=true (mêmes données) et OUTIL_CATALOGUES=true (sa fenêtre).
+const outilCatalogues = bool.fromEnvironment('OUTIL_CATALOGUES');
+
 /// Foyer de démonstration (30/10/2026) : quatre membres, trois magasins avec leur parcours appris,
 /// deux mois de courses avec tickets, des listes à tous les stades, des listes types,
 /// des promotions, des marques et des consignes. Créé au premier lancement (et par « Foyer neuf »).
