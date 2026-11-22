@@ -558,8 +558,8 @@ sealed class FormPrincipale : Form
             case MarqueH m:
                 icone = Icones.Glyphe(Icones.Marques, Icones.Orange, 64);
                 sous = m.Famille.AClasser ? "Marque à classer" : $"Marque · {m.Famille.Groupe} › {m.Famille.Nom}";
-                var autres = _entrepot.Marques.Familles.Where(f => f != m.Famille && f.Liste.Any(x => string.Equals((string?)x["nom"], m.Nom, StringComparison.CurrentCultureIgnoreCase))).ToList();
-                if (autres.Count > 0) Ligne("Aussi dans", string.Join(" ; ", autres.Select(f => $"{f.Groupe} › {f.Nom}")));
+                var autres = _entrepot.Marques.Familles.Where(x0 => x0 != m.Famille && x0.Liste.Any(x => string.Equals((string?)x["nom"], m.Nom, StringComparison.CurrentCultureIgnoreCase))).ToList();
+                if (autres.Count > 0) Ligne("Aussi dans", string.Join(" ; ", autres.Select(x1 => $"{x1.Groupe} › {x1.Nom}")));
                 Ligne("Origine", m.Source switch
                 {
                     "catalogue_initial" => "Catalogue initial", "ajout_catalogue" => "Ajout au catalogue", "ajout_mdd" => "Marque de distributeur",
@@ -569,18 +569,18 @@ sealed class FormPrincipale : Form
                 Ligne("Produits", pm.Count.ToString());
                 foreach (var p in pm) Ligne("", $"{p.Nom}  —  {p.Secteur.Rayon.Nom} › {p.Secteur.Nom}");
                 break;
-            case FamilleMarques f:
+            case FamilleMarques fam:
                 icone = Icones.Glyphe('\uE8B7', Icones.Orange, 64);
-                sous = f.AClasser ? "Marques des produits absentes de la hiérarchie" : $"Famille de produits · {f.Groupe}";
-                Ligne("Marques", f.Marques.Count.ToString());
-                Ligne("Marques avec produits", f.Liste.Count(x => ProduitsDe((string?)x["nom"] ?? "").Count > 0).ToString());
+                sous = fam.AClasser ? "Marques des produits absentes de la hiérarchie" : $"Famille de produits · {fam.Groupe}";
+                Ligne("Marques", fam.Marques.Count.ToString());
+                Ligne("Marques avec produits", fam.Liste.Count(x => ProduitsDe((string?)x["nom"] ?? "").Count > 0).ToString());
                 break;
             case GroupeM g:
                 icone = Icones.Glyphe(Icones.Produits, Icones.Vert, 64);
                 sous = "Groupe de marques";
                 var gr = _entrepot.Marques.Groupes.First(x => x.Nom == g.Nom);
                 Ligne("Familles", gr.Familles.Count.ToString());
-                foreach (var f in gr.Familles) Ligne(f.Nom, $"{f.Marques.Count} marques");
+                foreach (var fg in gr.Familles) Ligne(fg.Nom, $"{fg.Marques.Count} marques");
                 break;
             case TypeRecette t:
                 icone = IconesCatalogue.TypeRecette(t.Type);
