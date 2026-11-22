@@ -62,6 +62,16 @@ Source: "catalogues.ico"; DestDir: "{app}"; Flags: ignoreversion
 [InstallDelete]
 ; Les fichiers de la version précédente sont remplacés en entier (pas de restes d'une ancienne compilation)
 Type: filesandordirs; Name: "{app}\data"
+; 22/11/2026 : la première version (Flutter) laissait son programme et ses bibliothèques ; tout ce qui n'est pas du
+; nouveau logiciel est retiré avant la copie (les données, dans %APPDATA%, ne sont jamais touchées).
+Type: files; Name: "{app}\liste_de_courses.exe"
+Type: files; Name: "{app}\flutter_windows.dll"
+Type: files; Name: "{app}\*_plugin.dll"
+Type: files; Name: "{app}\sqlite3.dll"
+Type: files; Name: "{app}\msvcp140.dll"
+Type: files; Name: "{app}\vcruntime140.dll"
+Type: files; Name: "{app}\vcruntime140_1.dll"
+Type: filesandordirs; Name: "{app}\recettes-illustrations"
 
 [Icons]
 Name: "{autoprograms}\Emplettes catalogues"; Filename: "{app}\EmplettesCatalogues.exe"; IconFilename: "{app}\catalogues.ico"
