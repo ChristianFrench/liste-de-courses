@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../composants/composants.dart' show Bouton;
 import '../composants/icone.dart';
+import '../donnees/version.dart';
 import '../theme.dart';
 
 // Présentation commune aux trois catalogues de la console (21/11/2026, Aristide : « harmoniser la présentation
@@ -106,7 +107,12 @@ class EnTeteConsole extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(titre, style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau)),
+              Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
+                Flexible(child: Text(titre, style: Charte.texte(22, gras: true, couleur: Charte.encreNiveau))),
+                const SizedBox(width: 12),
+                // 22/11/2026 (Aristide) : la version de la console, pour vérifier qu'on a bien la dernière.
+                Text('Version : $versionApplication', key: const ValueKey('console-version'), style: Charte.texte(12, couleur: Charte.texteSecondaire)),
+              ]),
               Text(chiffres.join(' · '), style: Charte.texte(14, couleur: Charte.texteSecondaire)),
             ]),
           ),

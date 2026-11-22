@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import '../composants/composants.dart' show Bouton, confirmer, demanderTexte;
 import '../donnees/moderation.dart' show Moderation;
 import 'console_commun.dart';
-import '../composants/icone.dart';
 import '../donnees/journal_catalogue.dart';
 import '../donnees/recettes.dart';
 import '../donnees/recettes_communes.dart';
