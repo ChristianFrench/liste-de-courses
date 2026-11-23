@@ -238,8 +238,7 @@ class FiltresRecettes extends StatelessWidget {
     'Coût': 'filtre-cout',
     'Cuisson': 'filtre-mode-cuisson',
     'Occasion': 'filtre-occasion',
-    // 22/11/2026 : pas encore d'icône d'Aristide pour l'origine : le globe.
-    'Origine': 'globe',
+    'Origine': 'filtre-origine',
   };
 
   /// 20/11/2026 (Aristide) : les valeurs d'un critère en boutons à icône, à toucher pour (dé)sélectionner.
@@ -509,7 +508,7 @@ String? iconeCritere(String valeur) => switch (valeur) {
       'Moins de 30 min' || 'Moins d\'une heure' || 'Plus d\'une heure' => 'temps-preparation',
       _ when typesRecettes.containsKey(valeur) => imageDuType([valeur]),
       _ when valeur.contains(' · ') && typesRecettes.containsKey(valeur.split(' · ').first) => imageDuType([valeur.split(' · ').first], sousType: valeur.split(' · ').last),
-      _ when originesRecettes.contains(valeur) => 'globe',
+      _ when originesRecettes.contains(valeur) => 'origine-${slugRecette(valeur)}',
       _ => null,
     };
 

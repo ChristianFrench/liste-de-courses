@@ -162,7 +162,7 @@ class LigneArticle extends StatelessWidget {
                   child: SizedBox(
                     width: 34,
                     height: hauteur,
-                    child: Center(child: Icone(Icons.sticky_note_2_outlined, size: 22, color: grise ? Charte.texteSecondaire : Charte.cadre)),
+                    child: Center(child: Opacity(opacity: grise ? 0.5 : 1, child: imageCritere('consigne', 24))),
                   ),
                 ),
               ),

@@ -7,7 +7,7 @@ import '../navigation.dart';
 import '../theme.dart';
 import '../donnees/recette_ingredients.dart' show recettesFournies;
 import 'listes.dart';
-import 'recettes.dart' show FicheRecette;
+import 'recettes.dart' show FicheRecette, imageCritere;
 import 'travail.dart' show LigneRecetteChoisie, effacerRecetteChoisie;
 
 // Onglet Accueil : un bandeau ludique, « Comment ça marche », puis ce qui est en cours
@@ -128,7 +128,7 @@ class EcranAccueil extends StatelessWidget {
                 cle: 'accueil/recettes',
                 pliable: true,
                 titre: 'Recettes choisies',
-                icone: Icons.menu_book_outlined,
+                signe: imageCritere('recettes-choisies', 46),
                 nombre: _recettesChoisies.length,
                 enfants: [
                   for (final n in _recettesChoisies)

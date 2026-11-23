@@ -492,8 +492,12 @@ class TitreGroupe extends StatelessWidget {
       this.tailleSigne = 46,
       this.signeAuDessus = false,
       this.apres,
+      this.signeImage,
       this.onTap});
   final String nom;
+
+  /// Image toute faite devant le nom, même sur un bandeau mince (« Recettes choisies », 23/11/2026).
+  final Widget? signeImage;
 
   /// Bouton placé avant le chevron (catalogue : le crayon qui ouvre les actions du niveau).
   final Widget? apres;
@@ -559,7 +563,9 @@ class TitreGroupe extends StatelessWidget {
         width: 34,
         height: 30,
         child: signeAuDessus ? null : OverflowBox(minWidth: 0, minHeight: 0, maxWidth: tailleSigne, maxHeight: tailleSigne, alignment: const Alignment(0, -0.8), child: w));
-    final signe = !grand
+    final signe = signeImage != null
+        ? deborde(signeImage!)
+        : !grand
         ? null
         : image != null
             ? deborde(Pictogramme(image!, taille: tailleSigne)) // sans rond (01/11/2026, Aristide)

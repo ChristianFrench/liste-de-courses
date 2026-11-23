@@ -186,7 +186,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(42, 4, 8, 4),
         child: Row(children: [
-          Icone(choisir ? Icons.call_split : Icons.help_outline, size: 22, color: Charte.orange),
+          imageCritere(choisir ? 'ingredient-a-choisir' : 'ingredient-a-placer', 26),
           const SizedBox(width: 10),
           Expanded(
             child: Text.rich(TextSpan(children: [
@@ -929,6 +929,7 @@ class BandeauRecettes extends StatelessWidget {
               key: const ValueKey('recettes-choisies'),
               nom: 'Recettes choisies',
               icone: Icons.menu_book_outlined,
+              signeImage: imageCritere('recettes-choisies', 40),
               nombre: nombre ?? lignes.length,
               ouvert: ouvert,
               onTap: () => Retractables.i.basculer(cle),
@@ -952,10 +953,11 @@ class LigneRecetteChoisie extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final n = note;
-    final (icone, couleur, etatTexte) = switch (n.etat) {
-      NoteRecette.traitee => (Icons.check_circle, Charte.vert, courses ? (n.personnes == null ? '' : 'pour ${n.personnes} pers.') : 'ajoutée à la liste'),
-      NoteRecette.ignoree => (Icons.cancel_outlined, Charte.texteSecondaire, 'ignorée'),
-      _ => (Icons.pending_outlined, Charte.orange, '${n.ingredients.length} ingrédient${n.ingredients.length > 1 ? 's' : ''} à ajouter'),
+    // 23/11/2026 : icônes d'Aristide des trois états.
+    final (icone, etatTexte) = switch (n.etat) {
+      NoteRecette.traitee => ('recette-traitee', courses ? (n.personnes == null ? '' : 'pour ${n.personnes} pers.') : 'ajoutée à la liste'),
+      NoteRecette.ignoree => ('recette-ignoree', 'ignorée'),
+      _ => ('recette-a-traiter', '${n.ingredients.length} ingrédient${n.ingredients.length > 1 ? 's' : ''} à ajouter'),
     };
     final ignoree = n.etat == NoteRecette.ignoree;
     return InkWell(
@@ -965,7 +967,7 @@ class LigneRecetteChoisie extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         child: Row(children: [
-          Icone(icone, size: 24, color: couleur),
+          imageCritere(icone, 28),
           const SizedBox(width: 10),
           Expanded(
             child: Text.rich(TextSpan(children: [
