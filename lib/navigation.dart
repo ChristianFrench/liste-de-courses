@@ -21,13 +21,15 @@ class Nav extends ChangeNotifier {
   // ingrédients) et « Cuisiner » à la fin ; Gérer quitte la barre (roue dentée de l'accueil).
   // 22/11/2026 (Aristide) : généralisé à toutes les versions.
   static const bool avecCuisiner = true;
-  static const int cuisiner = avecCuisiner ? 3 : -1;
-  static const int recettes = avecCuisiner ? 4 : -2;
-  static const int gerer = avecCuisiner ? 5 : 3;
-  static const int nbOnglets = avecCuisiner ? 6 : 4;
+  // 23/11/2026 (Aristide) : l'onglet « Cuisiner » est supprimé (rien de plus que « Recettes ») ; les recettes à
+  // cuisiner sont dans l'accueil, « Recettes choisies ».
+  static const int cuisiner = -1;
+  static const int recettes = avecCuisiner ? 3 : -2;
+  static const int gerer = avecCuisiner ? 4 : 3;
+  static const int nbOnglets = avecCuisiner ? 5 : 4;
 
   /// Les onglets de la barre du bas, dans l'ordre affiché.
-  static const ordre = avecCuisiner ? [accueil, recettes, preparer, courses, cuisiner] : [accueil, preparer, courses, gerer];
+  static const ordre = avecCuisiner ? [accueil, recettes, preparer, courses] : [accueil, preparer, courses, gerer];
 
   // Rubriques de Gérer
   static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;

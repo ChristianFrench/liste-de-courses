@@ -35,7 +35,6 @@ class BarreOnglets extends StatelessWidget {
     Nav.accueil: (Icons.home_outlined, 'Accueil'),
     Nav.preparer: (Icons.checklist, 'Préparer'),
     Nav.courses: (Icons.shopping_cart_outlined, 'Courses'),
-    if (Nav.avecCuisiner) Nav.cuisiner: (Icons.restaurant_menu_outlined, 'Cuisiner'),
     if (Nav.avecCuisiner) Nav.recettes: (Icons.menu_book_outlined, 'Recettes'),
     Nav.gerer: (Icons.tune, 'Gérer'),
   };
@@ -322,7 +321,6 @@ class RacineOnglet extends StatelessWidget {
             corps: SousEcranPreparer(),
           ),
         Nav.courses => PageBase(entete: const EnTeteFenetre(icone: Icons.shopping_cart_outlined, titre: 'Courses', aide: Aides.courses), corps: SousEcranCourses()),
-        Nav.cuisiner => const EcranRecettes(onglet: true),
         Nav.recettes => const EcranRecettes(onglet: true, choix: true),
         _ => const MenuGerer(),
       },

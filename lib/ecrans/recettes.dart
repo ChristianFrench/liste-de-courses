@@ -47,7 +47,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
     final cles = {
       for (final r in _toutes ?? const <RecetteLue>[])
         if (_filtre.garde(r))
-          for (final t in _typesDe(r)) ...['recettes/$t', _cleSousType(t, r.sousTypes[t])],
+          for (final t in _typesVus(r)) ...['recettes/$t', _cleSousType(t, r.sousTypes[t])],
     };
     Retractables.i.fixer(cles, _filtre.texte.trim().isNotEmpty || _filtre.actif);
     setState(() {});
@@ -58,6 +58,12 @@ class _EcranRecettesState extends State<EcranRecettes> {
 
   /// 22/11/2026 : une recette de plusieurs types se range sous chacun.
   static List<String> _typesDe(RecetteLue r) => r.types.isEmpty ? const ['Autres recettes'] : r.types;
+
+  /// Les types sous lesquels montrer [r] : avec le filtre Type, seulement ceux choisis (23/11/2026, Aristide).
+  List<String> _typesVus(RecetteLue r) {
+    final choisis = _filtre.choix['Type']!;
+    return choisis.isEmpty ? _typesDe(r) : [for (final t in _typesDe(r)) if (choisis.contains(t)) t];
+  }
 
   @override
   void initState() {
@@ -75,7 +81,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
     final vues = [for (final r in toutes ?? const <RecetteLue>[]) if (_filtre.garde(r)) r];
     final parType = <String, List<RecetteLue>>{};
     for (final r in vues) {
-      for (final t in _typesDe(r)) {
+      for (final t in _typesVus(r)) {
         parType.putIfAbsent(t, () => []).add(r);
       }
     }
@@ -146,6 +152,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                   nombre: parType[t]!.length,
                   pliable: true,
                   parDefaut: false,
+                  marge: 0, // 23/11/2026 : bandes des sous-types sur toute la largeur
                   enfants: [
                     for (final (i, r) in parType[t]!.indexed) ...[
                       if (parType[t]!.any((x) => x.sousTypes[t] != null) &&
@@ -159,7 +166,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                           onTap: () => plis.basculer(_cleSousType(t, r.sousTypes[t]), parDefaut: false),
                         ),
                       if (!parType[t]!.any((x) => x.sousTypes[t] != null) || plis.ouvert(_cleSousType(t, r.sousTypes[t]), parDefaut: false))
-                      LigneMenu(
+                      Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: LigneMenu(
                         key: ValueKey('fiche-${r.titre}'),
                         titre: r.titre,
                         sousTitre: [
@@ -170,7 +177,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                           await Nav.aller<void>(context, FicheRecette(recette: r, choix: widget.choix));
                           if (mounted) setState(() {});
                         },
-                      ),
+                      )),
                     ],
                   ],
                 ),
@@ -650,16 +657,19 @@ class _VoletCaracteristiquesState extends State<VoletCaracteristiques> {
 /// Au moment du choix ([choix], onglet Recettes, 21/11/2026) les ingrédients se cochent et « Noter les
 /// ingrédients » les range dans la note préparée du foyer ; pour cuisiner, la fiche se consulte seulement.
 class FicheRecette extends StatefulWidget {
-  const FicheRecette({super.key, required this.recette, this.choix = false});
+  const FicheRecette({super.key, required this.recette, this.choix = false, this.surRecette = false});
   final RecetteLue recette;
   final bool choix;
+
+  /// Ouverte sur l'onglet « Recette » (recettes choisies de l'accueil, 23/11/2026).
+  final bool surRecette;
 
   @override
   State<FicheRecette> createState() => _FicheRecetteState();
 }
 
 class _FicheRecetteState extends State<FicheRecette> {
-  var _recette = false;
+  late var _recette = widget.surRecette;
   late int? _personnes;
   late final Set<String> _coches;
 

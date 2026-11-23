@@ -5,7 +5,10 @@ import '../composants/composants.dart';
 import '../donnees/modele.dart';
 import '../navigation.dart';
 import '../theme.dart';
+import '../donnees/recette_ingredients.dart' show recettesFournies;
 import 'listes.dart';
+import 'recettes.dart' show FicheRecette;
+import 'travail.dart' show LigneRecetteChoisie;
 
 // Onglet Accueil : un bandeau ludique, « Comment ça marche », puis ce qui est en cours
 // (préparations et courses) avec son action directe.
@@ -19,7 +22,24 @@ class EcranAccueil extends StatelessWidget {
         'accueil/instance',
         if (Etat.instance.coursesEnCours != null) 'accueil/courses',
         if (Etat.instance.coursesEnInstance.isNotEmpty) 'accueil/terminees',
+        if (_recettesChoisies.isNotEmpty) 'accueil/recettes',
       ];
+
+  /// 23/11/2026 (Aristide) : les recettes dont les ingrédients sont allés dans une liste, quel que soit le
+  /// magasin, les plus récentes d'abord : les recettes à cuisiner.
+  static List<NoteRecette> get _recettesChoisies =>
+      [for (final n in Etat.instance.noteRecettes) if (n.etat == NoteRecette.traitee) n]..sort((a, b) => b.le.compareTo(a.le));
+
+  static Future<void> _voir(BuildContext context, NoteRecette n) async {
+    final toutes = await recettesFournies();
+    final r = toutes.where((x) => n.recette != null ? x.id == n.recette : x.titre == n.titre).firstOrNull;
+    if (!context.mounted) return;
+    if (r == null) {
+      Nav.message(context, 'Cette recette n\'est plus dans le catalogue des recettes');
+      return;
+    }
+    await Nav.aller<void>(context, FicheRecette(recette: r, surRecette: true));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,11 +122,26 @@ class EcranAccueil extends StatelessWidget {
                   ),
                 ],
               ),
-            // 09/11/2026 (Aristide) : les courses terminées, comme dans l'onglet Courses.
+            // 23/11/2026 (Aristide) : les recettes choisies (à cuisiner) ; toucher l'une ouvre sa fiche sur « Recette ».
+            if (_recettesChoisies.isNotEmpty)
+              GroupeRetractable(
+                cle: 'accueil/recettes',
+                pliable: true,
+                titre: 'Recettes choisies',
+                icone: Icons.menu_book_outlined,
+                nombre: _recettesChoisies.length,
+                enfants: [
+                  for (final n in _recettesChoisies)
+                    LigneRecetteChoisie(note: n, courses: true, onTap: () => _voir(context, n)),
+                ],
+              ),
+            // 09/11/2026 (Aristide) : les courses terminées, comme dans l'onglet Courses ; repliées par défaut
+            // (23/11/2026, Aristide : elles sont nombreuses).
             if (terminees.isNotEmpty)
               GroupeRetractable(
                 cle: 'accueil/terminees',
                 pliable: true,
+                parDefaut: false,
                 titre: 'Terminées',
                 emplettes: 'liste_terminee',
                 nombre: terminees.length,
@@ -330,11 +365,12 @@ class _Etapes extends StatelessWidget {
       (
         'Je cuisine',
         [
-          'Les courses faites, l\'onglet Cuisiner est votre livre de recettes : près de 500 recettes, rangées par type.',
-          'Cherchez une recette par son nom ou par un ingrédient, ou filtrez-les avec les boutons à icône.',
-          'Touchez une recette : sa photo, le volet « Caractéristiques » (personnes, temps, difficulté), puis deux '
-              'onglets, Ingrédients et Recette, avec les étapes numérotées et les conseils.',
+          'Les courses faites, les recettes dont vous avez ajouté les ingrédients à une liste sont sur l\'accueil, '
+              'sous « Recettes choisies », quel que soit le magasin.',
+          'Touchez-en une : sa photo, ses caractéristiques, puis la recette elle-même, étapes numérotées et conseils ; '
+              'l\'onglet Ingrédients rappelle ce qu\'il faut.',
           'Avec − et +, changez le nombre de personnes : les quantités suivent.',
+          'Toutes les recettes restent dans l\'onglet Recettes, votre livre de cuisine.',
         ],
       ),
   ];
