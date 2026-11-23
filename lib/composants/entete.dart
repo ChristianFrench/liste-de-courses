@@ -349,8 +349,8 @@ class Aides {
   static const generale = 'L\'application compte quatre onglets, en bas de l\'écran : Accueil, Préparer, Courses et Gérer.\n$_gestes';
 
   static const accueil = 'L\'accueil rassemble ce qui est en cours.\n'
-      '« Comment ça marche » rappelle les cinq étapes : je choisis mes recettes, je prépare ma liste, je la valide, '
-      'je fais mes courses, je cuisine. Touchez une étape pour son explication.\n'
+      '« Comment ça marche » rappelle les quatre étapes : je choisis mes recettes, je prépare ma liste, je la valide, '
+      'je fais mes courses. Touchez une étape pour son explication.\n'
       '« En préparation » : les listes que vous êtes en train de construire. « À faire » : les listes prêtes pour les courses. '
       '« Courses en cours » : des courses interrompues par « Pause ». Touchez une liste pour ce que vous pouvez en faire.\n'
       '« Recettes choisies » : les recettes dont les ingrédients sont allés dans une liste ; touchez-en une pour la '

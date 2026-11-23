@@ -303,8 +303,6 @@ class _Etapes extends StatelessWidget {
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
-    // 23/11/2026 : les recettes à cuisiner sont sur l'accueil (« Recettes choisies »).
-    if (Nav.avecCuisiner) 'Je\ncuisine',
   ];
 
   static const _icones = [
@@ -312,7 +310,6 @@ class _Etapes extends StatelessWidget {
     Icons.checklist,
     Icons.check_circle_outline,
     Icons.shopping_cart_outlined,
-    if (Nav.avecCuisiner) Icons.restaurant_menu_outlined,
   ];
 
   // Explication de chaque étape, affichée quand on la touche.
@@ -329,6 +326,8 @@ class _Etapes extends StatelessWidget {
               'sous « Recettes choisies » : touchez-en une pour ajouter ses ingrédients, ou ignorez-la si vous avez changé d\'avis.',
           'Les ingrédients reconnus vont dans leur secteur. Ceux présents dans plusieurs secteurs (à choisir) ou inconnus '
               'du catalogue (à placer) restent sous la recette : touchez-les pour choisir l\'article, comme dans la recherche.',
+          'Les courses faites, les recettes choisies restent sur l\'accueil : touchez-en une pour la cuisiner (sa fiche '
+              's\'ouvre sur la recette).',
           'Un appui long sur une recette choisie permet de l\'effacer ; si sa liste est encore en préparation, ses articles '
               'peuvent être retirés en même temps.',
         ],
@@ -372,19 +371,6 @@ class _Etapes extends StatelessWidget {
             'ces courses passées servent ensuite à préparer les prochaines listes.',
       ],
     ),
-    if (Nav.avecCuisiner)
-      (
-        'Je cuisine',
-        [
-          'Les courses faites, les recettes dont vous avez ajouté les ingrédients à une liste sont sur l\'accueil, '
-              'sous « Recettes choisies », quel que soit le magasin.',
-          'Touchez-en une : sa photo, ses caractéristiques, puis la recette elle-même, étapes numérotées et conseils ; '
-              'l\'onglet Ingrédients rappelle ce qu\'il faut.',
-          'Avec − et +, changez le nombre de personnes : les quantités suivent.',
-          'Une fois la recette cuisinée, un appui long l\'efface des recettes choisies.',
-          'Toutes les recettes restent dans l\'onglet Recettes, votre livre de cuisine.',
-        ],
-      ),
   ];
 
   static Future<void> _expliquer(BuildContext context, int i) => modale(
