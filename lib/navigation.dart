@@ -29,7 +29,8 @@ class Nav extends ChangeNotifier {
   static const int nbOnglets = avecCuisiner ? 5 : 4;
 
   /// Les onglets de la barre du bas, dans l'ordre affiché.
-  static const ordre = avecCuisiner ? [accueil, recettes, preparer, courses] : [accueil, preparer, courses, gerer];
+  // 23/11/2026 (Aristide) : Gérer revient dans la barre, avec l'engrenage.
+  static const ordre = avecCuisiner ? [accueil, recettes, preparer, courses, gerer] : [accueil, preparer, courses, gerer];
 
   // Rubriques de Gérer
   static const int magasin = 10, parcours = 11, historique = 12, parametres = 13, corbeille = 14, foyer = 15, archives = 16;

@@ -261,6 +261,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
       ],
       if (ignoree) ActionLigne(Icons.undo, 'Reprendre', () => etat.marquerRecette(n, NoteRecette.aTraiter, l)),
       ActionLigne(Icons.menu_book_outlined, 'Voir la recette', () => voirRecetteNotee(context, n)),
+      ActionLigne(Icons.delete_outline, 'Effacer la recette', () => effacerRecetteChoisie(context, n), danger: true),
     ];
     return LigneRecetteChoisie(
       note: n,
@@ -990,4 +991,44 @@ Future<RecetteLue?> recetteNotee(NoteRecette n) async {
 Future<void> voirRecetteNotee(BuildContext context, NoteRecette n) async {
   final r = await recetteNotee(n);
   if (r != null && context.mounted) await Nav.aller<void>(context, FicheRecette(recette: r));
+}
+
+/// Efface une recette choisie (23/11/2026, Aristide) ; si sa liste est en préparation et contient des articles
+/// ajoutés pour elle, propose (coché) de les retirer aussi.
+Future<void> effacerRecetteChoisie(BuildContext context, NoteRecette n) async {
+  final etat = Etat.instance;
+  final l = etat.liste(n.liste);
+  final enPreparation = l != null && l.statut == StatutListe.enConstruction;
+  final articles = l == null ? const <LigneListe>[] : etat.articlesDeRecette(l, n.titre);
+  var retirer = enPreparation && articles.isNotEmpty;
+  final ok = await modale(
+    context,
+    titre: 'Effacer « ${n.titre} »',
+    oui: 'Effacer',
+    contenu: (context, maj) => Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      Text('La recette quitte les recettes choisies du foyer.', style: Charte.texte(16)),
+      if (enPreparation && articles.isNotEmpty) ...[
+        const SizedBox(height: 10),
+        Text('Attention : ses ingrédients ont été ajoutés à la liste « ${etat.nomListe(l)} », en préparation.',
+            style: Charte.texte(16, gras: true, couleur: Charte.orange)),
+        CaseModale(
+          key: const ValueKey('retirer-articles'),
+          texte: 'Retirer aussi ${articles.length} article${articles.length > 1 ? 's' : ''} de la liste',
+          aide: articles.map((g) => etat.produit(g.produitId)?.nom ?? '').where((x) => x.isNotEmpty).join(', '),
+          coche: retirer,
+          onChange: (v) => maj(() => retirer = v),
+          encadree: false,
+        ),
+      ] else if (l != null && !enPreparation && articles.isNotEmpty) ...[
+        const SizedBox(height: 10),
+        Text('Sa liste « ${etat.nomListe(l)} » n\'est plus en préparation : ses articles y restent.',
+            style: Charte.texte(15, couleur: Charte.texteSecondaire)),
+      ],
+    ]),
+  );
+  if (!ok) return;
+  final n2 = etat.effacerRecette(n, retirerArticles: retirer);
+  if (context.mounted) {
+    Nav.message(context, '« ${n.titre} » effacée${n2 > 0 ? ', $n2 article${n2 > 1 ? 's' : ''} retiré${n2 > 1 ? 's' : ''}' : ''}');
+  }
 }

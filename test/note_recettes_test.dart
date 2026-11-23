@@ -57,4 +57,25 @@ void main() {
     etat.reglerIngredient(n, n.aRegler.single);
     expect(n.aRegler, isEmpty);
   });
+
+  test('effacer une recette : ses seuls articles retirés de la liste en préparation', () async {
+    final etat = Etat.instance;
+    await etat.charger(dossier: Directory.systemTemp.createTempSync('effacer'));
+    etat.remplirDemonstration();
+    final l = etat.creerListe(etat.magasins.first.id, []);
+    final ps = etat.produitsVisibles.take(3).toList();
+    for (final p in ps) {
+      etat.ajouterLigne(l, p.id);
+    }
+    etat.definirConsigne(l, ps[0].id, 'pour : Quiche');
+    etat.definirConsigne(l, ps[1].id, 'pour : Quiche · pour : Crumble');
+    etat.recetteTraitee(l, titre: 'Quiche', ingredients: const []);
+    final n = etat.recettesTraitees(l).single;
+    expect(etat.articlesDeRecette(l, 'Quiche').length, 2);
+    expect(etat.effacerRecette(n, retirerArticles: true), 1);
+    expect(etat.ligne(l, ps[0].id), isNull);
+    expect(etat.ligne(l, ps[1].id)!.consigne, 'pour : Crumble');
+    expect(etat.ligne(l, ps[2].id), isNotNull);
+    expect(etat.noteRecettes.where((x) => x.titre == 'Quiche'), isEmpty);
+  });
 }

@@ -8,7 +8,7 @@ import '../theme.dart';
 import '../donnees/recette_ingredients.dart' show recettesFournies;
 import 'listes.dart';
 import 'recettes.dart' show FicheRecette;
-import 'travail.dart' show LigneRecetteChoisie;
+import 'travail.dart' show LigneRecetteChoisie, effacerRecetteChoisie;
 
 // Onglet Accueil : un bandeau ludique, « Comment ça marche », puis ce qui est en cours
 // (préparations et courses) avec son action directe.
@@ -132,7 +132,16 @@ class EcranAccueil extends StatelessWidget {
                 nombre: _recettesChoisies.length,
                 enfants: [
                   for (final n in _recettesChoisies)
-                    LigneRecetteChoisie(note: n, courses: true, onTap: () => _voir(context, n)),
+                    LigneRecetteChoisie(
+                      note: n,
+                      courses: true,
+                      onTap: () => _voir(context, n),
+                      // 23/11/2026 (Aristide) : effacer une recette (appui long).
+                      onLongPress: () => menuActions(context, titre: n.titre, actions: [
+                        ActionLigne(Icons.menu_book_outlined, 'Voir la recette', () => _voir(context, n)),
+                        ActionLigne(Icons.delete_outline, 'Effacer la recette', () => effacerRecetteChoisie(context, n), danger: true),
+                      ]),
+                    ),
                 ],
               ),
             // 09/11/2026 (Aristide) : les courses terminées, comme dans l'onglet Courses ; repliées par défaut
@@ -208,11 +217,7 @@ class _EnTetePhoto extends StatelessWidget {
                       if (EnTeteFenetre.chercherRecette case final f?)
                         boutonEnTete(Icons.restaurant_menu_outlined, 'Chercher une recette', () => f(context)),
                       const BoutonSynchro(),
-                      // 21/11/2026 (Aristide) : Gérer quitte la barre des onglets : roue dentée en haut de l'accueil.
-                      if (Nav.avecCuisiner)
-                        KeyedSubtree(
-                            key: const ValueKey('ouvrir-gerer'),
-                            child: boutonEnTete(Icons.settings_outlined, 'Gérer', () => Nav.i.allerOnglet(Nav.gerer))),
+                      // 23/11/2026 (Aristide) : l'engrenage de Gérer est revenu dans la barre du bas.
                       boutonEnTete(Icons.help_outline, 'Aide', () => montrerAide(context, 'Accueil', Aides.accueil)),
                       const SizedBox(width: 4),
                     ],
@@ -298,7 +303,7 @@ class _Etapes extends StatelessWidget {
     'Je prépare\nma liste',
     'Je la\nvalide',
     'Je fais\nmes courses',
-    // 20/11/2026 (Aristide) : avec l'onglet « Cuisiner » (démonstration d'abord).
+    // 23/11/2026 : les recettes à cuisiner sont sur l'accueil (« Recettes choisies »).
     if (Nav.avecCuisiner) 'Je\ncuisine',
   ];
 
@@ -322,6 +327,10 @@ class _Etapes extends StatelessWidget {
               'ingrédients » : la recette va dans la note préparée, commune à tout le foyer.',
           'Aucune liste n\'est nécessaire. Quand une liste est en préparation, les recettes notées apparaissent en tête, '
               'sous « Recettes choisies » : touchez-en une pour ajouter ses ingrédients, ou ignorez-la si vous avez changé d\'avis.',
+          'Les ingrédients reconnus vont dans leur secteur. Ceux présents dans plusieurs secteurs (à choisir) ou inconnus '
+              'du catalogue (à placer) restent sous la recette : touchez-les pour choisir l\'article, comme dans la recherche.',
+          'Un appui long sur une recette choisie permet de l\'effacer ; si sa liste est encore en préparation, ses articles '
+              'peuvent être retirés en même temps.',
         ],
       ),
     (
@@ -355,6 +364,8 @@ class _Etapes extends StatelessWidget {
         'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez la grande case d\'un article pour le cocher, '
             'deux fois pour le dire manquant ; un appui long sur la case en montre le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
+        'En tête de la liste, les recettes choisies rappellent pour quoi sont certains articles ; une petite note sur un '
+            'article signale une consigne : touchez-la pour la lire.',
         'Une pause interrompt les courses ; vous les reprenez plus tard là où vous en étiez.',
         'À la fin, touchez « Terminer les courses ». La course va dans l\'onglet Courses, « Terminées » : joignez-y le PDF '
             'du ticket fourni par l\'application du magasin, puis glissez-la vers la droite pour la mettre dans l\'historique ; '
@@ -370,6 +381,7 @@ class _Etapes extends StatelessWidget {
           'Touchez-en une : sa photo, ses caractéristiques, puis la recette elle-même, étapes numérotées et conseils ; '
               'l\'onglet Ingrédients rappelle ce qu\'il faut.',
           'Avec − et +, changez le nombre de personnes : les quantités suivent.',
+          'Une fois la recette cuisinée, un appui long l\'efface des recettes choisies.',
           'Toutes les recettes restent dans l\'onglet Recettes, votre livre de cuisine.',
         ],
       ),

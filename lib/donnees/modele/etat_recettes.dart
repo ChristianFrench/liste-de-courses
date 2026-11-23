@@ -124,4 +124,35 @@ extension EtatRecettes on Etat {
     n.aRegler.remove(x);
     modifie();
   }
+
+  /// Les articles d'une liste ajoutés pour une recette (consigne « pour : <titre> »).
+  List<LigneListe> articlesDeRecette(Liste l, String titre) =>
+      [for (final g in l.lignes) if (g.consigne?.split(' · ').contains('pour : $titre') ?? false) g];
+
+  /// Efface une recette de la note (23/11/2026, Aristide). Avec [retirerArticles], et si sa liste est encore en
+  /// préparation, les articles ajoutés pour elle seule sont retirés ; ceux partagés avec une autre recette ou
+  /// une autre consigne gardent leur ligne, sans la mention de cette recette. Rend le nombre d'articles retirés.
+  int effacerRecette(NoteRecette n, {bool retirerArticles = false}) {
+    var retires = 0;
+    final l = liste(n.liste);
+    if (retirerArticles && l != null && l.statut == StatutListe.enConstruction) {
+      final pour = 'pour : ${n.titre}';
+      for (final g in articlesDeRecette(l, n.titre)) {
+        final reste = [for (final x in g.consigne!.split(' · ')) if (x != pour) x];
+        if (reste.isEmpty) {
+          l.lignes.remove(g);
+          retires++;
+        } else {
+          g.consigne = reste.join(' · ');
+        }
+      }
+      if (retires > 0) {
+        l.modifieePar = moi.id;
+        l.modifieeLe = DateTime.now();
+      }
+    }
+    noteRecettes.remove(n);
+    modifie();
+    return retires;
+  }
 }

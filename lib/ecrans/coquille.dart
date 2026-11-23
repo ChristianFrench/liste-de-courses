@@ -36,7 +36,8 @@ class BarreOnglets extends StatelessWidget {
     Nav.preparer: (Icons.checklist, 'Préparer'),
     Nav.courses: (Icons.shopping_cart_outlined, 'Courses'),
     if (Nav.avecCuisiner) Nav.recettes: (Icons.menu_book_outlined, 'Recettes'),
-    Nav.gerer: (Icons.tune, 'Gérer'),
+    // 23/11/2026 (Aristide) : l'engrenage des paramètres, en bas.
+    Nav.gerer: (Icons.settings_outlined, 'Gérer'),
   };
 
   /// Icône et libellé des onglets de la barre, dans l'ordre affiché.
@@ -347,7 +348,7 @@ class MenuGerer extends StatelessWidget {
           icone: Icons.tune,
           titre: 'Gérer',
           aide: Aides.gerer,
-          onRetour: Nav.avecCuisiner ? () => Nav.i.allerOnglet(Nav.accueil) : null),
+          onRetour: null),
       corps: ListView(
         padding: const EdgeInsets.only(bottom: 16),
         children: [
