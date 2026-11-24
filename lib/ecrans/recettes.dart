@@ -111,7 +111,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
     final plis = Retractables.i;
     final toutOuvert = cles.isNotEmpty && cles.every((c) => plis.ouvert(c, parDefaut: false));
     return PageBase(
-      entete: EnTeteFenetre(
+      entete: EnTeteFenetre(aide: Aides.recettes, 
         retour: !widget.onglet,
         icone: widget.choix ? Icons.menu_book_outlined : Icons.restaurant_menu_outlined,
         sousTitre: widget.depuisEnTete || widget.onglet ? null : 'Gérer › Courses',
@@ -726,7 +726,7 @@ class _FicheRecetteState extends State<FicheRecette> {
           ),
     ]);
     return PageBase(
-      entete: EnTeteFenetre(
+      entete: EnTeteFenetre(aide: Aides.ficheRecette, 
           retour: true,
           icone: widget.choix ? Icons.menu_book_outlined : Icons.restaurant_menu_outlined,
           sousTitre: widget.choix ? 'Recettes' : 'Cuisiner',

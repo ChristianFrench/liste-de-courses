@@ -583,7 +583,8 @@ void main() {
       await _fermerVolet(tester);
       await _toucher(tester, find.byTooltip('Aide').first);
       expect(find.text('Aide · Préparer'), findsOneWidget);
-      // 24/11/2026 : l'aide en quelques points ; les gestes communs sont repliés en bas.
+      expect(find.text('Construire les listes avant les courses'), findsOneWidget, reason: 'titre = fonction de l\'écran');
+      // 24/11/2026 : titre = fonction de l'écran ; les gestes communs derrière l'icône en haut à droite.
       expect(find.text('Changer d\'onglet', findRichText: true), findsNothing);
       await _toucher(tester, find.byKey(const ValueKey('aide-gestes')));
       expect(find.textContaining('Changer d\'onglet', findRichText: true), findsOneWidget);

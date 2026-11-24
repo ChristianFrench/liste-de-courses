@@ -353,7 +353,7 @@ class _EcranTicketPdfState extends State<EcranTicketPdf> {
       backgroundColor: Charte.fond,
       body: SafeArea(
         child: Column(children: [
-          EnTeteFenetre(
+          EnTeteFenetre(aide: Aides.ticket, 
             titre: libelle.isEmpty ? 'Ticket de caisse' : libelle,
             icone: Icons.receipt_long_outlined,
             sousTitre: [jjmmaaaa(t.date), etat.magasin(t.magasinId)?.nom ?? '', if (t.montant > 0) euros(t.montant)]

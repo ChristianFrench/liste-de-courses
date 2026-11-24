@@ -313,40 +313,58 @@ class _PointSynchroState extends State<PointSynchro> with SingleTickerProviderSt
       );
 }
 
-/// Page d'aide d'une fenêtre (24/11/2026, Aristide : « quelques points avec une phrase courte, des icônes »).
-/// Chaque ligne du texte est un point « icône|Titre|Phrase » (voir [Aides]) ; une ligne sans « | » est une phrase
-/// d'introduction. Les gestes communs sont repliés en bas, sauf dans l'aide générale qui les montre.
+/// Page d'aide d'une fenêtre (24/11/2026, Aristide) : en titre la fonction de l'écran, puis ce que l'on voit
+/// (« À l'écran ») et ce que l'on peut faire (« Vous pouvez »), en quelques points « icône, titre, phrase courte ».
+/// Les gestes communs sont derrière l'icône en haut à droite. Format des textes : voir [Aides].
 Future<void> montrerAide(BuildContext context, String titre, String texte) {
-  var gestes = texte == Aides.generale;
-  return modale(
+  final lignes = texte.split('\n');
+  final fonction = lignes.isNotEmpty && !lignes.first.contains('|') && !lignes.first.startsWith('#') ? lignes.first : null;
+  final points = fonction == null ? texte : lignes.skip(1).join('\n');
+  var gestes = false;
+  return volet<void>(
     context,
-    titre: 'Aide · $titre',
-    icone: Icons.help_outline,
-    oui: null,
-    non: null,
-    contenu: (_, maj) => Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ..._pointsAide(texte),
-        if (texte != Aides.generale) ...[
-          const SizedBox(height: 4),
-          InkWell(
-            key: const ValueKey('aide-gestes'),
-            borderRadius: BorderRadius.circular(8),
-            onTap: () => maj(() => gestes = !gestes),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 6),
-              child: Row(children: [
-                Icone(Icons.swipe_outlined, size: 28, color: Charte.cadre),
-                const SizedBox(width: 10),
-                Expanded(child: Text('Gestes communs', style: Charte.texte(15, gras: true))),
-                Icone(gestes ? Icons.expand_less : Icons.expand_more, size: 24),
-              ]),
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, maj) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 0, 10, 14),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text(gestes ? 'Gestes communs' : 'Aide · $titre', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
+                    Text(gestes ? 'Les gestes valables sur tous les écrans' : (fonction ?? titre), style: Charte.texte(19, gras: true)),
+                  ]),
+                ),
+              ),
+              Tooltip(
+                message: gestes ? 'Revenir à l\'aide de l\'écran' : 'Gestes communs',
+                child: InkWell(
+                  key: const ValueKey('aide-gestes'),
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () => maj(() => gestes = !gestes),
+                  child: Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: Icone(gestes ? Icons.help_outline : Icons.swipe_outlined, size: 36),
+                  ),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 10),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _pointsAide(gestes ? Aides.gestes : points)),
+                ),
+              ),
             ),
-          ),
-          if (gestes) ..._pointsAide(Aides.gestes),
-        ],
-      ],
+          ],
+        ),
+      ),
     ),
   );
 }
@@ -406,7 +424,12 @@ const _iconesAide = <String, IconData>{
 
 List<Widget> _pointsAide(String texte) => [
       for (final l in texte.split('\n'))
-        if (l.split('|') case [final i, final t, final p])
+        if (l.startsWith('#'))
+          Padding(
+            padding: const EdgeInsets.only(top: 4, bottom: 8),
+            child: Text(l.substring(1), style: Charte.texte(14, gras: true, couleur: Charte.cadre)),
+          )
+        else if (l.split('|') case [final i, final t, final p])
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -425,129 +448,280 @@ List<Widget> _pointsAide(String texte) => [
     ];
 
 /// Textes d'aide des fenêtres (toucher le titre › Aide, ou la bouée en haut à droite).
-/// Une ligne par point : « icône|Titre court|Une phrase courte ». Les gestes communs s'ajoutent repliés.
+/// 24/11/2026 (Aristide) : seulement l'écran affiché, jamais les onglets du bas. Première ligne = la fonction
+/// de l'écran (le titre de l'aide) ; « #À l'écran » puis « #Vous pouvez » ; un point par ligne
+/// « icône|Titre court|Une phrase courte » (icônes : `_iconesAide`). Les gestes communs sont à part ([gestes]).
 class Aides {
   Aides._();
 
-  static const gestes = 'glisser|Changer d\'onglet|Glissez le doigt à gauche ou à droite sur le haut de l\'écran ou sur une zone libre.\n'
-      'toucher|Toucher une ligne|Ouvre son volet en bas : le détail, puis les actions.\n'
-      'annuler|Glisser une ligne à gauche|La supprime ; « Annuler » apparaît quelques secondes en bas.\n'
-      'fini|Glisser une ligne à droite|Fait son action principale.\n'
-      'menu|Toucher le titre ou un bandeau|Propose les actions de la fenêtre ou du groupe.\n'
-      'volet|Fermer un volet|Tirez la poignée vers le bas, ou touchez à côté.\n'
-      'nuage|Le nuage|Barré : la synchronisation du foyer n\'est pas active.';
+  static const gestes = "glisser|Changer d'onglet|Glissez le doigt à gauche ou à droite sur le haut de l'écran ou sur une zone libre.\n"
+      "toucher|Toucher une ligne|Ouvre son volet en bas : le détail, puis les actions.\n"
+      "annuler|Glisser une ligne à gauche|La supprime ; « Annuler » apparaît quelques secondes en bas.\n"
+      "fini|Glisser une ligne à droite|Fait son action principale.\n"
+      "menu|Toucher le titre ou un bandeau|Propose les actions de l'écran ou du groupe.\n"
+      "volet|Fermer un volet|Tirez la poignée vers le bas, ou touchez à côté.\n"
+      "nuage|Le nuage|Barré : la synchronisation du foyer n'est pas active.";
 
-  static const generale = 'accueil|Accueil|Ce qui est en cours : listes, courses, recettes choisies.\n'
-      'recette|Recettes|Choisir des recettes et ajouter leurs ingrédients à une liste.\n'
-      'liste|Préparer|Construire les listes avant les courses.\n'
-      'chariot|Courses|Faire les courses, puis retrouver les courses finies.\n'
-      'gerer|Gérer (engrenage)|Foyer, magasins, catalogues et paramètres.\n'
-      '$gestes';
+  static const generale = "Utiliser cet écran\n"
+      "#Vous pouvez\n"
+      "menu|Toucher le titre|Il propose les actions de cet écran.\n"
+      "glisser|Voir les gestes|L'icône en haut à droite rappelle les gestes communs.";
 
-  static const accueil = 'liste|Comment ça marche|Les quatre étapes ; touchez-en une pour son explication.\n'
-      'crayon|En préparation|Les listes en construction.\n'
-      'chariot|À faire|Les listes prêtes pour les courses.\n'
-      'pause|Courses en cours|Les courses mises en pause, à reprendre.\n'
-      'recette|Recettes choisies|Touchez pour cuisiner ; appui long pour effacer.\n'
-      'fini|Terminées|Les courses faites, repliées.\n'
-      'gerer|Engrenage, en bas|Ouvre Gérer.';
+  static const accueil = "Voir d'un coup d'œil ce qui est en cours\n"
+      "#À l'écran\n"
+      "liste|Comment ça marche|Les quatre étapes, de la recette aux courses.\n"
+      "crayon|En préparation|Les listes en construction.\n"
+      "chariot|À faire|Les listes prêtes pour les courses.\n"
+      "pause|Courses en cours|Les courses mises en pause.\n"
+      "recette|Recettes choisies|Les recettes dont les ingrédients sont dans une liste.\n"
+      "fini|Terminées|Les courses faites, repliées.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une étape|Lire son explication.\n"
+      "toucher|Toucher une liste|La reprendre, la valider ou faire les courses.\n"
+      "recette|Toucher une recette|L'ouvrir pour cuisiner ; appui long pour l'effacer.\n"
+      "gerer|Toucher l'engrenage, en bas|Ouvrir Gérer.";
 
-  static const preparer = 'plus|Nouvelle liste|Choisissez le magasin, puis la façon de remplir la liste.\n'
-      'crayon|En préparation|Touchez une liste pour la reprendre, la renommer ou la supprimer.\n'
-      'chariot|Prêtes pour les courses|Glissez à droite pour la remettre en préparation.';
+  static const recettes = "Choisir des recettes et noter leurs ingrédients\n"
+      "#À l'écran\n"
+      "recherche|Recherche|Tapez un mot du titre ou d'un ingrédient.\n"
+      "rayons|Filtres|Type, difficulté, temps, régime, saison, coût, cuisson, occasion, origine.\n"
+      "livre|Types et sous-types|Des bandeaux pliables ; « notée » marque une recette déjà choisie.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une recette|Ouvrir sa fiche.\n"
+      "volet|Tout déplier, tout replier|L'icône en haut à droite.";
 
-  static const courses = 'chariot|À faire|Touchez une liste puis « Faire les courses ».\n'
-      'pause|En cours|Les courses mises en pause, à reprendre.\n'
-      'fini|Terminées|Joignez le ticket ; glissez à droite pour l\'historique.\n'
-      'ticket|Ticket du magasin|« Partager » vers Emplettes, ou ouvrez le PDF avec Emplettes.\n'
-      'historique|Historique et archives|Voir le ticket, en faire une liste type, archiver.\n'
-      'archives|Archives|Les courses de plus de trois mois (réglable dans Données).';
+  static const ficheRecette = "Lire une recette et ajouter ses ingrédients à une liste\n"
+      "#À l'écran\n"
+      "voir|Photo et caractéristiques|Personnes, temps, difficulté, saison…\n"
+      "liste|Ingrédients|Avec leur quantité.\n"
+      "livre|Recette|Les étapes, numérotées.\n"
+      "#Vous pouvez\n"
+      "ajout|Noter les ingrédients|Cocher ceux à acheter : ils iront dans la liste en préparation.\n"
+      "corbeille|Retirer|Enlever la recette de la note.";
 
-  static const gerer = 'foyer|Mon foyer|Seul ou partagé, membres, invitations et code.\n'
-      'message|Collaboration|Notifications, mails et synchronisation du foyer.\n'
-      'magasin|Magasins|Vos magasins et leurs parcours appris.\n'
-      'rayons|Catalogues|Produits et marques, les mêmes dans tous les magasins.\n'
-      'promo|Types|Promotions, mesures (poids, volume, pièce) et packagings.\n'
-      'palette|Paramètres|Apparence, données, corbeille.';
+  static const preparer = "Construire les listes avant les courses\n"
+      "#À l'écran\n"
+      "crayon|En préparation|Les listes en construction.\n"
+      "chariot|Prêtes pour les courses|Les listes validées.\n"
+      "#Vous pouvez\n"
+      "plus|Nouvelle liste|Choisir le magasin, puis la façon de remplir la liste.\n"
+      "toucher|Toucher une liste|La reprendre, la renommer ou la supprimer.\n"
+      "annuler|Glisser une liste prête à droite|La remettre en préparation.";
 
-  static const nouvelleListe = 'magasin|Magasin et nom|Le nom est proposé ; deux listes ne peuvent pas avoir le même.\n'
-      'rayons|Par secteur|Cherchez les articles, ils se rangent sous leur secteur.\n'
-      'liste|Liste simple|Les articles restent dans l\'ordre de saisie.\n'
-      'livre|Liste type|Une liste enregistrée sous un nom, ou une liste vide.\n'
-      'fini|Achats habituels|Tout est coché ; décochez l\'inutile.\n'
-      'historique|Course passée|Cochez les articles à reprendre.\n'
-      'fichier|Depuis un texte|Collez un mail ou une note ; les articles sont reconnus.\n'
-      'ajout|Compléter des courses|Des articles à ajouter à des courses en cours.';
+  static const courses = "Suivre les courses, de la liste prête au ticket\n"
+      "#À l'écran\n"
+      "chariot|À faire|Les listes prêtes.\n"
+      "pause|En cours|Les courses mises en pause.\n"
+      "fini|Terminées|Les courses faites ; une icône signale le ticket joint.\n"
+      "#Vous pouvez\n"
+      "chariot|Faire les courses|Toucher une liste à faire.\n"
+      "ticket|Joindre le ticket|Toucher une course terminée.\n"
+      "historique|Ranger dans l'historique|Glisser une course terminée à droite.\n"
+      "envoi|Recevoir un ticket|Depuis l'appli du magasin : « Partager » vers Emplettes.";
 
-  static const preparation = 'recherche|Rechercher|Tapez trois lettres, touchez l\'article : il s\'ajoute.\n'
-      'plus|Absent du catalogue|Touchez « Créer « … » ».\n'
-      'recette|Recette|Cochez les ingrédients voulus ; ils s\'ajoutent « pour : » la recette.\n'
-      'calcul|− et +|Règlent la quantité ; à 0, l\'article est retiré.\n'
-      'toucher|Toucher la ligne|Packaging, consigne, promotion, marque.\n'
-      'fini|Liste prête|Valide la liste : commentaire, liste type, mail.';
+  static const gerer = "Régler ce qui sert une fois pour toutes\n"
+      "#À l'écran\n"
+      "foyer|Mon foyer|Le foyer, ses membres, la collaboration.\n"
+      "magasin|Courses|Magasins, catalogues des produits et des marques, types.\n"
+      "palette|Paramètres|Apparence, données, corbeille.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une rubrique|L'ouvrir.";
 
-  static const listeSimple = 'liste|Ordre de saisie|Pas de secteurs : les articles s\'ajoutent en fin de liste.\n'
-      'recherche|Rechercher|Tapez trois lettres, touchez l\'article ; « Créer » s\'il manque.\n'
-      'calcul|− et +|Règlent la quantité.\n'
-      'fini|Liste prête|« Ranger par rayons et secteurs » pour suivre le magasin.';
+  static const nouvelleListe = "Créer une liste pour un magasin\n"
+      "#À l'écran\n"
+      "magasin|Magasin et nom|Le nom est proposé ; il doit être unique.\n"
+      "calendrier|Courses|Aujourd'hui, demain ou un autre jour.\n"
+      "liste|Façons de remplir la liste|Une ligne par façon.\n"
+      "#Vous pouvez\n"
+      "rayons|Par secteur|Chercher les articles ; ils se rangent sous leur secteur.\n"
+      "liste|Liste simple|Garder l'ordre de saisie.\n"
+      "livre|Liste type|Partir d'une liste enregistrée, ou d'une liste vide.\n"
+      "fini|Achats habituels|Tout est coché ; décocher l'inutile.\n"
+      "historique|Course passée|Cocher les articles à reprendre.\n"
+      "fichier|Depuis un texte|Coller un mail ou une note.\n"
+      "ajout|Compléter des courses|Ajouter des articles à des courses en cours.";
 
-  static const enMagasin = 'fini|La case à gauche|Touchez-la quand l\'article est dans le chariot.\n'
-      'alerte|Deux touches|L\'article est absent du rayon : marqué « manquant ».\n'
-      'voir|Appui long|Montre le détail de l\'article quelques secondes.\n'
-      'pause|Pause|Interrompt les courses sans rien perdre.\n'
-      'drapeau|Terminer|Montre les manquants, puis range la course.\n'
-      'parcours|Parcours|L\'ordre où vous cochez apprend le magasin.\n'
-      'interdit|Liste figée|Pendant les courses, seule la case réagit.';
+  static const preparation = "Remplir la liste avant les courses\n"
+      "#À l'écran\n"
+      "recherche|Champ de recherche|Sous le titre.\n"
+      "recette|Recettes choisies|En haut : les ingrédients à choisir ou à placer.\n"
+      "rayons|La liste|Sous de minces bandeaux de secteur, dans l'ordre du parcours.\n"
+      "promo|Sur une ligne|P = promotion, ×6 = packaging, puis la consigne.\n"
+      "#Vous pouvez\n"
+      "recherche|Ajouter un article|Taper trois lettres, toucher l'article.\n"
+      "plus|Créer un article|« Créer « … » » s'il manque au catalogue.\n"
+      "calcul|− et +|Régler la quantité ; à 0, l'article est retiré.\n"
+      "toucher|Toucher une ligne|Packaging, consigne, promotion, marque.\n"
+      "fini|Liste prête|Valider : commentaire, liste type, mail.";
 
-  static const foyer = 'foyer|Foyer|Seul sur cet appareil, ou partagé avec d\'autres.\n'
-      'cle|Code de partage|À saisir sur un autre appareil pour rejoindre le foyer.\n'
-      'membre|Membres|Touchez un membre pour l\'inviter, le renommer ou le retirer.\n'
-      'maison|Appareil partagé|On choisit son nom à chaque lancement.\n'
-      'mail|Mails|Envoyer une liste à tout le foyer.\n'
-      'monde|Catalogue|Commun à tous les foyers ; vos ajouts restent chez vous.';
+  static const listeSimple = "Écrire une liste sans secteurs\n"
+      "#À l'écran\n"
+      "liste|La liste|Les articles dans l'ordre de saisie.\n"
+      "#Vous pouvez\n"
+      "recherche|Ajouter un article|Taper trois lettres ; « Créer » s'il manque.\n"
+      "calcul|− et +|Régler la quantité.\n"
+      "fini|Liste prête|« Ranger par rayons et secteurs » pour suivre le magasin.";
 
-  static const collaboration = 'membre|Membres|Touchez un membre pour ses notifications et mails.\n'
-      'cloche|Notification|Part à tous les membres du foyer.\n'
-      'mail|Mail|Montre le mail envoyé et la réponse du service.\n'
-      'info|Application fermée|Titre › « Recevoir les notifications sur cet appareil ».\n'
-      'nuage|Synchronisation|L\'état des échanges entre les appareils.';
+  static const enMagasin = "Cocher les articles en faisant les courses\n"
+      "#À l'écran\n"
+      "rayons|La liste|Dans l'ordre des allées, sous de minces bandeaux de secteur.\n"
+      "interdit|Liste figée|Pendant les courses, seule la case réagit.\n"
+      "#Vous pouvez\n"
+      "fini|Toucher la case|L'article est dans le chariot.\n"
+      "alerte|Toucher deux fois|L'article manque au rayon.\n"
+      "voir|Appui long|Voir le détail de l'article.\n"
+      "pause|Pause|Interrompre sans rien perdre.\n"
+      "drapeau|Terminer|Voir les manquants, puis ranger la course.";
 
-  static const historiqueMembre = 'historique|Journal|Notifications et mails du membre, du plus récent au plus ancien.\n'
-      'info|Sur cet appareil|Le journal n\'est gardé qu\'ici.';
+  static const consultation = "Consulter une liste\n"
+      "#À l'écran\n"
+      "liste|Les articles|Sous leurs secteurs, avec quantité et consigne.\n"
+      "#Vous pouvez\n"
+      "menu|Toucher le titre|Reprendre, envoyer par mail ou supprimer la liste.";
 
-  static const magasins = 'magasin|Vos magasins|Tous ont le même catalogue.\n'
-      'toucher|Toucher un magasin|Ses parcours, le renommer, le supprimer.\n'
-      'corbeille|Supprimer|Efface parcours et listes en cours ; l\'historique va aux archives.';
+  static const foyer = "Partager les listes avec les membres du foyer\n"
+      "#À l'écran\n"
+      "foyer|Foyer|Son nom ; seul sur cet appareil ou partagé.\n"
+      "cle|Code de partage|À saisir sur un autre appareil.\n"
+      "membre|Membres|Un point vert : en ligne.\n"
+      "mail|Mails|Les adresses du foyer.\n"
+      "#Vous pouvez\n"
+      "membre|Toucher un membre|L'inviter, le renommer ou le retirer.\n"
+      "copier|Toucher le code|Le copier ou le régénérer.\n"
+      "menu|Toucher le titre|Nouveau membre, changer de personne.";
 
-  static const typesPromotion = 'promo|Types de promotion|Proposés pour une ligne en promotion.\n'
-      'toucher|Toucher un type|Le modifier ou le supprimer.\n'
-      'plus|Nouveau type|En touchant le titre.\n'
-      'palette|Couleur|Gérer › Paramètres › Apparence.';
+  static const collaboration = "Échanger avec les membres du foyer\n"
+      "#À l'écran\n"
+      "membre|Membres|Leurs notifications et mails.\n"
+      "message|Communication|Notification et mail à tout le foyer.\n"
+      "nuage|Synchronisation|L'état des échanges entre appareils.\n"
+      "#Vous pouvez\n"
+      "cloche|Envoyer une notification|Elle part à tous les membres.\n"
+      "info|Être prévenu application fermée|Titre › « Recevoir les notifications sur cet appareil ».";
 
-  static const typesMesure = 'mesure|Mesures|Poids (g, kg), volume (cl, l) ou à la pièce.\n'
-      'toucher|Toucher une mesure|La modifier, voir ses articles, la supprimer.\n'
-      'plus|Nouvelle mesure|En touchant le titre.\n'
-      'palette|Couleur|Gérer › Paramètres › Apparence.';
+  static const historiqueMembre = "Voir les messages d'un membre\n"
+      "#À l'écran\n"
+      "historique|Journal|Notifications et mails, du plus récent au plus ancien.\n"
+      "info|Sur cet appareil|Le journal n'est gardé qu'ici.";
 
-  static const typesPackaging = 'lot|Packagings|Surtout des lots de 2 à 10.\n'
-      'toucher|Toucher un packaging|Le modifier, voir ses articles, le supprimer.\n'
-      'plus|Nouveau packaging|En touchant le titre.\n'
-      'palette|Couleur|Gérer › Paramètres › Apparence.';
+  static const synchronisation = "Vérifier les échanges entre les appareils du foyer\n"
+      "#À l'écran\n"
+      "nuage|État|Le voyant et sa signification.\n"
+      "membre|Appareils|Ceux du foyer, et leur dernière liaison.\n"
+      "#Vous pouvez\n"
+      "annuler|Tout renvoyer|Dans « Dépannage », si un appareil n'est pas à jour.";
 
-  static const catalogue = 'rayons|Un seul catalogue|Rayons, secteurs et produits, les mêmes partout.\n'
-      'toucher|Toucher un secteur|Voir ses produits, en ajouter un.\n'
-      'promo|Marque|« Ajouter une marque » sans créer de produit.\n'
-      'plus|Petit +|Signale un produit ajouté par le foyer.\n'
-      'crayon|Crayon|Modifier un rayon ou un secteur.';
+  static const essaiMail = "Envoyer un mail au foyer\n"
+      "#À l'écran\n"
+      "mail|Le mail|Destinataires, sujet et texte.\n"
+      "info|La réponse|Ce que le service d'envoi a répondu.";
 
-  static const marques = 'promo|Marques par secteur|Seuls les secteurs qui en ont paraissent.\n'
-      'toucher|Toucher une marque|La modifier ou la renommer partout.\n'
-      'corbeille|Retirer|Poubelle ou glissement à gauche.\n'
-      'plus|Nouvelle marque|En fin de secteur ou par le titre.';
+  static const magasins = "Gérer vos magasins\n"
+      "#À l'écran\n"
+      "magasin|Vos magasins|Tous ont le même catalogue.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher un magasin|Voir ses parcours, le renommer, le supprimer.\n"
+      "plus|Nouveau magasin|En touchant le titre.";
 
-  static const parcours = 'parcours|Parcours appris|L\'ordre des secteurs, par membre et par magasin.\n'
-      'fini|Tout seul|Il se complète à chaque course.';
+  static const parcours = "Voir l'ordre des secteurs appris dans ce magasin\n"
+      "#À l'écran\n"
+      "parcours|Parcours|Par membre ; il se complète à chaque course.";
 
-  static const historique = 'historique|Courses terminées|Par date ou par magasin.\n'
-      'ticket|Toucher une course|Voir ses articles ou son ticket.';
+  static const typesPromotion = "Définir les types de promotion\n"
+      "#À l'écran\n"
+      "promo|Types|Proposés pour une ligne en promotion.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher un type|Le modifier ou le supprimer.\n"
+      "plus|Nouveau type|En touchant le titre.";
+
+  static const typesMesure = "Définir les mesures des produits\n"
+      "#À l'écran\n"
+      "mesure|Mesures|Poids, volume ou pièce, et leur nombre d'articles.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une mesure|La modifier, voir ses articles, la supprimer.\n"
+      "plus|Nouvelle mesure|En touchant le titre.";
+
+  static const typesPackaging = "Définir les packagings\n"
+      "#À l'écran\n"
+      "lot|Packagings|Surtout des lots de 2 à 10.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher un packaging|Le modifier, voir ses articles, le supprimer.\n"
+      "plus|Nouveau packaging|En touchant le titre.";
+
+  static const catalogue = "Parcourir et compléter le catalogue des produits\n"
+      "#À l'écran\n"
+      "rayons|Rayons et secteurs|Des bandeaux pliables, les mêmes dans tous les magasins.\n"
+      "plus|Petit +|Un produit ajouté par le foyer.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher un secteur|Voir ses produits, en ajouter un.\n"
+      "toucher|Toucher un produit|Le modifier, le déplacer, lui ajouter une marque.\n"
+      "crayon|Crayon|Modifier un rayon ou un secteur.";
+
+  static const produit = "Voir et modifier un produit\n"
+      "#À l'écran\n"
+      "voir|Le produit|Son rayon, son secteur, ses marques, mesures et packagings.\n"
+      "#Vous pouvez\n"
+      "menu|Toucher le titre|Modifier, déplacer, ajouter une marque, masquer chez nous.";
+
+  static const marques = "Gérer les marques de chaque secteur\n"
+      "#À l'écran\n"
+      "promo|Marques|Rangées par rayon et secteur, avec leur nombre.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une marque|La modifier ou la renommer partout.\n"
+      "corbeille|Retirer|Poubelle ou glissement à gauche.\n"
+      "plus|Nouvelle marque|En fin de secteur ou par le titre.";
+
+  static const historique = "Retrouver les courses passées\n"
+      "#À l'écran\n"
+      "historique|Courses|Par date ou par magasin.\n"
+      "#Vous pouvez\n"
+      "ticket|Toucher une course|Voir son ticket, en faire une liste type, l'archiver.";
+
+  static const archives = "Retrouver les courses anciennes\n"
+      "#À l'écran\n"
+      "archives|Archives|Les courses archivées, par date.\n"
+      "#Vous pouvez\n"
+      "historique|Toucher une course|La remettre en historique ou la supprimer.";
+
+  static const ticket = "Voir le ticket de caisse d'une course\n"
+      "#À l'écran\n"
+      "ticket|Ticket|Le PDF, sa date et son montant.\n"
+      "#Vous pouvez\n"
+      "crayon|Toucher le titre|Corriger libellé et montant, ou l'ouvrir ailleurs.";
+
+  static const apparence = "Choisir les couleurs et la présentation\n"
+      "#À l'écran\n"
+      "palette|Palettes|Celle de l'application et celle des promotions, mesures, packagings.\n"
+      "voir|Aperçu|Le résultat, en direct.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une liste déroulante|Choisir une autre palette ou présentation.";
+
+  static const donnees = "Régler la conservation des données\n"
+      "#À l'écran\n"
+      "donnees|Sauvegardes|Copies automatiques et restauration.\n"
+      "fini|Achats habituels|Le seuil de présence dans vos courses.\n"
+      "archives|Archives|Quand archiver, quand supprimer.\n"
+      "#Vous pouvez\n"
+      "toucher|Toucher une ligne|Changer son réglage.";
+
+  static const sauvegardes = "Protéger vos données\n"
+      "#À l'écran\n"
+      "donnees|Copies|Les sauvegardes de l'appareil, de la plus récente à la plus ancienne.\n"
+      "#Vous pouvez\n"
+      "plus|Sauvegarder maintenant|Faire une copie tout de suite.\n"
+      "annuler|Toucher une copie|La restaurer.\n"
+      "fichier|Depuis un fichier|Restaurer une copie enregistrée ailleurs.";
+
+  static const corbeille = "Récupérer ce qui a été supprimé\n"
+      "#À l'écran\n"
+      "corbeille|Éléments supprimés|Listes, produits, magasins…\n"
+      "#Vous pouvez\n"
+      "annuler|Toucher un élément|Le restaurer ou le supprimer pour de bon.\n"
+      "menu|Toucher le titre|Vider la corbeille.";
+
+  static const bienvenue = "Commencer avec Emplettes\n"
+      "#Vous pouvez\n"
+      "membre|Seul|Utiliser l'application sur cet appareil uniquement.\n"
+      "foyer|Créer un foyer|Partager les listes avec d'autres.\n"
+      "porte|Rejoindre un foyer|Saisir le code reçu d'un membre.";
 }

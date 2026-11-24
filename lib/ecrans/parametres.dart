@@ -14,8 +14,8 @@ import '../donnees/synchro.dart';
 
 /// Page simple de Gérer : en-tête avec retour, contenu en colonne.
 /// [actions] : les actions de l'écran, proposées en touchant son titre.
-Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<ActionLigne> actions = const []}) => PageBase(
-      entete: EnTeteFenetre(retour: true, icone: icone, sousTitre: sousTitre, titre: titre, actions: actions),
+Widget _page(String sousTitre, String titre, IconData icone, List<Widget> contenu, {List<ActionLigne> actions = const [], String? aide}) => PageBase(
+      entete: EnTeteFenetre(aide: aide, retour: true, icone: icone, sousTitre: sousTitre, titre: titre, actions: actions),
       corps: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 16), children: contenu),
     );
 
@@ -134,7 +134,7 @@ class EcranApparence extends _EcranVivant {
     // 03/11/2026 (Aristide) : deux sections titrées comme les autres écrans, « Présentation » (les trois choix,
     // dans l'ordre) et « Aperçu » (une liste de courses dessinée comme les listes, qui suit chaque choix).
     return PageBase(
-      entete: EnTeteFenetre(retour: true, icone: Icons.palette_outlined, sousTitre: 'Gérer › Paramètres', titre: 'Apparence'),
+      entete: EnTeteFenetre(aide: Aides.apparence, retour: true, icone: Icons.palette_outlined, sousTitre: 'Gérer › Paramètres', titre: 'Apparence'),
       corps: ListView(padding: const EdgeInsets.only(bottom: 16), children: [
         GroupeRetractable(cle: 'apparence/presentation', titre: 'Présentation', image: 'bibliotheque--crayon-pastel', enfants: [
           Padding(
@@ -306,7 +306,7 @@ class EcranDonnees extends _EcranVivant {
   @override
   Widget construire(BuildContext context) {
     final etat = Etat.instance;
-    return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, [
+    return _page('Gérer › Paramètres', 'Données', Icons.storage_outlined, aide: Aides.donnees, [
       LigneMenu(
         key: const ValueKey('menu-sauvegardes'),
         icone: Icons.save_outlined,

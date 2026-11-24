@@ -47,7 +47,7 @@ class EcranConsultation extends StatelessWidget {
 
         final commentaire = etat.commentaire(l);
         return PageBase(
-          entete: EnTeteFenetre(
+          entete: EnTeteFenetre(aide: Aides.consultation, 
             retour: true,
             sousTitre: '${etatDe(l)} · ${etat.magasin(l.magasinId)?.nom ?? ''}',
             titre: etat.nomListe(l),

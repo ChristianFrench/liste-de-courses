@@ -105,7 +105,7 @@ class EcranPartage extends StatelessWidget {
     return ListenableBuilder(
       listenable: Listenable.merge([s, Etat.instance]),
       builder: (context, _) => PageBase(
-        entete: EnTeteFenetre(
+        entete: EnTeteFenetre(aide: Aides.synchronisation, 
           retour: true,
           icone: Icons.sync,
           sousTitre: 'Gérer › Paramètres',

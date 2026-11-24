@@ -99,7 +99,7 @@ class EcranFicheProduit extends StatelessWidget {
         final utilise = etat.produitUtilise(p);
         final ajoute = etat.estAjoute(p);
         return PageBase(
-          entete: EnTeteFenetre(
+          entete: EnTeteFenetre(aide: Aides.produit, 
             retour: true,
             icone: Icons.menu_book_outlined,
             sousTitre: 'Catalogue',

@@ -71,7 +71,7 @@ class _EcranEssaiMailState extends State<EcranEssaiMail> {
   @override
   Widget build(BuildContext context) {
     return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.outgoing_mail, sousTitre: 'Gérer › Collaboration', titre: 'Envoyer un mail'),
+      entete: EnTeteFenetre(aide: Aides.essaiMail, retour: true, icone: Icons.outgoing_mail, sousTitre: 'Gérer › Collaboration', titre: 'Envoyer un mail'),
       corps: ListView(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         children: [

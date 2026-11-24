@@ -40,7 +40,7 @@ class _EcranSauvegardesState extends State<EcranSauvegardes> {
   Widget build(BuildContext context) {
     final copies = _copies;
     return PageBase(
-      entete: const EnTeteFenetre(retour: true, icone: Icons.save_outlined, sousTitre: 'Gérer › Paramètres › Données', titre: 'Sauvegardes'),
+      entete: EnTeteFenetre(aide: Aides.sauvegardes, retour: true, icone: Icons.save_outlined, sousTitre: 'Gérer › Paramètres › Données', titre: 'Sauvegardes'),
       corps: ListView(padding: const EdgeInsets.fromLTRB(0, 8, 0, 16), children: [
         GroupeRetractable(
           cle: 'sauvegardes',

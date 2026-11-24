@@ -110,7 +110,7 @@ class EcranCorbeille extends StatelessWidget {
     return ListenableBuilder(
       listenable: etat,
       builder: (context, _) => PageBase(
-        entete: EnTeteFenetre(retour: true, sousTitre: 'Gérer', titre: 'Corbeille', actions: [
+        entete: EnTeteFenetre(aide: Aides.corbeille, retour: true, sousTitre: 'Gérer', titre: 'Corbeille', actions: [
           if (etat.corbeille.isNotEmpty) ActionLigne(Icons.delete_forever_outlined, 'Vider la corbeille', () => viderCorbeille(context)),
         ]),
         corps: ListView(
