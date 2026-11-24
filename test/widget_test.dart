@@ -1258,6 +1258,26 @@ void main() {
       expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
 
+      // 24/11/2026 : trois appuis rapprochés : « Pas besoin » ; deux appuis le remettent manquant
+      for (var i = 0; i < 3; i++) {
+        await tester.tap(find.byKey(ValueKey('case-$fromage')));
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      await tester.pumpAndSettle();
+      expect(etat.estPasBesoin(l4, fromage), isTrue);
+      expect(etat.manquant(l4, fromage), isFalse);
+      await tester.pump(const Duration(seconds: 3));
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.tap(find.byKey(ValueKey('case-$fromage')));
+      await tester.pumpAndSettle();
+      expect(etat.manquant(l4, fromage), isTrue);
+      expect(etat.estPasBesoin(l4, fromage), isFalse);
+      for (var i = 0; i < 4; i++) {
+        await tester.pump(const Duration(seconds: 2)); // les messages en bas, l'un après l'autre
+        await tester.pumpAndSettle();
+      }
+
       // Terminer depuis la zone de décision : la liste des manquants et des non cochés
       await _toucher(tester, find.text('Terminer'));
       expect(find.text('Terminer les courses ?'), findsOneWidget);

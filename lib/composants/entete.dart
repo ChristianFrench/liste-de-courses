@@ -574,8 +574,8 @@ class Aides {
       "#Vous pouvez\n"
       "fini|Toucher la case|L'article est dans le chariot.\n"
       "alerte|Toucher deux fois|L'article manque au rayon.\n"
-      "voir|Appui long|Le détail de l'article, avec « Pas besoin » et « Manquant en rayon ».\n"
-      "interdit|Pas besoin|L'article est inutile cette fois : case avec un tiret, nom gris barré.\n"
+      "interdit|Toucher trois fois|Pas besoin cette fois : tiret gris, nom barré.\n"
+      "voir|Appui long|Le détail, avec « Pas besoin » et « Manquant en rayon ».\n"
       "pause|Pause|Interrompre sans rien perdre.\n"
       "drapeau|Terminer|Voir les manquants, puis ranger la course.";
 

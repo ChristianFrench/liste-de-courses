@@ -323,21 +323,30 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
 
   String? _dernierAppui;
   DateTime _dernierAppuiLe = DateTime(2000);
+  int _nbAppuis = 0;
 
-  /// Toucher la case coche ou décoche ; deux appuis rapprochés sur la même case marquent l'article manquant ;
-  /// un article manquant touché est trouvé finalement (coché).
+  /// Toucher la case coche ou décoche ; deux appuis rapprochés sur la même case marquent l'article manquant,
+  /// trois appuis « Pas besoin » (24/11/2026, Aristide) ; un article manquant ou « pas besoin » touché est pris (coché).
   /// 13/11/2026 (Aristide) : le secteur où l'on vient de cocher prend le haut de l'écran.
   void _appui(Etat etat, Liste l, Produit p, Etape? x) {
-    final maintenant = DateTime.now();
-    final deuxAppuis = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
-    _dernierAppui = deuxAppuis ? null : p.id;
+    final maintenant = clock.now(); // heure simulée dans les essais
+    final suite = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
+    _nbAppuis = suite ? _nbAppuis + 1 : 1;
+    _dernierAppui = p.id;
     _dernierAppuiLe = maintenant;
-    if (deuxAppuis) {
+    if (_nbAppuis == 2) {
       HapticFeedback.mediumImpact();
       etat.marquerManquant(l, p.id, true);
       Nav.message(context, '« ${p.nom} » : manquant en rayon');
       return;
     }
+    if (_nbAppuis == 3) {
+      HapticFeedback.heavyImpact();
+      etat.marquerPasBesoin(l, p.id, true);
+      Nav.message(context, '« ${p.nom} » : pas besoin');
+      return;
+    }
+    if (_nbAppuis > 3) return;
     if (etat.estPasBesoin(l, p.id)) {
       etat.marquerPasBesoin(l, p.id, false);
       if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
@@ -351,7 +360,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
     // Après le délai du double appui : la case ne bouge pas sous le doigt entre deux appuis.
     Future.delayed(const Duration(milliseconds: 460), () {
-      if (_dernierAppui != p.id || !(etat.ligne(l, p.id)?.coche ?? false)) return;
+      if (_dernierAppui != p.id || _nbAppuis != 1 || !(etat.ligne(l, p.id)?.coche ?? false)) return;
       final c = _titres[x.id]?.currentContext;
       if (mounted && c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
     });
