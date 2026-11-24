@@ -56,6 +56,7 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `outils/recettes/nouvelles_298_497.py`, `nouvelles_498_597.py`, `difficulte.py`, `criteres.py`, `classement.py` (9 types, sous-types, origine), `vers_application.py` | recettes livrées avec la console (`outils/recettes/illustrations/recettes-fournies.json`, version à augmenter pour réappliquer) et leur copie allégée pour l'application |
 | `lib/donnees/recettes_communes.dart`, `lib/ecrans/console_recettes_edition.dart` | catalogue des recettes versionné (20/11/2026) : modification dans la console, journal (`journal.json` de la base), « Généraliser » publie l'index signé `ldc/recettes-communes` et les images `ldc/recettes-images/<empreinte>` |
 | `lib/composants/` | éléments d'interface communs (volets, boutons, champs, en-tête, recherche) |
+| `lib/composants/entete.dart` (`Aides`) | textes d'aide : une ligne par point « icône|Titre|phrase courte » (icônes dans `_iconesAide`) ; `montrerAide` ajoute les gestes communs repliés (24/11/2026) |
 | `outils/` | scripts (icônes, catalogue, site, vidéo, serveur `outils/vps/installer.sh`) |
 | `docs/` | mini-site emplettes.eu (généré par `outils/site/generer.py`) |
 | `ihm/` | ordres de travail du fil IHM (voir `CLAUDE.md`) |
