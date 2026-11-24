@@ -573,8 +573,8 @@ class Aides {
       "interdit|Liste figée|Pendant les courses, seule la case réagit.\n"
       "#Vous pouvez\n"
       "fini|Toucher la case|L'article est dans le chariot.\n"
-      "alerte|Toucher deux fois|L'article manque au rayon.\n"
-      "interdit|Toucher trois fois|Pas besoin cette fois : tiret gris, nom barré.\n"
+      "annuler|Appuis rapprochés|La case tourne : cochée, manquant (croix rouge), pas besoin (tiret gris), vide.\n"
+      "toucher|Après une pause|Un appui coche une case vide, ou la remet à vide.\n"
       "voir|Appui long|Le détail, avec « Pas besoin » et « Manquant en rayon ».\n"
       "pause|Pause|Interrompre sans rien perdre.\n"
       "drapeau|Terminer|Voir les manquants, puis ranger la course.";

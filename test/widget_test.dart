@@ -1247,30 +1247,36 @@ void main() {
       await _ouvrirListe(tester, etat.nomListe(l4), 'Reprendre les courses');
       expect(find.text('Magasin 1 · 5 / 9'), findsOneWidget);
 
-      // Deux appuis rapprochés sur la case : l'article manque en rayon
+      // Case cochée : un appui la vide, puis les appuis rapprochés la cochent et la disent manquante
       await tester.ensureVisible(find.byKey(ValueKey('case-$fromage')));
       await tester.pumpAndSettle();
-      await tester.tap(find.byKey(ValueKey('case-$fromage')));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.tap(find.byKey(ValueKey('case-$fromage')));
-      await tester.pumpAndSettle();
-      expect(etat.manquant(l4, fromage), isTrue);
-      expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
-      await tester.pump(const Duration(seconds: 3));
-
-      // 24/11/2026 : trois appuis rapprochés : « Pas besoin » ; deux appuis le remettent manquant
       for (var i = 0; i < 3; i++) {
         await tester.tap(find.byKey(ValueKey('case-$fromage')));
         await tester.pump(const Duration(milliseconds: 100));
       }
       await tester.pumpAndSettle();
+      expect(etat.manquant(l4, fromage), isTrue);
+      expect(find.text('Magasin 1 · 4 / 9'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+
+      // 24/11/2026 : après une pause, un appui remet la case à vide ; puis les appuis rapprochés la font
+      // tourner : cochée, manquant, pas besoin
+      Future<void> appuis(int n) async {
+        for (var i = 0; i < n; i++) {
+          await tester.tap(find.byKey(ValueKey('case-$fromage')));
+          await tester.pump(const Duration(milliseconds: 300));
+        }
+        await tester.pumpAndSettle();
+      }
+
+      await appuis(1);
+      expect(etat.manquant(l4, fromage), isFalse);
+      expect(etat.ligne(l4, fromage)!.coche, isFalse, reason: 'après une pause : vide');
+      await appuis(3);
       expect(etat.estPasBesoin(l4, fromage), isTrue);
       expect(etat.manquant(l4, fromage), isFalse);
       await tester.pump(const Duration(seconds: 3));
-      await tester.tap(find.byKey(ValueKey('case-$fromage')));
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.tap(find.byKey(ValueKey('case-$fromage')));
-      await tester.pumpAndSettle();
+      await appuis(3); // pause : vide, puis cochée, manquant
       expect(etat.manquant(l4, fromage), isTrue);
       expect(etat.estPasBesoin(l4, fromage), isFalse);
       for (var i = 0; i < 4; i++) {

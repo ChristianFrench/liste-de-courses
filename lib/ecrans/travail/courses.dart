@@ -323,44 +323,52 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
 
   String? _dernierAppui;
   DateTime _dernierAppuiLe = DateTime(2000);
-  int _nbAppuis = 0;
 
-  /// Toucher la case coche ou décoche ; deux appuis rapprochés sur la même case marquent l'article manquant,
-  /// trois appuis « Pas besoin » (24/11/2026, Aristide) ; un article manquant ou « pas besoin » touché est pris (coché).
-  /// 13/11/2026 (Aristide) : le secteur où l'on vient de cocher prend le haut de l'écran.
+  /// Délai entre deux appuis d'une même série (24/11/2026, Aristide : « une boucle avec un délai de 1 ou 2 secondes »).
+  static const delaiSerie = Duration(milliseconds: 1500);
+
+  /// L'état de la case : 0 vide, 1 cochée, 2 manquant, 3 pas besoin.
+  int _etatCase(Etat etat, Liste l, String id) => etat.estPasBesoin(l, id)
+      ? 3
+      : etat.manquant(l, id)
+          ? 2
+          : (etat.ligne(l, id)?.coche ?? false)
+              ? 1
+              : 0;
+
+  void _mettreCase(Etat etat, Liste l, String id, int n) {
+    final g = etat.ligne(l, id);
+    if (g == null) return;
+    switch (n) {
+      case 0 || 1:
+        if (etat.estPasBesoin(l, id)) etat.marquerPasBesoin(l, id, false);
+        if (etat.manquant(l, id)) etat.marquerManquant(l, id, false);
+        if (g.coche != (n == 1)) etat.cocher(l, id);
+      case 2:
+        etat.marquerManquant(l, id, true);
+      case 3:
+        etat.marquerPasBesoin(l, id, true);
+    }
+  }
+
+  /// 24/11/2026 (Aristide) : les appuis rapprochés (moins de [delaiSerie] entre deux) font tourner la case
+  /// en boucle : cochée, manquant, pas besoin, vide… Après une pause, un appui coche une case vide
+  /// et remet à vide une case cochée, manquante ou « pas besoin ».
+  /// 13/11/2026 (Aristide) : le secteur où l'on vient de cocher prend le haut de l'écran, la série finie.
   void _appui(Etat etat, Liste l, Produit p, Etape? x) {
     final maintenant = clock.now(); // heure simulée dans les essais
-    final suite = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < const Duration(milliseconds: 450);
-    _nbAppuis = suite ? _nbAppuis + 1 : 1;
+    final suite = _dernierAppui == p.id && maintenant.difference(_dernierAppuiLe) < delaiSerie;
     _dernierAppui = p.id;
     _dernierAppuiLe = maintenant;
-    if (_nbAppuis == 2) {
-      HapticFeedback.mediumImpact();
-      etat.marquerManquant(l, p.id, true);
-      Nav.message(context, '« ${p.nom} » : manquant en rayon');
-      return;
-    }
-    if (_nbAppuis == 3) {
-      HapticFeedback.heavyImpact();
-      etat.marquerPasBesoin(l, p.id, true);
-      Nav.message(context, '« ${p.nom} » : pas besoin');
-      return;
-    }
-    if (_nbAppuis > 3) return;
-    if (etat.estPasBesoin(l, p.id)) {
-      etat.marquerPasBesoin(l, p.id, false);
-      if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
-    } else if (etat.manquant(l, p.id)) {
-      etat.marquerManquant(l, p.id, false);
-      if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
-    } else {
-      etat.cocher(l, p.id);
-    }
-    HapticFeedback.selectionClick();
-    if (x == null || !(etat.ligne(l, p.id)?.coche ?? false)) return;
-    // Après le délai du double appui : la case ne bouge pas sous le doigt entre deux appuis.
-    Future.delayed(const Duration(milliseconds: 460), () {
-      if (_dernierAppui != p.id || _nbAppuis != 1 || !(etat.ligne(l, p.id)?.coche ?? false)) return;
+    final avant = _etatCase(etat, l, p.id);
+    final apres = suite ? (avant + 1) % 4 : (avant == 0 ? 1 : 0);
+    _mettreCase(etat, l, p.id, apres);
+    apres >= 2 ? HapticFeedback.mediumImpact() : HapticFeedback.selectionClick();
+    if (x == null || apres != 1) return;
+    // La série finie : la case ne bouge pas sous le doigt entre deux appuis.
+    Future.delayed(delaiSerie + const Duration(milliseconds: 10), () {
+      if (_dernierAppui != p.id || clock.now().difference(_dernierAppuiLe) < delaiSerie) return;
+      if (_etatCase(etat, l, p.id) != 1) return;
       final c = _titres[x.id]?.currentContext;
       if (mounted && c != null && c.mounted) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 250));
     });

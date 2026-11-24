@@ -361,7 +361,7 @@ class _Etapes extends StatelessWidget {
       [
         'Au magasin, touchez « Faire les courses » : indiquez qui fait les courses et le parcours.',
         'Les articles sont rangés dans l\'ordre de votre parcours, secteur par secteur. Touchez la grande case d\'un article pour le cocher, '
-            'deux fois pour le dire manquant, trois fois pour « Pas besoin » (inutile cette fois) ; '
+            'puis, en touchant de nouveau sans attendre, manquant, « Pas besoin » (inutile cette fois), vide… ; '
             'un appui long sur la case en montre le détail.',
         'Avec « Enregistrer le parcours », l\'ordre dans lequel vous cochez apprend à l\'application le parcours de ce magasin.',
         'En tête de la liste, les recettes choisies rappellent pour quoi sont certains articles ; une petite note sur un '
