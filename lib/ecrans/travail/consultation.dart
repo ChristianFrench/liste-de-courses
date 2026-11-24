@@ -39,6 +39,7 @@ class EcranConsultation extends StatelessWidget {
             produit: p,
             coche: avecCoches && g.coche,
             manquant: avecCoches && etat.manquant(l, p.id),
+            pasBesoin: avecCoches && etat.estPasBesoin(l, p.id),
             caseCourse: avecCoches,
             onTap: () => detailArticle(context, g),
             onDetail: () => detailArticle(context, g),

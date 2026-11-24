@@ -300,12 +300,14 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
     final p = etat.produit(g.produitId);
     if (p == null) return const SizedBox.shrink();
     final manquant = etat.manquant(l, p.id);
+    final inutile = etat.estPasBesoin(l, p.id);
     return LigneArticle(
       key: ValueKey(p.id),
       ligne: g,
       produit: p,
       coche: g.coche,
       manquant: manquant,
+      pasBesoin: inutile,
       surligne: ajout,
       caseCourse: true,
       // 13/11/2026 (Aristide), généralisé à toutes les versions le 14/11 : aucun geste sur l'article lui-même ;
@@ -313,7 +315,8 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       onCase: () => _appui(etat, l, p, x),
       onCaseLong: () {
         HapticFeedback.mediumImpact();
-        detailArticle(context, g, fermeSeul: true);
+        // 24/11/2026 (Aristide) : le détail propose aussi « Pas besoin » et « Manquant en rayon ».
+        detailArticle(context, g, courses: l);
       },
     );
   }
@@ -335,7 +338,10 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
       Nav.message(context, '« ${p.nom} » : manquant en rayon');
       return;
     }
-    if (etat.manquant(l, p.id)) {
+    if (etat.estPasBesoin(l, p.id)) {
+      etat.marquerPasBesoin(l, p.id, false);
+      if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
+    } else if (etat.manquant(l, p.id)) {
       etat.marquerManquant(l, p.id, false);
       if (!(etat.ligne(l, p.id)?.coche ?? true)) etat.cocher(l, p.id);
     } else {
@@ -385,7 +391,11 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
   Future<void> _terminer(BuildContext context, Liste l) async {
     final etat = Etat.instance;
     final manquants = [for (final g in l.lignes) if (etat.manquant(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''];
-    final reste = [for (final g in l.lignes) if (!g.coche && !etat.manquant(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''];
+    final inutiles = [for (final g in l.lignes) if (etat.estPasBesoin(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''];
+    final reste = [
+      for (final g in l.lignes)
+        if (!g.coche && !etat.manquant(l, g.produitId) && !etat.estPasBesoin(l, g.produitId)) etat.produit(g.produitId)?.nom ?? ''
+    ];
     Widget liste(String titre, List<String> noms, Color couleur) => Padding(
           padding: const EdgeInsets.only(top: 10),
           child: Column(
@@ -412,6 +422,7 @@ class _EcranCoursesSecteurState extends State<EcranCoursesSecteur> {
           Text('${l.nbCoches} article${l.nbCoches > 1 ? 's' : ''} coché${l.nbCoches > 1 ? 's' : ''} sur ${l.lignes.length}.',
               style: Charte.texte(16, gras: true)),
           if (manquants.isNotEmpty) liste('Manquants en rayon', manquants, Charte.rouge),
+          if (inutiles.isNotEmpty) liste('Pas besoin', inutiles, Charte.texteSecondaire),
           if (reste.isNotEmpty) liste('Non cochés', reste, Charte.encre),
           if (etat.apprend(l) && secteurs > 0) ...[
             const SizedBox(height: 8),

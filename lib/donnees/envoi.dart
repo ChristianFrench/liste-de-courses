@@ -219,7 +219,11 @@ String texteResume(Etat etat, Liste l) {
   }
 
   final manquants = [for (final g in l.lignes) if (etat.manquant(l, g.produitId)) nom(g)];
-  final oublies = [for (final g in l.lignes) if (!g.coche && !etat.manquant(l, g.produitId)) nom(g)];
+  final inutiles = [for (final g in l.lignes) if (etat.estPasBesoin(l, g.produitId)) nom(g)];
+  final oublies = [
+    for (final g in l.lignes)
+      if (!g.coche && !etat.manquant(l, g.produitId) && !etat.estPasBesoin(l, g.produitId)) nom(g)
+  ];
   final achetes = [for (final g in l.lignes) if (g.coche && !etat.manquant(l, g.produitId)) nom(g)];
   final b = StringBuffer('Courses terminées · ${etat.magasin(l.magasinId)?.nom ?? ''} · ${etat.nomListe(l)}\n'
       '${achetes.length} acheté${achetes.length > 1 ? 's' : ''} sur ${l.lignes.length}\n');
@@ -232,6 +236,7 @@ String texteResume(Etat etat, Liste l) {
 
   bloc('🔴 OUBLIÉS (non cochés)', oublies);
   bloc('🔵 ABSENTS DES RAYONS', manquants);
+  bloc('⚪ PAS BESOIN', inutiles);
   bloc('✅ ACHETÉS', achetes);
   return b.toString();
 }

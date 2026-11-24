@@ -64,11 +64,36 @@ extension EtatFoyer on Etat {
       g.cocheLe = null;
       g.cochePar = null;
       (manquants[l.id] ??= {}).add(produitId);
+      _retirerPasBesoin(l, produitId);
     } else {
       manquants[l.id]?.remove(produitId);
       if (manquants[l.id]?.isEmpty ?? false) manquants.remove(l.id);
     }
     modifie();
+  }
+
+  bool estPasBesoin(Liste l, String produitId) => pasBesoin[l.id]?.contains(produitId) ?? false;
+
+  /// « Pas besoin » (24/11/2026, Aristide) : pendant les courses, l'article s'avère inutile à l'achat ;
+  /// il est décoché, n'est plus manquant, et ne compte ni dans les oubliés ni dans les achetés.
+  void marquerPasBesoin(Liste l, String produitId, bool oui) {
+    final g = ligne(l, produitId);
+    if (g == null) return;
+    if (oui) {
+      g.cocheLe = null;
+      g.cochePar = null;
+      (pasBesoin[l.id] ??= {}).add(produitId);
+      manquants[l.id]?.remove(produitId);
+      if (manquants[l.id]?.isEmpty ?? false) manquants.remove(l.id);
+    } else {
+      _retirerPasBesoin(l, produitId);
+    }
+    modifie();
+  }
+
+  void _retirerPasBesoin(Liste l, String produitId) {
+    pasBesoin[l.id]?.remove(produitId);
+    if (pasBesoin[l.id]?.isEmpty ?? false) pasBesoin.remove(l.id);
   }
 
   bool estSimple(Liste l) => simples.contains(l.id);

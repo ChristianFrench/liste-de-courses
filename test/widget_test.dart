@@ -163,6 +163,24 @@ void main() {
   setUp(_donnees);
 
   group('Règles', () {
+    test('« Pas besoin » pendant les courses : ni oublié ni acheté, ni manquant ; résumé à part', () {
+      final e = Etat.instance;
+      final l = e.liste('l4')!;
+      final a = l.lignes[0].produitId, b = l.lignes[1].produitId;
+      e.marquerManquant(l, a, true);
+      e.marquerPasBesoin(l, a, true);
+      expect(e.estPasBesoin(l, a), isTrue);
+      expect(e.manquant(l, a), isFalse, reason: 'pas besoin remplace manquant');
+      e.cocher(l, b);
+      e.marquerPasBesoin(l, b, true);
+      expect(e.ligne(l, b)!.coche, isFalse, reason: 'pas besoin décoche');
+      final r = texteResume(e, l);
+      expect(r, contains('PAS BESOIN (2)'));
+      expect(RegExp(r'OUBLIÉS[^\n]*\n(- [^\n]*\n)*').firstMatch(r)?.group(0) ?? '', isNot(contains(e.produit(a)!.nom)));
+      e.marquerManquant(l, a, true);
+      expect(e.estPasBesoin(l, a), isFalse, reason: 'manquant remplace pas besoin');
+    });
+
     test('7. ordre du parcours ; changer de parcours change l\'ordre ; « Non placé » en dernier', () {
       final e = Etat.instance;
       final l = e.liste('l4')!;

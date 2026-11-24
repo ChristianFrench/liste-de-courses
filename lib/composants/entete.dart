@@ -479,7 +479,12 @@ class Aides {
       "toucher|Toucher une étape|Lire son explication.\n"
       "toucher|Toucher une liste|La reprendre, la valider ou faire les courses.\n"
       "recette|Toucher une recette|L'ouvrir pour cuisiner ; appui long pour l'effacer.\n"
-      "gerer|Toucher l'engrenage, en bas|Ouvrir Gérer.";
+      "#En bas de l'écran\n"
+      "accueil|Accueil|Cet écran : ce qui est en cours.\n"
+      "recette|Recettes|Choisir des recettes et noter leurs ingrédients.\n"
+      "crayon|Préparer|Construire les listes avant les courses.\n"
+      "chariot|Courses|Faire les courses, puis retrouver les courses finies.\n"
+      "gerer|Engrenage|Gérer : foyer, magasins, catalogues, paramètres.";
 
   static const recettes = "Choisir des recettes et noter leurs ingrédients\n"
       "#À l'écran\n"
@@ -569,7 +574,8 @@ class Aides {
       "#Vous pouvez\n"
       "fini|Toucher la case|L'article est dans le chariot.\n"
       "alerte|Toucher deux fois|L'article manque au rayon.\n"
-      "voir|Appui long|Voir le détail de l'article.\n"
+      "voir|Appui long|Le détail de l'article, avec « Pas besoin » et « Manquant en rayon ».\n"
+      "interdit|Pas besoin|L'article est inutile cette fois : case avec un tiret, nom gris barré.\n"
       "pause|Pause|Interrompre sans rien perdre.\n"
       "drapeau|Terminer|Voir les manquants, puis ranger la course.";
 

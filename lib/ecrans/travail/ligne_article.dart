@@ -16,6 +16,7 @@ class LigneArticle extends StatelessWidget {
     this.reglage,
     this.coche = false,
     this.manquant = false,
+    this.pasBesoin = false,
     this.surligne = false,
     this.caseCourse = false,
     this.onPromo,
@@ -42,6 +43,9 @@ class LigneArticle extends StatelessWidget {
 
   /// Manquant en rayon : nom en rouge, barré.
   final bool manquant;
+
+  /// « Pas besoin » (24/11/2026, Aristide) : inutile à l'achat cette fois ; nom gris barré, case avec un tiret.
+  final bool pasBesoin;
   final bool surligne;
 
   /// Pendant les courses : case cochée (un appui) ou croix rouge (manquant, double appui).
@@ -54,7 +58,7 @@ class LigneArticle extends StatelessWidget {
     final k = etat.packagingDe(g, produit);
     final couleurPack = k == null ? null : etat.couleurPack(k.id);
     final couleurPromo = g.promotion == null ? null : etat.couleurPromo(g.promotion!.type);
-    final grise = coche || manquant;
+    final grise = coche || manquant || pasBesoin;
     // La ligne grandit avec le texte (loupe des courses, réglage du téléphone).
     // En courses, la ligne fait 40 points pour une grande case (30 en préparation).
     // Essai des gestes de courses (démonstration seulement, 13/11/2026) : grande case, seule à réagir.
@@ -62,7 +66,7 @@ class LigneArticle extends StatelessWidget {
     final hauteur = (essai ? Charte.ligneListe : Charte.ligne) * MediaQuery.textScalerOf(context).scale(16) / 16;
     // 21/11/2026 (Aristide) : les cases un peu plus petites (0,72 → 0,64 de la ligne).
     final taille = hauteur * 0.64;
-    final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche ? Charte.texteSecondaire : Charte.encre)).copyWith(
+    final styleNom = Charte.texte(16, couleur: manquant ? Charte.rouge : (coche || pasBesoin ? Charte.texteSecondaire : Charte.encre)).copyWith(
       decoration: grise ? TextDecoration.lineThrough : null,
     );
     // Les petits signes ont une zone de toucher plus large que leur dessin.
@@ -104,6 +108,8 @@ class LigneArticle extends StatelessWidget {
                   ),
                   child: Icone(Icons.close, size: 16, color: Charte.rouge),
                 )
+              else if (pasBesoin)
+                _CasePasBesoin(20)
               else
                 CaseACocher(coche: coche, taille: 20),
               const SizedBox(width: 2),
@@ -112,7 +118,7 @@ class LigneArticle extends StatelessWidget {
               Semantics(
                 button: true,
                 checked: coche,
-                label: manquant ? 'Manquant : toucher si trouvé' : (coche ? 'Décocher' : 'Cocher'),
+                label: manquant ? 'Manquant : toucher si trouvé' : pasBesoin ? 'Pas besoin : toucher pour le prendre' : (coche ? 'Décocher' : 'Cocher'),
                 child: InkWell(
                   key: ValueKey('case-${produit.id}'),
                   onTap: onCase,
@@ -132,7 +138,9 @@ class LigneArticle extends StatelessWidget {
                               ),
                               child: Icone(Icons.close, size: taille * 0.8, color: Charte.rouge),
                             )
-                          : CaseACocher(coche: coche, taille: taille),
+                          : pasBesoin
+                              ? _CasePasBesoin(taille)
+                              : CaseACocher(coche: coche, taille: taille),
                     ),
                   ),
                 ),
@@ -144,7 +152,7 @@ class LigneArticle extends StatelessWidget {
                 TextSpan(text: produit.nom, style: styleNom, children: [
                   // 13/11/2026 (Aristide) : la marque choisie se voit sur la ligne (« Lait demi-écrémé · Lactel »).
                   if (Etat.instance.marque(g.marqueId) case final m? when !produit.nom.toLowerCase().contains(m.nom.toLowerCase()))
-                    TextSpan(text: ' · ${m.nom}', style: Charte.texte(15, couleur: coche || manquant ? (styleNom.color ?? Charte.cadre) : Charte.cadre)),
+                    TextSpan(text: ' · ${m.nom}', style: Charte.texte(15, couleur: grise ? (styleNom.color ?? Charte.cadre) : Charte.cadre)),
                   if (g.consigne != null) TextSpan(text: '  « ${g.consigne} »', style: Charte.texte(13, couleur: Charte.texteSecondaire)),
                 ]),
                 maxLines: 1,
@@ -198,7 +206,7 @@ class LigneArticle extends StatelessWidget {
 
 /// Détail d'un article pendant les courses : en clair, dans un volet.
 /// [fermeSeul] (appui long sur la case, 13/11/2026, Aristide) : le volet se ferme tout seul après 4 secondes.
-Future<void> detailArticle(BuildContext context, LigneListe g, {bool fermeSeul = false}) async {
+Future<void> detailArticle(BuildContext context, LigneListe g, {bool fermeSeul = false, Liste? courses}) async {
   final etat = Etat.instance;
   final p = etat.produit(g.produitId);
   final k = p == null ? null : etat.packagingDe(g, p);
@@ -226,6 +234,28 @@ Future<void> detailArticle(BuildContext context, LigneListe g, {bool fermeSeul =
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [for (final x in lignes) Padding(padding: const EdgeInsets.only(bottom: 6), child: Text(x, style: Charte.texte(17)))],
       ),
+      // 24/11/2026 (Aristide) : pendant les courses, dire qu'un article est inutile à l'achat, ou absent du rayon.
+      boutons: [
+        if (courses != null && p != null) ...[
+          Bouton(
+            key: const ValueKey('pas-besoin'),
+            texte: etat.estPasBesoin(courses, p.id) ? 'Finalement, je le prends' : 'Pas besoin',
+            plein: true,
+            onTap: () {
+              etat.marquerPasBesoin(courses, p.id, !etat.estPasBesoin(courses, p.id));
+              Navigator.of(ctx).pop();
+            },
+          ),
+          Bouton(
+            key: const ValueKey('manquant-en-rayon'),
+            texte: etat.manquant(courses, p.id) ? 'Trouvé finalement' : 'Manquant en rayon',
+            onTap: () {
+              etat.marquerManquant(courses, p.id, !etat.manquant(courses, p.id));
+              Navigator.of(ctx).pop();
+            },
+          ),
+        ],
+      ],
     ),
   );
   ouvert = false;
@@ -242,4 +272,22 @@ String codeCourtPackaging(String libelle) {
   if (n != null && (l.startsWith('pack') || l.startsWith('lot') || l.startsWith('boîte de') || l.startsWith('paquet'))) return '×$n';
   final t = l.replaceAll(' ', '');
   return t.length <= 5 ? t : t.substring(0, 5);
+}
+
+/// Case d'un article « Pas besoin » : un tiret gris.
+class _CasePasBesoin extends StatelessWidget {
+  const _CasePasBesoin(this.taille);
+  final double taille;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: taille,
+        height: taille,
+        decoration: BoxDecoration(
+          color: Charte.blanc,
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(color: Charte.texteSecondaire, width: Charte.traitCadre),
+        ),
+        child: Icone(Icons.remove, size: taille * 0.8, color: Charte.texteSecondaire),
+      );
 }

@@ -110,6 +110,9 @@ class Etat extends ChangeNotifier {
   /// Articles manquants en rayon, signalés pendant les courses (identifiant de liste → produits).
   Map<String, Set<String>> manquants = {};
 
+  /// Articles « Pas besoin », signalés pendant les courses (24/11/2026, Aristide) : inutiles à l'achat cette fois.
+  Map<String, Set<String>> pasBesoin = {};
+
   /// Listes simples : préparées sans rayons ni secteurs, dans l'ordre où les articles ont été ajoutés.
   /// Elles le restent en préparation, même reprises après « Liste prête ».
   Set<String> simples = {};
@@ -519,6 +522,7 @@ class Etat extends ChangeNotifier {
     commentaires = {for (final e in (options?['commentaires'] as Map? ?? {}).entries) e.key as String: e.value as String};
     noteRecettes = [for (final n in (options?['noteRecettes'] as List? ?? const []).whereType<Map>()) NoteRecette.depuis(n)];
     manquants = {for (final e in (options?['manquants'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
+    pasBesoin = {for (final e in (options?['pasBesoin'] as Map? ?? {}).entries) e.key as String: _ids(e.value).toSet()};
     simples = _ids(options?['simples']).toSet();
     datesPrevues = {for (final e in (options?['datesPrevues'] as Map? ?? {}).entries) e.key as String: e.value as String};
     libellesTickets = {for (final e in (options?['libellesTickets'] as Map? ?? {}).entries) e.key as String: e.value as String};

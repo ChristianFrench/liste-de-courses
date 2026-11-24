@@ -320,6 +320,7 @@ extension EtatChargement on Etat {
             if (commentaires.isNotEmpty) 'commentaires': commentaires,
             if (noteRecettes.isNotEmpty) 'noteRecettes': [for (final n in noteRecettes) n.versJson()],
             if (manquants.isNotEmpty) 'manquants': {for (final e in manquants.entries) e.key: e.value.toList()},
+            if (pasBesoin.isNotEmpty) 'pasBesoin': {for (final e in pasBesoin.entries) e.key: e.value.toList()},
             if (simples.isNotEmpty) 'simples': simples.toList(),
             if (datesPrevues.isNotEmpty) 'datesPrevues': datesPrevues,
             if (libellesTickets.isNotEmpty) 'libellesTickets': libellesTickets,
