@@ -169,6 +169,8 @@ class Nav extends ChangeNotifier {
       ..showSnackBar(SnackBar(
         content: Text(texte, style: Charte.texte(15, couleur: Charte.blanc)),
         duration: Duration(seconds: annuler == null ? 2 : 5),
+        // 25/11/2026 : avec « Annuler », Flutter garde désormais le message jusqu'à ce qu'on le ferme ; il part seul.
+        persist: false,
         action: annuler == null ? null : SnackBarAction(label: 'Annuler', textColor: Charte.blanc, onPressed: annuler),
       ));
   }

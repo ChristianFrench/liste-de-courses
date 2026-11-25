@@ -538,7 +538,7 @@ class _EcranConstructionState extends State<EcranConstruction> {
     final g = etat.ligne(l, p.id);
     if (avecPromo && EcranConstruction.promoApresRecherche && g != null && g.promotion == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) proposerPromo(context, l, g);
+        if (mounted) proposerPromo(context, l, g, abandonner: () => _retirer(l, p));
       });
     }
     Future.delayed(const Duration(seconds: 3), () {

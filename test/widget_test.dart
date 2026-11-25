@@ -1157,12 +1157,23 @@ void main() {
       await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
       await tester.pumpAndSettle();
       // 04/11/2026 : après l'ajout par la recherche, le volet « Promo » : la nature, la valeur, OK
-      final ligne = Etat.instance.listes.last.lignes.last;
-      expect(find.text('Promo pour ${etat.produit(ligne.produitId)!.nom} ?'), findsOneWidget);
+      final ligne0 = Etat.instance.listes.last.lignes.last;
+      expect(find.text('Promo pour ${etat.produit(ligne0.produitId)!.nom} ?'), findsOneWidget);
       // 13/11/2026 : le nombre à acheter, en haut du même volet, appliqué aussitôt
       expect(find.byKey(const ValueKey('promo-nombre')), findsOneWidget);
+      // 25/11/2026 : « Abandonner l'article » le retire de la liste ; on le reprend par la recherche
+      final avant = Etat.instance.listes.last.lignes.length;
+      await _toucher(tester, find.byKey(const ValueKey('abandonner-article')));
+      expect(Etat.instance.listes.last.lignes.length, avant - 1);
+      await tester.pump(const Duration(seconds: 6));
+      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'dentifr');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
+      await tester.pumpAndSettle();
+      expect(Etat.instance.listes.last.lignes.length, avant);
       await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
       await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
+      final ligne = Etat.instance.listes.last.lignes.last;
       expect(ligne.quantite, 3);
       await _toucher(tester, find.byKey(const ValueKey('promo-moins')));
       expect(ligne.quantite, 2);
@@ -1180,7 +1191,10 @@ void main() {
       await _toucher(tester, find.text('OK'));
       expect(find.text('LOT3+1'), findsOneWidget);
       expect(ligne.quantite, 3, reason: 'la quantité suit le lot');
-      await tester.pump(const Duration(seconds: 4));
+      for (var i = 0; i < 4; i++) {
+        await tester.pump(const Duration(seconds: 3)); // les messages en bas, l'un après l'autre
+        await tester.pumpAndSettle();
+      }
       await _toucher(tester, find.text('Liste prête'));
       expect(find.textContaining('il l\'acceptera ou la refusera'), findsOneWidget);
       await _toucher(tester, find.text('Valider'));
