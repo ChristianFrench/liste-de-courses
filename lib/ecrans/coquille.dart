@@ -4,6 +4,7 @@ import 'dart:async';
 // ignore_for_file: prefer_const_constructors
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 
 import '../composants/composants.dart';
 import '../donnees/base_locale.dart' show ecrireSurDisque;
@@ -39,6 +40,24 @@ class BarreOnglets extends StatelessWidget {
     // 23/11/2026 (Aristide) : l'engrenage des paramètres, en bas.
     Nav.gerer: (Icons.settings_outlined, 'Gérer'),
   };
+
+  /// 25/11/2026 (Aristide) : comme Chrome sur téléphone, la barre s'efface quand on fait défiler une liste
+  /// vers le bas et revient dès qu'on remonte (ou qu'on change d'onglet).
+  static final visible = ValueNotifier<bool>(true);
+
+  /// Faux dans les essais d'écrans, où l'on fait défiler puis touche les onglets.
+  static bool masquageAuDefilement = true;
+
+  /// Défilement vu dans un onglet : sens du doigt → barre visible ou non.
+  static bool suivreDefilement(UserScrollNotification n) {
+    if (!masquageAuDefilement || n.metrics.axis != Axis.vertical) return false;
+    if (n.direction == ScrollDirection.reverse) {
+      if (n.metrics.extentAfter > 0) visible.value = false;
+    } else if (n.direction == ScrollDirection.forward || n.metrics.pixels <= n.metrics.minScrollExtent) {
+      visible.value = true;
+    }
+    return false;
+  }
 
   /// Icône et libellé des onglets de la barre, dans l'ordre affiché.
   static List<(IconData, String)> get entrees => [for (final o in Nav.ordre) _entrees[o]!];
@@ -124,7 +143,9 @@ class Coquille extends StatelessWidget {
         },
         child: Scaffold(
           backgroundColor: Charte.fond,
-          body: IndexedStack(
+          body: NotificationListener<UserScrollNotification>(
+           onNotification: BarreOnglets.suivreDefilement,
+           child: IndexedStack(
             index: nav.onglet,
             children: [
               for (var o = 0; o < Nav.nbOnglets; o++)
@@ -133,8 +154,9 @@ class Coquille extends StatelessWidget {
                   onGenerateRoute: (_) => MaterialPageRoute<void>(builder: (_) => RacineOnglet(onglet: o)),
                 ),
             ],
+           ),
           ),
-          bottomNavigationBar: BarreOnglets(actif: nav.onglet, onChoix: (o) => nav.allerOnglet(o)),
+          bottomNavigationBar: _BarreEffacable(onglet: nav.onglet),
         ),
       ),
       ))))),
@@ -481,4 +503,36 @@ class _DejaOuverte extends StatelessWidget {
       ),
     );
   }
+}
+
+/// La barre des onglets, qui glisse hors de l'écran au défilement (25/11/2026, Aristide).
+class _BarreEffacable extends StatefulWidget {
+  const _BarreEffacable({required this.onglet});
+  final int onglet;
+
+  @override
+  State<_BarreEffacable> createState() => _BarreEffacableState();
+}
+
+class _BarreEffacableState extends State<_BarreEffacable> {
+  @override
+  void didUpdateWidget(_BarreEffacable ancien) {
+    super.didUpdateWidget(ancien);
+    // Changer d'onglet fait revenir la barre.
+    if (ancien.onglet != widget.onglet) BarreOnglets.visible.value = true;
+  }
+
+  @override
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: BarreOnglets.visible,
+        builder: (context, visible, _) => ClipRect(
+          child: AnimatedAlign(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            alignment: Alignment.topCenter,
+            heightFactor: visible ? 1 : 0,
+            child: BarreOnglets(actif: widget.onglet, onChoix: (o) => Nav.i.allerOnglet(o)),
+          ),
+        ),
+      );
 }

@@ -81,6 +81,8 @@ void main() {
     e.enregistrementActif = false;
     e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
     Nav.i.reinitialiser();
+    BarreOnglets.masquageAuDefilement = false; // la barre reste en place (essai à part)
+    BarreOnglets.visible.value = true;
 
     tester.view.physicalSize = const Size(780, 1688);
     tester.view.devicePixelRatio = 2;

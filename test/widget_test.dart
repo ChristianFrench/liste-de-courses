@@ -46,6 +46,8 @@ void _donnees() {
   EcranConstruction.promoApresRecherche = false; // le volet « Promo » est essayé à part
   e.lire(jsonDecode(File('assets/donnees_maquette.json').readAsStringSync()) as Map<String, dynamic>);
   Nav.i.reinitialiser();
+  BarreOnglets.masquageAuDefilement = false; // la barre reste en place (essai à part)
+  BarreOnglets.visible.value = true;
 }
 
 /// Écran de référence : 390 × 844 avec encoche et barre du bas.
@@ -608,6 +610,23 @@ void main() {
       expect(find.textContaining('Changer d\'onglet', findRichText: true), findsOneWidget);
       await _fermerVolet(tester);
       expect(find.text('Aide · Préparer'), findsNothing);
+    });
+
+    testWidgets('la barre des onglets s\'efface en descendant une liste et revient en remontant', (tester) async {
+      BarreOnglets.masquageAuDefilement = true;
+      addTearDown(() => BarreOnglets.masquageAuDefilement = false);
+      await _lancer(tester);
+      await tester.tap(_onglet('Recettes'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('Tout déplier').hitTestable().first); // une longue liste
+      await tester.pumpAndSettle();
+      final liste = find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).hitTestable().first;
+      await tester.drag(liste, const Offset(0, -300));
+      await tester.pumpAndSettle();
+      expect(BarreOnglets.visible.value, isFalse);
+      await tester.drag(liste, const Offset(0, 100));
+      await tester.pumpAndSettle();
+      expect(BarreOnglets.visible.value, isTrue);
     });
 
     testWidgets('1 et 2. les 3 onglets, les rubriques de Gérer et leurs sous-onglets mémorisés', (tester) async {
