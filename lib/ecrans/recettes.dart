@@ -153,6 +153,7 @@ class _EcranRecettesState extends State<EcranRecettes> {
                   pliable: true,
                   parDefaut: false,
                   marge: 0, // 23/11/2026 : bandes des sous-types sur toute la largeur
+                  sansDebord: true, // 25/11/2026 : pas d'espace blanc entre les types
                   enfants: [
                     for (final (i, r) in parType[t]!.indexed) ...[
                       if (parType[t]!.any((x) => x.sousTypes[t] != null) &&

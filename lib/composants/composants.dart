@@ -674,9 +674,14 @@ class GroupeRetractable extends StatelessWidget {
     this.pliable = false,
     this.emplettes,
     this.signe,
+    this.sansDebord = false,
   });
   final String cle;
   final bool ajoute;
+
+  /// 25/11/2026 (Aristide) : pas d'espace blanc entre les bandeaux repliés (types de recettes) ;
+  /// l'image tient alors dans le bandeau, sans déborder dessous.
+  final bool sansDebord;
 
   /// Image du bandeau fournie toute faite (types de recettes, 20/11/2026), prioritaire sur les autres.
   final Widget? signe;
@@ -729,7 +734,10 @@ class GroupeRetractable extends StatelessWidget {
     // suivante ; replié, le groupe laisse la place de ce débord.
     return Stack(clipBehavior: Clip.none, children: [
       _colonne(context, ouvert, signe != null),
-      if (signe != null) Positioned(left: 6, top: 3, width: 46, height: 46, child: IgnorePointer(child: signe)),
+      if (signe != null)
+        sansDebord
+            ? Positioned(left: 9, top: 1, width: 38, height: 38, child: IgnorePointer(child: signe))
+            : Positioned(left: 6, top: 3, width: 46, height: 46, child: IgnorePointer(child: signe)),
     ]);
   }
 
@@ -768,7 +776,7 @@ class GroupeRetractable extends StatelessWidget {
             ],
           ),
         ),
-        if (avecSigne && (!ouvert || (enfants.isEmpty && vide == null))) const SizedBox(height: _debord),
+        if (avecSigne && !sansDebord && (!ouvert || (enfants.isEmpty && vide == null))) const SizedBox(height: _debord),
       ],
     );
   }
