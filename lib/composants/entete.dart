@@ -84,7 +84,8 @@ class EnTeteFenetre extends StatelessWidget {
             colorFilter: ColorFilter.mode(Color(0x38000000), BlendMode.darken),
           ),
         ),
-        padding: EdgeInsets.only(left: retour ? 0 : 12, right: 4, top: 6),
+        // La place de la barre d'état (quand l'en-tête est tout en haut de l'écran), puis 6.
+        padding: EdgeInsets.only(left: retour ? 0 : 12, right: 4, top: 6 + MediaQuery.paddingOf(context).top),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'icone.dart';
 
 import '../theme.dart';
-import 'entete.dart' show glisserOnglet;
+import 'entete.dart' show EnTeteFenetre, glisserOnglet;
 import 'pictogramme.dart';
 import '../donnees/affichage.dart';
 
@@ -33,7 +33,10 @@ class _PageBaseState extends State<PageBase> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Charte.fond,
+      // 26/11/2026 (Aristide) : comme sur l'accueil, la photo de l'en-tête passe sous la barre d'état d'Android
+      // (icônes blanches sur l'image assombrie) au lieu d'un fond gris.
       body: SafeArea(
+        top: widget.entete is! EnTeteFenetre,
         child: Builder(
           // Glisser le doigt sur une zone libre de la fenêtre passe à l'onglet voisin, comme sur le bandeau
           // (les lignes qui se glissent gardent leur geste : elles l'emportent).
