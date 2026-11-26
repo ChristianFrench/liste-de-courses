@@ -1161,19 +1161,9 @@ void main() {
       expect(find.text('Promo pour ${etat.produit(ligne0.produitId)!.nom} ?'), findsOneWidget);
       // 13/11/2026 : le nombre à acheter, en haut du même volet, appliqué aussitôt
       expect(find.byKey(const ValueKey('promo-nombre')), findsOneWidget);
-      // 25/11/2026 : « Abandonner l'article » le retire de la liste ; on le reprend par la recherche
-      final avant = Etat.instance.listes.last.lignes.length;
-      await _toucher(tester, find.byKey(const ValueKey('abandonner-article')));
-      expect(Etat.instance.listes.last.lignes.length, avant - 1);
-      await tester.pump(const Duration(seconds: 6));
-      await tester.enterText(find.byKey(const ValueKey('champ-recherche')), 'dentifr');
-      await tester.pumpAndSettle();
-      await tester.tap(find.byKey(const ValueKey('option-recherche-0')));
-      await tester.pumpAndSettle();
-      expect(Etat.instance.listes.last.lignes.length, avant);
       await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
       await _toucher(tester, find.byKey(const ValueKey('promo-plus')));
-      final ligne = Etat.instance.listes.last.lignes.last;
+      final ligne = ligne0;
       expect(ligne.quantite, 3);
       await _toucher(tester, find.byKey(const ValueKey('promo-moins')));
       expect(ligne.quantite, 2);

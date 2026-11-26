@@ -139,9 +139,11 @@ class ListeDeCoursesApp extends StatelessWidget {
         child: Focus(
           autofocus: true,
           child: FormatTelephone(
-            child: demonstration
-                ? Banner(message: 'DÉMO', location: BannerLocation.topEnd, color: const Color(0xFFC62828), child: enfant!)
-                : enfant!,
+            child: BarreEtatVisible(
+              child: demonstration
+                  ? Banner(message: 'DÉMO', location: BannerLocation.topEnd, color: const Color(0xFFC62828), child: enfant!)
+                  : enfant!,
+            ),
           ),
         ),
       ),
@@ -186,6 +188,37 @@ class FormatTelephone extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// 26/11/2026 (Aristide) : la barre d'état d'Android doit rester visible. Depuis Android 15, l'application
+/// s'étend sous elle et sa couleur de fond est ignorée : un bandeau sombre est dessiné sous ses icônes blanches,
+/// au-dessus de tout (en-têtes clairs, volets).
+class BarreEtatVisible extends StatelessWidget {
+  const BarreEtatVisible({super.key, required this.child});
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final haut = MediaQuery.paddingOf(context).top;
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        statusBarColor: Color(0x00000000),
+        statusBarIconBrightness: Brightness.light,
+        statusBarBrightness: Brightness.dark,
+      ),
+      child: Stack(children: [
+        child,
+        if (haut > 0)
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: haut,
+            child: const IgnorePointer(child: ColoredBox(color: Color(0x66000000))),
+          ),
+      ]),
     );
   }
 }

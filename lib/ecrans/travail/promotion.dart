@@ -213,16 +213,14 @@ String texteCourtPromo(PromotionLigne p) {
 }
 
 /// Promotion d'une ligne de préparation : le volet « Promo », puis la ligne mise à jour.
-/// [abandonner] (ajout par la recherche, 25/11/2026, Aristide) : le volet propose aussi d'abandonner l'article.
-Future<void> proposerPromo(BuildContext context, Liste l, LigneListe g, {VoidCallback? abandonner}) async {
+Future<void> proposerPromo(BuildContext context, Liste l, LigneListe g) async {
   final etat = Etat.instance;
   // 13/11/2026 (Aristide) : le nombre à acheter en haut du même volet.
   final r = await voletPromo(context,
       article: etat.produit(g.produitId)?.nom ?? 'l\'article',
       actuelle: g.promotion,
       quantite: g.quantite,
-      onQuantite: (q) => etat.quantite(l, g.produitId, q),
-      abandonner: abandonner);
+      onQuantite: (q) => etat.quantite(l, g.produitId, q));
   if (r != null) etat.definirPromotion(l, g.produitId, r.promo);
 }
 
@@ -231,7 +229,7 @@ Future<void> proposerPromo(BuildContext context, Liste l, LigneListe g, {VoidCal
 /// Rend la promotion choisie (promo null : sans promotion), ou null si le volet est fermé sans choix.
 /// [quantite] et [onQuantite] (ajout par la recherche) : le nombre à acheter, en haut, appliqué aussitôt.
 Future<({PromotionLigne? promo})?> voletPromo(BuildContext context,
-    {required String article, PromotionLigne? actuelle, int? quantite, ValueChanged<int>? onQuantite, VoidCallback? abandonner}) {
+    {required String article, PromotionLigne? actuelle, int? quantite, ValueChanged<int>? onQuantite}) {
   final etat = Etat.instance;
   var nombre = quantite ?? 1;
   final types = [
@@ -371,17 +369,6 @@ Future<({PromotionLigne? promo})?> voletPromo(BuildContext context,
             zone,
           ]),
           boutons: [
-            // 25/11/2026 (Aristide) : la promo valide l'article ; on peut aussi l'abandonner (il quitte la liste).
-            if (abandonner != null)
-              Bouton(
-                key: const ValueKey('abandonner-article'),
-                texte: 'Abandonner l\'article',
-                icone: Icons.remove_circle_outline,
-                onTap: () {
-                  Navigator.of(ctx).pop();
-                  abandonner();
-                },
-              ),
             Bouton(texte: actuelle == null ? 'Sans promo' : 'Retirer', onTap: () => Navigator.of(ctx).pop((promo: null))),
             Bouton(
                 texte: 'OK',
