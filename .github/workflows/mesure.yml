@@ -1,0 +1,30 @@
+# Page de mesure du téléchargement sur le serveur (19/11/2026, Aristide) : https://<domaine>/telechargements/mesure/
+name: mesure
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['outils/mesure/**', '.github/workflows/mesure.yml']
+jobs:
+  depot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          VPS_HOTE: ${{ secrets.VPS_HOTE }}
+          VPS_CLE_DEPLOIEMENT: ${{ secrets.VPS_CLE_DEPLOIEMENT }}
+        run: |
+          set -e
+          D=depot/telechargements/mesure; mkdir -p $D
+          cp outils/mesure/index.html $D/
+          echo ok > $D/ping.txt
+          # Fichiers aléatoires : incompressibles, la mesure n'est pas faussée par la compression.
+          head -c 10485760 /dev/urandom > $D/essai-10mo.bin
+          head -c 52428800 /dev/urandom > $D/essai-50mo.bin
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$VPS_CLE_DEPLOIEMENT" > ~/.ssh/deploiement && chmod 600 ~/.ssh/deploiement
+          rsync -rlz -e "ssh -i $HOME/.ssh/deploiement -o StrictHostKeyChecking=accept-new" depot/ "deploiement@$VPS_HOTE:"
+          rm -f ~/.ssh/deploiement
+          for f in index.html essai-10mo.bin essai-50mo.bin; do echo "$(curl -s -o /dev/null -I -w '%{http_code} %header{content-length}' "https://$VPS_HOTE/telechargements/mesure/$f") $f"; done
+          # Débit mesuré depuis GitHub (États-Unis), pour comparaison.
+          curl -s -o /dev/null -w 'depuis GitHub : %{speed_download} octets/s, %{time_total} s\n' "https://$VPS_HOTE/telechargements/mesure/essai-50mo.bin"

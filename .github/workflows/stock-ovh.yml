@@ -1,0 +1,12 @@
+# Disponibilité des VPS OVH par centre de données (19/11/2026, déménagement du serveur hors du Canada).
+name: stock-ovh
+on: workflow_dispatch
+jobs:
+  stock:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for p in $(curl -fsS "https://eu.api.ovh.com/v1/order/catalog/public/vps?ovhSubsidiary=FR" | jq -r '.plans[].planCode' | grep -E '^vps-20[0-9]+-model[0-9]+$' | sort -u); do
+            echo "== $p"
+            curl -fsS "https://eu.api.ovh.com/v1/vps/order/rule/datacenter?ovhSubsidiary=FR&planCode=$p" | jq -c '.datacenters[]? | {d: .datacenter, s: .status, l: .linuxStatus}' || true
+          done

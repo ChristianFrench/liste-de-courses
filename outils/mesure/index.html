@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mesure du téléchargement</title>
+<style>
+  :root { --fond:#F4F7F5; --carte:#fff; --encre:#375042; --doux:#5E7468; --vert:#3F7D5A; --bord:#CCD7D1; }
+  @media (prefers-color-scheme: dark) { :root { --fond:#18201B; --carte:#222C26; --encre:#E3ECE6; --doux:#A9BBB0; --vert:#7CB98F; --bord:#34433A; } }
+  body { margin:0; background:var(--fond); color:var(--encre); font:16px/1.5 system-ui, "Segoe UI", Roboto, sans-serif; }
+  main { max-width:640px; margin:0 auto; padding:24px 16px; }
+  h1 { color:var(--vert); font-size:24px; margin:0 0 6px; }
+  p.doux { color:var(--doux); margin:0 0 18px; font-size:14px; }
+  .boutons { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+  button { background:var(--vert); color:#fff; border:0; border-radius:10px; padding:12px 18px; font-size:16px; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:default; }
+  .barre { height:10px; background:var(--bord); border-radius:5px; overflow:hidden; margin:6px 0 16px; }
+  .barre div { height:100%; width:0; background:var(--vert); }
+  table { width:100%; border-collapse:collapse; background:var(--carte); border:1px solid var(--bord); border-radius:12px; overflow:hidden; }
+  th, td { padding:8px 10px; text-align:left; border-top:1px solid var(--bord); font-size:15px; }
+  th { border-top:none; color:var(--vert); }
+  #etat { min-height:24px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Mesure du téléchargement</h1>
+<p class="doux">Serveur d'Emplettes. Chaque essai télécharge un fichier sans cache et mesure le temps de réponse (ping) puis le débit.</p>
+<div class="boutons">
+  <button data-f="10">10 Mo</button>
+  <button data-f="50">50 Mo</button>
+  <button id="tout">Ping + 10 Mo + 50 Mo</button>
+</div>
+<div id="etat"></div>
+<div class="barre"><div id="avance"></div></div>
+<table>
+  <thead><tr><th>Heure</th><th>Essai</th><th>Ping</th><th>Durée</th><th>Débit</th></tr></thead>
+  <tbody id="resultats"></tbody>
+</table>
+<p class="doux" style="margin-top:14px">Repère : l'APK d'Emplettes pèse 57 Mo. Débit en mégabits par seconde (Mbit/s) et en mégaoctets par seconde (Mo/s).</p>
+</main>
+<script>
+const etat = document.getElementById('etat'), avance = document.getElementById('avance'), res = document.getElementById('resultats');
+const boutons = [...document.querySelectorAll('button')];
+function ligne(cols) { const tr = document.createElement('tr'); tr.innerHTML = cols.map(c => '<td>' + c + '</td>').join(''); res.prepend(tr); }
+function heure() { return new Date().toLocaleTimeString('fr-FR'); }
+async function ping() {
+  const t = [];
+  for (let i = 0; i < 5; i++) {
+    const d = performance.now();
+    await fetch('ping.txt?t=' + Date.now() + i, { cache: 'no-store' });
+    t.push(performance.now() - d);
+  }
+  t.sort((a, b) => a - b);
+  return Math.round(t[2]);
+}
+async function essai(mo) {
+  const p = await ping();
+  etat.textContent = 'Téléchargement de ' + mo + ' Mo…';
+  avance.style.width = '0';
+  const debut = performance.now();
+  const r = await fetch('essai-' + mo + 'mo.bin?t=' + Date.now(), { cache: 'no-store' });
+  const total = Number(r.headers.get('content-length')) || mo * 1048576;
+  const lecteur = r.body.getReader();
+  let recu = 0;
+  for (;;) {
+    const { done, value } = await lecteur.read();
+    if (done) break;
+    recu += value.length;
+    avance.style.width = (100 * recu / total) + '%';
+  }
+  const s = (performance.now() - debut) / 1000;
+  const mbits = recu * 8 / 1e6 / s;
+  ligne([heure(), mo + ' Mo', p + ' ms', s.toFixed(1) + ' s', mbits.toFixed(1) + ' Mbit/s · ' + (mbits / 8).toFixed(1) + ' Mo/s']);
+  etat.textContent = 'Terminé : ' + mbits.toFixed(1) + ' Mbit/s. L\'APK de 57 Mo prendrait environ ' + Math.round(57 * 8 / mbits) + ' s.';
+}
+async function lancer(f) {
+  boutons.forEach(b => b.disabled = true);
+  try { await f(); } catch (e) { etat.textContent = 'Échec : ' + e.message; }
+  boutons.forEach(b => b.disabled = false);
+}
+boutons.forEach(b => b.dataset.f && b.addEventListener('click', () => lancer(() => essai(Number(b.dataset.f)))));
+document.getElementById('tout').addEventListener('click', () => lancer(async () => { await essai(10); await essai(50); }));
+</script>
+</body>
+</html>

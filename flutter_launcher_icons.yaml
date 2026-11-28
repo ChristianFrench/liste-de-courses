@@ -1,0 +1,9 @@
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/icone.png"
+  adaptive_icon_background: "#D3ECDB"
+  adaptive_icon_foreground: "assets/icone_premier_plan.png"
+  windows:
+    generate: true
+    image_path: "assets/icone_ronde.png"
+    icon_size: 256

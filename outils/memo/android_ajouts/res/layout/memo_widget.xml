@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/memo_fond">
+    <TextView android:id="@+id/titre"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:background="@drawable/memo_bandeau"
+        android:paddingLeft="14dp" android:paddingRight="14dp" android:paddingTop="8dp" android:paddingBottom="8dp"
+        android:text="Mémo Emplettes  ✎" android:textColor="#FFFFFF" android:textSize="16sp" android:textStyle="bold" />
+    <ListView android:id="@+id/liste"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:divider="@null" android:paddingBottom="6dp" />
+    <TextView android:id="@+id/vide"
+        android:layout_width="match_parent" android:layout_height="match_parent"
+        android:gravity="center" android:padding="12dp"
+        android:text="Touchez le titre pour choisir les rubriques à afficher."
+        android:textColor="#375042" android:textSize="14sp" />
+</LinearLayout>

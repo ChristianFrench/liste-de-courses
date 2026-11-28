@@ -1,0 +1,12 @@
+name: voir_recettes
+description: Visionneuse Windows des recettes d'un export Google Keep.
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: ^3.8.0
+dependencies:
+  flutter:
+    sdk: flutter
+  file_selector: ^1.0.3
+flutter:
+  uses-material-design: true

@@ -1,0 +1,11 @@
+# Codes HTTP des téléchargements du serveur (401 = mot de passe demandé), le serveur n'étant pas joignable depuis Claude.
+name: verifier-acces
+on: workflow_dispatch
+jobs:
+  acces:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for f in telechargements/version.json telechargements/Emplettes.apk telechargements/essai/version.json telechargements/essai/Emplettes.apk telechargements/essai/Memo-Emplettes.apk telechargements/essai/Emplettes-demo.apk telechargements/Emplettes-demo.apk telechargements/console/Emplettes-Editeur-Installation.exe; do
+            echo "$(curl -s -o /dev/null -I -w "%{http_code} %header{content-length}" "https://emplettes.eu/$f") $f"
+          done

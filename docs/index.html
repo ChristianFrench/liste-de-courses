@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emplettes</title>
+<meta name="description" content="Emplettes : la liste de courses du foyer, préparée à plusieurs, faite dans l'ordre des rayons.">
+<link rel="icon" href="images/complet.png">
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<!-- Page produite par outils/site/generer.py : modifier le script, pas ce fichier. -->
+<header class="menu">
+  <div class="large">
+    <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+    <button class="burger" aria-label="Menu" aria-expanded="false">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="navigation"><a href="index.html" aria-current="page">Accueil</a><a href="decouvrir.html">Découvrir</a><a href="telecharger.html">Télécharger</a><a href="aide.html">Aide</a><a href="essayer.html" class="essayer">Essayer</a></nav>
+  </div>
+</header>
+<div class="une">
+  <div class="large">
+    <div>
+      <span class="pastille-version" id="uneVersion">Version 1.0</span>
+      <h1>Emplettes</h1>
+      <p class="slogan">Les courses du foyer, de la recette au chariot.</p>
+      <p>On choisit ses recettes, chacun ajoute ce qui manque, depuis son téléphone ou son ordinateur. Au magasin, la liste suit l'ordre des rayons. Sans compte, sans publicité, même sans réseau.</p>
+      <div class="boutons">
+        <a class="bouton plein" href="essayer.html">Essayer maintenant</a>
+        <a class="bouton" href="telecharger.html">Télécharger</a>
+        <a class="bouton" href="#video">Voir la vidéo</a>
+      </div>
+    </div>
+    <div class="scene">
+      <img class="anim" id="animation" src="animation.webp" width="310" height="335" alt="La liste s'écrit, le caddie se remplit, les articles se cochent">
+      <button class="rejouer" id="rejouer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        Rejouer
+      </button>
+    </div>
+  </div>
+</div>
+<main>
+  <section class="chiffres-section">
+    <div class="large">
+      <div class="chiffres">
+        <div class="chiffre"><img src="icones/shopping-cart.png" alt=""><b><span data-chiffre="produits">2 500</span></b><span>produits dans le catalogue, rangés par rayons</span></div>
+        <div class="chiffre"><img src="icones/label.png" alt=""><b><span data-chiffre="marques">2 400</span></b><span>marques connues, proposées pour chaque produit</span></div>
+        <div class="chiffre"><img src="icones/cocotte.png" alt=""><b><span data-chiffre="recettes">596</span></b><span>recettes illustrées, faciles à cuisiner</span></div>
+      </div>
+    </div>
+  </section>
+  <section id="video">
+    <div class="large">
+      <div class="bandeau"><img src="icones/clapper-board.png" alt=""><h2>Emplettes en une minute</h2></div>
+      <video class="film paysage" controls preload="none" poster="video/affiche.jpg" src="video/emplettes.mp4"><track kind="subtitles" srclang="fr" label="Français" src="video/emplettes.vtt"></video>
+      <video class="film vertical" controls preload="none" poster="video/affiche-vertical.jpg" src="video/emplettes-vertical.mp4"><track kind="subtitles" srclang="fr" label="Français" src="video/emplettes.vtt"></video>
+    </div>
+  </section>
+  <section>
+    <div class="large">
+      <div class="bandeau"><img src="images/liste_crayon.png" alt=""><h2>L'essentiel</h2></div>
+      <div class="cartes">
+        <div class="carte"><img src="icones/cocotte.png" alt=""><h3>Des recettes faciles</h3><p>Des plats de tous les jours, expliqués pas à pas. Leurs ingrédients vont tout seuls dans la liste.</p></div>
+        <div class="carte"><img src="icones/memo.png" alt=""><h3>Préparer à plusieurs</h3><p>Une liste commune, que chaque membre du foyer complète. On repart d'une liste type ou des courses précédentes.</p></div>
+        <div class="carte"><img src="icones/shopping-cart.png" alt=""><h3>Dans l'ordre des rayons</h3><p>L'application apprend votre parcours dans chaque magasin : la liste se range dans l'ordre où vous passez.</p></div>
+        <div class="carte"><img src="icones/busts-in-silhouette.png" alt=""><h3>Tout le foyer</h3><p>Un code de foyer suffit, sans compte ni mot de passe. Les données sont chiffrées avec ce code.</p></div>
+        <div class="carte"><img src="icones/cloud.png" alt=""><h3>Même sans réseau</h3><p>Tout est enregistré sur l'appareil : au fond du magasin, l'application fonctionne normalement.</p></div>
+      </div>
+    </div>
+  </section>
+  <section id="recettes">
+    <div class="large">
+      <div class="bandeau"><img src="icones/cuisiner.png" alt=""><h2>Les recettes</h2></div>
+      <div class="recettes-une">
+        <div>
+          <p class="intro"><b><span data-chiffre="recettes">596</span> recettes de tous les jours</b>, de l'apéritif au dessert. Chacune tient en quelques étapes courtes, avec des ingrédients simples et leur quantité : rien de compliqué, tout le monde peut s'y mettre.</p>
+          <ul class="liste-points">
+            <li><b>On choisit</b> une recette par son nom, un ingrédient, la saison ou le temps dont on dispose.</li>
+            <li><b>On coche</b> ce qu'il faut acheter : le sel, l'huile et le reste du placard sont déjà décochés.</li>
+            <li><b>Les ingrédients rejoignent la liste</b>, chacun à sa place dans l'ordre des rayons, avec « pour : la recette ».</li>
+            <li><b>De retour à la maison</b>, la recette attend sur l'accueil : il n'y a plus qu'à cuisiner.</li>
+          </ul>
+          <p class="note">Pour 2 ou pour 8 : les quantités s'ajustent au nombre de personnes.</p>
+        </div>
+        <div class="mosaique">
+          <img src="images/recettes/tarte-tomate-chevre.webp" alt="Tarte fine à la tomate et au chèvre">
+          <img src="images/recettes/poulet-tikka.webp" alt="Poulet tikka masala">
+          <img src="images/recettes/ratatouille.webp" alt="Ratatouille">
+          <img src="images/recettes/tarte-aux-pommes.webp" alt="Tarte aux pommes normande">
+        </div>
+      </div>
+    </div>
+  </section>
+  <section>
+    <div class="large">
+      <div class="bandeau"><img src="images/liste_chariot.png" alt=""><h2>Comment ça marche</h2></div>
+      <div class="etapes">
+        <div class="etape"><span class="no">1</span><div><b>Je choisis mes recettes</b><span>Si je veux : leurs ingrédients sont notés pour la liste.</span></div></div>
+        <div class="etape"><span class="no">2</span><div><b>Je prépare ma liste</b><span>Seul ou à plusieurs, trois lettres suffisent pour trouver un article.</span></div></div>
+        <div class="etape"><span class="no">3</span><div><b>Je la valide</b><span>« Liste prête » : tout le foyer le sait.</span></div></div>
+        <div class="etape"><span class="no">4</span><div><b>Je fais mes courses</b><span>Dans l'ordre des rayons, en cochant au fil des allées.</span></div></div>
+      </div>
+      <div class="boutons" style="margin-top:20px"><a class="bouton plein" href="decouvrir.html">Découvrir les écrans</a><a class="bouton" href="essayer.html">Essayer la démonstration</a></div>
+    </div>
+  </section>
+</main>
+<footer>
+  <div class="large">
+    <div>
+      <a class="marque" href="index.html"><img src="images/complet.png" alt="">Emplettes</a>
+      <p style="margin:0;font-size:14.5px">La liste de courses du foyer, préparée à plusieurs.</p>
+    </div>
+    <div>
+      <h4>L'application</h4>
+      <ul>
+        <li><a href="decouvrir.html">Découvrir</a></li>
+        <li><a href="index.html#recettes">Les recettes</a></li>
+        <li><a href="essayer.html">Essayer</a></li>
+        <li><a href="documents/mode-emploi.html">Mode d'emploi</a></li>
+        <li><a href="documents/depliant.html">Dépliant</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Télécharger</h4>
+      <ul>
+        <li><a href="https://emplettes.eu/telechargements/Emplettes.apk">Android (APK)</a></li>
+        <li><a href="https://emplettes.eu/telechargements/Emplettes-Installation.exe">Windows</a></li>
+        <li><a href="telecharger.html#iphone">iPhone et iPad</a></li>
+        <li><a href="telecharger.html">Installer pas à pas</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Aide</h4>
+      <ul>
+        <li><a href="aide.html#questions">Questions fréquentes</a></li>
+        <li><a href="index.html#video">Vidéo</a></li>
+        <li><a href="aide.html#donnees">Vos données</a></li>
+        <li><a href="aide.html#contact">Contact</a><span class="a-venir">à venir</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="bas"><span id="basVersion">Emplettes · version 1.0</span> · Police Atkinson Hyperlegible et icônes Noto 3D, licence SIL OFL</div>
+</footer>
+<script src="site.js"></script>
+</body>
+</html>

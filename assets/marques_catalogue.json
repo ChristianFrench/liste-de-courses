@@ -1,0 +1,360 @@
+{
+ "secteurs": {
+  "Épicerie salée/Pâtes, riz et féculents": [
+   "Alpina",
+   "Barilla",
+   "Ben's Original",
+   "De Cecco",
+   "Ebly",
+   "Garofalo",
+   "Lustucru",
+   "Panzani",
+   "Rummo",
+   "Taureau Ailé",
+   "Tipiak",
+   "Vivien Paille"
+  ],
+  "Épicerie salée/Conserves": [
+   "Bonduelle",
+   "Cassegrain",
+   "Connétable",
+   "D'Aucy",
+   "Géant Vert",
+   "Parmentier",
+   "Petit Navire",
+   "Raynal et Roquelaure",
+   "Saupiquet"
+  ],
+  "Épicerie salée/Sauces et condiments": [
+   "Amora",
+   "Benedicta",
+   "Bertolli",
+   "Carapelli",
+   "Cauvin",
+   "Costa d'Oro",
+   "Heinz",
+   "Isio 4",
+   "Kühne",
+   "Lesieur",
+   "Maille",
+   "Monini",
+   "Patak's",
+   "Puget",
+   "Sacla",
+   "Tramier"
+  ],
+  "Apéritif/Chips et biscuits apéritif": [
+   "Belin",
+   "Brets",
+   "Bénénuts",
+   "Curly",
+   "Lay's",
+   "Pringles",
+   "Vico"
+  ],
+  "Apéritif/Fruits secs salés et olives": [
+   "Belin",
+   "Brets",
+   "Bénénuts",
+   "Curly",
+   "Lay's",
+   "Pringles",
+   "Vico"
+  ],
+  "Biscuits et sucré/Biscuits et gâteaux": [
+   "BN",
+   "Bonne Maman",
+   "Delacre",
+   "Gerblé",
+   "Lotus",
+   "LU",
+   "Michel et Augustin",
+   "Oreo",
+   "Saint Michel"
+  ],
+  "Biscuits et sucré/Chocolat et confiserie": [
+   "Carambar",
+   "Côte d'Or",
+   "Ferrero",
+   "Haribo",
+   "Kinder",
+   "Kiss Cool",
+   "Krema",
+   "Lindt",
+   "Lutti",
+   "M&M's",
+   "Malabar",
+   "Mentos",
+   "Milka",
+   "Nestlé",
+   "Poulain",
+   "Suchard",
+   "Toblerone",
+   "Valrhona"
+  ],
+  "Petit-déjeuner/Céréales": [
+   "Chocapic",
+   "Fitness",
+   "Jordan's",
+   "Kellogg's",
+   "Lion",
+   "Nestlé",
+   "Quaker"
+  ],
+  "Petit-déjeuner/Confitures et pâtes à tartiner": [
+   "Andros",
+   "Bonne Maman",
+   "Côte d'Or",
+   "Favols",
+   "Lucien Georgelin",
+   "Nocciolata",
+   "Nutella",
+   "Ovomaltine",
+   "Poulain",
+   "St Dalfour"
+  ],
+  "Eaux et boissons sans alcool/Eaux": [
+   "Badoit",
+   "Contrex",
+   "Cristaline",
+   "Evian",
+   "Hépar",
+   "Mont Roucous",
+   "Perrier",
+   "Quézac",
+   "San Pellegrino",
+   "Vittel",
+   "Volvic"
+  ],
+  "Eaux et boissons sans alcool/Sodas et sirops": [
+   "Canada Dry",
+   "Coca-Cola",
+   "Fanta",
+   "Orangina",
+   "Pepsi",
+   "Schweppes",
+   "Seven Up",
+   "Sprite"
+  ],
+  "Eaux et boissons sans alcool/Jus de fruits": [
+   "Andros",
+   "Granini",
+   "Innocent",
+   "Joker",
+   "Pago",
+   "Pampryl",
+   "Pressade",
+   "Tropicana"
+  ],
+  "Petit-déjeuner/Café": [
+   "Carte Noire",
+   "Grand'Mère",
+   "Illy",
+   "Jacques Vabre",
+   "L'Or",
+   "Lavazza",
+   "Malongo",
+   "Nescafé",
+   "Segafredo"
+  ],
+  "Petit-déjeuner/Thé et chocolat en poudre": [
+   "Clipper",
+   "Kusmi Tea",
+   "Lipton",
+   "Pagès",
+   "Twinings",
+   "Yogi Tea",
+   "Éléphant"
+  ],
+  "Crèmerie/Lait": [
+   "Candia",
+   "GrandLait",
+   "Lactel",
+   "Matin Léger",
+   "Viva"
+  ],
+  "Crèmerie/Yaourts et desserts": [
+   "Activia",
+   "Danette",
+   "Danone",
+   "La Laitière",
+   "Malo",
+   "Mamie Nova",
+   "Mont Blanc",
+   "Nestlé",
+   "Perle de Lait",
+   "Yoplait"
+  ],
+  "Crèmerie/Beurre, œufs, crème": [
+   "Elle & Vire",
+   "Isigny",
+   "Le Gall",
+   "Paysan Breton",
+   "Président"
+  ],
+  "Fromagerie/Fromages libre-service": [
+   "Babybel",
+   "Boursin",
+   "Caprice des Dieux",
+   "Chaumes",
+   "Chavroux",
+   "Entremont",
+   "Kiri",
+   "Président",
+   "Saint Albray",
+   "Société",
+   "Soignon",
+   "Tartare"
+  ],
+  "Charcuterie/Charcuterie libre-service": [
+   "Aoste",
+   "Brocéliande",
+   "Cochonou",
+   "Fleury Michon",
+   "Herta",
+   "Justin Bridou",
+   "Madrange"
+  ],
+  "Traiteur/Traiteur frais": [
+   "Delpeyrat",
+   "Labeyrie",
+   "Montfort",
+   "Rougié"
+  ],
+  "Volaille/Volaille libre-service": [
+   "Delpeyrat",
+   "Duc",
+   "Le Gaulois",
+   "Loué",
+   "Maître CoQ",
+   "Montfort",
+   "Père Dodu",
+   "Rougié"
+  ],
+  "Boucherie/Boucherie libre-service": [
+   "Bigard",
+   "Charal",
+   "Jean Rozé",
+   "Socopa",
+   "Tendriade"
+  ],
+  "Poissonnerie/Poissonnerie libre-service": [
+   "Capitaine Houat",
+   "Delpierre",
+   "Guyader",
+   "Labeyrie",
+   "Ovive"
+  ],
+  "Surgelés/Légumes surgelés": [
+   "Bonduelle",
+   "Findus",
+   "McCain"
+  ],
+  "Surgelés/Plats et pizzas surgelés": [
+   "Findus",
+   "Iglo",
+   "Marie",
+   "Picard"
+  ],
+  "Surgelés/Viandes et poissons surgelés": [
+   "Captain Iglo",
+   "Croustibat",
+   "Findus"
+  ],
+  "Boulangerie/Pain": [
+   "Harrys",
+   "Jacquet",
+   "La Boulangère",
+   "Pasquier"
+  ],
+  "Parfumerie et soins/Toilette et soins du corps": [
+   "Axe",
+   "Cadum",
+   "Dove",
+   "Le Petit Marseillais",
+   "Mennen",
+   "Nivea",
+   "Palmolive",
+   "Rexona",
+   "Sanex"
+  ],
+  "Parfumerie et soins/Cheveux": [
+   "Dop",
+   "Elsève",
+   "Garnier",
+   "Head & Shoulders",
+   "Pantene",
+   "Timotei"
+  ],
+  "Parfumerie et soins/Santé dentaire": [
+   "Colgate",
+   "Elmex",
+   "Oral-B",
+   "Parodontax",
+   "Sensodyne",
+   "Signal"
+  ],
+  "Entretien / Droguerie/Lessives et soin du linge": [
+   "Ariel",
+   "Dash",
+   "Le Chat",
+   "Omo",
+   "Persil",
+   "Skip",
+   "X-Tra"
+  ],
+  "Entretien / Droguerie/Nettoyants ménagers": [
+   "Ajax",
+   "Cif",
+   "Destop",
+   "Harpic",
+   "Mr Propre",
+   "Saint-Marc",
+   "Sanytol"
+  ],
+  "Entretien / Droguerie/Produits Vaisselle": [
+   "Finish",
+   "Mir",
+   "Paic",
+   "Sun"
+  ],
+  "Animaux/Chats": [
+   "Felix",
+   "Friskies",
+   "Gourmet",
+   "Purina One",
+   "Royal Canin",
+   "Sheba",
+   "Whiskas"
+  ],
+  "Animaux/Chiens": [
+   "César",
+   "Frolic",
+   "Hill's",
+   "Pedigree",
+   "Purina",
+   "Royal Canin"
+  ],
+  "Bébé/Hygiène bébé": [
+   "Lotus Baby",
+   "Love & Green",
+   "Pampers"
+  ],
+  "Bébé/Alimentation bébé": [
+   "Babybio",
+   "Blédina",
+   "Gallia",
+   "Guigoz"
+  ],
+  "Bio, vrac et terroir/Diététique et bio": [
+   "Bio Village",
+   "Bjorg",
+   "Bonneterre",
+   "Céréal Bio",
+   "Evernat",
+   "Markal",
+   "Priméal",
+   "Prosain"
+  ]
+ }
+}
