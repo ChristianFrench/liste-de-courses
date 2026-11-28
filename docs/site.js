@@ -6,9 +6,21 @@
   const burger = document.querySelector('.burger'), nav = $('navigation');
   if (burger) burger.addEventListener('click', () => burger.setAttribute('aria-expanded', nav.classList.toggle('ouvert')));
 
-  // Numéro de la version publiée (lu dans l'application web)
+  // Chiffres du catalogue publié (chiffres.json, écrit par la CI) : éléments data-chiffre et textes de Découvrir.
+  const nombre = (n) => Number(n).toLocaleString('fr-FR');
+  window.CHIFFRES = window.CHIFFRES || {};
+  const avecChiffres = (t) => t.replace(/\{(\w+)\}/g, (m, k) => (k in window.CHIFFRES ? nombre(window.CHIFFRES[k]) : m));
+  let rafraichir = () => {};
+  fetch('chiffres.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((c) => {
+    if (!c) return;
+    Object.assign(window.CHIFFRES, c);
+    document.querySelectorAll('[data-chiffre]').forEach((e) => { const v = c[e.dataset.chiffre]; if (v) e.textContent = nombre(v); });
+    rafraichir();
+  }).catch(() => {});
+
+  // Numéro de la version publiée (lu dans l'application web), à partir de la 1.0 annoncée par le site.
   fetch('web/version.json', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : null)).then((v) => {
-    if (!v || !v.version) return;
+    if (!v || !v.version || parseInt(v.version, 10) < 1) return;
     if ($('version')) $('version').textContent = 'Version ' + v.version + '.';
     if ($('basVersion')) $('basVersion').textContent = 'Emplettes · version ' + v.version;
   }).catch(() => {});
@@ -50,10 +62,20 @@
       $('diapos').querySelectorAll('img').forEach((im, k) => im.classList.toggle('visible', k === courant));
       $('points').querySelectorAll('button').forEach((b, k) => b.classList.toggle('actif', k === courant));
       $('compteur').textContent = (courant + 1) + ' / ' + n;
-      $('titreEcran').textContent = e.t;
-      $('texteEcran').textContent = e.x;
-      $('pointsEcran').innerHTML = '';
-      e.p.forEach((t) => { const li = document.createElement('li'); li.textContent = t; $('pointsEcran').appendChild(li); });
+      for (const [titre, texte, points] of [['titreEcran', 'texteEcran', 'pointsEcran'], ['legendeTitre', 'legendeTexte', 'legendePoints']]) {
+        if (!$(titre)) continue;
+        $(titre).textContent = e.t;
+        $(texte).textContent = avecChiffres(e.x);
+        $(points).innerHTML = '';
+        e.p.forEach((t) => { const li = document.createElement('li'); li.textContent = avecChiffres(t); $(points).appendChild(li); });
+      }
+    }
+    rafraichir = () => montrer(courant);
+    // Téléphone : flèches sur l'écran ; l'explication posée sur l'écran montre ses points d'un appui.
+    if ($('flecheGauche')) {
+      $('flecheGauche').addEventListener('click', () => { montrer(courant - 1); auto(); });
+      $('flecheDroite').addEventListener('click', () => { montrer(courant + 1); auto(); });
+      $('legende').addEventListener('click', () => $('legende').classList.toggle('complete'));
     }
     function auto() {
       clearInterval(minuterie);

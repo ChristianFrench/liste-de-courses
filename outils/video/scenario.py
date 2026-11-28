@@ -1,4 +1,4 @@
-"""Vidéo « Emplettes pour les nuls » : minutage, piste son (voix Piper + musique) et timeline pour video.html.
+"""Vidéo d'Emplettes (1.0, 27/11/2026) : minutage, piste son (voix Piper + musique) et timeline pour video.html.
 Usage : python3 outils/video/scenario.py <dossier des voix .wav> <dossier de sortie>
 Les écrans viennent de test/video/ecrans (VIDEO=1 flutter test --update-goldens test/video/ecrans_video_test.dart).
 """
@@ -24,47 +24,29 @@ def tap(t, x, y, double=False):
     return dict(t=t, type='double' if double else 'tap', x=x, y=y)
 
 # (voix, sous-titre, scènes, durée minimale)
+# 27/11/2026 (Aristide : « moins didactique, plus commercial ») : vidéo 1.0, les recettes d'abord, sans parties.
 SEGMENTS = [
-    ('00', 'Emplettes, la liste de courses de tout le foyer.', [dict(type='anim', poids=1)], 14.5),
-    ('t1', None, [dict(type='titre', numero='1', texte='Préparer ensemble')], 0),
-    ('01', 'Emplettes, la liste de courses de tout le foyer.', [tel('v01 Accueil')], 0),
-    ('02', 'Une nouvelle liste : le magasin, et c\'est parti.', [tel('v02 Nouvelle-liste', [tap(1.6, 195, 190)])], 0),
-    ('03', 'Trois lettres suffisent pour trouver un produit.',
-     [tel('v03 Remplir', [tap(0.6, 200, 168)], [(1.3, 'v03 Recherche-c'), (2.0, 'v03 Recherche-ca'), (2.7, 'v03 Recherche-cam')], poids=1.4),
-      tel('v03 Recherche-cam', [tap(0.5, 110, 208)], [(0.9, 'v04 Promo-proposee')], poids=0.6)], 0),
-    ('04', 'Chaque article se range tout seul à sa place dans le magasin.',
-     [tel('v04 Promo-proposee', [tap(0.6, 195, 727)], [(1.0, 'v04 Camembert-range')], poids=0.4),
-      tel('v04 Camembert-range', [tap(2.2, 367, 591)], poids=1, surligne=591)], 0),
-    ('05', 'Une marque, une promotion, un mot pour celui qui part.', [tel('v05 Article', [tap(2.0, 195, 555)])], 0),
-    ('05r', 'Une recette : on coche ses ingrédients, ils s\'ajoutent à la liste.',
-     [tel('v04 Camembert-range', [tap(0.5, 316, 119)], [(0.8, 'v06 Recette-choix')], poids=0.15),
-      tel('v06 Recette-choix', [tap(0.5, 65, 705)], [(0.8, 'v06 Mes-recettes')], poids=0.15),
-      tel('v06 Mes-recettes', [tap(0.7, 195, 727)], [(1.0, 'v06 Recette')], poids=0.2),
-      tel('v06 Recette', [tap(1.4, 195, 726)], [(1.7, 'v06 Recette-ajoutee')], poids=0.25),
-      tel('v06 Recette-ajoutee', poids=0.25)], 9.0),
-    ('06', 'Claire complète la liste depuis son téléphone…',
-     [dict(type='deux', g='v04 Camembert-range', d='v07 Yaourts-arrives', lg='Thomas', ld='Claire', gestes_d=[tap(1.2, 200, 640)])], 0),
-    ('07', '… et Thomas la voit aussitôt.',
-     [dict(type='deux', g='v07 Yaourts-arrives', d='v07 Yaourts-arrives', lg='Thomas', ld='Claire', surligne_g=640)], 0),
-    ('t2', None, [dict(type='titre', numero='2', texte='Faire les courses')], 0),
-    ('08', 'La liste est prête : tout le foyer le sait.', [tel('v08 Liste-prete', [tap(3.2, 195, 726)])], 0),
-    ('09', 'Samedi matin, Thomas part avec la liste.', [tel('v09 Partir', [tap(3.0, 195, 646)])], 0),
-    ('10', 'Un appui : l\'article est dans le chariot.',
-     [tel('v10 En-magasin', [tap(2.0, 25, 316)], [(2.2, 'v10 En-magasin-coche')])], 0),
-    ('11', 'Deux appuis : il manquait en rayon.', [tel('v10 En-magasin-coche', [tap(0.6, 25, 317, True)], [(1.0, 'v11 Manquant')])], 3.6),
-    ('12', 'Claire suit les courses de la maison, et peut encore ajouter.',
-     [dict(type='deux', g='v11 Manquant', d='v12 Courses-suivi', lg='Thomas', ld='Claire')], 0),
-    ('13', 'Terminé : le bilan et le ticket sont gardés.', [tel('v13 Terminer', [tap(3.0, 195, 727)])], 0),
-    ('t3', None, [dict(type='titre', numero='3', texte='Chaque course rend la suivante plus simple')], 0),
-    ('14', 'Repartir d\'une course passée : la liste est presque faite.', [tel('v14 Course-passee', [tap(3.2, 165, 630)])], 0),
-    ('15', 'Vos listes habituelles, gardées pour la prochaine fois.', [tel('v15 Listes-types', [tap(3.0, 150, 675)])], 0),
-    ('16', 'Le parcours du magasin s\'apprend tout seul, en cochant.', [tel('v16 Magasin')], 0),
-    ('17', 'À chaque course, il se complète.', [tel('v16 Parcours')], 0),
-    ('18', 'Un catalogue de plus de 2 000 produits, qui s\'enrichit de vos ajouts.', [tel('v18 Catalogue')], 0),
-    ('19', 'Et il s\'améliore pour tous les foyers.', [tel('v19 Nouveautes', [tap(3.0, 195, 777)])], 0),
-    ('20', 'Inviter un proche : un code, sans compte ni mot de passe.', [dict(type='mail')], 0),
-    ('21', 'Un message au foyer, reçu même application fermée.', [dict(type='notif')], 0),
-    ('22', 'Emplettes, sur Android et sur Windows. Essayez la démonstration sur emplettes.eu.', [dict(type='fin')], 0),
+    ('00', 'Les courses du foyer, de la recette au chariot.', [dict(type='anim', poids=1)], 13.5),
+    ('01', 'Près de 600 recettes faciles, chacune avec sa photo.',
+     [tel('v21 Recettes', [tap(1.2, 195, 181)], [(1.6, 'v21 Recherche')], poids=1),
+      tel('v21 Recherche', [tap(1.0, 195, 417)], [(1.3, 'v22 Fiche')], poids=0.9)], 0),
+    ('02', 'On coche ce qui manque. C\'est noté.', [tel('v22 Fiche', [tap(1.4, 195, 704)], [(1.7, 'v22 Notee')])], 4.6),
+    ('03', 'Un appui : les ingrédients se rangent tout seuls, rayon par rayon.',
+     [tel('v23 Recette-choisie', [tap(1.6, 195, 254)], [(1.9, 'v23 Ingredients')], poids=0.45),
+      tel('v23 Ingredients', [tap(1.3, 195, 726)], [(1.6, 'v23 Ajoutes')], poids=0.35),
+      tel('v23 Ajoutes', poids=0.2)], 0),
+    ('04', 'Trois lettres suffisent : 2\u00a0500 produits, 2\u00a0000 marques.',
+     [tel('v03 Remplir', [tap(0.5, 200, 168)], [(1.0, 'v03 Recherche-c'), (1.5, 'v03 Recherche-ca'), (2.0, 'v03 Recherche-cam')], poids=1.3),
+      tel('v04 Camembert-range', poids=0.7, surligne=262)], 0),
+    ('05', 'Toute la famille, la même liste.',
+     [dict(type='deux', g='v07 Yaourts-arrives', d='v07 Yaourts-arrives', lg='Thomas', ld='Claire', surligne_g=262)], 0),
+    ('06', 'Au magasin, la liste suit vos allées.',
+     [tel('v10 En-magasin', [tap(2.2, 25, 316)], [(2.4, 'v10 En-magasin-coche')])], 0),
+    ('07', 'Votre parcours s\'apprend tout seul.', [tel('v16 Parcours')], 0),
+    ('08', 'Le ticket est gardé, la recette vous attend.',
+     [tel('v13 Terminer', poids=1), tel('v22 Fiche', poids=1)], 0),
+    ('09', 'Sans compte, sans publicité, même sans réseau.', [dict(type='mail')], 0),
+    ('10', 'Emplettes 1.0 : Android, Windows, iPhone et iPad. emplettes.eu', [dict(type='fin')], 0),
 ]
 
 AVANT, APRES = 0.5, 1.1  # silence avant et après chaque voix

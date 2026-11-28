@@ -58,7 +58,7 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `lib/composants/` | éléments d'interface communs (volets, boutons, champs, en-tête, recherche) |
 | `lib/composants/entete.dart` (`Aides`) | textes d'aide : une ligne par point « icône / Titre / phrase courte » séparés par des barres verticales (icônes dans `_iconesAide`) ; `montrerAide` : titre = fonction de l'écran (1re ligne), sections « #À l'écran » et « #Vous pouvez », gestes communs derrière l'icône en haut à droite (24/11/2026) |
 | `outils/` | scripts (icônes, catalogue, site, vidéo, serveur `outils/vps/installer.sh`) |
-| `docs/` | mini-site emplettes.eu (généré par `outils/site/generer.py`) |
+| `docs/` | mini-site emplettes.eu (généré par `outils/site/generer.py` ; chiffres produits/marques/recettes écrits par la CI avec `outils/site/chiffres.py` dans `chiffres.json`, lus par `site.js` ; vidéo : `outils/video/`) |
 | `ihm/` | ordres de travail du fil IHM (voir `CLAUDE.md`) |
 
 ## 3. Le modèle en mémoire : `Etat`

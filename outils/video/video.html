@@ -109,7 +109,7 @@ window.rendre = function (t) {
   let u = 0, sc = seg.scenes[0], t0 = 0;
   for (const s of seg.scenes) { const d = seg.duree * (s.poids || 1) / poidsTotal; if (ts < u + d) { sc = s; t0 = u; break; } u += d; sc = s; t0 = u - d; }
   const tl = ts - t0;
-  const partie = seg.voix >= '14' && seg.voix <= '22' ? 'Partie 3' : seg.voix >= '08' && seg.voix <= '13' ? 'Partie 2' : seg.voix >= '01' && seg.voix <= '07' ? 'Partie 1' : '';
+  const partie = ''; // 27/11/2026 : vidéo 1.0, plus commerciale, sans parties
   const th = VERTICAL ? 760 : 620;
   if (sc.type === 'titre') {
     const d = document.createElement('div'); d.className = 'titre';
@@ -126,7 +126,7 @@ window.rendre = function (t) {
     if (ts > 9) {
       const tx = document.createElement('div');
       tx.style.cssText = `position:absolute;left:0;right:0;text-align:center;top:${VERTICAL ? 900 : 520}px;opacity:${Math.min(1, (ts - 9) * 2)}`;
-      tx.innerHTML = `<div style="font-size:${VERTICAL ? 78 : 64}px;font-weight:700">Emplettes</div><div style="font-size:${VERTICAL ? 34 : 28}px;margin-top:6px">La liste de courses de tout le foyer</div>`;
+      tx.innerHTML = `<div style="font-size:${VERTICAL ? 78 : 64}px;font-weight:700">Emplettes</div><div style="font-size:${VERTICAL ? 34 : 28}px;margin-top:6px">Les courses du foyer, de la recette au chariot</div>`;
       scene.appendChild(tx);
     }
     return;
@@ -135,8 +135,9 @@ window.rendre = function (t) {
     const d = document.createElement('div'); d.className = 'titre';
     d.innerHTML = `<img src="${img('images/complet.png')}" style="width:${VERTICAL ? 300 : 220}px">
       <div style="font-size:${VERTICAL ? 76 : 64}px;font-weight:700">Emplettes</div>
+      <div style="font-size:${VERTICAL ? 30 : 26}px;opacity:.9">Version 1.0</div>
       <div style="font-size:${VERTICAL ? 40 : 34}px">emplettes.eu</div>
-      <div style="display:flex;gap:14px;margin-top:8px">${['Android', 'Windows', 'Démo en ligne'].map(p => `<span style="border:2px solid #fff;border-radius:30px;padding:6px 18px;font-size:${VERTICAL ? 28 : 22}px">${p}</span>`).join('')}</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:8px">${['Android', 'Windows', 'iPhone et iPad', 'Démo en ligne'].map(p => `<span style="border:2px solid #fff;border-radius:30px;padding:6px 18px;font-size:${VERTICAL ? 28 : 22}px">${p}</span>`).join('')}</div>
       <div style="font-size:${VERTICAL ? 24 : 18}px;opacity:.75;margin-top:6px">Voix de synthèse Piper (Siwis, CC BY 4.0)</div>`;
     scene.appendChild(d); return;
   }

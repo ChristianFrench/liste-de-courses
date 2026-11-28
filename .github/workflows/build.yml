@@ -326,6 +326,8 @@ jobs:
         run: |
           mkdir site
           cp -r docs/. site/
+          # Chiffres du site (produits, marques, recettes) lus dans le catalogue publié (27/11/2026).
+          python3 outils/site/chiffres.py site/chiffres.json || true
           cp -r build/web site/web
           cp -r build/demo site/demo
           touch site/.nojekyll

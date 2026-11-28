@@ -2,6 +2,7 @@
 // À la demande : ECRANS=1 flutter test --update-goldens test/site/ecrans_site_test.dart
 // (les images vont dans test/site/ecrans ; outils/site/ecrans.py les convertit pour docs/ecrans).
 
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -78,8 +79,12 @@ void main() {
       await e.ajouterMagasinsEnseignes();
       e.remplirDemonstration();
       await Synchro.instance.choisirSeul();
+      // 28/11/2026 : les recettes lues avant l'application (l'onglet Recettes les charge dès le lancement).
+      await recettesFournies();
     });
     e.enregistrementActif = false;
+    BarreOnglets.masquageAuDefilement = false; // la barre des onglets reste en place sur les écrans
+    debugPrint('ÉTAPE chargé');
     Nav.i.reinitialiser();
 
     tester.view.physicalSize = const Size(780, 1688);
@@ -93,15 +98,35 @@ void main() {
       final ctx = tester.element(find.byType(Scaffold).first);
       // 10/11/2026 : toutes les images (pictos maison, symboles, images d'Emplettes, fonds), sinon certaines manquent sur les écrans.
       for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
-        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
+        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) {
+          await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {}).timeout(const Duration(seconds: 3), onTimeout: () => debugPrint('IMAGE lente ${f.path}'));
+        }
       }
       // 17/11/2026 : la recette montrée sur le site, et le catalogue des recettes.
       await precacheImage(const AssetImage('assets/recettes/illustrations/quiche-lorraine.webp'), ctx, onError: (_, __) {});
-      await recettesFournies();
     });
+    debugPrint('ÉTAPE images');
     await tester.pumpAndSettle();
+    debugPrint('ÉTAPE prêt');
 
     await _capture('01 Accueil');
+    // 27/11/2026 : l'onglet Recettes et la fiche d'une recette (le site 1.0 met les recettes en avant).
+    await _essayer('Recettes', () async {
+      await _toucher(tester, _onglet('Recettes'));
+      await _capture('18 Recettes');
+      await tester.enterText(find.byKey(const ValueKey('chercher-recette')).hitTestable().first, 'quiche lorraine');
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.byKey(const ValueKey('fiche-Quiche lorraine')).hitTestable().first);
+      await _capture('18 Fiche');
+      await _toucher(tester, find.byTooltip('Retour'));
+      await tester.enterText(find.byKey(const ValueKey('chercher-recette')).hitTestable().first, '');
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+    });
     await _essayer('Préparer', () async {
       await _toucher(tester, _onglet('Préparer'));
       await _capture('02 Preparer');

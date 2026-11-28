@@ -15,6 +15,7 @@ import 'dart:async';
 
 import 'package:liste_de_courses/ecrans/coquille.dart';
 import 'package:liste_de_courses/ecrans/editeur_catalogue.dart';
+import 'package:liste_de_courses/composants/composants.dart' show Retractables;
 import 'package:liste_de_courses/main.dart';
 import 'package:liste_de_courses/navigation.dart';
 
@@ -81,8 +82,12 @@ void main() {
       await e.ajouterMagasinsEnseignes();
       e.remplirDemonstration();
       await Synchro.instance.choisirSeul();
+      // 28/11/2026 : les recettes lues avant l'application (l'onglet Recettes les charge dès le lancement).
+      await recettesFournies();
     });
     e.enregistrementActif = false;
+    BarreOnglets.masquageAuDefilement = false; // la barre des onglets reste en place sur les écrans
+    debugPrint('ÉTAPE chargé');
     // La vidéo ajoute elle-même le camembert (Thomas) et les yaourts (Claire).
     final semaine = e.listes.firstWhere((l) => l.nom == 'Courses de la semaine');
     String nomDe(LigneListe g) => e.produit(g.produitId)?.nom ?? '';
@@ -101,14 +106,45 @@ void main() {
       final ctx = tester.element(find.byType(Scaffold).first);
       // 10/11/2026 : toutes les images (pictos maison, symboles, images d'Emplettes, fonds), sinon certaines manquent sur les écrans.
       for (final f in Directory('assets').listSync(recursive: true).whereType<File>()) {
-        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {});
+        if (f.path.endsWith('.png') || f.path.endsWith('.jpg')) {
+          await precacheImage(AssetImage(f.path), ctx, onError: (_, __) {}).timeout(const Duration(seconds: 3), onTimeout: () => debugPrint('IMAGE lente ${f.path}'));
+        }
       }
       await precacheImage(const AssetImage('assets/recettes/illustrations/quiche-lorraine.webp'), ctx, onError: (_, __) {});
-      await recettesFournies();
     });
+    debugPrint('ÉTAPE images');
     await tester.pumpAndSettle();
+    debugPrint('ÉTAPE prêt');
 
     await _capture('v01 Accueil');
+    void position(String nom, Finder f) => debugPrint('POSITION $nom ${tester.getCenter(f)}');
+    // 27/11/2026 : vidéo 1.0, les recettes d'abord : l'onglet Recettes, la fiche, « Noter les ingrédients ».
+    await _essayer('Recettes', () async {
+      position('onglet-recettes', _onglet('Recettes'));
+      await _toucher(tester, _onglet('Recettes'));
+      await _capture('v21 Recettes');
+      position('chercher', find.byKey(const ValueKey('chercher-recette')).hitTestable().first);
+      await tester.enterText(find.byKey(const ValueKey('chercher-recette')).hitTestable().first, 'quiche lorraine');
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+      await _capture('v21 Recherche');
+      position('fiche', find.byKey(const ValueKey('fiche-Quiche lorraine')).hitTestable().first);
+      await _toucher(tester, find.byKey(const ValueKey('fiche-Quiche lorraine')).hitTestable().first);
+      await _capture('v22 Fiche');
+      position('noter', find.byKey(const ValueKey('noter-ingredients')));
+      await _toucher(tester, find.byKey(const ValueKey('noter-ingredients')));
+      await tester.pump(const Duration(milliseconds: 600));
+      await _capture('v22 Notee');
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pumpAndSettle();
+      await _toucher(tester, find.byTooltip('Retour'));
+      await tester.enterText(find.byKey(const ValueKey('chercher-recette')).hitTestable().first, '');
+      await tester.pumpAndSettle();
+      FocusManager.instance.primaryFocus?.unfocus();
+      await tester.pumpAndSettle();
+    });
     await _essayer('Nouvelle liste', () async {
       await _toucher(tester, _onglet('Préparer'));
       await _toucher(tester, find.text('Nouvelle liste'));
@@ -138,33 +174,36 @@ void main() {
         await tester.tapAt(const Offset(195, 20));
         await tester.pumpAndSettle();
       });
-      // 17/11/2026 : une recette, ses ingrédients ajoutés (puis retirés, pour la suite de la vidéo).
-      await _essayer('Recette', () async {
+      // 27/11/2026 : la recette notée, en tête de la liste : un appui, ses ingrédients cochés, « Ajouter à la liste »
+      // (puis retirés, pour la suite de la vidéo).
+      await _essayer('Recette notée', () async {
         final avant = [...semaine.lignes];
-        void position(String nom, Finder f) => debugPrint('POSITION $nom ${tester.getCenter(f)}');
-        position('bouton-recette', find.byKey(const ValueKey('bouton-recette')));
-        await _toucher(tester, find.byKey(const ValueKey('bouton-recette')));
-        await _capture('v06 Recette-choix');
-        position('mes-recettes', find.text('Mes recettes').last);
-        await _toucher(tester, find.text('Mes recettes').last);
-        await tester.enterText(find.byKey(const ValueKey('filtre-recettes')), 'quiche');
+        final quiche = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('recette-choisie-'));
+        if (!Retractables.i.ouvert('preparer/recettes')) Retractables.i.basculer('preparer/recettes');
         await tester.pumpAndSettle();
-        FocusManager.instance.primaryFocus?.unfocus();
+        debugPrint('RECETTES ${quiche.evaluate().length} ${Retractables.i.ouvert('preparer/recettes')}');
+        await tester.scrollUntilVisible(find.byKey(const ValueKey('recettes-choisies')), -300,
+            scrollable: find.byWidgetPredicate((w) => w is Scrollable && axisDirectionToAxis(w.axisDirection) == Axis.vertical).first);
         await tester.pumpAndSettle();
-        await _capture('v06 Mes-recettes');
-        position('quiche', find.byKey(const ValueKey('recette-Quiche lorraine')));
-        await _toucher(tester, find.byKey(const ValueKey('recette-Quiche lorraine')));
-        await _capture('v06 Recette');
+        await tester.drag(find.byKey(const ValueKey('recettes-choisies')), const Offset(0, 400));
+        await tester.pumpAndSettle();
+        final lignesRecette = find.byWidgetPredicate((w) => w.key is ValueKey<String> && (w.key! as ValueKey<String>).value.startsWith('recette-choisie-'));
+        debugPrint('RECETTES lignes ${lignesRecette.evaluate().length} bandeaux ${find.byKey(const ValueKey('recettes-choisies')).evaluate().length}');
+        await _capture('v23 Recette-choisie');
+        position('quiche', quiche.first);
+        await _toucher(tester, quiche.first);
+        await _capture('v23 Ingredients');
         position('ajouter', find.text('Ajouter à la liste'));
         await _toucher(tester, find.text('Ajouter à la liste'));
         await tester.pump(const Duration(seconds: 1));
         await tester.pumpAndSettle();
-        await _capture('v06 Recette-ajoutee');
+        await _capture('v23 Ajoutes');
+        await tester.pump(const Duration(seconds: 6));
+        await tester.pumpAndSettle();
         semaine.lignes
           ..clear()
           ..addAll(avant);
         e.modifie();
-        await tester.pump(const Duration(seconds: 5));
         await tester.pumpAndSettle();
       });
       // Claire ajoute les yaourts depuis son téléphone.
@@ -269,6 +308,11 @@ void main() {
       await tester.pumpAndSettle();
       await _capture('v19 Nouveautes');
       await _toucher(tester, find.text('Fermer'));
+    });
+    await _essayer('Accueil, la recette à cuisiner', () async {
+      await _toucher(tester, _onglet('Accueil'));
+      await _toucher(tester, _onglet('Accueil'));
+      await _capture('v24 Accueil-recette');
     });
     await _essayer('Foyer', () async {
       await _toucher(tester, _onglet('Gérer'));
