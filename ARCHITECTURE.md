@@ -57,7 +57,7 @@ derniers messages, et ne sait rien lire, car tout est chiffré par foyer.
 | `lib/donnees/recettes_communes.dart`, `lib/ecrans/console_recettes_edition.dart` | catalogue des recettes versionné (20/11/2026) : modification dans la console, journal (`journal.json` de la base), « Généraliser » publie l'index signé `ldc/recettes-communes` et les images `ldc/recettes-images/<empreinte>` |
 | `lib/composants/` | éléments d'interface communs (volets, boutons, champs, en-tête, recherche) |
 | `lib/composants/entete.dart` (`Aides`) | textes d'aide : une ligne par point « icône / Titre / phrase courte » séparés par des barres verticales (icônes dans `_iconesAide`) ; `montrerAide` : titre = fonction de l'écran (1re ligne), sections « #À l'écran » et « #Vous pouvez », gestes communs derrière l'icône en haut à droite (24/11/2026) |
-| `outils/` | scripts (icônes, catalogue, site, vidéo, serveur `outils/vps/installer.sh`) |
+| `outils/` | scripts (icônes, catalogue, site, vidéo, documents de version `outils/documents/odt_version.py`, serveur `outils/vps/installer.sh`) |
 | `docs/` | mini-site emplettes.eu (généré par `outils/site/generer.py` ; chiffres produits/marques/recettes écrits par la CI avec `outils/site/chiffres.py` dans `chiffres.json`, lus par `site.js` ; vidéo : `outils/video/`) |
 | `ihm/` | ordres de travail du fil IHM (voir `CLAUDE.md`) |
 
